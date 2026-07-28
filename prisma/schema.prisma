@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  mobile    String   @unique
+  email     String?  @unique
+  password  String   @default("")
+  role      String   @default("PATIENT") // PATIENT, DOCTOR, ADMIN
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patientProfile PatientProfile?
+  doctorProfile  DoctorProfile?
+  asPatient      Appointment[]   @relation("PatientAppointments")
+  asDoctor       Appointment[]   @relation("DoctorAppointments")
+  complaints     Complaint[]
+  reviewsGiven   Review[]        @relation("PatientReviews")
+  reviewsReceived Review[]       @relation("DoctorReviews")
+}
+
+model PatientProfile {
+  id       String  @id @default(cuid())
+  userId   String  @unique
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  age      Int
+  gender   String
+  location String?
+}
+
+model DoctorProfile {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photoUrl      String?
+  qualification String
+  medRegNo      String  @unique
+  specialty     String
+  experience    Int
+  consultFee    Float   @default(0)
+  homeVisitFee  Float   @default(0)
+  availability  String  @default("Mon-Fri, 9AM-5PM")
+  radius        Int     @default(10)
+  lat           Float?
+  lng           Float?
+  languages     String  @default("English, Hindi")
+  isVerified    Boolean @default(false)
+  avgRating     Float   @default(0)
+  totalReviews  Int     @default(0)
+  bankDetails   String?
+  status        String  @default("PENDING") // PENDING, APPROVED, REJECTED, SUSPENDED
+}
+
+model Appointment {
+  id            String    @id @default(cuid())
+  patientId     String
+  patient       User      @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctorId      String
+  doctor        User      @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  symptoms      String
+  consultType   String    @default("CLINIC") // CLINIC, HOME, VIDEO
+  status        String    @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  paymentMethod String    @default("ONLINE") // ONLINE, CASH
+  isEmergency   Boolean   @default(false)
+  amount        Float     @default(0)
+  platformFee   Float     @default(0)
+  prescriptionUrl String?
+  followUpOfId  String?
+  followUpOf    Appointment? @relation("FollowUp", fields: [followUpOfId], references: [id])
+  followUps     Appointment[] @relation("FollowUp")
+  scheduledAt   DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  review        Review?
+}
+
+model Review {
+  id            String      @id @default(cuid())
+  patientId     String
+  patient       User        @relation("PatientReviews", fields: [patientId], references: [id])
+  doctorId      String
+  doctor        User        @relation("DoctorReviews", fields: [doctorId], references: [id])
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  rating        Int         // 1–5
+  comment       String?
+  createdAt     DateTime    @default(now())
+}
+
+model Complaint {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  subject     String
+  description String
+  status      String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
+  createdAt   DateTime @default(now())
+}
+
+model PlatformSettings {
+  id                String   @id @default(cuid())
+  commissionPercent Float    @default(10)
+  updatedAt         DateTime @updatedAt
+}
