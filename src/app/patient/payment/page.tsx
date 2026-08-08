@@ -15,16 +15,27 @@ const PAYMENT_METHODS = [
 function PaymentContent() {
   const searchParams = useSearchParams();
   const amount = Number(searchParams.get("amount") ?? 500);
+  const apptId = searchParams.get("apptId");
   const platformFee = Math.round(amount * 0.1);
   const total = amount + platformFee;
 
   const [method, setMethod] = useState("UPI");
   const [processing, setProcessing] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [error, setError] = useState("");
 
-  const pay = () => {
+  const pay = async () => {
+    if (!apptId) { setError("Missing appointment reference."); return; }
     setProcessing(true);
-    setTimeout(() => { setProcessing(false); setPaid(true); }, 2000);
+    setError("");
+    const res = await fetch("/api/payments/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appointmentId: apptId, method }),
+    });
+    setProcessing(false);
+    if (res.ok) setPaid(true);
+    else setError("Payment failed. Please try again.");
   };
 
   if (paid) {
@@ -35,7 +46,7 @@ function PaymentContent() {
         </div>
         <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Payment Successful!</h2>
         <p className="text-slate-500 mb-2">₹{total} paid via {method}</p>
-        <p className="text-sm text-slate-400 mb-8">Your doctor will be notified. You'll receive a confirmation SMS shortly.</p>
+        <p className="text-sm text-slate-400 mb-8">Your doctor will be notified. You&apos;ll receive a confirmation SMS shortly.</p>
         <Link href="/" className="btn-primary w-full justify-center py-3.5">Return to Home</Link>
       </div>
     );
@@ -79,6 +90,13 @@ function PaymentContent() {
         ))}
       </div>
 
+      {error && (
+        <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+          {error}
+        </div>
+      )}
+
       <button onClick={pay} disabled={processing} className="btn-primary w-full justify-center py-3.5 text-base">
         {processing
           ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
@@ -101,6 +119,9 @@ export default function PatientPayment() {
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900">Complete Payment</h1>
           <p className="text-slate-500 mt-2">Secure and encrypted payment gateway.</p>
+          <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-0.5">
+            Sandbox Payment Gateway — no real money moves
+          </span>
         </div>
         <Suspense fallback={<div className="bg-white rounded-2xl p-8 text-center text-slate-400">Loading…</div>}>
           <PaymentContent />

@@ -2,8 +2,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Heart, Menu, X, LogIn, UserPlus } from "lucide-react";
+import { Heart, Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/AuthProvider";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -11,9 +12,17 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ];
 
+const ROLE_HOME: Record<string, string> = {
+  ADMIN: "/admin",
+  DOCTOR: "/doctor/dashboard",
+  PATIENT: "/patient/dashboard",
+};
+
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { user, loading, logout } = useAuth();
+  const dashboardHref = user ? ROLE_HOME[user.role] ?? "/" : "/";
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/20 bg-white/90 backdrop-blur-xl">
@@ -49,12 +58,25 @@ export default function Navbar() {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-2">
-          <Link href="/login" className="btn-ghost gap-1.5">
-            <LogIn className="w-4 h-4" /> Sign In
-          </Link>
-          <Link href="/patient/register" className="btn-primary gap-1.5">
-            <UserPlus className="w-4 h-4" /> Register Free
-          </Link>
+          {loading ? null : user ? (
+            <>
+              <Link href={dashboardHref} className="btn-ghost gap-1.5">
+                <LayoutDashboard className="w-4 h-4" /> {user.name}
+              </Link>
+              <button onClick={logout} className="btn-primary gap-1.5">
+                <LogOut className="w-4 h-4" /> Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="btn-ghost gap-1.5">
+                <LogIn className="w-4 h-4" /> Sign In
+              </Link>
+              <Link href="/patient/register" className="btn-primary gap-1.5">
+                <UserPlus className="w-4 h-4" /> Register Free
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -75,8 +97,24 @@ export default function Navbar() {
             </Link>
           ))}
           <div className="pt-3 flex flex-col gap-2">
-            <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary justify-center">Sign In</Link>
-            <Link href="/patient/register" onClick={() => setOpen(false)} className="btn-primary justify-center">Register Free</Link>
+            {loading ? null : user ? (
+              <>
+                <Link href={dashboardHref} onClick={() => setOpen(false)} className="btn-secondary justify-center">
+                  {user.name}&apos;s Dashboard
+                </Link>
+                <button
+                  onClick={() => { setOpen(false); logout(); }}
+                  className="btn-primary justify-center"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary justify-center">Sign In</Link>
+                <Link href="/patient/register" onClick={() => setOpen(false)} className="btn-primary justify-center">Register Free</Link>
+              </>
+            )}
           </div>
         </div>
       )}

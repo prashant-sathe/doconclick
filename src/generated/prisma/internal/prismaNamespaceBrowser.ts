@@ -55,6 +55,9 @@ export const ModelName = {
   PatientProfile: 'PatientProfile',
   DoctorProfile: 'DoctorProfile',
   Appointment: 'Appointment',
+  Message: 'Message',
+  PrescriptionMedicine: 'PrescriptionMedicine',
+  Review: 'Review',
   Complaint: 'Complaint',
   PlatformSettings: 'PlatformSettings'
 } as const
@@ -94,7 +97,22 @@ export const PatientProfileScalarFieldEnum = {
   userId: 'userId',
   age: 'age',
   gender: 'gender',
-  location: 'location'
+  location: 'location',
+  homeAddress: 'homeAddress',
+  landmark: 'landmark',
+  pinCode: 'pinCode',
+  bloodGroup: 'bloodGroup',
+  height: 'height',
+  weight: 'weight',
+  allergies: 'allergies',
+  chronicDiseases: 'chronicDiseases',
+  medications: 'medications',
+  surgeries: 'surgeries',
+  emergencyContactName: 'emergencyContactName',
+  emergencyContactPhone: 'emergencyContactPhone',
+  photoUrl: 'photoUrl',
+  lat: 'lat',
+  lng: 'lng'
 } as const
 
 export type PatientProfileScalarFieldEnum = (typeof PatientProfileScalarFieldEnum)[keyof typeof PatientProfileScalarFieldEnum]
@@ -114,8 +132,19 @@ export const DoctorProfileScalarFieldEnum = {
   radius: 'radius',
   lat: 'lat',
   lng: 'lng',
+  languages: 'languages',
+  offersHomeVisit: 'offersHomeVisit',
+  isVerified: 'isVerified',
+  avgRating: 'avgRating',
+  totalReviews: 'totalReviews',
   bankDetails: 'bankDetails',
-  status: 'status'
+  status: 'status',
+  registrationFeePaid: 'registrationFeePaid',
+  registrationFeeStatus: 'registrationFeeStatus',
+  medRegCertUrl: 'medRegCertUrl',
+  degreeCertUrl: 'degreeCertUrl',
+  kycDocUrl: 'kycDocUrl',
+  address: 'address'
 } as const
 
 export type DoctorProfileScalarFieldEnum = (typeof DoctorProfileScalarFieldEnum)[keyof typeof DoctorProfileScalarFieldEnum]
@@ -126,15 +155,64 @@ export const AppointmentScalarFieldEnum = {
   patientId: 'patientId',
   doctorId: 'doctorId',
   symptoms: 'symptoms',
+  allergies: 'allergies',
+  consentGiven: 'consentGiven',
   consultType: 'consultType',
   status: 'status',
+  paymentMethod: 'paymentMethod',
+  paymentStatus: 'paymentStatus',
+  isEmergency: 'isEmergency',
   amount: 'amount',
   platformFee: 'platformFee',
+  prescriptionUrl: 'prescriptionUrl',
+  doctorNotes: 'doctorNotes',
+  travelStatus: 'travelStatus',
+  doctorLat: 'doctorLat',
+  doctorLng: 'doctorLng',
+  doctorLocationUpdatedAt: 'doctorLocationUpdatedAt',
+  followUpOfId: 'followUpOfId',
   scheduledAt: 'scheduledAt',
   createdAt: 'createdAt'
 } as const
 
 export type AppointmentScalarFieldEnum = (typeof AppointmentScalarFieldEnum)[keyof typeof AppointmentScalarFieldEnum]
+
+
+export const MessageScalarFieldEnum = {
+  id: 'id',
+  appointmentId: 'appointmentId',
+  senderId: 'senderId',
+  text: 'text',
+  createdAt: 'createdAt'
+} as const
+
+export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const PrescriptionMedicineScalarFieldEnum = {
+  id: 'id',
+  appointmentId: 'appointmentId',
+  name: 'name',
+  dosage: 'dosage',
+  frequency: 'frequency',
+  duration: 'duration',
+  instructions: 'instructions'
+} as const
+
+export type PrescriptionMedicineScalarFieldEnum = (typeof PrescriptionMedicineScalarFieldEnum)[keyof typeof PrescriptionMedicineScalarFieldEnum]
+
+
+export const ReviewScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  doctorId: 'doctorId',
+  appointmentId: 'appointmentId',
+  rating: 'rating',
+  comment: 'comment',
+  createdAt: 'createdAt'
+} as const
+
+export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]
 
 
 export const ComplaintScalarFieldEnum = {

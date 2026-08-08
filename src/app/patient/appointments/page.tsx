@@ -1,0 +1,377 @@
+"use client";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  Loader2, CalendarClock, Stethoscope, Home, Building2, Video,
+  FileText, Star, X, Wallet, CreditCard, Siren, RotateCcw, Clock,
+  Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin,
+  MessageCircle,
+} from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
+import { cn } from "@/lib/utils";
+import PatientHeader from "@/components/patient/PatientHeader";
+import PatientMobileNav from "@/components/patient/PatientMobileNav";
+
+interface Medicine {
+  id: string;
+  name: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  instructions: string | null;
+}
+
+interface Appointment {
+  id: string;
+  doctorId: string;
+  status: string;
+  consultType: string;
+  symptoms: string;
+  amount: number;
+  paymentMethod: string;
+  paymentStatus: string;
+  isEmergency: boolean;
+  travelStatus: string;
+  prescriptionUrl: string | null;
+  doctorNotes: string | null;
+  scheduledAt: string;
+  doctor: { name: string; doctorProfile: { specialty: string } | null };
+  review: { id: string; rating: number; comment: string | null } | null;
+  medicines: Medicine[];
+}
+
+const TYPE_ICON: Record<string, React.ElementType> = { HOME: Home, CLINIC: Building2, VIDEO: Video };
+
+const STATUS_BADGE: Record<string, string> = {
+  PENDING_APPROVAL: "badge badge-warning",
+  SCHEDULED: "badge badge-info",
+  COMPLETED: "badge badge-success",
+  CANCELLED: "badge badge-gray",
+  REJECTED: "badge badge-danger",
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  PENDING_APPROVAL: "Waiting for doctor",
+  SCHEDULED: "Confirmed",
+  COMPLETED: "Completed",
+  CANCELLED: "Cancelled",
+  REJECTED: "Declined",
+};
+
+function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: string; onClose: () => void; onSubmitted: () => void }) {
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const submit = async () => {
+    setBusy(true);
+    setError("");
+    const res = await fetch("/api/reviews", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appointmentId, rating, comment }),
+    });
+    setBusy(false);
+    if (res.ok) onSubmitted();
+    else setError((await res.json()).error ?? "Could not submit review.");
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-extrabold text-slate-900">Leave a Review</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="flex justify-center gap-1.5 mb-4">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <button key={s} type="button" onClick={() => setRating(s)}>
+              <Star className={cn("w-8 h-8", s <= rating ? "fill-amber-400 text-amber-400" : "fill-slate-100 text-slate-200")} />
+            </button>
+          ))}
+        </div>
+        <textarea
+          rows={3}
+          className="input-field resize-none mb-4"
+          placeholder="Share your experience (optional)…"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+        {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+        <button onClick={submit} disabled={busy} className="btn-primary w-full justify-center py-3">
+          {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting…</> : "Submit Review"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AppointmentCard({ a, onCancel, onReview }: {
+  a: Appointment;
+  onCancel: (id: string) => void;
+  onReview: (id: string) => void;
+}) {
+  const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
+  const router = useRouter();
+  const needsPayment = a.status === "SCHEDULED" && a.paymentMethod === "ONLINE" && a.paymentStatus === "PENDING";
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div className="flex items-start gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+            <Icon className="w-5 h-5 text-blue-600" />
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-slate-900 flex items-center gap-2 flex-wrap">
+              {a.doctor.name}
+              {a.isEmergency && (
+                <span className="badge badge-danger"><Siren className="w-3 h-3" /> Emergency</span>
+              )}
+            </div>
+            <div className="text-xs text-slate-500 mt-0.5">{a.doctor.doctorProfile?.specialty ?? ""}</div>
+            <div className="text-xs text-slate-400 mt-0.5">
+              {new Date(a.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+          <span className={STATUS_BADGE[a.status] ?? "badge badge-gray"}>{STATUS_LABEL[a.status] ?? a.status}</span>
+          <span className="text-sm font-bold text-slate-800">₹{a.amount}</span>
+        </div>
+      </div>
+
+      <p className="text-sm text-slate-600 mb-3">{a.symptoms}</p>
+
+      {a.status === "PENDING_APPROVAL" && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center gap-2">
+          <Clock className="w-4 h-4 flex-shrink-0" /> Waiting for {a.doctor.name} to accept this request.
+        </div>
+      )}
+      {a.status === "REJECTED" && (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
+          <ThumbsDown className="w-4 h-4 flex-shrink-0 text-slate-400" /> {a.doctor.name} was unable to accept this request. No payment was taken.
+        </div>
+      )}
+      {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
+        <Link
+          href={`/patient/track/${a.id}`}
+          className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 mb-3 flex items-center justify-between gap-2 hover:bg-emerald-100 transition-colors"
+        >
+          <span className="flex items-center gap-2">
+            <Car className="w-4 h-4 flex-shrink-0" /> {a.doctor.name} is on the way
+          </span>
+          <span className="font-semibold underline flex items-center gap-1">
+            <MapPin className="w-3.5 h-3.5" /> Track Live
+          </span>
+        </Link>
+      )}
+      {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
+          <MapPinCheck className="w-4 h-4 flex-shrink-0" /> {a.doctor.name} has arrived.
+        </div>
+      )}
+
+      <div className="flex items-center gap-2 flex-wrap mb-3">
+        <span className="badge badge-gray">
+          {a.paymentMethod === "ONLINE" ? <CreditCard className="w-3 h-3" /> : <Wallet className="w-3 h-3" />}
+          {a.paymentMethod === "ONLINE" ? "Online" : "Cash"}
+        </span>
+        {a.status !== "REJECTED" && a.status !== "PENDING_APPROVAL" && (
+          <span className={cn("badge", a.paymentStatus === "PAID" ? "badge-success" : "badge-warning")}>
+            {a.paymentStatus}
+          </span>
+        )}
+      </div>
+
+      {a.doctorNotes && (
+        <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-600 mb-3">
+          <span className="font-semibold text-slate-700">Doctor&apos;s notes: </span>{a.doctorNotes}
+        </div>
+      )}
+
+      {a.status === "COMPLETED" && a.medicines.length > 0 && (
+        <div className="border border-slate-100 rounded-xl overflow-hidden mb-3">
+          <div className="bg-slate-50 px-3 py-2 flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <Pill className="w-3.5 h-3.5" /> Prescription
+          </div>
+          <div className="divide-y divide-slate-50">
+            {a.medicines.map((m) => (
+              <div key={m.id} className="px-3 py-2 text-sm">
+                <span className="font-semibold text-slate-800">{m.name}</span>
+                <span className="text-slate-500"> — {[m.dosage, m.frequency, m.duration].filter(Boolean).join(" · ")}</span>
+                {m.instructions && <div className="text-xs text-slate-400 mt-0.5">{m.instructions}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex gap-2 flex-wrap">
+        {(a.status === "SCHEDULED" || a.status === "PENDING_APPROVAL") && (
+          <button onClick={() => onCancel(a.id)} className="btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
+            Cancel {a.status === "PENDING_APPROVAL" ? "Request" : "Appointment"}
+          </button>
+        )}
+        {needsPayment && (
+          <Link href={`/patient/payment?amount=${a.amount}&apptId=${a.id}`} className="btn-primary py-2 px-3 text-xs">
+            <CardIcon className="w-3.5 h-3.5" /> Pay Now
+          </Link>
+        )}
+        {(a.status === "SCHEDULED" || a.status === "COMPLETED") && (
+          <Link href={`/patient/chat/${a.id}`} className="btn-secondary py-2 px-3 text-xs">
+            <MessageCircle className="w-3.5 h-3.5" /> Chat
+          </Link>
+        )}
+        {a.status === "COMPLETED" && a.prescriptionUrl && (
+          <a href={a.prescriptionUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary py-2 px-3 text-xs">
+            <FileText className="w-3.5 h-3.5" /> View Attached File
+          </a>
+        )}
+        {a.status === "COMPLETED" && !a.review && (
+          <button onClick={() => onReview(a.id)} className="btn-secondary py-2 px-3 text-xs">
+            <Star className="w-3.5 h-3.5" /> Leave a Review
+          </button>
+        )}
+        {a.review && (
+          <span className="text-xs text-slate-500 flex items-center gap-1 py-2">
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> You rated {a.review.rating}/5
+          </span>
+        )}
+        {a.status === "COMPLETED" && (
+          <button
+            onClick={() => router.push(`/patient/book?doctorId=${a.doctorId}&followUpOf=${a.id}`)}
+            className="btn-secondary py-2 px-3 text-xs"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> Book Follow-up
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function PatientAppointments() {
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [reviewFor, setReviewFor] = useState<string | null>(null);
+
+  const load = useCallback(() => {
+    setLoading(true);
+    fetch("/api/appointments/me")
+      .then((r) => r.json())
+      .then((d) => { setAppointments(d); setLoading(false); });
+  }, []);
+
+  useEffect(() => {
+    if (!authLoading && !user) router.push("/login?next=/patient/appointments");
+    if (!authLoading && user && user.role !== "PATIENT") router.push("/login");
+  }, [authLoading, user, router]);
+
+  useEffect(() => { if (user?.role === "PATIENT") load(); }, [user, load]);
+
+  const cancelAppointment = async (id: string) => {
+    await fetch(`/api/appointments/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "CANCELLED" }),
+    });
+    load();
+  };
+
+  if (authLoading || !user || user.role !== "PATIENT") {
+    return <div className="min-h-screen gradient-surface flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+    </div>;
+  }
+
+  const pending = appointments
+    .filter((a) => a.status === "PENDING_APPROVAL")
+    .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
+  const upcoming = appointments
+    .filter((a) => a.status === "SCHEDULED")
+    .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
+  const past = appointments
+    .filter((a) => !["PENDING_APPROVAL", "SCHEDULED"].includes(a.status))
+    .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
+
+  return (
+    <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
+      <PatientHeader />
+      <PatientMobileNav />
+      <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
+        <div className="mb-8">
+          <h1 className="text-2xl font-extrabold text-slate-900">My Appointments</h1>
+          <p className="text-slate-500 text-sm">Track requests, upcoming visits, and past consultations.</p>
+        </div>
+
+        {loading ? (
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-28 rounded-2xl" />)}
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {pending.length > 0 && (
+              <section>
+                <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Clock className="w-4 h-4" /> Pending Requests ({pending.length})
+                </h2>
+                <div className="space-y-3">
+                  {pending.map((a) => (
+                    <AppointmentCard key={a.id} a={a} onCancel={cancelAppointment} onReview={setReviewFor} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <section>
+              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <CalendarClock className="w-4 h-4" /> Upcoming ({upcoming.length})
+              </h2>
+              {upcoming.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-sm">
+                  No upcoming appointments. <Link href="/patient/dashboard" className="text-blue-600 font-semibold">Book one now →</Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {upcoming.map((a) => (
+                    <AppointmentCard key={a.id} a={a} onCancel={cancelAppointment} onReview={setReviewFor} />
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section>
+              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Past ({past.length})</h2>
+              {past.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-sm">
+                  No past appointments yet.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {past.map((a) => (
+                    <AppointmentCard key={a.id} a={a} onCancel={cancelAppointment} onReview={setReviewFor} />
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+        )}
+      </div>
+
+      {reviewFor && (
+        <ReviewModal
+          appointmentId={reviewFor}
+          onClose={() => setReviewFor(null)}
+          onSubmitted={() => { setReviewFor(null); load(); }}
+        />
+      )}
+    </div>
+  );
+}

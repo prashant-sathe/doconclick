@@ -37,22 +37,35 @@ export async function GET(
   });
 }
 
-// PATCH – update doctor status
+// PATCH – update doctor status and/or verification
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { status } = await req.json();
+  const { status, isVerified } = await req.json();
 
-  const valid = ["APPROVED", "REJECTED", "SUSPENDED", "PENDING"];
-  if (!valid.includes(status)) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+  const data: { status?: string; isVerified?: boolean } = {};
+
+  if (status !== undefined) {
+    const valid = ["APPROVED", "REJECTED", "SUSPENDED", "PENDING"];
+    if (!valid.includes(status)) {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
+    data.status = status;
+  }
+
+  if (isVerified !== undefined) {
+    data.isVerified = Boolean(isVerified);
+  }
+
+  if (Object.keys(data).length === 0) {
+    return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }
 
   const updated = await prisma.doctorProfile.update({
     where: { userId: id },
-    data: { status },
+    data,
   });
 
   return NextResponse.json(updated);

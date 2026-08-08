@@ -33,6 +33,8 @@ export type DoctorProfileAvgAggregateOutputType = {
   radius: number | null
   lat: number | null
   lng: number | null
+  avgRating: number | null
+  totalReviews: number | null
 }
 
 export type DoctorProfileSumAggregateOutputType = {
@@ -42,6 +44,8 @@ export type DoctorProfileSumAggregateOutputType = {
   radius: number | null
   lat: number | null
   lng: number | null
+  avgRating: number | null
+  totalReviews: number | null
 }
 
 export type DoctorProfileMinAggregateOutputType = {
@@ -58,8 +62,19 @@ export type DoctorProfileMinAggregateOutputType = {
   radius: number | null
   lat: number | null
   lng: number | null
+  languages: string | null
+  offersHomeVisit: boolean | null
+  isVerified: boolean | null
+  avgRating: number | null
+  totalReviews: number | null
   bankDetails: string | null
   status: string | null
+  registrationFeePaid: boolean | null
+  registrationFeeStatus: string | null
+  medRegCertUrl: string | null
+  degreeCertUrl: string | null
+  kycDocUrl: string | null
+  address: string | null
 }
 
 export type DoctorProfileMaxAggregateOutputType = {
@@ -76,8 +91,19 @@ export type DoctorProfileMaxAggregateOutputType = {
   radius: number | null
   lat: number | null
   lng: number | null
+  languages: string | null
+  offersHomeVisit: boolean | null
+  isVerified: boolean | null
+  avgRating: number | null
+  totalReviews: number | null
   bankDetails: string | null
   status: string | null
+  registrationFeePaid: boolean | null
+  registrationFeeStatus: string | null
+  medRegCertUrl: string | null
+  degreeCertUrl: string | null
+  kycDocUrl: string | null
+  address: string | null
 }
 
 export type DoctorProfileCountAggregateOutputType = {
@@ -94,8 +120,19 @@ export type DoctorProfileCountAggregateOutputType = {
   radius: number
   lat: number
   lng: number
+  languages: number
+  offersHomeVisit: number
+  isVerified: number
+  avgRating: number
+  totalReviews: number
   bankDetails: number
   status: number
+  registrationFeePaid: number
+  registrationFeeStatus: number
+  medRegCertUrl: number
+  degreeCertUrl: number
+  kycDocUrl: number
+  address: number
   _all: number
 }
 
@@ -107,6 +144,8 @@ export type DoctorProfileAvgAggregateInputType = {
   radius?: true
   lat?: true
   lng?: true
+  avgRating?: true
+  totalReviews?: true
 }
 
 export type DoctorProfileSumAggregateInputType = {
@@ -116,6 +155,8 @@ export type DoctorProfileSumAggregateInputType = {
   radius?: true
   lat?: true
   lng?: true
+  avgRating?: true
+  totalReviews?: true
 }
 
 export type DoctorProfileMinAggregateInputType = {
@@ -132,8 +173,19 @@ export type DoctorProfileMinAggregateInputType = {
   radius?: true
   lat?: true
   lng?: true
+  languages?: true
+  offersHomeVisit?: true
+  isVerified?: true
+  avgRating?: true
+  totalReviews?: true
   bankDetails?: true
   status?: true
+  registrationFeePaid?: true
+  registrationFeeStatus?: true
+  medRegCertUrl?: true
+  degreeCertUrl?: true
+  kycDocUrl?: true
+  address?: true
 }
 
 export type DoctorProfileMaxAggregateInputType = {
@@ -150,8 +202,19 @@ export type DoctorProfileMaxAggregateInputType = {
   radius?: true
   lat?: true
   lng?: true
+  languages?: true
+  offersHomeVisit?: true
+  isVerified?: true
+  avgRating?: true
+  totalReviews?: true
   bankDetails?: true
   status?: true
+  registrationFeePaid?: true
+  registrationFeeStatus?: true
+  medRegCertUrl?: true
+  degreeCertUrl?: true
+  kycDocUrl?: true
+  address?: true
 }
 
 export type DoctorProfileCountAggregateInputType = {
@@ -168,8 +231,19 @@ export type DoctorProfileCountAggregateInputType = {
   radius?: true
   lat?: true
   lng?: true
+  languages?: true
+  offersHomeVisit?: true
+  isVerified?: true
+  avgRating?: true
+  totalReviews?: true
   bankDetails?: true
   status?: true
+  registrationFeePaid?: true
+  registrationFeeStatus?: true
+  medRegCertUrl?: true
+  degreeCertUrl?: true
+  kycDocUrl?: true
+  address?: true
   _all?: true
 }
 
@@ -263,8 +337,8 @@ export type DoctorProfileGroupByOutputType = {
   id: string
   userId: string
   photoUrl: string | null
-  qualification: string
-  medRegNo: string
+  qualification: string | null
+  medRegNo: string | null
   specialty: string
   experience: number
   consultFee: number
@@ -273,8 +347,19 @@ export type DoctorProfileGroupByOutputType = {
   radius: number
   lat: number | null
   lng: number | null
+  languages: string
+  offersHomeVisit: boolean
+  isVerified: boolean
+  avgRating: number
+  totalReviews: number
   bankDetails: string | null
   status: string
+  registrationFeePaid: boolean
+  registrationFeeStatus: string
+  medRegCertUrl: string | null
+  degreeCertUrl: string | null
+  kycDocUrl: string | null
+  address: string | null
   _count: DoctorProfileCountAggregateOutputType | null
   _avg: DoctorProfileAvgAggregateOutputType | null
   _sum: DoctorProfileSumAggregateOutputType | null
@@ -304,8 +389,8 @@ export type DoctorProfileWhereInput = {
   id?: Prisma.StringFilter<"DoctorProfile"> | string
   userId?: Prisma.StringFilter<"DoctorProfile"> | string
   photoUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
-  qualification?: Prisma.StringFilter<"DoctorProfile"> | string
-  medRegNo?: Prisma.StringFilter<"DoctorProfile"> | string
+  qualification?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  medRegNo?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   specialty?: Prisma.StringFilter<"DoctorProfile"> | string
   experience?: Prisma.IntFilter<"DoctorProfile"> | number
   consultFee?: Prisma.FloatFilter<"DoctorProfile"> | number
@@ -314,8 +399,19 @@ export type DoctorProfileWhereInput = {
   radius?: Prisma.IntFilter<"DoctorProfile"> | number
   lat?: Prisma.FloatNullableFilter<"DoctorProfile"> | number | null
   lng?: Prisma.FloatNullableFilter<"DoctorProfile"> | number | null
+  languages?: Prisma.StringFilter<"DoctorProfile"> | string
+  offersHomeVisit?: Prisma.BoolFilter<"DoctorProfile"> | boolean
+  isVerified?: Prisma.BoolFilter<"DoctorProfile"> | boolean
+  avgRating?: Prisma.FloatFilter<"DoctorProfile"> | number
+  totalReviews?: Prisma.IntFilter<"DoctorProfile"> | number
   bankDetails?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   status?: Prisma.StringFilter<"DoctorProfile"> | string
+  registrationFeePaid?: Prisma.BoolFilter<"DoctorProfile"> | boolean
+  registrationFeeStatus?: Prisma.StringFilter<"DoctorProfile"> | string
+  medRegCertUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  degreeCertUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  kycDocUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  address?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -323,8 +419,8 @@ export type DoctorProfileOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  qualification?: Prisma.SortOrder
-  medRegNo?: Prisma.SortOrder
+  qualification?: Prisma.SortOrderInput | Prisma.SortOrder
+  medRegNo?: Prisma.SortOrderInput | Prisma.SortOrder
   specialty?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   consultFee?: Prisma.SortOrder
@@ -333,8 +429,19 @@ export type DoctorProfileOrderByWithRelationInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  languages?: Prisma.SortOrder
+  offersHomeVisit?: Prisma.SortOrder
+  isVerified?: Prisma.SortOrder
+  avgRating?: Prisma.SortOrder
+  totalReviews?: Prisma.SortOrder
   bankDetails?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  registrationFeePaid?: Prisma.SortOrder
+  registrationFeeStatus?: Prisma.SortOrder
+  medRegCertUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  degreeCertUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  kycDocUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  address?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -346,7 +453,7 @@ export type DoctorProfileWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.DoctorProfileWhereInput[]
   NOT?: Prisma.DoctorProfileWhereInput | Prisma.DoctorProfileWhereInput[]
   photoUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
-  qualification?: Prisma.StringFilter<"DoctorProfile"> | string
+  qualification?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   specialty?: Prisma.StringFilter<"DoctorProfile"> | string
   experience?: Prisma.IntFilter<"DoctorProfile"> | number
   consultFee?: Prisma.FloatFilter<"DoctorProfile"> | number
@@ -355,8 +462,19 @@ export type DoctorProfileWhereUniqueInput = Prisma.AtLeast<{
   radius?: Prisma.IntFilter<"DoctorProfile"> | number
   lat?: Prisma.FloatNullableFilter<"DoctorProfile"> | number | null
   lng?: Prisma.FloatNullableFilter<"DoctorProfile"> | number | null
+  languages?: Prisma.StringFilter<"DoctorProfile"> | string
+  offersHomeVisit?: Prisma.BoolFilter<"DoctorProfile"> | boolean
+  isVerified?: Prisma.BoolFilter<"DoctorProfile"> | boolean
+  avgRating?: Prisma.FloatFilter<"DoctorProfile"> | number
+  totalReviews?: Prisma.IntFilter<"DoctorProfile"> | number
   bankDetails?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   status?: Prisma.StringFilter<"DoctorProfile"> | string
+  registrationFeePaid?: Prisma.BoolFilter<"DoctorProfile"> | boolean
+  registrationFeeStatus?: Prisma.StringFilter<"DoctorProfile"> | string
+  medRegCertUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  degreeCertUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  kycDocUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  address?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId" | "medRegNo">
 
@@ -364,8 +482,8 @@ export type DoctorProfileOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  qualification?: Prisma.SortOrder
-  medRegNo?: Prisma.SortOrder
+  qualification?: Prisma.SortOrderInput | Prisma.SortOrder
+  medRegNo?: Prisma.SortOrderInput | Prisma.SortOrder
   specialty?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   consultFee?: Prisma.SortOrder
@@ -374,8 +492,19 @@ export type DoctorProfileOrderByWithAggregationInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  languages?: Prisma.SortOrder
+  offersHomeVisit?: Prisma.SortOrder
+  isVerified?: Prisma.SortOrder
+  avgRating?: Prisma.SortOrder
+  totalReviews?: Prisma.SortOrder
   bankDetails?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  registrationFeePaid?: Prisma.SortOrder
+  registrationFeeStatus?: Prisma.SortOrder
+  medRegCertUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  degreeCertUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  kycDocUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  address?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.DoctorProfileCountOrderByAggregateInput
   _avg?: Prisma.DoctorProfileAvgOrderByAggregateInput
   _max?: Prisma.DoctorProfileMaxOrderByAggregateInput
@@ -390,8 +519,8 @@ export type DoctorProfileScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
   userId?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
   photoUrl?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
-  qualification?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
-  medRegNo?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
+  qualification?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
+  medRegNo?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
   specialty?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
   experience?: Prisma.IntWithAggregatesFilter<"DoctorProfile"> | number
   consultFee?: Prisma.FloatWithAggregatesFilter<"DoctorProfile"> | number
@@ -400,25 +529,47 @@ export type DoctorProfileScalarWhereWithAggregatesInput = {
   radius?: Prisma.IntWithAggregatesFilter<"DoctorProfile"> | number
   lat?: Prisma.FloatNullableWithAggregatesFilter<"DoctorProfile"> | number | null
   lng?: Prisma.FloatNullableWithAggregatesFilter<"DoctorProfile"> | number | null
+  languages?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
+  offersHomeVisit?: Prisma.BoolWithAggregatesFilter<"DoctorProfile"> | boolean
+  isVerified?: Prisma.BoolWithAggregatesFilter<"DoctorProfile"> | boolean
+  avgRating?: Prisma.FloatWithAggregatesFilter<"DoctorProfile"> | number
+  totalReviews?: Prisma.IntWithAggregatesFilter<"DoctorProfile"> | number
   bankDetails?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
   status?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
+  registrationFeePaid?: Prisma.BoolWithAggregatesFilter<"DoctorProfile"> | boolean
+  registrationFeeStatus?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
+  medRegCertUrl?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
+  degreeCertUrl?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
+  kycDocUrl?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
+  address?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
 }
 
 export type DoctorProfileCreateInput = {
   id?: string
   photoUrl?: string | null
-  qualification: string
-  medRegNo: string
-  specialty: string
-  experience: number
+  qualification?: string | null
+  medRegNo?: string | null
+  specialty?: string
+  experience?: number
   consultFee?: number
   homeVisitFee?: number
   availability?: string
   radius?: number
   lat?: number | null
   lng?: number | null
+  languages?: string
+  offersHomeVisit?: boolean
+  isVerified?: boolean
+  avgRating?: number
+  totalReviews?: number
   bankDetails?: string | null
   status?: string
+  registrationFeePaid?: boolean
+  registrationFeeStatus?: string
+  medRegCertUrl?: string | null
+  degreeCertUrl?: string | null
+  kycDocUrl?: string | null
+  address?: string | null
   user: Prisma.UserCreateNestedOneWithoutDoctorProfileInput
 }
 
@@ -426,25 +577,36 @@ export type DoctorProfileUncheckedCreateInput = {
   id?: string
   userId: string
   photoUrl?: string | null
-  qualification: string
-  medRegNo: string
-  specialty: string
-  experience: number
+  qualification?: string | null
+  medRegNo?: string | null
+  specialty?: string
+  experience?: number
   consultFee?: number
   homeVisitFee?: number
   availability?: string
   radius?: number
   lat?: number | null
   lng?: number | null
+  languages?: string
+  offersHomeVisit?: boolean
+  isVerified?: boolean
+  avgRating?: number
+  totalReviews?: number
   bankDetails?: string | null
   status?: string
+  registrationFeePaid?: boolean
+  registrationFeeStatus?: string
+  medRegCertUrl?: string | null
+  degreeCertUrl?: string | null
+  kycDocUrl?: string | null
+  address?: string | null
 }
 
 export type DoctorProfileUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qualification?: Prisma.StringFieldUpdateOperationsInput | string
-  medRegNo?: Prisma.StringFieldUpdateOperationsInput | string
+  qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medRegNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -453,8 +615,19 @@ export type DoctorProfileUpdateInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  languages?: Prisma.StringFieldUpdateOperationsInput | string
+  offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  medRegCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutDoctorProfileNestedInput
 }
 
@@ -462,8 +635,8 @@ export type DoctorProfileUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qualification?: Prisma.StringFieldUpdateOperationsInput | string
-  medRegNo?: Prisma.StringFieldUpdateOperationsInput | string
+  qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medRegNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -472,33 +645,55 @@ export type DoctorProfileUncheckedUpdateInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  languages?: Prisma.StringFieldUpdateOperationsInput | string
+  offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  medRegCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DoctorProfileCreateManyInput = {
   id?: string
   userId: string
   photoUrl?: string | null
-  qualification: string
-  medRegNo: string
-  specialty: string
-  experience: number
+  qualification?: string | null
+  medRegNo?: string | null
+  specialty?: string
+  experience?: number
   consultFee?: number
   homeVisitFee?: number
   availability?: string
   radius?: number
   lat?: number | null
   lng?: number | null
+  languages?: string
+  offersHomeVisit?: boolean
+  isVerified?: boolean
+  avgRating?: number
+  totalReviews?: number
   bankDetails?: string | null
   status?: string
+  registrationFeePaid?: boolean
+  registrationFeeStatus?: string
+  medRegCertUrl?: string | null
+  degreeCertUrl?: string | null
+  kycDocUrl?: string | null
+  address?: string | null
 }
 
 export type DoctorProfileUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qualification?: Prisma.StringFieldUpdateOperationsInput | string
-  medRegNo?: Prisma.StringFieldUpdateOperationsInput | string
+  qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medRegNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -507,16 +702,27 @@ export type DoctorProfileUpdateManyMutationInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  languages?: Prisma.StringFieldUpdateOperationsInput | string
+  offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  medRegCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DoctorProfileUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qualification?: Prisma.StringFieldUpdateOperationsInput | string
-  medRegNo?: Prisma.StringFieldUpdateOperationsInput | string
+  qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medRegNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -525,8 +731,19 @@ export type DoctorProfileUncheckedUpdateManyInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  languages?: Prisma.StringFieldUpdateOperationsInput | string
+  offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  medRegCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DoctorProfileNullableScalarRelationFilter = {
@@ -548,8 +765,19 @@ export type DoctorProfileCountOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  languages?: Prisma.SortOrder
+  offersHomeVisit?: Prisma.SortOrder
+  isVerified?: Prisma.SortOrder
+  avgRating?: Prisma.SortOrder
+  totalReviews?: Prisma.SortOrder
   bankDetails?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  registrationFeePaid?: Prisma.SortOrder
+  registrationFeeStatus?: Prisma.SortOrder
+  medRegCertUrl?: Prisma.SortOrder
+  degreeCertUrl?: Prisma.SortOrder
+  kycDocUrl?: Prisma.SortOrder
+  address?: Prisma.SortOrder
 }
 
 export type DoctorProfileAvgOrderByAggregateInput = {
@@ -559,6 +787,8 @@ export type DoctorProfileAvgOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  avgRating?: Prisma.SortOrder
+  totalReviews?: Prisma.SortOrder
 }
 
 export type DoctorProfileMaxOrderByAggregateInput = {
@@ -575,8 +805,19 @@ export type DoctorProfileMaxOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  languages?: Prisma.SortOrder
+  offersHomeVisit?: Prisma.SortOrder
+  isVerified?: Prisma.SortOrder
+  avgRating?: Prisma.SortOrder
+  totalReviews?: Prisma.SortOrder
   bankDetails?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  registrationFeePaid?: Prisma.SortOrder
+  registrationFeeStatus?: Prisma.SortOrder
+  medRegCertUrl?: Prisma.SortOrder
+  degreeCertUrl?: Prisma.SortOrder
+  kycDocUrl?: Prisma.SortOrder
+  address?: Prisma.SortOrder
 }
 
 export type DoctorProfileMinOrderByAggregateInput = {
@@ -593,8 +834,19 @@ export type DoctorProfileMinOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  languages?: Prisma.SortOrder
+  offersHomeVisit?: Prisma.SortOrder
+  isVerified?: Prisma.SortOrder
+  avgRating?: Prisma.SortOrder
+  totalReviews?: Prisma.SortOrder
   bankDetails?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  registrationFeePaid?: Prisma.SortOrder
+  registrationFeeStatus?: Prisma.SortOrder
+  medRegCertUrl?: Prisma.SortOrder
+  degreeCertUrl?: Prisma.SortOrder
+  kycDocUrl?: Prisma.SortOrder
+  address?: Prisma.SortOrder
 }
 
 export type DoctorProfileSumOrderByAggregateInput = {
@@ -604,6 +856,8 @@ export type DoctorProfileSumOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  avgRating?: Prisma.SortOrder
+  totalReviews?: Prisma.SortOrder
 }
 
 export type DoctorProfileCreateNestedOneWithoutUserInput = {
@@ -646,46 +900,64 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type NullableFloatFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type DoctorProfileCreateWithoutUserInput = {
   id?: string
   photoUrl?: string | null
-  qualification: string
-  medRegNo: string
-  specialty: string
-  experience: number
+  qualification?: string | null
+  medRegNo?: string | null
+  specialty?: string
+  experience?: number
   consultFee?: number
   homeVisitFee?: number
   availability?: string
   radius?: number
   lat?: number | null
   lng?: number | null
+  languages?: string
+  offersHomeVisit?: boolean
+  isVerified?: boolean
+  avgRating?: number
+  totalReviews?: number
   bankDetails?: string | null
   status?: string
+  registrationFeePaid?: boolean
+  registrationFeeStatus?: string
+  medRegCertUrl?: string | null
+  degreeCertUrl?: string | null
+  kycDocUrl?: string | null
+  address?: string | null
 }
 
 export type DoctorProfileUncheckedCreateWithoutUserInput = {
   id?: string
   photoUrl?: string | null
-  qualification: string
-  medRegNo: string
-  specialty: string
-  experience: number
+  qualification?: string | null
+  medRegNo?: string | null
+  specialty?: string
+  experience?: number
   consultFee?: number
   homeVisitFee?: number
   availability?: string
   radius?: number
   lat?: number | null
   lng?: number | null
+  languages?: string
+  offersHomeVisit?: boolean
+  isVerified?: boolean
+  avgRating?: number
+  totalReviews?: number
   bankDetails?: string | null
   status?: string
+  registrationFeePaid?: boolean
+  registrationFeeStatus?: string
+  medRegCertUrl?: string | null
+  degreeCertUrl?: string | null
+  kycDocUrl?: string | null
+  address?: string | null
 }
 
 export type DoctorProfileCreateOrConnectWithoutUserInput = {
@@ -707,8 +979,8 @@ export type DoctorProfileUpdateToOneWithWhereWithoutUserInput = {
 export type DoctorProfileUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qualification?: Prisma.StringFieldUpdateOperationsInput | string
-  medRegNo?: Prisma.StringFieldUpdateOperationsInput | string
+  qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medRegNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -717,15 +989,26 @@ export type DoctorProfileUpdateWithoutUserInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  languages?: Prisma.StringFieldUpdateOperationsInput | string
+  offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  medRegCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DoctorProfileUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qualification?: Prisma.StringFieldUpdateOperationsInput | string
-  medRegNo?: Prisma.StringFieldUpdateOperationsInput | string
+  qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medRegNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -734,8 +1017,19 @@ export type DoctorProfileUncheckedUpdateWithoutUserInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  languages?: Prisma.StringFieldUpdateOperationsInput | string
+  offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  medRegCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -754,8 +1048,19 @@ export type DoctorProfileSelect<ExtArgs extends runtime.Types.Extensions.Interna
   radius?: boolean
   lat?: boolean
   lng?: boolean
+  languages?: boolean
+  offersHomeVisit?: boolean
+  isVerified?: boolean
+  avgRating?: boolean
+  totalReviews?: boolean
   bankDetails?: boolean
   status?: boolean
+  registrationFeePaid?: boolean
+  registrationFeeStatus?: boolean
+  medRegCertUrl?: boolean
+  degreeCertUrl?: boolean
+  kycDocUrl?: boolean
+  address?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["doctorProfile"]>
 
@@ -773,8 +1078,19 @@ export type DoctorProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   radius?: boolean
   lat?: boolean
   lng?: boolean
+  languages?: boolean
+  offersHomeVisit?: boolean
+  isVerified?: boolean
+  avgRating?: boolean
+  totalReviews?: boolean
   bankDetails?: boolean
   status?: boolean
+  registrationFeePaid?: boolean
+  registrationFeeStatus?: boolean
+  medRegCertUrl?: boolean
+  degreeCertUrl?: boolean
+  kycDocUrl?: boolean
+  address?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["doctorProfile"]>
 
@@ -792,8 +1108,19 @@ export type DoctorProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   radius?: boolean
   lat?: boolean
   lng?: boolean
+  languages?: boolean
+  offersHomeVisit?: boolean
+  isVerified?: boolean
+  avgRating?: boolean
+  totalReviews?: boolean
   bankDetails?: boolean
   status?: boolean
+  registrationFeePaid?: boolean
+  registrationFeeStatus?: boolean
+  medRegCertUrl?: boolean
+  degreeCertUrl?: boolean
+  kycDocUrl?: boolean
+  address?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["doctorProfile"]>
 
@@ -811,11 +1138,22 @@ export type DoctorProfileSelectScalar = {
   radius?: boolean
   lat?: boolean
   lng?: boolean
+  languages?: boolean
+  offersHomeVisit?: boolean
+  isVerified?: boolean
+  avgRating?: boolean
+  totalReviews?: boolean
   bankDetails?: boolean
   status?: boolean
+  registrationFeePaid?: boolean
+  registrationFeeStatus?: boolean
+  medRegCertUrl?: boolean
+  degreeCertUrl?: boolean
+  kycDocUrl?: boolean
+  address?: boolean
 }
 
-export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "bankDetails" | "status", ExtArgs["result"]["doctorProfile"]>
+export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "offersHomeVisit" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "address", ExtArgs["result"]["doctorProfile"]>
 export type DoctorProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -835,8 +1173,8 @@ export type $DoctorProfilePayload<ExtArgs extends runtime.Types.Extensions.Inter
     id: string
     userId: string
     photoUrl: string | null
-    qualification: string
-    medRegNo: string
+    qualification: string | null
+    medRegNo: string | null
     specialty: string
     experience: number
     consultFee: number
@@ -845,8 +1183,19 @@ export type $DoctorProfilePayload<ExtArgs extends runtime.Types.Extensions.Inter
     radius: number
     lat: number | null
     lng: number | null
+    languages: string
+    offersHomeVisit: boolean
+    isVerified: boolean
+    avgRating: number
+    totalReviews: number
     bankDetails: string | null
     status: string
+    registrationFeePaid: boolean
+    registrationFeeStatus: string
+    medRegCertUrl: string | null
+    degreeCertUrl: string | null
+    kycDocUrl: string | null
+    address: string | null
   }, ExtArgs["result"]["doctorProfile"]>
   composites: {}
 }
@@ -1284,8 +1633,19 @@ export interface DoctorProfileFieldRefs {
   readonly radius: Prisma.FieldRef<"DoctorProfile", 'Int'>
   readonly lat: Prisma.FieldRef<"DoctorProfile", 'Float'>
   readonly lng: Prisma.FieldRef<"DoctorProfile", 'Float'>
+  readonly languages: Prisma.FieldRef<"DoctorProfile", 'String'>
+  readonly offersHomeVisit: Prisma.FieldRef<"DoctorProfile", 'Boolean'>
+  readonly isVerified: Prisma.FieldRef<"DoctorProfile", 'Boolean'>
+  readonly avgRating: Prisma.FieldRef<"DoctorProfile", 'Float'>
+  readonly totalReviews: Prisma.FieldRef<"DoctorProfile", 'Int'>
   readonly bankDetails: Prisma.FieldRef<"DoctorProfile", 'String'>
   readonly status: Prisma.FieldRef<"DoctorProfile", 'String'>
+  readonly registrationFeePaid: Prisma.FieldRef<"DoctorProfile", 'Boolean'>
+  readonly registrationFeeStatus: Prisma.FieldRef<"DoctorProfile", 'String'>
+  readonly medRegCertUrl: Prisma.FieldRef<"DoctorProfile", 'String'>
+  readonly degreeCertUrl: Prisma.FieldRef<"DoctorProfile", 'String'>
+  readonly kycDocUrl: Prisma.FieldRef<"DoctorProfile", 'String'>
+  readonly address: Prisma.FieldRef<"DoctorProfile", 'String'>
 }
     
 

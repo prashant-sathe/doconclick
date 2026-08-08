@@ -4,12 +4,9 @@ import { hashPassword } from "@/lib/auth";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const {
-    name, mobile, email, qualification, medRegNo, specialty,
-    experience, consultFee, homeVisitFee, availability, radius, bankDetails, password,
-  } = body;
+  const { name, mobile, email, password } = body;
 
-  if (!name || !mobile || !password || !medRegNo || !specialty) {
+  if (!name || !mobile || !password) {
     return NextResponse.json({ error: "All required fields must be filled." }, { status: 400 });
   }
 
@@ -29,18 +26,7 @@ export async function POST(req: Request) {
         password: hashed,
         role: "DOCTOR",
         doctorProfile: {
-          create: {
-            qualification,
-            medRegNo,
-            specialty,
-            experience: Number(experience),
-            consultFee: Number(consultFee),
-            homeVisitFee: Number(homeVisitFee),
-            availability,
-            radius: Number(radius),
-            bankDetails,
-            status: "PENDING",
-          },
+          create: { status: "PENDING" },
         },
       },
       include: { doctorProfile: true },

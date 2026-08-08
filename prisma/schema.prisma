@@ -27,6 +27,7 @@ model User {
   complaints     Complaint[]
   reviewsGiven   Review[]        @relation("PatientReviews")
   reviewsReceived Review[]       @relation("DoctorReviews")
+  messagesSent   Message[]       @relation("SentMessages")
 }
 
 model PatientProfile {
@@ -36,6 +37,22 @@ model PatientProfile {
   age      Int
   gender   String
   location String?
+
+  homeAddress           String?
+  landmark              String?
+  pinCode               String?
+  bloodGroup            String?
+  height                Int?
+  weight                Int?
+  allergies             String?
+  chronicDiseases       String?
+  medications           String?
+  surgeries             String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  photoUrl              String?
+  lat                   Float?
+  lng                   Float?
 }
 
 model DoctorProfile {
@@ -43,10 +60,10 @@ model DoctorProfile {
   userId        String  @unique
   user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   photoUrl      String?
-  qualification String
-  medRegNo      String  @unique
-  specialty     String
-  experience    Int
+  qualification String?
+  medRegNo      String? @unique
+  specialty     String  @default("General Physician")
+  experience    Int     @default(0)
   consultFee    Float   @default(0)
   homeVisitFee  Float   @default(0)
   availability  String  @default("Mon-Fri, 9AM-5PM")
@@ -54,11 +71,19 @@ model DoctorProfile {
   lat           Float?
   lng           Float?
   languages     String  @default("English, Hindi")
+  offersHomeVisit Boolean @default(true)
   isVerified    Boolean @default(false)
   avgRating     Float   @default(0)
   totalReviews  Int     @default(0)
   bankDetails   String?
   status        String  @default("PENDING") // PENDING, APPROVED, REJECTED, SUSPENDED
+
+  registrationFeePaid   Boolean @default(false)
+  registrationFeeStatus String  @default("PENDING") // PENDING, PAID
+  medRegCertUrl         String?
+  degreeCertUrl         String?
+  kycDocUrl             String?
+  address               String?
 }
 
 model Appointment {
@@ -68,19 +93,50 @@ model Appointment {
   doctorId      String
   doctor        User      @relation("DoctorAppointments", fields: [doctorId], references: [id])
   symptoms      String
+  allergies     String?
+  consentGiven  Boolean   @default(false)
   consultType   String    @default("CLINIC") // CLINIC, HOME, VIDEO
-  status        String    @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
-  paymentMethod String    @default("ONLINE") // ONLINE, CASH
+  status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, COMPLETED, CANCELLED
+  paymentMethod String    @default("CASH") // ONLINE, CASH
+  paymentStatus String    @default("PENDING") // PENDING, PAID
   isEmergency   Boolean   @default(false)
   amount        Float     @default(0)
   platformFee   Float     @default(0)
   prescriptionUrl String?
+  doctorNotes   String?
+  travelStatus  String    @default("NOT_STARTED") // NOT_STARTED, ON_THE_WAY, ARRIVED
+  doctorLat     Float?
+  doctorLng     Float?
+  doctorLocationUpdatedAt DateTime?
   followUpOfId  String?
   followUpOf    Appointment? @relation("FollowUp", fields: [followUpOfId], references: [id])
   followUps     Appointment[] @relation("FollowUp")
   scheduledAt   DateTime  @default(now())
   createdAt     DateTime  @default(now())
   review        Review?
+  medicines     PrescriptionMedicine[]
+  messages      Message[]
+}
+
+model Message {
+  id            String      @id @default(cuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  senderId      String
+  sender        User        @relation("SentMessages", fields: [senderId], references: [id])
+  text          String
+  createdAt     DateTime    @default(now())
+}
+
+model PrescriptionMedicine {
+  id            String      @id @default(cuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  name          String
+  dosage        String
+  frequency     String
+  duration      String
+  instructions  String?
 }
 
 model Review {

@@ -13,6 +13,7 @@ async function main() {
 
   // Wipe everything in correct FK order
   await prisma.complaint.deleteMany();
+  await prisma.review.deleteMany();
   await prisma.appointment.deleteMany();
   await prisma.patientProfile.deleteMany();
   await prisma.doctorProfile.deleteMany();
@@ -117,7 +118,7 @@ async function main() {
       name: "Dr. Kavita Desai",
       mobile: "9000000005",
       email: "kavita.desai@doconclick.com",
-      specialty: "Gynaecologist",
+      specialty: "Gynecologist",
       qualification: "MBBS, MS (OBG)",
       medRegNo: "MH-REG-10005",
       experience: 10,
@@ -132,7 +133,7 @@ async function main() {
       name: "Dr. Nikhil Bane",
       mobile: "9000000006",
       email: "nikhil.bane@doconclick.com",
-      specialty: "Orthopaedic Surgeon",
+      specialty: "Orthopedic Surgeon",
       qualification: "MBBS, MS (Ortho)",
       medRegNo: "MH-REG-10006",
       experience: 11,
@@ -173,6 +174,37 @@ async function main() {
       lat: 18.5265,
       lng: 73.8920,
     },
+    {
+      name: "Dr. Meera Iyer",
+      mobile: "9000000009",
+      email: "meera.iyer@doconclick.com",
+      specialty: "Physiotherapist",
+      qualification: "BPTh, MPTh (Ortho)",
+      medRegNo: "MH-REG-10009",
+      experience: 7,
+      consultFee: 450,
+      homeVisitFee: 800,
+      availability: "Mon-Sat, 8AM-6PM",
+      radius: 10,
+      lat: 18.5150,
+      lng: 73.8480,
+    },
+    {
+      name: "Dr. Vikram Shah",
+      mobile: "9000000010",
+      email: "vikram.shah@doconclick.com",
+      specialty: "Dentist",
+      qualification: "BDS, MDS (Orthodontics)",
+      medRegNo: "MH-REG-10010",
+      experience: 13,
+      consultFee: 500,
+      homeVisitFee: 0,
+      availability: "Mon-Sat, 10AM-7PM",
+      radius: 8,
+      lat: 18.5300,
+      lng: 73.8550,
+      offersHomeVisit: false,
+    },
   ];
 
   for (const doc of doctors) {
@@ -195,20 +227,24 @@ async function main() {
             radius: doc.radius,
             lat: doc.lat,
             lng: doc.lng,
+            offersHomeVisit: doc.offersHomeVisit ?? true,
+            isVerified: true,
             status: "APPROVED",
+            registrationFeePaid: true,
+            registrationFeeStatus: "PAID",
           },
         },
       },
     });
   }
 
-  console.log("\n✅ Done! Seeded admin, 1 patient, and 8 approved doctors.\n");
+  console.log("\n✅ Done! Seeded admin, 1 patient, and 10 approved doctors.\n");
   console.log("  ┌──────────────────────────────────────────────┐");
   console.log("  │              Login Credentials               │");
   console.log("  ├──────────────────────────────────────────────┤");
   console.log("  │  Admin    :  9999999999 / Admin@2025         │");
   console.log("  │  Patient  :  9876543210 / Patient@2025       │");
-  console.log("  │  Doctors  :  9000000001…08 / Doctor@2025     │");
+  console.log("  │  Doctors  :  9000000001…10 / Doctor@2025     │");
   console.log("  │  URL      :  http://localhost:3000/login      │");
   console.log("  └──────────────────────────────────────────────┘\n");
   void patient;

@@ -28,10 +28,18 @@ export type AggregatePatientProfile = {
 
 export type PatientProfileAvgAggregateOutputType = {
   age: number | null
+  height: number | null
+  weight: number | null
+  lat: number | null
+  lng: number | null
 }
 
 export type PatientProfileSumAggregateOutputType = {
   age: number | null
+  height: number | null
+  weight: number | null
+  lat: number | null
+  lng: number | null
 }
 
 export type PatientProfileMinAggregateOutputType = {
@@ -40,6 +48,21 @@ export type PatientProfileMinAggregateOutputType = {
   age: number | null
   gender: string | null
   location: string | null
+  homeAddress: string | null
+  landmark: string | null
+  pinCode: string | null
+  bloodGroup: string | null
+  height: number | null
+  weight: number | null
+  allergies: string | null
+  chronicDiseases: string | null
+  medications: string | null
+  surgeries: string | null
+  emergencyContactName: string | null
+  emergencyContactPhone: string | null
+  photoUrl: string | null
+  lat: number | null
+  lng: number | null
 }
 
 export type PatientProfileMaxAggregateOutputType = {
@@ -48,6 +71,21 @@ export type PatientProfileMaxAggregateOutputType = {
   age: number | null
   gender: string | null
   location: string | null
+  homeAddress: string | null
+  landmark: string | null
+  pinCode: string | null
+  bloodGroup: string | null
+  height: number | null
+  weight: number | null
+  allergies: string | null
+  chronicDiseases: string | null
+  medications: string | null
+  surgeries: string | null
+  emergencyContactName: string | null
+  emergencyContactPhone: string | null
+  photoUrl: string | null
+  lat: number | null
+  lng: number | null
 }
 
 export type PatientProfileCountAggregateOutputType = {
@@ -56,16 +94,39 @@ export type PatientProfileCountAggregateOutputType = {
   age: number
   gender: number
   location: number
+  homeAddress: number
+  landmark: number
+  pinCode: number
+  bloodGroup: number
+  height: number
+  weight: number
+  allergies: number
+  chronicDiseases: number
+  medications: number
+  surgeries: number
+  emergencyContactName: number
+  emergencyContactPhone: number
+  photoUrl: number
+  lat: number
+  lng: number
   _all: number
 }
 
 
 export type PatientProfileAvgAggregateInputType = {
   age?: true
+  height?: true
+  weight?: true
+  lat?: true
+  lng?: true
 }
 
 export type PatientProfileSumAggregateInputType = {
   age?: true
+  height?: true
+  weight?: true
+  lat?: true
+  lng?: true
 }
 
 export type PatientProfileMinAggregateInputType = {
@@ -74,6 +135,21 @@ export type PatientProfileMinAggregateInputType = {
   age?: true
   gender?: true
   location?: true
+  homeAddress?: true
+  landmark?: true
+  pinCode?: true
+  bloodGroup?: true
+  height?: true
+  weight?: true
+  allergies?: true
+  chronicDiseases?: true
+  medications?: true
+  surgeries?: true
+  emergencyContactName?: true
+  emergencyContactPhone?: true
+  photoUrl?: true
+  lat?: true
+  lng?: true
 }
 
 export type PatientProfileMaxAggregateInputType = {
@@ -82,6 +158,21 @@ export type PatientProfileMaxAggregateInputType = {
   age?: true
   gender?: true
   location?: true
+  homeAddress?: true
+  landmark?: true
+  pinCode?: true
+  bloodGroup?: true
+  height?: true
+  weight?: true
+  allergies?: true
+  chronicDiseases?: true
+  medications?: true
+  surgeries?: true
+  emergencyContactName?: true
+  emergencyContactPhone?: true
+  photoUrl?: true
+  lat?: true
+  lng?: true
 }
 
 export type PatientProfileCountAggregateInputType = {
@@ -90,6 +181,21 @@ export type PatientProfileCountAggregateInputType = {
   age?: true
   gender?: true
   location?: true
+  homeAddress?: true
+  landmark?: true
+  pinCode?: true
+  bloodGroup?: true
+  height?: true
+  weight?: true
+  allergies?: true
+  chronicDiseases?: true
+  medications?: true
+  surgeries?: true
+  emergencyContactName?: true
+  emergencyContactPhone?: true
+  photoUrl?: true
+  lat?: true
+  lng?: true
   _all?: true
 }
 
@@ -185,6 +291,21 @@ export type PatientProfileGroupByOutputType = {
   age: number
   gender: string
   location: string | null
+  homeAddress: string | null
+  landmark: string | null
+  pinCode: string | null
+  bloodGroup: string | null
+  height: number | null
+  weight: number | null
+  allergies: string | null
+  chronicDiseases: string | null
+  medications: string | null
+  surgeries: string | null
+  emergencyContactName: string | null
+  emergencyContactPhone: string | null
+  photoUrl: string | null
+  lat: number | null
+  lng: number | null
   _count: PatientProfileCountAggregateOutputType | null
   _avg: PatientProfileAvgAggregateOutputType | null
   _sum: PatientProfileSumAggregateOutputType | null
@@ -216,6 +337,21 @@ export type PatientProfileWhereInput = {
   age?: Prisma.IntFilter<"PatientProfile"> | number
   gender?: Prisma.StringFilter<"PatientProfile"> | string
   location?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  homeAddress?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  landmark?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  pinCode?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  bloodGroup?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  height?: Prisma.IntNullableFilter<"PatientProfile"> | number | null
+  weight?: Prisma.IntNullableFilter<"PatientProfile"> | number | null
+  allergies?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  chronicDiseases?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  medications?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  surgeries?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  emergencyContactName?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  photoUrl?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  lat?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
+  lng?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -225,6 +361,21 @@ export type PatientProfileOrderByWithRelationInput = {
   age?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
+  homeAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  landmark?: Prisma.SortOrderInput | Prisma.SortOrder
+  pinCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  bloodGroup?: Prisma.SortOrderInput | Prisma.SortOrder
+  height?: Prisma.SortOrderInput | Prisma.SortOrder
+  weight?: Prisma.SortOrderInput | Prisma.SortOrder
+  allergies?: Prisma.SortOrderInput | Prisma.SortOrder
+  chronicDiseases?: Prisma.SortOrderInput | Prisma.SortOrder
+  medications?: Prisma.SortOrderInput | Prisma.SortOrder
+  surgeries?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
+  photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  lat?: Prisma.SortOrderInput | Prisma.SortOrder
+  lng?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -237,6 +388,21 @@ export type PatientProfileWhereUniqueInput = Prisma.AtLeast<{
   age?: Prisma.IntFilter<"PatientProfile"> | number
   gender?: Prisma.StringFilter<"PatientProfile"> | string
   location?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  homeAddress?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  landmark?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  pinCode?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  bloodGroup?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  height?: Prisma.IntNullableFilter<"PatientProfile"> | number | null
+  weight?: Prisma.IntNullableFilter<"PatientProfile"> | number | null
+  allergies?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  chronicDiseases?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  medications?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  surgeries?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  emergencyContactName?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  photoUrl?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
+  lat?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
+  lng?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId">
 
@@ -246,6 +412,21 @@ export type PatientProfileOrderByWithAggregationInput = {
   age?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
+  homeAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  landmark?: Prisma.SortOrderInput | Prisma.SortOrder
+  pinCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  bloodGroup?: Prisma.SortOrderInput | Prisma.SortOrder
+  height?: Prisma.SortOrderInput | Prisma.SortOrder
+  weight?: Prisma.SortOrderInput | Prisma.SortOrder
+  allergies?: Prisma.SortOrderInput | Prisma.SortOrder
+  chronicDiseases?: Prisma.SortOrderInput | Prisma.SortOrder
+  medications?: Prisma.SortOrderInput | Prisma.SortOrder
+  surgeries?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
+  photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  lat?: Prisma.SortOrderInput | Prisma.SortOrder
+  lng?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PatientProfileCountOrderByAggregateInput
   _avg?: Prisma.PatientProfileAvgOrderByAggregateInput
   _max?: Prisma.PatientProfileMaxOrderByAggregateInput
@@ -262,6 +443,21 @@ export type PatientProfileScalarWhereWithAggregatesInput = {
   age?: Prisma.IntWithAggregatesFilter<"PatientProfile"> | number
   gender?: Prisma.StringWithAggregatesFilter<"PatientProfile"> | string
   location?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  homeAddress?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  landmark?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  pinCode?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  bloodGroup?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  height?: Prisma.IntNullableWithAggregatesFilter<"PatientProfile"> | number | null
+  weight?: Prisma.IntNullableWithAggregatesFilter<"PatientProfile"> | number | null
+  allergies?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  chronicDiseases?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  medications?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  surgeries?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  emergencyContactName?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  photoUrl?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
+  lat?: Prisma.FloatNullableWithAggregatesFilter<"PatientProfile"> | number | null
+  lng?: Prisma.FloatNullableWithAggregatesFilter<"PatientProfile"> | number | null
 }
 
 export type PatientProfileCreateInput = {
@@ -269,6 +465,21 @@ export type PatientProfileCreateInput = {
   age: number
   gender: string
   location?: string | null
+  homeAddress?: string | null
+  landmark?: string | null
+  pinCode?: string | null
+  bloodGroup?: string | null
+  height?: number | null
+  weight?: number | null
+  allergies?: string | null
+  chronicDiseases?: string | null
+  medications?: string | null
+  surgeries?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  photoUrl?: string | null
+  lat?: number | null
+  lng?: number | null
   user: Prisma.UserCreateNestedOneWithoutPatientProfileInput
 }
 
@@ -278,6 +489,21 @@ export type PatientProfileUncheckedCreateInput = {
   age: number
   gender: string
   location?: string | null
+  homeAddress?: string | null
+  landmark?: string | null
+  pinCode?: string | null
+  bloodGroup?: string | null
+  height?: number | null
+  weight?: number | null
+  allergies?: string | null
+  chronicDiseases?: string | null
+  medications?: string | null
+  surgeries?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  photoUrl?: string | null
+  lat?: number | null
+  lng?: number | null
 }
 
 export type PatientProfileUpdateInput = {
@@ -285,6 +511,21 @@ export type PatientProfileUpdateInput = {
   age?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  landmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  weight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chronicDiseases?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medications?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surgeries?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   user?: Prisma.UserUpdateOneRequiredWithoutPatientProfileNestedInput
 }
 
@@ -294,6 +535,21 @@ export type PatientProfileUncheckedUpdateInput = {
   age?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  landmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  weight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chronicDiseases?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medications?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surgeries?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type PatientProfileCreateManyInput = {
@@ -302,6 +558,21 @@ export type PatientProfileCreateManyInput = {
   age: number
   gender: string
   location?: string | null
+  homeAddress?: string | null
+  landmark?: string | null
+  pinCode?: string | null
+  bloodGroup?: string | null
+  height?: number | null
+  weight?: number | null
+  allergies?: string | null
+  chronicDiseases?: string | null
+  medications?: string | null
+  surgeries?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  photoUrl?: string | null
+  lat?: number | null
+  lng?: number | null
 }
 
 export type PatientProfileUpdateManyMutationInput = {
@@ -309,6 +580,21 @@ export type PatientProfileUpdateManyMutationInput = {
   age?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  landmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  weight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chronicDiseases?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medications?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surgeries?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type PatientProfileUncheckedUpdateManyInput = {
@@ -317,6 +603,21 @@ export type PatientProfileUncheckedUpdateManyInput = {
   age?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  landmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  weight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chronicDiseases?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medications?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surgeries?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type PatientProfileNullableScalarRelationFilter = {
@@ -330,10 +631,29 @@ export type PatientProfileCountOrderByAggregateInput = {
   age?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  homeAddress?: Prisma.SortOrder
+  landmark?: Prisma.SortOrder
+  pinCode?: Prisma.SortOrder
+  bloodGroup?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  weight?: Prisma.SortOrder
+  allergies?: Prisma.SortOrder
+  chronicDiseases?: Prisma.SortOrder
+  medications?: Prisma.SortOrder
+  surgeries?: Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrder
+  photoUrl?: Prisma.SortOrder
+  lat?: Prisma.SortOrder
+  lng?: Prisma.SortOrder
 }
 
 export type PatientProfileAvgOrderByAggregateInput = {
   age?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  weight?: Prisma.SortOrder
+  lat?: Prisma.SortOrder
+  lng?: Prisma.SortOrder
 }
 
 export type PatientProfileMaxOrderByAggregateInput = {
@@ -342,6 +662,21 @@ export type PatientProfileMaxOrderByAggregateInput = {
   age?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  homeAddress?: Prisma.SortOrder
+  landmark?: Prisma.SortOrder
+  pinCode?: Prisma.SortOrder
+  bloodGroup?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  weight?: Prisma.SortOrder
+  allergies?: Prisma.SortOrder
+  chronicDiseases?: Prisma.SortOrder
+  medications?: Prisma.SortOrder
+  surgeries?: Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrder
+  photoUrl?: Prisma.SortOrder
+  lat?: Prisma.SortOrder
+  lng?: Prisma.SortOrder
 }
 
 export type PatientProfileMinOrderByAggregateInput = {
@@ -350,10 +685,29 @@ export type PatientProfileMinOrderByAggregateInput = {
   age?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  homeAddress?: Prisma.SortOrder
+  landmark?: Prisma.SortOrder
+  pinCode?: Prisma.SortOrder
+  bloodGroup?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  weight?: Prisma.SortOrder
+  allergies?: Prisma.SortOrder
+  chronicDiseases?: Prisma.SortOrder
+  medications?: Prisma.SortOrder
+  surgeries?: Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrder
+  photoUrl?: Prisma.SortOrder
+  lat?: Prisma.SortOrder
+  lng?: Prisma.SortOrder
 }
 
 export type PatientProfileSumOrderByAggregateInput = {
   age?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  weight?: Prisma.SortOrder
+  lat?: Prisma.SortOrder
+  lng?: Prisma.SortOrder
 }
 
 export type PatientProfileCreateNestedOneWithoutUserInput = {
@@ -396,11 +750,42 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type PatientProfileCreateWithoutUserInput = {
   id?: string
   age: number
   gender: string
   location?: string | null
+  homeAddress?: string | null
+  landmark?: string | null
+  pinCode?: string | null
+  bloodGroup?: string | null
+  height?: number | null
+  weight?: number | null
+  allergies?: string | null
+  chronicDiseases?: string | null
+  medications?: string | null
+  surgeries?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  photoUrl?: string | null
+  lat?: number | null
+  lng?: number | null
 }
 
 export type PatientProfileUncheckedCreateWithoutUserInput = {
@@ -408,6 +793,21 @@ export type PatientProfileUncheckedCreateWithoutUserInput = {
   age: number
   gender: string
   location?: string | null
+  homeAddress?: string | null
+  landmark?: string | null
+  pinCode?: string | null
+  bloodGroup?: string | null
+  height?: number | null
+  weight?: number | null
+  allergies?: string | null
+  chronicDiseases?: string | null
+  medications?: string | null
+  surgeries?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  photoUrl?: string | null
+  lat?: number | null
+  lng?: number | null
 }
 
 export type PatientProfileCreateOrConnectWithoutUserInput = {
@@ -431,6 +831,21 @@ export type PatientProfileUpdateWithoutUserInput = {
   age?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  landmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  weight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chronicDiseases?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medications?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surgeries?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type PatientProfileUncheckedUpdateWithoutUserInput = {
@@ -438,6 +853,21 @@ export type PatientProfileUncheckedUpdateWithoutUserInput = {
   age?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  landmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  weight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chronicDiseases?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medications?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surgeries?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 
@@ -448,6 +878,21 @@ export type PatientProfileSelect<ExtArgs extends runtime.Types.Extensions.Intern
   age?: boolean
   gender?: boolean
   location?: boolean
+  homeAddress?: boolean
+  landmark?: boolean
+  pinCode?: boolean
+  bloodGroup?: boolean
+  height?: boolean
+  weight?: boolean
+  allergies?: boolean
+  chronicDiseases?: boolean
+  medications?: boolean
+  surgeries?: boolean
+  emergencyContactName?: boolean
+  emergencyContactPhone?: boolean
+  photoUrl?: boolean
+  lat?: boolean
+  lng?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["patientProfile"]>
 
@@ -457,6 +902,21 @@ export type PatientProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   age?: boolean
   gender?: boolean
   location?: boolean
+  homeAddress?: boolean
+  landmark?: boolean
+  pinCode?: boolean
+  bloodGroup?: boolean
+  height?: boolean
+  weight?: boolean
+  allergies?: boolean
+  chronicDiseases?: boolean
+  medications?: boolean
+  surgeries?: boolean
+  emergencyContactName?: boolean
+  emergencyContactPhone?: boolean
+  photoUrl?: boolean
+  lat?: boolean
+  lng?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["patientProfile"]>
 
@@ -466,6 +926,21 @@ export type PatientProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   age?: boolean
   gender?: boolean
   location?: boolean
+  homeAddress?: boolean
+  landmark?: boolean
+  pinCode?: boolean
+  bloodGroup?: boolean
+  height?: boolean
+  weight?: boolean
+  allergies?: boolean
+  chronicDiseases?: boolean
+  medications?: boolean
+  surgeries?: boolean
+  emergencyContactName?: boolean
+  emergencyContactPhone?: boolean
+  photoUrl?: boolean
+  lat?: boolean
+  lng?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["patientProfile"]>
 
@@ -475,9 +950,24 @@ export type PatientProfileSelectScalar = {
   age?: boolean
   gender?: boolean
   location?: boolean
+  homeAddress?: boolean
+  landmark?: boolean
+  pinCode?: boolean
+  bloodGroup?: boolean
+  height?: boolean
+  weight?: boolean
+  allergies?: boolean
+  chronicDiseases?: boolean
+  medications?: boolean
+  surgeries?: boolean
+  emergencyContactName?: boolean
+  emergencyContactPhone?: boolean
+  photoUrl?: boolean
+  lat?: boolean
+  lng?: boolean
 }
 
-export type PatientProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "age" | "gender" | "location", ExtArgs["result"]["patientProfile"]>
+export type PatientProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "age" | "gender" | "location" | "homeAddress" | "landmark" | "pinCode" | "bloodGroup" | "height" | "weight" | "allergies" | "chronicDiseases" | "medications" | "surgeries" | "emergencyContactName" | "emergencyContactPhone" | "photoUrl" | "lat" | "lng", ExtArgs["result"]["patientProfile"]>
 export type PatientProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -499,6 +989,21 @@ export type $PatientProfilePayload<ExtArgs extends runtime.Types.Extensions.Inte
     age: number
     gender: string
     location: string | null
+    homeAddress: string | null
+    landmark: string | null
+    pinCode: string | null
+    bloodGroup: string | null
+    height: number | null
+    weight: number | null
+    allergies: string | null
+    chronicDiseases: string | null
+    medications: string | null
+    surgeries: string | null
+    emergencyContactName: string | null
+    emergencyContactPhone: string | null
+    photoUrl: string | null
+    lat: number | null
+    lng: number | null
   }, ExtArgs["result"]["patientProfile"]>
   composites: {}
 }
@@ -928,6 +1433,21 @@ export interface PatientProfileFieldRefs {
   readonly age: Prisma.FieldRef<"PatientProfile", 'Int'>
   readonly gender: Prisma.FieldRef<"PatientProfile", 'String'>
   readonly location: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly homeAddress: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly landmark: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly pinCode: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly bloodGroup: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly height: Prisma.FieldRef<"PatientProfile", 'Int'>
+  readonly weight: Prisma.FieldRef<"PatientProfile", 'Int'>
+  readonly allergies: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly chronicDiseases: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly medications: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly surgeries: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly emergencyContactName: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly emergencyContactPhone: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly photoUrl: Prisma.FieldRef<"PatientProfile", 'String'>
+  readonly lat: Prisma.FieldRef<"PatientProfile", 'Float'>
+  readonly lng: Prisma.FieldRef<"PatientProfile", 'Float'>
 }
     
 

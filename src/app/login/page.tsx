@@ -3,6 +3,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Heart, Phone, Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
 
 const ROLE_HOME: Record<string, string> = {
   ADMIN:   "/admin",
@@ -14,6 +15,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextUrl = searchParams.get("next");
+  const { refresh } = useAuth();
 
   const [form, setForm] = useState({ mobile: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -45,6 +47,7 @@ function LoginForm() {
       return;
     }
 
+    await refresh();
     const destination = nextUrl ?? ROLE_HOME[data.role] ?? "/";
     router.push(destination);
     router.refresh();

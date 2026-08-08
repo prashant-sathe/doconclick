@@ -4,7 +4,7 @@ import {
   CheckCircle, XCircle, PauseCircle, Search, RefreshCw, Stethoscope,
   Eye, X, Phone, Mail, Award, Hash, Briefcase, DollarSign,
   Clock, MapPin, CreditCard, CalendarCheck, TrendingUp, AlertCircle,
-  CheckCircle2, User,
+  CheckCircle2, User, BadgeCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,10 @@ interface DoctorProfile {
   radius: number;
   bankDetails: string;
   status: string;
+  isVerified: boolean;
+  medRegCertUrl: string | null;
+  degreeCertUrl: string | null;
+  kycDocUrl: string | null;
 }
 
 interface Doctor {
@@ -85,6 +89,13 @@ function DoctorRow({
         <span className={STATUS_BADGE[d.doctorProfile?.status ?? "PENDING"] ?? "badge badge-gray"}>
           {d.doctorProfile?.status ?? "PENDING"}
         </span>
+      </td>
+      <td>
+        {d.doctorProfile?.isVerified ? (
+          <span className="badge badge-success"><BadgeCheck className="w-3 h-3" /> Verified</span>
+        ) : (
+          <span className="badge badge-gray">Not Verified</span>
+        )}
       </td>
       <td>
         <div className="flex items-center gap-1.5">
@@ -162,6 +173,19 @@ function DoctorDrawer({
     setData(await res.json());
   };
 
+  const toggleVerified = async () => {
+    if (!data?.doctorProfile) return;
+    setUpdating(true);
+    await fetch(`/api/admin/doctors/${doctorId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isVerified: !data.doctorProfile.isVerified }),
+    });
+    setUpdating(false);
+    const res = await fetch(`/api/admin/doctors/${doctorId}`);
+    setData(await res.json());
+  };
+
   const p = data?.doctorProfile;
   const s = data?.stats;
 
@@ -182,15 +206,29 @@ function DoctorDrawer({
               <div className="text-xl font-extrabold text-white">{data?.name ?? "Loading…"}</div>
               <div className="text-blue-100 text-sm mt-0.5">{p?.specialty ?? ""} · {p?.qualification ?? ""}</div>
               {p && (
-                <span className={cn(
-                  "mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold",
-                  p.status === "APPROVED"  ? "bg-emerald-400 text-white" :
-                  p.status === "PENDING"   ? "bg-amber-400 text-white" :
-                  p.status === "SUSPENDED" ? "bg-slate-500 text-white" :
-                                             "bg-red-400 text-white"
-                )}>
-                  {p.status}
-                </span>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className={cn(
+                    "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold",
+                    p.status === "APPROVED"  ? "bg-emerald-400 text-white" :
+                    p.status === "PENDING"   ? "bg-amber-400 text-white" :
+                    p.status === "SUSPENDED" ? "bg-slate-500 text-white" :
+                                               "bg-red-400 text-white"
+                  )}>
+                    {p.status}
+                  </span>
+                  <button
+                    onClick={toggleVerified}
+                    disabled={updating}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold transition-colors disabled:opacity-50",
+                      p.isVerified ? "bg-white text-emerald-600" : "bg-white/10 text-white hover:bg-white/20"
+                    )}
+                    title="Toggle qualification verification"
+                  >
+                    <BadgeCheck className="w-3.5 h-3.5" />
+                    {p.isVerified ? "Verified" : "Mark Verified"}
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -247,6 +285,26 @@ function DoctorDrawer({
                 <div className="bg-slate-50 rounded-xl p-3 text-sm text-slate-700 font-mono">
                   {p?.bankDetails ?? "Not provided"}
                 </div>
+              </Section>
+
+              {/* Verification Documents */}
+              <Section title="Verification Documents" icon={BadgeCheck}>
+                {[
+                  { label: "Registration Certificate", url: p?.medRegCertUrl },
+                  { label: "Medical Degree Certificate", url: p?.degreeCertUrl },
+                  { label: "Government ID (KYC)", url: p?.kycDocUrl },
+                ].map(({ label, url }) => (
+                  <div key={label} className="flex items-center justify-between px-4 py-3 gap-4">
+                    <span className="text-sm text-slate-500">{label}</span>
+                    {url ? (
+                      <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 font-semibold hover:underline">
+                        View document →
+                      </a>
+                    ) : (
+                      <span className="text-sm text-slate-300">Not uploaded</span>
+                    )}
+                  </div>
+                ))}
               </Section>
 
               {/* Recent Appointments */}
@@ -413,12 +471,13 @@ export default function AdminDoctors() {
                   <th>Experience</th>
                   <th>Fee (₹)</th>
                   <th>Status</th>
+                  <th>Verified</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={7} className="text-center py-12 text-slate-400">
+                  <tr><td colSpan={8} className="text-center py-12 text-slate-400">
                     <Stethoscope className="w-8 h-8 mx-auto mb-2 opacity-30" />
                     No doctors found.
                   </td></tr>
