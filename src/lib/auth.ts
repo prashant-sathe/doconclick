@@ -6,6 +6,12 @@ const JWT_SECRET = process.env.JWT_SECRET ?? "doconclick_super_secret_jwt_key_ch
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 
+// Browsers drop `Secure` cookies on plain HTTP origins, so a NODE_ENV=production
+// deployment served without TLS (e.g. straight to an EC2 IP) needs to opt out
+// via COOKIE_SECURE=false until a domain + HTTPS are in place.
+export const COOKIE_SECURE =
+  process.env.NODE_ENV === "production" && process.env.COOKIE_SECURE !== "false";
+
 export type JWTPayload = {
   id: string;
   name: string;
@@ -47,7 +53,7 @@ export async function setAuthCookie(payload: JWTPayload) {
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: COOKIE_SECURE,
     sameSite: "lax",
     maxAge: COOKIE_MAX_AGE,
     path: "/",
@@ -58,7 +64,7 @@ export async function clearAuthCookie() {
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: COOKIE_SECURE,
     sameSite: "lax",
     maxAge: 0,
     path: "/",

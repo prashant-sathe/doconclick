@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { COOKIE_SECURE } from "@/lib/auth";
 
 const COOKIE_NAME = "doconclick_token";
 
@@ -7,7 +8,7 @@ export async function POST() {
   const response = NextResponse.json({ success: true });
   response.cookies.set(COOKIE_NAME, "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: COOKIE_SECURE,
     sameSite: "lax",
     maxAge: 0,
     path: "/",

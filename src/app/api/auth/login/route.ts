@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword, signToken, type JWTPayload } from "@/lib/auth";
+import { verifyPassword, signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
 
     response.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: COOKIE_SECURE,
       sameSite: "lax",
       maxAge: COOKIE_MAX_AGE,
       path: "/",
