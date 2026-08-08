@@ -58,9 +58,12 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - uploads:/var/www/uploads:ro
+      - letsencrypt:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
     depends_on:
       app:
         condition: service_healthy
@@ -68,3 +71,5 @@ services:
 volumes:
   postgres_data:
   uploads:
+  letsencrypt:
+  certbot-www:
