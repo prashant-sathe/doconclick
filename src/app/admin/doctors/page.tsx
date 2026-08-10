@@ -533,7 +533,7 @@ export default function AdminDoctors() {
       {viewId && (
         <DoctorDrawer
           doctorId={viewId}
-          onClose={() => setViewId(null)}
+          onClose={() => { setViewId(null); load(); }}
           onStatusChange={load}
         />
       )}
