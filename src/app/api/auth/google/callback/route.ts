@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
-import { STATE_COOKIE_NAME, decodeState } from "@/lib/googleOAuth";
+import { STATE_COOKIE_NAME, decodeState, externalOrigin } from "@/lib/googleOAuth";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -29,11 +29,12 @@ function failureRedirect(origin: string, reason: string) {
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
+  const origin = externalOrigin(req, url);
   const code = url.searchParams.get("code");
   const rawState = url.searchParams.get("state");
 
   if (!code || !rawState) {
-    return failureRedirect(url.origin, "google_failed");
+    return failureRedirect(origin, "google_failed");
   }
 
   const state = decodeState(rawState);
@@ -41,7 +42,7 @@ export async function GET(req: Request) {
   const expectedNonce = cookieStore.get(STATE_COOKIE_NAME)?.value;
 
   if (!state || !expectedNonce || state.nonce !== expectedNonce) {
-    return failureRedirect(url.origin, "google_state_mismatch");
+    return failureRedirect(origin, "google_state_mismatch");
   }
 
   try {
@@ -52,13 +53,13 @@ export async function GET(req: Request) {
         code,
         client_id: process.env.GOOGLE_CLIENT_ID ?? "",
         client_secret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-        redirect_uri: `${url.origin}/api/auth/google/callback`,
+        redirect_uri: `${origin}/api/auth/google/callback`,
         grant_type: "authorization_code",
       }),
     });
 
     if (!tokenRes.ok) {
-      return failureRedirect(url.origin, "google_failed");
+      return failureRedirect(origin, "google_failed");
     }
 
     const { access_token: accessToken } = await tokenRes.json();
@@ -68,12 +69,12 @@ export async function GET(req: Request) {
     });
 
     if (!userInfoRes.ok) {
-      return failureRedirect(url.origin, "google_failed");
+      return failureRedirect(origin, "google_failed");
     }
 
     const googleUser: GoogleUserInfo = await userInfoRes.json();
     if (!googleUser.email) {
-      return failureRedirect(url.origin, "google_no_email");
+      return failureRedirect(origin, "google_no_email");
     }
 
     let user = await prisma.user.findUnique({ where: { email: googleUser.email } });
@@ -81,7 +82,7 @@ export async function GET(req: Request) {
     if (!user && state.intent === "reset") {
       // Forgot-password flow: never create an account here — if no existing
       // account uses this Google email, this reset method just isn't available.
-      return failureRedirect(url.origin, "google_no_account");
+      return failureRedirect(origin, "google_no_account");
     }
 
     if (!user) {
@@ -114,7 +115,7 @@ export async function GET(req: Request) {
           ? "/complete-profile"
           : state.next || ROLE_HOME[user.role] || "/";
 
-    const response = NextResponse.redirect(new URL(destination, url.origin));
+    const response = NextResponse.redirect(new URL(destination, origin));
     response.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: COOKIE_SECURE,
@@ -126,6 +127,6 @@ export async function GET(req: Request) {
     return response;
   } catch (err) {
     console.error("Google OAuth callback error:", err);
-    return failureRedirect(url.origin, "google_failed");
+    return failureRedirect(origin, "google_failed");
   }
 }

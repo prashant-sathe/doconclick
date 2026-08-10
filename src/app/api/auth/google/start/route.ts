@@ -5,6 +5,7 @@ import {
   STATE_COOKIE_MAX_AGE,
   encodeState,
   newNonce,
+  externalOrigin,
   type OAuthRole,
   type OAuthIntent,
 } from "@/lib/googleOAuth";
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
 
   const nonce = newNonce();
   const state = encodeState({ nonce, role, next, intent });
-  const redirectUri = `${url.origin}/api/auth/google/callback`;
+  const redirectUri = `${externalOrigin(req, url)}/api/auth/google/callback`;
 
   const googleUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   googleUrl.searchParams.set("client_id", process.env.GOOGLE_CLIENT_ID ?? "");
