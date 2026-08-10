@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Loader2, Award, Hash, Briefcase, IndianRupee, MapPin, Clock,
   CreditCard, Camera, FileText, Shield, BadgeCheck, CheckCircle2,
-  Save, ArrowRight, UploadCloud, Home, Navigation, Lock,
+  Save, ArrowRight, UploadCloud, Home, Navigation, Lock, Languages,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 interface FormState {
   specialty: string;
   qualification: string;
+  languages: string;
   medRegNo: string;
   experience: string;
   consultFee: string;
@@ -36,7 +37,7 @@ interface FormState {
 }
 
 const EMPTY_FORM: FormState = {
-  specialty: "General Physician", qualification: "", medRegNo: "", experience: "",
+  specialty: "General Physician", qualification: "", languages: "", medRegNo: "", experience: "",
   consultFee: "", homeVisitFee: "", offersHomeVisit: true, radius: 10,
   bankName: "", bankAccount: "", ifsc: "", address: "", lat: null, lng: null,
 };
@@ -151,6 +152,7 @@ export default function DoctorProfilePage() {
         setForm({
           specialty: p.specialty ?? "General Physician",
           qualification: p.qualification ?? "",
+          languages: p.languages ?? "",
           medRegNo: p.medRegNo ?? "",
           experience: p.experience ? String(p.experience) : "",
           consultFee: p.consultFee ? String(p.consultFee) : "",
@@ -226,6 +228,7 @@ export default function DoctorProfilePage() {
       body: JSON.stringify({
         specialty: form.specialty,
         qualification: form.qualification,
+        languages: form.languages,
         medRegNo: form.medRegNo,
         experience: form.experience,
         consultFee: form.consultFee,
@@ -300,6 +303,10 @@ export default function DoctorProfilePage() {
               <div>
                 <label className="input-label">Qualification</label>
                 <input className="input-field" placeholder="MBBS, MD" value={form.qualification} onChange={(e) => set("qualification", e.target.value)} />
+              </div>
+              <div>
+                <label className="input-label"><Languages className="inline w-3.5 h-3.5 mr-1" />Languages Spoken</label>
+                <input className="input-field" placeholder="English, Hindi, Marathi" value={form.languages} onChange={(e) => set("languages", e.target.value)} />
               </div>
               <div>
                 <label className="input-label"><Hash className="inline w-3.5 h-3.5 mr-1" />Medical Registration Number</label>

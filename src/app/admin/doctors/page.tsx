@@ -4,7 +4,7 @@ import {
   CheckCircle, XCircle, PauseCircle, Search, RefreshCw, Stethoscope,
   Eye, X, Phone, Mail, Award, Hash, Briefcase, DollarSign,
   Clock, MapPin, CreditCard, CalendarCheck, TrendingUp, AlertCircle,
-  CheckCircle2, User, BadgeCheck,
+  CheckCircle2, User, BadgeCheck, Languages,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 interface DoctorProfile {
   specialty: string;
   qualification: string;
+  languages: string;
   medRegNo: string;
   experience: number;
   consultFee: number;
@@ -272,6 +273,7 @@ function DoctorDrawer({
               {/* Professional */}
               <Section title="Professional Details" icon={Stethoscope}>
                 <Row icon={Award}      label="Qualification"    value={p?.qualification ?? "—"} />
+                <Row icon={Languages}  label="Languages"        value={p?.languages ?? "—"} />
                 <Row icon={Hash}       label="Reg. Number"      value={p?.medRegNo ?? "—"} mono />
                 <Row icon={Briefcase}  label="Experience"       value={p ? `${p.experience} years` : "—"} />
                 <Row icon={DollarSign} label="Clinic Fee"       value={p ? `₹${p.consultFee}` : "—"} />
