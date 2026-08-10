@@ -4,11 +4,10 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Stethoscope, Users, CalendarCheck,
   DollarSign, MessageCircle, Settings, Heart,
-  LogOut, ChevronRight, Loader2,
+  LogOut, ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
-import { useState } from "react";
 
 const navItems = [
   { href: "/admin",            label: "Overview",    icon: LayoutDashboard },
@@ -23,12 +22,6 @@ const navItems = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const [loggingOut, setLoggingOut] = useState(false);
-
-  const handleLogout = async () => {
-    setLoggingOut(true);
-    await logout();
-  };
 
   return (
     <aside className="h-screen w-64 fixed left-0 top-0 flex flex-col border-r border-slate-200/70 bg-slate-50/80 backdrop-blur-xl z-40">
@@ -79,15 +72,11 @@ export default function AdminSidebar() {
           </div>
         </div>
         <button
-          onClick={handleLogout}
-          disabled={loggingOut}
+          onClick={logout}
           className="sidebar-item w-full text-red-500 hover:bg-red-50 hover:text-red-600"
         >
-          {loggingOut
-            ? <Loader2 className="w-4 h-4 animate-spin" />
-            : <LogOut className="w-4 h-4" />
-          }
-          <span>{loggingOut ? "Signing out…" : "Sign Out"}</span>
+          <LogOut className="w-4 h-4" />
+          <span>Sign Out</span>
         </button>
       </div>
     </aside>
