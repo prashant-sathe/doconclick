@@ -28,6 +28,8 @@ interface Appointment {
   status: string;
   consultType: string;
   symptoms: string;
+  patientName: string | null;
+  relation: string;
   amount: number;
   paymentMethod: string;
   paymentStatus: string;
@@ -137,6 +139,9 @@ function AppointmentCard({ a, onCancel, onReview }: {
             <div className="text-xs text-slate-400 mt-0.5">
               {new Date(a.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
             </div>
+            {a.relation !== "Self" && a.patientName && (
+              <div className="text-xs text-blue-600 font-medium mt-0.5">For {a.patientName} ({a.relation})</div>
+            )}
           </div>
         </div>
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">

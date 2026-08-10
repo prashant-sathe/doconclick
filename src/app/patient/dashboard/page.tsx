@@ -5,11 +5,12 @@ import {
   MapPin, Home, Building2, Video, Stethoscope, Clock,
   ChevronDown, X, Loader2, CheckCircle, LogOut, Languages,
   Navigation, AlertCircle, IndianRupee, CalendarClock, Siren,
-  CalendarCheck2, Wallet, CreditCard, AlertTriangle, ShieldCheck,
+  CalendarCheck2, Wallet, CreditCard, AlertTriangle, ShieldCheck, Users,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { SPECIALTIES, specialtyColor } from "@/lib/specialties";
 import { estimateArrivalMinutes } from "@/lib/eta";
+import { RELATIONS } from "@/lib/relations";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
@@ -116,6 +117,8 @@ function PatientDashboardInner() {
   const [consultType, setConsultType] = useState("HOME");
   const [symptoms, setSymptoms] = useState("");
   const [allergies, setAllergies] = useState("");
+  const [relation, setRelation] = useState("Self");
+  const [patientName, setPatientName] = useState("");
   const [consentGiven, setConsentGiven] = useState(false);
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
@@ -271,6 +274,8 @@ function PatientDashboardInner() {
           setBookingOpen(false);
           setConsultType(doc.doctorProfile?.offersHomeVisit ? "HOME" : "CLINIC");
           setSymptoms("");
+          setRelation("Self");
+          setPatientName("");
           setConsentGiven(false);
           setBooked(null);
           setScheduleMode("NOW");
@@ -376,6 +381,8 @@ function PatientDashboardInner() {
       body: JSON.stringify({
         doctorId: selectedDoctor.id,
         symptoms,
+        patientName,
+        relation,
         allergies,
         consentGiven,
         consultType,
@@ -715,6 +722,21 @@ function PatientDashboardInner() {
                     </button>
                   </div>
 
+                  {/* Who is this for */}
+                  <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />Who is this for?</label>
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    {RELATIONS.map((r) => (
+                      <button key={r} type="button" onClick={() => setRelation(r)}
+                        className={`py-2 rounded-xl border text-xs font-semibold transition-all ${relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                  {relation !== "Self" && (
+                    <input className="input-field mb-4" placeholder={`${relation}'s full name`}
+                      value={patientName} onChange={(e) => setPatientName(e.target.value)} />
+                  )}
+
                   {/* Symptoms */}
                   <label className="input-label">Symptoms / Reason</label>
                   <textarea
@@ -754,7 +776,7 @@ function PatientDashboardInner() {
                     </button>
                     <button
                       onClick={submitBooking}
-                      disabled={booking || !symptoms.trim() || !consentGiven || (scheduleMode === "LATER" && !scheduledAt)}
+                      disabled={booking || !symptoms.trim() || !consentGiven || (scheduleMode === "LATER" && !scheduledAt) || (relation !== "Self" && !patientName.trim())}
                       className="btn-primary flex-1 justify-center py-3"
                     >
                       {booking ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : `Confirm ₹${fee}`}

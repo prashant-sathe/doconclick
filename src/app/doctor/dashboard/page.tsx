@@ -30,6 +30,8 @@ interface Appointment {
   status: string;
   consultType: string;
   symptoms: string;
+  patientName: string | null;
+  relation: string;
   allergies: string | null;
   amount: number;
   paymentMethod: string;
@@ -54,6 +56,10 @@ interface MedicineRow {
 }
 
 const TYPE_ICON: Record<string, React.ElementType> = { HOME: Home, CLINIC: Building2, VIDEO: Video };
+
+function patientLabel(a: Appointment): string {
+  return a.relation !== "Self" && a.patientName ? a.patientName : a.patient.name;
+}
 const EMPTY_ROW: MedicineRow = { name: "", dosage: "", frequency: "", duration: "", instructions: "" };
 
 function CompleteVisitForm({ appt, onDone, onCancel }: {
@@ -333,7 +339,10 @@ export default function DoctorDashboard() {
                       </div>
                       <div className="min-w-0">
                         <div className="font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
-                          {a.patient.name}
+                          {patientLabel(a)}
+                          {a.relation !== "Self" && (
+                            <span className="badge badge-gray text-[10px]">{a.relation} of {a.patient.name}</span>
+                          )}
                           {a.isEmergency && <span className="badge badge-danger"><Siren className="w-3 h-3" /> Emergency</span>}
                         </div>
                         <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
@@ -390,8 +399,11 @@ export default function DoctorDashboard() {
                         <div className="min-w-0">
                           <div className="font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
                             <Link href={`/doctor/patients/${a.patientId}`} className="hover:underline hover:text-teal-600">
-                              {a.patient.name}
+                              {patientLabel(a)}
                             </Link>
+                            {a.relation !== "Self" && (
+                              <span className="badge badge-gray text-[10px]">{a.relation} of {a.patient.name}</span>
+                            )}
                             {a.isEmergency && (
                               <span className="badge badge-danger"><Siren className="w-3 h-3" /> Emergency</span>
                             )}
@@ -484,8 +496,11 @@ export default function DoctorDashboard() {
                 <div key={a.id} className="px-6 py-3.5 flex items-center justify-between">
                   <div>
                     <Link href={`/doctor/patients/${a.patientId}`} className="font-semibold text-slate-800 text-sm hover:underline hover:text-teal-600">
-                      {a.patient.name}
+                      {patientLabel(a)}
                     </Link>
+                    {a.relation !== "Self" && (
+                      <span className="badge badge-gray text-[10px] ml-1.5">{a.relation} of {a.patient.name}</span>
+                    )}
                     <div className="text-xs text-slate-400">
                       {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
                     </div>

@@ -8,6 +8,8 @@ interface Appointment {
   patient: { name: string };
   doctor: { name: string };
   symptoms: string;
+  patientName: string | null;
+  relation: string;
   consultType: string;
   status: string;
   amount: number;
@@ -46,6 +48,7 @@ export default function AdminBookings() {
     .filter((b) =>
       search === "" ||
       b.patient.name.toLowerCase().includes(search.toLowerCase()) ||
+      (b.patientName?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
       b.doctor.name.toLowerCase().includes(search.toLowerCase())
     );
 
@@ -127,7 +130,12 @@ export default function AdminBookings() {
                   </td></tr>
                 ) : filtered.map((b) => (
                   <tr key={b.id}>
-                    <td className="font-semibold text-slate-900">{b.patient.name}</td>
+                    <td className="font-semibold text-slate-900">
+                      {b.relation !== "Self" && b.patientName ? b.patientName : b.patient.name}
+                      {b.relation !== "Self" && (
+                        <div className="text-xs font-normal text-slate-400">{b.relation} of {b.patient.name}</div>
+                      )}
+                    </td>
                     <td>{b.doctor.name}</td>
                     <td><span className={TYPE_BADGE[b.consultType] ?? "badge badge-gray"}>{b.consultType}</span></td>
                     <td className="max-w-[160px] truncate text-slate-600">{b.symptoms}</td>

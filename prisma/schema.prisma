@@ -95,6 +95,8 @@ model Appointment {
   doctorId      String
   doctor        User      @relation("DoctorAppointments", fields: [doctorId], references: [id])
   symptoms      String
+  patientName   String?
+  relation      String    @default("Self")
   allergies     String?
   consentGiven  Boolean   @default(false)
   consultType   String    @default("CLINIC") // CLINIC, HOME, VIDEO

@@ -12,6 +12,8 @@ export async function POST(req: Request) {
     const {
       doctorId,
       symptoms,
+      patientName,
+      relation,
       allergies,
       consentGiven,
       consultType,
@@ -24,6 +26,14 @@ export async function POST(req: Request) {
 
     if (!doctorId || !symptoms || !consultType) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const normalizedRelation = relation && relation.trim() ? relation.trim() : "Self";
+    if (normalizedRelation !== "Self" && !patientName?.trim()) {
+      return NextResponse.json(
+        { error: "Please enter the patient's name." },
+        { status: 400 }
+      );
     }
 
     // Emergency requests are a deliberate one-tap flow — consent is implied by the
@@ -70,6 +80,8 @@ export async function POST(req: Request) {
         patientId: authUser.id,
         doctorId,
         symptoms,
+        patientName: normalizedRelation === "Self" ? null : patientName.trim(),
+        relation: normalizedRelation,
         allergies: allergies?.trim() ? allergies.trim() : null,
         consentGiven: isEmergency ? true : Boolean(consentGiven),
         consultType,

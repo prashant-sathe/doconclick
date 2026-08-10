@@ -45,6 +45,8 @@ export type AppointmentMinAggregateOutputType = {
   patientId: string | null
   doctorId: string | null
   symptoms: string | null
+  patientName: string | null
+  relation: string | null
   allergies: string | null
   consentGiven: boolean | null
   consultType: string | null
@@ -70,6 +72,8 @@ export type AppointmentMaxAggregateOutputType = {
   patientId: string | null
   doctorId: string | null
   symptoms: string | null
+  patientName: string | null
+  relation: string | null
   allergies: string | null
   consentGiven: boolean | null
   consultType: string | null
@@ -95,6 +99,8 @@ export type AppointmentCountAggregateOutputType = {
   patientId: number
   doctorId: number
   symptoms: number
+  patientName: number
+  relation: number
   allergies: number
   consentGiven: number
   consultType: number
@@ -136,6 +142,8 @@ export type AppointmentMinAggregateInputType = {
   patientId?: true
   doctorId?: true
   symptoms?: true
+  patientName?: true
+  relation?: true
   allergies?: true
   consentGiven?: true
   consultType?: true
@@ -161,6 +169,8 @@ export type AppointmentMaxAggregateInputType = {
   patientId?: true
   doctorId?: true
   symptoms?: true
+  patientName?: true
+  relation?: true
   allergies?: true
   consentGiven?: true
   consultType?: true
@@ -186,6 +196,8 @@ export type AppointmentCountAggregateInputType = {
   patientId?: true
   doctorId?: true
   symptoms?: true
+  patientName?: true
+  relation?: true
   allergies?: true
   consentGiven?: true
   consultType?: true
@@ -298,6 +310,8 @@ export type AppointmentGroupByOutputType = {
   patientId: string
   doctorId: string
   symptoms: string
+  patientName: string | null
+  relation: string
   allergies: string | null
   consentGiven: boolean
   consultType: string
@@ -346,6 +360,8 @@ export type AppointmentWhereInput = {
   patientId?: Prisma.StringFilter<"Appointment"> | string
   doctorId?: Prisma.StringFilter<"Appointment"> | string
   symptoms?: Prisma.StringFilter<"Appointment"> | string
+  patientName?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  relation?: Prisma.StringFilter<"Appointment"> | string
   allergies?: Prisma.StringNullableFilter<"Appointment"> | string | null
   consentGiven?: Prisma.BoolFilter<"Appointment"> | boolean
   consultType?: Prisma.StringFilter<"Appointment"> | string
@@ -378,6 +394,8 @@ export type AppointmentOrderByWithRelationInput = {
   patientId?: Prisma.SortOrder
   doctorId?: Prisma.SortOrder
   symptoms?: Prisma.SortOrder
+  patientName?: Prisma.SortOrderInput | Prisma.SortOrder
+  relation?: Prisma.SortOrder
   allergies?: Prisma.SortOrderInput | Prisma.SortOrder
   consentGiven?: Prisma.SortOrder
   consultType?: Prisma.SortOrder
@@ -413,6 +431,8 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   patientId?: Prisma.StringFilter<"Appointment"> | string
   doctorId?: Prisma.StringFilter<"Appointment"> | string
   symptoms?: Prisma.StringFilter<"Appointment"> | string
+  patientName?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  relation?: Prisma.StringFilter<"Appointment"> | string
   allergies?: Prisma.StringNullableFilter<"Appointment"> | string | null
   consentGiven?: Prisma.BoolFilter<"Appointment"> | boolean
   consultType?: Prisma.StringFilter<"Appointment"> | string
@@ -445,6 +465,8 @@ export type AppointmentOrderByWithAggregationInput = {
   patientId?: Prisma.SortOrder
   doctorId?: Prisma.SortOrder
   symptoms?: Prisma.SortOrder
+  patientName?: Prisma.SortOrderInput | Prisma.SortOrder
+  relation?: Prisma.SortOrder
   allergies?: Prisma.SortOrderInput | Prisma.SortOrder
   consentGiven?: Prisma.SortOrder
   consultType?: Prisma.SortOrder
@@ -478,6 +500,8 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   patientId?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
   doctorId?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
   symptoms?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
+  patientName?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
+  relation?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
   allergies?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   consentGiven?: Prisma.BoolWithAggregatesFilter<"Appointment"> | boolean
   consultType?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
@@ -501,6 +525,8 @@ export type AppointmentScalarWhereWithAggregatesInput = {
 export type AppointmentCreateInput = {
   id?: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -532,6 +558,8 @@ export type AppointmentUncheckedCreateInput = {
   patientId: string
   doctorId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -559,6 +587,8 @@ export type AppointmentUncheckedCreateInput = {
 export type AppointmentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -590,6 +620,8 @@ export type AppointmentUncheckedUpdateInput = {
   patientId?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -619,6 +651,8 @@ export type AppointmentCreateManyInput = {
   patientId: string
   doctorId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -642,6 +676,8 @@ export type AppointmentCreateManyInput = {
 export type AppointmentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -666,6 +702,8 @@ export type AppointmentUncheckedUpdateManyInput = {
   patientId?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -706,6 +744,8 @@ export type AppointmentCountOrderByAggregateInput = {
   patientId?: Prisma.SortOrder
   doctorId?: Prisma.SortOrder
   symptoms?: Prisma.SortOrder
+  patientName?: Prisma.SortOrder
+  relation?: Prisma.SortOrder
   allergies?: Prisma.SortOrder
   consentGiven?: Prisma.SortOrder
   consultType?: Prisma.SortOrder
@@ -738,6 +778,8 @@ export type AppointmentMaxOrderByAggregateInput = {
   patientId?: Prisma.SortOrder
   doctorId?: Prisma.SortOrder
   symptoms?: Prisma.SortOrder
+  patientName?: Prisma.SortOrder
+  relation?: Prisma.SortOrder
   allergies?: Prisma.SortOrder
   consentGiven?: Prisma.SortOrder
   consultType?: Prisma.SortOrder
@@ -763,6 +805,8 @@ export type AppointmentMinOrderByAggregateInput = {
   patientId?: Prisma.SortOrder
   doctorId?: Prisma.SortOrder
   symptoms?: Prisma.SortOrder
+  patientName?: Prisma.SortOrder
+  relation?: Prisma.SortOrder
   allergies?: Prisma.SortOrder
   consentGiven?: Prisma.SortOrder
   consultType?: Prisma.SortOrder
@@ -986,6 +1030,8 @@ export type AppointmentUpdateOneRequiredWithoutReviewNestedInput = {
 export type AppointmentCreateWithoutPatientInput = {
   id?: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1015,6 +1061,8 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   id?: string
   doctorId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1052,6 +1100,8 @@ export type AppointmentCreateManyPatientInputEnvelope = {
 export type AppointmentCreateWithoutDoctorInput = {
   id?: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1081,6 +1131,8 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   id?: string
   patientId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1139,6 +1191,8 @@ export type AppointmentScalarWhereInput = {
   patientId?: Prisma.StringFilter<"Appointment"> | string
   doctorId?: Prisma.StringFilter<"Appointment"> | string
   symptoms?: Prisma.StringFilter<"Appointment"> | string
+  patientName?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  relation?: Prisma.StringFilter<"Appointment"> | string
   allergies?: Prisma.StringNullableFilter<"Appointment"> | string | null
   consentGiven?: Prisma.BoolFilter<"Appointment"> | boolean
   consultType?: Prisma.StringFilter<"Appointment"> | string
@@ -1178,6 +1232,8 @@ export type AppointmentUpdateManyWithWhereWithoutDoctorInput = {
 export type AppointmentCreateWithoutFollowUpsInput = {
   id?: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1208,6 +1264,8 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   patientId: string
   doctorId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1239,6 +1297,8 @@ export type AppointmentCreateOrConnectWithoutFollowUpsInput = {
 export type AppointmentCreateWithoutFollowUpOfInput = {
   id?: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1269,6 +1329,8 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   patientId: string
   doctorId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1316,6 +1378,8 @@ export type AppointmentUpdateToOneWithWhereWithoutFollowUpsInput = {
 export type AppointmentUpdateWithoutFollowUpsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1346,6 +1410,8 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   patientId?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1388,6 +1454,8 @@ export type AppointmentUpdateManyWithWhereWithoutFollowUpOfInput = {
 export type AppointmentCreateWithoutMessagesInput = {
   id?: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1418,6 +1486,8 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   patientId: string
   doctorId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1460,6 +1530,8 @@ export type AppointmentUpdateToOneWithWhereWithoutMessagesInput = {
 export type AppointmentUpdateWithoutMessagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1490,6 +1562,8 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   patientId?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1516,6 +1590,8 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
 export type AppointmentCreateWithoutMedicinesInput = {
   id?: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1546,6 +1622,8 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   patientId: string
   doctorId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1588,6 +1666,8 @@ export type AppointmentUpdateToOneWithWhereWithoutMedicinesInput = {
 export type AppointmentUpdateWithoutMedicinesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1618,6 +1698,8 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   patientId?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1644,6 +1726,8 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
 export type AppointmentCreateWithoutReviewInput = {
   id?: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1674,6 +1758,8 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   patientId: string
   doctorId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1716,6 +1802,8 @@ export type AppointmentUpdateToOneWithWhereWithoutReviewInput = {
 export type AppointmentUpdateWithoutReviewInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1746,6 +1834,8 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   patientId?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1773,6 +1863,8 @@ export type AppointmentCreateManyPatientInput = {
   id?: string
   doctorId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1797,6 +1889,8 @@ export type AppointmentCreateManyDoctorInput = {
   id?: string
   patientId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -1820,6 +1914,8 @@ export type AppointmentCreateManyDoctorInput = {
 export type AppointmentUpdateWithoutPatientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1849,6 +1945,8 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1877,6 +1975,8 @@ export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1900,6 +2000,8 @@ export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
 export type AppointmentUpdateWithoutDoctorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1929,6 +2031,8 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   patientId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1957,6 +2061,8 @@ export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   patientId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1982,6 +2088,8 @@ export type AppointmentCreateManyFollowUpOfInput = {
   patientId: string
   doctorId: string
   symptoms: string
+  patientName?: string | null
+  relation?: string
   allergies?: string | null
   consentGiven?: boolean
   consultType?: string
@@ -2004,6 +2112,8 @@ export type AppointmentCreateManyFollowUpOfInput = {
 export type AppointmentUpdateWithoutFollowUpOfInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2034,6 +2144,8 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   patientId?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2062,6 +2174,8 @@ export type AppointmentUncheckedUpdateManyWithoutFollowUpOfInput = {
   patientId?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
   allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2135,6 +2249,8 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   patientId?: boolean
   doctorId?: boolean
   symptoms?: boolean
+  patientName?: boolean
+  relation?: boolean
   allergies?: boolean
   consentGiven?: boolean
   consultType?: boolean
@@ -2168,6 +2284,8 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   patientId?: boolean
   doctorId?: boolean
   symptoms?: boolean
+  patientName?: boolean
+  relation?: boolean
   allergies?: boolean
   consentGiven?: boolean
   consultType?: boolean
@@ -2196,6 +2314,8 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   patientId?: boolean
   doctorId?: boolean
   symptoms?: boolean
+  patientName?: boolean
+  relation?: boolean
   allergies?: boolean
   consentGiven?: boolean
   consultType?: boolean
@@ -2224,6 +2344,8 @@ export type AppointmentSelectScalar = {
   patientId?: boolean
   doctorId?: boolean
   symptoms?: boolean
+  patientName?: boolean
+  relation?: boolean
   allergies?: boolean
   consentGiven?: boolean
   consultType?: boolean
@@ -2244,7 +2366,7 @@ export type AppointmentSelectScalar = {
   createdAt?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "allergies" | "consentGiven" | "consultType" | "status" | "paymentMethod" | "paymentStatus" | "isEmergency" | "amount" | "platformFee" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "scheduledAt" | "createdAt", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "consentGiven" | "consultType" | "status" | "paymentMethod" | "paymentStatus" | "isEmergency" | "amount" | "platformFee" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "scheduledAt" | "createdAt", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2282,6 +2404,8 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     patientId: string
     doctorId: string
     symptoms: string
+    patientName: string | null
+    relation: string
     allergies: string | null
     consentGiven: boolean
     consultType: string
@@ -2734,6 +2858,8 @@ export interface AppointmentFieldRefs {
   readonly patientId: Prisma.FieldRef<"Appointment", 'String'>
   readonly doctorId: Prisma.FieldRef<"Appointment", 'String'>
   readonly symptoms: Prisma.FieldRef<"Appointment", 'String'>
+  readonly patientName: Prisma.FieldRef<"Appointment", 'String'>
+  readonly relation: Prisma.FieldRef<"Appointment", 'String'>
   readonly allergies: Prisma.FieldRef<"Appointment", 'String'>
   readonly consentGiven: Prisma.FieldRef<"Appointment", 'Boolean'>
   readonly consultType: Prisma.FieldRef<"Appointment", 'String'>

@@ -5,12 +5,13 @@ import Link from "next/link";
 import {
   MapPin, Video, Home, Building2, Loader2,
   CalendarClock, Wallet, CreditCard, Siren, Clock, IndianRupee,
-  CalendarCheck2, Hash, ClipboardList, AlertTriangle, ShieldCheck,
+  CalendarCheck2, Hash, ClipboardList, AlertTriangle, ShieldCheck, Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { specialtyColor } from "@/lib/specialties";
+import { RELATIONS } from "@/lib/relations";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
@@ -76,7 +77,7 @@ function PatientBookInner() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [specialtyFilter, setSpecialtyFilter] = useState("");
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
-  const [form, setForm] = useState({ doctorId: "", symptoms: "", allergies: "", consultType: "CLINIC" });
+  const [form, setForm] = useState({ doctorId: "", symptoms: "", allergies: "", consultType: "CLINIC", relation: "Self", patientName: "" });
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
@@ -130,6 +131,7 @@ function PatientBookInner() {
     e.preventDefault();
     if (!user?.id) { router.push("/login"); return; }
     if (!isEmergency && !consentGiven) { setError("Please agree to the consent statement to continue."); return; }
+    if (form.relation !== "Self" && !form.patientName.trim()) { setError("Please enter the patient's name."); return; }
     setError("");
     setLoading(true);
     const res = await fetch("/api/appointments", {
@@ -329,6 +331,24 @@ function PatientBookInner() {
                   <CreditCard className="w-3.5 h-3.5" /> Pay Online
                 </button>
               </div>
+            </div>
+
+            <div>
+              <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />Who is this for?</label>
+              <div className="grid grid-cols-4 gap-2">
+                {RELATIONS.map((r) => (
+                  <button key={r} type="button" onClick={() => set("relation", r)}
+                    className={cn("py-2 rounded-xl border text-xs font-semibold transition-all",
+                      form.relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
+                    )}>
+                    {r}
+                  </button>
+                ))}
+              </div>
+              {form.relation !== "Self" && (
+                <input required className="input-field mt-3" placeholder={`${form.relation}'s full name`}
+                  value={form.patientName} onChange={(e) => set("patientName", e.target.value)} />
+              )}
             </div>
 
             <div>
