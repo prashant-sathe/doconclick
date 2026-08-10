@@ -14,6 +14,7 @@ interface DoctorProfile {
   qualification: string;
   languages: string;
   bio: string | null;
+  registrationFeePaid: boolean;
   medRegNo: string;
   experience: number;
   consultFee: number;
@@ -152,9 +153,11 @@ function DoctorDrawer({
   const [data, setData] = useState<DoctorDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [verifyError, setVerifyError] = useState("");
 
   useEffect(() => {
     setLoading(true);
+    setVerifyError("");
     fetch(`/api/admin/doctors/${doctorId}`)
       .then((r) => r.json())
       .then((d) => { setData(d); setLoading(false); });
@@ -177,13 +180,24 @@ function DoctorDrawer({
 
   const toggleVerified = async () => {
     if (!data?.doctorProfile) return;
+    const turningOn = !data.doctorProfile.isVerified;
+    if (turningOn && !data.doctorProfile.registrationFeePaid) {
+      setVerifyError("Doctor hasn't paid the ₹99 registration fee yet.");
+      return;
+    }
+    setVerifyError("");
     setUpdating(true);
-    await fetch(`/api/admin/doctors/${doctorId}`, {
+    const patchRes = await fetch(`/api/admin/doctors/${doctorId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isVerified: !data.doctorProfile.isVerified }),
+      body: JSON.stringify({ isVerified: turningOn }),
     });
     setUpdating(false);
+    if (!patchRes.ok) {
+      const body = await patchRes.json().catch(() => ({}));
+      setVerifyError(body.error ?? "Could not update verification status.");
+      return;
+    }
     const res = await fetch(`/api/admin/doctors/${doctorId}`);
     setData(await res.json());
   };
@@ -218,19 +232,28 @@ function DoctorDrawer({
                   )}>
                     {p.status}
                   </span>
+                  <span className={cn(
+                    "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold",
+                    p.registrationFeePaid ? "bg-emerald-400 text-white" : "bg-amber-400 text-white"
+                  )}>
+                    {p.registrationFeePaid ? "Fee Paid" : "Fee Unpaid"}
+                  </span>
                   <button
                     onClick={toggleVerified}
-                    disabled={updating}
+                    disabled={updating || (!p.isVerified && !p.registrationFeePaid)}
                     className={cn(
                       "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold transition-colors disabled:opacity-50",
                       p.isVerified ? "bg-white text-emerald-600" : "bg-white/10 text-white hover:bg-white/20"
                     )}
-                    title="Toggle qualification verification"
+                    title={!p.isVerified && !p.registrationFeePaid ? "Doctor hasn't paid the registration fee yet" : "Toggle qualification verification"}
                   >
                     <BadgeCheck className="w-3.5 h-3.5" />
                     {p.isVerified ? "Verified" : "Mark Verified"}
                   </button>
                 </div>
+              )}
+              {verifyError && (
+                <p className="text-xs text-red-100 bg-red-500/30 rounded-lg px-2.5 py-1 mt-2">{verifyError}</p>
               )}
             </div>
           </div>

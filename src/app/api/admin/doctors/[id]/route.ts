@@ -56,6 +56,18 @@ export async function PATCH(
   }
 
   if (isVerified !== undefined) {
+    if (isVerified) {
+      const profile = await prisma.doctorProfile.findUnique({
+        where: { userId: id },
+        select: { registrationFeePaid: true },
+      });
+      if (!profile?.registrationFeePaid) {
+        return NextResponse.json(
+          { error: "Cannot verify: doctor hasn't paid the ₹99 registration fee yet." },
+          { status: 400 }
+        );
+      }
+    }
     data.isVerified = Boolean(isVerified);
   }
 
