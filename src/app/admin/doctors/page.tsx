@@ -4,7 +4,7 @@ import {
   CheckCircle, XCircle, PauseCircle, Search, RefreshCw, Stethoscope,
   Eye, X, Phone, Mail, Award, Hash, Briefcase, DollarSign,
   Clock, MapPin, CreditCard, CalendarCheck, TrendingUp, AlertCircle,
-  CheckCircle2, User, BadgeCheck, Languages,
+  CheckCircle2, User, BadgeCheck, Languages, FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,7 @@ interface DoctorProfile {
   specialty: string;
   qualification: string;
   languages: string;
+  bio: string | null;
   medRegNo: string;
   experience: number;
   consultFee: number;
@@ -262,6 +263,12 @@ function DoctorDrawer({
                   </div>
                 ))}
               </div>
+
+              {p?.bio && (
+                <Section title="About" icon={FileText}>
+                  <p className="text-sm text-slate-600 leading-relaxed px-4 py-3">{p.bio}</p>
+                </Section>
+              )}
 
               {/* Contact */}
               <Section title="Contact Information" icon={User}>

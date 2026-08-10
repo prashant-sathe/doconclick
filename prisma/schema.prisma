@@ -71,6 +71,7 @@ model DoctorProfile {
   lat           Float?
   lng           Float?
   languages     String  @default("English, Hindi")
+  bio           String?
   offersHomeVisit Boolean @default(true)
   isVerified    Boolean @default(false)
   avgRating     Float   @default(0)

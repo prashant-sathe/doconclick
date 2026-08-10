@@ -27,6 +27,7 @@ interface Doctor {
     homeVisitFee: number;
     availability: string;
     languages: string;
+    bio: string | null;
     isVerified: boolean;
     offersHomeVisit: boolean;
     avgRating: number;
@@ -267,6 +268,9 @@ function PatientBookInner() {
                 </div>
                 <div className="text-xs mt-0.5">{selectedDoctor.doctorProfile.specialty} · {selectedDoctor.doctorProfile.experience} yrs · {selectedDoctor.doctorProfile.availability}</div>
                 <div className="text-xs mt-0.5">Speaks: {selectedDoctor.doctorProfile.languages}</div>
+                {selectedDoctor.doctorProfile.bio && (
+                  <div className="text-xs mt-1 text-blue-700/80 line-clamp-2">{selectedDoctor.doctorProfile.bio}</div>
+                )}
                 <div className="mt-1.5">
                   <RatingStars avgRating={selectedDoctor.doctorProfile.avgRating} totalReviews={selectedDoctor.doctorProfile.totalReviews} />
                 </div>

@@ -41,6 +41,7 @@ const EDITABLE_FIELDS = [
   "radius",
   "offersHomeVisit",
   "languages",
+  "bio",
   "bankDetails",
   "address",
   "lat",

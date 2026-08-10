@@ -28,6 +28,7 @@ interface DoctorProfile {
   lng: number | null;
   qualification: string;
   languages: string;
+  bio: string | null;
   isVerified: boolean;
   offersHomeVisit: boolean;
   avgRating: number;
@@ -798,6 +799,12 @@ function PatientDashboardInner() {
                       <Languages className="w-3 h-3" /> {selectedDoctor.doctorProfile.languages}
                     </span>
                   </div>
+
+                  {selectedDoctor.doctorProfile.bio && (
+                    <p className="text-sm text-slate-600 bg-slate-50 rounded-xl p-3.5 mb-5 leading-relaxed">
+                      {selectedDoctor.doctorProfile.bio}
+                    </p>
+                  )}
 
                   {/* Fee cards */}
                   <div className="grid grid-cols-2 gap-3 mb-3">

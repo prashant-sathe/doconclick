@@ -133,6 +133,7 @@ export const DoctorProfileScalarFieldEnum = {
   lat: 'lat',
   lng: 'lng',
   languages: 'languages',
+  bio: 'bio',
   offersHomeVisit: 'offersHomeVisit',
   isVerified: 'isVerified',
   avgRating: 'avgRating',

@@ -22,6 +22,7 @@ interface FormState {
   specialty: string;
   qualification: string;
   languages: string;
+  bio: string;
   medRegNo: string;
   experience: string;
   consultFee: string;
@@ -37,7 +38,7 @@ interface FormState {
 }
 
 const EMPTY_FORM: FormState = {
-  specialty: "General Physician", qualification: "", languages: "", medRegNo: "", experience: "",
+  specialty: "General Physician", qualification: "", languages: "", bio: "", medRegNo: "", experience: "",
   consultFee: "", homeVisitFee: "", offersHomeVisit: true, radius: 10,
   bankName: "", bankAccount: "", ifsc: "", address: "", lat: null, lng: null,
 };
@@ -153,6 +154,7 @@ export default function DoctorProfilePage() {
           specialty: p.specialty ?? "General Physician",
           qualification: p.qualification ?? "",
           languages: p.languages ?? "",
+          bio: p.bio ?? "",
           medRegNo: p.medRegNo ?? "",
           experience: p.experience ? String(p.experience) : "",
           consultFee: p.consultFee ? String(p.consultFee) : "",
@@ -229,6 +231,7 @@ export default function DoctorProfilePage() {
         specialty: form.specialty,
         qualification: form.qualification,
         languages: form.languages,
+        bio: form.bio,
         medRegNo: form.medRegNo,
         experience: form.experience,
         consultFee: form.consultFee,
@@ -307,6 +310,16 @@ export default function DoctorProfilePage() {
               <div>
                 <label className="input-label"><Languages className="inline w-3.5 h-3.5 mr-1" />Languages Spoken</label>
                 <input className="input-field" placeholder="English, Hindi, Marathi" value={form.languages} onChange={(e) => set("languages", e.target.value)} />
+              </div>
+              <div>
+                <label className="input-label"><FileText className="inline w-3.5 h-3.5 mr-1" />About You</label>
+                <textarea
+                  rows={3}
+                  className="input-field resize-none"
+                  placeholder="Tell patients a bit about your experience, approach to care, and specialties…"
+                  value={form.bio}
+                  onChange={(e) => set("bio", e.target.value)}
+                />
               </div>
               <div>
                 <label className="input-label"><Hash className="inline w-3.5 h-3.5 mr-1" />Medical Registration Number</label>

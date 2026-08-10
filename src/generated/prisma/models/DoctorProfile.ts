@@ -63,6 +63,7 @@ export type DoctorProfileMinAggregateOutputType = {
   lat: number | null
   lng: number | null
   languages: string | null
+  bio: string | null
   offersHomeVisit: boolean | null
   isVerified: boolean | null
   avgRating: number | null
@@ -92,6 +93,7 @@ export type DoctorProfileMaxAggregateOutputType = {
   lat: number | null
   lng: number | null
   languages: string | null
+  bio: string | null
   offersHomeVisit: boolean | null
   isVerified: boolean | null
   avgRating: number | null
@@ -121,6 +123,7 @@ export type DoctorProfileCountAggregateOutputType = {
   lat: number
   lng: number
   languages: number
+  bio: number
   offersHomeVisit: number
   isVerified: number
   avgRating: number
@@ -174,6 +177,7 @@ export type DoctorProfileMinAggregateInputType = {
   lat?: true
   lng?: true
   languages?: true
+  bio?: true
   offersHomeVisit?: true
   isVerified?: true
   avgRating?: true
@@ -203,6 +207,7 @@ export type DoctorProfileMaxAggregateInputType = {
   lat?: true
   lng?: true
   languages?: true
+  bio?: true
   offersHomeVisit?: true
   isVerified?: true
   avgRating?: true
@@ -232,6 +237,7 @@ export type DoctorProfileCountAggregateInputType = {
   lat?: true
   lng?: true
   languages?: true
+  bio?: true
   offersHomeVisit?: true
   isVerified?: true
   avgRating?: true
@@ -348,6 +354,7 @@ export type DoctorProfileGroupByOutputType = {
   lat: number | null
   lng: number | null
   languages: string
+  bio: string | null
   offersHomeVisit: boolean
   isVerified: boolean
   avgRating: number
@@ -400,6 +407,7 @@ export type DoctorProfileWhereInput = {
   lat?: Prisma.FloatNullableFilter<"DoctorProfile"> | number | null
   lng?: Prisma.FloatNullableFilter<"DoctorProfile"> | number | null
   languages?: Prisma.StringFilter<"DoctorProfile"> | string
+  bio?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   offersHomeVisit?: Prisma.BoolFilter<"DoctorProfile"> | boolean
   isVerified?: Prisma.BoolFilter<"DoctorProfile"> | boolean
   avgRating?: Prisma.FloatFilter<"DoctorProfile"> | number
@@ -430,6 +438,7 @@ export type DoctorProfileOrderByWithRelationInput = {
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
   languages?: Prisma.SortOrder
+  bio?: Prisma.SortOrderInput | Prisma.SortOrder
   offersHomeVisit?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
@@ -463,6 +472,7 @@ export type DoctorProfileWhereUniqueInput = Prisma.AtLeast<{
   lat?: Prisma.FloatNullableFilter<"DoctorProfile"> | number | null
   lng?: Prisma.FloatNullableFilter<"DoctorProfile"> | number | null
   languages?: Prisma.StringFilter<"DoctorProfile"> | string
+  bio?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   offersHomeVisit?: Prisma.BoolFilter<"DoctorProfile"> | boolean
   isVerified?: Prisma.BoolFilter<"DoctorProfile"> | boolean
   avgRating?: Prisma.FloatFilter<"DoctorProfile"> | number
@@ -493,6 +503,7 @@ export type DoctorProfileOrderByWithAggregationInput = {
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
   languages?: Prisma.SortOrder
+  bio?: Prisma.SortOrderInput | Prisma.SortOrder
   offersHomeVisit?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
@@ -530,6 +541,7 @@ export type DoctorProfileScalarWhereWithAggregatesInput = {
   lat?: Prisma.FloatNullableWithAggregatesFilter<"DoctorProfile"> | number | null
   lng?: Prisma.FloatNullableWithAggregatesFilter<"DoctorProfile"> | number | null
   languages?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
+  bio?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
   offersHomeVisit?: Prisma.BoolWithAggregatesFilter<"DoctorProfile"> | boolean
   isVerified?: Prisma.BoolWithAggregatesFilter<"DoctorProfile"> | boolean
   avgRating?: Prisma.FloatWithAggregatesFilter<"DoctorProfile"> | number
@@ -558,6 +570,7 @@ export type DoctorProfileCreateInput = {
   lat?: number | null
   lng?: number | null
   languages?: string
+  bio?: string | null
   offersHomeVisit?: boolean
   isVerified?: boolean
   avgRating?: number
@@ -588,6 +601,7 @@ export type DoctorProfileUncheckedCreateInput = {
   lat?: number | null
   lng?: number | null
   languages?: string
+  bio?: string | null
   offersHomeVisit?: boolean
   isVerified?: boolean
   avgRating?: number
@@ -616,6 +630,7 @@ export type DoctorProfileUpdateInput = {
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   languages?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -646,6 +661,7 @@ export type DoctorProfileUncheckedUpdateInput = {
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   languages?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -675,6 +691,7 @@ export type DoctorProfileCreateManyInput = {
   lat?: number | null
   lng?: number | null
   languages?: string
+  bio?: string | null
   offersHomeVisit?: boolean
   isVerified?: boolean
   avgRating?: number
@@ -703,6 +720,7 @@ export type DoctorProfileUpdateManyMutationInput = {
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   languages?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -732,6 +750,7 @@ export type DoctorProfileUncheckedUpdateManyInput = {
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   languages?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -766,6 +785,7 @@ export type DoctorProfileCountOrderByAggregateInput = {
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
   languages?: Prisma.SortOrder
+  bio?: Prisma.SortOrder
   offersHomeVisit?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
@@ -806,6 +826,7 @@ export type DoctorProfileMaxOrderByAggregateInput = {
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
   languages?: Prisma.SortOrder
+  bio?: Prisma.SortOrder
   offersHomeVisit?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
@@ -835,6 +856,7 @@ export type DoctorProfileMinOrderByAggregateInput = {
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
   languages?: Prisma.SortOrder
+  bio?: Prisma.SortOrder
   offersHomeVisit?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
@@ -918,6 +940,7 @@ export type DoctorProfileCreateWithoutUserInput = {
   lat?: number | null
   lng?: number | null
   languages?: string
+  bio?: string | null
   offersHomeVisit?: boolean
   isVerified?: boolean
   avgRating?: number
@@ -946,6 +969,7 @@ export type DoctorProfileUncheckedCreateWithoutUserInput = {
   lat?: number | null
   lng?: number | null
   languages?: string
+  bio?: string | null
   offersHomeVisit?: boolean
   isVerified?: boolean
   avgRating?: number
@@ -990,6 +1014,7 @@ export type DoctorProfileUpdateWithoutUserInput = {
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   languages?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1018,6 +1043,7 @@ export type DoctorProfileUncheckedUpdateWithoutUserInput = {
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   languages?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1049,6 +1075,7 @@ export type DoctorProfileSelect<ExtArgs extends runtime.Types.Extensions.Interna
   lat?: boolean
   lng?: boolean
   languages?: boolean
+  bio?: boolean
   offersHomeVisit?: boolean
   isVerified?: boolean
   avgRating?: boolean
@@ -1079,6 +1106,7 @@ export type DoctorProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   lat?: boolean
   lng?: boolean
   languages?: boolean
+  bio?: boolean
   offersHomeVisit?: boolean
   isVerified?: boolean
   avgRating?: boolean
@@ -1109,6 +1137,7 @@ export type DoctorProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   lat?: boolean
   lng?: boolean
   languages?: boolean
+  bio?: boolean
   offersHomeVisit?: boolean
   isVerified?: boolean
   avgRating?: boolean
@@ -1139,6 +1168,7 @@ export type DoctorProfileSelectScalar = {
   lat?: boolean
   lng?: boolean
   languages?: boolean
+  bio?: boolean
   offersHomeVisit?: boolean
   isVerified?: boolean
   avgRating?: boolean
@@ -1153,7 +1183,7 @@ export type DoctorProfileSelectScalar = {
   address?: boolean
 }
 
-export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "offersHomeVisit" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "address", ExtArgs["result"]["doctorProfile"]>
+export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "bio" | "offersHomeVisit" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "address", ExtArgs["result"]["doctorProfile"]>
 export type DoctorProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -1184,6 +1214,7 @@ export type $DoctorProfilePayload<ExtArgs extends runtime.Types.Extensions.Inter
     lat: number | null
     lng: number | null
     languages: string
+    bio: string | null
     offersHomeVisit: boolean
     isVerified: boolean
     avgRating: number
@@ -1634,6 +1665,7 @@ export interface DoctorProfileFieldRefs {
   readonly lat: Prisma.FieldRef<"DoctorProfile", 'Float'>
   readonly lng: Prisma.FieldRef<"DoctorProfile", 'Float'>
   readonly languages: Prisma.FieldRef<"DoctorProfile", 'String'>
+  readonly bio: Prisma.FieldRef<"DoctorProfile", 'String'>
   readonly offersHomeVisit: Prisma.FieldRef<"DoctorProfile", 'Boolean'>
   readonly isVerified: Prisma.FieldRef<"DoctorProfile", 'Boolean'>
   readonly avgRating: Prisma.FieldRef<"DoctorProfile", 'Float'>
