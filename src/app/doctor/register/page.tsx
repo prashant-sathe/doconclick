@@ -6,6 +6,7 @@ import {
   Stethoscope, User, Phone, Lock, Eye, EyeOff,
   Loader2, CheckCircle, ArrowRight,
 } from "lucide-react";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 
 export default function DoctorRegister() {
   const [loading, setLoading] = useState(false);
@@ -103,6 +104,13 @@ export default function DoctorRegister() {
                 {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Creating Account…</> : <>Create Account <ArrowRight className="w-4 h-4" /></>}
               </button>
             </form>
+
+            <div className="flex items-center gap-3 my-6">
+              <div className="h-px bg-slate-100 flex-1" />
+              <span className="text-xs text-slate-400 font-medium">OR</span>
+              <div className="h-px bg-slate-100 flex-1" />
+            </div>
+            <GoogleSignInButton role="DOCTOR" label="Sign up with Google" />
           </div>
 
           <p className="text-center text-sm text-slate-400 mt-4">

@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Heart, Phone, Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 
 const ROLE_HOME: Record<string, string> = {
   ADMIN:   "/admin",
@@ -131,6 +132,13 @@ function LoginForm() {
             )}
           </button>
         </form>
+
+        <div className="flex items-center gap-3 my-6">
+          <div className="h-px bg-slate-100 flex-1" />
+          <span className="text-xs text-slate-400 font-medium">OR</span>
+          <div className="h-px bg-slate-100 flex-1" />
+        </div>
+        <GoogleSignInButton next={nextUrl ?? undefined} />
 
         <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-2 text-sm text-slate-400">
           <p>

@@ -46,6 +46,12 @@ export function proxy(request: NextRequest) {
     );
   }
 
+  // Google sign-in accounts start with a placeholder mobile number — force
+  // them to add a real one before touching any other authenticated page.
+  if (user && user.mobile.startsWith("pending_") && pathname !== "/complete-profile") {
+    return NextResponse.redirect(new URL("/complete-profile", request.url));
+  }
+
   // Check if this route requires authentication
   const matched = PROTECTED.find((p) => p.pattern.test(pathname));
   if (!matched) return NextResponse.next();
