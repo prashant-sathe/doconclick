@@ -12,6 +12,12 @@ const ROLE_HOME: Record<string, string> = {
   PATIENT: "/patient/dashboard",
 };
 
+const ERROR_MESSAGES: Record<string, string> = {
+  google_failed: "Something went wrong verifying your Google account. Please try again.",
+  google_state_mismatch: "That verification link expired. Please try again.",
+  google_no_account: "No DocOnClick account uses that Google email.",
+};
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -21,7 +27,7 @@ function LoginForm() {
   const [form, setForm] = useState({ mobile: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(() => ERROR_MESSAGES[searchParams.get("error") ?? ""] ?? "");
 
   const set = (k: string, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -87,10 +93,15 @@ function LoginForm() {
 
           {/* Password */}
           <div>
-            <label className="input-label">
-              <Lock className="inline w-3.5 h-3.5 mr-1.5" />
-              Password
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="input-label">
+                <Lock className="inline w-3.5 h-3.5 mr-1.5" />
+                Password
+              </label>
+              <Link href="/forgot-password" className="text-xs font-semibold text-blue-600 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <div className="relative">
               <input
                 required

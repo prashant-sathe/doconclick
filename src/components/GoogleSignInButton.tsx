@@ -1,12 +1,14 @@
 type Props = {
   role?: "PATIENT" | "DOCTOR";
   next?: string;
+  intent?: "login" | "reset";
   label?: string;
 };
 
-export default function GoogleSignInButton({ role = "PATIENT", next, label = "Continue with Google" }: Props) {
+export default function GoogleSignInButton({ role = "PATIENT", next, intent, label = "Continue with Google" }: Props) {
   const params = new URLSearchParams({ role });
   if (next) params.set("next", next);
+  if (intent) params.set("intent", intent);
 
   return (
     <a

@@ -78,6 +78,12 @@ export async function GET(req: Request) {
 
     let user = await prisma.user.findUnique({ where: { email: googleUser.email } });
 
+    if (!user && state.intent === "reset") {
+      // Forgot-password flow: never create an account here — if no existing
+      // account uses this Google email, this reset method just isn't available.
+      return failureRedirect(url.origin, "google_no_account");
+    }
+
     if (!user) {
       user = await prisma.user.create({
         data: {
@@ -101,9 +107,12 @@ export async function GET(req: Request) {
     };
     const token = signToken(payload);
 
-    const destination = user.mobile.startsWith("pending_")
-      ? "/complete-profile"
-      : state.next || ROLE_HOME[user.role] || "/";
+    const destination =
+      state.intent === "reset"
+        ? "/reset-password"
+        : user.mobile.startsWith("pending_")
+          ? "/complete-profile"
+          : state.next || ROLE_HOME[user.role] || "/";
 
     const response = NextResponse.redirect(new URL(destination, url.origin));
     response.cookies.set(COOKIE_NAME, token, {

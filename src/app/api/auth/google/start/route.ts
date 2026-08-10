@@ -6,17 +6,20 @@ import {
   encodeState,
   newNonce,
   type OAuthRole,
+  type OAuthIntent,
 } from "@/lib/googleOAuth";
 
 // GET: Kick off Google's OAuth consent flow for either role.
-// ?role=PATIENT|DOCTOR (defaults to PATIENT) and optional ?next=/some/path
+// ?role=PATIENT|DOCTOR (defaults to PATIENT), optional ?next=/some/path,
+// optional ?intent=reset (defaults to "login") for the forgot-password flow.
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const role: OAuthRole = url.searchParams.get("role") === "DOCTOR" ? "DOCTOR" : "PATIENT";
   const next = url.searchParams.get("next") ?? undefined;
+  const intent: OAuthIntent = url.searchParams.get("intent") === "reset" ? "reset" : "login";
 
   const nonce = newNonce();
-  const state = encodeState({ nonce, role, next });
+  const state = encodeState({ nonce, role, next, intent });
   const redirectUri = `${url.origin}/api/auth/google/callback`;
 
   const googleUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
