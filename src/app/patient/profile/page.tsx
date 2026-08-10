@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Loader2, MapPin, Droplets, Ruler, Weight, AlertTriangle, Pill,
-  Scissors, PhoneCall, Camera, CheckCircle2, ArrowRight, Save,
+  Scissors, PhoneCall, Camera, CheckCircle2, ArrowRight, Save, UploadCloud, User,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -57,6 +57,49 @@ function CompletionRing({ percent }: { percent: number }) {
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <span className="text-lg font-extrabold text-slate-900">{percent}%</span>
+      </div>
+    </div>
+  );
+}
+
+function PhotoUpload({ url, onUploaded }: { url: string; onUploaded: (url: string) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const upload = async (file: File) => {
+    setBusy(true);
+    setError("");
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch("/api/patients/me/photo", { method: "POST", body: form });
+    setBusy(false);
+    if (res.ok) {
+      const data = await res.json();
+      onUploaded(data.photoUrl);
+    } else {
+      setError((await res.json().catch(() => ({}))).error ?? "Upload failed.");
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-4">
+      <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200">
+        {url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt="Profile" className="w-full h-full object-cover" />
+        ) : (
+          <User className="w-7 h-7 text-slate-300" />
+        )}
+      </div>
+      <div>
+        <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer inline-flex">
+          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
+          {url ? "Replace Photo" : "Upload Photo"}
+          <input type="file" accept="image/jpeg,image/png" className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }} />
+        </label>
+        <p className="text-xs text-slate-400 mt-1.5">JPG or PNG, up to 5MB.</p>
+        {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
       </div>
     </div>
   );
@@ -312,7 +355,7 @@ export default function PatientProfilePage() {
           {/* Photo */}
           <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><Camera className="w-4 h-4 text-purple-500" /> Profile Photo</h2>
-            <input type="url" className="input-field" placeholder="https://your-photo.com/image.jpg" value={form.photoUrl} onChange={(e) => set("photoUrl", e.target.value)} />
+            <PhotoUpload url={form.photoUrl} onUploaded={(url) => set("photoUrl", url)} />
           </section>
 
           {saveError && (
