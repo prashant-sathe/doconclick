@@ -24,6 +24,7 @@ interface Doctor {
     specialty: string;
     experience: number;
     consultFee: number;
+    videoFee: number;
     homeVisitFee: number;
     availability: string;
     languages: string;
@@ -53,10 +54,17 @@ function nowLocalInput() {
 }
 
 const ALL_TYPES = [
-  { id: "CLINIC", label: "Clinic Visit", icon: Building2 },
-  { id: "HOME",   label: "Home Visit",   icon: Home },
-  { id: "VIDEO",  label: "Video Call",   icon: Video },
+  { id: "CLINIC", label: "Clinic Visit", icon: Building2, comingSoon: false },
+  { id: "HOME",   label: "Home Visit",   icon: Home,      comingSoon: false },
+  { id: "VIDEO",  label: "Video Call",   icon: Video,      comingSoon: true },
 ];
+
+function feeForConsultType(profile: Doctor["doctorProfile"], consultType: string): number {
+  if (!profile) return 0;
+  if (consultType === "HOME") return profile.homeVisitFee;
+  if (consultType === "VIDEO") return profile.videoFee;
+  return profile.consultFee;
+}
 
 function PatientBookInner() {
   const { user, loading: authLoading } = useAuth();
@@ -109,9 +117,7 @@ function PatientBookInner() {
     userPos && selectedDoctor?.doctorProfile?.lat && selectedDoctor?.doctorProfile?.lng
       ? haversine(userPos[0], userPos[1], selectedDoctor.doctorProfile.lat, selectedDoctor.doctorProfile.lng)
       : null;
-  const currentFee = form.consultType === "HOME"
-    ? selectedDoctor?.doctorProfile?.homeVisitFee ?? 0
-    : selectedDoctor?.doctorProfile?.consultFee ?? 0;
+  const currentFee = feeForConsultType(selectedDoctor?.doctorProfile ?? null, form.consultType);
   const availableTypes = ALL_TYPES.filter(
     (t) => t.id !== "HOME" || selectedDoctor?.doctorProfile?.offersHomeVisit !== false
   );
@@ -236,11 +242,15 @@ function PatientBookInner() {
             <div>
               <label className="input-label mb-2 block">Consultation Type</label>
               <div className={cn("grid gap-3", availableTypes.length === 3 ? "grid-cols-3" : "grid-cols-2")}>
-                {availableTypes.map(({ id, label, icon: Icon }) => (
-                  <button key={id} type="button" onClick={() => set("consultType", id)}
-                    className={cn("flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border text-xs font-semibold transition-all",
+                {availableTypes.map(({ id, label, icon: Icon, comingSoon }) => (
+                  <button key={id} type="button" disabled={comingSoon} onClick={() => set("consultType", id)}
+                    className={cn("relative flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border text-xs font-semibold transition-all",
+                      comingSoon ? "border-slate-100 text-slate-300 cursor-not-allowed" :
                       form.consultType === id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                     )}>
+                    {comingSoon && (
+                      <span className="absolute -top-2 -right-1.5 badge badge-gray text-[9px] px-1.5 py-0.5">Soon</span>
+                    )}
                     <Icon className="w-5 h-5" /> {label}
                   </button>
                 ))}
@@ -254,7 +264,7 @@ function PatientBookInner() {
                 <option value="">— Choose a doctor —</option>
                 {visibleDoctors.map((d) => (
                   <option key={d.id} value={d.id}>
-                    {d.name} — {d.doctorProfile?.specialty} (₹{form.consultType === "HOME" ? d.doctorProfile?.homeVisitFee : d.doctorProfile?.consultFee})
+                    {d.name} — {d.doctorProfile?.specialty} (₹{feeForConsultType(d.doctorProfile, form.consultType)})
                   </option>
                 ))}
               </select>

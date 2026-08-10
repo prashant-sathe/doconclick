@@ -21,6 +21,7 @@ interface DoctorProfile {
   specialty: string;
   experience: number;
   consultFee: number;
+  videoFee: number;
   homeVisitFee: number;
   availability: string;
   radius: number;
@@ -78,10 +79,17 @@ function makePinSvg(color: string, pulse = false) {
 
 // ── CONSULT TYPE OPTIONS ───────────────────────────────────────────────────
 const ALL_TYPES = [
-  { id: "HOME", label: "Home Visit", icon: Home },
-  { id: "CLINIC", label: "Clinic Visit", icon: Building2 },
-  { id: "VIDEO", label: "Video Call", icon: Video },
+  { id: "HOME", label: "Home Visit", icon: Home, comingSoon: false },
+  { id: "CLINIC", label: "Clinic Visit", icon: Building2, comingSoon: false },
+  { id: "VIDEO", label: "Video Call", icon: Video, comingSoon: true },
 ];
+
+function feeForConsultType(profile: DoctorProfile | null | undefined, consultType: string): number {
+  if (!profile) return 0;
+  if (consultType === "HOME") return profile.homeVisitFee;
+  if (consultType === "VIDEO") return profile.videoFee;
+  return profile.consultFee;
+}
 
 // Local datetime-local min value (now, floored to the minute)
 function nowLocalInput() {
@@ -360,10 +368,7 @@ function PatientDashboardInner() {
   const submitBooking = async () => {
     if (!user?.id || !selectedDoctor || !consentGiven) return;
     setBooking(true);
-    const fee =
-      consultType === "HOME"
-        ? selectedDoctor.doctorProfile?.homeVisitFee ?? 0
-        : selectedDoctor.doctorProfile?.consultFee ?? 0;
+    const fee = feeForConsultType(selectedDoctor.doctorProfile, consultType);
 
     const res = await fetch("/api/appointments", {
       method: "POST",
@@ -392,10 +397,7 @@ function PatientDashboardInner() {
     if (!user?.id || !nearestAny) return;
     setEmergencyBusy(true);
     const type = nearestAny.doctorProfile?.offersHomeVisit ? "HOME" : "CLINIC";
-    const fee =
-      type === "HOME"
-        ? nearestAny.doctorProfile?.homeVisitFee ?? 0
-        : nearestAny.doctorProfile?.consultFee ?? 0;
+    const fee = feeForConsultType(nearestAny.doctorProfile, type);
 
     const res = await fetch("/api/appointments", {
       method: "POST",
@@ -418,10 +420,7 @@ function PatientDashboardInner() {
     }
   };
 
-  const fee =
-    consultType === "HOME"
-      ? selectedDoctor?.doctorProfile?.homeVisitFee ?? 0
-      : selectedDoctor?.doctorProfile?.consultFee ?? 0;
+  const fee = feeForConsultType(selectedDoctor?.doctorProfile, consultType);
 
   const eta = selectedDoctor?.distance != null ? estimateArrivalMinutes(selectedDoctor.distance) : null;
   const availableTypes = ALL_TYPES.filter(
@@ -644,17 +643,23 @@ function PatientDashboardInner() {
 
                   {/* Consult type */}
                   <div className={`grid gap-2 mb-4 ${availableTypes.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
-                    {availableTypes.map(({ id, label, icon: Icon }) => (
+                    {availableTypes.map(({ id, label, icon: Icon, comingSoon }) => (
                       <button
                         key={id}
                         type="button"
+                        disabled={comingSoon}
                         onClick={() => setConsultType(id)}
-                        className={`flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
-                          consultType === id
-                            ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : "border-slate-200 text-slate-500 hover:border-slate-300"
+                        className={`relative flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
+                          comingSoon
+                            ? "border-slate-100 text-slate-300 cursor-not-allowed"
+                            : consultType === id
+                              ? "border-blue-500 bg-blue-50 text-blue-700"
+                              : "border-slate-200 text-slate-500 hover:border-slate-300"
                         }`}
                       >
+                        {comingSoon && (
+                          <span className="absolute -top-2 -right-1.5 badge badge-gray text-[9px] px-1.5 py-0.5">Soon</span>
+                        )}
                         <Icon className="w-4 h-4" />
                         {label}
                       </button>
@@ -807,11 +812,17 @@ function PatientDashboardInner() {
                   )}
 
                   {/* Fee cards */}
-                  <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="grid grid-cols-3 gap-3 mb-3">
                     <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                       <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                       <p className="text-xs text-slate-500">Clinic Visit</p>
                       <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.consultFee}</p>
+                    </div>
+                    <div className="relative rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center opacity-60">
+                      <span className="absolute -top-2 -right-1.5 badge badge-gray text-[9px] px-1.5 py-0.5">Soon</span>
+                      <Video className="w-5 h-5 text-slate-400 mx-auto mb-1" />
+                      <p className="text-xs text-slate-500">Video Call</p>
+                      <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.videoFee}</p>
                     </div>
                     {selectedDoctor.doctorProfile.offersHomeVisit ? (
                       <div className="rounded-2xl p-4 border border-blue-200 bg-blue-50 text-center">
@@ -865,9 +876,11 @@ function PatientDashboardInner() {
                       <Building2 className="w-4 h-4" /> Clinic Visit
                     </button>
                     <button
-                      onClick={() => { setConsultType("VIDEO"); setBookingOpen(true); }}
-                      className="btn-secondary justify-center py-3 text-sm"
+                      disabled
+                      title="Video calling is coming soon"
+                      className="relative btn-secondary justify-center py-3 text-sm opacity-50 cursor-not-allowed"
                     >
+                      <span className="absolute -top-2 -right-1.5 badge badge-gray text-[9px] px-1.5 py-0.5">Soon</span>
                       <Video className="w-4 h-4" /> Video Call
                     </button>
                   </div>

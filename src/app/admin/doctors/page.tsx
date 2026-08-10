@@ -18,6 +18,7 @@ interface DoctorProfile {
   medRegNo: string;
   experience: number;
   consultFee: number;
+  videoFee: number;
   homeVisitFee: number;
   availability: string;
   radius: number;
@@ -307,6 +308,7 @@ function DoctorDrawer({
                 <Row icon={Hash}       label="Reg. Number"      value={p?.medRegNo ?? "—"} mono />
                 <Row icon={Briefcase}  label="Experience"       value={p ? `${p.experience} years` : "—"} />
                 <Row icon={DollarSign} label="Clinic Fee"       value={p ? `₹${p.consultFee}` : "—"} />
+                <Row icon={DollarSign} label="Video Call Fee"   value={p ? `₹${p.videoFee}` : "—"} />
                 <Row icon={DollarSign} label="Home Visit Fee"   value={p ? `₹${p.homeVisitFee}` : "—"} />
                 <Row icon={Clock}      label="Availability"     value={p?.availability ?? "—"} />
                 <Row icon={MapPin}     label="Service Radius"   value={p ? `${p.radius} km` : "—"} />

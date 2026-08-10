@@ -1179,6 +1179,7 @@ export const DoctorProfileScalarFieldEnum = {
   specialty: 'specialty',
   experience: 'experience',
   consultFee: 'consultFee',
+  videoFee: 'videoFee',
   homeVisitFee: 'homeVisitFee',
   availability: 'availability',
   radius: 'radius',

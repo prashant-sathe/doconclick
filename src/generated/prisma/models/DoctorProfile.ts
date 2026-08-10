@@ -29,6 +29,7 @@ export type AggregateDoctorProfile = {
 export type DoctorProfileAvgAggregateOutputType = {
   experience: number | null
   consultFee: number | null
+  videoFee: number | null
   homeVisitFee: number | null
   radius: number | null
   lat: number | null
@@ -40,6 +41,7 @@ export type DoctorProfileAvgAggregateOutputType = {
 export type DoctorProfileSumAggregateOutputType = {
   experience: number | null
   consultFee: number | null
+  videoFee: number | null
   homeVisitFee: number | null
   radius: number | null
   lat: number | null
@@ -57,6 +59,7 @@ export type DoctorProfileMinAggregateOutputType = {
   specialty: string | null
   experience: number | null
   consultFee: number | null
+  videoFee: number | null
   homeVisitFee: number | null
   availability: string | null
   radius: number | null
@@ -87,6 +90,7 @@ export type DoctorProfileMaxAggregateOutputType = {
   specialty: string | null
   experience: number | null
   consultFee: number | null
+  videoFee: number | null
   homeVisitFee: number | null
   availability: string | null
   radius: number | null
@@ -117,6 +121,7 @@ export type DoctorProfileCountAggregateOutputType = {
   specialty: number
   experience: number
   consultFee: number
+  videoFee: number
   homeVisitFee: number
   availability: number
   radius: number
@@ -143,6 +148,7 @@ export type DoctorProfileCountAggregateOutputType = {
 export type DoctorProfileAvgAggregateInputType = {
   experience?: true
   consultFee?: true
+  videoFee?: true
   homeVisitFee?: true
   radius?: true
   lat?: true
@@ -154,6 +160,7 @@ export type DoctorProfileAvgAggregateInputType = {
 export type DoctorProfileSumAggregateInputType = {
   experience?: true
   consultFee?: true
+  videoFee?: true
   homeVisitFee?: true
   radius?: true
   lat?: true
@@ -171,6 +178,7 @@ export type DoctorProfileMinAggregateInputType = {
   specialty?: true
   experience?: true
   consultFee?: true
+  videoFee?: true
   homeVisitFee?: true
   availability?: true
   radius?: true
@@ -201,6 +209,7 @@ export type DoctorProfileMaxAggregateInputType = {
   specialty?: true
   experience?: true
   consultFee?: true
+  videoFee?: true
   homeVisitFee?: true
   availability?: true
   radius?: true
@@ -231,6 +240,7 @@ export type DoctorProfileCountAggregateInputType = {
   specialty?: true
   experience?: true
   consultFee?: true
+  videoFee?: true
   homeVisitFee?: true
   availability?: true
   radius?: true
@@ -348,6 +358,7 @@ export type DoctorProfileGroupByOutputType = {
   specialty: string
   experience: number
   consultFee: number
+  videoFee: number
   homeVisitFee: number
   availability: string
   radius: number
@@ -401,6 +412,7 @@ export type DoctorProfileWhereInput = {
   specialty?: Prisma.StringFilter<"DoctorProfile"> | string
   experience?: Prisma.IntFilter<"DoctorProfile"> | number
   consultFee?: Prisma.FloatFilter<"DoctorProfile"> | number
+  videoFee?: Prisma.FloatFilter<"DoctorProfile"> | number
   homeVisitFee?: Prisma.FloatFilter<"DoctorProfile"> | number
   availability?: Prisma.StringFilter<"DoctorProfile"> | string
   radius?: Prisma.IntFilter<"DoctorProfile"> | number
@@ -432,6 +444,7 @@ export type DoctorProfileOrderByWithRelationInput = {
   specialty?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   consultFee?: Prisma.SortOrder
+  videoFee?: Prisma.SortOrder
   homeVisitFee?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   radius?: Prisma.SortOrder
@@ -466,6 +479,7 @@ export type DoctorProfileWhereUniqueInput = Prisma.AtLeast<{
   specialty?: Prisma.StringFilter<"DoctorProfile"> | string
   experience?: Prisma.IntFilter<"DoctorProfile"> | number
   consultFee?: Prisma.FloatFilter<"DoctorProfile"> | number
+  videoFee?: Prisma.FloatFilter<"DoctorProfile"> | number
   homeVisitFee?: Prisma.FloatFilter<"DoctorProfile"> | number
   availability?: Prisma.StringFilter<"DoctorProfile"> | string
   radius?: Prisma.IntFilter<"DoctorProfile"> | number
@@ -497,6 +511,7 @@ export type DoctorProfileOrderByWithAggregationInput = {
   specialty?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   consultFee?: Prisma.SortOrder
+  videoFee?: Prisma.SortOrder
   homeVisitFee?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   radius?: Prisma.SortOrder
@@ -535,6 +550,7 @@ export type DoctorProfileScalarWhereWithAggregatesInput = {
   specialty?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
   experience?: Prisma.IntWithAggregatesFilter<"DoctorProfile"> | number
   consultFee?: Prisma.FloatWithAggregatesFilter<"DoctorProfile"> | number
+  videoFee?: Prisma.FloatWithAggregatesFilter<"DoctorProfile"> | number
   homeVisitFee?: Prisma.FloatWithAggregatesFilter<"DoctorProfile"> | number
   availability?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
   radius?: Prisma.IntWithAggregatesFilter<"DoctorProfile"> | number
@@ -564,6 +580,7 @@ export type DoctorProfileCreateInput = {
   specialty?: string
   experience?: number
   consultFee?: number
+  videoFee?: number
   homeVisitFee?: number
   availability?: string
   radius?: number
@@ -595,6 +612,7 @@ export type DoctorProfileUncheckedCreateInput = {
   specialty?: string
   experience?: number
   consultFee?: number
+  videoFee?: number
   homeVisitFee?: number
   availability?: string
   radius?: number
@@ -624,6 +642,7 @@ export type DoctorProfileUpdateInput = {
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  videoFee?: Prisma.FloatFieldUpdateOperationsInput | number
   homeVisitFee?: Prisma.FloatFieldUpdateOperationsInput | number
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   radius?: Prisma.IntFieldUpdateOperationsInput | number
@@ -655,6 +674,7 @@ export type DoctorProfileUncheckedUpdateInput = {
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  videoFee?: Prisma.FloatFieldUpdateOperationsInput | number
   homeVisitFee?: Prisma.FloatFieldUpdateOperationsInput | number
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   radius?: Prisma.IntFieldUpdateOperationsInput | number
@@ -685,6 +705,7 @@ export type DoctorProfileCreateManyInput = {
   specialty?: string
   experience?: number
   consultFee?: number
+  videoFee?: number
   homeVisitFee?: number
   availability?: string
   radius?: number
@@ -714,6 +735,7 @@ export type DoctorProfileUpdateManyMutationInput = {
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  videoFee?: Prisma.FloatFieldUpdateOperationsInput | number
   homeVisitFee?: Prisma.FloatFieldUpdateOperationsInput | number
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   radius?: Prisma.IntFieldUpdateOperationsInput | number
@@ -744,6 +766,7 @@ export type DoctorProfileUncheckedUpdateManyInput = {
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  videoFee?: Prisma.FloatFieldUpdateOperationsInput | number
   homeVisitFee?: Prisma.FloatFieldUpdateOperationsInput | number
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   radius?: Prisma.IntFieldUpdateOperationsInput | number
@@ -779,6 +802,7 @@ export type DoctorProfileCountOrderByAggregateInput = {
   specialty?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   consultFee?: Prisma.SortOrder
+  videoFee?: Prisma.SortOrder
   homeVisitFee?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   radius?: Prisma.SortOrder
@@ -803,6 +827,7 @@ export type DoctorProfileCountOrderByAggregateInput = {
 export type DoctorProfileAvgOrderByAggregateInput = {
   experience?: Prisma.SortOrder
   consultFee?: Prisma.SortOrder
+  videoFee?: Prisma.SortOrder
   homeVisitFee?: Prisma.SortOrder
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
@@ -820,6 +845,7 @@ export type DoctorProfileMaxOrderByAggregateInput = {
   specialty?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   consultFee?: Prisma.SortOrder
+  videoFee?: Prisma.SortOrder
   homeVisitFee?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   radius?: Prisma.SortOrder
@@ -850,6 +876,7 @@ export type DoctorProfileMinOrderByAggregateInput = {
   specialty?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   consultFee?: Prisma.SortOrder
+  videoFee?: Prisma.SortOrder
   homeVisitFee?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   radius?: Prisma.SortOrder
@@ -874,6 +901,7 @@ export type DoctorProfileMinOrderByAggregateInput = {
 export type DoctorProfileSumOrderByAggregateInput = {
   experience?: Prisma.SortOrder
   consultFee?: Prisma.SortOrder
+  videoFee?: Prisma.SortOrder
   homeVisitFee?: Prisma.SortOrder
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
@@ -934,6 +962,7 @@ export type DoctorProfileCreateWithoutUserInput = {
   specialty?: string
   experience?: number
   consultFee?: number
+  videoFee?: number
   homeVisitFee?: number
   availability?: string
   radius?: number
@@ -963,6 +992,7 @@ export type DoctorProfileUncheckedCreateWithoutUserInput = {
   specialty?: string
   experience?: number
   consultFee?: number
+  videoFee?: number
   homeVisitFee?: number
   availability?: string
   radius?: number
@@ -1008,6 +1038,7 @@ export type DoctorProfileUpdateWithoutUserInput = {
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  videoFee?: Prisma.FloatFieldUpdateOperationsInput | number
   homeVisitFee?: Prisma.FloatFieldUpdateOperationsInput | number
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   radius?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1037,6 +1068,7 @@ export type DoctorProfileUncheckedUpdateWithoutUserInput = {
   specialty?: Prisma.StringFieldUpdateOperationsInput | string
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   consultFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  videoFee?: Prisma.FloatFieldUpdateOperationsInput | number
   homeVisitFee?: Prisma.FloatFieldUpdateOperationsInput | number
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   radius?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1069,6 +1101,7 @@ export type DoctorProfileSelect<ExtArgs extends runtime.Types.Extensions.Interna
   specialty?: boolean
   experience?: boolean
   consultFee?: boolean
+  videoFee?: boolean
   homeVisitFee?: boolean
   availability?: boolean
   radius?: boolean
@@ -1100,6 +1133,7 @@ export type DoctorProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   specialty?: boolean
   experience?: boolean
   consultFee?: boolean
+  videoFee?: boolean
   homeVisitFee?: boolean
   availability?: boolean
   radius?: boolean
@@ -1131,6 +1165,7 @@ export type DoctorProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   specialty?: boolean
   experience?: boolean
   consultFee?: boolean
+  videoFee?: boolean
   homeVisitFee?: boolean
   availability?: boolean
   radius?: boolean
@@ -1162,6 +1197,7 @@ export type DoctorProfileSelectScalar = {
   specialty?: boolean
   experience?: boolean
   consultFee?: boolean
+  videoFee?: boolean
   homeVisitFee?: boolean
   availability?: boolean
   radius?: boolean
@@ -1183,7 +1219,7 @@ export type DoctorProfileSelectScalar = {
   address?: boolean
 }
 
-export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "bio" | "offersHomeVisit" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "address", ExtArgs["result"]["doctorProfile"]>
+export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "videoFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "bio" | "offersHomeVisit" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "address", ExtArgs["result"]["doctorProfile"]>
 export type DoctorProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -1208,6 +1244,7 @@ export type $DoctorProfilePayload<ExtArgs extends runtime.Types.Extensions.Inter
     specialty: string
     experience: number
     consultFee: number
+    videoFee: number
     homeVisitFee: number
     availability: string
     radius: number
@@ -1659,6 +1696,7 @@ export interface DoctorProfileFieldRefs {
   readonly specialty: Prisma.FieldRef<"DoctorProfile", 'String'>
   readonly experience: Prisma.FieldRef<"DoctorProfile", 'Int'>
   readonly consultFee: Prisma.FieldRef<"DoctorProfile", 'Float'>
+  readonly videoFee: Prisma.FieldRef<"DoctorProfile", 'Float'>
   readonly homeVisitFee: Prisma.FieldRef<"DoctorProfile", 'Float'>
   readonly availability: Prisma.FieldRef<"DoctorProfile", 'String'>
   readonly radius: Prisma.FieldRef<"DoctorProfile", 'Int'>

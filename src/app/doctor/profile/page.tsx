@@ -26,6 +26,7 @@ interface FormState {
   medRegNo: string;
   experience: string;
   consultFee: string;
+  videoFee: string;
   homeVisitFee: string;
   offersHomeVisit: boolean;
   radius: number;
@@ -39,7 +40,7 @@ interface FormState {
 
 const EMPTY_FORM: FormState = {
   specialty: "General Physician", qualification: "", languages: "", bio: "", medRegNo: "", experience: "",
-  consultFee: "", homeVisitFee: "", offersHomeVisit: true, radius: 10,
+  consultFee: "", videoFee: "", homeVisitFee: "", offersHomeVisit: true, radius: 10,
   bankName: "", bankAccount: "", ifsc: "", address: "", lat: null, lng: null,
 };
 
@@ -158,6 +159,7 @@ export default function DoctorProfilePage() {
           medRegNo: p.medRegNo ?? "",
           experience: p.experience ? String(p.experience) : "",
           consultFee: p.consultFee ? String(p.consultFee) : "",
+          videoFee: p.videoFee ? String(p.videoFee) : "",
           homeVisitFee: p.homeVisitFee ? String(p.homeVisitFee) : "",
           offersHomeVisit: p.offersHomeVisit ?? true,
           radius: p.radius ?? 10,
@@ -235,6 +237,7 @@ export default function DoctorProfilePage() {
         medRegNo: form.medRegNo,
         experience: form.experience,
         consultFee: form.consultFee,
+        videoFee: form.videoFee,
         homeVisitFee: form.homeVisitFee,
         offersHomeVisit: form.offersHomeVisit,
         radius: form.radius,
@@ -366,10 +369,14 @@ export default function DoctorProfilePage() {
           <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><IndianRupee className="w-4 h-4 text-emerald-500" /> Consultation Settings</h2>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="input-label">Clinic / Video Fee (₹)</label>
+                  <label className="input-label">Clinic Fee (₹)</label>
                   <input type="number" min={0} className="input-field" placeholder="500" value={form.consultFee} onChange={(e) => set("consultFee", e.target.value)} />
+                </div>
+                <div>
+                  <label className="input-label">Video Call Fee (₹)</label>
+                  <input type="number" min={0} className="input-field" placeholder="400" value={form.videoFee} onChange={(e) => set("videoFee", e.target.value)} />
                 </div>
                 <div>
                   <label className="input-label">Home Visit Fee (₹)</label>

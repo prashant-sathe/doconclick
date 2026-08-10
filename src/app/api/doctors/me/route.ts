@@ -36,6 +36,7 @@ const EDITABLE_FIELDS = [
   "medRegNo",
   "experience",
   "consultFee",
+  "videoFee",
   "homeVisitFee",
   "availability",
   "radius",
@@ -63,7 +64,7 @@ export async function PATCH(req: Request) {
     const value = body[key];
     if (key === "experience") {
       data[key] = value === "" || value == null ? 0 : Number(value);
-    } else if (key === "consultFee" || key === "homeVisitFee") {
+    } else if (key === "consultFee" || key === "videoFee" || key === "homeVisitFee") {
       data[key] = value === "" || value == null ? 0 : Number(value);
     } else if (key === "radius") {
       data[key] = Math.min(20, Math.max(5, Number(value) || 5));

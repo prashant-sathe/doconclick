@@ -65,6 +65,7 @@ model DoctorProfile {
   specialty     String  @default("General Physician")
   experience    Int     @default(0)
   consultFee    Float   @default(0)
+  videoFee      Float   @default(0)
   homeVisitFee  Float   @default(0)
   availability  String  @default("Mon-Fri, 9AM-5PM")
   radius        Int     @default(10)
