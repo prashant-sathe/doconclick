@@ -249,9 +249,9 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       )}
 
       <div className="flex gap-2 flex-wrap">
-        {(a.status === "SCHEDULED" || a.status === "PENDING_APPROVAL") && (
+        {a.status === "PENDING_APPROVAL" && (
           <button onClick={() => onCancel(a.id)} className="btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
-            Cancel {a.status === "PENDING_APPROVAL" ? "Request" : "Appointment"}
+            Cancel Request
           </button>
         )}
         {needsPayment && (

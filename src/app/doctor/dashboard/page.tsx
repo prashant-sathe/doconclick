@@ -403,6 +403,7 @@ export default function DoctorDashboard() {
             ) : (
               pending.map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
+                const patientLoc = a.patient.patientProfile;
                 return (
                   <div key={a.id} className="px-6 py-4 flex items-center justify-between gap-3">
                     <div className="flex items-start gap-4 min-w-0">
@@ -426,6 +427,16 @@ export default function DoctorDashboard() {
                           <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}
                           </div>
+                        )}
+                        {a.consultType === "HOME" && patientLoc?.lat != null && patientLoc?.lng != null && (
+                          <a
+                            href={navigateUrl(patientLoc.lat, patientLoc.lng)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-blue-600 font-semibold mt-1 hover:underline"
+                          >
+                            <Navigation className="w-3 h-3" /> {patientLoc.homeAddress || "View patient location"}
+                          </a>
                         )}
                         {respondError?.id === a.id && (
                           <div className="text-xs text-red-600 mt-1">{respondError.message}</div>
@@ -539,9 +550,15 @@ export default function DoctorDashboard() {
                           <XCircle className="w-3.5 h-3.5" /> Cancel
                         </button>
                         {(a.consultType !== "HOME" || a.travelStatus === "ARRIVED") && (
-                          <button onClick={() => setCompletingId(completingId === a.id ? null : a.id)} className="btn-primary py-1.5 px-3 text-xs">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Mark Complete
-                          </button>
+                          a.paymentMethod === "ONLINE" && a.paymentStatus !== "PAID" ? (
+                            <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-semibold px-1" title="Waiting for the patient to pay before this can be marked complete">
+                              <Clock className="w-3.5 h-3.5" /> Awaiting payment
+                            </span>
+                          ) : (
+                            <button onClick={() => setCompletingId(completingId === a.id ? null : a.id)} className="btn-primary py-1.5 px-3 text-xs">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Mark Complete
+                            </button>
+                          )
                         )}
                       </div>
                     </div>

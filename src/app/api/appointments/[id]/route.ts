@@ -75,6 +75,12 @@ export async function PATCH(
         { status: 400 }
       );
     }
+    if (status === "COMPLETED" && appointment.paymentMethod === "ONLINE" && appointment.paymentStatus !== "PAID") {
+      return NextResponse.json(
+        { error: "The patient hasn't completed payment yet. You can mark this consultation complete once payment is received." },
+        { status: 400 }
+      );
+    }
     const updated = await prisma.appointment.update({
       where: { id },
       data: {
@@ -92,8 +98,11 @@ export async function PATCH(
     if (appointment.patientId !== authUser.id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
-    if (status !== "CANCELLED" || !["PENDING_APPROVAL", "SCHEDULED"].includes(appointment.status)) {
-      return NextResponse.json({ error: "Invalid status transition" }, { status: 400 });
+    if (status !== "CANCELLED" || appointment.status !== "PENDING_APPROVAL") {
+      return NextResponse.json(
+        { error: "This appointment can no longer be cancelled." },
+        { status: 400 }
+      );
     }
     const updated = await prisma.appointment.update({
       where: { id },
