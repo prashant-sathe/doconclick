@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyCashfreeWebhookSignature, DOCTOR_REGISTRATION_FEE } from "@/lib/cashfree";
+import { verifyCashfreeWebhookSignature, DOCTOR_REGISTRATION_FEE, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 
 interface CashfreeWebhookPayload {
   type: "PAYMENT_SUCCESS_WEBHOOK" | "PAYMENT_FAILED_WEBHOOK" | string;
@@ -62,11 +62,46 @@ export async function POST(req: Request) {
       );
       return NextResponse.json({ ok: true });
     }
+    const sixMonthsOut = new Date();
+    sixMonthsOut.setMonth(sixMonthsOut.getMonth() + 6);
     await prisma.doctorProfile.update({
       where: { id: profile.id },
       data: {
         registrationFeePaid: true,
         registrationFeeStatus: "PAID",
+        cashfreePaymentId: payload.data.payment.cf_payment_id,
+        // First-time-only free trial of patient-access — this only ever
+        // fires once per doctor, at their one and only registration payment.
+        trialEndsAt: sixMonthsOut,
+      },
+    });
+    return NextResponse.json({ ok: true });
+  }
+
+  if (orderId.startsWith("docsub")) {
+    const profile = await prisma.doctorProfile.findFirst({ where: { cashfreeOrderId: orderId } });
+    if (!profile) {
+      console.error("Cashfree webhook: no doctor profile found for order", orderId);
+      return NextResponse.json({ ok: true });
+    }
+    if (payload.data.order.order_amount !== DOCTOR_SUBSCRIPTION_FEE) {
+      console.error(
+        "Cashfree webhook amount mismatch for doctor subscription", profile.id,
+        "expected", DOCTOR_SUBSCRIPTION_FEE, "got", payload.data.order.order_amount
+      );
+      return NextResponse.json({ ok: true });
+    }
+    // Extend from whichever is later — "now" for a lapsed renewal, or the
+    // current paid-until date for someone renewing early — so early renewal
+    // never loses time they already paid for.
+    const now = Date.now();
+    const currentPaidUntil = profile.subscriptionPaidUntil ? new Date(profile.subscriptionPaidUntil).getTime() : 0;
+    const base = new Date(Math.max(now, currentPaidUntil));
+    base.setMonth(base.getMonth() + 1);
+    await prisma.doctorProfile.update({
+      where: { id: profile.id },
+      data: {
+        subscriptionPaidUntil: base,
         cashfreePaymentId: payload.data.payment.cf_payment_id,
       },
     });

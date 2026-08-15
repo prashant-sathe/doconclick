@@ -7,12 +7,17 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const now = new Date();
 
   const doctor = await prisma.user.findFirst({
     where: {
       id,
       role: "DOCTOR",
-      doctorProfile: { status: "APPROVED", isVerified: true },
+      doctorProfile: {
+        status: "APPROVED",
+        isVerified: true,
+        OR: [{ trialEndsAt: { gt: now } }, { subscriptionPaidUntil: { gt: now } }],
+      },
     },
     select: {
       id: true,

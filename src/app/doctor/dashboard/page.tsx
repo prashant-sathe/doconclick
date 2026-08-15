@@ -11,12 +11,15 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
+import { hasActiveDoctorSubscription } from "@/lib/subscription";
 
 interface DoctorProfile {
   specialty: string;
   qualification: string | null;
   avgRating: number;
   registrationFeePaid: boolean;
+  trialEndsAt: string | null;
+  subscriptionPaidUntil: string | null;
 }
 
 interface DoctorMe {
@@ -206,7 +209,11 @@ export default function DoctorDashboard() {
       .then((res) => (res.ok ? res.json() : null))
       .then((d: DoctorMe | null) => {
         setDoctor(d);
-        if (d && !d.doctorProfile?.registrationFeePaid) router.push("/doctor/payment");
+        if (d && !d.doctorProfile?.registrationFeePaid) {
+          router.push("/doctor/profile");
+        } else if (d?.doctorProfile && !hasActiveDoctorSubscription(d.doctorProfile)) {
+          router.push("/doctor/subscribe");
+        }
       })
       .catch(() => setDoctor(null));
   }, [user, router]);
@@ -303,7 +310,11 @@ export default function DoctorDashboard() {
     };
   }, []);
 
-  if (authLoading || !user || user.role !== "DOCTOR" || !doctor?.doctorProfile?.registrationFeePaid) {
+  if (
+    authLoading || !user || user.role !== "DOCTOR" ||
+    !doctor?.doctorProfile?.registrationFeePaid ||
+    !hasActiveDoctorSubscription(doctor.doctorProfile)
+  ) {
     return (
       <div className="min-h-screen gradient-surface flex items-center justify-center">
         <Loader2 className="w-6 h-6 animate-spin text-slate-400" />

@@ -5,6 +5,7 @@ import { Loader2, IndianRupee, TrendingUp, Wallet, CreditCard } from "lucide-rea
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
+import { hasActiveDoctorSubscription } from "@/lib/subscription";
 
 interface Appointment {
   id: string;
@@ -43,7 +44,8 @@ export default function DoctorEarnings() {
     fetch("/api/doctors/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (!d?.doctorProfile?.registrationFeePaid) { router.push("/doctor/payment"); return; }
+        if (!d?.doctorProfile?.registrationFeePaid) { router.push("/doctor/profile"); return; }
+        if (!hasActiveDoctorSubscription(d.doctorProfile)) { router.push("/doctor/subscribe"); return; }
         return fetch("/api/appointments/me")
           .then((r) => r.json())
           .then((appts) => { setAppointments(appts); setLoading(false); });

@@ -7,11 +7,13 @@ import {
   CreditCard, Camera, FileText, Shield, BadgeCheck, CheckCircle2,
   Save, ArrowRight, UploadCloud, Home, Navigation, Lock, Languages,
   QrCode, Copy, Check, Download, Building2, Image as ImageIcon,
+  ShieldCheck, AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
 import { computeDoctorCompleteness, type DoctorProfileData } from "@/lib/doctorProfileCompleteness";
 import { useSpecialties } from "@/lib/useSpecialties";
+import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
@@ -183,6 +185,9 @@ export default function DoctorProfilePage() {
   const [toTime, setToTime] = useState("18:00");
   const [docs, setDocs] = useState({ photoUrl: null as string | null, medRegCertUrl: null as string | null, degreeCertUrl: null as string | null, kycDocUrl: null as string | null, clinicPhotoUrl: null as string | null });
   const [isVerified, setIsVerified] = useState(false);
+  const [registrationFeePaid, setRegistrationFeePaid] = useState(false);
+  const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
+  const [subscriptionPaidUntil, setSubscriptionPaidUntil] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -201,7 +206,6 @@ export default function DoctorProfilePage() {
       .then((r) => r.json())
       .then((d) => {
         const p = d.doctorProfile ?? {};
-        if (!p.registrationFeePaid) { router.push("/doctor/payment"); return; }
         setForm({
           specialty: p.specialty ?? "General Physician",
           qualification: p.qualification ?? "",
@@ -234,6 +238,9 @@ export default function DoctorProfilePage() {
         }
         setDocs({ photoUrl: p.photoUrl ?? null, medRegCertUrl: p.medRegCertUrl ?? null, degreeCertUrl: p.degreeCertUrl ?? null, kycDocUrl: p.kycDocUrl ?? null, clinicPhotoUrl: p.clinicPhotoUrl ?? null });
         setIsVerified(!!p.isVerified);
+        setRegistrationFeePaid(!!p.registrationFeePaid);
+        setTrialEndsAt(p.trialEndsAt ?? null);
+        setSubscriptionPaidUntil(p.subscriptionPaidUntil ?? null);
         setLoading(false);
       });
   }, [user, router]);
@@ -355,6 +362,44 @@ export default function DoctorProfilePage() {
             </div>
           </div>
         </div>
+
+        {!registrationFeePaid && (
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-6 flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-slate-900">Verify your account &amp; start onboarding patients</p>
+                <p className="text-sm text-slate-500 mt-0.5">Fill in your profile below, then pay a one-time ₹99 to activate your dashboard.</p>
+              </div>
+            </div>
+            <Link href="/doctor/payment" className="btn-primary py-2.5 px-4 text-sm flex-shrink-0">
+              <CreditCard className="w-4 h-4" /> Pay ₹99
+            </Link>
+          </div>
+        )}
+
+        {registrationFeePaid && !hasActiveDoctorSubscription({ trialEndsAt, subscriptionPaidUntil }) && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-5 mb-6 flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-slate-900">Your plan has expired</p>
+                <p className="text-sm text-slate-500 mt-0.5">Renew for ₹499/month to keep seeing and managing patients.</p>
+              </div>
+            </div>
+            <Link href="/doctor/subscribe" className="btn-primary py-2.5 px-4 text-sm flex-shrink-0">
+              <CreditCard className="w-4 h-4" /> Renew ₹499
+            </Link>
+          </div>
+        )}
+
+        {registrationFeePaid && hasActiveDoctorSubscription({ trialEndsAt, subscriptionPaidUntil }) && (
+          <p className="text-xs text-slate-400 mb-6">
+            {trialEndsAt && (!subscriptionPaidUntil || new Date(trialEndsAt) > new Date(subscriptionPaidUntil))
+              ? `Free trial active — ends ${new Date(trialEndsAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}.`
+              : `Plan active — renews by ${new Date(subscriptionPaidUntil!).toLocaleDateString("en-IN", { dateStyle: "medium" })}.`}
+          </p>
+        )}
 
         <div className="flex justify-end mb-6">
           <Link href="/doctor/dashboard" className="btn-secondary gap-1.5 text-sm">

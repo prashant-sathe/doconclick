@@ -3,6 +3,7 @@ import crypto from "crypto";
 // Shared with the webhook handler's amount-match check — keep in one place
 // so the two never drift apart.
 export const DOCTOR_REGISTRATION_FEE = 99;
+export const DOCTOR_SUBSCRIPTION_FEE = 499;
 
 const CASHFREE_BASE =
   process.env.CASHFREE_ENV === "sandbox"

@@ -90,6 +90,8 @@ model DoctorProfile {
   clinicPhotoUrl        String?
   cashfreeOrderId       String?
   cashfreePaymentId     String?
+  trialEndsAt           DateTime?
+  subscriptionPaidUntil DateTime?
 }
 
 model Appointment {

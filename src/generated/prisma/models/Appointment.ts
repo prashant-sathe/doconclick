@@ -994,10 +994,6 @@ export type AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput = {
   connect?: Prisma.AppointmentWhereUniqueInput | Prisma.AppointmentWhereUniqueInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type AppointmentUpdateOneWithoutFollowUpsNestedInput = {
   create?: Prisma.XOR<Prisma.AppointmentCreateWithoutFollowUpsInput, Prisma.AppointmentUncheckedCreateWithoutFollowUpsInput>
   connectOrCreate?: Prisma.AppointmentCreateOrConnectWithoutFollowUpsInput

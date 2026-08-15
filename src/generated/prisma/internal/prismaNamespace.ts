@@ -1352,7 +1352,9 @@ export const DoctorProfileScalarFieldEnum = {
   clinicName: 'clinicName',
   clinicPhotoUrl: 'clinicPhotoUrl',
   cashfreeOrderId: 'cashfreeOrderId',
-  cashfreePaymentId: 'cashfreePaymentId'
+  cashfreePaymentId: 'cashfreePaymentId',
+  trialEndsAt: 'trialEndsAt',
+  subscriptionPaidUntil: 'subscriptionPaidUntil'
 } as const
 
 export type DoctorProfileScalarFieldEnum = (typeof DoctorProfileScalarFieldEnum)[keyof typeof DoctorProfileScalarFieldEnum]
