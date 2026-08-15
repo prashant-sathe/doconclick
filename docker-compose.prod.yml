@@ -19,12 +19,14 @@ services:
 
   # One-off job: applies the Prisma schema (`prisma db push`, matching the
   # project's existing no-migrations convention) before the app starts.
-  # Uses the `builder` stage since it still has the full Prisma CLI +
-  # engines that the pruned standalone runtime image intentionally drops.
+  # Uses the `prisma` stage (has the CLI + generated client, but skips
+  # `npm run build`) rather than `builder` — this job never touches the
+  # compiled app, and building it would otherwise run `next build` twice
+  # in parallel alongside the `app` target's own build.
   migrate:
     build:
       context: .
-      target: builder
+      target: prisma
     command: ["npx", "prisma", "db", "push", "--accept-data-loss"]
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
