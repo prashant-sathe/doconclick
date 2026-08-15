@@ -39,6 +39,7 @@ interface Appointment {
   prescriptionUrl: string | null;
   doctorNotes: string | null;
   scheduledAt: string;
+  createdAt: string;
   doctor: { name: string; doctorProfile: { specialty: string } | null };
   review: { id: string; rating: number; comment: string | null } | null;
   medicines: Medicine[];
@@ -52,6 +53,7 @@ const STATUS_BADGE: Record<string, string> = {
   COMPLETED: "badge badge-success",
   CANCELLED: "badge badge-gray",
   REJECTED: "badge badge-danger",
+  EXPIRED: "badge badge-gray",
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -60,7 +62,17 @@ const STATUS_LABEL: Record<string, string> = {
   COMPLETED: "Completed",
   CANCELLED: "Cancelled",
   REJECTED: "Declined",
+  EXPIRED: "Doctor was busy",
 };
+
+const REQUEST_TIMEOUT_MS = 30 * 60 * 1000;
+
+function formatCountdown(ms: number): string {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
 
 function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: string; onClose: () => void; onSubmitted: () => void }) {
   const [rating, setRating] = useState(5);
@@ -113,15 +125,17 @@ function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: s
   );
 }
 
-function AppointmentCard({ a, patientId, onCancel, onReview }: {
+function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
   a: Appointment;
   patientId: string;
+  now: number;
   onCancel: (id: string) => void;
   onReview: (id: string) => void;
 }) {
   const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
   const router = useRouter();
   const needsPayment = a.status === "SCHEDULED" && a.paymentMethod === "ONLINE" && a.paymentStatus === "PENDING";
+  const timeLeftMs = REQUEST_TIMEOUT_MS - (now - new Date(a.createdAt).getTime());
 
   return (
     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
@@ -155,13 +169,23 @@ function AppointmentCard({ a, patientId, onCancel, onReview }: {
       <p className="text-sm text-slate-600 mb-3">{a.symptoms}</p>
 
       {a.status === "PENDING_APPROVAL" && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center gap-2">
-          <Clock className="w-4 h-4 flex-shrink-0" /> Waiting for {a.doctor.name} to accept this request.
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
+          <span className="flex items-center gap-2">
+            <Clock className="w-4 h-4 flex-shrink-0" /> Waiting for {a.doctor.name} to accept this request.
+          </span>
+          <span className="text-xs font-mono font-semibold text-amber-700 flex-shrink-0">
+            {timeLeftMs > 0 ? `${formatCountdown(timeLeftMs)} left` : "Expiring…"}
+          </span>
         </div>
       )}
       {a.status === "REJECTED" && (
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
           <ThumbsDown className="w-4 h-4 flex-shrink-0 text-slate-400" /> {a.doctor.name} was unable to accept this request. No payment was taken.
+        </div>
+      )}
+      {a.status === "EXPIRED" && (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
+          <Clock className="w-4 h-4 flex-shrink-0 text-slate-400" /> {a.doctor.name}{" "}didn&apos;t respond in time and may be too busy right now. No payment was taken — try booking again or choose another doctor.
         </div>
       )}
       {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
@@ -271,6 +295,7 @@ export default function PatientAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [reviewFor, setReviewFor] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
 
   const load = useCallback(() => {
     fetch("/api/appointments/me")
@@ -291,6 +316,12 @@ export default function PatientAppointments() {
     const interval = setInterval(load, 5000);
     return () => clearInterval(interval);
   }, [user, load]);
+
+  // Ticks the pending-request countdown independently of the 5s data poll.
+  useEffect(() => {
+    const tick = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(tick);
+  }, []);
 
   const cancelAppointment = async (id: string) => {
     await fetch(`/api/appointments/${id}`, {
@@ -340,7 +371,7 @@ export default function PatientAppointments() {
                 </h2>
                 <div className="space-y-3">
                   {pending.map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} onCancel={cancelAppointment} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={cancelAppointment} onReview={setReviewFor} />
                   ))}
                 </div>
               </section>
@@ -357,7 +388,7 @@ export default function PatientAppointments() {
               ) : (
                 <div className="space-y-3">
                   {upcoming.map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} onCancel={cancelAppointment} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={cancelAppointment} onReview={setReviewFor} />
                   ))}
                 </div>
               )}
@@ -372,7 +403,7 @@ export default function PatientAppointments() {
               ) : (
                 <div className="space-y-3">
                   {past.map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} onCancel={cancelAppointment} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={cancelAppointment} onReview={setReviewFor} />
                   ))}
                 </div>
               )}

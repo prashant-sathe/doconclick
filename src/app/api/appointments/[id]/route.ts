@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { expireStalePendingRequests } from "@/lib/expireAppointments";
 
 // Valid status transitions a doctor may make, keyed by the appointment's current status
 const DOCTOR_TRANSITIONS: Record<string, string[]> = {
@@ -46,6 +47,7 @@ export async function PATCH(
   }
 
   const { id } = await params;
+  await expireStalePendingRequests();
   const appointment = await prisma.appointment.findUnique({ where: { id } });
   if (!appointment) {
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
@@ -56,6 +58,12 @@ export async function PATCH(
   if (authUser.role === "DOCTOR") {
     if (appointment.doctorId !== authUser.id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+    }
+    if (appointment.status === "EXPIRED") {
+      return NextResponse.json(
+        { error: "This request timed out and the patient has already been notified — it can no longer be accepted." },
+        { status: 409 }
+      );
     }
     const allowed = DOCTOR_TRANSITIONS[appointment.status] ?? [];
     if (!allowed.includes(status)) {

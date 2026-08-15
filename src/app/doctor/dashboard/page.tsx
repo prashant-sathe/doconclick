@@ -166,6 +166,7 @@ export default function DoctorDashboard() {
   const [loadingAppts, setLoadingAppts] = useState(true);
   const [completingId, setCompletingId] = useState<string | null>(null);
   const [respondingId, setRespondingId] = useState<string | null>(null);
+  const [respondError, setRespondError] = useState<{ id: string; message: string } | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/dashboard");
@@ -184,24 +185,32 @@ export default function DoctorDashboard() {
   }, [user, router]);
 
   const loadAppointments = useCallback(() => {
-    setLoadingAppts(true);
     fetch("/api/appointments/me")
       .then((r) => r.json())
       .then((d) => { setAppointments(d); setLoadingAppts(false); });
   }, []);
 
+  // Poll so a pending request that times out (no response within 30 min)
+  // disappears from the queue without the doctor needing to refresh.
   useEffect(() => {
-    if (user?.role === "DOCTOR") loadAppointments();
+    if (user?.role !== "DOCTOR") return;
+    loadAppointments();
+    const interval = setInterval(loadAppointments, 5000);
+    return () => clearInterval(interval);
   }, [user, loadAppointments]);
 
   const respond = async (id: string, status: "SCHEDULED" | "REJECTED") => {
     setRespondingId(id);
-    await fetch(`/api/appointments/${id}`, {
+    setRespondError(null);
+    const res = await fetch(`/api/appointments/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
     setRespondingId(null);
+    if (!res.ok) {
+      setRespondError({ id, message: (await res.json().catch(() => ({}))).error ?? "Could not update this request." });
+    }
     loadAppointments();
   };
 
@@ -379,6 +388,9 @@ export default function DoctorDashboard() {
                           <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}
                           </div>
+                        )}
+                        {respondError?.id === a.id && (
+                          <div className="text-xs text-red-600 mt-1">{respondError.message}</div>
                         )}
                       </div>
                     </div>

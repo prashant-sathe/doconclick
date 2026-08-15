@@ -100,7 +100,7 @@ model Appointment {
   allergies     String?
   consentGiven  Boolean   @default(false)
   consultType   String    @default("CLINIC") // CLINIC, HOME, VIDEO
-  status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, COMPLETED, CANCELLED
+  status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED
   paymentMethod String    @default("CASH") // ONLINE, CASH
   paymentStatus String    @default("PENDING") // PENDING, PAID
   isEmergency   Boolean   @default(false)

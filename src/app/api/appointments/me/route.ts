@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { expireStalePendingRequests } from "@/lib/expireAppointments";
 
 // GET: The logged-in user's own appointments (as patient or as doctor)
 export async function GET() {
@@ -8,6 +9,8 @@ export async function GET() {
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+
+  await expireStalePendingRequests();
 
   if (authUser.role === "PATIENT") {
     const appointments = await prisma.appointment.findMany({
