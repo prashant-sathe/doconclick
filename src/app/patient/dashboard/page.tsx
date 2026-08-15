@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
+import { isDoctorAvailableNow } from "@/lib/availability";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
 import RatingStars from "@/components/patient/RatingStars";
@@ -113,6 +114,7 @@ function PatientDashboardInner() {
   const [posError, setPosError] = useState(false);
   const [specialtyFilter, setSpecialtyFilter] = useState("");
   const [search, setSearch] = useState("");
+  const [now, setNow] = useState(() => Date.now());
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -158,6 +160,14 @@ function PatientDashboardInner() {
       .then((data: Doctor[]) => setDoctors(data));
   }, []);
 
+  // Re-checks who's currently within their set hours every minute, so a
+  // doctor's pin appears/disappears live as their availability window
+  // opens or closes without the patient needing to reload the map.
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   // ── Deep link: open a specific doctor's panel (follow-up bookings) ──────
   useEffect(() => {
     if (didDeepLink.current || !deepLinkedDoctorId || doctors.length === 0) return;
@@ -189,9 +199,10 @@ function PatientDashboardInner() {
     return doctorsWithDist.filter((d) => {
       const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
       const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
-      return matchesSpecialty && matchesSearch;
+      const isOpenNow = isDoctorAvailableNow(d.doctorProfile?.availability, new Date(now));
+      return matchesSpecialty && matchesSearch && isOpenNow;
     });
-  }, [doctorsWithDist, specialtyFilter, search]);
+  }, [doctorsWithDist, specialtyFilter, search, now]);
 
   const sorted = useMemo(() => [...filteredDoctors].sort(
     (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
@@ -327,7 +338,7 @@ function PatientDashboardInner() {
     if (!leafletMapRef.current) return;
     placeDoctorMarkers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doctors, specialtyFilter, search]);
+  }, [doctors, specialtyFilter, search, now]);
 
   // ── Fly to selected doctor ─────────────────────────────────────────────
   useEffect(() => {
