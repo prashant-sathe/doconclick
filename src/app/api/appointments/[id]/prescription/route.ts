@@ -11,6 +11,59 @@ const ALLOWED_TYPES: Record<string, string> = {
 };
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
+// GET: The patient fetches structured prescription data for their own completed appointment
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const authUser = await getAuthUser();
+  if (!authUser) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const appointment = await prisma.appointment.findUnique({
+    where: { id },
+    include: {
+      patient: { select: { name: true, patientProfile: { select: { age: true, gender: true } } } },
+      doctor: { select: { name: true, doctorProfile: { select: { qualification: true, medRegNo: true, specialty: true } } } },
+      medicines: true,
+    },
+  });
+
+  if (!appointment) {
+    return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
+  }
+  if (authUser.id !== appointment.patientId) {
+    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  }
+  if (appointment.status !== "COMPLETED") {
+    return NextResponse.json({ error: "Prescription not available yet" }, { status: 400 });
+  }
+
+  return NextResponse.json({
+    id: appointment.id,
+    scheduledAt: appointment.scheduledAt,
+    patientName: appointment.patientName,
+    accountHolderName: appointment.patient.name,
+    relation: appointment.relation,
+    patientAge: appointment.patient.patientProfile?.age ?? null,
+    patientGender: appointment.patient.patientProfile?.gender ?? null,
+    doctorName: appointment.doctor.name,
+    doctorQualification: appointment.doctor.doctorProfile?.qualification ?? null,
+    doctorRegNo: appointment.doctor.doctorProfile?.medRegNo ?? null,
+    doctorSpecialty: appointment.doctor.doctorProfile?.specialty ?? "General Physician",
+    doctorNotes: appointment.doctorNotes,
+    medicines: appointment.medicines.map((m) => ({
+      name: m.name,
+      dosage: m.dosage,
+      frequency: m.frequency,
+      duration: m.duration,
+      instructions: m.instructions,
+    })),
+  });
+}
+
 // POST: Doctor uploads a prescription file for their own appointment
 export async function POST(
   req: Request,

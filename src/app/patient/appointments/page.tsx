@@ -12,6 +12,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
+import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
 
 interface Medicine {
   id: string;
@@ -112,8 +113,9 @@ function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: s
   );
 }
 
-function AppointmentCard({ a, onCancel, onReview }: {
+function AppointmentCard({ a, patientId, onCancel, onReview }: {
   a: Appointment;
+  patientId: string;
   onCancel: (id: string) => void;
   onReview: (id: string) => void;
 }) {
@@ -237,6 +239,9 @@ function AppointmentCard({ a, onCancel, onReview }: {
             <FileText className="w-3.5 h-3.5" /> View Attached File
           </a>
         )}
+        {a.status === "COMPLETED" && (a.medicines.length > 0 || !!a.doctorNotes) && (
+          <PrescriptionDownloadButton appointmentId={a.id} patientId={patientId} />
+        )}
         {a.status === "COMPLETED" && !a.review && (
           <button onClick={() => onReview(a.id)} className="btn-secondary py-2 px-3 text-xs">
             <Star className="w-3.5 h-3.5" /> Leave a Review
@@ -329,7 +334,7 @@ export default function PatientAppointments() {
                 </h2>
                 <div className="space-y-3">
                   {pending.map((a) => (
-                    <AppointmentCard key={a.id} a={a} onCancel={cancelAppointment} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} onCancel={cancelAppointment} onReview={setReviewFor} />
                   ))}
                 </div>
               </section>
@@ -346,7 +351,7 @@ export default function PatientAppointments() {
               ) : (
                 <div className="space-y-3">
                   {upcoming.map((a) => (
-                    <AppointmentCard key={a.id} a={a} onCancel={cancelAppointment} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} onCancel={cancelAppointment} onReview={setReviewFor} />
                   ))}
                 </div>
               )}
@@ -361,7 +366,7 @@ export default function PatientAppointments() {
               ) : (
                 <div className="space-y-3">
                   {past.map((a) => (
-                    <AppointmentCard key={a.id} a={a} onCancel={cancelAppointment} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} onCancel={cancelAppointment} onReview={setReviewFor} />
                   ))}
                 </div>
               )}
