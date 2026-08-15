@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   MapPin, Video, Home, Building2, Loader2,
   CalendarClock, Wallet, CreditCard, Siren, Clock, IndianRupee,
-  CalendarCheck2, Hash, ClipboardList, AlertTriangle, ShieldCheck, Users,
+  CalendarCheck2, Hash, ClipboardList, AlertTriangle, ShieldCheck, Users, Search, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
@@ -77,6 +77,7 @@ function PatientBookInner() {
 
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [specialtyFilter, setSpecialtyFilter] = useState("");
+  const [search, setSearch] = useState("");
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
   const [form, setForm] = useState({ doctorId: "", symptoms: "", allergies: "", consultType: "CLINIC", relation: "Self", patientName: "" });
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
@@ -110,9 +111,12 @@ function PatientBookInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const visibleDoctors = specialtyFilter
-    ? doctors.filter((d) => d.doctorProfile?.specialty === specialtyFilter)
-    : doctors;
+  const visibleDoctors = doctors.filter((d) => {
+    const q = search.trim().toLowerCase();
+    const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
+    const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
+    return matchesSpecialty && matchesSearch;
+  });
 
   const selectedDoctor = doctors.find((d) => d.id === form.doctorId);
   const distance =
@@ -235,9 +239,28 @@ function PatientBookInner() {
         <form onSubmit={submit} className="lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 lg:items-start lg:min-w-0">
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-lg mx-auto lg:max-w-none lg:mx-0 lg:min-w-0">
           <div className="space-y-5">
-            {/* Specialty filter */}
+            {/* Search + specialty filter */}
             <div>
-              <label className="input-label mb-2 block">Filter by Specialty</label>
+              <label className="input-label mb-2 block">Find a Doctor</label>
+              <div className="relative mb-3">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search doctor or specialty…"
+                  value={search}
+                  onChange={(e) => { setSearch(e.target.value); set("doctorId", ""); }}
+                  className="input-field pl-10 pr-10"
+                />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch("")}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
               <SpecialtyFilter value={specialtyFilter} onChange={(s) => { setSpecialtyFilter(s); set("doctorId", ""); }} />
             </div>
 

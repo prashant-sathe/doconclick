@@ -5,7 +5,7 @@ import {
   MapPin, Home, Building2, Video, Stethoscope, Clock,
   ChevronDown, X, Loader2, CheckCircle, LogOut, Languages,
   Navigation, AlertCircle, IndianRupee, CalendarClock, Siren,
-  CalendarCheck2, Wallet, CreditCard, AlertTriangle, ShieldCheck, Users,
+  CalendarCheck2, Wallet, CreditCard, AlertTriangle, ShieldCheck, Users, Search,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
@@ -112,6 +112,7 @@ function PatientDashboardInner() {
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
   const [posError, setPosError] = useState(false);
   const [specialtyFilter, setSpecialtyFilter] = useState("");
+  const [search, setSearch] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -183,11 +184,14 @@ function PatientDashboardInner() {
     };
   }), [doctors, userPos]);
 
-  const filteredDoctors = useMemo(() => (
-    specialtyFilter
-      ? doctorsWithDist.filter((d) => d.doctorProfile?.specialty === specialtyFilter)
-      : doctorsWithDist
-  ), [doctorsWithDist, specialtyFilter]);
+  const filteredDoctors = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return doctorsWithDist.filter((d) => {
+      const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
+      const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
+      return matchesSpecialty && matchesSearch;
+    });
+  }, [doctorsWithDist, specialtyFilter, search]);
 
   const sorted = useMemo(() => [...filteredDoctors].sort(
     (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
@@ -323,7 +327,7 @@ function PatientDashboardInner() {
     if (!leafletMapRef.current) return;
     placeDoctorMarkers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doctors, specialtyFilter]);
+  }, [doctors, specialtyFilter, search]);
 
   // ── Fly to selected doctor ─────────────────────────────────────────────
   useEffect(() => {
@@ -510,9 +514,28 @@ function PatientDashboardInner() {
           </div>
         </div>
 
-        {/* Specialty filter chips */}
+        {/* Search + specialty filter chips */}
         <div className="px-3 sm:px-4 pointer-events-auto">
           <div className="glass-card rounded-2xl p-2.5 max-w-full">
+            <div className="relative mb-2">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search doctor or specialty…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-8 pr-8 py-2 rounded-xl border border-slate-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
             <SpecialtyFilter value={specialtyFilter} onChange={setSpecialtyFilter} />
           </div>
         </div>
