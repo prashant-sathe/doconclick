@@ -17,7 +17,7 @@ export async function GET() {
       prisma.appointment.count(),
       prisma.appointment.aggregate({
         _sum: { amount: true, platformFee: true },
-        where: { status: "COMPLETED" },
+        where: { status: "COMPLETED", paymentStatus: "PAID" },
       }),
       prisma.appointment.findMany({
         take: 5,

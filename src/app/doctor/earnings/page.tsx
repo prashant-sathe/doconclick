@@ -56,7 +56,7 @@ export default function DoctorEarnings() {
     </div>;
   }
 
-  const completed = appointments.filter((a) => a.status === "COMPLETED");
+  const completed = appointments.filter((a) => a.status === "COMPLETED" && a.paymentStatus === "PAID");
   const net = (a: Appointment) => a.amount - a.platformFee;
 
   const now = new Date();

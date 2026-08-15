@@ -1,24 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, Smartphone, Building, CheckCircle, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { CreditCard, CheckCircle, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 
 const REGISTRATION_FEE = 99;
 
-const PAYMENT_METHODS = [
-  { id: "UPI", label: "UPI", icon: Smartphone },
-  { id: "CARD", label: "Card", icon: CreditCard },
-  { id: "NET", label: "Net Banking", icon: Building },
-];
-
 export default function DoctorPayment() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const [method, setMethod] = useState("UPI");
-  const [processing, setProcessing] = useState(false);
-  const [paid, setPaid] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [alreadyPaid, setAlreadyPaid] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -26,20 +19,32 @@ export default function DoctorPayment() {
     if (!authLoading && user && user.role !== "DOCTOR") router.push("/login");
   }, [authLoading, user, router]);
 
+  useEffect(() => {
+    if (!user || user.role !== "DOCTOR") return;
+    fetch("/api/doctors/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setAlreadyPaid(!!d?.doctorProfile?.registrationFeePaid))
+      .finally(() => setChecking(false));
+  }, [user]);
+
   const pay = async () => {
-    setProcessing(true);
+    setPaying(true);
     setError("");
-    const res = await fetch("/api/doctors/registration-fee/confirm", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ method }),
-    });
-    setProcessing(false);
-    if (res.ok) setPaid(true);
-    else setError("Payment failed. Please try again.");
+    const res = await fetch("/api/doctors/registration-fee/create-order", { method: "POST" });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setPaying(false);
+      setError(data.error ?? "Could not start payment. Please try again.");
+      return;
+    }
+    const { load } = await import("@cashfreepayments/cashfree-js");
+    // See src/app/patient/payment/page.tsx for why this is hardcoded rather
+    // than env-driven (NEXT_PUBLIC_ vars are inlined at Docker build time).
+    const cashfree = await load({ mode: "production" });
+    cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
   };
 
-  if (authLoading || !user) {
+  if (authLoading || !user || checking) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
     </div>;
@@ -54,18 +59,18 @@ export default function DoctorPayment() {
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900">Registration Fee</h1>
           <p className="text-slate-500 mt-2">A one-time ₹{REGISTRATION_FEE} fee activates your doctor dashboard.</p>
-          <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-0.5">
-            Sandbox Payment Gateway — no real money moves
-          </span>
+          <p className="text-slate-500 mt-2 flex items-center justify-center gap-1.5 text-sm">
+            <ShieldCheck className="w-4 h-4 text-emerald-500" /> Secured by Cashfree
+          </p>
         </div>
 
-        {paid ? (
+        {alreadyPaid ? (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center">
             <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
               <CheckCircle className="w-9 h-9 text-emerald-500" />
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Payment Successful!</h2>
-            <p className="text-slate-500 mb-8">Your dashboard is now unlocked. Let&apos;s complete your consultation profile.</p>
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Already Paid</h2>
+            <p className="text-slate-500 mb-8">Your dashboard is unlocked.</p>
             <button onClick={() => router.push("/doctor/dashboard")} className="btn-primary w-full justify-center py-3.5 text-base">
               Go to Dashboard
             </button>
@@ -77,23 +82,6 @@ export default function DoctorPayment() {
               <span className="font-extrabold text-blue-600 text-xl">₹{REGISTRATION_FEE}</span>
             </div>
 
-            <p className="input-label mb-3">Select Payment Method</p>
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              {PAYMENT_METHODS.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => setMethod(id)}
-                  type="button"
-                  className={cn(
-                    "flex flex-col items-center gap-1.5 p-3.5 rounded-xl border text-xs font-semibold transition-all",
-                    method === id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
-                  )}
-                >
-                  <Icon className="w-4 h-4" /> {label}
-                </button>
-              ))}
-            </div>
-
             {error && (
               <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
@@ -101,8 +89,8 @@ export default function DoctorPayment() {
               </div>
             )}
 
-            <button onClick={pay} disabled={processing} className="btn-primary w-full justify-center py-3.5 text-base">
-              {processing ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</> : `Pay ₹${REGISTRATION_FEE} via ${method}`}
+            <button onClick={pay} disabled={paying} className="btn-primary w-full justify-center py-3.5 text-base">
+              {paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</> : `Pay ₹${REGISTRATION_FEE}`}
             </button>
           </div>
         )}

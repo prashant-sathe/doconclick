@@ -56,6 +56,8 @@ export type AppointmentMinAggregateOutputType = {
   isEmergency: boolean | null
   amount: number | null
   platformFee: number | null
+  cashfreeOrderId: string | null
+  cashfreePaymentId: string | null
   prescriptionUrl: string | null
   doctorNotes: string | null
   travelStatus: string | null
@@ -83,6 +85,8 @@ export type AppointmentMaxAggregateOutputType = {
   isEmergency: boolean | null
   amount: number | null
   platformFee: number | null
+  cashfreeOrderId: string | null
+  cashfreePaymentId: string | null
   prescriptionUrl: string | null
   doctorNotes: string | null
   travelStatus: string | null
@@ -110,6 +114,8 @@ export type AppointmentCountAggregateOutputType = {
   isEmergency: number
   amount: number
   platformFee: number
+  cashfreeOrderId: number
+  cashfreePaymentId: number
   prescriptionUrl: number
   doctorNotes: number
   travelStatus: number
@@ -153,6 +159,8 @@ export type AppointmentMinAggregateInputType = {
   isEmergency?: true
   amount?: true
   platformFee?: true
+  cashfreeOrderId?: true
+  cashfreePaymentId?: true
   prescriptionUrl?: true
   doctorNotes?: true
   travelStatus?: true
@@ -180,6 +188,8 @@ export type AppointmentMaxAggregateInputType = {
   isEmergency?: true
   amount?: true
   platformFee?: true
+  cashfreeOrderId?: true
+  cashfreePaymentId?: true
   prescriptionUrl?: true
   doctorNotes?: true
   travelStatus?: true
@@ -207,6 +217,8 @@ export type AppointmentCountAggregateInputType = {
   isEmergency?: true
   amount?: true
   platformFee?: true
+  cashfreeOrderId?: true
+  cashfreePaymentId?: true
   prescriptionUrl?: true
   doctorNotes?: true
   travelStatus?: true
@@ -321,6 +333,8 @@ export type AppointmentGroupByOutputType = {
   isEmergency: boolean
   amount: number
   platformFee: number
+  cashfreeOrderId: string | null
+  cashfreePaymentId: string | null
   prescriptionUrl: string | null
   doctorNotes: string | null
   travelStatus: string
@@ -371,6 +385,8 @@ export type AppointmentWhereInput = {
   isEmergency?: Prisma.BoolFilter<"Appointment"> | boolean
   amount?: Prisma.FloatFilter<"Appointment"> | number
   platformFee?: Prisma.FloatFilter<"Appointment"> | number
+  cashfreeOrderId?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  cashfreePaymentId?: Prisma.StringNullableFilter<"Appointment"> | string | null
   prescriptionUrl?: Prisma.StringNullableFilter<"Appointment"> | string | null
   doctorNotes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   travelStatus?: Prisma.StringFilter<"Appointment"> | string
@@ -406,6 +422,8 @@ export type AppointmentOrderByWithRelationInput = {
   isEmergency?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
+  cashfreeOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  cashfreePaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   prescriptionUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   doctorNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   travelStatus?: Prisma.SortOrder
@@ -444,6 +462,8 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   isEmergency?: Prisma.BoolFilter<"Appointment"> | boolean
   amount?: Prisma.FloatFilter<"Appointment"> | number
   platformFee?: Prisma.FloatFilter<"Appointment"> | number
+  cashfreeOrderId?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  cashfreePaymentId?: Prisma.StringNullableFilter<"Appointment"> | string | null
   prescriptionUrl?: Prisma.StringNullableFilter<"Appointment"> | string | null
   doctorNotes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   travelStatus?: Prisma.StringFilter<"Appointment"> | string
@@ -479,6 +499,8 @@ export type AppointmentOrderByWithAggregationInput = {
   isEmergency?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
+  cashfreeOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  cashfreePaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   prescriptionUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   doctorNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   travelStatus?: Prisma.SortOrder
@@ -514,6 +536,8 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   isEmergency?: Prisma.BoolWithAggregatesFilter<"Appointment"> | boolean
   amount?: Prisma.FloatWithAggregatesFilter<"Appointment"> | number
   platformFee?: Prisma.FloatWithAggregatesFilter<"Appointment"> | number
+  cashfreeOrderId?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
+  cashfreePaymentId?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   prescriptionUrl?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   doctorNotes?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   travelStatus?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
@@ -539,6 +563,8 @@ export type AppointmentCreateInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -573,6 +599,8 @@ export type AppointmentUncheckedCreateInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -603,6 +631,8 @@ export type AppointmentUpdateInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -637,6 +667,8 @@ export type AppointmentUncheckedUpdateInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -669,6 +701,8 @@ export type AppointmentCreateManyInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -694,6 +728,8 @@ export type AppointmentUpdateManyMutationInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -720,6 +756,8 @@ export type AppointmentUncheckedUpdateManyInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -762,6 +800,8 @@ export type AppointmentCountOrderByAggregateInput = {
   isEmergency?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
+  cashfreeOrderId?: Prisma.SortOrder
+  cashfreePaymentId?: Prisma.SortOrder
   prescriptionUrl?: Prisma.SortOrder
   doctorNotes?: Prisma.SortOrder
   travelStatus?: Prisma.SortOrder
@@ -796,6 +836,8 @@ export type AppointmentMaxOrderByAggregateInput = {
   isEmergency?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
+  cashfreeOrderId?: Prisma.SortOrder
+  cashfreePaymentId?: Prisma.SortOrder
   prescriptionUrl?: Prisma.SortOrder
   doctorNotes?: Prisma.SortOrder
   travelStatus?: Prisma.SortOrder
@@ -823,6 +865,8 @@ export type AppointmentMinOrderByAggregateInput = {
   isEmergency?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
+  cashfreeOrderId?: Prisma.SortOrder
+  cashfreePaymentId?: Prisma.SortOrder
   prescriptionUrl?: Prisma.SortOrder
   doctorNotes?: Prisma.SortOrder
   travelStatus?: Prisma.SortOrder
@@ -1062,6 +1106,8 @@ export type AppointmentCreateWithoutPatientInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1094,6 +1140,8 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1134,6 +1182,8 @@ export type AppointmentCreateWithoutDoctorInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1166,6 +1216,8 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1227,6 +1279,8 @@ export type AppointmentScalarWhereInput = {
   isEmergency?: Prisma.BoolFilter<"Appointment"> | boolean
   amount?: Prisma.FloatFilter<"Appointment"> | number
   platformFee?: Prisma.FloatFilter<"Appointment"> | number
+  cashfreeOrderId?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  cashfreePaymentId?: Prisma.StringNullableFilter<"Appointment"> | string | null
   prescriptionUrl?: Prisma.StringNullableFilter<"Appointment"> | string | null
   doctorNotes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   travelStatus?: Prisma.StringFilter<"Appointment"> | string
@@ -1268,6 +1322,8 @@ export type AppointmentCreateWithoutFollowUpsInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1301,6 +1357,8 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1335,6 +1393,8 @@ export type AppointmentCreateWithoutFollowUpOfInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1368,6 +1428,8 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1418,6 +1480,8 @@ export type AppointmentUpdateWithoutFollowUpsInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1451,6 +1515,8 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1496,6 +1562,8 @@ export type AppointmentCreateWithoutMessagesInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1529,6 +1597,8 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1574,6 +1644,8 @@ export type AppointmentUpdateWithoutMessagesInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1607,6 +1679,8 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1636,6 +1710,8 @@ export type AppointmentCreateWithoutMedicinesInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1669,6 +1745,8 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1714,6 +1792,8 @@ export type AppointmentUpdateWithoutMedicinesInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1747,6 +1827,8 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1776,6 +1858,8 @@ export type AppointmentCreateWithoutAttachmentsInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1809,6 +1893,8 @@ export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1854,6 +1940,8 @@ export type AppointmentUpdateWithoutAttachmentsInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1887,6 +1975,8 @@ export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1916,6 +2006,8 @@ export type AppointmentCreateWithoutReviewInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1949,6 +2041,8 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -1994,6 +2088,8 @@ export type AppointmentUpdateWithoutReviewInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2027,6 +2123,8 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2057,6 +2155,8 @@ export type AppointmentCreateManyPatientInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -2083,6 +2183,8 @@ export type AppointmentCreateManyDoctorInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -2108,6 +2210,8 @@ export type AppointmentUpdateWithoutPatientInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2140,6 +2244,8 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2171,6 +2277,8 @@ export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2196,6 +2304,8 @@ export type AppointmentUpdateWithoutDoctorInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2228,6 +2338,8 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2259,6 +2371,8 @@ export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2286,6 +2400,8 @@ export type AppointmentCreateManyFollowUpOfInput = {
   isEmergency?: boolean
   amount?: number
   platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
@@ -2310,6 +2426,8 @@ export type AppointmentUpdateWithoutFollowUpOfInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2343,6 +2461,8 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2374,6 +2494,8 @@ export type AppointmentUncheckedUpdateManyWithoutFollowUpOfInput = {
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2458,6 +2580,8 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   isEmergency?: boolean
   amount?: boolean
   platformFee?: boolean
+  cashfreeOrderId?: boolean
+  cashfreePaymentId?: boolean
   prescriptionUrl?: boolean
   doctorNotes?: boolean
   travelStatus?: boolean
@@ -2494,6 +2618,8 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   isEmergency?: boolean
   amount?: boolean
   platformFee?: boolean
+  cashfreeOrderId?: boolean
+  cashfreePaymentId?: boolean
   prescriptionUrl?: boolean
   doctorNotes?: boolean
   travelStatus?: boolean
@@ -2524,6 +2650,8 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   isEmergency?: boolean
   amount?: boolean
   platformFee?: boolean
+  cashfreeOrderId?: boolean
+  cashfreePaymentId?: boolean
   prescriptionUrl?: boolean
   doctorNotes?: boolean
   travelStatus?: boolean
@@ -2554,6 +2682,8 @@ export type AppointmentSelectScalar = {
   isEmergency?: boolean
   amount?: boolean
   platformFee?: boolean
+  cashfreeOrderId?: boolean
+  cashfreePaymentId?: boolean
   prescriptionUrl?: boolean
   doctorNotes?: boolean
   travelStatus?: boolean
@@ -2565,7 +2695,7 @@ export type AppointmentSelectScalar = {
   createdAt?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "consentGiven" | "consultType" | "status" | "paymentMethod" | "paymentStatus" | "isEmergency" | "amount" | "platformFee" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "scheduledAt" | "createdAt", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "consentGiven" | "consultType" | "status" | "paymentMethod" | "paymentStatus" | "isEmergency" | "amount" | "platformFee" | "cashfreeOrderId" | "cashfreePaymentId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "scheduledAt" | "createdAt", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2616,6 +2746,8 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     isEmergency: boolean
     amount: number
     platformFee: number
+    cashfreeOrderId: string | null
+    cashfreePaymentId: string | null
     prescriptionUrl: string | null
     doctorNotes: string | null
     travelStatus: string
@@ -3071,6 +3203,8 @@ export interface AppointmentFieldRefs {
   readonly isEmergency: Prisma.FieldRef<"Appointment", 'Boolean'>
   readonly amount: Prisma.FieldRef<"Appointment", 'Float'>
   readonly platformFee: Prisma.FieldRef<"Appointment", 'Float'>
+  readonly cashfreeOrderId: Prisma.FieldRef<"Appointment", 'String'>
+  readonly cashfreePaymentId: Prisma.FieldRef<"Appointment", 'String'>
   readonly prescriptionUrl: Prisma.FieldRef<"Appointment", 'String'>
   readonly doctorNotes: Prisma.FieldRef<"Appointment", 'String'>
   readonly travelStatus: Prisma.FieldRef<"Appointment", 'String'>

@@ -88,6 +88,8 @@ model DoctorProfile {
   address               String?
   clinicName            String?
   clinicPhotoUrl        String?
+  cashfreeOrderId       String?
+  cashfreePaymentId     String?
 }
 
 model Appointment {
@@ -108,6 +110,8 @@ model Appointment {
   isEmergency   Boolean   @default(false)
   amount        Float     @default(0)
   platformFee   Float     @default(0)
+  cashfreeOrderId   String?
+  cashfreePaymentId String?
   prescriptionUrl String? // deprecated — superseded by `attachments`; kept so existing data isn't dropped
   doctorNotes   String?
   travelStatus  String    @default("NOT_STARTED") // NOT_STARTED, ON_THE_WAY, ARRIVED

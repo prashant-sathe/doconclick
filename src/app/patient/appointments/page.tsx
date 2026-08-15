@@ -255,7 +255,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
           </button>
         )}
         {needsPayment && (
-          <Link href={`/patient/payment?amount=${a.amount}&apptId=${a.id}`} className="btn-primary py-2 px-3 text-xs">
+          <Link href={`/patient/payment?apptId=${a.id}`} className="btn-primary py-2 px-3 text-xs">
             <CardIcon className="w-3.5 h-3.5" /> Pay Now
           </Link>
         )}
