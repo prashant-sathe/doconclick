@@ -14,6 +14,8 @@ interface DoctorProfileData {
   id: string;
   name: string;
   doctorProfile: {
+    clinicName: string | null;
+    clinicPhotoUrl: string | null;
     qualification: string | null;
     medRegNo: string | null;
     specialty: string;
@@ -101,7 +103,18 @@ export default function DoctorProfilePage() {
     <div className="min-h-screen gradient-surface pb-16">
       <Header />
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          {profile.clinicPhotoUrl && (
+            <div className="w-full h-40 sm:h-48 bg-slate-100">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={profile.clinicPhotoUrl}
+                alt={profile.clinicName ? `${profile.clinicName} — clinic photo` : "Clinic photo"}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <div className="p-6">
           {/* Header */}
           <div className="flex items-start gap-4 mb-5">
             <div
@@ -117,6 +130,11 @@ export default function DoctorProfilePage() {
               </div>
               <p className="text-sm text-slate-500 mt-0.5">{profile.specialty}</p>
               <p className="text-xs text-slate-400 mt-0.5">{profile.qualification}</p>
+              {profile.clinicName && (
+                <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                  <Building2 className="w-3 h-3 flex-shrink-0" /> {profile.clinicName}
+                </p>
+              )}
               <div className="mt-1.5">
                 <RatingStars avgRating={profile.avgRating} totalReviews={profile.totalReviews} />
               </div>
@@ -186,6 +204,7 @@ export default function DoctorProfilePage() {
           <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary w-full justify-center py-3.5 text-base">
             Book Appointment
           </Link>
+          </div>
         </div>
       </div>
     </div>

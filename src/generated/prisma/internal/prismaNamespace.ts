@@ -1273,7 +1273,9 @@ export const DoctorProfileScalarFieldEnum = {
   medRegCertUrl: 'medRegCertUrl',
   degreeCertUrl: 'degreeCertUrl',
   kycDocUrl: 'kycDocUrl',
-  address: 'address'
+  address: 'address',
+  clinicName: 'clinicName',
+  clinicPhotoUrl: 'clinicPhotoUrl'
 } as const
 
 export type DoctorProfileScalarFieldEnum = (typeof DoctorProfileScalarFieldEnum)[keyof typeof DoctorProfileScalarFieldEnum]

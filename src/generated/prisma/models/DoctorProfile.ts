@@ -79,6 +79,8 @@ export type DoctorProfileMinAggregateOutputType = {
   degreeCertUrl: string | null
   kycDocUrl: string | null
   address: string | null
+  clinicName: string | null
+  clinicPhotoUrl: string | null
 }
 
 export type DoctorProfileMaxAggregateOutputType = {
@@ -110,6 +112,8 @@ export type DoctorProfileMaxAggregateOutputType = {
   degreeCertUrl: string | null
   kycDocUrl: string | null
   address: string | null
+  clinicName: string | null
+  clinicPhotoUrl: string | null
 }
 
 export type DoctorProfileCountAggregateOutputType = {
@@ -141,6 +145,8 @@ export type DoctorProfileCountAggregateOutputType = {
   degreeCertUrl: number
   kycDocUrl: number
   address: number
+  clinicName: number
+  clinicPhotoUrl: number
   _all: number
 }
 
@@ -198,6 +204,8 @@ export type DoctorProfileMinAggregateInputType = {
   degreeCertUrl?: true
   kycDocUrl?: true
   address?: true
+  clinicName?: true
+  clinicPhotoUrl?: true
 }
 
 export type DoctorProfileMaxAggregateInputType = {
@@ -229,6 +237,8 @@ export type DoctorProfileMaxAggregateInputType = {
   degreeCertUrl?: true
   kycDocUrl?: true
   address?: true
+  clinicName?: true
+  clinicPhotoUrl?: true
 }
 
 export type DoctorProfileCountAggregateInputType = {
@@ -260,6 +270,8 @@ export type DoctorProfileCountAggregateInputType = {
   degreeCertUrl?: true
   kycDocUrl?: true
   address?: true
+  clinicName?: true
+  clinicPhotoUrl?: true
   _all?: true
 }
 
@@ -378,6 +390,8 @@ export type DoctorProfileGroupByOutputType = {
   degreeCertUrl: string | null
   kycDocUrl: string | null
   address: string | null
+  clinicName: string | null
+  clinicPhotoUrl: string | null
   _count: DoctorProfileCountAggregateOutputType | null
   _avg: DoctorProfileAvgAggregateOutputType | null
   _sum: DoctorProfileSumAggregateOutputType | null
@@ -432,6 +446,8 @@ export type DoctorProfileWhereInput = {
   degreeCertUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   kycDocUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   address?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  clinicName?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  clinicPhotoUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -464,6 +480,8 @@ export type DoctorProfileOrderByWithRelationInput = {
   degreeCertUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   kycDocUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
+  clinicName?: Prisma.SortOrderInput | Prisma.SortOrder
+  clinicPhotoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -499,6 +517,8 @@ export type DoctorProfileWhereUniqueInput = Prisma.AtLeast<{
   degreeCertUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   kycDocUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   address?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  clinicName?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  clinicPhotoUrl?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId" | "medRegNo">
 
@@ -531,6 +551,8 @@ export type DoctorProfileOrderByWithAggregationInput = {
   degreeCertUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   kycDocUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
+  clinicName?: Prisma.SortOrderInput | Prisma.SortOrder
+  clinicPhotoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.DoctorProfileCountOrderByAggregateInput
   _avg?: Prisma.DoctorProfileAvgOrderByAggregateInput
   _max?: Prisma.DoctorProfileMaxOrderByAggregateInput
@@ -570,6 +592,8 @@ export type DoctorProfileScalarWhereWithAggregatesInput = {
   degreeCertUrl?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
   kycDocUrl?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
+  clinicName?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
+  clinicPhotoUrl?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
 }
 
 export type DoctorProfileCreateInput = {
@@ -600,6 +624,8 @@ export type DoctorProfileCreateInput = {
   degreeCertUrl?: string | null
   kycDocUrl?: string | null
   address?: string | null
+  clinicName?: string | null
+  clinicPhotoUrl?: string | null
   user: Prisma.UserCreateNestedOneWithoutDoctorProfileInput
 }
 
@@ -632,6 +658,8 @@ export type DoctorProfileUncheckedCreateInput = {
   degreeCertUrl?: string | null
   kycDocUrl?: string | null
   address?: string | null
+  clinicName?: string | null
+  clinicPhotoUrl?: string | null
 }
 
 export type DoctorProfileUpdateInput = {
@@ -662,6 +690,8 @@ export type DoctorProfileUpdateInput = {
   degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutDoctorProfileNestedInput
 }
 
@@ -694,6 +724,8 @@ export type DoctorProfileUncheckedUpdateInput = {
   degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DoctorProfileCreateManyInput = {
@@ -725,6 +757,8 @@ export type DoctorProfileCreateManyInput = {
   degreeCertUrl?: string | null
   kycDocUrl?: string | null
   address?: string | null
+  clinicName?: string | null
+  clinicPhotoUrl?: string | null
 }
 
 export type DoctorProfileUpdateManyMutationInput = {
@@ -755,6 +789,8 @@ export type DoctorProfileUpdateManyMutationInput = {
   degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DoctorProfileUncheckedUpdateManyInput = {
@@ -786,6 +822,8 @@ export type DoctorProfileUncheckedUpdateManyInput = {
   degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DoctorProfileNullableScalarRelationFilter = {
@@ -822,6 +860,8 @@ export type DoctorProfileCountOrderByAggregateInput = {
   degreeCertUrl?: Prisma.SortOrder
   kycDocUrl?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  clinicName?: Prisma.SortOrder
+  clinicPhotoUrl?: Prisma.SortOrder
 }
 
 export type DoctorProfileAvgOrderByAggregateInput = {
@@ -865,6 +905,8 @@ export type DoctorProfileMaxOrderByAggregateInput = {
   degreeCertUrl?: Prisma.SortOrder
   kycDocUrl?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  clinicName?: Prisma.SortOrder
+  clinicPhotoUrl?: Prisma.SortOrder
 }
 
 export type DoctorProfileMinOrderByAggregateInput = {
@@ -896,6 +938,8 @@ export type DoctorProfileMinOrderByAggregateInput = {
   degreeCertUrl?: Prisma.SortOrder
   kycDocUrl?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  clinicName?: Prisma.SortOrder
+  clinicPhotoUrl?: Prisma.SortOrder
 }
 
 export type DoctorProfileSumOrderByAggregateInput = {
@@ -982,6 +1026,8 @@ export type DoctorProfileCreateWithoutUserInput = {
   degreeCertUrl?: string | null
   kycDocUrl?: string | null
   address?: string | null
+  clinicName?: string | null
+  clinicPhotoUrl?: string | null
 }
 
 export type DoctorProfileUncheckedCreateWithoutUserInput = {
@@ -1012,6 +1058,8 @@ export type DoctorProfileUncheckedCreateWithoutUserInput = {
   degreeCertUrl?: string | null
   kycDocUrl?: string | null
   address?: string | null
+  clinicName?: string | null
+  clinicPhotoUrl?: string | null
 }
 
 export type DoctorProfileCreateOrConnectWithoutUserInput = {
@@ -1058,6 +1106,8 @@ export type DoctorProfileUpdateWithoutUserInput = {
   degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DoctorProfileUncheckedUpdateWithoutUserInput = {
@@ -1088,6 +1138,8 @@ export type DoctorProfileUncheckedUpdateWithoutUserInput = {
   degreeCertUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kycDocUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1121,6 +1173,8 @@ export type DoctorProfileSelect<ExtArgs extends runtime.Types.Extensions.Interna
   degreeCertUrl?: boolean
   kycDocUrl?: boolean
   address?: boolean
+  clinicName?: boolean
+  clinicPhotoUrl?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["doctorProfile"]>
 
@@ -1153,6 +1207,8 @@ export type DoctorProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   degreeCertUrl?: boolean
   kycDocUrl?: boolean
   address?: boolean
+  clinicName?: boolean
+  clinicPhotoUrl?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["doctorProfile"]>
 
@@ -1185,6 +1241,8 @@ export type DoctorProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   degreeCertUrl?: boolean
   kycDocUrl?: boolean
   address?: boolean
+  clinicName?: boolean
+  clinicPhotoUrl?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["doctorProfile"]>
 
@@ -1217,9 +1275,11 @@ export type DoctorProfileSelectScalar = {
   degreeCertUrl?: boolean
   kycDocUrl?: boolean
   address?: boolean
+  clinicName?: boolean
+  clinicPhotoUrl?: boolean
 }
 
-export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "videoFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "bio" | "offersHomeVisit" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "address", ExtArgs["result"]["doctorProfile"]>
+export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "videoFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "bio" | "offersHomeVisit" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "address" | "clinicName" | "clinicPhotoUrl", ExtArgs["result"]["doctorProfile"]>
 export type DoctorProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -1264,6 +1324,8 @@ export type $DoctorProfilePayload<ExtArgs extends runtime.Types.Extensions.Inter
     degreeCertUrl: string | null
     kycDocUrl: string | null
     address: string | null
+    clinicName: string | null
+    clinicPhotoUrl: string | null
   }, ExtArgs["result"]["doctorProfile"]>
   composites: {}
 }
@@ -1716,6 +1778,8 @@ export interface DoctorProfileFieldRefs {
   readonly degreeCertUrl: Prisma.FieldRef<"DoctorProfile", 'String'>
   readonly kycDocUrl: Prisma.FieldRef<"DoctorProfile", 'String'>
   readonly address: Prisma.FieldRef<"DoctorProfile", 'String'>
+  readonly clinicName: Prisma.FieldRef<"DoctorProfile", 'String'>
+  readonly clinicPhotoUrl: Prisma.FieldRef<"DoctorProfile", 'String'>
 }
     
 

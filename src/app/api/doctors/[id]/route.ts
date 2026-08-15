@@ -20,6 +20,8 @@ export async function GET(
       doctorProfile: {
         select: {
           photoUrl: true,
+          clinicName: true,
+          clinicPhotoUrl: true,
           qualification: true,
           medRegNo: true,
           specialty: true,

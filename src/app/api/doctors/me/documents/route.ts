@@ -11,11 +11,12 @@ const ALLOWED_TYPES: Record<string, string> = {
 };
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
-const DOC_FIELD: Record<string, "photoUrl" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl"> = {
+const DOC_FIELD: Record<string, "photoUrl" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "clinicPhotoUrl"> = {
   photo: "photoUrl",
   medRegCert: "medRegCertUrl",
   degreeCert: "degreeCertUrl",
   kyc: "kycDocUrl",
+  clinicPhoto: "clinicPhotoUrl",
 };
 
 // POST: Doctor uploads a verification document or profile photo.
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid document type" }, { status: 400 });
   }
 
-  if (type !== "photo") {
+  if (type !== "photo" && type !== "clinicPhoto") {
     const profile = await prisma.doctorProfile.findUnique({ where: { userId: authUser.id } });
     if (profile?.isVerified) {
       return NextResponse.json(

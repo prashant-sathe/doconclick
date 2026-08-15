@@ -6,7 +6,7 @@ import {
   Loader2, Award, Hash, Briefcase, IndianRupee, MapPin, Clock,
   CreditCard, Camera, FileText, Shield, BadgeCheck, CheckCircle2,
   Save, ArrowRight, UploadCloud, Home, Navigation, Lock, Languages,
-  QrCode, Copy, Check, Download,
+  QrCode, Copy, Check, Download, Building2, Image as ImageIcon,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,7 @@ interface FormState {
   bankAccount: string;
   ifsc: string;
   address: string;
+  clinicName: string;
   lat: number | null;
   lng: number | null;
 }
@@ -42,7 +43,7 @@ interface FormState {
 const EMPTY_FORM: FormState = {
   specialty: "General Physician", qualification: "", languages: "", bio: "", medRegNo: "", experience: "",
   consultFee: "", videoFee: "", homeVisitFee: "", offersHomeVisit: true, radius: 10,
-  bankName: "", bankAccount: "", ifsc: "", address: "", lat: null, lng: null,
+  bankName: "", bankAccount: "", ifsc: "", address: "", clinicName: "", lat: null, lng: null,
 };
 
 function CompletionRing({ percent }: { percent: number }) {
@@ -126,6 +127,52 @@ function DocSlot({ label, icon: Icon, url, type, locked, onUploaded }: {
   );
 }
 
+function CoverPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded: (url: string) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const upload = async (file: File) => {
+    setBusy(true);
+    setError("");
+    const form = new FormData();
+    form.append("type", "clinicPhoto");
+    form.append("file", file);
+    const res = await fetch("/api/doctors/me/documents", { method: "POST", body: form });
+    setBusy(false);
+    if (res.ok) {
+      const data = await res.json();
+      onUploaded(data.clinicPhotoUrl);
+    } else {
+      setError((await res.json().catch(() => ({}))).error ?? "Upload failed.");
+    }
+  };
+
+  return (
+    <div>
+      <div className="relative w-full h-36 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 mb-2">
+        {url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt="Clinic cover photo" className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-1.5">
+            <ImageIcon className="w-7 h-7" />
+            <span className="text-xs text-slate-400">No clinic photo yet</span>
+          </div>
+        )}
+      </div>
+      <div className="flex items-center gap-3">
+        <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer flex-shrink-0">
+          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
+          {url ? "Replace Clinic Photo" : "Upload Clinic Photo"}
+          <input type="file" accept=".jpg,.jpeg,.png" className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }} />
+        </label>
+        {error && <span className="text-xs text-red-500">{error}</span>}
+      </div>
+    </div>
+  );
+}
+
 export default function DoctorProfilePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -134,7 +181,7 @@ export default function DoctorProfilePage() {
   const [days, setDays] = useState<string[]>(["Mon", "Tue", "Wed", "Thu", "Fri"]);
   const [fromTime, setFromTime] = useState("09:00");
   const [toTime, setToTime] = useState("18:00");
-  const [docs, setDocs] = useState({ photoUrl: null as string | null, medRegCertUrl: null as string | null, degreeCertUrl: null as string | null, kycDocUrl: null as string | null });
+  const [docs, setDocs] = useState({ photoUrl: null as string | null, medRegCertUrl: null as string | null, degreeCertUrl: null as string | null, kycDocUrl: null as string | null, clinicPhotoUrl: null as string | null });
   const [isVerified, setIsVerified] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -169,6 +216,7 @@ export default function DoctorProfilePage() {
           radius: p.radius ?? 10,
           bankName: "", bankAccount: "", ifsc: "",
           address: p.address ?? "",
+          clinicName: p.clinicName ?? "",
           lat: p.lat ?? null,
           lng: p.lng ?? null,
         });
@@ -177,12 +225,14 @@ export default function DoctorProfilePage() {
           setForm((f) => ({ ...f, bankName: bankName ?? "", bankAccount: bankAccount ?? "", ifsc: (ifscPart ?? "").replace("IFSC: ", "") }));
         }
         if (p.availability) {
-          const match = String(p.availability).match(/^(.+?)\s+(\d{1,2}:\d{2}(?:AM|PM)?)[–-](\d{1,2}:\d{2}(?:AM|PM)?)$/);
+          const match = String(p.availability).match(/^(.+?)\s+(\d{1,2}:\d{2})(?:AM|PM)?[–-](\d{1,2}:\d{2})(?:AM|PM)?$/);
           if (match) {
             setDays(match[1].split(",").map((d: string) => d.trim()));
+            setFromTime(match[2]);
+            setToTime(match[3]);
           }
         }
-        setDocs({ photoUrl: p.photoUrl ?? null, medRegCertUrl: p.medRegCertUrl ?? null, degreeCertUrl: p.degreeCertUrl ?? null, kycDocUrl: p.kycDocUrl ?? null });
+        setDocs({ photoUrl: p.photoUrl ?? null, medRegCertUrl: p.medRegCertUrl ?? null, degreeCertUrl: p.degreeCertUrl ?? null, kycDocUrl: p.kycDocUrl ?? null, clinicPhotoUrl: p.clinicPhotoUrl ?? null });
         setIsVerified(!!p.isVerified);
         setLoading(false);
       });
@@ -265,6 +315,7 @@ export default function DoctorProfilePage() {
         availability,
         bankDetails,
         address: form.address,
+        clinicName: form.clinicName,
         lat: form.lat,
         lng: form.lng,
       }),
@@ -391,6 +442,18 @@ export default function DoctorProfilePage() {
 
           <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><MapPin className="w-4 h-4 text-red-500" /> Practice Location</h2>
+
+            <div className="mb-4">
+              <label className="input-label"><Building2 className="inline w-3.5 h-3.5 mr-1" />Clinic Name <span className="text-slate-400 font-normal normal-case">(optional)</span></label>
+              <input className="input-field" placeholder="e.g. Sunrise Family Clinic" value={form.clinicName} onChange={(e) => set("clinicName", e.target.value)} />
+            </div>
+
+            <div className="mb-4">
+              <label className="input-label">Clinic Photo <span className="text-slate-400 font-normal normal-case">(optional)</span></label>
+              <p className="text-xs text-slate-400 mb-2">Shown as the cover photo on your public profile.</p>
+              <CoverPhotoUpload url={docs.clinicPhotoUrl} onUploaded={(url) => setDocs((d) => ({ ...d, clinicPhotoUrl: url }))} />
+            </div>
+
             <p className="text-xs text-slate-400 mb-4">Patients find you on the map using this location — without it, you won&apos;t appear in search even once verified.</p>
             <div className="flex gap-2 mb-2">
               <div className="flex-1">

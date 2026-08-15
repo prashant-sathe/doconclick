@@ -45,6 +45,7 @@ const EDITABLE_FIELDS = [
   "bio",
   "bankDetails",
   "address",
+  "clinicName",
   "lat",
   "lng",
 ] as const;

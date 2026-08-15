@@ -86,6 +86,8 @@ model DoctorProfile {
   degreeCertUrl         String?
   kycDocUrl             String?
   address               String?
+  clinicName            String?
+  clinicPhotoUrl        String?
 }
 
 model Appointment {
