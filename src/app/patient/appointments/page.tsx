@@ -23,6 +23,12 @@ interface Medicine {
   instructions: string | null;
 }
 
+interface Attachment {
+  id: string;
+  url: string;
+  fileName: string | null;
+}
+
 interface Appointment {
   id: string;
   doctorId: string;
@@ -36,7 +42,7 @@ interface Appointment {
   paymentStatus: string;
   isEmergency: boolean;
   travelStatus: string;
-  prescriptionUrl: string | null;
+  attachments: Attachment[];
   doctorNotes: string | null;
   scheduledAt: string;
   createdAt: string;
@@ -258,11 +264,12 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
             <MessageCircle className="w-3.5 h-3.5" /> Chat
           </Link>
         )}
-        {a.status === "COMPLETED" && a.prescriptionUrl && (
-          <a href={a.prescriptionUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary py-2 px-3 text-xs">
-            <FileText className="w-3.5 h-3.5" /> View Attached File
+        {a.status === "COMPLETED" && a.attachments.map((att, i) => (
+          <a key={att.id} href={att.url} target="_blank" rel="noopener noreferrer" className="btn-secondary py-2 px-3 text-xs">
+            <FileText className="w-3.5 h-3.5" />
+            {a.attachments.length > 1 ? `File ${i + 1}` : "View Attached File"}
           </a>
-        )}
+        ))}
         {a.status === "COMPLETED" && (a.medicines.length > 0 || !!a.doctorNotes) && (
           <PrescriptionDownloadButton appointmentId={a.id} patientId={patientId} />
         )}

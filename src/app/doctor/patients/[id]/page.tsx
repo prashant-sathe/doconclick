@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Loader2, ArrowLeft, User, Droplets, AlertTriangle, Pill,
-  Scissors, PhoneCall, CalendarClock, Star, Stethoscope,
+  Scissors, PhoneCall, CalendarClock, Star, Stethoscope, Paperclip,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
@@ -19,6 +19,12 @@ interface Medicine {
   instructions: string | null;
 }
 
+interface Attachment {
+  id: string;
+  url: string;
+  fileName: string | null;
+}
+
 interface HistoryAppointment {
   id: string;
   status: string;
@@ -28,6 +34,7 @@ interface HistoryAppointment {
   doctorNotes: string | null;
   scheduledAt: string;
   medicines: Medicine[];
+  attachments: Attachment[];
   review: { rating: number; comment: string | null } | null;
 }
 
@@ -158,6 +165,21 @@ export default function DoctorPatientHistory() {
                     <div className="text-xs text-slate-500 space-y-0.5 mb-2">
                       {a.medicines.map((m) => (
                         <div key={m.id}>• {m.name} — {[m.dosage, m.frequency, m.duration].filter(Boolean).join(" · ")}</div>
+                      ))}
+                    </div>
+                  )}
+                  {a.attachments.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {a.attachments.map((att, i) => (
+                        <a
+                          key={att.id}
+                          href={att.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-teal-600 bg-teal-50 border border-teal-100 rounded-lg px-2 py-1 hover:bg-teal-100"
+                        >
+                          <Paperclip className="w-3 h-3" /> {att.fileName ?? `Attachment ${i + 1}`}
+                        </a>
                       ))}
                     </div>
                   )}

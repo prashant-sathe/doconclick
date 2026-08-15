@@ -10,6 +10,7 @@ const ALLOWED_TYPES: Record<string, string> = {
   "image/png": "png",
 };
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+const MAX_FILES = 10;
 
 // GET: The patient fetches structured prescription data for their own completed appointment
 export async function GET(
@@ -64,7 +65,7 @@ export async function GET(
   });
 }
 
-// POST: Doctor uploads a prescription file for their own appointment
+// POST: Doctor uploads one or more prescription files (reports/scans) for their own appointment
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -81,33 +82,45 @@ export async function POST(
   }
 
   const form = await req.formData();
-  const file = form.get("file");
-  if (!(file instanceof File)) {
+  const files = form.getAll("file").filter((f): f is File => f instanceof File);
+  if (files.length === 0) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
-
-  const ext = ALLOWED_TYPES[file.type];
-  if (!ext) {
-    return NextResponse.json({ error: "Only PDF, JPG, or PNG files are allowed" }, { status: 400 });
+  if (files.length > MAX_FILES) {
+    return NextResponse.json({ error: `You can attach at most ${MAX_FILES} files at once` }, { status: 400 });
   }
-  if (file.size > MAX_SIZE_BYTES) {
-    return NextResponse.json({ error: "File must be under 5MB" }, { status: 400 });
+  for (const file of files) {
+    if (!ALLOWED_TYPES[file.type]) {
+      return NextResponse.json({ error: "Only PDF, JPG, or PNG files are allowed" }, { status: 400 });
+    }
+    if (file.size > MAX_SIZE_BYTES) {
+      return NextResponse.json({ error: "Each file must be under 5MB" }, { status: 400 });
+    }
   }
 
   const dir = path.join(process.cwd(), "public", "uploads", "prescriptions");
   await mkdir(dir, { recursive: true });
-  const filename = `${id}-${Date.now()}.${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(dir, filename), buffer);
 
-  const prescriptionUrl = `/uploads/prescriptions/${filename}`;
+  const saved: { url: string; fileName: string }[] = [];
+  for (const [index, file] of files.entries()) {
+    const ext = ALLOWED_TYPES[file.type];
+    const filename = `${id}-${Date.now()}-${index}.${ext}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await writeFile(path.join(dir, filename), buffer);
+    saved.push({ url: `/uploads/prescriptions/${filename}`, fileName: file.name });
+  }
+
+  await prisma.prescriptionAttachment.createMany({
+    data: saved.map((s) => ({ appointmentId: id, url: s.url, fileName: s.fileName })),
+  });
+
   const updated = await prisma.appointment.update({
     where: { id },
     data: {
-      prescriptionUrl,
       status: appointment.status === "SCHEDULED" ? "COMPLETED" : appointment.status,
       ...(appointment.paymentMethod === "CASH" ? { paymentStatus: "PAID" } : {}),
     },
+    include: { attachments: true },
   });
 
   return NextResponse.json(updated);

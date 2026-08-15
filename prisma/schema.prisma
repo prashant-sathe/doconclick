@@ -108,7 +108,7 @@ model Appointment {
   isEmergency   Boolean   @default(false)
   amount        Float     @default(0)
   platformFee   Float     @default(0)
-  prescriptionUrl String?
+  prescriptionUrl String? // deprecated — superseded by `attachments`; kept so existing data isn't dropped
   doctorNotes   String?
   travelStatus  String    @default("NOT_STARTED") // NOT_STARTED, ON_THE_WAY, ARRIVED
   doctorLat     Float?
@@ -121,6 +121,7 @@ model Appointment {
   createdAt     DateTime  @default(now())
   review        Review?
   medicines     PrescriptionMedicine[]
+  attachments   PrescriptionAttachment[]
   messages      Message[]
 }
 
@@ -143,6 +144,15 @@ model PrescriptionMedicine {
   frequency     String
   duration      String
   instructions  String?
+}
+
+model PrescriptionAttachment {
+  id            String      @id @default(cuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  url           String
+  fileName      String?
+  createdAt     DateTime    @default(now())
 }
 
 model Review {

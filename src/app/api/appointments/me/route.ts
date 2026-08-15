@@ -20,6 +20,7 @@ export async function GET() {
         doctor: { select: { name: true, doctorProfile: { select: { specialty: true, photoUrl: true } } } },
         review: true,
         medicines: true,
+        attachments: true,
       },
     });
     return NextResponse.json(appointments);

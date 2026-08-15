@@ -37,7 +37,6 @@ interface Appointment {
   paymentMethod: string;
   paymentStatus: string;
   isEmergency: boolean;
-  prescriptionUrl: string | null;
   travelStatus: string;
   scheduledAt: string;
   patient: {
@@ -68,9 +67,16 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   onCancel: () => void;
 }) {
   const [notes, setNotes] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [fileError, setFileError] = useState("");
   const [medicines, setMedicines] = useState<MedicineRow[]>([{ ...EMPTY_ROW }]);
   const [busy, setBusy] = useState(false);
+
+  const addFiles = (picked: FileList | null) => {
+    if (!picked) return;
+    setFiles((cur) => [...cur, ...Array.from(picked)]);
+  };
+  const removeFile = (i: number) => setFiles((cur) => cur.filter((_, idx) => idx !== i));
 
   const setMed = (i: number, k: keyof MedicineRow, v: string) => {
     setMedicines((rows) => rows.map((r, idx) => (idx === i ? { ...r, [k]: v } : r)));
@@ -80,6 +86,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
   const submit = async () => {
     setBusy(true);
+    setFileError("");
     await fetch(`/api/appointments/${appt.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -93,10 +100,15 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         body: JSON.stringify({ medicines: validMedicines }),
       });
     }
-    if (file) {
+    if (files.length > 0) {
       const form = new FormData();
-      form.append("file", file);
-      await fetch(`/api/appointments/${appt.id}/prescription`, { method: "POST", body: form });
+      files.forEach((f) => form.append("file", f));
+      const res = await fetch(`/api/appointments/${appt.id}/prescription`, { method: "POST", body: form });
+      if (!res.ok) {
+        setBusy(false);
+        setFileError((await res.json().catch(() => ({}))).error ?? "Could not upload attachments.");
+        return;
+      }
     }
     setBusy(false);
     onDone();
@@ -137,12 +149,27 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         </button>
       </div>
 
-      <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer">
-        <Paperclip className="w-3.5 h-3.5" />
-        {file ? file.name : "Attach a report/scan (PDF/JPG/PNG, optional)"}
-        <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-      </label>
+      <div>
+        <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer">
+          <Paperclip className="w-3.5 h-3.5" />
+          Attach reports/scans (PDF/JPG/PNG, optional, multiple allowed)
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple className="hidden"
+            onChange={(e) => addFiles(e.target.files)} />
+        </label>
+        {files.length > 0 && (
+          <ul className="mt-2 space-y-1">
+            {files.map((f, i) => (
+              <li key={i} className="flex items-center justify-between gap-2 bg-white rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs text-slate-600">
+                <span className="truncate">{f.name}</span>
+                <button type="button" onClick={() => removeFile(i)} className="text-slate-400 hover:text-red-500 flex-shrink-0">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {fileError && <p className="text-xs text-red-500 mt-1">{fileError}</p>}
+      </div>
       <div className="flex gap-2">
         <button onClick={onCancel} className="btn-secondary py-1.5 px-3 text-xs flex-1 justify-center">Cancel</button>
         <button onClick={submit} disabled={busy} className="btn-primary py-1.5 px-3 text-xs flex-1 justify-center">
