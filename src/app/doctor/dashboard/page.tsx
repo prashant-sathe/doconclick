@@ -6,7 +6,7 @@ import {
   CalendarCheck, Clock, Video, Home, Building2, Stethoscope, Star,
   Loader2, Siren, CheckCircle2, XCircle, Paperclip, IndianRupee,
   Navigation, Plus, Trash2, History, ThumbsUp, ThumbsDown, Inbox,
-  Car, MapPinCheck, AlertTriangle, MessageCircle,
+  Car, MapPinCheck, AlertTriangle, MessageCircle, Search, X,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
@@ -162,6 +162,7 @@ export default function DoctorDashboard() {
   const { user, loading: authLoading } = useAuth();
   const [doctor, setDoctor] = useState<DoctorMe | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [search, setSearch] = useState("");
   const [loadingAppts, setLoadingAppts] = useState(true);
   const [completingId, setCompletingId] = useState<string | null>(null);
   const [respondingId, setRespondingId] = useState<string | null>(null);
@@ -275,10 +276,13 @@ export default function DoctorDashboard() {
   }
 
   const profile = doctor?.doctorProfile;
-  const pending = appointments.filter((a) => a.status === "PENDING_APPROVAL");
-  const upcoming = appointments.filter((a) => a.status === "SCHEDULED");
-  const completed = appointments.filter((a) => a.status === "COMPLETED");
-  const totalEarnings = completed.reduce((sum, a) => sum + a.amount, 0);
+  const matchesSearch = (a: Appointment) =>
+    patientLabel(a).toLowerCase().includes(search.trim().toLowerCase());
+  const completedAll = appointments.filter((a) => a.status === "COMPLETED");
+  const pending = appointments.filter((a) => a.status === "PENDING_APPROVAL" && matchesSearch(a));
+  const upcoming = appointments.filter((a) => a.status === "SCHEDULED" && matchesSearch(a));
+  const completed = completedAll.filter(matchesSearch);
+  const totalEarnings = completedAll.reduce((sum, a) => sum + a.amount, 0);
 
   return (
     <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
@@ -305,7 +309,7 @@ export default function DoctorDashboard() {
         {/* Stat Strip */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
-            { label: "Total Consultations", value: String(completed.length), color: "text-blue-600", bg: "bg-blue-50" },
+            { label: "Total Consultations", value: String(completedAll.length), color: "text-blue-600", bg: "bg-blue-50" },
             { label: "Total Earnings", value: `₹${totalEarnings.toLocaleString("en-IN")}`, color: "text-emerald-600", bg: "bg-emerald-50" },
             { label: "Avg. Rating", value: `${(profile?.avgRating ?? 0).toFixed(1)} / 5`, color: "text-amber-600", bg: "bg-amber-50" },
           ].map(({ label, value, color, bg }) => (
@@ -314,6 +318,27 @@ export default function DoctorDashboard() {
               <p className={`text-2xl font-extrabold ${color}`}>{value}</p>
             </div>
           ))}
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-6">
+          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            className="input-field pl-10 pr-10"
+            placeholder="Search by patient name…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Pending Requests */}
@@ -327,7 +352,7 @@ export default function DoctorDashboard() {
             {loadingAppts ? (
               <div className="p-6 space-y-3">{[...Array(2)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
             ) : pending.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-10">No pending requests.</p>
+              <p className="text-sm text-slate-400 text-center py-10">{search ? "No pending requests match your search." : "No pending requests."}</p>
             ) : (
               pending.map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
@@ -384,7 +409,7 @@ export default function DoctorDashboard() {
                 {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}
               </div>
             ) : upcoming.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-10">No upcoming appointments.</p>
+              <p className="text-sm text-slate-400 text-center py-10">{search ? "No upcoming appointments match your search." : "No upcoming appointments."}</p>
             ) : (
               upcoming.map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
