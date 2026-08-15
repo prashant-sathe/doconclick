@@ -273,7 +273,6 @@ export default function PatientAppointments() {
   const [reviewFor, setReviewFor] = useState<string | null>(null);
 
   const load = useCallback(() => {
-    setLoading(true);
     fetch("/api/appointments/me")
       .then((r) => r.json())
       .then((d) => { setAppointments(d); setLoading(false); });
@@ -284,7 +283,14 @@ export default function PatientAppointments() {
     if (!authLoading && user && user.role !== "PATIENT") router.push("/login");
   }, [authLoading, user, router]);
 
-  useEffect(() => { if (user?.role === "PATIENT") load(); }, [user, load]);
+  // Poll so status changes (e.g. the doctor accepting a request) show up
+  // without the patient needing to refresh the page.
+  useEffect(() => {
+    if (user?.role !== "PATIENT") return;
+    load();
+    const interval = setInterval(load, 5000);
+    return () => clearInterval(interval);
+  }, [user, load]);
 
   const cancelAppointment = async (id: string) => {
     await fetch(`/api/appointments/${id}`, {
