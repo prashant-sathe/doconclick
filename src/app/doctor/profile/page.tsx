@@ -6,6 +6,7 @@ import {
   Loader2, Award, Hash, Briefcase, IndianRupee, MapPin, Clock,
   CreditCard, Camera, FileText, Shield, BadgeCheck, CheckCircle2,
   Save, ArrowRight, UploadCloud, Home, Navigation, Lock, Languages,
+  QrCode, Copy, Check, Download,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -138,6 +139,8 @@ export default function DoctorProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/profile");
@@ -183,6 +186,23 @@ export default function DoctorProfilePage() {
         setLoading(false);
       });
   }, [user, router]);
+
+  const profileUrl = user ? `${window.location.origin}/patient/doctor/${user.id}` : "";
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    import("qrcode").then(({ default: QRCode }) =>
+      QRCode.toDataURL(`${window.location.origin}/patient/doctor/${user.id}`, { width: 220, margin: 1 })
+    ).then((url) => { if (!cancelled) setQrDataUrl(url); });
+    return () => { cancelled = true; };
+  }, [user]);
+
+  const copyLink = async () => {
+    await navigator.clipboard.writeText(profileUrl);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
 
   const set = (k: keyof FormState, v: string | number | boolean | null) => { setSaved(false); setForm((f) => ({ ...f, [k]: v })); };
   const toggleDay = (d: string) => { setSaved(false); setDays((cur) => cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d]); };
@@ -289,6 +309,40 @@ export default function DoctorProfilePage() {
             Continue to Dashboard <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
+
+        <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
+          <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <QrCode className="w-4 h-4 text-teal-500" /> Your Booking QR Code
+          </h2>
+          <p className="text-sm text-slate-500 mb-4">
+            Patients who scan this land straight on your public profile and can book an appointment with you — print it for your clinic or share the link.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+            <div className="w-[132px] h-[132px] rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center flex-shrink-0">
+              {qrDataUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={qrDataUrl} alt="Your booking QR code" width={120} height={120} />
+              ) : (
+                <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1 w-full">
+              <p className="text-xs font-semibold text-slate-500 mb-1">Public profile link</p>
+              <p className="text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2 break-all mb-3">{profileUrl}</p>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={copyLink} className="btn-secondary py-2 px-3 text-xs">
+                  {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  {linkCopied ? "Copied" : "Copy Link"}
+                </button>
+                {qrDataUrl && (
+                  <a href={qrDataUrl} download={`doconclick-qr-${user.id}.png`} className="btn-secondary py-2 px-3 text-xs">
+                    <Download className="w-3.5 h-3.5" /> Download QR Code
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
 
         <form onSubmit={submit} className="space-y-6">
           <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
