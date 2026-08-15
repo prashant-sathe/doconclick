@@ -166,6 +166,14 @@ model Complaint {
   createdAt   DateTime @default(now())
 }
 
+model Specialty {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String   @default("#2563eb")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
 model PlatformSettings {
   id                String   @id @default(cuid())
   commissionPercent Float    @default(10)

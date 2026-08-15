@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Stethoscope, Users, CalendarCheck,
-  DollarSign, MessageCircle, Settings, Heart,
+  DollarSign, MessageCircle, Settings, Heart, Tag,
   LogOut, ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { useAuth } from "@/components/AuthProvider";
 const navItems = [
   { href: "/admin",            label: "Overview",    icon: LayoutDashboard },
   { href: "/admin/doctors",    label: "Doctors",     icon: Stethoscope },
+  { href: "/admin/specialties", label: "Specialties", icon: Tag },
   { href: "/admin/patients",   label: "Patients",    icon: Users },
   { href: "/admin/bookings",   label: "Bookings",    icon: CalendarCheck },
   { href: "/admin/finance",    label: "Finance",     icon: DollarSign },

@@ -82,6 +82,11 @@ export type Review = Prisma.ReviewModel
  */
 export type Complaint = Prisma.ComplaintModel
 /**
+ * Model Specialty
+ * 
+ */
+export type Specialty = Prisma.SpecialtyModel
+/**
  * Model PlatformSettings
  * 
  */

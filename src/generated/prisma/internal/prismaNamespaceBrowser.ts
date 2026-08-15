@@ -59,6 +59,7 @@ export const ModelName = {
   PrescriptionMedicine: 'PrescriptionMedicine',
   Review: 'Review',
   Complaint: 'Complaint',
+  Specialty: 'Specialty',
   PlatformSettings: 'PlatformSettings'
 } as const
 
@@ -229,6 +230,17 @@ export const ComplaintScalarFieldEnum = {
 } as const
 
 export type ComplaintScalarFieldEnum = (typeof ComplaintScalarFieldEnum)[keyof typeof ComplaintScalarFieldEnum]
+
+
+export const SpecialtyScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  color: 'color',
+  isActive: 'isActive',
+  createdAt: 'createdAt'
+} as const
+
+export type SpecialtyScalarFieldEnum = (typeof SpecialtyScalarFieldEnum)[keyof typeof SpecialtyScalarFieldEnum]
 
 
 export const PlatformSettingsScalarFieldEnum = {

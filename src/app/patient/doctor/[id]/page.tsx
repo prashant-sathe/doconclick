@@ -6,7 +6,7 @@ import {
   Loader2, Heart, Building2, Video, Home, Clock, Languages, UserX,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { specialtyColor } from "@/lib/specialties";
+import { useSpecialties } from "@/lib/useSpecialties";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 
@@ -59,6 +59,7 @@ function Header() {
 
 export default function DoctorProfilePage() {
   const { id } = useParams<{ id: string }>();
+  const { colorFor } = useSpecialties();
   const [doctor, setDoctor] = useState<DoctorProfileData | null | undefined>(undefined);
   const [reviews, setReviews] = useState<DoctorReview[]>([]);
 
@@ -105,7 +106,7 @@ export default function DoctorProfilePage() {
           <div className="flex items-start gap-4 mb-5">
             <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-xl font-extrabold shadow"
-              style={{ background: `linear-gradient(135deg, ${specialtyColor(profile.specialty)}, ${specialtyColor(profile.specialty)}99)` }}
+              style={{ background: `linear-gradient(135deg, ${colorFor(profile.specialty)}, ${colorFor(profile.specialty)}99)` }}
             >
               {doctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
             </div>

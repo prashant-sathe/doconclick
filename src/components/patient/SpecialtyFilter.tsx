@@ -1,5 +1,5 @@
 "use client";
-import { SPECIALTIES } from "@/lib/specialties";
+import { useSpecialties } from "@/lib/useSpecialties";
 import { cn } from "@/lib/utils";
 
 export default function SpecialtyFilter({
@@ -11,6 +11,7 @@ export default function SpecialtyFilter({
   onChange: (specialty: string) => void;
   className?: string;
 }) {
+  const { specialties } = useSpecialties();
   return (
     <div className="relative">
       <div className={cn("flex gap-2 overflow-x-auto no-scrollbar scroll-smooth", className)}>
@@ -26,7 +27,7 @@ export default function SpecialtyFilter({
         >
           All
         </button>
-        {SPECIALTIES.map(({ name, color }) => (
+        {specialties.map(({ name, color }) => (
           <button
             key={name}
             type="button"

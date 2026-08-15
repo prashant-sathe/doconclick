@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
 import { computeDoctorCompleteness, type DoctorProfileData } from "@/lib/doctorProfileCompleteness";
-import { SPECIALTIES } from "@/lib/specialties";
+import { useSpecialties } from "@/lib/useSpecialties";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
@@ -129,6 +129,7 @@ function DocSlot({ label, icon: Icon, url, type, locked, onUploaded }: {
 export default function DoctorProfilePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { specialties } = useSpecialties();
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [days, setDays] = useState<string[]>(["Mon", "Tue", "Wed", "Thu", "Fri"]);
   const [fromTime, setFromTime] = useState("09:00");
@@ -352,7 +353,10 @@ export default function DoctorProfilePage() {
                 <div>
                   <label className="input-label">Specialty</label>
                   <select className="input-field" value={form.specialty} onChange={(e) => set("specialty", e.target.value)}>
-                    {SPECIALTIES.map((s) => <option key={s.name}>{s.name}</option>)}
+                    {!specialties.some((s) => s.name === form.specialty) && form.specialty && (
+                      <option value={form.specialty}>{form.specialty}</option>
+                    )}
+                    {specialties.map((s) => <option key={s.name}>{s.name}</option>)}
                   </select>
                 </div>
                 <div>

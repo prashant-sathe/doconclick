@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
 import { estimateArrivalMinutes } from "@/lib/eta";
-import { specialtyColor } from "@/lib/specialties";
+import { useSpecialties } from "@/lib/useSpecialties";
 import { RELATIONS } from "@/lib/relations";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
@@ -71,6 +71,7 @@ function PatientBookInner() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { colorFor } = useSpecialties();
   const followUpOfId = searchParams.get("followUpOf");
   const preselectDoctorId = searchParams.get("doctorId");
 
@@ -408,7 +409,7 @@ function PatientBookInner() {
               <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
                 <div
                   className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-sm font-extrabold"
-                  style={{ background: `linear-gradient(135deg, ${specialtyColor(selectedDoctor.doctorProfile.specialty)}, ${specialtyColor(selectedDoctor.doctorProfile.specialty)}99)` }}
+                  style={{ background: `linear-gradient(135deg, ${colorFor(selectedDoctor.doctorProfile.specialty)}, ${colorFor(selectedDoctor.doctorProfile.specialty)}99)` }}
                 >
                   {selectedDoctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
                 </div>

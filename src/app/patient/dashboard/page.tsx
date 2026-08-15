@@ -8,7 +8,7 @@ import {
   CalendarCheck2, Wallet, CreditCard, AlertTriangle, ShieldCheck, Users,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { SPECIALTIES, specialtyColor } from "@/lib/specialties";
+import { useSpecialties } from "@/lib/useSpecialties";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
 import RatingStars from "@/components/patient/RatingStars";
@@ -105,6 +105,7 @@ function PatientDashboardInner() {
   const { user, logout, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { specialties, colorFor } = useSpecialties();
 
   // State
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -249,7 +250,7 @@ function PatientDashboardInner() {
 
     docList.forEach((doc) => {
       if (!doc.doctorProfile?.lat || !doc.doctorProfile?.lng) return;
-      const color = specialtyColor(doc.doctorProfile.specialty);
+      const color = colorFor(doc.doctorProfile.specialty);
       const isNearest = doc.id === nearestId;
       const svgStr = makePinSvg(color, isNearest);
       const icon = L.divIcon({
@@ -284,7 +285,7 @@ function PatientDashboardInner() {
 
       markersRef.current.set(doc.id, marker);
     });
-  }, [filteredDoctors, nearest?.id]);
+  }, [filteredDoctors, nearest?.id, colorFor]);
 
   // ── Add user position circle ───────────────────────────────────────────
   const addUserCircle = useCallback(async (pos: [number, number]) => {
@@ -530,7 +531,7 @@ function PatientDashboardInner() {
             >
               <div
                 className="w-2 h-2 rounded-full animate-pulse flex-shrink-0"
-                style={{ backgroundColor: specialtyColor(nearest.doctorProfile.specialty) }}
+                style={{ backgroundColor: colorFor(nearest.doctorProfile.specialty) }}
               />
               <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
                 Nearest: <span className="text-blue-600">{nearest.name}</span>
@@ -560,7 +561,7 @@ function PatientDashboardInner() {
       <div className="hidden sm:block absolute bottom-6 left-4 z-20 pointer-events-none">
         <div className="glass-card rounded-2xl p-3 flex flex-col gap-1.5 max-w-[170px]">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Specialties</p>
-          {SPECIALTIES.slice(0, 5).map(({ name, color }) => (
+          {specialties.slice(0, 5).map(({ name, color }) => (
             <div key={name} className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
               <span className="text-[10px] text-slate-600 leading-none">{name}</span>
@@ -791,7 +792,7 @@ function PatientDashboardInner() {
                     {/* Avatar */}
                     <div
                       className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-xl font-extrabold shadow"
-                      style={{ background: `linear-gradient(135deg, ${specialtyColor(selectedDoctor.doctorProfile.specialty)}, ${specialtyColor(selectedDoctor.doctorProfile.specialty)}99)` }}
+                      style={{ background: `linear-gradient(135deg, ${colorFor(selectedDoctor.doctorProfile.specialty)}, ${colorFor(selectedDoctor.doctorProfile.specialty)}99)` }}
                     >
                       {selectedDoctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
                     </div>
