@@ -6,7 +6,7 @@ export async function GET(req: Request) {
   const status = searchParams.get("status");
 
   const doctors = await prisma.user.findMany({
-    where: { role: "DOCTOR" },
+    where: { role: "DOCTOR", deletedAt: null },
     include: {
       doctorProfile: true,
     },

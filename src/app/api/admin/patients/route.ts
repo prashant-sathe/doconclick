@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const patients = await prisma.user.findMany({
-    where: { role: "PATIENT" },
+    where: { role: "PATIENT", deletedAt: null },
     include: {
       patientProfile: true,
       asPatient: { select: { id: true, status: true } },

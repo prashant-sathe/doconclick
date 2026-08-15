@@ -13,6 +13,7 @@ export async function GET(
     where: {
       id,
       role: "DOCTOR",
+      deletedAt: null,
       doctorProfile: {
         status: "APPROVED",
         isVerified: true,

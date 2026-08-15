@@ -4,7 +4,7 @@ import {
   Search, Users, Eye, X, Phone, Mail, MapPin, Calendar,
   Activity, Droplets, Ruler, Weight, AlertTriangle,
   Pill, Scissors, PhoneCall, DollarSign, CalendarCheck,
-  CheckCircle2, AlertCircle, MessageCircle, Clock, RefreshCw,
+  CheckCircle2, AlertCircle, MessageCircle, Clock, RefreshCw, Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -244,6 +244,8 @@ export default function AdminPatients() {
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState("");
   const [viewId, setViewId]     = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Patient | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -253,6 +255,15 @@ export default function AdminPatients() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    await fetch(`/api/admin/patients/${deleteTarget.id}`, { method: "DELETE" });
+    setDeleteTarget(null);
+    setDeleting(false);
+    await load();
+  };
 
   const filtered = patients.filter(
     (p) =>
@@ -301,7 +312,7 @@ export default function AdminPatients() {
                   <th>Location</th>
                   <th>Total Bookings</th>
                   <th>Joined</th>
-                  <th>View</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -326,13 +337,22 @@ export default function AdminPatients() {
                       {new Date(p.createdAt).toLocaleDateString("en-IN")}
                     </td>
                     <td>
-                      <button
-                        onClick={() => setViewId(p.id)}
-                        title="View Full Profile"
-                        className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => setViewId(p.id)}
+                          title="View Full Profile"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(p)}
+                          title="Delete Account"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -348,6 +368,30 @@ export default function AdminPatients() {
       {/* Drawer */}
       {viewId && (
         <PatientDrawer patientId={viewId} onClose={() => setViewId(null)} />
+      )}
+
+      {/* Delete confirmation */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-3">
+              <Trash2 className="w-5 h-5 text-red-600" />
+              <h3 className="font-bold text-slate-800">Delete this account?</h3>
+            </div>
+            <p className="text-sm text-slate-500 mb-5">
+              {deleteTarget.name} ({deleteTarget.mobile}) will be permanently blocked from logging in, and their mobile number will be freed for a new registration.
+              Their past appointment history is kept for the doctors who treated them. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteTarget(null)} className="btn-secondary flex-1">
+                Cancel
+              </button>
+              <button onClick={confirmDelete} disabled={deleting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                {deleting ? "Deleting…" : "Delete Account"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

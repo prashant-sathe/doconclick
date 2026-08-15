@@ -4,7 +4,7 @@ import {
   CheckCircle, XCircle, PauseCircle, Search, RefreshCw, Stethoscope,
   Eye, X, Phone, Mail, Award, Hash, Briefcase, DollarSign,
   Clock, MapPin, CreditCard, CalendarCheck, TrendingUp, AlertCircle,
-  CheckCircle2, User, BadgeCheck, Languages, FileText,
+  CheckCircle2, User, BadgeCheck, Languages, FileText, Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -72,12 +72,13 @@ const FILTERS = ["ALL", "PENDING", "APPROVED", "REJECTED", "SUSPENDED"];
 
 // ── Row in table ───────────────────────────────────────────────
 function DoctorRow({
-  d, updating, onStatus, onView,
+  d, updating, onStatus, onView, onDelete,
 }: {
   d: Doctor;
   updating: string | null;
   onStatus: (id: string, status: string) => void;
   onView: (d: Doctor) => void;
+  onDelete: (d: Doctor) => void;
 }) {
   return (
     <tr>
@@ -135,6 +136,12 @@ function DoctorRow({
               <PauseCircle className="w-4 h-4" />
             </button>
           )}
+          {/* Delete */}
+          <button onClick={() => onDelete(d)} disabled={updating === d.id}
+            title="Delete Account"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40">
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
       </td>
     </tr>
@@ -427,6 +434,7 @@ export default function AdminDoctors() {
   const [filter, setFilter]     = useState("ALL");
   const [updating, setUpdating] = useState<string | null>(null);
   const [viewId, setViewId]     = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Doctor | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -444,6 +452,15 @@ export default function AdminDoctors() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
+    await load();
+    setUpdating(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setUpdating(deleteTarget.id);
+    await fetch(`/api/admin/doctors/${deleteTarget.id}`, { method: "DELETE" });
+    setDeleteTarget(null);
     await load();
     setUpdating(null);
   };
@@ -518,7 +535,8 @@ export default function AdminDoctors() {
                 ) : filtered.map((d) => (
                   <DoctorRow key={d.id} d={d} updating={updating}
                     onStatus={updateStatus}
-                    onView={(doc) => setViewId(doc.id)} />
+                    onView={(doc) => setViewId(doc.id)}
+                    onDelete={(doc) => setDeleteTarget(doc)} />
                 ))}
               </tbody>
             </table>
@@ -536,6 +554,30 @@ export default function AdminDoctors() {
           onClose={() => { setViewId(null); load(); }}
           onStatusChange={load}
         />
+      )}
+
+      {/* Delete confirmation */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-3">
+              <Trash2 className="w-5 h-5 text-red-600" />
+              <h3 className="font-bold text-slate-800">Delete this account?</h3>
+            </div>
+            <p className="text-sm text-slate-500 mb-5">
+              {deleteTarget.name} ({deleteTarget.mobile}) will be permanently blocked from logging in, and their mobile number will be freed for a new registration.
+              Their past appointments and earnings history are kept for your records. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteTarget(null)} className="btn-secondary flex-1">
+                Cancel
+              </button>
+              <button onClick={confirmDelete} disabled={updating === deleteTarget.id} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                {updating === deleteTarget.id ? "Deleting…" : "Delete Account"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

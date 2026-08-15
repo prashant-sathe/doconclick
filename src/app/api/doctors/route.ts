@@ -10,6 +10,7 @@ export async function GET(req: Request) {
   const doctors = await prisma.user.findMany({
     where: {
       role: "DOCTOR",
+      deletedAt: null,
       doctorProfile: {
         status: "APPROVED",
         isVerified: true,

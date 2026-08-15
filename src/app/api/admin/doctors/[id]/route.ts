@@ -1,11 +1,24 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
+import { softDeleteUser } from "@/lib/userDeletion";
+
+async function requireAdmin() {
+  const authUser = await getAuthUser();
+  if (!authUser || authUser.role !== "ADMIN") {
+    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  }
+  return null;
+}
 
 // GET – full doctor profile for admin view
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const { id } = await params;
 
   const user = await prisma.user.findUnique({
@@ -42,6 +55,9 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const { id } = await params;
   const { status, isVerified } = await req.json();
 
@@ -81,5 +97,20 @@ export async function PATCH(
   });
 
   return NextResponse.json(updated);
+}
+
+// DELETE – soft-delete the doctor's account, freeing their mobile/email for reuse
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const { id } = await params;
+  const deleted = await softDeleteUser(id);
+  if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  return NextResponse.json({ ...deleted, password: undefined });
 }
 

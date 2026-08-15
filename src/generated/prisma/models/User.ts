@@ -31,6 +31,7 @@ export type UserMinAggregateOutputType = {
   email: string | null
   password: string | null
   role: string | null
+  deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -42,6 +43,7 @@ export type UserMaxAggregateOutputType = {
   email: string | null
   password: string | null
   role: string | null
+  deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -53,6 +55,7 @@ export type UserCountAggregateOutputType = {
   email: number
   password: number
   role: number
+  deletedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -66,6 +69,7 @@ export type UserMinAggregateInputType = {
   email?: true
   password?: true
   role?: true
+  deletedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -77,6 +81,7 @@ export type UserMaxAggregateInputType = {
   email?: true
   password?: true
   role?: true
+  deletedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -88,6 +93,7 @@ export type UserCountAggregateInputType = {
   email?: true
   password?: true
   role?: true
+  deletedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -172,6 +178,7 @@ export type UserGroupByOutputType = {
   email: string | null
   password: string
   role: string
+  deletedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -204,6 +211,7 @@ export type UserWhereInput = {
   email?: Prisma.StringNullableFilter<"User"> | string | null
   password?: Prisma.StringFilter<"User"> | string
   role?: Prisma.StringFilter<"User"> | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   patientProfile?: Prisma.XOR<Prisma.PatientProfileNullableScalarRelationFilter, Prisma.PatientProfileWhereInput> | null
@@ -225,6 +233,7 @@ export type UserOrderByWithRelationInput = {
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   patientProfile?: Prisma.PatientProfileOrderByWithRelationInput
@@ -249,6 +258,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"User"> | string
   password?: Prisma.StringFilter<"User"> | string
   role?: Prisma.StringFilter<"User"> | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   patientProfile?: Prisma.XOR<Prisma.PatientProfileNullableScalarRelationFilter, Prisma.PatientProfileWhereInput> | null
@@ -270,6 +280,7 @@ export type UserOrderByWithAggregationInput = {
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -287,6 +298,7 @@ export type UserScalarWhereWithAggregatesInput = {
   email?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   password?: Prisma.StringWithAggregatesFilter<"User"> | string
   role?: Prisma.StringWithAggregatesFilter<"User"> | string
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -298,6 +310,7 @@ export type UserCreateInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -319,6 +332,7 @@ export type UserUncheckedCreateInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -340,6 +354,7 @@ export type UserUpdateInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -361,6 +376,7 @@ export type UserUncheckedUpdateInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -382,6 +398,7 @@ export type UserCreateManyInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -393,6 +410,7 @@ export type UserUpdateManyMutationInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -404,6 +422,7 @@ export type UserUncheckedUpdateManyInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -415,6 +434,7 @@ export type UserCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -426,6 +446,7 @@ export type UserMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -437,6 +458,7 @@ export type UserMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -457,6 +479,10 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -612,6 +638,7 @@ export type UserCreateWithoutPatientProfileInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
@@ -632,6 +659,7 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
@@ -668,6 +696,7 @@ export type UserUpdateWithoutPatientProfileInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
@@ -688,6 +717,7 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -708,6 +738,7 @@ export type UserCreateWithoutDoctorProfileInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -728,6 +759,7 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -764,6 +796,7 @@ export type UserUpdateWithoutDoctorProfileInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -784,6 +817,7 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -804,6 +838,7 @@ export type UserCreateWithoutAsPatientInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -824,6 +859,7 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -849,6 +885,7 @@ export type UserCreateWithoutAsDoctorInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -869,6 +906,7 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -905,6 +943,7 @@ export type UserUpdateWithoutAsPatientInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -925,6 +964,7 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -956,6 +996,7 @@ export type UserUpdateWithoutAsDoctorInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -976,6 +1017,7 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -996,6 +1038,7 @@ export type UserCreateWithoutSettlementsInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -1016,6 +1059,7 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1041,6 +1085,7 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -1061,6 +1106,7 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1097,6 +1143,7 @@ export type UserUpdateWithoutSettlementsInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -1117,6 +1164,7 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1148,6 +1196,7 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -1168,6 +1217,7 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1188,6 +1238,7 @@ export type UserCreateWithoutMessagesSentInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -1208,6 +1259,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1244,6 +1296,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -1264,6 +1317,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1284,6 +1338,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -1304,6 +1359,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1329,6 +1385,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -1349,6 +1406,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1385,6 +1443,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -1405,6 +1464,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1436,6 +1496,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -1456,6 +1517,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1476,6 +1538,7 @@ export type UserCreateWithoutComplaintsInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -1496,6 +1559,7 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   email?: string | null
   password?: string
   role?: string
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1532,6 +1596,7 @@ export type UserUpdateWithoutComplaintsInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -1552,6 +1617,7 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1666,6 +1732,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   email?: boolean
   password?: boolean
   role?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   patientProfile?: boolean | Prisma.User$patientProfileArgs<ExtArgs>
@@ -1688,6 +1755,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   password?: boolean
   role?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -1699,6 +1767,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   password?: boolean
   role?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -1710,11 +1779,12 @@ export type UserSelectScalar = {
   email?: boolean
   password?: boolean
   role?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "mobile" | "email" | "password" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "mobile" | "email" | "password" | "role" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patientProfile?: boolean | Prisma.User$patientProfileArgs<ExtArgs>
   doctorProfile?: boolean | Prisma.User$doctorProfileArgs<ExtArgs>
@@ -1752,6 +1822,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     email: string | null
     password: string
     role: string
+    deletedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -2193,6 +2264,7 @@ export interface UserFieldRefs {
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'String'>
+  readonly deletedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
