@@ -28,6 +28,8 @@ model User {
   reviewsGiven   Review[]        @relation("PatientReviews")
   reviewsReceived Review[]       @relation("DoctorReviews")
   messagesSent   Message[]       @relation("SentMessages")
+  settlements       Settlement[] @relation("DoctorSettlements")
+  settlementsAdmined Settlement[] @relation("AdminSettlements")
 }
 
 model PatientProfile {
@@ -114,6 +116,8 @@ model Appointment {
   platformFee   Float     @default(0)
   cashfreeOrderId   String?
   cashfreePaymentId String?
+  settlementId  String?
+  settlement    Settlement? @relation(fields: [settlementId], references: [id])
   prescriptionUrl String? // deprecated — superseded by `attachments`; kept so existing data isn't dropped
   doctorNotes   String?
   travelStatus  String    @default("NOT_STARTED") // NOT_STARTED, ON_THE_WAY, ARRIVED
@@ -129,6 +133,22 @@ model Appointment {
   medicines     PrescriptionMedicine[]
   attachments   PrescriptionAttachment[]
   messages      Message[]
+}
+
+model Settlement {
+  id               String   @id @default(cuid())
+  doctorId         String
+  doctor           User     @relation("DoctorSettlements", fields: [doctorId], references: [id])
+  cashCount        Int      @default(0)
+  onlineCount      Int      @default(0)
+  cashFeeOwed      Float    @default(0) // owed BY doctor TO platform
+  onlinePayoutOwed Float    @default(0) // owed TO doctor BY platform
+  netAmount        Float    // onlinePayoutOwed - cashFeeOwed
+  note             String?
+  settledByAdminId String?
+  settledByAdmin   User?    @relation("AdminSettlements", fields: [settledByAdminId], references: [id])
+  createdAt        DateTime @default(now())
+  appointments     Appointment[]
 }
 
 model Message {

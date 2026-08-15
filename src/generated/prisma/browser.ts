@@ -38,6 +38,11 @@ export type DoctorProfile = Prisma.DoctorProfileModel
  */
 export type Appointment = Prisma.AppointmentModel
 /**
+ * Model Settlement
+ * 
+ */
+export type Settlement = Prisma.SettlementModel
+/**
  * Model Message
  * 
  */

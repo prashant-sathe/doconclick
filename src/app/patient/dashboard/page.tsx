@@ -5,7 +5,7 @@ import {
   MapPin, Home, Building2, Video, Stethoscope, Clock,
   ChevronDown, X, Loader2, CheckCircle, LogOut, Languages,
   Navigation, AlertCircle, IndianRupee, CalendarClock, Siren,
-  CalendarCheck2, Wallet, CreditCard, AlertTriangle, ShieldCheck, Users, Search,
+  CalendarCheck2, AlertTriangle, ShieldCheck, Users, Search,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
@@ -126,9 +126,8 @@ function PatientDashboardInner() {
   const [consentGiven, setConsentGiven] = useState(false);
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"ONLINE" | "CASH">("CASH");
   const [booking, setBooking] = useState(false);
-  const [booked, setBooked] = useState<{ id: string; fee: number; paymentMethod: string } | null>(null);
+  const [booked, setBooked] = useState<{ id: string; fee: number } | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [emergencyOpen, setEmergencyOpen] = useState(false);
   const [emergencyText, setEmergencyText] = useState("");
@@ -295,7 +294,6 @@ function PatientDashboardInner() {
           setConsentGiven(false);
           setBooked(null);
           setScheduleMode("NOW");
-          setPaymentMethod("CASH");
         });
 
       markersRef.current.set(doc.id, marker);
@@ -403,7 +401,7 @@ function PatientDashboardInner() {
         consentGiven,
         consultType,
         amount: fee,
-        paymentMethod,
+        paymentMethod: "ONLINE",
         followUpOfId: followUpOfId ?? undefined,
         ...(scheduleMode === "LATER" && scheduledAt
           ? { scheduledAt: new Date(scheduledAt).toISOString() }
@@ -412,7 +410,7 @@ function PatientDashboardInner() {
     });
     const data = await res.json();
     setBooking(false);
-    if (res.ok) setBooked({ id: data.id, fee, paymentMethod });
+    if (res.ok) setBooked({ id: data.id, fee });
   };
 
   // ── Emergency quick-book ────────────────────────────────────────────────
@@ -430,7 +428,7 @@ function PatientDashboardInner() {
         symptoms: emergencyText || "Emergency request",
         consultType: type,
         amount: fee,
-        paymentMethod: "CASH",
+        paymentMethod: "ONLINE",
         isEmergency: true,
       }),
     });
@@ -666,7 +664,7 @@ function PatientDashboardInner() {
                     <p className="text-xs text-slate-400 font-mono mt-2">ID: {booked.id.slice(0, 14)}…</p>
                   </div>
                   <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 w-full">
-                    You&apos;ll be notified once accepted{booked.paymentMethod === "ONLINE" ? " — pay online from My Appointments after that" : ""}.
+                    You&apos;ll be notified once accepted — pay online from My Appointments after that.
                   </div>
                   <button
                     onClick={() => router.push("/patient/appointments")}
@@ -743,19 +741,6 @@ function PatientDashboardInner() {
                       onChange={(e) => setScheduledAt(e.target.value)}
                     />
                   )}
-
-                  {/* Payment method */}
-                  <label className="input-label mb-2 block">Payment</label>
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    <button type="button" onClick={() => setPaymentMethod("CASH")}
-                      className={`py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${paymentMethod === "CASH" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
-                      <Wallet className="w-3.5 h-3.5" /> Pay Cash
-                    </button>
-                    <button type="button" onClick={() => setPaymentMethod("ONLINE")}
-                      className={`py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${paymentMethod === "ONLINE" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
-                      <CreditCard className="w-3.5 h-3.5" /> Pay Online
-                    </button>
-                  </div>
 
                   {/* Who is this for */}
                   <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />Who is this for?</label>
@@ -961,7 +946,7 @@ function PatientDashboardInner() {
                 </div>
                 <h3 className="text-lg font-extrabold text-slate-900 mb-1">Request Sent</h3>
                 <p className="text-sm text-slate-500 mb-4">
-                  {emergencyResult.doctorName} has been notified and flagged as urgent — waiting for them to accept. Estimated arrival once accepted: ~{emergencyResult.eta} min. Pay cash on visit.
+                  {emergencyResult.doctorName} has been notified and flagged as urgent — waiting for them to accept. Estimated arrival once accepted: ~{emergencyResult.eta} min. Pay online from My Appointments once accepted.
                 </p>
                 <button onClick={() => setEmergencyOpen(false)} className="btn-primary w-full justify-center py-3">Close</button>
               </div>

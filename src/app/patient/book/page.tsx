@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   MapPin, Video, Home, Building2, Loader2,
-  CalendarClock, Wallet, CreditCard, Siren, Clock, IndianRupee,
+  CalendarClock, Siren, Clock, IndianRupee,
   CalendarCheck2, Hash, ClipboardList, AlertTriangle, ShieldCheck, Users, Search, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -83,7 +83,6 @@ function PatientBookInner() {
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"ONLINE" | "CASH">("CASH");
   const [isEmergency, setIsEmergency] = useState(false);
   const [consentGiven, setConsentGiven] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -128,9 +127,8 @@ function PatientBookInner() {
     (t) => t.id !== "HOME" || selectedDoctor?.doctorProfile?.offersHomeVisit !== false
   );
 
-  // An emergency always books immediately with cash, overriding any manual selection
+  // An emergency always books immediately, overriding any manual schedule selection
   const effectiveScheduleMode = isEmergency ? "NOW" : scheduleMode;
-  const effectivePaymentMethod = isEmergency ? "CASH" : paymentMethod;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,7 +143,7 @@ function PatientBookInner() {
       body: JSON.stringify({
         ...form,
         amount: currentFee,
-        paymentMethod: effectivePaymentMethod,
+        paymentMethod: "ONLINE",
         isEmergency,
         consentGiven,
         followUpOfId: followUpOfId ?? undefined,
@@ -181,7 +179,7 @@ function PatientBookInner() {
               <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Request Sent!</h2>
               <p className="text-slate-500 mb-6">Waiting for the doctor to confirm your appointment.</p>
               <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3">
-                You&apos;ll be notified once accepted{effectivePaymentMethod === "ONLINE" ? " — pay online from My Appointments after that" : ""}.
+                You&apos;ll be notified once accepted — pay online from My Appointments after that.
               </div>
               <Link href="/patient/appointments" className="btn-secondary w-full justify-center py-3 mt-3">View My Appointments</Link>
             </div>
@@ -340,23 +338,6 @@ function PatientBookInner() {
               )}
             </div>
 
-            {/* Payment */}
-            <div>
-              <label className="input-label mb-2 block">Payment</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button type="button" disabled={isEmergency} onClick={() => setPaymentMethod("CASH")}
-                  className={cn("py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50",
-                    effectivePaymentMethod === "CASH" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
-                  <Wallet className="w-3.5 h-3.5" /> Pay Cash
-                </button>
-                <button type="button" disabled={isEmergency} onClick={() => setPaymentMethod("ONLINE")}
-                  className={cn("py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50",
-                    effectivePaymentMethod === "ONLINE" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
-                  <CreditCard className="w-3.5 h-3.5" /> Pay Online
-                </button>
-              </div>
-            </div>
-
             <div>
               <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />Who is this for?</label>
               <div className="grid grid-cols-4 gap-2">
@@ -394,7 +375,7 @@ function PatientBookInner() {
               <input type="checkbox" checked={isEmergency} onChange={(e) => setIsEmergency(e.target.checked)}
                 className="w-4 h-4 accent-red-500" />
               <Siren className="w-4 h-4 text-red-500 flex-shrink-0" />
-              <span className="text-sm font-semibold text-red-700">This is an emergency (books now, pays cash)</span>
+              <span className="text-sm font-semibold text-red-700">This is an emergency (books now, pay online after)</span>
             </label>
 
             {/* Consent */}
@@ -459,7 +440,7 @@ function PatientBookInner() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-500">Payment</span>
-                <span className="font-semibold text-slate-800">{effectivePaymentMethod === "ONLINE" ? "Online" : "Cash"}</span>
+                <span className="font-semibold text-slate-800">Online</span>
               </div>
               {form.consultType === "HOME" && distance != null && (
                 <div className="flex items-center justify-between">

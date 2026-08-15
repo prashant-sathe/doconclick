@@ -19,7 +19,6 @@ export async function POST(req: Request) {
       consultType,
       amount,
       scheduledAt,
-      paymentMethod,
       isEmergency,
       followUpOfId,
     } = await req.json();
@@ -88,7 +87,7 @@ export async function POST(req: Request) {
         amount: Number(amount),
         platformFee,
         status: "PENDING_APPROVAL",
-        paymentMethod: paymentMethod === "ONLINE" ? "ONLINE" : "CASH",
+        paymentMethod: "ONLINE",
         isEmergency: Boolean(isEmergency),
         followUpOfId: followUpOfId ?? undefined,
         ...(scheduledAt ? { scheduledAt: new Date(scheduledAt) } : {}),
