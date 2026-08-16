@@ -14,6 +14,7 @@ interface DoctorProfileData {
   id: string;
   name: string;
   doctorProfile: {
+    photoUrl: string | null;
     clinicName: string | null;
     clinicPhotoUrl: string | null;
     qualification: string | null;
@@ -117,12 +118,21 @@ export default function DoctorProfilePage() {
           <div className="p-6">
           {/* Header */}
           <div className="flex items-start gap-4 mb-5">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-xl font-extrabold shadow"
-              style={{ background: `linear-gradient(135deg, ${colorFor(profile.specialty)}, ${colorFor(profile.specialty)}99)` }}
-            >
-              {doctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-            </div>
+            {profile.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={profile.photoUrl}
+                alt={doctor.name}
+                className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 shadow"
+              />
+            ) : (
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-xl font-extrabold shadow"
+                style={{ background: `linear-gradient(135deg, ${colorFor(profile.specialty)}, ${colorFor(profile.specialty)}99)` }}
+              >
+                {doctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+              </div>
+            )}
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-lg font-extrabold text-slate-900 leading-tight">{doctor.name}</h1>

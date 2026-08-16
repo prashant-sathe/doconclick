@@ -22,6 +22,7 @@ interface Doctor {
   id: string;
   name: string;
   doctorProfile: {
+    photoUrl: string | null;
     specialty: string;
     experience: number;
     consultFee: number;
@@ -411,12 +412,21 @@ function PatientBookInner() {
 
             {selectedDoctor?.doctorProfile ? (
               <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
-                <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-sm font-extrabold"
-                  style={{ background: `linear-gradient(135deg, ${colorFor(selectedDoctor.doctorProfile.specialty)}, ${colorFor(selectedDoctor.doctorProfile.specialty)}99)` }}
-                >
-                  {selectedDoctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-                </div>
+                {selectedDoctor.doctorProfile.photoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={selectedDoctor.doctorProfile.photoUrl}
+                    alt={selectedDoctor.name}
+                    className="w-11 h-11 rounded-xl object-cover flex-shrink-0"
+                  />
+                ) : (
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-sm font-extrabold"
+                    style={{ background: `linear-gradient(135deg, ${colorFor(selectedDoctor.doctorProfile.specialty)}, ${colorFor(selectedDoctor.doctorProfile.specialty)}99)` }}
+                  >
+                    {selectedDoctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                  </div>
+                )}
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="font-bold text-slate-900 text-sm truncate">{selectedDoctor.name}</span>

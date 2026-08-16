@@ -100,9 +100,14 @@ function DocSlot({ label, icon: Icon, url, type, locked, onUploaded }: {
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-4">
       <div className="flex items-center gap-3 min-w-0">
-        <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0", url ? "bg-emerald-50" : "bg-slate-100")}>
-          <Icon className={cn("w-4 h-4", url ? "text-emerald-600" : "text-slate-400")} />
-        </div>
+        {type === "photo" && url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt="Profile photo" className="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-slate-200" />
+        ) : (
+          <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0", url ? "bg-emerald-50" : "bg-slate-100")}>
+            <Icon className={cn("w-4 h-4", url ? "text-emerald-600" : "text-slate-400")} />
+          </div>
+        )}
         <div className="min-w-0">
           <p className="text-sm font-semibold text-slate-800">{label}</p>
           {url ? (

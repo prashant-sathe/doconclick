@@ -20,6 +20,9 @@ import { computeCompleteness } from "@/lib/profileCompleteness";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface DoctorProfile {
+  photoUrl: string | null;
+  clinicName: string | null;
+  clinicPhotoUrl: string | null;
   specialty: string;
   experience: number;
   consultFee: number;
@@ -806,15 +809,35 @@ function PatientDashboardInner() {
               ) : (
                 /* ── DOCTOR PROFILE CARD ───────────────────────────── */
                 <div className="pb-6">
+                  {/* Clinic cover photo */}
+                  {selectedDoctor.doctorProfile.clinicPhotoUrl && (
+                    <div className="w-full h-32 sm:h-40 rounded-2xl overflow-hidden bg-slate-100 mb-4 -mt-1">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={selectedDoctor.doctorProfile.clinicPhotoUrl}
+                        alt={selectedDoctor.doctorProfile.clinicName ? `${selectedDoctor.doctorProfile.clinicName} — clinic photo` : "Clinic photo"}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                   {/* Header */}
                   <div className="flex items-start gap-4 mb-5">
                     {/* Avatar */}
-                    <div
-                      className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-xl font-extrabold shadow"
-                      style={{ background: `linear-gradient(135deg, ${colorFor(selectedDoctor.doctorProfile.specialty)}, ${colorFor(selectedDoctor.doctorProfile.specialty)}99)` }}
-                    >
-                      {selectedDoctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-                    </div>
+                    {selectedDoctor.doctorProfile.photoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={selectedDoctor.doctorProfile.photoUrl}
+                        alt={selectedDoctor.name}
+                        className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 shadow"
+                      />
+                    ) : (
+                      <div
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-xl font-extrabold shadow"
+                        style={{ background: `linear-gradient(135deg, ${colorFor(selectedDoctor.doctorProfile.specialty)}, ${colorFor(selectedDoctor.doctorProfile.specialty)}99)` }}
+                      >
+                        {selectedDoctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                      </div>
+                    )}
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="text-lg font-extrabold text-slate-900 leading-tight">{selectedDoctor.name}</h3>
@@ -822,6 +845,11 @@ function PatientDashboardInner() {
                       </div>
                       <p className="text-sm text-slate-500 mt-0.5">{selectedDoctor.doctorProfile.specialty}</p>
                       <p className="text-xs text-slate-400 mt-0.5">{selectedDoctor.doctorProfile.qualification}</p>
+                      {selectedDoctor.doctorProfile.clinicName && (
+                        <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                          <Building2 className="w-3 h-3 flex-shrink-0" /> {selectedDoctor.doctorProfile.clinicName}
+                        </p>
+                      )}
                       <div className="mt-1.5">
                         <RatingStars
                           avgRating={selectedDoctor.doctorProfile.avgRating}
