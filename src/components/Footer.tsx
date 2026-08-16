@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Heart, Phone, Mail, MapPin, ArrowRight, ExternalLink } from "lucide-react";
+import { Heart, Mail, ArrowRight } from "lucide-react";
 
 const footerLinks = {
   "Platform": [
@@ -64,15 +64,9 @@ export default function Footer() {
               India's most trusted on-demand healthcare platform. Connecting patients with verified doctors for home visits, video consultations, and clinic appointments.
             </p>
             <div className="space-y-2 text-sm">
-              <a href="tel:+918000000000" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors">
-                <Phone className="w-4 h-4 text-blue-400" /> +91 8000 000 000
-              </a>
               <a href="mailto:support@doconclick.com" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors">
                 <Mail className="w-4 h-4 text-blue-400" /> support@doconclick.com
               </a>
-              <div className="flex items-center gap-2.5 text-slate-400">
-                <MapPin className="w-4 h-4 text-blue-400" /> Mumbai, Maharashtra, India
-              </div>
             </div>
             {/* Social */}
             <div className="flex gap-2 mt-6">

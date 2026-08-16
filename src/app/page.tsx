@@ -254,18 +254,15 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: HomeIcon,  color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", title: "Home Visit", price: "From ₹499", desc: "A verified doctor visits you at your home. Perfect for elderly patients, post-surgery care, and urgent situations.", perks: ["Doctor arrives in 30-90 min", "Real-time tracking", "No travel needed"] },
-              { icon: Video,     color: "text-blue-600",    bg: "bg-blue-50",    border: "border-blue-100",    title: "Video Consultation", price: "From ₹199", desc: "Consult top specialists from the comfort of your home via HD video. Get prescriptions and follow-ups online.", perks: ["Instant connection", "HD video call", "Digital prescription"] },
-              { icon: Building2, color: "text-purple-600",  bg: "bg-purple-50",  border: "border-purple-100",  title: "Clinic Visit",  price: "From ₹299", desc: "Book a confirmed slot at the doctor's clinic — zero waiting time. Walk in exactly when your appointment is.", perks: ["Zero waiting time", "Confirmed slot", "In-person examination"] },
-            ].map(({ icon: Icon, color, bg, border, title, price, desc, perks }) => (
+              { icon: HomeIcon,  color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", title: "Home Visit", desc: "A verified doctor visits you at your home. Perfect for elderly patients, post-surgery care, and urgent situations.", perks: ["Doctor arrives in 30-90 min", "Real-time tracking", "No travel needed"] },
+              { icon: Video,     color: "text-blue-600",    bg: "bg-blue-50",    border: "border-blue-100",    title: "Video Consultation", desc: "Consult top specialists from the comfort of your home via HD video. Get prescriptions and follow-ups online.", perks: ["Instant connection", "HD video call", "Digital prescription"] },
+              { icon: Building2, color: "text-purple-600",  bg: "bg-purple-50",  border: "border-purple-100",  title: "Clinic Visit",  desc: "Book a confirmed slot at the doctor's clinic — zero waiting time. Walk in exactly when your appointment is.", perks: ["Zero waiting time", "Confirmed slot", "In-person examination"] },
+            ].map(({ icon: Icon, color, bg, border, title, desc, perks }) => (
               <div key={title} className={`stat-card card-hover border ${border}`}>
                 <div className={`w-14 h-14 rounded-2xl ${bg} flex items-center justify-center mb-5`}>
                   <Icon className={`w-7 h-7 ${color}`} />
                 </div>
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-xl font-bold text-slate-900">{title}</h3>
-                  <span className={`text-sm font-bold ${color}`}>{price}</span>
-                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
                 <p className="text-slate-500 text-sm leading-relaxed mb-5">{desc}</p>
                 <ul className="space-y-2">
                   {perks.map(p => (
@@ -370,11 +367,10 @@ export default function Home() {
               Join <span className="gradient-text">DocOnClick</span> Today
             </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             {[
               { title: "For Patients", icon: Heart, color: "text-blue-500", bg: "bg-blue-50", desc: "Register in 2 minutes. Book your first consultation today.", cta: "Register as Patient", href: "/patient/register" },
               { title: "For Doctors", icon: Stethoscope, color: "text-teal-500", bg: "bg-teal-50", desc: "Join 1,200+ verified doctors. Grow your practice with DocOnClick.", cta: "Join as Doctor", href: "/doctor/register" },
-              { title: "Admin Portal", icon: Shield, color: "text-purple-500", bg: "bg-purple-50", desc: "Platform administration — manage doctors, bookings, and analytics.", cta: "Admin Dashboard", href: "/admin" },
             ].map(({ title, icon: Icon, color, bg, desc, cta, href }) => (
               <div key={title} className="stat-card card-hover border border-slate-100 group">
                 <div className={`w-14 h-14 rounded-2xl ${bg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>

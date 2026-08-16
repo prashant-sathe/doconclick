@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Phone, Mail, MapPin, Clock, MessageCircle, Headphones, Send, CheckCircle, Loader2 } from "lucide-react";
+import { Mail, Clock, MessageCircle, Headphones, Send, CheckCircle, Loader2 } from "lucide-react";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", mobile: "", subject: "", message: "", type: "general" });
@@ -49,9 +49,7 @@ export default function ContactPage() {
                 <p className="text-slate-500 text-sm leading-relaxed">Whether you have a question about our services, pricing, or need technical support — our team is ready to answer all your questions.</p>
               </div>
               {[
-                { icon: Phone,   title: "Call Us",         info: "+91 8000 000 000",           sub: "Mon–Sat, 8AM–10PM",        color: "text-blue-500",   bg: "bg-blue-50" },
                 { icon: Mail,    title: "Email",           info: "support@doconclick.com",     sub: "We reply within 24 hours",  color: "text-teal-500",   bg: "bg-teal-50" },
-                { icon: MapPin,  title: "Office",          info: "Bandra West, Mumbai 400050", sub: "Maharashtra, India",        color: "text-purple-500", bg: "bg-purple-50" },
                 { icon: Clock,   title: "Working Hours",   info: "Mon – Sat: 8AM – 10PM",     sub: "Sun: 10AM – 6PM",           color: "text-amber-500",  bg: "bg-amber-50" },
               ].map(({ icon: Icon, title, info, sub, color, bg }) => (
                 <div key={title} className="stat-card flex items-start gap-4">
@@ -156,19 +154,6 @@ export default function ContactPage() {
                   </>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Map placeholder */}
-      <section className="pb-0 bg-white">
-        <div className="mx-auto max-w-7xl px-6 pb-0">
-          <div className="rounded-2xl overflow-hidden border border-slate-200 h-64 gradient-surface flex items-center justify-center">
-            <div className="text-center">
-              <MapPin className="w-10 h-10 text-blue-400 mx-auto mb-2" />
-              <p className="text-slate-600 font-semibold">Bandra West, Mumbai 400050</p>
-              <p className="text-slate-400 text-sm">Maharashtra, India</p>
             </div>
           </div>
         </div>
