@@ -2,13 +2,15 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, XCircle, Clock, X } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, Car, MapPinCheck, X } from "lucide-react";
 import type { AppointmentStatusEvent } from "@/hooks/usePatientNotifications";
 
 const AUTO_DISMISS_MS = 6000;
 
-const STATUS_COPY: Record<string, { title: string; message: (doctor: string) => string; icon: typeof CheckCircle2; color: string; bg: string }> = {
+const EVENT_COPY: Record<string, { title: string; message: (doctor: string) => string; icon: typeof CheckCircle2; color: string; bg: string }> = {
   SCHEDULED: { title: "Appointment confirmed!", message: (d) => `${d} accepted your request.`, icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
+  ON_THE_WAY: { title: "Your doctor is on the way!", message: (d) => `${d} has started the journey to you.`, icon: Car, color: "text-blue-600", bg: "bg-blue-50" },
+  ARRIVED: { title: "Your doctor has arrived!", message: (d) => `${d} is here for your visit.`, icon: MapPinCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
   REJECTED: { title: "Request declined", message: (d) => `${d} was unable to accept your request.`, icon: XCircle, color: "text-red-600", bg: "bg-red-50" },
   EXPIRED: { title: "No response from doctor", message: (d) => `${d} didn't respond in time.`, icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
   COMPLETED: { title: "Consultation completed", message: (d) => `Your visit with ${d} is complete.`, icon: CheckCircle2, color: "text-blue-600", bg: "bg-blue-50" },
@@ -24,9 +26,9 @@ export default function PatientNotificationToast({ event, onDismiss }: {
   useEffect(() => {
     const t = setTimeout(onDismiss, AUTO_DISMISS_MS);
     return () => clearTimeout(t);
-  }, [event.id, event.status, onDismiss]);
+  }, [event.id, event.event, onDismiss]);
 
-  const copy = STATUS_COPY[event.status];
+  const copy = EVENT_COPY[event.event];
   if (!copy) return null;
   const Icon = copy.icon;
 

@@ -16,6 +16,8 @@ const NAV = [
 
 const STATUS_LABEL: Record<string, string> = {
   SCHEDULED: "Confirmed",
+  ON_THE_WAY: "On the way",
+  ARRIVED: "Arrived",
   COMPLETED: "Completed",
   CANCELLED: "Cancelled",
   REJECTED: "Declined",
@@ -24,6 +26,8 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_DOT: Record<string, string> = {
   SCHEDULED: "bg-emerald-500",
+  ON_THE_WAY: "bg-blue-500",
+  ARRIVED: "bg-emerald-500",
   COMPLETED: "bg-blue-500",
   CANCELLED: "bg-slate-400",
   REJECTED: "bg-red-500",
@@ -105,10 +109,10 @@ export default function PatientHeader() {
                           onClick={() => { setBellOpen(false); router.push("/patient/appointments"); }}
                           className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors flex items-center gap-2.5"
                         >
-                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[a.status] ?? "bg-slate-300"}`} />
+                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[a.event] ?? "bg-slate-300"}`} />
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-slate-800 truncate">{a.doctor.name}</p>
-                            <p className="text-xs text-slate-400 mt-0.5">{STATUS_LABEL[a.status] ?? a.status} · {a.consultType}</p>
+                            <p className="text-xs text-slate-400 mt-0.5">{STATUS_LABEL[a.event] ?? a.event} · {a.consultType}</p>
                           </div>
                         </button>
                       ))}

@@ -5,14 +5,29 @@ import { startRingingAlert } from "@/lib/playNotificationSound";
 export interface AppointmentStatusEvent {
   id: string;
   status: string;
+  travelStatus: string;
   consultType: string;
   scheduledAt: string;
   doctor: { name: string };
+  event: string;
 }
 
-// Status changes worth notifying the patient about — not the initial
-// PENDING_APPROVAL creation, since that's their own booking action.
-const NOTABLE_STATUSES = new Set(["SCHEDULED", "REJECTED", "EXPIRED", "COMPLETED", "CANCELLED"]);
+type RawAppointment = { id: string; status: string; travelStatus: string; consultType: string; scheduledAt: string; doctor: { name: string } };
+
+// Each appointment's lifecycle produces a sequence of distinct "events" worth
+// notifying the patient about. PENDING_APPROVAL (their own booking action)
+// and travelStatus NOT_STARTED (the default, not a real event) are excluded.
+function deriveEvent(a: RawAppointment): string | null {
+  if (a.status === "REJECTED" || a.status === "EXPIRED" || a.status === "COMPLETED" || a.status === "CANCELLED") {
+    return a.status;
+  }
+  if (a.status === "SCHEDULED") {
+    if (a.consultType === "HOME" && a.travelStatus === "ARRIVED") return "ARRIVED";
+    if (a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY") return "ON_THE_WAY";
+    return "SCHEDULED";
+  }
+  return null;
+}
 
 const POLL_MS = 5000;
 const seenKey = (patientId: string) => `doconclick_notif_patient_seen_${patientId}`;
@@ -29,7 +44,7 @@ export function usePatientNotifications(patientId: string | undefined) {
   const [notableAppointments, setNotableAppointments] = useState<AppointmentStatusEvent[]>([]);
   const [hasUnseen, setHasUnseen] = useState(false);
   const [activeToast, setActiveToast] = useState<AppointmentStatusEvent | null>(null);
-  const lastKnownStatus = useRef<Map<string, string> | null>(null);
+  const lastKnownEvent = useRef<Map<string, string> | null>(null);
   const stopRingingRef = useRef<(() => void) | null>(null);
 
   const stopRinging = useCallback(() => {
@@ -40,32 +55,34 @@ export function usePatientNotifications(patientId: string | undefined) {
   const computeUnseen = useCallback((events: AppointmentStatusEvent[]) => {
     if (!patientId) return false;
     const seen = loadSeenMap(patientId);
-    return events.some((e) => seen[e.id] !== e.status);
+    return events.some((e) => seen[e.id] !== e.event);
   }, [patientId]);
 
   useEffect(() => {
     if (!patientId) return;
-    lastKnownStatus.current = null;
+    lastKnownEvent.current = null;
 
     const poll = async () => {
       const res = await fetch("/api/appointments/me").catch(() => null);
       if (!res?.ok) return;
-      const all: Array<{ id: string; status: string; consultType: string; scheduledAt: string; doctor: { name: string } }> = await res.json();
-      const notable = all.filter((a) => NOTABLE_STATUSES.has(a.status));
+      const all: RawAppointment[] = await res.json();
+      const notable = all
+        .map((a) => ({ ...a, event: deriveEvent(a) }))
+        .filter((a): a is AppointmentStatusEvent => a.event !== null);
       setNotableAppointments(notable);
       setHasUnseen(computeUnseen(notable));
 
-      if (lastKnownStatus.current === null) {
-        lastKnownStatus.current = new Map(notable.map((a) => [a.id, a.status]));
+      if (lastKnownEvent.current === null) {
+        lastKnownEvent.current = new Map(notable.map((a) => [a.id, a.event]));
         return;
       }
-      const changed = notable.find((a) => lastKnownStatus.current!.get(a.id) !== a.status);
+      const changed = notable.find((a) => lastKnownEvent.current!.get(a.id) !== a.event);
       if (changed) {
         setActiveToast(changed);
         stopRingingRef.current?.();
         stopRingingRef.current = startRingingAlert();
       }
-      for (const a of notable) lastKnownStatus.current.set(a.id, a.status);
+      for (const a of notable) lastKnownEvent.current.set(a.id, a.event);
     };
 
     poll();
@@ -80,7 +97,7 @@ export function usePatientNotifications(patientId: string | undefined) {
   const markSeen = useCallback(() => {
     if (!patientId) return;
     const seen: Record<string, string> = {};
-    for (const a of notableAppointments) seen[a.id] = a.status;
+    for (const a of notableAppointments) seen[a.id] = a.event;
     localStorage.setItem(seenKey(patientId), JSON.stringify(seen));
     setHasUnseen(false);
     stopRinging();
