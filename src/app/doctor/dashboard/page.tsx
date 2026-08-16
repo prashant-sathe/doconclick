@@ -37,6 +37,7 @@ interface Appointment {
   relation: string;
   allergies: string | null;
   amount: number;
+  platformFee: number;
   paymentMethod: string;
   paymentStatus: string;
   isEmergency: boolean;
@@ -328,8 +329,10 @@ export default function DoctorDashboard() {
   const completedAll = appointments.filter((a) => a.status === "COMPLETED");
   const pending = appointments.filter((a) => a.status === "PENDING_APPROVAL" && matchesSearch(a));
   const upcoming = appointments.filter((a) => a.status === "SCHEDULED" && matchesSearch(a));
-  const completed = completedAll.filter(matchesSearch);
-  const totalEarnings = completedAll.reduce((sum, a) => sum + a.amount, 0);
+  const completed = completedAll.filter((a) => a.paymentStatus === "PAID").filter(matchesSearch);
+  const totalEarnings = completedAll
+    .filter((a) => a.paymentStatus === "PAID")
+    .reduce((sum, a) => sum + (a.amount - a.platformFee), 0);
 
   return (
     <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
@@ -601,7 +604,7 @@ export default function DoctorDashboard() {
                       {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
                     </div>
                   </div>
-                  <div className="text-sm font-bold text-slate-700">₹{a.amount}</div>
+                  <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>
                 </div>
               ))}
             </div>
