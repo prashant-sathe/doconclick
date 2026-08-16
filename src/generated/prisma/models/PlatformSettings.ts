@@ -27,56 +27,76 @@ export type AggregatePlatformSettings = {
 }
 
 export type PlatformSettingsAvgAggregateOutputType = {
-  commissionPercent: number | null
+  clinicCommissionPercent: number | null
+  videoCommissionPercent: number | null
+  homeCommissionPercent: number | null
 }
 
 export type PlatformSettingsSumAggregateOutputType = {
-  commissionPercent: number | null
+  clinicCommissionPercent: number | null
+  videoCommissionPercent: number | null
+  homeCommissionPercent: number | null
 }
 
 export type PlatformSettingsMinAggregateOutputType = {
   id: string | null
-  commissionPercent: number | null
+  clinicCommissionPercent: number | null
+  videoCommissionPercent: number | null
+  homeCommissionPercent: number | null
   updatedAt: Date | null
 }
 
 export type PlatformSettingsMaxAggregateOutputType = {
   id: string | null
-  commissionPercent: number | null
+  clinicCommissionPercent: number | null
+  videoCommissionPercent: number | null
+  homeCommissionPercent: number | null
   updatedAt: Date | null
 }
 
 export type PlatformSettingsCountAggregateOutputType = {
   id: number
-  commissionPercent: number
+  clinicCommissionPercent: number
+  videoCommissionPercent: number
+  homeCommissionPercent: number
   updatedAt: number
   _all: number
 }
 
 
 export type PlatformSettingsAvgAggregateInputType = {
-  commissionPercent?: true
+  clinicCommissionPercent?: true
+  videoCommissionPercent?: true
+  homeCommissionPercent?: true
 }
 
 export type PlatformSettingsSumAggregateInputType = {
-  commissionPercent?: true
+  clinicCommissionPercent?: true
+  videoCommissionPercent?: true
+  homeCommissionPercent?: true
 }
 
 export type PlatformSettingsMinAggregateInputType = {
   id?: true
-  commissionPercent?: true
+  clinicCommissionPercent?: true
+  videoCommissionPercent?: true
+  homeCommissionPercent?: true
   updatedAt?: true
 }
 
 export type PlatformSettingsMaxAggregateInputType = {
   id?: true
-  commissionPercent?: true
+  clinicCommissionPercent?: true
+  videoCommissionPercent?: true
+  homeCommissionPercent?: true
   updatedAt?: true
 }
 
 export type PlatformSettingsCountAggregateInputType = {
   id?: true
-  commissionPercent?: true
+  clinicCommissionPercent?: true
+  videoCommissionPercent?: true
+  homeCommissionPercent?: true
   updatedAt?: true
   _all?: true
 }
@@ -169,7 +189,9 @@ export type PlatformSettingsGroupByArgs<ExtArgs extends runtime.Types.Extensions
 
 export type PlatformSettingsGroupByOutputType = {
   id: string
-  commissionPercent: number
+  clinicCommissionPercent: number
+  videoCommissionPercent: number
+  homeCommissionPercent: number
   updatedAt: Date
   _count: PlatformSettingsCountAggregateOutputType | null
   _avg: PlatformSettingsAvgAggregateOutputType | null
@@ -198,13 +220,17 @@ export type PlatformSettingsWhereInput = {
   OR?: Prisma.PlatformSettingsWhereInput[]
   NOT?: Prisma.PlatformSettingsWhereInput | Prisma.PlatformSettingsWhereInput[]
   id?: Prisma.StringFilter<"PlatformSettings"> | string
-  commissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  clinicCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  videoCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  homeCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   updatedAt?: Prisma.DateTimeFilter<"PlatformSettings"> | Date | string
 }
 
 export type PlatformSettingsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  commissionPercent?: Prisma.SortOrder
+  clinicCommissionPercent?: Prisma.SortOrder
+  videoCommissionPercent?: Prisma.SortOrder
+  homeCommissionPercent?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -213,13 +239,17 @@ export type PlatformSettingsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.PlatformSettingsWhereInput | Prisma.PlatformSettingsWhereInput[]
   OR?: Prisma.PlatformSettingsWhereInput[]
   NOT?: Prisma.PlatformSettingsWhereInput | Prisma.PlatformSettingsWhereInput[]
-  commissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  clinicCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  videoCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  homeCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   updatedAt?: Prisma.DateTimeFilter<"PlatformSettings"> | Date | string
 }, "id">
 
 export type PlatformSettingsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  commissionPercent?: Prisma.SortOrder
+  clinicCommissionPercent?: Prisma.SortOrder
+  videoCommissionPercent?: Prisma.SortOrder
+  homeCommissionPercent?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PlatformSettingsCountOrderByAggregateInput
   _avg?: Prisma.PlatformSettingsAvgOrderByAggregateInput
@@ -233,112 +263,148 @@ export type PlatformSettingsScalarWhereWithAggregatesInput = {
   OR?: Prisma.PlatformSettingsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PlatformSettingsScalarWhereWithAggregatesInput | Prisma.PlatformSettingsScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
-  commissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  clinicCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  videoCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  homeCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PlatformSettings"> | Date | string
 }
 
 export type PlatformSettingsCreateInput = {
   id?: string
-  commissionPercent?: number
+  clinicCommissionPercent?: number
+  videoCommissionPercent?: number
+  homeCommissionPercent?: number
   updatedAt?: Date | string
 }
 
 export type PlatformSettingsUncheckedCreateInput = {
   id?: string
-  commissionPercent?: number
+  clinicCommissionPercent?: number
+  videoCommissionPercent?: number
+  homeCommissionPercent?: number
   updatedAt?: Date | string
 }
 
 export type PlatformSettingsUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  commissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PlatformSettingsUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  commissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PlatformSettingsCreateManyInput = {
   id?: string
-  commissionPercent?: number
+  clinicCommissionPercent?: number
+  videoCommissionPercent?: number
+  homeCommissionPercent?: number
   updatedAt?: Date | string
 }
 
 export type PlatformSettingsUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  commissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PlatformSettingsUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  commissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PlatformSettingsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  commissionPercent?: Prisma.SortOrder
+  clinicCommissionPercent?: Prisma.SortOrder
+  videoCommissionPercent?: Prisma.SortOrder
+  homeCommissionPercent?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type PlatformSettingsAvgOrderByAggregateInput = {
-  commissionPercent?: Prisma.SortOrder
+  clinicCommissionPercent?: Prisma.SortOrder
+  videoCommissionPercent?: Prisma.SortOrder
+  homeCommissionPercent?: Prisma.SortOrder
 }
 
 export type PlatformSettingsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  commissionPercent?: Prisma.SortOrder
+  clinicCommissionPercent?: Prisma.SortOrder
+  videoCommissionPercent?: Prisma.SortOrder
+  homeCommissionPercent?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type PlatformSettingsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  commissionPercent?: Prisma.SortOrder
+  clinicCommissionPercent?: Prisma.SortOrder
+  videoCommissionPercent?: Prisma.SortOrder
+  homeCommissionPercent?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type PlatformSettingsSumOrderByAggregateInput = {
-  commissionPercent?: Prisma.SortOrder
+  clinicCommissionPercent?: Prisma.SortOrder
+  videoCommissionPercent?: Prisma.SortOrder
+  homeCommissionPercent?: Prisma.SortOrder
 }
 
 
 
 export type PlatformSettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  commissionPercent?: boolean
+  clinicCommissionPercent?: boolean
+  videoCommissionPercent?: boolean
+  homeCommissionPercent?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["platformSettings"]>
 
 export type PlatformSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  commissionPercent?: boolean
+  clinicCommissionPercent?: boolean
+  videoCommissionPercent?: boolean
+  homeCommissionPercent?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["platformSettings"]>
 
 export type PlatformSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  commissionPercent?: boolean
+  clinicCommissionPercent?: boolean
+  videoCommissionPercent?: boolean
+  homeCommissionPercent?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["platformSettings"]>
 
 export type PlatformSettingsSelectScalar = {
   id?: boolean
-  commissionPercent?: boolean
+  clinicCommissionPercent?: boolean
+  videoCommissionPercent?: boolean
+  homeCommissionPercent?: boolean
   updatedAt?: boolean
 }
 
-export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "commissionPercent" | "updatedAt", ExtArgs["result"]["platformSettings"]>
+export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "updatedAt", ExtArgs["result"]["platformSettings"]>
 
 export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlatformSettings"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    commissionPercent: number
+    clinicCommissionPercent: number
+    videoCommissionPercent: number
+    homeCommissionPercent: number
     updatedAt: Date
   }, ExtArgs["result"]["platformSettings"]>
   composites: {}
@@ -764,7 +830,9 @@ export interface Prisma__PlatformSettingsClient<T, Null = never, ExtArgs extends
  */
 export interface PlatformSettingsFieldRefs {
   readonly id: Prisma.FieldRef<"PlatformSettings", 'String'>
-  readonly commissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly clinicCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly videoCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly homeCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly updatedAt: Prisma.FieldRef<"PlatformSettings", 'DateTime'>
 }
     

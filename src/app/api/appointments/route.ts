@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { commissionPercentForConsultType } from "@/lib/platformFee";
 
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
@@ -71,7 +72,7 @@ export async function POST(req: Request) {
     }
 
     const settings = await prisma.platformSettings.findFirst();
-    const commission = settings?.commissionPercent ?? 10;
+    const commission = commissionPercentForConsultType(settings, consultType);
     const platformFee = (Number(amount) * commission) / 100;
 
     const appointment = await prisma.appointment.create({

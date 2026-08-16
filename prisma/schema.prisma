@@ -214,7 +214,9 @@ model Specialty {
 }
 
 model PlatformSettings {
-  id                String   @id @default(cuid())
-  commissionPercent Float    @default(10)
-  updatedAt         DateTime @updatedAt
+  id                      String   @id @default(cuid())
+  clinicCommissionPercent Float    @default(10)
+  videoCommissionPercent  Float    @default(10)
+  homeCommissionPercent   Float    @default(10)
+  updatedAt               DateTime @updatedAt
 }

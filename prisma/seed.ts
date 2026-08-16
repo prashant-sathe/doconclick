@@ -33,7 +33,7 @@ async function main() {
   });
 
   // ── Platform settings ─────────────────────────────────────
-  await prisma.platformSettings.create({ data: { commissionPercent: 10 } });
+  await prisma.platformSettings.create({ data: { clinicCommissionPercent: 10, videoCommissionPercent: 10, homeCommissionPercent: 10 } });
 
   // ── Sample patient ─────────────────────────────────────────
   const patientPassword = await bcrypt.hash("Patient@2025", 12);

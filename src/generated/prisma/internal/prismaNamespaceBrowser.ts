@@ -284,7 +284,9 @@ export type SpecialtyScalarFieldEnum = (typeof SpecialtyScalarFieldEnum)[keyof t
 
 export const PlatformSettingsScalarFieldEnum = {
   id: 'id',
-  commissionPercent: 'commissionPercent',
+  clinicCommissionPercent: 'clinicCommissionPercent',
+  videoCommissionPercent: 'videoCommissionPercent',
+  homeCommissionPercent: 'homeCommissionPercent',
   updatedAt: 'updatedAt'
 } as const
 

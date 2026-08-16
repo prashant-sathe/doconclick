@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { IndianRupee, TrendingUp, Save, Wallet } from "lucide-react";
 
-interface Settings { id: string; commissionPercent: number }
 interface Analytics {
   totalRevenue: number;
   totalPlatformFee: number;
@@ -32,9 +31,10 @@ interface SettlementRecord {
 }
 
 export default function AdminFinance() {
-  const [settings, setSettings] = useState<Settings | null>(null);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [commission, setCommission] = useState("10");
+  const [clinicCommission, setClinicCommission] = useState("10");
+  const [videoCommission, setVideoCommission] = useState("10");
+  const [homeCommission, setHomeCommission] = useState("10");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [pending, setPending] = useState<PendingSettlement[]>([]);
@@ -52,8 +52,9 @@ export default function AdminFinance() {
       fetch("/api/admin/settings").then((r) => r.json()),
       fetch("/api/admin/analytics").then((r) => r.json()),
     ]).then(([s, a]) => {
-      setSettings(s);
-      setCommission(String(s.commissionPercent));
+      setClinicCommission(String(s.clinicCommissionPercent));
+      setVideoCommission(String(s.videoCommissionPercent));
+      setHomeCommission(String(s.homeCommissionPercent));
       setAnalytics(a);
     });
     loadSettlements();
@@ -64,7 +65,11 @@ export default function AdminFinance() {
     await fetch("/api/admin/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ commissionPercent: parseFloat(commission) }),
+      body: JSON.stringify({
+        clinicCommissionPercent: parseFloat(clinicCommission),
+        videoCommissionPercent: parseFloat(videoCommission),
+        homeCommissionPercent: parseFloat(homeCommission),
+      }),
     });
     setSaving(false);
     setSaved(true);
@@ -116,7 +121,7 @@ export default function AdminFinance() {
             <div>
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Platform Earnings</p>
               <p className="text-3xl font-extrabold text-emerald-600">₹{analytics?.totalPlatformFee.toLocaleString() ?? "—"}</p>
-              <p className="text-xs text-slate-400 mt-1">{settings?.commissionPercent ?? 10}% of gross</p>
+              <p className="text-xs text-slate-400 mt-1">Varies by visit type</p>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
               <TrendingUp className="w-6 h-6" />
@@ -141,24 +146,54 @@ export default function AdminFinance() {
 
       {/* Commission Settings */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 max-w-lg">
-        <h2 className="font-bold text-slate-800 mb-5 text-lg">Commission Settings</h2>
-        <div className="form-group mb-5">
-          <label className="input-label">Platform Commission (%)</label>
+        <h2 className="font-bold text-slate-800 mb-1 text-lg">Commission Settings</h2>
+        <p className="text-xs text-slate-400 mb-5">
+          Set a different platform commission per visit type. Applies to future appointments only — already-booked appointments keep the rate they were charged at.
+        </p>
+        <div className="form-group mb-4">
+          <label className="input-label">Clinic Visit Commission (%)</label>
           <div className="relative">
             <input
               type="number"
-              min={1}
-              max={50}
+              min={0}
+              max={100}
               step={0.5}
-              value={commission}
-              onChange={(e) => setCommission(e.target.value)}
+              value={clinicCommission}
+              onChange={(e) => setClinicCommission(e.target.value)}
               className="input-field pr-16"
             />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">% fee</span>
           </div>
-          <p className="text-xs text-slate-400 mt-1.5">
-            This percentage is charged on each completed consultation. Applies to future appointments.
-          </p>
+        </div>
+        <div className="form-group mb-4">
+          <label className="input-label">Video Call Commission (%)</label>
+          <div className="relative">
+            <input
+              type="number"
+              min={0}
+              max={100}
+              step={0.5}
+              value={videoCommission}
+              onChange={(e) => setVideoCommission(e.target.value)}
+              className="input-field pr-16"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">% fee</span>
+          </div>
+        </div>
+        <div className="form-group mb-5">
+          <label className="input-label">Home Visit Commission (%)</label>
+          <div className="relative">
+            <input
+              type="number"
+              min={0}
+              max={100}
+              step={0.5}
+              value={homeCommission}
+              onChange={(e) => setHomeCommission(e.target.value)}
+              className="input-field pr-16"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">% fee</span>
+          </div>
         </div>
         <button
           onClick={saveSettings}
