@@ -200,6 +200,8 @@ export default function DoctorDashboard() {
   const [respondError, setRespondError] = useState<{ id: string; message: string } | null>(null);
   const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [rejectTarget, setRejectTarget] = useState<Appointment | null>(null);
+  const [rejecting, setRejecting] = useState(false);
   const [upcomingExpanded, setUpcomingExpanded] = useState(false);
   const [completedExpanded, setCompletedExpanded] = useState(false);
   const [cancelledExpanded, setCancelledExpanded] = useState(false);
@@ -253,6 +255,14 @@ export default function DoctorDashboard() {
       setRespondError({ id, message: (await res.json().catch(() => ({}))).error ?? "Could not update this request." });
     }
     loadAppointments();
+  };
+
+  const confirmReject = async () => {
+    if (!rejectTarget) return;
+    setRejecting(true);
+    await respond(rejectTarget.id, "REJECTED");
+    setRejecting(false);
+    setRejectTarget(null);
   };
 
   const confirmCancel = async () => {
@@ -458,7 +468,7 @@ export default function DoctorDashboard() {
                       </div>
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
-                      <button onClick={() => respond(a.id, "REJECTED")} disabled={respondingId === a.id} className="btn-secondary py-1.5 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
+                      <button onClick={() => setRejectTarget(a)} disabled={respondingId === a.id} className="btn-secondary py-1.5 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
                         <ThumbsDown className="w-3.5 h-3.5" /> Reject
                       </button>
                       <button onClick={() => respond(a.id, "SCHEDULED")} disabled={respondingId === a.id} className="btn-primary py-1.5 px-3 text-xs">
@@ -681,6 +691,29 @@ export default function DoctorDashboard() {
               </button>
               <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
                 {cancelling ? "Cancelling…" : "Cancel Appointment"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject confirmation */}
+      {rejectTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-3">
+              <ThumbsDown className="w-5 h-5 text-red-600" />
+              <h3 className="font-bold text-slate-800">Reject this request?</h3>
+            </div>
+            <p className="text-sm text-slate-500 mb-5">
+              {patientLabel(rejectTarget)}&apos;s request will be declined. They&apos;ll need to book again with another doctor. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setRejectTarget(null)} className="btn-secondary flex-1">
+                Keep Request
+              </button>
+              <button onClick={confirmReject} disabled={rejecting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                {rejecting ? "Rejecting…" : "Reject Request"}
               </button>
             </div>
           </div>

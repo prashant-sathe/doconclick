@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, Loader2 } from "lucide-react";
+import { unlockAudio } from "@/lib/playNotificationSound";
 
 type AuthUser = {
   id: string;
@@ -50,6 +51,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  // Browsers only allow audio playback after a genuine user gesture. Unlocking
+  // here — on the very first click/keypress/touch anywhere in the app,
+  // starting from the login page — means audio is ready well before a doctor
+  // ever reaches a page that might need to play a notification sound.
+  useEffect(() => {
+    const unlock = () => unlockAudio();
+    document.addEventListener("click", unlock, { once: true });
+    document.addEventListener("keydown", unlock, { once: true });
+    document.addEventListener("touchstart", unlock, { once: true });
+    return () => {
+      document.removeEventListener("click", unlock);
+      document.removeEventListener("keydown", unlock);
+      document.removeEventListener("touchstart", unlock);
+    };
+  }, []);
 
   const logout = async () => {
     setConfirmingLogout(true);
