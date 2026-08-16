@@ -56,6 +56,29 @@ model PatientProfile {
   photoUrl              String?
   lat                   Float?
   lng                   Float?
+
+  dependents PatientDependent[]
+}
+
+model PatientDependent {
+  id               String   @id @default(cuid())
+  patientProfileId String
+  patientProfile   PatientProfile @relation(fields: [patientProfileId], references: [id], onDelete: Cascade)
+  name             String
+  relation         String   // Spouse, Son, Daughter, Father, Mother, Other
+  age              Int?
+  gender           String?
+  bloodGroup       String?
+  height           Int?
+  weight           Int?
+  allergies        String?
+  chronicDiseases  String?
+  medications      String?
+  surgeries        String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  createdAt        DateTime @default(now())
+  appointments     Appointment[]
 }
 
 model DoctorProfile {
@@ -107,6 +130,8 @@ model Appointment {
   patientName   String?
   relation      String    @default("Self")
   allergies     String?
+  dependentId   String?
+  dependent     PatientDependent? @relation(fields: [dependentId], references: [id])
   consentGiven  Boolean   @default(false)
   consultType   String    @default("CLINIC") // CLINIC, HOME, VIDEO
   status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED

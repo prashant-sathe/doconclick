@@ -10,7 +10,13 @@ import ChatThread from "@/components/ChatThread";
 
 interface ChatAppointment {
   status: string;
+  patientName: string | null;
+  relation: string;
   patient: { name: string };
+}
+
+function patientLabel(a: ChatAppointment): string {
+  return a.relation !== "Self" && a.patientName ? a.patientName : a.patient.name;
 }
 
 export default function DoctorChatPage() {
@@ -57,7 +63,10 @@ export default function DoctorChatPage() {
               <UserIcon className="w-5 h-5 text-teal-600" />
             </div>
             <div className="min-w-0">
-              <p className="font-bold text-slate-900 truncate">{appt?.patient.name ?? "…"}</p>
+              <p className="font-bold text-slate-900 truncate">{appt ? patientLabel(appt) : "…"}</p>
+              {appt && appt.relation !== "Self" && (
+                <p className="text-xs text-slate-400 truncate">{appt.relation} of {appt.patient.name}</p>
+              )}
             </div>
           </div>
 
@@ -68,7 +77,7 @@ export default function DoctorChatPage() {
           ) : !chatOpen ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">Accept this request to start chatting with {appt.patient.name}.</p>
+              <p className="text-sm text-slate-500">Accept this request to start chatting with {patientLabel(appt)}.</p>
             </div>
           ) : (
             <ChatThread appointmentId={params.id} meId={user.id} accent="teal" />

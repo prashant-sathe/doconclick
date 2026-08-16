@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   PatientProfile: 'PatientProfile',
+  PatientDependent: 'PatientDependent',
   DoctorProfile: 'DoctorProfile',
   Appointment: 'Appointment',
   Settlement: 'Settlement',
@@ -122,6 +123,28 @@ export const PatientProfileScalarFieldEnum = {
 export type PatientProfileScalarFieldEnum = (typeof PatientProfileScalarFieldEnum)[keyof typeof PatientProfileScalarFieldEnum]
 
 
+export const PatientDependentScalarFieldEnum = {
+  id: 'id',
+  patientProfileId: 'patientProfileId',
+  name: 'name',
+  relation: 'relation',
+  age: 'age',
+  gender: 'gender',
+  bloodGroup: 'bloodGroup',
+  height: 'height',
+  weight: 'weight',
+  allergies: 'allergies',
+  chronicDiseases: 'chronicDiseases',
+  medications: 'medications',
+  surgeries: 'surgeries',
+  emergencyContactName: 'emergencyContactName',
+  emergencyContactPhone: 'emergencyContactPhone',
+  createdAt: 'createdAt'
+} as const
+
+export type PatientDependentScalarFieldEnum = (typeof PatientDependentScalarFieldEnum)[keyof typeof PatientDependentScalarFieldEnum]
+
+
 export const DoctorProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -170,6 +193,7 @@ export const AppointmentScalarFieldEnum = {
   patientName: 'patientName',
   relation: 'relation',
   allergies: 'allergies',
+  dependentId: 'dependentId',
   consentGiven: 'consentGiven',
   consultType: 'consultType',
   status: 'status',

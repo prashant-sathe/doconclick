@@ -12,8 +12,8 @@ import { computeCompleteness, type PatientProfileData } from "@/lib/profileCompl
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
-
-const CHRONIC_OPTIONS = ["Diabetes", "Hypertension", "Asthma", "Heart Disease", "Thyroid", "Arthritis", "COPD", "None"];
+import { CHRONIC_OPTIONS, BLOOD_GROUPS } from "@/lib/medicalOptions";
+import { computeBMI, bmiCategoryClasses } from "@/lib/bmi";
 
 interface FormState {
   location: string;
@@ -171,6 +171,8 @@ export default function PatientProfilePage() {
     });
   };
 
+  const bmi = computeBMI(Number(form.height), Number(form.weight));
+
   const completenessInput: PatientProfileData = {
     location: form.location || null,
     homeAddress: form.homeAddress || null,
@@ -297,7 +299,7 @@ export default function PatientProfilePage() {
                   <label className="input-label"><Droplets className="inline w-3.5 h-3.5 mr-1" />Blood Group</label>
                   <select className="input-field" value={form.bloodGroup} onChange={(e) => set("bloodGroup", e.target.value)}>
                     <option value="">Select…</option>
-                    {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((g) => <option key={g}>{g}</option>)}
+                    {BLOOD_GROUPS.map((g) => <option key={g}>{g}</option>)}
                   </select>
                 </div>
                 <div>
@@ -309,6 +311,12 @@ export default function PatientProfilePage() {
                   <input type="number" className="input-field" placeholder="70" value={form.weight} onChange={(e) => set("weight", e.target.value)} />
                 </div>
               </div>
+              {bmi && (
+                <div className={cn("rounded-xl px-4 py-2.5 text-sm font-semibold flex items-center justify-between", bmiCategoryClasses(bmi.category))}>
+                  <span>BMI: {bmi.value}</span>
+                  <span>{bmi.category}</span>
+                </div>
+              )}
               <div>
                 <label className="input-label">Chronic Conditions</label>
                 <div className="flex flex-wrap gap-2 mt-1">

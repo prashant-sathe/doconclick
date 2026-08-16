@@ -35,6 +35,7 @@ interface Appointment {
   symptoms: string;
   patientName: string | null;
   relation: string;
+  dependentId: string | null;
   allergies: string | null;
   amount: number;
   platformFee: number;
@@ -62,6 +63,9 @@ const TYPE_ICON: Record<string, React.ElementType> = { HOME: Home, CLINIC: Build
 
 function patientLabel(a: Appointment): string {
   return a.relation !== "Self" && a.patientName ? a.patientName : a.patient.name;
+}
+function historyHref(a: Appointment): string {
+  return a.dependentId ? `/doctor/patients/${a.patientId}?dependentId=${a.dependentId}` : `/doctor/patients/${a.patientId}`;
 }
 const EMPTY_ROW: MedicineRow = { name: "", dosage: "", frequency: "", duration: "", instructions: "" };
 
@@ -508,7 +512,7 @@ export default function DoctorDashboard() {
                         </div>
                         <div className="min-w-0">
                           <div className="font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
-                            <Link href={`/doctor/patients/${a.patientId}`} className="hover:underline hover:text-teal-600">
+                            <Link href={historyHref(a)} className="hover:underline hover:text-teal-600">
                               {patientLabel(a)}
                             </Link>
                             {a.relation !== "Self" && (
@@ -558,7 +562,7 @@ export default function DoctorDashboard() {
                         </div>
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
-                        <Link href={`/doctor/patients/${a.patientId}`} className="btn-secondary py-1.5 px-3 text-xs" title="Patient history">
+                        <Link href={historyHref(a)} className="btn-secondary py-1.5 px-3 text-xs" title="Patient history">
                           <History className="w-3.5 h-3.5" />
                         </Link>
                         <Link href={`/doctor/chat/${a.id}`} className="btn-secondary py-1.5 px-3 text-xs" title="Chat with patient">
@@ -620,7 +624,7 @@ export default function DoctorDashboard() {
               {(completedExpanded ? completed : completed.slice(0, PAGE_SIZE)).map((a) => (
                 <div key={a.id} className="px-6 py-3.5 flex items-center justify-between">
                   <div>
-                    <Link href={`/doctor/patients/${a.patientId}`} className="font-semibold text-slate-800 text-sm hover:underline hover:text-teal-600">
+                    <Link href={historyHref(a)} className="font-semibold text-slate-800 text-sm hover:underline hover:text-teal-600">
                       {patientLabel(a)}
                     </Link>
                     {a.relation !== "Self" && (

@@ -399,6 +399,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   PatientProfile: 'PatientProfile',
+  PatientDependent: 'PatientDependent',
   DoctorProfile: 'DoctorProfile',
   Appointment: 'Appointment',
   Settlement: 'Settlement',
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "patientProfile" | "doctorProfile" | "appointment" | "settlement" | "message" | "prescriptionMedicine" | "prescriptionAttachment" | "review" | "complaint" | "specialty" | "platformSettings"
+    modelProps: "user" | "patientProfile" | "patientDependent" | "doctorProfile" | "appointment" | "settlement" | "message" | "prescriptionMedicine" | "prescriptionAttachment" | "review" | "complaint" | "specialty" | "platformSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -573,6 +574,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PatientProfileCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PatientProfileCountAggregateOutputType> | number
+        }
+      }
+    }
+    PatientDependent: {
+      payload: Prisma.$PatientDependentPayload<ExtArgs>
+      fields: Prisma.PatientDependentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PatientDependentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PatientDependentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload>
+        }
+        findFirst: {
+          args: Prisma.PatientDependentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PatientDependentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload>
+        }
+        findMany: {
+          args: Prisma.PatientDependentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload>[]
+        }
+        create: {
+          args: Prisma.PatientDependentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload>
+        }
+        createMany: {
+          args: Prisma.PatientDependentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PatientDependentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload>[]
+        }
+        delete: {
+          args: Prisma.PatientDependentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload>
+        }
+        update: {
+          args: Prisma.PatientDependentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload>
+        }
+        deleteMany: {
+          args: Prisma.PatientDependentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PatientDependentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PatientDependentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload>[]
+        }
+        upsert: {
+          args: Prisma.PatientDependentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientDependentPayload>
+        }
+        aggregate: {
+          args: Prisma.PatientDependentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePatientDependent>
+        }
+        groupBy: {
+          args: Prisma.PatientDependentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PatientDependentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PatientDependentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PatientDependentCountAggregateOutputType> | number
         }
       }
     }
@@ -1396,6 +1471,28 @@ export const PatientProfileScalarFieldEnum = {
 export type PatientProfileScalarFieldEnum = (typeof PatientProfileScalarFieldEnum)[keyof typeof PatientProfileScalarFieldEnum]
 
 
+export const PatientDependentScalarFieldEnum = {
+  id: 'id',
+  patientProfileId: 'patientProfileId',
+  name: 'name',
+  relation: 'relation',
+  age: 'age',
+  gender: 'gender',
+  bloodGroup: 'bloodGroup',
+  height: 'height',
+  weight: 'weight',
+  allergies: 'allergies',
+  chronicDiseases: 'chronicDiseases',
+  medications: 'medications',
+  surgeries: 'surgeries',
+  emergencyContactName: 'emergencyContactName',
+  emergencyContactPhone: 'emergencyContactPhone',
+  createdAt: 'createdAt'
+} as const
+
+export type PatientDependentScalarFieldEnum = (typeof PatientDependentScalarFieldEnum)[keyof typeof PatientDependentScalarFieldEnum]
+
+
 export const DoctorProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1444,6 +1541,7 @@ export const AppointmentScalarFieldEnum = {
   patientName: 'patientName',
   relation: 'relation',
   allergies: 'allergies',
+  dependentId: 'dependentId',
   consentGiven: 'consentGiven',
   consultType: 'consultType',
   status: 'status',
@@ -1812,6 +1910,7 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   patientProfile?: Prisma.PatientProfileOmit
+  patientDependent?: Prisma.PatientDependentOmit
   doctorProfile?: Prisma.DoctorProfileOmit
   appointment?: Prisma.AppointmentOmit
   settlement?: Prisma.SettlementOmit

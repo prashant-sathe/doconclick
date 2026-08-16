@@ -13,8 +13,7 @@ export async function POST(req: Request) {
     const {
       doctorId,
       symptoms,
-      patientName,
-      relation,
+      dependentId,
       allergies,
       consentGiven,
       consultType,
@@ -28,13 +27,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const normalizedRelation = relation && relation.trim() ? relation.trim() : "Self";
-    if (normalizedRelation !== "Self" && !patientName?.trim()) {
-      return NextResponse.json(
-        { error: "Please enter the patient's name." },
-        { status: 400 }
-      );
+    // Booking for someone other than yourself always goes through a saved
+    // dependent profile now — patientName/relation/allergies for that case
+    // are derived from it below, never trusted from the client directly.
+    let dependent: { id: string; name: string; relation: string; allergies: string | null } | null = null;
+    if (dependentId) {
+      const found = await prisma.patientDependent.findUnique({
+        where: { id: dependentId },
+        include: { patientProfile: { select: { userId: true } } },
+      });
+      if (!found || found.patientProfile.userId !== authUser.id) {
+        return NextResponse.json({ error: "Invalid family member selected." }, { status: 400 });
+      }
+      dependent = found;
     }
+    const normalizedRelation = dependent ? dependent.relation : "Self";
 
     // Emergency requests are a deliberate one-tap flow — consent is implied by the
     // act of requesting urgent help. Every other booking requires an explicit checkbox.
@@ -80,8 +87,9 @@ export async function POST(req: Request) {
         patientId: authUser.id,
         doctorId,
         symptoms,
-        patientName: normalizedRelation === "Self" ? null : patientName.trim(),
+        patientName: dependent ? dependent.name : null,
         relation: normalizedRelation,
+        dependentId: dependent?.id,
         allergies: allergies?.trim() ? allergies.trim() : null,
         consentGiven: isEmergency ? true : Boolean(consentGiven),
         consultType,

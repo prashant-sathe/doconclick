@@ -16,6 +16,7 @@ import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
+import DependentPicker from "@/components/patient/DependentPicker";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -125,7 +126,7 @@ function PatientDashboardInner() {
   const [symptoms, setSymptoms] = useState("");
   const [allergies, setAllergies] = useState("");
   const [relation, setRelation] = useState("Self");
-  const [patientName, setPatientName] = useState("");
+  const [dependentId, setDependentId] = useState<string | null>(null);
   const [consentGiven, setConsentGiven] = useState(false);
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
@@ -293,7 +294,7 @@ function PatientDashboardInner() {
           setConsultType(doc.doctorProfile?.offersHomeVisit ? "HOME" : "CLINIC");
           setSymptoms("");
           setRelation("Self");
-          setPatientName("");
+          setDependentId(null);
           setConsentGiven(false);
           setBooked(null);
           setScheduleMode("NOW");
@@ -398,8 +399,7 @@ function PatientDashboardInner() {
       body: JSON.stringify({
         doctorId: selectedDoctor.id,
         symptoms,
-        patientName,
-        relation,
+        dependentId,
         allergies,
         consentGiven,
         consultType,
@@ -749,15 +749,16 @@ function PatientDashboardInner() {
                   <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />Who is this for?</label>
                   <div className="grid grid-cols-4 gap-2 mb-3">
                     {RELATIONS.map((r) => (
-                      <button key={r} type="button" onClick={() => setRelation(r)}
+                      <button key={r} type="button" onClick={() => { setRelation(r); setDependentId(null); }}
                         className={`py-2 rounded-xl border text-xs font-semibold transition-all ${relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
                         {r}
                       </button>
                     ))}
                   </div>
                   {relation !== "Self" && (
-                    <input className="input-field mb-4" placeholder={`${relation}'s full name`}
-                      value={patientName} onChange={(e) => setPatientName(e.target.value)} />
+                    <div className="mb-4">
+                      <DependentPicker key={relation} relation={relation} selectedId={dependentId} onSelect={setDependentId} />
+                    </div>
                   )}
 
                   {/* Symptoms */}
@@ -799,7 +800,7 @@ function PatientDashboardInner() {
                     </button>
                     <button
                       onClick={submitBooking}
-                      disabled={booking || !symptoms.trim() || !consentGiven || (scheduleMode === "LATER" && !scheduledAt) || (relation !== "Self" && !patientName.trim())}
+                      disabled={booking || !symptoms.trim() || !consentGiven || (scheduleMode === "LATER" && !scheduledAt) || (relation !== "Self" && !dependentId)}
                       className="btn-primary flex-1 justify-center py-3"
                     >
                       {booking ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : `Confirm ₹${fee}`}

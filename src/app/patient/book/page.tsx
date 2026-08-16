@@ -17,6 +17,7 @@ import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
+import DependentPicker from "@/components/patient/DependentPicker";
 
 interface Doctor {
   id: string;
@@ -80,8 +81,9 @@ function PatientBookInner() {
   const [specialtyFilter, setSpecialtyFilter] = useState("");
   const [search, setSearch] = useState("");
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
-  const [form, setForm] = useState({ doctorId: "", symptoms: "", allergies: "", consultType: "CLINIC", relation: "Self", patientName: "" });
+  const [form, setForm] = useState({ doctorId: "", symptoms: "", allergies: "", consultType: "CLINIC", relation: "Self" });
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const [dependentId, setDependentId] = useState<string | null>(null);
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
   const [isEmergency, setIsEmergency] = useState(false);
@@ -135,14 +137,18 @@ function PatientBookInner() {
     e.preventDefault();
     if (!user?.id) { router.push("/login"); return; }
     if (!isEmergency && !consentGiven) { setError("Please agree to the consent statement to continue."); return; }
-    if (form.relation !== "Self" && !form.patientName.trim()) { setError("Please enter the patient's name."); return; }
+    if (form.relation !== "Self" && !dependentId) { setError("Please select or add the family member this visit is for."); return; }
     setError("");
     setLoading(true);
     const res = await fetch("/api/appointments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...form,
+        doctorId: form.doctorId,
+        symptoms: form.symptoms,
+        allergies: form.allergies,
+        consultType: form.consultType,
+        dependentId,
         amount: currentFee,
         paymentMethod: "ONLINE",
         isEmergency,
@@ -343,7 +349,7 @@ function PatientBookInner() {
               <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />Who is this for?</label>
               <div className="grid grid-cols-4 gap-2">
                 {RELATIONS.map((r) => (
-                  <button key={r} type="button" onClick={() => set("relation", r)}
+                  <button key={r} type="button" onClick={() => { set("relation", r); setDependentId(null); }}
                     className={cn("py-2 rounded-xl border text-xs font-semibold transition-all",
                       form.relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                     )}>
@@ -352,8 +358,9 @@ function PatientBookInner() {
                 ))}
               </div>
               {form.relation !== "Self" && (
-                <input required className="input-field mt-3" placeholder={`${form.relation}'s full name`}
-                  value={form.patientName} onChange={(e) => set("patientName", e.target.value)} />
+                <div className="mt-3">
+                  <DependentPicker key={form.relation} relation={form.relation} selectedId={dependentId} onSelect={setDependentId} />
+                </div>
               )}
             </div>
 

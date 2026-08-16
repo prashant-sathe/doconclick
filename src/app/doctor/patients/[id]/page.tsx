@@ -1,14 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Loader2, ArrowLeft, User, Droplets, AlertTriangle, Pill,
-  Scissors, PhoneCall, CalendarClock, Star, Stethoscope, Paperclip,
+  Scissors, PhoneCall, CalendarClock, Star, Stethoscope, Paperclip, Users,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
+import { computeBMI, bmiCategoryClasses } from "@/lib/bmi";
 
 interface Medicine {
   id: string;
@@ -38,28 +39,35 @@ interface HistoryAppointment {
   review: { rating: number; comment: string | null } | null;
 }
 
+interface MedicalInfo {
+  age: number | null;
+  gender: string | null;
+  bloodGroup: string | null;
+  height: number | null;
+  weight: number | null;
+  allergies: string | null;
+  chronicDiseases: string | null;
+  medications: string | null;
+  surgeries: string | null;
+  emergencyContactName: string | null;
+  emergencyContactPhone: string | null;
+}
+
 interface PatientHistory {
   patient: {
     id: string;
     name: string;
     mobile: string;
-    patientProfile: {
-      age: number;
-      gender: string;
-      bloodGroup: string | null;
-      allergies: string | null;
-      chronicDiseases: string | null;
-      medications: string | null;
-      surgeries: string | null;
-      emergencyContactName: string | null;
-      emergencyContactPhone: string | null;
-    } | null;
+    patientProfile: MedicalInfo | null;
   };
+  dependent: (MedicalInfo & { name: string; relation: string }) | null;
   appointments: HistoryAppointment[];
 }
 
-export default function DoctorPatientHistory() {
+function DoctorPatientHistoryInner() {
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const dependentId = searchParams.get("dependentId");
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [data, setData] = useState<PatientHistory | null>(null);
@@ -73,13 +81,16 @@ export default function DoctorPatientHistory() {
 
   useEffect(() => {
     if (!user || user.role !== "DOCTOR") return;
-    fetch(`/api/doctors/patients/${params.id}`)
+    const url = dependentId
+      ? `/api/doctors/patients/${params.id}?dependentId=${dependentId}`
+      : `/api/doctors/patients/${params.id}`;
+    fetch(url)
       .then(async (r) => {
         if (!r.ok) { setError((await r.json()).error ?? "Could not load patient history."); return; }
         setData(await r.json());
       })
       .finally(() => setLoading(false));
-  }, [user, params.id]);
+  }, [user, params.id, dependentId]);
 
   if (authLoading || loading || !user) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">
@@ -87,7 +98,11 @@ export default function DoctorPatientHistory() {
     </div>;
   }
 
-  const p = data?.patient.patientProfile;
+  // Viewing a family member's records shows only their own info — never the
+  // account holder's own medical data — per the scoped-history requirement.
+  const subject = data?.dependent ?? data?.patient.patientProfile ?? null;
+  const displayName = data?.dependent?.name ?? data?.patient.name ?? "";
+  const bmi = subject?.height && subject?.weight ? computeBMI(subject.height, subject.weight) : null;
 
   return (
     <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
@@ -106,11 +121,20 @@ export default function DoctorPatientHistory() {
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center text-white text-xl font-extrabold">
-                  {data.patient.name.charAt(0)}
+                  {displayName.charAt(0)}
                 </div>
                 <div>
-                  <h1 className="text-xl font-extrabold text-slate-900">{data.patient.name}</h1>
-                  <p className="text-sm text-slate-500">{data.patient.mobile}{p ? ` · ${p.age} yrs · ${p.gender}` : ""}</p>
+                  <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2 flex-wrap">
+                    {displayName}
+                    {data.dependent && (
+                      <span className="badge badge-gray text-[10px]"><Users className="w-3 h-3" /> {data.dependent.relation} of {data.patient.name}</span>
+                    )}
+                  </h1>
+                  <p className="text-sm text-slate-500">
+                    {data.patient.mobile}
+                    {subject?.age ? ` · ${subject.age} yrs` : ""}{subject?.gender ? ` · ${subject.gender}` : ""}
+                    {subject?.height ? ` · ${subject.height}cm` : ""}{subject?.weight ? ` · ${subject.weight}kg` : ""}
+                  </p>
                 </div>
               </div>
 
@@ -118,28 +142,35 @@ export default function DoctorPatientHistory() {
                 <div className="bg-red-50 rounded-xl p-3">
                   <Droplets className="w-3.5 h-3.5 text-red-500 mb-1" />
                   <p className="text-[10px] font-semibold text-slate-500 uppercase">Blood Group</p>
-                  <p className="text-sm font-bold text-slate-800">{p?.bloodGroup ?? "—"}</p>
+                  <p className="text-sm font-bold text-slate-800">{subject?.bloodGroup ?? "—"}</p>
                 </div>
                 <div className="bg-amber-50 rounded-xl p-3">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-500 mb-1" />
                   <p className="text-[10px] font-semibold text-slate-500 uppercase">Allergies</p>
-                  <p className="text-sm font-bold text-slate-800 truncate">{p?.allergies ?? "—"}</p>
+                  <p className="text-sm font-bold text-slate-800 truncate">{subject?.allergies ?? "—"}</p>
                 </div>
                 <div className="bg-purple-50 rounded-xl p-3">
                   <Pill className="w-3.5 h-3.5 text-purple-500 mb-1" />
                   <p className="text-[10px] font-semibold text-slate-500 uppercase">Chronic</p>
-                  <p className="text-sm font-bold text-slate-800 truncate">{p?.chronicDiseases ?? "—"}</p>
+                  <p className="text-sm font-bold text-slate-800 truncate">{subject?.chronicDiseases ?? "—"}</p>
                 </div>
                 <div className="bg-blue-50 rounded-xl p-3">
                   <Scissors className="w-3.5 h-3.5 text-blue-500 mb-1" />
                   <p className="text-[10px] font-semibold text-slate-500 uppercase">Surgeries</p>
-                  <p className="text-sm font-bold text-slate-800 truncate">{p?.surgeries ?? "—"}</p>
+                  <p className="text-sm font-bold text-slate-800 truncate">{subject?.surgeries ?? "—"}</p>
                 </div>
+                {bmi && (
+                  <div className={`rounded-xl p-3 ${bmiCategoryClasses(bmi.category)}`}>
+                    <p className="text-[10px] font-semibold uppercase opacity-70">BMI</p>
+                    <p className="text-sm font-bold">{bmi.value}</p>
+                    <p className="text-[10px] font-semibold">{bmi.category}</p>
+                  </div>
+                )}
               </div>
 
-              {(p?.emergencyContactName || p?.emergencyContactPhone) && (
+              {(subject?.emergencyContactName || subject?.emergencyContactPhone) && (
                 <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
-                  <PhoneCall className="w-3.5 h-3.5" /> Emergency: {p.emergencyContactName} {p.emergencyContactPhone}
+                  <PhoneCall className="w-3.5 h-3.5" /> Emergency: {subject.emergencyContactName} {subject.emergencyContactPhone}
                 </div>
               )}
             </div>
@@ -199,5 +230,17 @@ export default function DoctorPatientHistory() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function DoctorPatientHistory() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen gradient-surface flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
+      </div>
+    }>
+      <DoctorPatientHistoryInner />
+    </Suspense>
   );
 }

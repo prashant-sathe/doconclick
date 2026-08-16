@@ -10,6 +10,7 @@
  */
 export type * from './models/User'
 export type * from './models/PatientProfile'
+export type * from './models/PatientDependent'
 export type * from './models/DoctorProfile'
 export type * from './models/Appointment'
 export type * from './models/Settlement'

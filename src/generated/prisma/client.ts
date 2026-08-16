@@ -52,6 +52,11 @@ export type User = Prisma.UserModel
  */
 export type PatientProfile = Prisma.PatientProfileModel
 /**
+ * Model PatientDependent
+ * 
+ */
+export type PatientDependent = Prisma.PatientDependentModel
+/**
  * Model DoctorProfile
  * 
  */

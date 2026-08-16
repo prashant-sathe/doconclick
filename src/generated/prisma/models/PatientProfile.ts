@@ -353,6 +353,7 @@ export type PatientProfileWhereInput = {
   lat?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
   lng?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  dependents?: Prisma.PatientDependentListRelationFilter
 }
 
 export type PatientProfileOrderByWithRelationInput = {
@@ -377,6 +378,7 @@ export type PatientProfileOrderByWithRelationInput = {
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  dependents?: Prisma.PatientDependentOrderByRelationAggregateInput
 }
 
 export type PatientProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -404,6 +406,7 @@ export type PatientProfileWhereUniqueInput = Prisma.AtLeast<{
   lat?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
   lng?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  dependents?: Prisma.PatientDependentListRelationFilter
 }, "id" | "userId">
 
 export type PatientProfileOrderByWithAggregationInput = {
@@ -481,6 +484,7 @@ export type PatientProfileCreateInput = {
   lat?: number | null
   lng?: number | null
   user: Prisma.UserCreateNestedOneWithoutPatientProfileInput
+  dependents?: Prisma.PatientDependentCreateNestedManyWithoutPatientProfileInput
 }
 
 export type PatientProfileUncheckedCreateInput = {
@@ -504,6 +508,7 @@ export type PatientProfileUncheckedCreateInput = {
   photoUrl?: string | null
   lat?: number | null
   lng?: number | null
+  dependents?: Prisma.PatientDependentUncheckedCreateNestedManyWithoutPatientProfileInput
 }
 
 export type PatientProfileUpdateInput = {
@@ -527,6 +532,7 @@ export type PatientProfileUpdateInput = {
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   user?: Prisma.UserUpdateOneRequiredWithoutPatientProfileNestedInput
+  dependents?: Prisma.PatientDependentUpdateManyWithoutPatientProfileNestedInput
 }
 
 export type PatientProfileUncheckedUpdateInput = {
@@ -550,6 +556,7 @@ export type PatientProfileUncheckedUpdateInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dependents?: Prisma.PatientDependentUncheckedUpdateManyWithoutPatientProfileNestedInput
 }
 
 export type PatientProfileCreateManyInput = {
@@ -710,6 +717,11 @@ export type PatientProfileSumOrderByAggregateInput = {
   lng?: Prisma.SortOrder
 }
 
+export type PatientProfileScalarRelationFilter = {
+  is?: Prisma.PatientProfileWhereInput
+  isNot?: Prisma.PatientProfileWhereInput
+}
+
 export type PatientProfileCreateNestedOneWithoutUserInput = {
   create?: Prisma.XOR<Prisma.PatientProfileCreateWithoutUserInput, Prisma.PatientProfileUncheckedCreateWithoutUserInput>
   connectOrCreate?: Prisma.PatientProfileCreateOrConnectWithoutUserInput
@@ -766,6 +778,20 @@ export type NullableFloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type PatientProfileCreateNestedOneWithoutDependentsInput = {
+  create?: Prisma.XOR<Prisma.PatientProfileCreateWithoutDependentsInput, Prisma.PatientProfileUncheckedCreateWithoutDependentsInput>
+  connectOrCreate?: Prisma.PatientProfileCreateOrConnectWithoutDependentsInput
+  connect?: Prisma.PatientProfileWhereUniqueInput
+}
+
+export type PatientProfileUpdateOneRequiredWithoutDependentsNestedInput = {
+  create?: Prisma.XOR<Prisma.PatientProfileCreateWithoutDependentsInput, Prisma.PatientProfileUncheckedCreateWithoutDependentsInput>
+  connectOrCreate?: Prisma.PatientProfileCreateOrConnectWithoutDependentsInput
+  upsert?: Prisma.PatientProfileUpsertWithoutDependentsInput
+  connect?: Prisma.PatientProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PatientProfileUpdateToOneWithWhereWithoutDependentsInput, Prisma.PatientProfileUpdateWithoutDependentsInput>, Prisma.PatientProfileUncheckedUpdateWithoutDependentsInput>
+}
+
 export type PatientProfileCreateWithoutUserInput = {
   id?: string
   age: number
@@ -786,6 +812,7 @@ export type PatientProfileCreateWithoutUserInput = {
   photoUrl?: string | null
   lat?: number | null
   lng?: number | null
+  dependents?: Prisma.PatientDependentCreateNestedManyWithoutPatientProfileInput
 }
 
 export type PatientProfileUncheckedCreateWithoutUserInput = {
@@ -808,6 +835,7 @@ export type PatientProfileUncheckedCreateWithoutUserInput = {
   photoUrl?: string | null
   lat?: number | null
   lng?: number | null
+  dependents?: Prisma.PatientDependentUncheckedCreateNestedManyWithoutPatientProfileInput
 }
 
 export type PatientProfileCreateOrConnectWithoutUserInput = {
@@ -846,6 +874,7 @@ export type PatientProfileUpdateWithoutUserInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dependents?: Prisma.PatientDependentUpdateManyWithoutPatientProfileNestedInput
 }
 
 export type PatientProfileUncheckedUpdateWithoutUserInput = {
@@ -868,8 +897,146 @@ export type PatientProfileUncheckedUpdateWithoutUserInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dependents?: Prisma.PatientDependentUncheckedUpdateManyWithoutPatientProfileNestedInput
 }
 
+export type PatientProfileCreateWithoutDependentsInput = {
+  id?: string
+  age: number
+  gender: string
+  location?: string | null
+  homeAddress?: string | null
+  landmark?: string | null
+  pinCode?: string | null
+  bloodGroup?: string | null
+  height?: number | null
+  weight?: number | null
+  allergies?: string | null
+  chronicDiseases?: string | null
+  medications?: string | null
+  surgeries?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  photoUrl?: string | null
+  lat?: number | null
+  lng?: number | null
+  user: Prisma.UserCreateNestedOneWithoutPatientProfileInput
+}
+
+export type PatientProfileUncheckedCreateWithoutDependentsInput = {
+  id?: string
+  userId: string
+  age: number
+  gender: string
+  location?: string | null
+  homeAddress?: string | null
+  landmark?: string | null
+  pinCode?: string | null
+  bloodGroup?: string | null
+  height?: number | null
+  weight?: number | null
+  allergies?: string | null
+  chronicDiseases?: string | null
+  medications?: string | null
+  surgeries?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  photoUrl?: string | null
+  lat?: number | null
+  lng?: number | null
+}
+
+export type PatientProfileCreateOrConnectWithoutDependentsInput = {
+  where: Prisma.PatientProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.PatientProfileCreateWithoutDependentsInput, Prisma.PatientProfileUncheckedCreateWithoutDependentsInput>
+}
+
+export type PatientProfileUpsertWithoutDependentsInput = {
+  update: Prisma.XOR<Prisma.PatientProfileUpdateWithoutDependentsInput, Prisma.PatientProfileUncheckedUpdateWithoutDependentsInput>
+  create: Prisma.XOR<Prisma.PatientProfileCreateWithoutDependentsInput, Prisma.PatientProfileUncheckedCreateWithoutDependentsInput>
+  where?: Prisma.PatientProfileWhereInput
+}
+
+export type PatientProfileUpdateToOneWithWhereWithoutDependentsInput = {
+  where?: Prisma.PatientProfileWhereInput
+  data: Prisma.XOR<Prisma.PatientProfileUpdateWithoutDependentsInput, Prisma.PatientProfileUncheckedUpdateWithoutDependentsInput>
+}
+
+export type PatientProfileUpdateWithoutDependentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  landmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  weight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chronicDiseases?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medications?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surgeries?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  user?: Prisma.UserUpdateOneRequiredWithoutPatientProfileNestedInput
+}
+
+export type PatientProfileUncheckedUpdateWithoutDependentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  landmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  weight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chronicDiseases?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medications?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surgeries?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+}
+
+
+/**
+ * Count Type PatientProfileCountOutputType
+ */
+
+export type PatientProfileCountOutputType = {
+  dependents: number
+}
+
+export type PatientProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  dependents?: boolean | PatientProfileCountOutputTypeCountDependentsArgs
+}
+
+/**
+ * PatientProfileCountOutputType without action
+ */
+export type PatientProfileCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PatientProfileCountOutputType
+   */
+  select?: Prisma.PatientProfileCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * PatientProfileCountOutputType without action
+ */
+export type PatientProfileCountOutputTypeCountDependentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PatientDependentWhereInput
+}
 
 
 export type PatientProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -894,6 +1061,8 @@ export type PatientProfileSelect<ExtArgs extends runtime.Types.Extensions.Intern
   lat?: boolean
   lng?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  dependents?: boolean | Prisma.PatientProfile$dependentsArgs<ExtArgs>
+  _count?: boolean | Prisma.PatientProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["patientProfile"]>
 
 export type PatientProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -970,6 +1139,8 @@ export type PatientProfileSelectScalar = {
 export type PatientProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "age" | "gender" | "location" | "homeAddress" | "landmark" | "pinCode" | "bloodGroup" | "height" | "weight" | "allergies" | "chronicDiseases" | "medications" | "surgeries" | "emergencyContactName" | "emergencyContactPhone" | "photoUrl" | "lat" | "lng", ExtArgs["result"]["patientProfile"]>
 export type PatientProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  dependents?: boolean | Prisma.PatientProfile$dependentsArgs<ExtArgs>
+  _count?: boolean | Prisma.PatientProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PatientProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -982,6 +1153,7 @@ export type $PatientProfilePayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "PatientProfile"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    dependents: Prisma.$PatientDependentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1399,6 +1571,7 @@ readonly fields: PatientProfileFieldRefs;
 export interface Prisma__PatientProfileClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  dependents<T extends Prisma.PatientProfile$dependentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PatientProfile$dependentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientDependentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1846,6 +2019,30 @@ export type PatientProfileDeleteManyArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many PatientProfiles to delete.
    */
   limit?: number
+}
+
+/**
+ * PatientProfile.dependents
+ */
+export type PatientProfile$dependentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PatientDependent
+   */
+  select?: Prisma.PatientDependentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PatientDependent
+   */
+  omit?: Prisma.PatientDependentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PatientDependentInclude<ExtArgs> | null
+  where?: Prisma.PatientDependentWhereInput
+  orderBy?: Prisma.PatientDependentOrderByWithRelationInput | Prisma.PatientDependentOrderByWithRelationInput[]
+  cursor?: Prisma.PatientDependentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PatientDependentScalarFieldEnum | Prisma.PatientDependentScalarFieldEnum[]
 }
 
 /**

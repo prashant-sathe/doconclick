@@ -17,7 +17,13 @@ interface Appointment {
   paymentStatus: string;
   scheduledAt: string;
   settlementId: string | null;
+  patientName: string | null;
+  relation: string;
   patient: { name: string };
+}
+
+function patientLabel(a: Appointment): string {
+  return a.relation !== "Self" && a.patientName ? a.patientName : a.patient.name;
 }
 
 interface SettlementRecord {
@@ -187,7 +193,7 @@ export default function DoctorEarnings() {
               {recent.map((a) => (
                 <div key={a.id} className="px-6 py-3.5 flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-800 truncate">{a.patient.name}</p>
+                    <p className="text-sm font-semibold text-slate-800 truncate">{patientLabel(a)}</p>
                     <p className="text-xs text-slate-400">
                       {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType} · {a.paymentMethod === "ONLINE" ? "Online" : "Cash"}
                     </p>

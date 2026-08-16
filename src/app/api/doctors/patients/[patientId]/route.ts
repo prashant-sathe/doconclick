@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 
-// GET: A patient's profile + shared appointment history, visible to a doctor only
-// if they have at least one appointment together (booking itself is the consent).
+// GET: A patient's (or one of their family member's) profile + shared
+// appointment history, visible to a doctor only if they have at least one
+// appointment together (booking itself is the consent). Scoped by an
+// optional `?dependentId=` — when present, both the medical-info block and
+// the appointment list are restricted to that specific family member, never
+// mixed with the account holder's own records or anyone else's.
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ patientId: string }> }
 ) {
   const authUser = await getAuthUser();
@@ -14,9 +18,21 @@ export async function GET(
   }
 
   const { patientId } = await params;
+  const dependentId = new URL(req.url).searchParams.get("dependentId");
+
+  let dependent = null;
+  if (dependentId) {
+    dependent = await prisma.patientDependent.findUnique({
+      where: { id: dependentId },
+      include: { patientProfile: { select: { userId: true } } },
+    });
+    if (!dependent || dependent.patientProfile.userId !== patientId) {
+      return NextResponse.json({ error: "Family member not found" }, { status: 404 });
+    }
+  }
 
   const sharedAppointments = await prisma.appointment.findMany({
-    where: { doctorId: authUser.id, patientId },
+    where: { doctorId: authUser.id, patientId, dependentId: dependentId ?? null },
     orderBy: { scheduledAt: "desc" },
     include: { medicines: true, attachments: true, review: true },
   });
@@ -31,11 +47,13 @@ export async function GET(
       id: true,
       name: true,
       mobile: true,
-      patientProfile: {
+      patientProfile: dependentId ? false : {
         select: {
           age: true,
           gender: true,
           bloodGroup: true,
+          height: true,
+          weight: true,
           allergies: true,
           chronicDiseases: true,
           medications: true,
@@ -51,5 +69,25 @@ export async function GET(
     return NextResponse.json({ error: "Patient not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ patient, appointments: sharedAppointments });
+  return NextResponse.json({
+    patient,
+    dependent: dependent
+      ? {
+          name: dependent.name,
+          relation: dependent.relation,
+          age: dependent.age,
+          gender: dependent.gender,
+          bloodGroup: dependent.bloodGroup,
+          height: dependent.height,
+          weight: dependent.weight,
+          allergies: dependent.allergies,
+          chronicDiseases: dependent.chronicDiseases,
+          medications: dependent.medications,
+          surgeries: dependent.surgeries,
+          emergencyContactName: dependent.emergencyContactName,
+          emergencyContactPhone: dependent.emergencyContactPhone,
+        }
+      : null,
+    appointments: sharedAppointments,
+  });
 }
