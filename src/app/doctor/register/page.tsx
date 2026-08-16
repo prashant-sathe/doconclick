@@ -1,17 +1,20 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import {
   Stethoscope, User, Phone, Lock, Eye, EyeOff,
-  Loader2, CheckCircle, ArrowRight,
+  Loader2, ArrowRight,
 } from "lucide-react";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
+import { useAuth } from "@/components/AuthProvider";
 
 export default function DoctorRegister() {
+  const router = useRouter();
+  const { refresh } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [showPw, setShowPw] = useState(false);
 
   const [form, setForm] = useState({
@@ -36,24 +39,14 @@ export default function DoctorRegister() {
       }),
     });
     const data = await res.json();
-    setLoading(false);
-    if (!res.ok) { setError(data.error ?? "Registration failed."); return; }
-    setSuccess(true);
+    if (!res.ok) {
+      setLoading(false);
+      setError(data.error ?? "Registration failed.");
+      return;
+    }
+    await refresh();
+    router.push("/doctor/profile");
   };
-
-  if (success) return (
-    <div className="min-h-screen gradient-surface flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md w-full text-center">
-        <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
-          <CheckCircle className="w-10 h-10 text-emerald-500" />
-        </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Account Created!</h2>
-        <p className="text-slate-500 mb-8">Sign in to pay the one-time ₹99 registration fee and set up your consultation profile.</p>
-        <Link href="/login" className="btn-primary w-full justify-center py-3.5 text-base">Sign In Now</Link>
-        <p className="text-xs text-slate-400 mt-3">Or <Link href="/" className="text-blue-500 underline">return home</Link></p>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen gradient-surface">

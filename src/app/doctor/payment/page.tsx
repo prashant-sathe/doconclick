@@ -1,10 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, CheckCircle, Loader2, ShieldCheck } from "lucide-react";
+import { CreditCard, CheckCircle, Loader2, ShieldCheck, Gift } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 
 const REGISTRATION_FEE = 99;
+const FREE_TRIAL_MONTHS = 6;
+const TRIAL_VALUE = DOCTOR_SUBSCRIPTION_FEE * FREE_TRIAL_MONTHS;
 
 export default function DoctorPayment() {
   const router = useRouter();
@@ -77,9 +80,21 @@ export default function DoctorPayment() {
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
-            <div className="bg-slate-50 rounded-xl p-4 mb-6 flex justify-between items-center">
+            <div className="bg-slate-50 rounded-xl p-4 mb-3 flex justify-between items-center">
               <span className="text-slate-500 text-sm">Registration Fee</span>
               <span className="font-extrabold text-blue-600 text-xl">₹{REGISTRATION_FEE}</span>
+            </div>
+
+            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6 flex items-start gap-3">
+              <Gift className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-emerald-700">
+                  {FREE_TRIAL_MONTHS} months of patient access — free
+                </p>
+                <p className="text-xs text-emerald-600/80 mt-0.5">
+                  Normally ₹{DOCTOR_SUBSCRIPTION_FEE}/month, you save <span className="font-bold">₹{TRIAL_VALUE.toLocaleString("en-IN")}</span> by registering now.
+                </p>
+              </div>
             </div>
 
             {error && (
