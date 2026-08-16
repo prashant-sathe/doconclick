@@ -198,6 +198,12 @@ export default function DoctorDashboard() {
   const [completingId, setCompletingId] = useState<string | null>(null);
   const [respondingId, setRespondingId] = useState<string | null>(null);
   const [respondError, setRespondError] = useState<{ id: string; message: string } | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [upcomingExpanded, setUpcomingExpanded] = useState(false);
+  const [completedExpanded, setCompletedExpanded] = useState(false);
+  const [cancelledExpanded, setCancelledExpanded] = useState(false);
+  const PAGE_SIZE = 5;
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/dashboard");
@@ -249,12 +255,16 @@ export default function DoctorDashboard() {
     loadAppointments();
   };
 
-  const cancelAppointment = async (id: string) => {
-    await fetch(`/api/appointments/${id}`, {
+  const confirmCancel = async () => {
+    if (!cancelTarget) return;
+    setCancelling(true);
+    await fetch(`/api/appointments/${cancelTarget.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "CANCELLED" }),
     });
+    setCancelling(false);
+    setCancelTarget(null);
     loadAppointments();
   };
 
@@ -329,6 +339,7 @@ export default function DoctorDashboard() {
   const completedAll = appointments.filter((a) => a.status === "COMPLETED");
   const pending = appointments.filter((a) => a.status === "PENDING_APPROVAL" && matchesSearch(a));
   const upcoming = appointments.filter((a) => a.status === "SCHEDULED" && matchesSearch(a));
+  const cancelled = appointments.filter((a) => a.status === "CANCELLED" && matchesSearch(a));
   const completed = completedAll.filter((a) => a.paymentStatus === "PAID").filter(matchesSearch);
   const totalEarnings = completedAll
     .filter((a) => a.paymentStatus === "PAID")
@@ -475,7 +486,7 @@ export default function DoctorDashboard() {
             ) : upcoming.length === 0 ? (
               <p className="text-sm text-slate-400 text-center py-10">{search ? "No upcoming appointments match your search." : "No upcoming appointments."}</p>
             ) : (
-              upcoming.map((a) => {
+              (upcomingExpanded ? upcoming : upcoming.slice(0, PAGE_SIZE)).map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
                 const patientLoc = a.patient.patientProfile;
                 return (
@@ -553,7 +564,7 @@ export default function DoctorDashboard() {
                             <MapPinCheck className="w-3.5 h-3.5" /> Arrived
                           </button>
                         )}
-                        <button onClick={() => cancelAppointment(a.id)} className="btn-secondary py-1.5 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
+                        <button onClick={() => setCancelTarget(a)} className="btn-secondary py-1.5 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
                           <XCircle className="w-3.5 h-3.5" /> Cancel
                         </button>
                         {(a.consultType !== "HOME" || a.travelStatus === "ARRIVED") && (
@@ -581,6 +592,11 @@ export default function DoctorDashboard() {
               })
             )}
           </div>
+          {!upcomingExpanded && upcoming.length > PAGE_SIZE && (
+            <button onClick={() => setUpcomingExpanded(true)} className="w-full py-3 text-xs font-semibold text-teal-600 hover:bg-teal-50 border-t border-slate-100 transition-colors">
+              Load {upcoming.length - PAGE_SIZE} more
+            </button>
+          )}
         </div>
 
         {/* Recent Completed */}
@@ -591,7 +607,7 @@ export default function DoctorDashboard() {
               <h2 className="font-bold text-slate-800">Recent Completed Visits</h2>
             </div>
             <div className="divide-y divide-slate-50">
-              {completed.slice(0, 5).map((a) => (
+              {(completedExpanded ? completed : completed.slice(0, PAGE_SIZE)).map((a) => (
                 <div key={a.id} className="px-6 py-3.5 flex items-center justify-between">
                   <div>
                     <Link href={`/doctor/patients/${a.patientId}`} className="font-semibold text-slate-800 text-sm hover:underline hover:text-teal-600">
@@ -608,9 +624,68 @@ export default function DoctorDashboard() {
                 </div>
               ))}
             </div>
+            {!completedExpanded && completed.length > PAGE_SIZE && (
+              <button onClick={() => setCompletedExpanded(true)} className="w-full py-3 text-xs font-semibold text-teal-600 hover:bg-teal-50 border-t border-slate-100 transition-colors">
+                Load {completed.length - PAGE_SIZE} more
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Cancelled */}
+        {cancelled.length > 0 && (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+              <XCircle className="w-5 h-5 text-red-400" />
+              <h2 className="font-bold text-slate-800">Cancelled Appointments</h2>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {(cancelledExpanded ? cancelled : cancelled.slice(0, PAGE_SIZE)).map((a) => (
+                <div key={a.id} className="px-6 py-3.5 flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-slate-500 text-sm">{patientLabel(a)}</span>
+                    {a.relation !== "Self" && (
+                      <span className="badge badge-gray text-[10px] ml-1.5">{a.relation} of {a.patient.name}</span>
+                    )}
+                    <div className="text-xs text-slate-400">
+                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
+                    </div>
+                  </div>
+                  <span className="badge badge-danger">Cancelled</span>
+                </div>
+              ))}
+            </div>
+            {!cancelledExpanded && cancelled.length > PAGE_SIZE && (
+              <button onClick={() => setCancelledExpanded(true)} className="w-full py-3 text-xs font-semibold text-teal-600 hover:bg-teal-50 border-t border-slate-100 transition-colors">
+                Load {cancelled.length - PAGE_SIZE} more
+              </button>
+            )}
           </div>
         )}
       </div>
+
+      {/* Cancel confirmation */}
+      {cancelTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-3">
+              <XCircle className="w-5 h-5 text-red-600" />
+              <h3 className="font-bold text-slate-800">Cancel this appointment?</h3>
+            </div>
+            <p className="text-sm text-slate-500 mb-5">
+              {patientLabel(cancelTarget)}&apos;s appointment on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setCancelTarget(null)} className="btn-secondary flex-1">
+                Keep Appointment
+              </button>
+              <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                {cancelling ? "Cancelling…" : "Cancel Appointment"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

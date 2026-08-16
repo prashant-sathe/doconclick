@@ -135,7 +135,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
   a: Appointment;
   patientId: string;
   now: number;
-  onCancel: (id: string) => void;
+  onCancel: (a: Appointment) => void;
   onReview: (id: string) => void;
 }) {
   const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
@@ -250,7 +250,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
 
       <div className="flex gap-2 flex-wrap">
         {a.status === "PENDING_APPROVAL" && (
-          <button onClick={() => onCancel(a.id)} className="btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
+          <button onClick={() => onCancel(a)} className="btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
             Cancel Request
           </button>
         )}
@@ -303,6 +303,12 @@ export default function PatientAppointments() {
   const [loading, setLoading] = useState(true);
   const [reviewFor, setReviewFor] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const [pendingExpanded, setPendingExpanded] = useState(false);
+  const [upcomingExpanded, setUpcomingExpanded] = useState(false);
+  const [pastExpanded, setPastExpanded] = useState(false);
+  const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const PAGE_SIZE = 5;
 
   const load = useCallback(() => {
     fetch("/api/appointments/me")
@@ -330,12 +336,16 @@ export default function PatientAppointments() {
     return () => clearInterval(tick);
   }, []);
 
-  const cancelAppointment = async (id: string) => {
-    await fetch(`/api/appointments/${id}`, {
+  const confirmCancel = async () => {
+    if (!cancelTarget) return;
+    setCancelling(true);
+    await fetch(`/api/appointments/${cancelTarget.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "CANCELLED" }),
     });
+    setCancelling(false);
+    setCancelTarget(null);
     load();
   };
 
@@ -377,10 +387,15 @@ export default function PatientAppointments() {
                   <Clock className="w-4 h-4" /> Pending Requests ({pending.length})
                 </h2>
                 <div className="space-y-3">
-                  {pending.map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={cancelAppointment} onReview={setReviewFor} />
+                  {(pendingExpanded ? pending : pending.slice(0, PAGE_SIZE)).map((a) => (
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={setCancelTarget} onReview={setReviewFor} />
                   ))}
                 </div>
+                {!pendingExpanded && pending.length > PAGE_SIZE && (
+                  <button onClick={() => setPendingExpanded(true)} className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors">
+                    Load {pending.length - PAGE_SIZE} more
+                  </button>
+                )}
               </section>
             )}
 
@@ -394,10 +409,15 @@ export default function PatientAppointments() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {upcoming.map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={cancelAppointment} onReview={setReviewFor} />
+                  {(upcomingExpanded ? upcoming : upcoming.slice(0, PAGE_SIZE)).map((a) => (
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={setCancelTarget} onReview={setReviewFor} />
                   ))}
                 </div>
+              )}
+              {!upcomingExpanded && upcoming.length > PAGE_SIZE && (
+                <button onClick={() => setUpcomingExpanded(true)} className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors">
+                  Load {upcoming.length - PAGE_SIZE} more
+                </button>
               )}
             </section>
 
@@ -409,10 +429,15 @@ export default function PatientAppointments() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {past.map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={cancelAppointment} onReview={setReviewFor} />
+                  {(pastExpanded ? past : past.slice(0, PAGE_SIZE)).map((a) => (
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={setCancelTarget} onReview={setReviewFor} />
                   ))}
                 </div>
+              )}
+              {!pastExpanded && past.length > PAGE_SIZE && (
+                <button onClick={() => setPastExpanded(true)} className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors">
+                  Load {past.length - PAGE_SIZE} more
+                </button>
               )}
             </section>
           </div>
@@ -425,6 +450,28 @@ export default function PatientAppointments() {
           onClose={() => setReviewFor(null)}
           onSubmitted={() => { setReviewFor(null); load(); }}
         />
+      )}
+
+      {cancelTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-3">
+              <ThumbsDown className="w-5 h-5 text-red-600" />
+              <h3 className="font-bold text-slate-800">Cancel this request?</h3>
+            </div>
+            <p className="text-sm text-slate-500 mb-5">
+              Your request to {cancelTarget.doctor.name} on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setCancelTarget(null)} className="btn-secondary flex-1">
+                Keep Request
+              </button>
+              <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                {cancelling ? "Cancelling…" : "Cancel Request"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
