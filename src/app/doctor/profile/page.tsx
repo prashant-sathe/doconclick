@@ -261,6 +261,50 @@ export default function DoctorProfilePage() {
     return () => { cancelled = true; };
   }, [user]);
 
+  const downloadBrandedQR = () => {
+    if (!qrDataUrl || !user) return;
+    const W = 420, H = 560, QR_SIZE = 300, QR_Y = 155;
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = "center";
+
+    ctx.fillStyle = "#0d9488";
+    ctx.font = "bold 28px Arial, sans-serif";
+    ctx.fillText("DocOnClick", W / 2, 50);
+
+    ctx.fillStyle = "#0f172a";
+    ctx.font = "bold 24px Arial, sans-serif";
+    ctx.fillText(user.name, W / 2, 95);
+
+    if (form.specialty) {
+      ctx.fillStyle = "#64748b";
+      ctx.font = "16px Arial, sans-serif";
+      ctx.fillText(form.specialty, W / 2, 122);
+    }
+
+    const qrImg = new Image();
+    qrImg.onload = () => {
+      const qrX = (W - QR_SIZE) / 2;
+      ctx.drawImage(qrImg, qrX, QR_Y, QR_SIZE, QR_SIZE);
+
+      ctx.fillStyle = "#475569";
+      ctx.font = "16px Arial, sans-serif";
+      ctx.fillText("Scan to book an appointment", W / 2, QR_Y + QR_SIZE + 35);
+
+      const link = document.createElement("a");
+      link.download = `doconclick-qr-${user.id}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    };
+    qrImg.src = qrDataUrl;
+  };
+
   const copyLink = async () => {
     await navigator.clipboard.writeText(profileUrl);
     setLinkCopied(true);
@@ -437,9 +481,9 @@ export default function DoctorProfilePage() {
                   {linkCopied ? "Copied" : "Copy Link"}
                 </button>
                 {qrDataUrl && (
-                  <a href={qrDataUrl} download={`doconclick-qr-${user.id}.png`} className="btn-secondary py-2 px-3 text-xs">
+                  <button type="button" onClick={downloadBrandedQR} className="btn-secondary py-2 px-3 text-xs">
                     <Download className="w-3.5 h-3.5" /> Download QR Code
-                  </a>
+                  </button>
                 )}
               </div>
             </div>
