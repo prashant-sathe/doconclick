@@ -504,8 +504,12 @@ export default function DoctorDashboard() {
                             <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}
                           </div>
                         )}
-                          <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
-                            <IndianRupee className="w-3 h-3" /> {a.amount} · {a.paymentMethod === "ONLINE" ? "Paid Online" : "Cash on visit"}
+                          <div className={`text-xs mt-0.5 flex items-center gap-1 ${a.paymentMethod === "ONLINE" && a.paymentStatus !== "PAID" ? "text-amber-600 font-semibold" : "text-slate-400"}`}>
+                            <IndianRupee className="w-3 h-3" /> {a.amount} · {
+                              a.paymentMethod === "ONLINE"
+                                ? (a.paymentStatus === "PAID" ? "Paid Online" : "Payment Pending")
+                                : "Cash on visit"
+                            }
                           </div>
                           {a.consultType === "HOME" && patientLoc?.lat != null && patientLoc?.lng != null && (
                             <a
