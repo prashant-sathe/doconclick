@@ -21,9 +21,12 @@ export async function GET() {
         review: true,
         medicines: true,
         attachments: true,
+        _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });
-    return NextResponse.json(appointments);
+    return NextResponse.json(
+      appointments.map(({ _count, ...a }) => ({ ...a, unreadMessageCount: _count.messages }))
+    );
   }
 
   if (authUser.role === "DOCTOR") {
@@ -38,9 +41,12 @@ export async function GET() {
             patientProfile: { select: { lat: true, lng: true, homeAddress: true } },
           },
         },
+        _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });
-    return NextResponse.json(appointments);
+    return NextResponse.json(
+      appointments.map(({ _count, ...a }) => ({ ...a, unreadMessageCount: _count.messages }))
+    );
   }
 
   return NextResponse.json({ error: "Not authorized" }, { status: 403 });

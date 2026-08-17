@@ -12,6 +12,7 @@ import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
+import { playMessageChime } from "@/lib/playNotificationSound";
 
 interface DoctorProfile {
   specialty: string;
@@ -44,6 +45,7 @@ interface Appointment {
   isEmergency: boolean;
   travelStatus: string;
   scheduledAt: string;
+  unreadMessageCount: number;
   patient: {
     name: string;
     mobile: string;
@@ -231,10 +233,17 @@ export default function DoctorDashboard() {
       .catch(() => setDoctor(null));
   }, [user, router]);
 
+  const unreadTotalRef = useRef<number | null>(null);
   const loadAppointments = useCallback(() => {
     fetch("/api/appointments/me")
       .then((r) => r.json())
-      .then((d) => { setAppointments(d); setLoadingAppts(false); });
+      .then((d: Appointment[]) => {
+        setAppointments(d);
+        setLoadingAppts(false);
+        const total = d.reduce((sum, a) => sum + a.unreadMessageCount, 0);
+        if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
+        unreadTotalRef.current = total;
+      });
   }, []);
 
   // Poll so a pending request that times out (no response within 30 min)
@@ -565,8 +574,13 @@ export default function DoctorDashboard() {
                         <Link href={historyHref(a)} className="btn-secondary py-1.5 px-3 text-xs" title="Patient history">
                           <History className="w-3.5 h-3.5" />
                         </Link>
-                        <Link href={`/doctor/chat/${a.id}`} className="btn-secondary py-1.5 px-3 text-xs" title="Chat with patient">
+                        <Link href={`/doctor/chat/${a.id}`} className="relative btn-secondary py-1.5 px-3 text-xs" title="Chat with patient">
                           <MessageCircle className="w-3.5 h-3.5" />
+                          {a.unreadMessageCount > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
+                              {a.unreadMessageCount > 9 ? "9+" : a.unreadMessageCount}
+                            </span>
+                          )}
                         </Link>
                         {a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (
                           <button onClick={() => startJourney(a.id)} disabled={startingJourneyId === a.id} className="btn-secondary py-1.5 px-3 text-xs text-blue-600 border-blue-200 hover:bg-blue-50">

@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
+import { playMessageChime } from "@/lib/playNotificationSound";
 
 interface Medicine {
   id: string;
@@ -42,6 +43,7 @@ interface Appointment {
   paymentStatus: string;
   isEmergency: boolean;
   travelStatus: string;
+  unreadMessageCount: number;
   attachments: Attachment[];
   doctorNotes: string | null;
   scheduledAt: string;
@@ -260,8 +262,13 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
           </Link>
         )}
         {(a.status === "SCHEDULED" || a.status === "COMPLETED") && (
-          <Link href={`/patient/chat/${a.id}`} className="btn-secondary py-2 px-3 text-xs">
+          <Link href={`/patient/chat/${a.id}`} className="relative btn-secondary py-2 px-3 text-xs">
             <MessageCircle className="w-3.5 h-3.5" /> Chat
+            {a.unreadMessageCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
+                {a.unreadMessageCount > 9 ? "9+" : a.unreadMessageCount}
+              </span>
+            )}
           </Link>
         )}
         {a.status === "COMPLETED" && a.attachments.map((att, i) => (
@@ -310,10 +317,17 @@ export default function PatientAppointments() {
   const [cancelling, setCancelling] = useState(false);
   const PAGE_SIZE = 5;
 
+  const unreadTotalRef = useRef<number | null>(null);
   const load = useCallback(() => {
     fetch("/api/appointments/me")
       .then((r) => r.json())
-      .then((d) => { setAppointments(d); setLoading(false); });
+      .then((d: Appointment[]) => {
+        setAppointments(d);
+        setLoading(false);
+        const total = d.reduce((sum, a) => sum + a.unreadMessageCount, 0);
+        if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
+        unreadTotalRef.current = total;
+      });
   }, []);
 
   useEffect(() => {

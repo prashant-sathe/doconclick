@@ -7,7 +7,7 @@ import { getAuthUser } from "@/lib/auth";
 // after completion for post-visit follow-up questions.
 const CHAT_ENABLED_STATUSES = ["SCHEDULED", "COMPLETED"];
 
-async function loadAndAuthorize(id: string, userId: string) {
+export async function loadAndAuthorize(id: string, userId: string) {
   const appointment = await prisma.appointment.findUnique({ where: { id } });
   if (!appointment || (appointment.patientId !== userId && appointment.doctorId !== userId)) {
     return { error: NextResponse.json({ error: "Appointment not found" }, { status: 404 }) };

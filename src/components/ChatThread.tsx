@@ -41,7 +41,10 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       messageCountRef.current = data.length;
       requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }));
     }
-  }, [appointmentId]);
+    if (data.some((m) => m.sender.id !== meId)) {
+      fetch(`/api/appointments/${appointmentId}/messages/read`, { method: "PATCH" });
+    }
+  }, [appointmentId, meId]);
 
   useEffect(() => {
     load();

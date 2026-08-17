@@ -64,3 +64,26 @@ export function startRingingAlert(): () => void {
     clearTimeout(timeout);
   };
 }
+
+// A single, lighter chime for a new chat message — unlike startRingingAlert
+// this doesn't repeat, since a new message isn't as time-sensitive as an
+// incoming appointment request.
+export function playMessageChime() {
+  const ctx = getContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = 660;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.15, now + 0.02);
+    gain.gain.linearRampToValueAtTime(0, now + 0.18);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.18);
+  } catch {
+    // Best-effort only.
+  }
+}
