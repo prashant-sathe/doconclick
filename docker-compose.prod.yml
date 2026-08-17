@@ -42,8 +42,6 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       NODE_ENV: production
-    volumes:
-      - uploads:/app/public/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -63,11 +61,29 @@ services:
       - "443:443"
     volumes:
       - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - uploads:/var/www/uploads:ro
       - letsencrypt:/etc/letsencrypt:ro
       - certbot-www:/var/www/certbot:ro
     depends_on:
       app:
+        condition: service_healthy
+
+  # One-off job: uploads pre-existing files from the legacy `uploads` volume
+  # to S3 and rewrites their DB URLs. Not part of the normal startup graph —
+  # run manually once after setting the AWS_* vars in .env.production:
+  #   docker compose -f docker-compose.prod.yml run --rm migrate-uploads-to-s3
+  # Safe to delete this service (and the `uploads` volume) once confirmed.
+  migrate-uploads-to-s3:
+    build:
+      context: .
+      target: prisma
+    command: ["npx", "tsx", "prisma/migrate-uploads-to-s3.ts"]
+    env_file: .env.production
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    volumes:
+      - uploads:/app/public/uploads
+    depends_on:
+      postgres:
         condition: service_healthy
 
 volumes:
