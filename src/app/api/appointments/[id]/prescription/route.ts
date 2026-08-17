@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { uploadToS3 } from "@/lib/s3";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -98,16 +97,13 @@ export async function POST(
     }
   }
 
-  const dir = path.join(process.cwd(), "public", "uploads", "prescriptions");
-  await mkdir(dir, { recursive: true });
-
   const saved: { url: string; fileName: string }[] = [];
   for (const [index, file] of files.entries()) {
     const ext = ALLOWED_TYPES[file.type];
     const filename = `${id}-${Date.now()}-${index}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(dir, filename), buffer);
-    saved.push({ url: `/uploads/prescriptions/${filename}`, fileName: file.name });
+    const url = await uploadToS3(`prescriptions/${filename}`, buffer, file.type);
+    saved.push({ url, fileName: file.name });
   }
 
   await prisma.prescriptionAttachment.createMany({

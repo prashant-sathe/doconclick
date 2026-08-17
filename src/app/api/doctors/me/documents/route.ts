@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { uploadToS3 } from "@/lib/s3";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -56,13 +55,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "File must be under 5MB" }, { status: 400 });
   }
 
-  const dir = path.join(process.cwd(), "public", "uploads", "doctor-docs");
-  await mkdir(dir, { recursive: true });
   const filename = `${authUser.id}-${type}-${Date.now()}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(dir, filename), buffer);
-
-  const url = `/uploads/doctor-docs/${filename}`;
+  const url = await uploadToS3(`doctor-docs/${filename}`, buffer, file.type);
   const field = DOC_FIELD[type];
 
   try {

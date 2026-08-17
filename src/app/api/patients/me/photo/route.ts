@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { uploadToS3 } from "@/lib/s3";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -31,13 +30,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "File must be under 5MB" }, { status: 400 });
   }
 
-  const dir = path.join(process.cwd(), "public", "uploads", "patient-photos");
-  await mkdir(dir, { recursive: true });
   const filename = `${authUser.id}-${Date.now()}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(dir, filename), buffer);
-
-  const url = `/uploads/patient-photos/${filename}`;
+  const url = await uploadToS3(`patient-photos/${filename}`, buffer, file.type);
 
   try {
     const updated = await prisma.patientProfile.update({

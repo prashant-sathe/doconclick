@@ -8,12 +8,14 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "tsx prisma/seed.ts",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "migrate:uploads-to-s3": "tsx prisma/migrate-uploads-to-s3.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1111.0",
     "@cashfreepayments/cashfree-js": "^1.0.7",
     "@prisma/adapter-better-sqlite3": "^7.9.0",
     "@prisma/adapter-pg": "^7.9.0",
