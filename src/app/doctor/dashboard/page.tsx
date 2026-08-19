@@ -13,6 +13,7 @@ import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { playMessageChime } from "@/lib/playNotificationSound";
+import { FREQUENCY_OPTIONS, DURATION_OPTIONS } from "@/lib/medicalOptions";
 
 interface DoctorProfile {
   specialty: string;
@@ -57,7 +58,9 @@ interface MedicineRow {
   name: string;
   dosage: string;
   frequency: string;
+  frequencyOther: string;
   duration: string;
+  durationOther: string;
   instructions: string;
 }
 
@@ -69,7 +72,7 @@ function patientLabel(a: Appointment): string {
 function historyHref(a: Appointment): string {
   return a.dependentId ? `/doctor/patients/${a.patientId}?dependentId=${a.dependentId}` : `/doctor/patients/${a.patientId}`;
 }
-const EMPTY_ROW: MedicineRow = { name: "", dosage: "", frequency: "", duration: "", instructions: "" };
+const EMPTY_ROW: MedicineRow = { name: "", dosage: "", frequency: "", frequencyOther: "", duration: "", durationOther: "", instructions: "" };
 
 function CompleteVisitForm({ appt, onDone, onCancel }: {
   appt: Appointment;
@@ -89,7 +92,13 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   const removeFile = (i: number) => setFiles((cur) => cur.filter((_, idx) => idx !== i));
 
   const setMed = (i: number, k: keyof MedicineRow, v: string) => {
-    setMedicines((rows) => rows.map((r, idx) => (idx === i ? { ...r, [k]: v } : r)));
+    setMedicines((rows) => rows.map((r, idx) => {
+      if (idx !== i) return r;
+      const next = { ...r, [k]: v };
+      if (k === "frequency" && v !== "Other") next.frequencyOther = "";
+      if (k === "duration" && v !== "Other") next.durationOther = "";
+      return next;
+    }));
   };
   const addRow = () => setMedicines((rows) => [...rows, { ...EMPTY_ROW }]);
   const removeRow = (i: number) => setMedicines((rows) => rows.filter((_, idx) => idx !== i));
@@ -102,7 +111,15 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "COMPLETED", doctorNotes: notes }),
     });
-    const validMedicines = medicines.filter((m) => m.name.trim());
+    const validMedicines = medicines
+      .filter((m) => m.name.trim())
+      .map((m) => ({
+        name: m.name,
+        dosage: m.dosage,
+        frequency: m.frequency === "Other" ? m.frequencyOther.trim() : m.frequency,
+        duration: m.duration === "Other" ? m.durationOther.trim() : m.duration,
+        instructions: m.instructions,
+      }));
     if (validMedicines.length > 0) {
       await fetch(`/api/appointments/${appt.id}/prescription-items`, {
         method: "POST",
@@ -141,8 +158,24 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
             <div key={i} className="bg-white rounded-lg border border-slate-200 p-2.5 grid grid-cols-2 sm:grid-cols-5 gap-1.5 items-center">
               <input className="input-field text-xs py-1.5 col-span-2 sm:col-span-1" placeholder="Medicine name" value={m.name} onChange={(e) => setMed(i, "name", e.target.value)} />
               <input className="input-field text-xs py-1.5" placeholder="Dosage" value={m.dosage} onChange={(e) => setMed(i, "dosage", e.target.value)} />
-              <input className="input-field text-xs py-1.5" placeholder="Frequency" value={m.frequency} onChange={(e) => setMed(i, "frequency", e.target.value)} />
-              <input className="input-field text-xs py-1.5" placeholder="Duration" value={m.duration} onChange={(e) => setMed(i, "duration", e.target.value)} />
+              <div className="space-y-1">
+                <select className="input-field text-xs py-1.5" value={m.frequency} onChange={(e) => setMed(i, "frequency", e.target.value)}>
+                  <option value="">Frequency</option>
+                  {FREQUENCY_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+                </select>
+                {m.frequency === "Other" && (
+                  <input className="input-field text-xs py-1.5" placeholder="Specify frequency" value={m.frequencyOther} onChange={(e) => setMed(i, "frequencyOther", e.target.value)} />
+                )}
+              </div>
+              <div className="space-y-1">
+                <select className="input-field text-xs py-1.5" value={m.duration} onChange={(e) => setMed(i, "duration", e.target.value)}>
+                  <option value="">Duration</option>
+                  {DURATION_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+                </select>
+                {m.duration === "Other" && (
+                  <input className="input-field text-xs py-1.5" placeholder="Specify duration" value={m.durationOther} onChange={(e) => setMed(i, "durationOther", e.target.value)} />
+                )}
+              </div>
               <div className="flex gap-1.5">
                 <input className="input-field text-xs py-1.5 flex-1" placeholder="Instructions" value={m.instructions} onChange={(e) => setMed(i, "instructions", e.target.value)} />
                 {medicines.length > 1 && (
