@@ -68,6 +68,8 @@ export type DoctorProfileMinAggregateOutputType = {
   languages: string | null
   bio: string | null
   offersHomeVisit: boolean | null
+  offersClinic: boolean | null
+  offersVideo: boolean | null
   isVerified: boolean | null
   avgRating: number | null
   totalReviews: number | null
@@ -105,6 +107,8 @@ export type DoctorProfileMaxAggregateOutputType = {
   languages: string | null
   bio: string | null
   offersHomeVisit: boolean | null
+  offersClinic: boolean | null
+  offersVideo: boolean | null
   isVerified: boolean | null
   avgRating: number | null
   totalReviews: number | null
@@ -142,6 +146,8 @@ export type DoctorProfileCountAggregateOutputType = {
   languages: number
   bio: number
   offersHomeVisit: number
+  offersClinic: number
+  offersVideo: number
   isVerified: number
   avgRating: number
   totalReviews: number
@@ -205,6 +211,8 @@ export type DoctorProfileMinAggregateInputType = {
   languages?: true
   bio?: true
   offersHomeVisit?: true
+  offersClinic?: true
+  offersVideo?: true
   isVerified?: true
   avgRating?: true
   totalReviews?: true
@@ -242,6 +250,8 @@ export type DoctorProfileMaxAggregateInputType = {
   languages?: true
   bio?: true
   offersHomeVisit?: true
+  offersClinic?: true
+  offersVideo?: true
   isVerified?: true
   avgRating?: true
   totalReviews?: true
@@ -279,6 +289,8 @@ export type DoctorProfileCountAggregateInputType = {
   languages?: true
   bio?: true
   offersHomeVisit?: true
+  offersClinic?: true
+  offersVideo?: true
   isVerified?: true
   avgRating?: true
   totalReviews?: true
@@ -403,6 +415,8 @@ export type DoctorProfileGroupByOutputType = {
   languages: string
   bio: string | null
   offersHomeVisit: boolean
+  offersClinic: boolean
+  offersVideo: boolean
   isVerified: boolean
   avgRating: number
   totalReviews: number
@@ -463,6 +477,8 @@ export type DoctorProfileWhereInput = {
   languages?: Prisma.StringFilter<"DoctorProfile"> | string
   bio?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   offersHomeVisit?: Prisma.BoolFilter<"DoctorProfile"> | boolean
+  offersClinic?: Prisma.BoolFilter<"DoctorProfile"> | boolean
+  offersVideo?: Prisma.BoolFilter<"DoctorProfile"> | boolean
   isVerified?: Prisma.BoolFilter<"DoctorProfile"> | boolean
   avgRating?: Prisma.FloatFilter<"DoctorProfile"> | number
   totalReviews?: Prisma.IntFilter<"DoctorProfile"> | number
@@ -501,6 +517,8 @@ export type DoctorProfileOrderByWithRelationInput = {
   languages?: Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   offersHomeVisit?: Prisma.SortOrder
+  offersClinic?: Prisma.SortOrder
+  offersVideo?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
@@ -542,6 +560,8 @@ export type DoctorProfileWhereUniqueInput = Prisma.AtLeast<{
   languages?: Prisma.StringFilter<"DoctorProfile"> | string
   bio?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
   offersHomeVisit?: Prisma.BoolFilter<"DoctorProfile"> | boolean
+  offersClinic?: Prisma.BoolFilter<"DoctorProfile"> | boolean
+  offersVideo?: Prisma.BoolFilter<"DoctorProfile"> | boolean
   isVerified?: Prisma.BoolFilter<"DoctorProfile"> | boolean
   avgRating?: Prisma.FloatFilter<"DoctorProfile"> | number
   totalReviews?: Prisma.IntFilter<"DoctorProfile"> | number
@@ -580,6 +600,8 @@ export type DoctorProfileOrderByWithAggregationInput = {
   languages?: Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   offersHomeVisit?: Prisma.SortOrder
+  offersClinic?: Prisma.SortOrder
+  offersVideo?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
@@ -625,6 +647,8 @@ export type DoctorProfileScalarWhereWithAggregatesInput = {
   languages?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
   bio?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
   offersHomeVisit?: Prisma.BoolWithAggregatesFilter<"DoctorProfile"> | boolean
+  offersClinic?: Prisma.BoolWithAggregatesFilter<"DoctorProfile"> | boolean
+  offersVideo?: Prisma.BoolWithAggregatesFilter<"DoctorProfile"> | boolean
   isVerified?: Prisma.BoolWithAggregatesFilter<"DoctorProfile"> | boolean
   avgRating?: Prisma.FloatWithAggregatesFilter<"DoctorProfile"> | number
   totalReviews?: Prisma.IntWithAggregatesFilter<"DoctorProfile"> | number
@@ -661,6 +685,8 @@ export type DoctorProfileCreateInput = {
   languages?: string
   bio?: string | null
   offersHomeVisit?: boolean
+  offersClinic?: boolean
+  offersVideo?: boolean
   isVerified?: boolean
   avgRating?: number
   totalReviews?: number
@@ -699,6 +725,8 @@ export type DoctorProfileUncheckedCreateInput = {
   languages?: string
   bio?: string | null
   offersHomeVisit?: boolean
+  offersClinic?: boolean
+  offersVideo?: boolean
   isVerified?: boolean
   avgRating?: number
   totalReviews?: number
@@ -735,6 +763,8 @@ export type DoctorProfileUpdateInput = {
   languages?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersClinic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersVideo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
@@ -773,6 +803,8 @@ export type DoctorProfileUncheckedUpdateInput = {
   languages?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersClinic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersVideo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
@@ -810,6 +842,8 @@ export type DoctorProfileCreateManyInput = {
   languages?: string
   bio?: string | null
   offersHomeVisit?: boolean
+  offersClinic?: boolean
+  offersVideo?: boolean
   isVerified?: boolean
   avgRating?: number
   totalReviews?: number
@@ -846,6 +880,8 @@ export type DoctorProfileUpdateManyMutationInput = {
   languages?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersClinic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersVideo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
@@ -883,6 +919,8 @@ export type DoctorProfileUncheckedUpdateManyInput = {
   languages?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersClinic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersVideo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
@@ -925,6 +963,8 @@ export type DoctorProfileCountOrderByAggregateInput = {
   languages?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   offersHomeVisit?: Prisma.SortOrder
+  offersClinic?: Prisma.SortOrder
+  offersVideo?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
@@ -974,6 +1014,8 @@ export type DoctorProfileMaxOrderByAggregateInput = {
   languages?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   offersHomeVisit?: Prisma.SortOrder
+  offersClinic?: Prisma.SortOrder
+  offersVideo?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
@@ -1011,6 +1053,8 @@ export type DoctorProfileMinOrderByAggregateInput = {
   languages?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   offersHomeVisit?: Prisma.SortOrder
+  offersClinic?: Prisma.SortOrder
+  offersVideo?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
@@ -1103,6 +1147,8 @@ export type DoctorProfileCreateWithoutUserInput = {
   languages?: string
   bio?: string | null
   offersHomeVisit?: boolean
+  offersClinic?: boolean
+  offersVideo?: boolean
   isVerified?: boolean
   avgRating?: number
   totalReviews?: number
@@ -1139,6 +1185,8 @@ export type DoctorProfileUncheckedCreateWithoutUserInput = {
   languages?: string
   bio?: string | null
   offersHomeVisit?: boolean
+  offersClinic?: boolean
+  offersVideo?: boolean
   isVerified?: boolean
   avgRating?: number
   totalReviews?: number
@@ -1191,6 +1239,8 @@ export type DoctorProfileUpdateWithoutUserInput = {
   languages?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersClinic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersVideo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1227,6 +1277,8 @@ export type DoctorProfileUncheckedUpdateWithoutUserInput = {
   languages?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offersHomeVisit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersClinic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  offersVideo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1266,6 +1318,8 @@ export type DoctorProfileSelect<ExtArgs extends runtime.Types.Extensions.Interna
   languages?: boolean
   bio?: boolean
   offersHomeVisit?: boolean
+  offersClinic?: boolean
+  offersVideo?: boolean
   isVerified?: boolean
   avgRating?: boolean
   totalReviews?: boolean
@@ -1304,6 +1358,8 @@ export type DoctorProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   languages?: boolean
   bio?: boolean
   offersHomeVisit?: boolean
+  offersClinic?: boolean
+  offersVideo?: boolean
   isVerified?: boolean
   avgRating?: boolean
   totalReviews?: boolean
@@ -1342,6 +1398,8 @@ export type DoctorProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   languages?: boolean
   bio?: boolean
   offersHomeVisit?: boolean
+  offersClinic?: boolean
+  offersVideo?: boolean
   isVerified?: boolean
   avgRating?: boolean
   totalReviews?: boolean
@@ -1380,6 +1438,8 @@ export type DoctorProfileSelectScalar = {
   languages?: boolean
   bio?: boolean
   offersHomeVisit?: boolean
+  offersClinic?: boolean
+  offersVideo?: boolean
   isVerified?: boolean
   avgRating?: boolean
   totalReviews?: boolean
@@ -1399,7 +1459,7 @@ export type DoctorProfileSelectScalar = {
   subscriptionPaidUntil?: boolean
 }
 
-export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "videoFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "bio" | "offersHomeVisit" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "address" | "clinicName" | "clinicPhotoUrl" | "cashfreeOrderId" | "cashfreePaymentId" | "trialEndsAt" | "subscriptionPaidUntil", ExtArgs["result"]["doctorProfile"]>
+export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "videoFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "bio" | "offersHomeVisit" | "offersClinic" | "offersVideo" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "address" | "clinicName" | "clinicPhotoUrl" | "cashfreeOrderId" | "cashfreePaymentId" | "trialEndsAt" | "subscriptionPaidUntil", ExtArgs["result"]["doctorProfile"]>
 export type DoctorProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -1433,6 +1493,8 @@ export type $DoctorProfilePayload<ExtArgs extends runtime.Types.Extensions.Inter
     languages: string
     bio: string | null
     offersHomeVisit: boolean
+    offersClinic: boolean
+    offersVideo: boolean
     isVerified: boolean
     avgRating: number
     totalReviews: number
@@ -1891,6 +1953,8 @@ export interface DoctorProfileFieldRefs {
   readonly languages: Prisma.FieldRef<"DoctorProfile", 'String'>
   readonly bio: Prisma.FieldRef<"DoctorProfile", 'String'>
   readonly offersHomeVisit: Prisma.FieldRef<"DoctorProfile", 'Boolean'>
+  readonly offersClinic: Prisma.FieldRef<"DoctorProfile", 'Boolean'>
+  readonly offersVideo: Prisma.FieldRef<"DoctorProfile", 'Boolean'>
   readonly isVerified: Prisma.FieldRef<"DoctorProfile", 'Boolean'>
   readonly avgRating: Prisma.FieldRef<"DoctorProfile", 'Float'>
   readonly totalReviews: Prisma.FieldRef<"DoctorProfile", 'Int'>

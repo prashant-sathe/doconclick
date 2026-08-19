@@ -34,6 +34,8 @@ interface Doctor {
     bio: string | null;
     isVerified: boolean;
     offersHomeVisit: boolean;
+    offersClinic: boolean;
+    offersVideo: boolean;
     avgRating: number;
     totalReviews: number;
     lat: number | null;
@@ -57,10 +59,18 @@ function nowLocalInput() {
 }
 
 const ALL_TYPES = [
-  { id: "CLINIC", label: "Clinic Visit", icon: Building2, comingSoon: false },
-  { id: "HOME",   label: "Home Visit",   icon: Home,      comingSoon: false },
-  { id: "VIDEO",  label: "Video Call",   icon: Video,      comingSoon: true },
+  { id: "CLINIC", label: "Clinic Visit", icon: Building2 },
+  { id: "HOME",   label: "Home Visit",   icon: Home },
+  { id: "VIDEO",  label: "Video Call",   icon: Video },
 ];
+
+function defaultConsultType(profile: Doctor["doctorProfile"]): string {
+  if (!profile) return "CLINIC";
+  if (profile.offersClinic !== false) return "CLINIC";
+  if (profile.offersHomeVisit) return "HOME";
+  if (profile.offersVideo) return "VIDEO";
+  return "CLINIC";
+}
 
 function feeForConsultType(profile: Doctor["doctorProfile"], consultType: string): number {
   if (!profile) return 0;
@@ -97,8 +107,9 @@ function PatientBookInner() {
   useEffect(() => {
     fetch("/api/doctors").then((r) => r.json()).then((data: Doctor[]) => {
       setDoctors(data);
-      if (preselectDoctorId && data.some((d) => d.id === preselectDoctorId)) {
-        set("doctorId", preselectDoctorId);
+      const preselected = preselectDoctorId && data.find((d) => d.id === preselectDoctorId);
+      if (preselected) {
+        setForm((f) => ({ ...f, doctorId: preselected.id, consultType: defaultConsultType(preselected.doctorProfile) }));
       }
     });
     navigator.geolocation.getCurrentPosition(
@@ -126,9 +137,12 @@ function PatientBookInner() {
       ? haversine(userPos[0], userPos[1], selectedDoctor.doctorProfile.lat, selectedDoctor.doctorProfile.lng)
       : null;
   const currentFee = feeForConsultType(selectedDoctor?.doctorProfile ?? null, form.consultType);
-  const availableTypes = ALL_TYPES.filter(
-    (t) => t.id !== "HOME" || selectedDoctor?.doctorProfile?.offersHomeVisit !== false
-  );
+  const availableTypes = ALL_TYPES.filter((t) => {
+    if (t.id === "HOME") return selectedDoctor?.doctorProfile?.offersHomeVisit !== false;
+    if (t.id === "CLINIC") return selectedDoctor?.doctorProfile?.offersClinic !== false;
+    if (t.id === "VIDEO") return selectedDoctor ? selectedDoctor.doctorProfile?.offersVideo === true : true;
+    return true;
+  });
 
   // An emergency always books immediately, overriding any manual schedule selection
   const effectiveScheduleMode = isEmergency ? "NOW" : scheduleMode;
@@ -273,15 +287,11 @@ function PatientBookInner() {
             <div>
               <label className="input-label mb-2 block">Consultation Type</label>
               <div className={cn("grid gap-3", availableTypes.length === 3 ? "grid-cols-3" : "grid-cols-2")}>
-                {availableTypes.map(({ id, label, icon: Icon, comingSoon }) => (
-                  <button key={id} type="button" disabled={comingSoon} onClick={() => set("consultType", id)}
+                {availableTypes.map(({ id, label, icon: Icon }) => (
+                  <button key={id} type="button" onClick={() => set("consultType", id)}
                     className={cn("relative flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border text-xs font-semibold transition-all",
-                      comingSoon ? "border-slate-100 text-slate-300 cursor-not-allowed" :
                       form.consultType === id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                     )}>
-                    {comingSoon && (
-                      <span className="absolute -top-2 -right-1.5 badge badge-gray text-[9px] px-1.5 py-0.5">Soon</span>
-                    )}
                     <Icon className="w-5 h-5" /> {label}
                   </button>
                 ))}
@@ -291,7 +301,10 @@ function PatientBookInner() {
             {/* Doctor Select */}
             <div>
               <label className="input-label">Select Doctor</label>
-              <select required className="input-field" value={form.doctorId} onChange={(e) => set("doctorId", e.target.value)}>
+              <select required className="input-field" value={form.doctorId} onChange={(e) => {
+                const doc = doctors.find((d) => d.id === e.target.value);
+                setForm((f) => ({ ...f, doctorId: e.target.value, consultType: defaultConsultType(doc?.doctorProfile ?? null) }));
+              }}>
                 <option value="">— Choose a doctor —</option>
                 {visibleDoctors.map((d) => (
                   <option key={d.id} value={d.id}>

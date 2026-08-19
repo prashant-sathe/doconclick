@@ -1511,6 +1511,8 @@ export const DoctorProfileScalarFieldEnum = {
   languages: 'languages',
   bio: 'bio',
   offersHomeVisit: 'offersHomeVisit',
+  offersClinic: 'offersClinic',
+  offersVideo: 'offersVideo',
   isVerified: 'isVerified',
   avgRating: 'avgRating',
   totalReviews: 'totalReviews',

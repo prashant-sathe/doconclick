@@ -70,6 +70,12 @@ export async function POST(req: Request) {
     if (consultType === "HOME" && !doctor.doctorProfile.offersHomeVisit) {
       return NextResponse.json({ error: "This doctor does not offer home visits" }, { status: 400 });
     }
+    if (consultType === "CLINIC" && !doctor.doctorProfile.offersClinic) {
+      return NextResponse.json({ error: "This doctor does not offer clinic visits" }, { status: 400 });
+    }
+    if (consultType === "VIDEO" && !doctor.doctorProfile.offersVideo) {
+      return NextResponse.json({ error: "This doctor does not offer video consultations" }, { status: 400 });
+    }
 
     if (followUpOfId) {
       const original = await prisma.appointment.findUnique({ where: { id: followUpOfId } });

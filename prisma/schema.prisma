@@ -100,6 +100,8 @@ model DoctorProfile {
   languages     String  @default("English, Hindi")
   bio           String?
   offersHomeVisit Boolean @default(true)
+  offersClinic    Boolean @default(true)
+  offersVideo     Boolean @default(false)
   isVerified    Boolean @default(false)
   avgRating     Float   @default(0)
   totalReviews  Int     @default(0)

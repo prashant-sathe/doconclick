@@ -39,6 +39,8 @@ export async function GET(
           languages: true,
           bio: true,
           offersHomeVisit: true,
+          offersClinic: true,
+          offersVideo: true,
           isVerified: true,
           avgRating: true,
           totalReviews: true,

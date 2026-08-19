@@ -7,7 +7,7 @@ import {
   CreditCard, Camera, FileText, Shield, BadgeCheck, CheckCircle2,
   Save, ArrowRight, UploadCloud, Home, Navigation, Lock, Languages,
   QrCode, Copy, Check, Download, Building2, Image as ImageIcon,
-  ShieldCheck, AlertTriangle,
+  ShieldCheck, AlertTriangle, Video,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -32,6 +32,8 @@ interface FormState {
   videoFee: string;
   homeVisitFee: string;
   offersHomeVisit: boolean;
+  offersClinic: boolean;
+  offersVideo: boolean;
   radius: number;
   bankName: string;
   bankAccount: string;
@@ -42,9 +44,13 @@ interface FormState {
   lng: number | null;
 }
 
+function daysUntil(target: Date): number {
+  return Math.max(0, Math.ceil((target.getTime() - Date.now()) / 86400000));
+}
+
 const EMPTY_FORM: FormState = {
   specialty: "General Physician", qualification: "", languages: "", bio: "", medRegNo: "", experience: "",
-  consultFee: "", videoFee: "", homeVisitFee: "", offersHomeVisit: true, radius: 10,
+  consultFee: "", videoFee: "", homeVisitFee: "", offersHomeVisit: true, offersClinic: true, offersVideo: false, radius: 10,
   bankName: "", bankAccount: "", ifsc: "", address: "", clinicName: "", lat: null, lng: null,
 };
 
@@ -222,6 +228,8 @@ export default function DoctorProfilePage() {
           videoFee: p.videoFee ? String(p.videoFee) : "",
           homeVisitFee: p.homeVisitFee ? String(p.homeVisitFee) : "",
           offersHomeVisit: p.offersHomeVisit ?? true,
+          offersClinic: p.offersClinic ?? true,
+          offersVideo: p.offersVideo ?? false,
           radius: p.radius ?? 10,
           bankName: "", bankAccount: "", ifsc: "",
           address: p.address ?? "",
@@ -367,6 +375,8 @@ export default function DoctorProfilePage() {
         videoFee: form.videoFee,
         homeVisitFee: form.homeVisitFee,
         offersHomeVisit: form.offersHomeVisit,
+        offersClinic: form.offersClinic,
+        offersVideo: form.offersVideo,
         radius: form.radius,
         availability,
         bankDetails,
@@ -442,13 +452,34 @@ export default function DoctorProfilePage() {
           </div>
         )}
 
-        {registrationFeePaid && hasActiveDoctorSubscription({ trialEndsAt, subscriptionPaidUntil }) && (
-          <p className="text-xs text-slate-400 mb-6">
-            {trialEndsAt && (!subscriptionPaidUntil || new Date(trialEndsAt) > new Date(subscriptionPaidUntil))
-              ? `Free trial active — ends ${new Date(trialEndsAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}.`
-              : `Plan active — renews by ${new Date(subscriptionPaidUntil!).toLocaleDateString("en-IN", { dateStyle: "medium" })}.`}
-          </p>
-        )}
+        {registrationFeePaid && hasActiveDoctorSubscription({ trialEndsAt, subscriptionPaidUntil }) && (() => {
+          const isTrial = !!trialEndsAt && (!subscriptionPaidUntil || new Date(trialEndsAt) > new Date(subscriptionPaidUntil));
+          const target = new Date(isTrial ? trialEndsAt! : subscriptionPaidUntil!);
+          const daysLeft = daysUntil(target);
+          const urgency = daysLeft <= 2 ? "danger" : daysLeft <= 7 ? "warning" : "success";
+          return (
+            <div className={cn(
+              "rounded-2xl p-5 mb-6 flex items-center justify-between gap-4 flex-wrap border",
+              urgency === "danger" ? "bg-red-50 border-red-200" : urgency === "warning" ? "bg-amber-50 border-amber-200" : "bg-emerald-50 border-emerald-200"
+            )}>
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className={cn(
+                  "w-5 h-5 flex-shrink-0 mt-0.5",
+                  urgency === "danger" ? "text-red-600" : urgency === "warning" ? "text-amber-600" : "text-emerald-600"
+                )} />
+                <div>
+                  <p className="font-bold text-slate-900">{isTrial ? "Free trial active" : "Plan active"}</p>
+                  <p className="text-sm text-slate-500 mt-0.5">
+                    {isTrial ? "Ends" : "Renews by"} {target.toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                  </p>
+                </div>
+              </div>
+              <span className={cn("badge", urgency === "danger" ? "badge-danger" : urgency === "warning" ? "badge-warning" : "badge-success")}>
+                {daysLeft === 0 ? "Expires today" : `${daysLeft} day${daysLeft === 1 ? "" : "s"} left`}
+              </span>
+            </div>
+          );
+        })()}
 
         <div className="flex justify-end mb-6">
           <Link href="/doctor/dashboard" className="btn-secondary gap-1.5 text-sm">
@@ -456,6 +487,7 @@ export default function DoctorProfilePage() {
           </Link>
         </div>
 
+        {isVerified && (
         <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
           <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
             <QrCode className="w-4 h-4 text-teal-500" /> Your Booking QR Code
@@ -489,6 +521,7 @@ export default function DoctorProfilePage() {
             </div>
           </div>
         </section>
+        )}
 
         <form onSubmit={submit} className="space-y-6">
           <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
@@ -598,10 +631,20 @@ export default function DoctorProfilePage() {
                   <input type="number" min={0} className="input-field" placeholder="800" value={form.homeVisitFee} onChange={(e) => set("homeVisitFee", e.target.value)} />
                 </div>
               </div>
-              <label className="flex items-center justify-between p-4 rounded-xl border border-slate-200 cursor-pointer">
-                <span className="flex items-center gap-2 text-sm font-semibold text-slate-800"><Home className="w-4 h-4 text-slate-400" /> Offer Home Visits</span>
-                <input type="checkbox" checked={form.offersHomeVisit} onChange={(e) => set("offersHomeVisit", e.target.checked)} className="w-4 h-4 accent-teal-500" />
-              </label>
+              <div className="space-y-2">
+                <label className="flex items-center justify-between p-4 rounded-xl border border-slate-200 cursor-pointer">
+                  <span className="flex items-center gap-2 text-sm font-semibold text-slate-800"><Building2 className="w-4 h-4 text-slate-400" /> Offer Clinic Visits</span>
+                  <input type="checkbox" checked={form.offersClinic} onChange={(e) => set("offersClinic", e.target.checked)} className="w-4 h-4 accent-teal-500" />
+                </label>
+                <label className="flex items-center justify-between p-4 rounded-xl border border-slate-200 cursor-pointer">
+                  <span className="flex items-center gap-2 text-sm font-semibold text-slate-800"><Home className="w-4 h-4 text-slate-400" /> Offer Home Visits</span>
+                  <input type="checkbox" checked={form.offersHomeVisit} onChange={(e) => set("offersHomeVisit", e.target.checked)} className="w-4 h-4 accent-teal-500" />
+                </label>
+                <label className="flex items-center justify-between p-4 rounded-xl border border-slate-200 cursor-pointer">
+                  <span className="flex items-center gap-2 text-sm font-semibold text-slate-800"><Video className="w-4 h-4 text-slate-400" /> Offer Video Call Consultation</span>
+                  <input type="checkbox" checked={form.offersVideo} onChange={(e) => set("offersVideo", e.target.checked)} className="w-4 h-4 accent-teal-500" />
+                </label>
+              </div>
               <div>
                 <label className="input-label mb-2 flex items-center justify-between">
                   <span><MapPin className="inline w-3.5 h-3.5 mr-1" />Consultation Radius</span>

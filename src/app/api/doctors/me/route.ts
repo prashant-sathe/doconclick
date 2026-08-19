@@ -41,6 +41,8 @@ const EDITABLE_FIELDS = [
   "availability",
   "radius",
   "offersHomeVisit",
+  "offersClinic",
+  "offersVideo",
   "languages",
   "bio",
   "bankDetails",
@@ -71,7 +73,7 @@ export async function PATCH(req: Request) {
       data[key] = Math.min(20, Math.max(5, Number(value) || 5));
     } else if (key === "lat" || key === "lng") {
       data[key] = value === "" || value == null ? null : Number(value);
-    } else if (key === "offersHomeVisit") {
+    } else if (key === "offersHomeVisit" || key === "offersClinic" || key === "offersVideo") {
       data[key] = Boolean(value);
     } else {
       data[key] = value === "" || value == null ? null : String(value);

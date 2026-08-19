@@ -38,6 +38,8 @@ interface DoctorProfile {
   bio: string | null;
   isVerified: boolean;
   offersHomeVisit: boolean;
+  offersClinic: boolean;
+  offersVideo: boolean;
   avgRating: number;
   totalReviews: number;
 }
@@ -85,10 +87,18 @@ function makePinSvg(color: string, pulse = false) {
 
 // ── CONSULT TYPE OPTIONS ───────────────────────────────────────────────────
 const ALL_TYPES = [
-  { id: "HOME", label: "Home Visit", icon: Home, comingSoon: false },
-  { id: "CLINIC", label: "Clinic Visit", icon: Building2, comingSoon: false },
-  { id: "VIDEO", label: "Video Call", icon: Video, comingSoon: true },
+  { id: "HOME", label: "Home Visit", icon: Home },
+  { id: "CLINIC", label: "Clinic Visit", icon: Building2 },
+  { id: "VIDEO", label: "Video Call", icon: Video },
 ];
+
+function defaultConsultType(profile: DoctorProfile | null | undefined): string {
+  if (!profile) return "CLINIC";
+  if (profile.offersHomeVisit) return "HOME";
+  if (profile.offersClinic !== false) return "CLINIC";
+  if (profile.offersVideo) return "VIDEO";
+  return "CLINIC";
+}
 
 function feeForConsultType(profile: DoctorProfile | null | undefined, consultType: string): number {
   if (!profile) return 0;
@@ -180,6 +190,7 @@ function PatientDashboardInner() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedDoctor(doc);
       setPanelOpen(true);
+      setConsultType(defaultConsultType(doc.doctorProfile));
     }
   }, [doctors, deepLinkedDoctorId]);
 
@@ -291,7 +302,7 @@ function PatientDashboardInner() {
           setSelectedDoctor(doc);
           setPanelOpen(true);
           setBookingOpen(false);
-          setConsultType(doc.doctorProfile?.offersHomeVisit ? "HOME" : "CLINIC");
+          setConsultType(defaultConsultType(doc.doctorProfile));
           setSymptoms("");
           setRelation("Self");
           setDependentId(null);
@@ -420,7 +431,7 @@ function PatientDashboardInner() {
   const submitEmergency = async () => {
     if (!user?.id || !nearestAny) return;
     setEmergencyBusy(true);
-    const type = nearestAny.doctorProfile?.offersHomeVisit ? "HOME" : "CLINIC";
+    const type = defaultConsultType(nearestAny.doctorProfile);
     const fee = feeForConsultType(nearestAny.doctorProfile, type);
 
     const res = await fetch("/api/appointments", {
@@ -447,9 +458,12 @@ function PatientDashboardInner() {
   const fee = feeForConsultType(selectedDoctor?.doctorProfile, consultType);
 
   const eta = selectedDoctor?.distance != null ? estimateArrivalMinutes(selectedDoctor.distance) : null;
-  const availableTypes = ALL_TYPES.filter(
-    (t) => t.id !== "HOME" || selectedDoctor?.doctorProfile?.offersHomeVisit !== false
-  );
+  const availableTypes = ALL_TYPES.filter((t) => {
+    if (t.id === "HOME") return selectedDoctor?.doctorProfile?.offersHomeVisit !== false;
+    if (t.id === "CLINIC") return selectedDoctor?.doctorProfile?.offersClinic !== false;
+    if (t.id === "VIDEO") return selectedDoctor ? selectedDoctor.doctorProfile?.offersVideo === true : true;
+    return true;
+  });
 
   // ── Derived loading flag ───────────────────────────────────────────────
   const isLoading = authLoading || !userPos;
@@ -560,7 +574,7 @@ function PatientDashboardInner() {
                 setSelectedDoctor(nearest);
                 setPanelOpen(true);
                 setBookingOpen(false);
-                setConsultType(nearest.doctorProfile?.offersHomeVisit ? "HOME" : "CLINIC");
+                setConsultType(defaultConsultType(nearest.doctorProfile));
               }}
               className="glass-card rounded-2xl pl-3 pr-3 py-2.5 flex items-center gap-2 pointer-events-auto shadow-lg hover:scale-[1.02] transition-transform min-w-0 flex-1 sm:flex-initial"
             >
@@ -686,23 +700,17 @@ function PatientDashboardInner() {
 
                   {/* Consult type */}
                   <div className={`grid gap-2 mb-4 ${availableTypes.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
-                    {availableTypes.map(({ id, label, icon: Icon, comingSoon }) => (
+                    {availableTypes.map(({ id, label, icon: Icon }) => (
                       <button
                         key={id}
                         type="button"
-                        disabled={comingSoon}
                         onClick={() => setConsultType(id)}
                         className={`relative flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
-                          comingSoon
-                            ? "border-slate-100 text-slate-300 cursor-not-allowed"
-                            : consultType === id
-                              ? "border-blue-500 bg-blue-50 text-blue-700"
-                              : "border-slate-200 text-slate-500 hover:border-slate-300"
+                          consultType === id
+                            ? "border-blue-500 bg-blue-50 text-blue-700"
+                            : "border-slate-200 text-slate-500 hover:border-slate-300"
                         }`}
                       >
-                        {comingSoon && (
-                          <span className="absolute -top-2 -right-1.5 badge badge-gray text-[9px] px-1.5 py-0.5">Soon</span>
-                        )}
                         <Icon className="w-4 h-4" />
                         {label}
                       </button>
@@ -884,17 +892,30 @@ function PatientDashboardInner() {
 
                   {/* Fee cards */}
                   <div className="grid grid-cols-3 gap-3 mb-3">
-                    <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
-                      <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                      <p className="text-xs text-slate-500">Clinic Visit</p>
-                      <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.consultFee}</p>
-                    </div>
-                    <div className="relative rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center opacity-60">
-                      <span className="absolute -top-2 -right-1.5 badge badge-gray text-[9px] px-1.5 py-0.5">Soon</span>
-                      <Video className="w-5 h-5 text-slate-400 mx-auto mb-1" />
-                      <p className="text-xs text-slate-500">Video Call</p>
-                      <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.videoFee}</p>
-                    </div>
+                    {selectedDoctor.doctorProfile.offersClinic !== false ? (
+                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
+                        <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                        <p className="text-xs text-slate-500">Clinic Visit</p>
+                        <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.consultFee}</p>
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
+                        <Building2 className="w-5 h-5 text-slate-300 mx-auto mb-1" />
+                        <p className="text-xs text-slate-400">Clinic visit not offered</p>
+                      </div>
+                    )}
+                    {selectedDoctor.doctorProfile.offersVideo ? (
+                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
+                        <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                        <p className="text-xs text-slate-500">Video Call</p>
+                        <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.videoFee}</p>
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
+                        <Video className="w-5 h-5 text-slate-300 mx-auto mb-1" />
+                        <p className="text-xs text-slate-400">Video call not offered</p>
+                      </div>
+                    )}
                     {selectedDoctor.doctorProfile.offersHomeVisit ? (
                       <div className="rounded-2xl p-4 border border-blue-200 bg-blue-50 text-center">
                         <Home className="w-5 h-5 text-blue-600 mx-auto mb-1" />
@@ -939,21 +960,23 @@ function PatientDashboardInner() {
                       <Home className="w-4 h-4" /> Request Home Visit
                     </button>
                   )}
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => { setConsultType("CLINIC"); setBookingOpen(true); }}
-                      className="btn-secondary justify-center py-3 text-sm"
-                    >
-                      <Building2 className="w-4 h-4" /> Clinic Visit
-                    </button>
-                    <button
-                      disabled
-                      title="Video calling is coming soon"
-                      className="relative btn-secondary justify-center py-3 text-sm opacity-50 cursor-not-allowed"
-                    >
-                      <span className="absolute -top-2 -right-1.5 badge badge-gray text-[9px] px-1.5 py-0.5">Soon</span>
-                      <Video className="w-4 h-4" /> Video Call
-                    </button>
+                  <div className="flex gap-2">
+                    {selectedDoctor.doctorProfile.offersClinic !== false && (
+                      <button
+                        onClick={() => { setConsultType("CLINIC"); setBookingOpen(true); }}
+                        className="btn-secondary justify-center py-3 text-sm flex-1"
+                      >
+                        <Building2 className="w-4 h-4" /> Clinic Visit
+                      </button>
+                    )}
+                    {selectedDoctor.doctorProfile.offersVideo && (
+                      <button
+                        onClick={() => { setConsultType("VIDEO"); setBookingOpen(true); }}
+                        className="btn-secondary justify-center py-3 text-sm flex-1"
+                      >
+                        <Video className="w-4 h-4" /> Video Call
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
