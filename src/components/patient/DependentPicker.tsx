@@ -23,7 +23,7 @@ export interface Dependent {
 
 const EMPTY_FORM = {
   name: "", age: "", gender: "", bloodGroup: "", height: "", weight: "",
-  allergies: "", chronicDiseases: [] as string[], medications: "", surgeries: "",
+  allergies: "", chronicDiseases: [] as string[], otherChronicText: "", medications: "", surgeries: "",
   emergencyContactName: "", emergencyContactPhone: "",
 };
 
@@ -62,22 +62,30 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
 
   const set = (k: Exclude<keyof typeof EMPTY_FORM, "chronicDiseases">, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const toggleChronic = (o: string) => {
-    setForm((f) => ({
-      ...f,
-      chronicDiseases: f.chronicDiseases.includes(o)
-        ? f.chronicDiseases.filter((x) => x !== o)
-        : [...f.chronicDiseases, o],
-    }));
+    setForm((f) => {
+      const nowSelected = f.chronicDiseases.includes(o);
+      return {
+        ...f,
+        chronicDiseases: nowSelected
+          ? f.chronicDiseases.filter((x) => x !== o)
+          : [...f.chronicDiseases, o],
+        otherChronicText: o === "Other" && nowSelected ? "" : f.otherChronicText,
+      };
+    });
   };
 
   const saveNew = async () => {
     if (!form.name.trim()) { setError("Please enter a name."); return; }
     setSaving(true);
     setError("");
+    const serializedChronic = form.chronicDiseases
+      .map((o) => (o === "Other" ? form.otherChronicText.trim() : o))
+      .filter(Boolean)
+      .join(",");
     const res = await fetch("/api/patients/me/dependents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, chronicDiseases: form.chronicDiseases.join(","), relation }),
+      body: JSON.stringify({ ...form, chronicDiseases: serializedChronic, relation }),
     });
     const data = await res.json();
     setSaving(false);
@@ -174,6 +182,14 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
                 </button>
               ))}
             </div>
+            {form.chronicDiseases.includes("Other") && (
+              <input
+                className="input-field mt-2"
+                placeholder="Please specify"
+                value={form.otherChronicText}
+                onChange={(e) => set("otherChronicText", e.target.value)}
+              />
+            )}
           </div>
           <textarea className="input-field resize-none" rows={2} placeholder="Known allergies" value={form.allergies} onChange={(e) => set("allergies", e.target.value)} />
           <textarea className="input-field resize-none" rows={2} placeholder="Current medications" value={form.medications} onChange={(e) => set("medications", e.target.value)} />

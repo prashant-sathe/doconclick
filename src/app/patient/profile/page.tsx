@@ -25,6 +25,7 @@ interface FormState {
   weight: string;
   allergies: string;
   chronicDiseases: string[];
+  otherChronicText: string;
   medications: string;
   surgeries: string;
   emergencyContactName: string;
@@ -36,7 +37,7 @@ interface FormState {
 
 const EMPTY_FORM: FormState = {
   location: "", homeAddress: "", landmark: "", pinCode: "", bloodGroup: "",
-  height: "", weight: "", allergies: "", chronicDiseases: [], medications: "",
+  height: "", weight: "", allergies: "", chronicDiseases: [], otherChronicText: "", medications: "",
   surgeries: "", emergencyContactName: "", emergencyContactPhone: "", photoUrl: "",
   lat: null, lng: null,
 };
@@ -134,7 +135,15 @@ export default function PatientProfilePage() {
           height: p.height != null ? String(p.height) : "",
           weight: p.weight != null ? String(p.weight) : "",
           allergies: p.allergies ?? "",
-          chronicDiseases: p.chronicDiseases ? p.chronicDiseases.split(",").filter(Boolean) : [],
+          ...(() => {
+            const loaded: string[] = p.chronicDiseases ? p.chronicDiseases.split(",").filter(Boolean) : [];
+            const known = new Set(CHRONIC_OPTIONS);
+            const custom = loaded.find((x) => !known.has(x));
+            return {
+              chronicDiseases: custom ? [...loaded.filter((x) => known.has(x)), "Other"] : loaded,
+              otherChronicText: custom ?? "",
+            };
+          })(),
           medications: p.medications ?? "",
           surgeries: p.surgeries ?? "",
           emergencyContactName: p.emergencyContactName ?? "",
@@ -150,12 +159,16 @@ export default function PatientProfilePage() {
   const set = (k: keyof FormState, v: string) => { setSaved(false); setForm((f) => ({ ...f, [k]: v })); };
   const toggleChronic = (o: string) => {
     setSaved(false);
-    setForm((f) => ({
-      ...f,
-      chronicDiseases: f.chronicDiseases.includes(o)
-        ? f.chronicDiseases.filter((x) => x !== o)
-        : [...f.chronicDiseases, o],
-    }));
+    setForm((f) => {
+      const nowSelected = f.chronicDiseases.includes(o);
+      return {
+        ...f,
+        chronicDiseases: nowSelected
+          ? f.chronicDiseases.filter((x) => x !== o)
+          : [...f.chronicDiseases, o],
+        otherChronicText: o === "Other" && nowSelected ? "" : f.otherChronicText,
+      };
+    });
   };
 
   const getGPS = () => {
@@ -173,6 +186,11 @@ export default function PatientProfilePage() {
 
   const bmi = computeBMI(Number(form.height), Number(form.weight));
 
+  const serializedChronic = form.chronicDiseases
+    .map((o) => (o === "Other" ? form.otherChronicText.trim() : o))
+    .filter(Boolean)
+    .join(",");
+
   const completenessInput: PatientProfileData = {
     location: form.location || null,
     homeAddress: form.homeAddress || null,
@@ -181,7 +199,7 @@ export default function PatientProfilePage() {
     height: form.height ? Number(form.height) : null,
     weight: form.weight ? Number(form.weight) : null,
     allergies: form.allergies || null,
-    chronicDiseases: form.chronicDiseases.length ? form.chronicDiseases.join(",") : null,
+    chronicDiseases: serializedChronic || null,
     emergencyContactName: form.emergencyContactName || null,
     emergencyContactPhone: form.emergencyContactPhone || null,
     photoUrl: form.photoUrl || null,
@@ -197,7 +215,7 @@ export default function PatientProfilePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
-        chronicDiseases: form.chronicDiseases.join(","),
+        chronicDiseases: serializedChronic,
         height: form.height || null,
         weight: form.weight || null,
       }),
@@ -329,6 +347,14 @@ export default function PatientProfilePage() {
                     </button>
                   ))}
                 </div>
+                {form.chronicDiseases.includes("Other") && (
+                  <input
+                    className="input-field mt-2"
+                    placeholder="Please specify"
+                    value={form.otherChronicText}
+                    onChange={(e) => set("otherChronicText", e.target.value)}
+                  />
+                )}
               </div>
               <div>
                 <label className="input-label"><AlertTriangle className="inline w-3.5 h-3.5 mr-1" />Known Allergies</label>
