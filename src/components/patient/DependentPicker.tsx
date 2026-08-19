@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CHRONIC_OPTIONS, BLOOD_GROUPS } from "@/lib/medicalOptions";
 
@@ -40,6 +40,7 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
   const [dependents, setDependents] = useState<Dependent[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -58,7 +59,7 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
   // selected relation changes, so `adding`/`form` naturally reset — no effect
   // needed. Only fall back to the add-form automatically once loading
   // finishes and there's nothing saved yet for this relation.
-  const showAddForm = adding || (!loading && matching.length === 0);
+  const showAddForm = adding || editingId !== null || (!loading && matching.length === 0);
 
   const set = (k: Exclude<keyof typeof EMPTY_FORM, "chronicDiseases">, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const toggleChronic = (o: string) => {
@@ -74,6 +75,37 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
     });
   };
 
+  const startEdit = (d: Dependent) => {
+    const loaded: string[] = d.chronicDiseases ? d.chronicDiseases.split(",").filter(Boolean) : [];
+    const known = new Set(CHRONIC_OPTIONS);
+    const custom = loaded.find((x) => !known.has(x));
+    setForm({
+      name: d.name,
+      age: d.age != null ? String(d.age) : "",
+      gender: d.gender ?? "",
+      bloodGroup: d.bloodGroup ?? "",
+      height: d.height != null ? String(d.height) : "",
+      weight: d.weight != null ? String(d.weight) : "",
+      allergies: d.allergies ?? "",
+      chronicDiseases: custom ? [...loaded.filter((x) => known.has(x)), "Other"] : loaded,
+      otherChronicText: custom ?? "",
+      medications: d.medications ?? "",
+      surgeries: d.surgeries ?? "",
+      emergencyContactName: d.emergencyContactName ?? "",
+      emergencyContactPhone: d.emergencyContactPhone ?? "",
+    });
+    setError("");
+    setEditingId(d.id);
+    setAdding(false);
+  };
+
+  const cancelForm = () => {
+    setAdding(false);
+    setEditingId(null);
+    setForm(EMPTY_FORM);
+    setError("");
+  };
+
   const saveNew = async () => {
     if (!form.name.trim()) { setError("Please enter a name."); return; }
     setSaving(true);
@@ -82,17 +114,24 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
       .map((o) => (o === "Other" ? form.otherChronicText.trim() : o))
       .filter(Boolean)
       .join(",");
-    const res = await fetch("/api/patients/me/dependents", {
-      method: "POST",
+    const url = editingId ? `/api/patients/me/dependents/${editingId}` : "/api/patients/me/dependents";
+    const res = await fetch(url, {
+      method: editingId ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...form, chronicDiseases: serializedChronic, relation }),
     });
     const data = await res.json();
     setSaving(false);
     if (!res.ok) { setError(data.error ?? "Could not save."); return; }
-    setDependents((d) => [data, ...d]);
+    if (editingId) {
+      setDependents((d) => d.map((x) => (x.id === data.id ? data : x)));
+    } else {
+      setDependents((d) => [data, ...d]);
+    }
     onSelect(data.id);
     setAdding(false);
+    setEditingId(null);
+    setForm(EMPTY_FORM);
   };
 
   const deleteDependent = async (id: string) => {
@@ -137,14 +176,20 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
                   </button>
                 </div>
               ) : (
-                <button type="button" onClick={() => setConfirmDeleteId(d.id)} aria-label={`Delete ${d.name}`}
-                  className="flex-shrink-0 p-2.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button type="button" onClick={() => startEdit(d)} aria-label={`Edit ${d.name}`}
+                    className="p-2.5 rounded-lg text-slate-300 hover:text-blue-500 hover:bg-blue-50 transition-colors">
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button type="button" onClick={() => setConfirmDeleteId(d.id)} aria-label={`Delete ${d.name}`}
+                    className="p-2.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               )}
             </div>
           ))}
-          <button type="button" onClick={() => { setAdding(true); onSelect(null); }} className="text-xs text-blue-600 font-semibold hover:underline">
+          <button type="button" onClick={() => { setForm(EMPTY_FORM); setAdding(true); onSelect(null); }} className="text-xs text-blue-600 font-semibold hover:underline">
             + Add another {relation.toLowerCase()}
           </button>
         </div>
@@ -191,20 +236,35 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
               />
             )}
           </div>
-          <textarea className="input-field resize-none" rows={2} placeholder="Known allergies" value={form.allergies} onChange={(e) => set("allergies", e.target.value)} />
-          <textarea className="input-field resize-none" rows={2} placeholder="Current medications" value={form.medications} onChange={(e) => set("medications", e.target.value)} />
-          <textarea className="input-field resize-none" rows={2} placeholder="Past surgeries" value={form.surgeries} onChange={(e) => set("surgeries", e.target.value)} />
+          <div>
+            <label className="input-label">Known Allergies</label>
+            <textarea className="input-field resize-none" rows={2} placeholder="e.g. Penicillin, Dust, Peanuts (or 'None')" value={form.allergies} onChange={(e) => set("allergies", e.target.value)} />
+          </div>
+          <div>
+            <label className="input-label">Current Medications</label>
+            <textarea className="input-field resize-none" rows={2} placeholder="e.g. Metformin 500mg" value={form.medications} onChange={(e) => set("medications", e.target.value)} />
+          </div>
+          <div>
+            <label className="input-label">Previous Surgeries</label>
+            <textarea className="input-field resize-none" rows={2} placeholder="e.g. Appendectomy 2018" value={form.surgeries} onChange={(e) => set("surgeries", e.target.value)} />
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            <input className="input-field" placeholder="Emergency contact name" value={form.emergencyContactName} onChange={(e) => set("emergencyContactName", e.target.value)} />
-            <input className="input-field" placeholder="Emergency contact phone" value={form.emergencyContactPhone} onChange={(e) => set("emergencyContactPhone", e.target.value)} />
+            <div>
+              <label className="input-label">Emergency Contact Name</label>
+              <input className="input-field" placeholder="e.g. Priya Sharma" value={form.emergencyContactName} onChange={(e) => set("emergencyContactName", e.target.value)} />
+            </div>
+            <div>
+              <label className="input-label">Emergency Contact Phone</label>
+              <input className="input-field" placeholder="9800000000" value={form.emergencyContactPhone} onChange={(e) => set("emergencyContactPhone", e.target.value)} />
+            </div>
           </div>
           {error && <p className="text-xs text-red-600">{error}</p>}
           <div className="flex gap-2">
-            {matching.length > 0 && (
-              <button type="button" onClick={() => setAdding(false)} className="btn-secondary py-2 px-3 text-xs flex-1">Cancel</button>
+            {(matching.length > 0 || editingId) && (
+              <button type="button" onClick={cancelForm} className="btn-secondary py-2 px-3 text-xs flex-1">Cancel</button>
             )}
             <button type="button" onClick={saveNew} disabled={saving} className="btn-primary py-2 px-3 text-xs flex-1">
-              {saving ? "Saving…" : `Save ${relation}'s Details`}
+              {saving ? "Saving…" : editingId ? "Save Changes" : `Save ${relation}'s Details`}
             </button>
           </div>
         </div>
