@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
 
 const ALLOWED_TYPES: Record<string, string> = {
@@ -11,7 +11,7 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 // POST: Patient uploads/replaces their profile photo.
 export async function POST(req: Request) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }

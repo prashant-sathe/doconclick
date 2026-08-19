@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
+import { getAuthUserAny, signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -10,7 +10,7 @@ const MOBILE_REGEX = /^[6-9]\d{9}$/;
 // PATCH: One-time step for Google sign-ins — set a real mobile number in
 // place of the "pending_..." placeholder created at account creation.
 export async function PATCH(req: Request) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -34,7 +34,10 @@ export async function PATCH(req: Request) {
     };
     const token = signToken(payload);
 
-    const response = NextResponse.json({ id: updated.id, name: updated.name, role: updated.role });
+    // `token` is additive here — the web page only reads `.error`/`.role` from
+    // this response, so bearer (mobile) callers can use it to refresh their
+    // stored JWT without any change to the web's cookie-based behavior.
+    const response = NextResponse.json({ id: updated.id, name: updated.name, role: updated.role, token });
     response.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: COOKIE_SECURE,

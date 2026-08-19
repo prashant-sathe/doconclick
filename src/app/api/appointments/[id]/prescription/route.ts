@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
+import { omitOtp } from "@/lib/otp";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -16,7 +17,7 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -54,6 +55,8 @@ export async function GET(
     doctorRegNo: appointment.doctor.doctorProfile?.medRegNo ?? null,
     doctorSpecialty: appointment.doctor.doctorProfile?.specialty ?? "General Physician",
     doctorNotes: appointment.doctorNotes,
+    consultationStartedAt: appointment.otpVerifiedAt,
+    consultationEndedAt: appointment.completedAt,
     medicines: appointment.medicines.map((m) => ({
       name: m.name,
       dosage: m.dosage,
@@ -69,7 +72,7 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -78,6 +81,18 @@ export async function POST(
   const appointment = await prisma.appointment.findUnique({ where: { id } });
   if (!appointment || appointment.doctorId !== authUser.id) {
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
+  }
+  if (appointment.consultType === "HOME" && appointment.travelStatus !== "ARRIVED") {
+    return NextResponse.json(
+      { error: "Mark your journey as arrived before adding a prescription for this home visit." },
+      { status: 400 }
+    );
+  }
+  if (!appointment.otpVerifiedAt) {
+    return NextResponse.json(
+      { error: "Verify the patient's OTP before adding a prescription." },
+      { status: 400 }
+    );
   }
 
   const form = await req.formData();
@@ -110,14 +125,10 @@ export async function POST(
     data: saved.map((s) => ({ appointmentId: id, url: s.url, fileName: s.fileName })),
   });
 
-  const updated = await prisma.appointment.update({
+  const updated = await prisma.appointment.findUnique({
     where: { id },
-    data: {
-      status: appointment.status === "SCHEDULED" ? "COMPLETED" : appointment.status,
-      ...(appointment.paymentMethod === "CASH" ? { paymentStatus: "PAID" } : {}),
-    },
     include: { attachments: true },
   });
 
-  return NextResponse.json(updated);
+  return NextResponse.json(updated ? omitOtp(updated) : updated);
 }

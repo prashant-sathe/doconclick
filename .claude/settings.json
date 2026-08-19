@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze *)",
+      "Read(//opt/homebrew/share/flutter/packages/flutter/lib/**)",
+      "Read(//opt/homebrew/share/flutter/packages/flutter/lib/src/material/**)"
+    ]
+  }
+}

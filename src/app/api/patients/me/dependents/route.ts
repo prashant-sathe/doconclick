@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 import { RELATIONS } from "@/lib/relations";
 
 // GET: the current patient's saved family-member profiles
-export async function GET() {
-  const authUser = await getAuthUser();
+export async function GET(req: Request) {
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -22,7 +22,7 @@ export async function GET() {
 
 // POST: save a new family member's medical profile
 export async function POST(req: Request) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }

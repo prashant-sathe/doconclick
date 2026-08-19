@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 
 // GET: The currently logged-in doctor's own profile
-export async function GET() {
-  const authUser = await getAuthUser();
+export async function GET(req: Request) {
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -52,7 +52,7 @@ const EDITABLE_FIELDS = [
 
 // PATCH: Update the logged-in doctor's own profile
 export async function PATCH(req: Request) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }

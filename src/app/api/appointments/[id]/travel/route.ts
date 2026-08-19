@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
+import { sendPushToUser } from "@/lib/pushNotifications";
 
 const VALID_STATUSES = ["ON_THE_WAY", "ARRIVED"];
 
@@ -11,7 +12,7 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -42,6 +43,14 @@ export async function PATCH(
           ? { doctorLat: Number(lat), doctorLng: Number(lng), doctorLocationUpdatedAt: new Date() }
           : {}),
       },
+    });
+    sendPushToUser(appointment.patientId, {
+      title: travelStatus === "ARRIVED" ? "Doctor has arrived" : "Doctor is on the way",
+      body:
+        travelStatus === "ARRIVED"
+          ? "Your doctor has arrived at your location."
+          : "Your doctor is on the way to your location.",
+      data: { type: "travel_status", appointmentId: id, travelStatus },
     });
     return NextResponse.json(updated);
   } catch (err) {

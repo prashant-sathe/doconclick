@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
+import { sendPushToUser } from "@/lib/pushNotifications";
 
 // Chat is only open once a booking has been accepted — matches the "once the
 // doctor accepts, patient and doctor can chat" requirement — and stays open
@@ -24,10 +25,10 @@ export async function loadAndAuthorize(id: string, userId: string) {
 }
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -49,13 +50,13 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
   const { id } = await params;
-  const { error } = await loadAndAuthorize(id, authUser.id);
+  const { appointment, error } = await loadAndAuthorize(id, authUser.id);
   if (error) return error;
 
   const { text } = await req.json();
@@ -66,6 +67,13 @@ export async function POST(
   const message = await prisma.message.create({
     data: { appointmentId: id, senderId: authUser.id, text: text.trim().slice(0, 2000) },
     include: { sender: { select: { id: true, name: true, role: true } } },
+  });
+
+  const recipientId = appointment!.patientId === authUser.id ? appointment!.doctorId : appointment!.patientId;
+  sendPushToUser(recipientId, {
+    title: `New message from ${message.sender.name}`,
+    body: message.text,
+    data: { type: "chat_message", appointmentId: id },
   });
 
   return NextResponse.json(message);

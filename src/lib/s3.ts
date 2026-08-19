@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 let client: S3Client | null = null;
 
@@ -35,4 +35,19 @@ export async function uploadToS3(key: string, buffer: Buffer, contentType: strin
 
   const region = process.env.AWS_REGION;
   return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
+}
+
+// Deletes an object previously uploaded via `uploadToS3`, given its public URL.
+export async function deleteFromS3ByUrl(url: string): Promise<void> {
+  const bucket = process.env.S3_BUCKET_NAME;
+  if (!bucket) {
+    throw new Error("AWS S3 is not configured (S3_BUCKET_NAME missing)");
+  }
+
+  const marker = `.amazonaws.com/`;
+  const idx = url.indexOf(marker);
+  if (idx === -1) return;
+  const key = url.slice(idx + marker.length);
+
+  await getClient().send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
 }

@@ -31,6 +31,7 @@ model User {
   messagesSent   Message[]       @relation("SentMessages")
   settlements       Settlement[] @relation("DoctorSettlements")
   settlementsAdmined Settlement[] @relation("AdminSettlements")
+  deviceTokens      DeviceToken[] @relation("UserDeviceTokens")
 }
 
 model PatientProfile {
@@ -147,6 +148,9 @@ model Appointment {
   prescriptionUrl String? // deprecated — superseded by `attachments`; kept so existing data isn't dropped
   doctorNotes   String?
   travelStatus  String    @default("NOT_STARTED") // NOT_STARTED, ON_THE_WAY, ARRIVED
+  otpCode       String? // patient-only visit-verification code, generated when the doctor accepts; never sent to the doctor
+  otpVerifiedAt DateTime? // consultation "start" — set once the doctor verifies the OTP
+  completedAt   DateTime? // consultation "end" — set when the appointment is marked COMPLETED
   doctorLat     Float?
   doctorLng     Float?
   doctorLocationUpdatedAt DateTime?
@@ -237,6 +241,18 @@ model Specialty {
   color     String   @default("#2563eb")
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+}
+
+// FCM push tokens for the Flutter app — a user can have several (multiple
+// devices), tokens rotate over time so old ones self-clean on send failure.
+model DeviceToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("UserDeviceTokens", fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  platform  String   // "android" | "ios"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PlatformSettings {

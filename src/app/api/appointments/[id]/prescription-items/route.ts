@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 
 interface MedicineInput {
   name: string;
@@ -15,7 +15,7 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -24,6 +24,18 @@ export async function POST(
   const appointment = await prisma.appointment.findUnique({ where: { id } });
   if (!appointment || appointment.doctorId !== authUser.id) {
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
+  }
+  if (appointment.consultType === "HOME" && appointment.travelStatus !== "ARRIVED") {
+    return NextResponse.json(
+      { error: "Mark your journey as arrived before adding a prescription for this home visit." },
+      { status: 400 }
+    );
+  }
+  if (!appointment.otpVerifiedAt) {
+    return NextResponse.json(
+      { error: "Verify the patient's OTP before adding a prescription." },
+      { status: 400 }
+    );
   }
 
   const { medicines } = await req.json();

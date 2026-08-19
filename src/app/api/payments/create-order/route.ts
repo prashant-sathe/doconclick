@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
 import { createCashfreeOrder } from "@/lib/cashfree";
 
 // POST: Creates a real Cashfree order for an appointment's online payment
 // and returns a payment_session_id for the client to redirect into checkout.
 export async function POST(req: Request) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -47,7 +47,9 @@ export async function POST(req: Request) {
       data: { cashfreeOrderId: orderId },
     });
 
-    return NextResponse.json({ paymentSessionId });
+    // orderId is additive — web's checkout page only reads paymentSessionId
+    // from this response, so returning it too doesn't change web behavior.
+    return NextResponse.json({ paymentSessionId, orderId });
   } catch (err) {
     console.error("Failed to create Cashfree order for appointment", appointment.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });

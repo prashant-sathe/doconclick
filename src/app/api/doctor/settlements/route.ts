@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 
 // GET: the current doctor's own past settlements, newest first
-export async function GET() {
-  const authUser = await getAuthUser();
+export async function GET(req: Request) {
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }

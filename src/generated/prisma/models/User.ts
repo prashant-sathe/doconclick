@@ -224,6 +224,7 @@ export type UserWhereInput = {
   messagesSent?: Prisma.MessageListRelationFilter
   settlements?: Prisma.SettlementListRelationFilter
   settlementsAdmined?: Prisma.SettlementListRelationFilter
+  deviceTokens?: Prisma.DeviceTokenListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -246,6 +247,7 @@ export type UserOrderByWithRelationInput = {
   messagesSent?: Prisma.MessageOrderByRelationAggregateInput
   settlements?: Prisma.SettlementOrderByRelationAggregateInput
   settlementsAdmined?: Prisma.SettlementOrderByRelationAggregateInput
+  deviceTokens?: Prisma.DeviceTokenOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -271,6 +273,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   messagesSent?: Prisma.MessageListRelationFilter
   settlements?: Prisma.SettlementListRelationFilter
   settlementsAdmined?: Prisma.SettlementListRelationFilter
+  deviceTokens?: Prisma.DeviceTokenListRelationFilter
 }, "id" | "mobile" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -323,6 +326,7 @@ export type UserCreateInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -345,6 +349,7 @@ export type UserUncheckedCreateInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -367,6 +372,7 @@ export type UserUpdateInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -389,6 +395,7 @@ export type UserUncheckedUpdateInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -631,6 +638,20 @@ export type UserUpdateOneRequiredWithoutComplaintsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutComplaintsInput, Prisma.UserUpdateWithoutComplaintsInput>, Prisma.UserUncheckedUpdateWithoutComplaintsInput>
 }
 
+export type UserCreateNestedOneWithoutDeviceTokensInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeviceTokensInput, Prisma.UserUncheckedCreateWithoutDeviceTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeviceTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDeviceTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeviceTokensInput, Prisma.UserUncheckedCreateWithoutDeviceTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeviceTokensInput
+  upsert?: Prisma.UserUpsertWithoutDeviceTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeviceTokensInput, Prisma.UserUpdateWithoutDeviceTokensInput>, Prisma.UserUncheckedUpdateWithoutDeviceTokensInput>
+}
+
 export type UserCreateWithoutPatientProfileInput = {
   id?: string
   name: string
@@ -650,6 +671,7 @@ export type UserCreateWithoutPatientProfileInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPatientProfileInput = {
@@ -671,6 +693,7 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPatientProfileInput = {
@@ -708,6 +731,7 @@ export type UserUpdateWithoutPatientProfileInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPatientProfileInput = {
@@ -729,6 +753,7 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDoctorProfileInput = {
@@ -750,6 +775,7 @@ export type UserCreateWithoutDoctorProfileInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDoctorProfileInput = {
@@ -771,6 +797,7 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDoctorProfileInput = {
@@ -808,6 +835,7 @@ export type UserUpdateWithoutDoctorProfileInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDoctorProfileInput = {
@@ -829,6 +857,7 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAsPatientInput = {
@@ -850,6 +879,7 @@ export type UserCreateWithoutAsPatientInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsPatientInput = {
@@ -871,6 +901,7 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAsPatientInput = {
@@ -897,6 +928,7 @@ export type UserCreateWithoutAsDoctorInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsDoctorInput = {
@@ -918,6 +950,7 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAsDoctorInput = {
@@ -955,6 +988,7 @@ export type UserUpdateWithoutAsPatientInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsPatientInput = {
@@ -976,6 +1010,7 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutAsDoctorInput = {
@@ -1008,6 +1043,7 @@ export type UserUpdateWithoutAsDoctorInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsDoctorInput = {
@@ -1029,6 +1065,7 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSettlementsInput = {
@@ -1050,6 +1087,7 @@ export type UserCreateWithoutSettlementsInput = {
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsInput = {
@@ -1071,6 +1109,7 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsInput = {
@@ -1097,6 +1136,7 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
@@ -1118,6 +1158,7 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsAdminedInput = {
@@ -1155,6 +1196,7 @@ export type UserUpdateWithoutSettlementsInput = {
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsInput = {
@@ -1176,6 +1218,7 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutSettlementsAdminedInput = {
@@ -1208,6 +1251,7 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
@@ -1229,6 +1273,7 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -1250,6 +1295,7 @@ export type UserCreateWithoutMessagesSentInput = {
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -1271,6 +1317,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -1308,6 +1355,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -1329,6 +1377,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReviewsGivenInput = {
@@ -1350,6 +1399,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsGivenInput = {
@@ -1371,6 +1421,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsGivenInput = {
@@ -1397,6 +1448,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsReceivedInput = {
@@ -1418,6 +1470,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsReceivedInput = {
@@ -1455,6 +1508,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsGivenInput = {
@@ -1476,6 +1530,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReviewsReceivedInput = {
@@ -1508,6 +1563,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
@@ -1529,6 +1585,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutComplaintsInput = {
@@ -1550,6 +1607,7 @@ export type UserCreateWithoutComplaintsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsInput = {
@@ -1571,6 +1629,7 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsInput = {
@@ -1608,6 +1667,7 @@ export type UserUpdateWithoutComplaintsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsInput = {
@@ -1629,6 +1689,111 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutDeviceTokensInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+}
+
+export type UserUncheckedCreateWithoutDeviceTokensInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+}
+
+export type UserCreateOrConnectWithoutDeviceTokensInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeviceTokensInput, Prisma.UserUncheckedCreateWithoutDeviceTokensInput>
+}
+
+export type UserUpsertWithoutDeviceTokensInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDeviceTokensInput, Prisma.UserUncheckedUpdateWithoutDeviceTokensInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeviceTokensInput, Prisma.UserUncheckedCreateWithoutDeviceTokensInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDeviceTokensInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDeviceTokensInput, Prisma.UserUncheckedUpdateWithoutDeviceTokensInput>
+}
+
+export type UserUpdateWithoutDeviceTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDeviceTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
 }
 
 
@@ -1645,6 +1810,7 @@ export type UserCountOutputType = {
   messagesSent: number
   settlements: number
   settlementsAdmined: number
+  deviceTokens: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1656,6 +1822,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   messagesSent?: boolean | UserCountOutputTypeCountMessagesSentArgs
   settlements?: boolean | UserCountOutputTypeCountSettlementsArgs
   settlementsAdmined?: boolean | UserCountOutputTypeCountSettlementsAdminedArgs
+  deviceTokens?: boolean | UserCountOutputTypeCountDeviceTokensArgs
 }
 
 /**
@@ -1724,6 +1891,13 @@ export type UserCountOutputTypeCountSettlementsAdminedArgs<ExtArgs extends runti
   where?: Prisma.SettlementWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDeviceTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeviceTokenWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1745,6 +1919,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
   settlements?: boolean | Prisma.User$settlementsArgs<ExtArgs>
   settlementsAdmined?: boolean | Prisma.User$settlementsAdminedArgs<ExtArgs>
+  deviceTokens?: boolean | Prisma.User$deviceTokensArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1796,6 +1971,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
   settlements?: boolean | Prisma.User$settlementsArgs<ExtArgs>
   settlementsAdmined?: boolean | Prisma.User$settlementsAdminedArgs<ExtArgs>
+  deviceTokens?: boolean | Prisma.User$deviceTokensArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1814,6 +1990,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     messagesSent: Prisma.$MessagePayload<ExtArgs>[]
     settlements: Prisma.$SettlementPayload<ExtArgs>[]
     settlementsAdmined: Prisma.$SettlementPayload<ExtArgs>[]
+    deviceTokens: Prisma.$DeviceTokenPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2229,6 +2406,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   messagesSent<T extends Prisma.User$messagesSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   settlements<T extends Prisma.User$settlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   settlementsAdmined<T extends Prisma.User$settlementsAdminedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settlementsAdminedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deviceTokens<T extends Prisma.User$deviceTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deviceTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2887,6 +3065,30 @@ export type User$settlementsAdminedArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.SettlementScalarFieldEnum | Prisma.SettlementScalarFieldEnum[]
+}
+
+/**
+ * User.deviceTokens
+ */
+export type User$deviceTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeviceToken
+   */
+  select?: Prisma.DeviceTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeviceToken
+   */
+  omit?: Prisma.DeviceTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeviceTokenInclude<ExtArgs> | null
+  where?: Prisma.DeviceTokenWhereInput
+  orderBy?: Prisma.DeviceTokenOrderByWithRelationInput | Prisma.DeviceTokenOrderByWithRelationInput[]
+  cursor?: Prisma.DeviceTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeviceTokenScalarFieldEnum | Prisma.DeviceTokenScalarFieldEnum[]
 }
 
 /**

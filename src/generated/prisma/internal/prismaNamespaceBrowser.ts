@@ -63,6 +63,7 @@ export const ModelName = {
   Review: 'Review',
   Complaint: 'Complaint',
   Specialty: 'Specialty',
+  DeviceToken: 'DeviceToken',
   PlatformSettings: 'PlatformSettings'
 } as const
 
@@ -208,6 +209,9 @@ export const AppointmentScalarFieldEnum = {
   prescriptionUrl: 'prescriptionUrl',
   doctorNotes: 'doctorNotes',
   travelStatus: 'travelStatus',
+  otpCode: 'otpCode',
+  otpVerifiedAt: 'otpVerifiedAt',
+  completedAt: 'completedAt',
   doctorLat: 'doctorLat',
   doctorLng: 'doctorLng',
   doctorLocationUpdatedAt: 'doctorLocationUpdatedAt',
@@ -305,6 +309,18 @@ export const SpecialtyScalarFieldEnum = {
 } as const
 
 export type SpecialtyScalarFieldEnum = (typeof SpecialtyScalarFieldEnum)[keyof typeof SpecialtyScalarFieldEnum]
+
+
+export const DeviceTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  token: 'token',
+  platform: 'platform',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DeviceTokenScalarFieldEnum = (typeof DeviceTokenScalarFieldEnum)[keyof typeof DeviceTokenScalarFieldEnum]
 
 
 export const PlatformSettingsScalarFieldEnum = {

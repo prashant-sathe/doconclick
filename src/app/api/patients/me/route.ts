@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 
 const EDITABLE_FIELDS = [
   "location",
@@ -22,8 +22,8 @@ const EDITABLE_FIELDS = [
 ] as const;
 
 // GET: The logged-in patient's own profile
-export async function GET() {
-  const authUser = await getAuthUser();
+export async function GET(req: Request) {
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -48,7 +48,7 @@ export async function GET() {
 
 // PATCH: Update the logged-in patient's own profile
 export async function PATCH(req: Request) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }

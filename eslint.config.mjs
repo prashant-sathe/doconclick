@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // The Flutter app — not part of this ESLint project, and its native
+    // build output (mobile/build/**) contains vendored third-party JS.
+    "mobile/**",
   ]),
 ]);
 

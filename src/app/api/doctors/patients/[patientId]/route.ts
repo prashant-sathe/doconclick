@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 
 // GET: A patient's (or one of their family member's) profile + shared
 // appointment history, visible to a doctor only if they have at least one
@@ -12,7 +12,7 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ patientId: string }> }
 ) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -88,6 +88,7 @@ export async function GET(
           emergencyContactPhone: dependent.emergencyContactPhone,
         }
       : null,
-    appointments: sharedAppointments,
+    // Never send the patient's visit-verification code to the doctor.
+    appointments: sharedAppointments.map(({ otpCode: _otpCode, ...a }) => a),
   });
 }

@@ -102,6 +102,11 @@ export type Complaint = Prisma.ComplaintModel
  */
 export type Specialty = Prisma.SpecialtyModel
 /**
+ * Model DeviceToken
+ * 
+ */
+export type DeviceToken = Prisma.DeviceTokenModel
+/**
  * Model PlatformSettings
  * 
  */

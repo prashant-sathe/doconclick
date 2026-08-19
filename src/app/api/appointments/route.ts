@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
+import { sendPushToUser } from "@/lib/pushNotifications";
 
 export async function POST(req: Request) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -105,6 +106,12 @@ export async function POST(req: Request) {
         patient: { select: { name: true } },
         doctor: { select: { name: true } },
       },
+    });
+
+    sendPushToUser(doctorId, {
+      title: "New booking request",
+      body: `${patient.name} requested a ${consultType.toLowerCase()} consultation.`,
+      data: { type: "appointment_request", appointmentId: appointment.id },
     });
 
     return NextResponse.json(appointment);

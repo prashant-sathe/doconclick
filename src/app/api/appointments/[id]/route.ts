@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
+import { sendPushToUser } from "@/lib/pushNotifications";
+import { generateOtp, omitOtp } from "@/lib/otp";
 
 // Valid status transitions a doctor may make, keyed by the appointment's current status
 const DOCTOR_TRANSITIONS: Record<string, string[]> = {
@@ -12,16 +14,16 @@ const DOCTOR_TRANSITIONS: Record<string, string[]> = {
 // GET: A single appointment, visible only to its own patient or doctor
 // (used for lightweight polling, e.g. live travel-status tracking)
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
   const { id } = await params;
-  const appointment = await prisma.appointment.findUnique({
+  let appointment = await prisma.appointment.findUnique({
     where: { id },
     include: {
       doctor: { select: { name: true, doctorProfile: { select: { specialty: true } } } },
@@ -32,7 +34,19 @@ export async function GET(
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
   }
 
-  return NextResponse.json(appointment);
+  // Backfill for appointments accepted before OTP verification existed.
+  if (appointment.patientId === authUser.id && appointment.status === "SCHEDULED" && !appointment.otpCode) {
+    appointment = await prisma.appointment.update({
+      where: { id },
+      data: { otpCode: generateOtp() },
+      include: {
+        doctor: { select: { name: true, doctorProfile: { select: { specialty: true } } } },
+        patient: { select: { name: true } },
+      },
+    });
+  }
+
+  return NextResponse.json(appointment.doctorId === authUser.id ? omitOtp(appointment) : appointment);
 }
 
 // PATCH: Doctor accepts/rejects/completes/cancels their own appointment;
@@ -41,7 +55,7 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -81,17 +95,39 @@ export async function PATCH(
         { status: 400 }
       );
     }
+    if (status === "COMPLETED" && !appointment.otpVerifiedAt) {
+      return NextResponse.json(
+        { error: "Verify the patient's OTP before completing this consultation." },
+        { status: 400 }
+      );
+    }
     const updated = await prisma.appointment.update({
       where: { id },
       data: {
         status,
         doctorNotes: doctorNotes ?? appointment.doctorNotes,
+        ...(status === "SCHEDULED" && appointment.status === "PENDING_APPROVAL"
+          ? { otpCode: generateOtp() }
+          : {}),
+        ...(status === "COMPLETED" ? { completedAt: new Date() } : {}),
         ...(status === "COMPLETED" && appointment.paymentMethod === "CASH"
           ? { paymentStatus: "PAID" }
           : {}),
       },
     });
-    return NextResponse.json(updated);
+    sendPushToUser(appointment.patientId, {
+      title: "Appointment update",
+      body:
+        status === "SCHEDULED"
+          ? "Your booking was accepted."
+          : status === "REJECTED"
+            ? "Your booking was declined."
+            : status === "COMPLETED"
+              ? "Your consultation is complete."
+              : "Your appointment was cancelled.",
+      data: { type: "appointment_status", appointmentId: id, status },
+    });
+    return NextResponse.json(omitOtp(updated));
   }
 
   if (authUser.role === "PATIENT") {
@@ -107,6 +143,11 @@ export async function PATCH(
     const updated = await prisma.appointment.update({
       where: { id },
       data: { status: "CANCELLED" },
+    });
+    sendPushToUser(appointment.doctorId, {
+      title: "Appointment cancelled",
+      body: "The patient cancelled their booking request.",
+      data: { type: "appointment_status", appointmentId: id, status: "CANCELLED" },
     });
     return NextResponse.json(updated);
   }

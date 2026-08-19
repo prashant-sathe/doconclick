@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUserAny } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
 
 const ALLOWED_TYPES: Record<string, string> = {
@@ -21,7 +21,7 @@ const DOC_FIELD: Record<string, "photoUrl" | "medRegCertUrl" | "degreeCertUrl" |
 // POST: Doctor uploads a verification document or profile photo.
 // `type` (form field) selects which slot: photo | medRegCert | degreeCert | kyc
 export async function POST(req: Request) {
-  const authUser = await getAuthUser();
+  const authUser = await getAuthUserAny(req);
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }

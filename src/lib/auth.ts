@@ -87,3 +87,21 @@ export function getTokenFromRequest(request: Request): JWTPayload | null {
   if (!match) return null;
   return verifyToken(decodeURIComponent(match[1]));
 }
+
+// ──────────────────────────────────────────────────────────────
+// Bearer-token helpers (for the Flutter app — no cookie support there)
+// ──────────────────────────────────────────────────────────────
+export function getAuthUserFromBearer(request: Request): JWTPayload | null {
+  const header = request.headers.get("authorization") ?? "";
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  if (!match) return null;
+  return verifyToken(match[1]);
+}
+
+// Tries the browser cookie first (so existing web behavior is untouched),
+// then falls back to an `Authorization: Bearer` header for mobile clients.
+export async function getAuthUserAny(request: Request): Promise<JWTPayload | null> {
+  const cookieUser = await getAuthUser();
+  if (cookieUser) return cookieUser;
+  return getAuthUserFromBearer(request);
+}

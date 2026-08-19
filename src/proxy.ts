@@ -23,6 +23,29 @@ const ROLE_HOME: Record<string, string> = {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Dev-only CORS so the Flutter web build (`flutter run -d chrome`, served
+  // from its own localhost port) can call this API cross-origin. Bearer-token
+  // auth means no cookies/credentials are involved, so reflecting the origin
+  // is safe here — and this never runs in production.
+  if (pathname.startsWith("/api/") && process.env.NODE_ENV !== "production") {
+    const origin = request.headers.get("origin");
+    if (origin) {
+      const corsHeaders = {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      };
+      if (request.method === "OPTIONS") {
+        return new NextResponse(null, { status: 204, headers: corsHeaders });
+      }
+      const res = NextResponse.next();
+      for (const [key, value] of Object.entries(corsHeaders)) {
+        res.headers.set(key, value);
+      }
+      return res;
+    }
+  }
+
   // Skip API routes, static files, auth pages, and public pages
   if (
     pathname.startsWith("/api/") ||

@@ -11,6 +11,7 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
+import ConsultationTimer from "@/components/ConsultationTimer";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { playMessageChime } from "@/lib/playNotificationSound";
 
@@ -26,6 +27,12 @@ interface DoctorProfile {
 interface DoctorMe {
   name: string;
   doctorProfile: DoctorProfile | null;
+}
+
+interface Attachment {
+  id: string;
+  url: string;
+  fileName: string | null;
 }
 
 interface Appointment {
@@ -44,8 +51,11 @@ interface Appointment {
   paymentStatus: string;
   isEmergency: boolean;
   travelStatus: string;
+  otpVerifiedAt: string | null;
+  completedAt: string | null;
   scheduledAt: string;
   unreadMessageCount: number;
+  attachments: Attachment[];
   patient: {
     name: string;
     mobile: string;
@@ -71,22 +81,101 @@ function historyHref(a: Appointment): string {
 }
 const EMPTY_ROW: MedicineRow = { name: "", dosage: "", frequency: "", duration: "", instructions: "" };
 
-function CompleteVisitForm({ appt, onDone, onCancel }: {
+// Ask the patient for their 6-digit visit code, in person, before any
+// prescription work (or completion) is allowed — proves the doctor actually
+// met the patient. The backend enforces this too; this is just the UI for it.
+function OtpVerify({ apptId, onVerified }: { apptId: string; onVerified: () => void }) {
+  const [otp, setOtp] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const verify = async () => {
+    setBusy(true);
+    setError("");
+    const res = await fetch(`/api/appointments/${apptId}/otp`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ otp }),
+    });
+    setBusy(false);
+    if (!res.ok) {
+      setError((await res.json().catch(() => ({}))).error ?? "Could not verify the OTP.");
+      setOtp("");
+      return;
+    }
+    onVerified();
+  };
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <input
+        type="text"
+        inputMode="numeric"
+        maxLength={6}
+        className="input-field text-xs py-1.5 w-20 text-center tracking-widest"
+        placeholder="OTP"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+      />
+      <button onClick={verify} disabled={busy || otp.length !== 6} className="btn-primary py-1.5 px-3 text-xs">
+        {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Verify"}
+      </button>
+      {error && <span className="text-xs text-red-500">{error}</span>}
+    </div>
+  );
+}
+
+function CompleteVisitForm({ appt, onDone, onCancel, onAttachmentsChanged }: {
   appt: Appointment;
   onDone: () => void;
   onCancel: () => void;
+  onAttachmentsChanged: () => void;
 }) {
   const [notes, setNotes] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
+  const [attachments, setAttachments] = useState<Attachment[]>(appt.attachments);
+  const [uploading, setUploading] = useState(false);
   const [fileError, setFileError] = useState("");
+  const [toast, setToast] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [medicines, setMedicines] = useState<MedicineRow[]>([{ ...EMPTY_ROW }]);
   const [busy, setBusy] = useState(false);
 
-  const addFiles = (picked: FileList | null) => {
-    if (!picked) return;
-    setFiles((cur) => [...cur, ...Array.from(picked)]);
+  const flash = (message: string) => {
+    setToast(message);
+    setTimeout(() => setToast(""), 3000);
   };
-  const removeFile = (i: number) => setFiles((cur) => cur.filter((_, idx) => idx !== i));
+
+  const uploadFiles = async (picked: FileList | null) => {
+    if (!picked || picked.length === 0) return;
+    setUploading(true);
+    setFileError("");
+    const form = new FormData();
+    Array.from(picked).forEach((f) => form.append("file", f));
+    const res = await fetch(`/api/appointments/${appt.id}/prescription`, { method: "POST", body: form });
+    setUploading(false);
+    if (!res.ok) {
+      setFileError((await res.json().catch(() => ({}))).error ?? "Could not upload attachments.");
+      return;
+    }
+    const updated: Appointment = await res.json();
+    setAttachments(updated.attachments);
+    onAttachmentsChanged();
+    flash(picked.length > 1 ? `${picked.length} files uploaded.` : "File uploaded.");
+  };
+
+  const deleteAttachment = async (att: Attachment) => {
+    if (!confirm(`Remove "${att.fileName ?? "this file"}" from this appointment?`)) return;
+    setDeletingId(att.id);
+    const res = await fetch(`/api/appointments/${appt.id}/prescription/${att.id}`, { method: "DELETE" });
+    setDeletingId(null);
+    if (!res.ok) {
+      setFileError((await res.json().catch(() => ({}))).error ?? "Could not delete the attachment.");
+      return;
+    }
+    setAttachments((cur) => cur.filter((a) => a.id !== att.id));
+    onAttachmentsChanged();
+    flash("Attachment removed.");
+  };
 
   const setMed = (i: number, k: keyof MedicineRow, v: string) => {
     setMedicines((rows) => rows.map((r, idx) => (idx === i ? { ...r, [k]: v } : r)));
@@ -96,12 +185,16 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
   const submit = async () => {
     setBusy(true);
-    setFileError("");
-    await fetch(`/api/appointments/${appt.id}`, {
+    const res = await fetch(`/api/appointments/${appt.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "COMPLETED", doctorNotes: notes }),
     });
+    if (!res.ok) {
+      setBusy(false);
+      setFileError((await res.json().catch(() => ({}))).error ?? "Could not mark this consultation complete.");
+      return;
+    }
     const validMedicines = medicines.filter((m) => m.name.trim());
     if (validMedicines.length > 0) {
       await fetch(`/api/appointments/${appt.id}/prescription-items`, {
@@ -109,16 +202,6 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ medicines: validMedicines }),
       });
-    }
-    if (files.length > 0) {
-      const form = new FormData();
-      files.forEach((f) => form.append("file", f));
-      const res = await fetch(`/api/appointments/${appt.id}/prescription`, { method: "POST", body: form });
-      if (!res.ok) {
-        setBusy(false);
-        setFileError((await res.json().catch(() => ({}))).error ?? "Could not upload attachments.");
-        return;
-      }
     }
     setBusy(false);
     onDone();
@@ -160,19 +243,24 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       </div>
 
       <div>
-        <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer">
-          <Paperclip className="w-3.5 h-3.5" />
-          Attach reports/scans (PDF/JPG/PNG, optional, multiple allowed)
-          <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple className="hidden"
-            onChange={(e) => addFiles(e.target.files)} />
-        </label>
-        {files.length > 0 && (
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer">
+            <Paperclip className="w-3.5 h-3.5" />
+            {uploading ? "Uploading…" : "Attach reports/scans (PDF/JPG/PNG, multiple allowed)"}
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple className="hidden" disabled={uploading}
+              onChange={(e) => { uploadFiles(e.target.files); e.target.value = ""; }} />
+          </label>
+          {toast && <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> {toast}</span>}
+        </div>
+        {attachments.length > 0 && (
           <ul className="mt-2 space-y-1">
-            {files.map((f, i) => (
-              <li key={i} className="flex items-center justify-between gap-2 bg-white rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs text-slate-600">
-                <span className="truncate">{f.name}</span>
-                <button type="button" onClick={() => removeFile(i)} className="text-slate-400 hover:text-red-500 flex-shrink-0">
-                  <X className="w-3.5 h-3.5" />
+            {attachments.map((att) => (
+              <li key={att.id} className="flex items-center justify-between gap-2 bg-white rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs text-slate-600">
+                <a href={att.url} target="_blank" rel="noopener noreferrer" className="truncate hover:underline hover:text-teal-600">
+                  {att.fileName ?? "Attachment"}
+                </a>
+                <button type="button" onClick={() => deleteAttachment(att)} disabled={deletingId === att.id} className="text-slate-400 hover:text-red-500 flex-shrink-0">
+                  {deletingId === att.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                 </button>
               </li>
             ))}
@@ -568,9 +656,14 @@ export default function DoctorDashboard() {
                               <MapPinCheck className="w-3 h-3" /> Marked arrived
                             </div>
                           )}
+                          {a.otpVerifiedAt && (
+                            <div className="mt-1">
+                              <ConsultationTimer startedAt={a.otpVerifiedAt} endedAt={a.completedAt} />
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <div className="flex gap-2 flex-shrink-0">
+                      <div className="flex gap-2 flex-shrink-0 items-center">
                         <Link href={historyHref(a)} className="btn-secondary py-1.5 px-3 text-xs" title="Patient history">
                           <History className="w-3.5 h-3.5" />
                         </Link>
@@ -596,7 +689,9 @@ export default function DoctorDashboard() {
                           <XCircle className="w-3.5 h-3.5" /> Cancel
                         </button>
                         {(a.consultType !== "HOME" || a.travelStatus === "ARRIVED") && (
-                          a.paymentMethod === "ONLINE" && a.paymentStatus !== "PAID" ? (
+                          !a.otpVerifiedAt ? (
+                            <OtpVerify apptId={a.id} onVerified={loadAppointments} />
+                          ) : a.paymentMethod === "ONLINE" && a.paymentStatus !== "PAID" ? (
                             <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-semibold px-1" title="Waiting for the patient to pay before this can be marked complete">
                               <Clock className="w-3.5 h-3.5" /> Awaiting payment
                             </span>
@@ -613,6 +708,7 @@ export default function DoctorDashboard() {
                         appt={a}
                         onCancel={() => setCompletingId(null)}
                         onDone={() => { setCompletingId(null); loadAppointments(); }}
+                        onAttachmentsChanged={loadAppointments}
                       />
                     )}
                   </div>
@@ -647,6 +743,11 @@ export default function DoctorDashboard() {
                     <div className="text-xs text-slate-400">
                       {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
                     </div>
+                    {a.otpVerifiedAt && a.completedAt && (
+                      <div className="mt-0.5">
+                        <ConsultationTimer startedAt={a.otpVerifiedAt} endedAt={a.completedAt} />
+                      </div>
+                    )}
                   </div>
                   <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>
                 </div>

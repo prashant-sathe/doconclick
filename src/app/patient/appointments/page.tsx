@@ -6,13 +6,14 @@ import {
   Loader2, CalendarClock, Stethoscope, Home, Building2, Video,
   FileText, Star, X, Wallet, CreditCard, Siren, RotateCcw, Clock,
   Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin,
-  MessageCircle,
+  MessageCircle, KeyRound, ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
+import ConsultationTimer from "@/components/ConsultationTimer";
 import { playMessageChime } from "@/lib/playNotificationSound";
 
 interface Medicine {
@@ -43,6 +44,9 @@ interface Appointment {
   paymentStatus: string;
   isEmergency: boolean;
   travelStatus: string;
+  otpCode: string | null;
+  otpVerifiedAt: string | null;
+  completedAt: string | null;
   unreadMessageCount: number;
   attachments: Attachment[];
   doctorNotes: string | null;
@@ -212,6 +216,29 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
           <MapPinCheck className="w-4 h-4 flex-shrink-0" /> {a.doctor.name} has arrived.
+        </div>
+      )}
+      {a.status === "SCHEDULED" && a.otpVerifiedAt && (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center justify-between gap-2 flex-wrap">
+          <span className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 flex-shrink-0 text-slate-500" /> Verified with your doctor
+          </span>
+          <ConsultationTimer startedAt={a.otpVerifiedAt} endedAt={a.completedAt} />
+        </div>
+      )}
+      {a.status === "SCHEDULED" && !a.otpVerifiedAt && a.otpCode && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-3 flex items-center gap-3">
+          <KeyRound className="w-5 h-5 flex-shrink-0 text-blue-600" />
+          <div>
+            <div className="text-xs text-blue-700 font-semibold">Visit OTP</div>
+            <div className="text-lg font-extrabold text-blue-900 tracking-widest">{a.otpCode}</div>
+          </div>
+          <span className="text-xs text-blue-700 ml-auto">Share this with your doctor when they begin your consultation</span>
+        </div>
+      )}
+      {a.status === "COMPLETED" && a.otpVerifiedAt && a.completedAt && (
+        <div className="mb-3">
+          <ConsultationTimer startedAt={a.otpVerifiedAt} endedAt={a.completedAt} />
         </div>
       )}
 
