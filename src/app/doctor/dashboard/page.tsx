@@ -615,6 +615,11 @@ export default function DoctorDashboard() {
                             </span>
                           )}
                         </Link>
+                        {a.consultType === "VIDEO" && (
+                          <Link href={`/doctor/video/${a.id}`} className="btn-secondary py-1.5 px-3 text-xs" title="Join video call">
+                            <Video className="w-3.5 h-3.5" />
+                          </Link>
+                        )}
                         {a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (
                           <button onClick={() => startJourney(a.id)} disabled={startingJourneyId === a.id} className="btn-secondary py-1.5 px-3 text-xs text-blue-600 border-blue-200 hover:bg-blue-50">
                             {startingJourneyId === a.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Car className="w-3.5 h-3.5" />} Start Journey

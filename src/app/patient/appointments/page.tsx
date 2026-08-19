@@ -271,6 +271,11 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
             )}
           </Link>
         )}
+        {a.consultType === "VIDEO" && a.status === "SCHEDULED" && (
+          <Link href={`/patient/video/${a.id}`} className="btn-secondary py-2 px-3 text-xs">
+            <Video className="w-3.5 h-3.5" /> Join Video Call
+          </Link>
+        )}
         {a.status === "COMPLETED" && a.attachments.map((att, i) => (
           <a key={att.id} href={att.url} target="_blank" rel="noopener noreferrer" className="btn-secondary py-2 px-3 text-xs">
             <FileText className="w-3.5 h-3.5" />
