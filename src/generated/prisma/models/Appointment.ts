@@ -54,6 +54,7 @@ export type AppointmentMinAggregateOutputType = {
   status: string | null
   paymentMethod: string | null
   paymentStatus: string | null
+  paidAt: Date | null
   isEmergency: boolean | null
   amount: number | null
   platformFee: number | null
@@ -85,6 +86,7 @@ export type AppointmentMaxAggregateOutputType = {
   status: string | null
   paymentMethod: string | null
   paymentStatus: string | null
+  paidAt: Date | null
   isEmergency: boolean | null
   amount: number | null
   platformFee: number | null
@@ -116,6 +118,7 @@ export type AppointmentCountAggregateOutputType = {
   status: number
   paymentMethod: number
   paymentStatus: number
+  paidAt: number
   isEmergency: number
   amount: number
   platformFee: number
@@ -163,6 +166,7 @@ export type AppointmentMinAggregateInputType = {
   status?: true
   paymentMethod?: true
   paymentStatus?: true
+  paidAt?: true
   isEmergency?: true
   amount?: true
   platformFee?: true
@@ -194,6 +198,7 @@ export type AppointmentMaxAggregateInputType = {
   status?: true
   paymentMethod?: true
   paymentStatus?: true
+  paidAt?: true
   isEmergency?: true
   amount?: true
   platformFee?: true
@@ -225,6 +230,7 @@ export type AppointmentCountAggregateInputType = {
   status?: true
   paymentMethod?: true
   paymentStatus?: true
+  paidAt?: true
   isEmergency?: true
   amount?: true
   platformFee?: true
@@ -343,6 +349,7 @@ export type AppointmentGroupByOutputType = {
   status: string
   paymentMethod: string
   paymentStatus: string
+  paidAt: Date | null
   isEmergency: boolean
   amount: number
   platformFee: number
@@ -397,6 +404,7 @@ export type AppointmentWhereInput = {
   status?: Prisma.StringFilter<"Appointment"> | string
   paymentMethod?: Prisma.StringFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringFilter<"Appointment"> | string
+  paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   isEmergency?: Prisma.BoolFilter<"Appointment"> | boolean
   amount?: Prisma.FloatFilter<"Appointment"> | number
   platformFee?: Prisma.FloatFilter<"Appointment"> | number
@@ -438,6 +446,7 @@ export type AppointmentOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
+  paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
   isEmergency?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
@@ -482,6 +491,7 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.StringFilter<"Appointment"> | string
   paymentMethod?: Prisma.StringFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringFilter<"Appointment"> | string
+  paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   isEmergency?: Prisma.BoolFilter<"Appointment"> | boolean
   amount?: Prisma.FloatFilter<"Appointment"> | number
   platformFee?: Prisma.FloatFilter<"Appointment"> | number
@@ -523,6 +533,7 @@ export type AppointmentOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
+  paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
   isEmergency?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
@@ -562,6 +573,7 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   status?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
   paymentMethod?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
+  paidAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   isEmergency?: Prisma.BoolWithAggregatesFilter<"Appointment"> | boolean
   amount?: Prisma.FloatWithAggregatesFilter<"Appointment"> | number
   platformFee?: Prisma.FloatWithAggregatesFilter<"Appointment"> | number
@@ -590,6 +602,7 @@ export type AppointmentCreateInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -629,6 +642,7 @@ export type AppointmentUncheckedCreateInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -662,6 +676,7 @@ export type AppointmentUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -701,6 +716,7 @@ export type AppointmentUncheckedUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -737,6 +753,7 @@ export type AppointmentCreateManyInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -765,6 +782,7 @@ export type AppointmentUpdateManyMutationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -794,6 +812,7 @@ export type AppointmentUncheckedUpdateManyInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -840,6 +859,7 @@ export type AppointmentCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
+  paidAt?: Prisma.SortOrder
   isEmergency?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
@@ -878,6 +898,7 @@ export type AppointmentMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
+  paidAt?: Prisma.SortOrder
   isEmergency?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
@@ -909,6 +930,7 @@ export type AppointmentMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
+  paidAt?: Prisma.SortOrder
   isEmergency?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
@@ -1231,6 +1253,7 @@ export type AppointmentCreateWithoutPatientInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1268,6 +1291,7 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1311,6 +1335,7 @@ export type AppointmentCreateWithoutDoctorInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1348,6 +1373,7 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1413,6 +1439,7 @@ export type AppointmentScalarWhereInput = {
   status?: Prisma.StringFilter<"Appointment"> | string
   paymentMethod?: Prisma.StringFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringFilter<"Appointment"> | string
+  paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   isEmergency?: Prisma.BoolFilter<"Appointment"> | boolean
   amount?: Prisma.FloatFilter<"Appointment"> | number
   platformFee?: Prisma.FloatFilter<"Appointment"> | number
@@ -1457,6 +1484,7 @@ export type AppointmentCreateWithoutDependentInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1494,6 +1522,7 @@ export type AppointmentUncheckedCreateWithoutDependentInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1553,6 +1582,7 @@ export type AppointmentCreateWithoutFollowUpsInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1591,6 +1621,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1628,6 +1659,7 @@ export type AppointmentCreateWithoutFollowUpOfInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1666,6 +1698,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1719,6 +1752,7 @@ export type AppointmentUpdateWithoutFollowUpsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1757,6 +1791,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1805,6 +1840,7 @@ export type AppointmentCreateWithoutSettlementInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1843,6 +1879,7 @@ export type AppointmentUncheckedCreateWithoutSettlementInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1901,6 +1938,7 @@ export type AppointmentCreateWithoutMessagesInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1939,6 +1977,7 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -1987,6 +2026,7 @@ export type AppointmentUpdateWithoutMessagesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2025,6 +2065,7 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2057,6 +2098,7 @@ export type AppointmentCreateWithoutMedicinesInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -2095,6 +2137,7 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -2143,6 +2186,7 @@ export type AppointmentUpdateWithoutMedicinesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2181,6 +2225,7 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2213,6 +2258,7 @@ export type AppointmentCreateWithoutAttachmentsInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -2251,6 +2297,7 @@ export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -2299,6 +2346,7 @@ export type AppointmentUpdateWithoutAttachmentsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2337,6 +2385,7 @@ export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2369,6 +2418,7 @@ export type AppointmentCreateWithoutReviewInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -2407,6 +2457,7 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -2455,6 +2506,7 @@ export type AppointmentUpdateWithoutReviewInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2493,6 +2545,7 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2527,6 +2580,7 @@ export type AppointmentCreateManyPatientInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -2557,6 +2611,7 @@ export type AppointmentCreateManyDoctorInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -2585,6 +2640,7 @@ export type AppointmentUpdateWithoutPatientInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2622,6 +2678,7 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2657,6 +2714,7 @@ export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2685,6 +2743,7 @@ export type AppointmentUpdateWithoutDoctorInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2722,6 +2781,7 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2757,6 +2817,7 @@ export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2787,6 +2848,7 @@ export type AppointmentCreateManyDependentInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -2815,6 +2877,7 @@ export type AppointmentUpdateWithoutDependentInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2852,6 +2915,7 @@ export type AppointmentUncheckedUpdateWithoutDependentInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2887,6 +2951,7 @@ export type AppointmentUncheckedUpdateManyWithoutDependentInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2918,6 +2983,7 @@ export type AppointmentCreateManyFollowUpOfInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -2945,6 +3011,7 @@ export type AppointmentUpdateWithoutFollowUpOfInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2983,6 +3050,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -3018,6 +3086,7 @@ export type AppointmentUncheckedUpdateManyWithoutFollowUpOfInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -3048,6 +3117,7 @@ export type AppointmentCreateManySettlementInput = {
   status?: string
   paymentMethod?: string
   paymentStatus?: string
+  paidAt?: Date | string | null
   isEmergency?: boolean
   amount?: number
   platformFee?: number
@@ -3075,6 +3145,7 @@ export type AppointmentUpdateWithoutSettlementInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -3113,6 +3184,7 @@ export type AppointmentUncheckedUpdateWithoutSettlementInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -3148,6 +3220,7 @@ export type AppointmentUncheckedUpdateManyWithoutSettlementInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -3236,6 +3309,7 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   status?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
+  paidAt?: boolean
   isEmergency?: boolean
   amount?: boolean
   platformFee?: boolean
@@ -3278,6 +3352,7 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   status?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
+  paidAt?: boolean
   isEmergency?: boolean
   amount?: boolean
   platformFee?: boolean
@@ -3314,6 +3389,7 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   status?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
+  paidAt?: boolean
   isEmergency?: boolean
   amount?: boolean
   platformFee?: boolean
@@ -3350,6 +3426,7 @@ export type AppointmentSelectScalar = {
   status?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
+  paidAt?: boolean
   isEmergency?: boolean
   amount?: boolean
   platformFee?: boolean
@@ -3367,7 +3444,7 @@ export type AppointmentSelectScalar = {
   createdAt?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "status" | "paymentMethod" | "paymentStatus" | "isEmergency" | "amount" | "platformFee" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "scheduledAt" | "createdAt", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "status" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "scheduledAt" | "createdAt", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -3424,6 +3501,7 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     status: string
     paymentMethod: string
     paymentStatus: string
+    paidAt: Date | null
     isEmergency: boolean
     amount: number
     platformFee: number
@@ -3885,6 +3963,7 @@ export interface AppointmentFieldRefs {
   readonly status: Prisma.FieldRef<"Appointment", 'String'>
   readonly paymentMethod: Prisma.FieldRef<"Appointment", 'String'>
   readonly paymentStatus: Prisma.FieldRef<"Appointment", 'String'>
+  readonly paidAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly isEmergency: Prisma.FieldRef<"Appointment", 'Boolean'>
   readonly amount: Prisma.FieldRef<"Appointment", 'Float'>
   readonly platformFee: Prisma.FieldRef<"Appointment", 'Float'>

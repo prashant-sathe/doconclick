@@ -1549,6 +1549,7 @@ export const AppointmentScalarFieldEnum = {
   status: 'status',
   paymentMethod: 'paymentMethod',
   paymentStatus: 'paymentStatus',
+  paidAt: 'paidAt',
   isEmergency: 'isEmergency',
   amount: 'amount',
   platformFee: 'platformFee',

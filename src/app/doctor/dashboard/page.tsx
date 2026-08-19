@@ -14,6 +14,7 @@ import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { FREQUENCY_OPTIONS, DURATION_OPTIONS } from "@/lib/medicalOptions";
+import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 
 interface DoctorProfile {
   specialty: string;
@@ -43,6 +44,7 @@ interface Appointment {
   platformFee: number;
   paymentMethod: string;
   paymentStatus: string;
+  paidAt: string | null;
   isEmergency: boolean;
   travelStatus: string;
   scheduledAt: string;
@@ -68,6 +70,13 @@ const TYPE_ICON: Record<string, React.ElementType> = { HOME: Home, CLINIC: Build
 
 function patientLabel(a: Appointment): string {
   return a.relation !== "Self" && a.patientName ? a.patientName : a.patient.name;
+}
+// Seconds left before a paid video appointment's "Join Video Call" button
+// unlocks; 0 once VIDEO_UNLOCK_DELAY_SECONDS has passed since payment.
+function videoUnlockRemainingSec(a: Appointment, now: number): number {
+  if (!a.paidAt) return 0;
+  const unlockAt = new Date(a.paidAt).getTime() + VIDEO_UNLOCK_DELAY_SECONDS * 1000;
+  return Math.max(0, Math.ceil((unlockAt - now) / 1000));
 }
 function historyHref(a: Appointment): string {
   return a.dependentId ? `/doctor/patients/${a.patientId}?dependentId=${a.dependentId}` : `/doctor/patients/${a.patientId}`;
@@ -277,6 +286,13 @@ export default function DoctorDashboard() {
         if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
         unreadTotalRef.current = total;
       });
+  }, []);
+
+  // Ticks the video-call payment-unlock countdown independently of the 5s data poll.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const tick = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(tick);
   }, []);
 
   // Poll so a pending request that times out (no response within 30 min)
@@ -615,10 +631,19 @@ export default function DoctorDashboard() {
                             </span>
                           )}
                         </Link>
-                        {a.consultType === "VIDEO" && (
-                          <Link href={`/doctor/video/${a.id}`} className="btn-secondary py-1.5 px-3 text-xs" title="Join video call">
-                            <Video className="w-3.5 h-3.5" />
-                          </Link>
+                        {a.consultType === "VIDEO" && a.paymentStatus === "PAID" && (
+                          videoUnlockRemainingSec(a, now) > 0 ? (
+                            <span
+                              className="btn-secondary py-1.5 px-3 text-xs opacity-60 cursor-not-allowed"
+                              title={`Video call unlocking in ${videoUnlockRemainingSec(a, now)}s`}
+                            >
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            </span>
+                          ) : (
+                            <Link href={`/doctor/video/${a.id}`} className="btn-secondary py-1.5 px-3 text-xs" title="Join video call">
+                              <Video className="w-3.5 h-3.5" />
+                            </Link>
+                          )
                         )}
                         {a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (
                           <button onClick={() => startJourney(a.id)} disabled={startingJourneyId === a.id} className="btn-secondary py-1.5 px-3 text-xs text-blue-600 border-blue-200 hover:bg-blue-50">

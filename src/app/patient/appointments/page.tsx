@@ -14,6 +14,7 @@ import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
 import { playMessageChime } from "@/lib/playNotificationSound";
+import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 
 interface Medicine {
   id: string;
@@ -41,6 +42,7 @@ interface Appointment {
   amount: number;
   paymentMethod: string;
   paymentStatus: string;
+  paidAt: string | null;
   isEmergency: boolean;
   travelStatus: string;
   unreadMessageCount: number;
@@ -80,6 +82,14 @@ function formatCountdown(ms: number): string {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+// Seconds left before a paid video appointment's "Join Video Call" button
+// unlocks; 0 once VIDEO_UNLOCK_DELAY_SECONDS has passed since payment.
+function videoUnlockRemainingSec(a: Appointment, now: number): number {
+  if (!a.paidAt) return 0;
+  const unlockAt = new Date(a.paidAt).getTime() + VIDEO_UNLOCK_DELAY_SECONDS * 1000;
+  return Math.max(0, Math.ceil((unlockAt - now) / 1000));
 }
 
 function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: string; onClose: () => void; onSubmitted: () => void }) {
@@ -261,6 +271,11 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
             <CardIcon className="w-3.5 h-3.5" /> Pay Now
           </Link>
         )}
+        {needsPayment && a.consultType === "VIDEO" && (
+          <span className="inline-flex items-center text-xs text-slate-400 py-2">
+            Video call unlocks after payment
+          </span>
+        )}
         {(a.status === "SCHEDULED" || a.status === "COMPLETED") && (
           <Link href={`/patient/chat/${a.id}`} className="relative btn-secondary py-2 px-3 text-xs">
             <MessageCircle className="w-3.5 h-3.5" /> Chat
@@ -271,10 +286,16 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
             )}
           </Link>
         )}
-        {a.consultType === "VIDEO" && a.status === "SCHEDULED" && (
-          <Link href={`/patient/video/${a.id}`} className="btn-secondary py-2 px-3 text-xs">
-            <Video className="w-3.5 h-3.5" /> Join Video Call
-          </Link>
+        {a.consultType === "VIDEO" && a.status === "SCHEDULED" && a.paymentStatus === "PAID" && (
+          videoUnlockRemainingSec(a, now) > 0 ? (
+            <span className="btn-secondary py-2 px-3 text-xs opacity-60 cursor-not-allowed">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Unlocking in {videoUnlockRemainingSec(a, now)}s
+            </span>
+          ) : (
+            <Link href={`/patient/video/${a.id}`} className="btn-secondary py-2 px-3 text-xs">
+              <Video className="w-3.5 h-3.5" /> Join Video Call
+            </Link>
+          )
         )}
         {a.status === "COMPLETED" && a.attachments.map((att, i) => (
           <a key={att.id} href={att.url} target="_blank" rel="noopener noreferrer" className="btn-secondary py-2 px-3 text-xs">

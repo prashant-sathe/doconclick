@@ -126,6 +126,7 @@ export async function POST(req: Request) {
     where: { id: appointment.id },
     data: {
       paymentStatus: "PAID",
+      paidAt: new Date(),
       cashfreePaymentId: payload.data.payment.cf_payment_id,
     },
   });

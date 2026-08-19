@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { generateAgoraToken } from "@/lib/agora";
+import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 
 export async function GET(
   _req: Request,
@@ -20,6 +21,21 @@ export async function GET(
   if (appointment.consultType !== "VIDEO" || appointment.status !== "SCHEDULED") {
     return NextResponse.json(
       { error: "Video call is only available for scheduled video consultations." },
+      { status: 403 }
+    );
+  }
+  if (appointment.paymentStatus !== "PAID") {
+    return NextResponse.json(
+      { error: "Payment is required before joining the video call." },
+      { status: 403 }
+    );
+  }
+  const unlockAt = appointment.paidAt
+    ? appointment.paidAt.getTime() + VIDEO_UNLOCK_DELAY_SECONDS * 1000
+    : 0; // defensive: PAID but no paidAt somehow — don't block
+  if (Date.now() < unlockAt) {
+    return NextResponse.json(
+      { error: "Video call is unlocking…", availableAt: new Date(unlockAt).toISOString() },
       { status: 403 }
     );
   }

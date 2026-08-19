@@ -139,6 +139,7 @@ model Appointment {
   status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED
   paymentMethod String    @default("CASH") // ONLINE, CASH
   paymentStatus String    @default("PENDING") // PENDING, PAID
+  paidAt        DateTime?
   isEmergency   Boolean   @default(false)
   amount        Float     @default(0)
   platformFee   Float     @default(0)
