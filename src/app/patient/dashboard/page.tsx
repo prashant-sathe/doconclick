@@ -158,15 +158,42 @@ function PatientDashboardInner() {
   const markersRef = useRef<Map<string, import("leaflet").Marker>>(new Map());
 
   // ── Get user geolocation ───────────────────────────────────────────────
+  // Some mobile browsers/WebViews never invoke either getCurrentPosition
+  // callback (geolocation missing, permission prompt left unanswered, etc.),
+  // which used to leave userPos — and therefore the whole map — stuck at
+  // null forever. A JS-level fallback timer guarantees we always fall back
+  // to the Pune default instead of silently showing no markers.
   useEffect(() => {
+    let settled = false;
+    const fallback = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      setPosError(true);
+      setUserPos([18.5204, 73.8567]); // Pune fallback
+    }, 8000);
+
+    if (!navigator.geolocation) {
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
-      (pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]),
+      (pos) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(fallback);
+        setUserPos([pos.coords.latitude, pos.coords.longitude]);
+      },
       () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(fallback);
         setPosError(true);
         setUserPos([18.5204, 73.8567]); // Pune fallback
       },
       { timeout: 8000 }
     );
+
+    return () => window.clearTimeout(fallback);
   }, []);
 
   // ── Fetch doctors ──────────────────────────────────────────────────────
@@ -379,12 +406,16 @@ function PatientDashboardInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userPos]);
 
-  // ── Re-place markers when doctors list or specialty filter changes ─────
+  // ── Re-place markers when doctors list, filters, or marker colors change ──
+  // `colorFor` falls back to a generic blue until /api/specialties resolves,
+  // so it's a required dep here — otherwise markers placed before that fetch
+  // finishes stay the wrong color until the unrelated 60s `now` tick happens
+  // to fire and incidentally re-place them.
   useEffect(() => {
     if (!leafletMapRef.current) return;
     placeDoctorMarkers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doctors, specialtyFilter, search, now]);
+  }, [doctors, specialtyFilter, search, now, colorFor]);
 
   // ── Fly to selected doctor ─────────────────────────────────────────────
   useEffect(() => {
