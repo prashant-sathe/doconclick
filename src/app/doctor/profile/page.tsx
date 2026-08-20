@@ -487,41 +487,50 @@ export default function DoctorProfilePage() {
           </Link>
         </div>
 
-        {isVerified && (
-        <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
-          <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <QrCode className="w-4 h-4 text-teal-500" /> Your Booking QR Code
-          </h2>
-          <p className="text-sm text-slate-500 mb-4">
-            Patients who scan this land straight on your public profile and can book an appointment with you — print it for your clinic or share the link.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
-            <div className="w-[132px] h-[132px] rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center flex-shrink-0">
-              {qrDataUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={qrDataUrl} alt="Your booking QR code" width={120} height={120} />
-              ) : (
-                <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
-              )}
-            </div>
-            <div className="min-w-0 flex-1 w-full">
-              <p className="text-xs font-semibold text-slate-500 mb-1">Public profile link</p>
-              <p className="text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2 break-all mb-3">{profileUrl}</p>
-              <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={copyLink} className="btn-secondary py-2 px-3 text-xs">
-                  {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                  {linkCopied ? "Copied" : "Copy Link"}
-                </button>
-                {qrDataUrl && (
-                  <button type="button" onClick={downloadBrandedQR} className="btn-secondary py-2 px-3 text-xs">
-                    <Download className="w-3.5 h-3.5" /> Download QR Code
-                  </button>
+        <section className="relative group bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6 overflow-hidden">
+          <div className={isVerified ? undefined : "blur-[2px] select-none pointer-events-none"}>
+            <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <QrCode className="w-4 h-4 text-teal-500" /> Your Booking QR Code
+            </h2>
+            <p className="text-sm text-slate-500 mb-4">
+              Patients who scan this land straight on your public profile and can book an appointment with you — print it for your clinic or share the link.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+              <div className="w-[132px] h-[132px] rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center flex-shrink-0">
+                {qrDataUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={qrDataUrl} alt="Your booking QR code" width={120} height={120} />
+                ) : (
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
                 )}
+              </div>
+              <div className="min-w-0 flex-1 w-full">
+                <p className="text-xs font-semibold text-slate-500 mb-1">Public profile link</p>
+                <p className="text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2 break-all mb-3">{profileUrl}</p>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" onClick={copyLink} className="btn-secondary py-2 px-3 text-xs">
+                    {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    {linkCopied ? "Copied" : "Copy Link"}
+                  </button>
+                  {qrDataUrl && (
+                    <button type="button" onClick={downloadBrandedQR} className="btn-secondary py-2 px-3 text-xs">
+                      <Download className="w-3.5 h-3.5" /> Download QR Code
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
+
+          {!isVerified && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-2 bg-slate-900 text-white text-xs font-medium rounded-full px-4 py-2 shadow-lg text-center max-w-[85%]">
+                <Lock className="w-3.5 h-3.5 flex-shrink-0" />
+                This will unlock once your profile is verified
+              </div>
+            </div>
+          )}
         </section>
-        )}
 
         <form onSubmit={submit} className="space-y-6">
           <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
