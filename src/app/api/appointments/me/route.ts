@@ -18,7 +18,7 @@ export async function GET() {
       where: { patientId: authUser.id },
       orderBy: { scheduledAt: "desc" },
       include: {
-        doctor: { select: { name: true, doctorProfile: { select: { specialty: true, photoUrl: true } } } },
+        doctor: { select: { name: true, doctorProfile: { select: { specialty: true, photoUrl: true, clinicName: true, address: true, lat: true, lng: true } } } },
         review: true,
         medicines: true,
         attachments: true,

@@ -6,7 +6,7 @@ import {
   Loader2, CalendarClock, Stethoscope, Home, Building2, Video,
   FileText, Star, X, Wallet, CreditCard, Siren, RotateCcw, Clock,
   Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin,
-  MessageCircle,
+  MessageCircle, Navigation,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -50,7 +50,10 @@ interface Appointment {
   doctorNotes: string | null;
   scheduledAt: string;
   createdAt: string;
-  doctor: { name: string; doctorProfile: { specialty: string } | null };
+  doctor: {
+    name: string;
+    doctorProfile: { specialty: string; clinicName: string | null; address: string | null; lat: number | null; lng: number | null } | null;
+  };
   review: { id: string; rating: number; comment: string | null } | null;
   medicines: Medicine[];
 }
@@ -90,6 +93,18 @@ function videoUnlockRemainingSec(a: Appointment, now: number): number {
   if (!a.paidAt) return 0;
   const unlockAt = new Date(a.paidAt).getTime() + VIDEO_UNLOCK_DELAY_SECONDS * 1000;
   return Math.max(0, Math.ceil((unlockAt - now) / 1000));
+}
+
+// Google Maps directions link to a doctor's clinic, preferring precise coordinates over the address text.
+function clinicDirectionsUrl(profile: { address: string | null; lat: number | null; lng: number | null } | null): string | null {
+  if (!profile) return null;
+  if (profile.lat != null && profile.lng != null) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${profile.lat},${profile.lng}`;
+  }
+  if (profile.address) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(profile.address)}`;
+  }
+  return null;
 }
 
 function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: string; onClose: () => void; onSubmitted: () => void }) {
@@ -205,6 +220,21 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
           <Clock className="w-4 h-4 flex-shrink-0 text-slate-400" /> {a.doctor.name}{" "}didn&apos;t respond in time and may be too busy right now. No payment was taken — try booking again or choose another doctor.
         </div>
+      )}
+      {a.status === "SCHEDULED" && a.consultType === "CLINIC" && a.paymentStatus === "PAID" && clinicDirectionsUrl(a.doctor.doctorProfile) && (
+        <a
+          href={clinicDirectionsUrl(a.doctor.doctorProfile)!}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-teal-50 border border-teal-200 rounded-xl px-4 py-3 text-sm text-teal-800 mb-3 flex items-center justify-between gap-2 hover:bg-teal-100 transition-colors"
+        >
+          <span className="flex items-center gap-2">
+            <Building2 className="w-4 h-4 flex-shrink-0" /> {a.doctor.doctorProfile?.clinicName || `${a.doctor.name}'s clinic`}
+          </span>
+          <span className="font-semibold underline flex items-center gap-1">
+            <Navigation className="w-3.5 h-3.5" /> Get Directions
+          </span>
+        </a>
       )}
       {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
         <Link
