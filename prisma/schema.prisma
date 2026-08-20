@@ -32,6 +32,19 @@ model User {
   settlements       Settlement[] @relation("DoctorSettlements")
   settlementsAdmined Settlement[] @relation("AdminSettlements")
   paymentLogs       DoctorPaymentLog[] @relation("DoctorPaymentLogs")
+  savedDoctors      SavedDoctor[] @relation("PatientSavedDoctors")
+  savedByPatients   SavedDoctor[] @relation("DoctorSavedBy")
+}
+
+model SavedDoctor {
+  id        String   @id @default(cuid())
+  patientId String
+  patient   User     @relation("PatientSavedDoctors", fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId  String
+  doctor    User     @relation("DoctorSavedBy", fields: [doctorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([patientId, doctorId])
 }
 
 model PatientProfile {

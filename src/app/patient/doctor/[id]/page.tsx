@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
-  Loader2, Heart, Building2, Video, Home, Clock, Languages, UserX,
+  Loader2, Heart, Building2, Video, Home, Clock, Languages, UserX, Bookmark, BookmarkCheck,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import { cn } from "@/lib/utils";
 import { useSpecialties } from "@/lib/useSpecialties";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
@@ -64,9 +65,12 @@ function Header() {
 
 export default function DoctorProfilePage() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const { colorFor } = useSpecialties();
   const [doctor, setDoctor] = useState<DoctorProfileData | null | undefined>(undefined);
   const [reviews, setReviews] = useState<DoctorReview[]>([]);
+  const [saved, setSaved] = useState(false);
+  const [savingBookmark, setSavingBookmark] = useState(false);
 
   useEffect(() => {
     fetch(`/api/doctors/${id}`)
@@ -76,6 +80,29 @@ export default function DoctorProfilePage() {
       .then((r) => (r.ok ? r.json() : []))
       .then(setReviews);
   }, [id]);
+
+  useEffect(() => {
+    if (user?.role !== "PATIENT") return;
+    fetch("/api/patients/me/saved-doctors")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list: { doctor: { id: string } }[]) => setSaved(list.some((s) => s.doctor.id === id)));
+  }, [user, id]);
+
+  const toggleSave = async () => {
+    setSavingBookmark(true);
+    const nextSaved = !saved;
+    setSaved(nextSaved);
+    if (nextSaved) {
+      await fetch("/api/patients/me/saved-doctors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ doctorId: id }),
+      });
+    } else {
+      await fetch(`/api/patients/me/saved-doctors/${id}`, { method: "DELETE" });
+    }
+    setSavingBookmark(false);
+  };
 
   if (doctor === undefined) {
     return (
@@ -117,9 +144,25 @@ export default function DoctorProfilePage() {
               />
             </div>
           )}
-          <div className="p-6">
+          <div className="p-6 relative">
           {/* Header */}
           <div className="flex items-start gap-4 mb-5">
+            {user?.role === "PATIENT" && (
+              <button
+                type="button"
+                onClick={toggleSave}
+                disabled={savingBookmark}
+                title={saved ? "Remove from saved doctors" : "Save doctor for later"}
+                className={cn(
+                  "absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors",
+                  saved
+                    ? "bg-blue-50 border-blue-200 text-blue-600"
+                    : "bg-white border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-200"
+                )}
+              >
+                {saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+              </button>
+            )}
             {profile.photoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img

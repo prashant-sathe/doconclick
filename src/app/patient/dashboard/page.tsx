@@ -6,6 +6,7 @@ import {
   ChevronDown, X, Loader2, CheckCircle, LogOut, Languages,
   Navigation, AlertCircle, IndianRupee, CalendarClock, Siren,
   CalendarCheck2, AlertTriangle, ShieldCheck, Users, Search,
+  Bookmark, BookmarkCheck,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
@@ -130,6 +131,8 @@ function PatientDashboardInner() {
   const [search, setSearch] = useState("");
   const [now, setNow] = useState(() => Date.now());
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [savedDoctorIds, setSavedDoctorIds] = useState<Set<string>>(new Set());
+  const [savingBookmark, setSavingBookmark] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [consultType, setConsultType] = useState("HOME");
@@ -172,6 +175,36 @@ function PatientDashboardInner() {
       .then((r) => r.json())
       .then((data: Doctor[]) => setDoctors(data));
   }, []);
+
+  // ── Fetch this patient's bookmarked doctors, for the save toggle in the detail panel ──
+  useEffect(() => {
+    if (!user || user.role !== "PATIENT") return;
+    fetch("/api/patients/me/saved-doctors")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list: { doctor: { id: string } }[]) => setSavedDoctorIds(new Set(list.map((s) => s.doctor.id))));
+  }, [user]);
+
+  const toggleSaveDoctor = async () => {
+    if (!selectedDoctor) return;
+    const doctorId = selectedDoctor.id;
+    const isSaved = savedDoctorIds.has(doctorId);
+    setSavingBookmark(true);
+    setSavedDoctorIds((prev) => {
+      const next = new Set(prev);
+      isSaved ? next.delete(doctorId) : next.add(doctorId);
+      return next;
+    });
+    if (isSaved) {
+      await fetch(`/api/patients/me/saved-doctors/${doctorId}`, { method: "DELETE" });
+    } else {
+      await fetch("/api/patients/me/saved-doctors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ doctorId }),
+      });
+    }
+    setSavingBookmark(false);
+  };
 
   // Re-checks who's currently within their set hours every minute, so a
   // doctor's pin appears/disappears live as their availability window
@@ -847,7 +880,7 @@ function PatientDashboardInner() {
                         {selectedDoctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
                       </div>
                     )}
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="text-lg font-extrabold text-slate-900 leading-tight">{selectedDoctor.name}</h3>
                         {selectedDoctor.doctorProfile.isVerified && <VerifiedBadge />}
@@ -866,6 +899,19 @@ function PatientDashboardInner() {
                         />
                       </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={toggleSaveDoctor}
+                      disabled={savingBookmark}
+                      title={savedDoctorIds.has(selectedDoctor.id) ? "Remove from saved doctors" : "Save doctor for later"}
+                      className={`w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors flex-shrink-0 ${
+                        savedDoctorIds.has(selectedDoctor.id)
+                          ? "bg-blue-50 border-blue-200 text-blue-600"
+                          : "bg-white border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-200"
+                      }`}
+                    >
+                      {savedDoctorIds.has(selectedDoctor.id) ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                    </button>
                   </div>
 
                   {/* Chips row */}
