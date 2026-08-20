@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { safeNum } from "@/lib/adminAuth";
 
 export async function GET() {
   try {
@@ -15,9 +16,12 @@ export async function GET() {
       prisma.user.count({ where: { role: "PATIENT" } }),
       prisma.user.count({ where: { role: "DOCTOR" } }),
       prisma.appointment.count(),
-      prisma.appointment.aggregate({
-        _sum: { amount: true, platformFee: true },
+      // Summed in JS rather than via Prisma's aggregate/_sum: a single row with a
+      // corrupt (NaN) amount would otherwise poison the whole SQL-level SUM(),
+      // zeroing out revenue from every other completed appointment.
+      prisma.appointment.findMany({
         where: { status: "COMPLETED", paymentStatus: "PAID" },
+        select: { amount: true, platformFee: true },
       }),
       prisma.appointment.findMany({
         take: 5,
@@ -35,8 +39,8 @@ export async function GET() {
       totalPatients,
       totalDoctors,
       totalAppointments,
-      totalRevenue: revenueData._sum.amount ?? 0,
-      totalPlatformFee: revenueData._sum.platformFee ?? 0,
+      totalRevenue: revenueData.reduce((s, a) => s + safeNum(a.amount), 0),
+      totalPlatformFee: revenueData.reduce((s, a) => s + safeNum(a.platformFee), 0),
       recentAppointments,
       pendingDoctors,
       openComplaints: complaints,

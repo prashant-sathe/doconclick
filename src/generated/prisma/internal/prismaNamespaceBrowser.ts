@@ -57,6 +57,7 @@ export const ModelName = {
   DoctorProfile: 'DoctorProfile',
   Appointment: 'Appointment',
   Settlement: 'Settlement',
+  DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
   PrescriptionMedicine: 'PrescriptionMedicine',
   PrescriptionAttachment: 'PrescriptionAttachment',
@@ -236,6 +237,18 @@ export const SettlementScalarFieldEnum = {
 } as const
 
 export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
+
+
+export const DoctorPaymentLogScalarFieldEnum = {
+  id: 'id',
+  doctorId: 'doctorId',
+  type: 'type',
+  amount: 'amount',
+  cashfreePaymentId: 'cashfreePaymentId',
+  createdAt: 'createdAt'
+} as const
+
+export type DoctorPaymentLogScalarFieldEnum = (typeof DoctorPaymentLogScalarFieldEnum)[keyof typeof DoctorPaymentLogScalarFieldEnum]
 
 
 export const MessageScalarFieldEnum = {

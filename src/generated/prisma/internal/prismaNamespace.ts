@@ -403,6 +403,7 @@ export const ModelName = {
   DoctorProfile: 'DoctorProfile',
   Appointment: 'Appointment',
   Settlement: 'Settlement',
+  DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
   PrescriptionMedicine: 'PrescriptionMedicine',
   PrescriptionAttachment: 'PrescriptionAttachment',
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "patientProfile" | "patientDependent" | "doctorProfile" | "appointment" | "settlement" | "message" | "prescriptionMedicine" | "prescriptionAttachment" | "review" | "complaint" | "specialty" | "platformSettings"
+    modelProps: "user" | "patientProfile" | "patientDependent" | "doctorProfile" | "appointment" | "settlement" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionAttachment" | "review" | "complaint" | "specialty" | "platformSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -870,6 +871,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SettlementCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SettlementCountAggregateOutputType> | number
+        }
+      }
+    }
+    DoctorPaymentLog: {
+      payload: Prisma.$DoctorPaymentLogPayload<ExtArgs>
+      fields: Prisma.DoctorPaymentLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DoctorPaymentLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DoctorPaymentLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload>
+        }
+        findFirst: {
+          args: Prisma.DoctorPaymentLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DoctorPaymentLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload>
+        }
+        findMany: {
+          args: Prisma.DoctorPaymentLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload>[]
+        }
+        create: {
+          args: Prisma.DoctorPaymentLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload>
+        }
+        createMany: {
+          args: Prisma.DoctorPaymentLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DoctorPaymentLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload>[]
+        }
+        delete: {
+          args: Prisma.DoctorPaymentLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload>
+        }
+        update: {
+          args: Prisma.DoctorPaymentLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.DoctorPaymentLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DoctorPaymentLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DoctorPaymentLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.DoctorPaymentLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorPaymentLogPayload>
+        }
+        aggregate: {
+          args: Prisma.DoctorPaymentLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDoctorPaymentLog>
+        }
+        groupBy: {
+          args: Prisma.DoctorPaymentLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DoctorPaymentLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DoctorPaymentLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DoctorPaymentLogCountAggregateOutputType> | number
         }
       }
     }
@@ -1586,6 +1661,18 @@ export const SettlementScalarFieldEnum = {
 export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
 
 
+export const DoctorPaymentLogScalarFieldEnum = {
+  id: 'id',
+  doctorId: 'doctorId',
+  type: 'type',
+  amount: 'amount',
+  cashfreePaymentId: 'cashfreePaymentId',
+  createdAt: 'createdAt'
+} as const
+
+export type DoctorPaymentLogScalarFieldEnum = (typeof DoctorPaymentLogScalarFieldEnum)[keyof typeof DoctorPaymentLogScalarFieldEnum]
+
+
 export const MessageScalarFieldEnum = {
   id: 'id',
   appointmentId: 'appointmentId',
@@ -1918,6 +2005,7 @@ export type GlobalOmitConfig = {
   doctorProfile?: Prisma.DoctorProfileOmit
   appointment?: Prisma.AppointmentOmit
   settlement?: Prisma.SettlementOmit
+  doctorPaymentLog?: Prisma.DoctorPaymentLogOmit
   message?: Prisma.MessageOmit
   prescriptionMedicine?: Prisma.PrescriptionMedicineOmit
   prescriptionAttachment?: Prisma.PrescriptionAttachmentOmit

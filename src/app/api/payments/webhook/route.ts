@@ -64,17 +64,27 @@ export async function POST(req: Request) {
     }
     const sixMonthsOut = new Date();
     sixMonthsOut.setMonth(sixMonthsOut.getMonth() + 6);
-    await prisma.doctorProfile.update({
-      where: { id: profile.id },
-      data: {
-        registrationFeePaid: true,
-        registrationFeeStatus: "PAID",
-        cashfreePaymentId: payload.data.payment.cf_payment_id,
-        // First-time-only free trial of patient-access — this only ever
-        // fires once per doctor, at their one and only registration payment.
-        trialEndsAt: sixMonthsOut,
-      },
-    });
+    await prisma.$transaction([
+      prisma.doctorProfile.update({
+        where: { id: profile.id },
+        data: {
+          registrationFeePaid: true,
+          registrationFeeStatus: "PAID",
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+          // First-time-only free trial of patient-access — this only ever
+          // fires once per doctor, at their one and only registration payment.
+          trialEndsAt: sixMonthsOut,
+        },
+      }),
+      prisma.doctorPaymentLog.create({
+        data: {
+          doctorId: profile.userId,
+          type: "REGISTRATION",
+          amount: DOCTOR_REGISTRATION_FEE,
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+        },
+      }),
+    ]);
     return NextResponse.json({ ok: true });
   }
 
@@ -98,13 +108,23 @@ export async function POST(req: Request) {
     const currentPaidUntil = profile.subscriptionPaidUntil ? new Date(profile.subscriptionPaidUntil).getTime() : 0;
     const base = new Date(Math.max(now, currentPaidUntil));
     base.setMonth(base.getMonth() + 1);
-    await prisma.doctorProfile.update({
-      where: { id: profile.id },
-      data: {
-        subscriptionPaidUntil: base,
-        cashfreePaymentId: payload.data.payment.cf_payment_id,
-      },
-    });
+    await prisma.$transaction([
+      prisma.doctorProfile.update({
+        where: { id: profile.id },
+        data: {
+          subscriptionPaidUntil: base,
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+        },
+      }),
+      prisma.doctorPaymentLog.create({
+        data: {
+          doctorId: profile.userId,
+          type: "SUBSCRIPTION",
+          amount: DOCTOR_SUBSCRIPTION_FEE,
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+        },
+      }),
+    ]);
     return NextResponse.json({ ok: true });
   }
 

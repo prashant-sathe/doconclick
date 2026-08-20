@@ -31,6 +31,7 @@ model User {
   messagesSent   Message[]       @relation("SentMessages")
   settlements       Settlement[] @relation("DoctorSettlements")
   settlementsAdmined Settlement[] @relation("AdminSettlements")
+  paymentLogs       DoctorPaymentLog[] @relation("DoctorPaymentLogs")
 }
 
 model PatientProfile {
@@ -178,6 +179,16 @@ model Settlement {
   settledByAdmin   User?    @relation("AdminSettlements", fields: [settledByAdminId], references: [id])
   createdAt        DateTime @default(now())
   appointments     Appointment[]
+}
+
+model DoctorPaymentLog {
+  id                String   @id @default(cuid())
+  doctorId          String
+  doctor            User     @relation("DoctorPaymentLogs", fields: [doctorId], references: [id])
+  type              String   // REGISTRATION, SUBSCRIPTION
+  amount            Float
+  cashfreePaymentId String?
+  createdAt         DateTime @default(now())
 }
 
 model Message {
