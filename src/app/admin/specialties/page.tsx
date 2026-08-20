@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Tag, Plus, Trash2, Loader2, EyeOff, Eye, AlertCircle, Pencil, X, Check } from "lucide-react";
+import { Tag, Plus, Trash2, Loader2, EyeOff, Eye, AlertCircle, Pencil, X, Check, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SpecialtyRow {
@@ -18,6 +18,7 @@ export default function AdminSpecialties() {
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
   const [editTarget, setEditTarget] = useState<SpecialtyRow | null>(null);
   const [editName, setEditName] = useState("");
   const [editColor, setEditColor] = useState("#2563eb");
@@ -34,6 +35,8 @@ export default function AdminSpecialties() {
   };
 
   useEffect(() => { load(); }, []);
+
+  const filtered = specialties.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()));
 
   const addSpecialty = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,18 +150,29 @@ export default function AdminSpecialties() {
         )}
       </form>
 
+      <div className="relative mb-6 max-w-sm">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search specialties…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="input-field pl-10"
+        />
+      </div>
+
       {loading ? (
         <div className="space-y-3">
           {[...Array(4)].map((_, i) => <div key={i} className="skeleton h-16 rounded-2xl" />)}
         </div>
-      ) : specialties.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-slate-400">
           <Tag className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          No specialties yet.
+          {search ? "No specialties match your search." : "No specialties yet."}
         </div>
       ) : (
         <div className="space-y-3">
-          {specialties.map((s) => (
+          {filtered.map((s) => (
             <div key={s.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
