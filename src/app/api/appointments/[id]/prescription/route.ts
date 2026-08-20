@@ -26,7 +26,7 @@ export async function GET(
     where: { id },
     include: {
       patient: { select: { name: true, patientProfile: { select: { age: true, gender: true } } } },
-      doctor: { select: { name: true, doctorProfile: { select: { qualification: true, medRegNo: true, specialty: true } } } },
+      doctor: { select: { name: true, doctorProfile: { select: { qualification: true, medRegNo: true, specialty: true, clinicName: true } } } },
       medicines: true,
     },
   });
@@ -53,6 +53,7 @@ export async function GET(
     doctorQualification: appointment.doctor.doctorProfile?.qualification ?? null,
     doctorRegNo: appointment.doctor.doctorProfile?.medRegNo ?? null,
     doctorSpecialty: appointment.doctor.doctorProfile?.specialty ?? "General Physician",
+    clinicName: appointment.doctor.doctorProfile?.clinicName ?? null,
     doctorNotes: appointment.doctorNotes,
     medicines: appointment.medicines.map((m) => ({
       name: m.name,

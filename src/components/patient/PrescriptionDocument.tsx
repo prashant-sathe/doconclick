@@ -21,6 +21,7 @@ export interface PrescriptionData {
   doctorQualification: string | null;
   doctorRegNo: string | null;
   doctorSpecialty: string;
+  clinicName: string | null;
   doctorNotes: string | null;
   medicines: PrescriptionMedicineData[];
 }
@@ -132,7 +133,12 @@ export default function PrescriptionDocument({
             <div style={{ width: 36, height: 36, borderRadius: 10, background: TEAL, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <Stethoscope color="#ffffff" size={20} />
             </div>
-            <span style={{ fontSize: 20, fontWeight: 800, color: INK }}>DocOnClick</span>
+            <div>
+              <span style={{ fontSize: 20, fontWeight: 800, color: INK }}>DocOnClick</span>
+              {data.clinicName && (
+                <div style={{ fontSize: 12, fontWeight: 600, color: TEAL, marginTop: 2 }}>{data.clinicName}</div>
+              )}
+            </div>
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: 1 }}>PRESCRIPTION</div>
