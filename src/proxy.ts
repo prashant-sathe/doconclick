@@ -9,6 +9,7 @@ const PROTECTED: { pattern: RegExp; roles: string[] }[] = [
   { pattern: /^\/doctor\/dashboard(\/|$)/, roles: ["DOCTOR"] },
   { pattern: /^\/patient\/dashboard(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/patient\/book(\/|$)/, roles: ["PATIENT"] },
+  { pattern: /^\/patient\/assistant(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/patient\/payment(\/|$)/, roles: ["PATIENT"] },
 ];
 

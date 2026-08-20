@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Heart, CalendarCheck2, UserCircle, LogOut, Bell, Bookmark } from "lucide-react";
+import { Heart, CalendarCheck2, UserCircle, LogOut, Bell, Bookmark, Sparkles } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
 import { usePatientNotifications } from "@/hooks/usePatientNotifications";
@@ -10,6 +10,7 @@ import PatientNotificationToast from "@/components/patient/PatientNotificationTo
 
 const NAV = [
   { href: "/patient/dashboard", label: "Find a Doctor" },
+  { href: "/patient/assistant", label: "Health Assistant", icon: Sparkles },
   { href: "/patient/appointments", label: "Appointments", icon: CalendarCheck2 },
   { href: "/patient/saved", label: "Saved", icon: Bookmark },
   { href: "/patient/profile", label: "Profile", icon: UserCircle },

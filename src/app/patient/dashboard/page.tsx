@@ -6,13 +6,14 @@ import {
   ChevronDown, X, Loader2, CheckCircle, LogOut, Languages,
   Navigation, AlertCircle, IndianRupee, CalendarClock, Siren,
   CalendarCheck2, AlertTriangle, ShieldCheck, Users, Search,
-  Bookmark, BookmarkCheck,
+  Bookmark, BookmarkCheck, Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isDoctorAvailableNow } from "@/lib/availability";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
+import { haversine } from "@/lib/geo";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
@@ -61,18 +62,6 @@ interface Review {
 }
 
 // ── Haversine distance (km) ────────────────────────────────────────────────
-function haversine(lat1: number, lng1: number, lat2: number, lng2: number) {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
 // ── SVG pin creator ────────────────────────────────────────────────────────
 function makePinSvg(color: string, pulse = false) {
   const outer = pulse
@@ -583,6 +572,13 @@ function PatientDashboardInner() {
                 Profile {profilePercent}%
               </button>
             )}
+            <button
+              onClick={() => router.push("/patient/assistant")}
+              className="hidden sm:flex w-8 h-8 rounded-xl gradient-primary items-center justify-center text-white hover:opacity-90 transition-opacity"
+              title="Health Assistant"
+            >
+              <Sparkles className="w-4 h-4" />
+            </button>
             <button
               onClick={() => router.push("/patient/appointments")}
               className="hidden sm:flex w-8 h-8 rounded-xl bg-blue-50 items-center justify-center text-blue-500 hover:bg-blue-100 transition-colors"

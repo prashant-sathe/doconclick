@@ -2,12 +2,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MapPin, CalendarCheck2, UserCircle, Bookmark } from "lucide-react";
+import { MapPin, CalendarCheck2, UserCircle, Bookmark, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 
 const TABS = [
   { href: "/patient/dashboard", label: "Find Doctors", icon: MapPin },
+  { href: "/patient/assistant", label: "Assistant", icon: Sparkles },
   { href: "/patient/appointments", label: "Appointments", icon: CalendarCheck2 },
   { href: "/patient/saved", label: "Saved", icon: Bookmark },
   { href: "/patient/profile", label: "Profile", icon: UserCircle },
