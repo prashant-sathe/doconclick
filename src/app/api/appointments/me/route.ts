@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
+import { safeNum } from "@/lib/adminAuth";
 
 // GET: The logged-in user's own appointments (as patient or as doctor)
 export async function GET() {
@@ -25,7 +26,12 @@ export async function GET() {
       },
     });
     return NextResponse.json(
-      appointments.map(({ _count, ...a }) => ({ ...a, unreadMessageCount: _count.messages }))
+      appointments.map(({ _count, ...a }) => ({
+        ...a,
+        amount: safeNum(a.amount),
+        platformFee: safeNum(a.platformFee),
+        unreadMessageCount: _count.messages,
+      }))
     );
   }
 
@@ -45,7 +51,12 @@ export async function GET() {
       },
     });
     return NextResponse.json(
-      appointments.map(({ _count, ...a }) => ({ ...a, unreadMessageCount: _count.messages }))
+      appointments.map(({ _count, ...a }) => ({
+        ...a,
+        amount: safeNum(a.amount),
+        platformFee: safeNum(a.platformFee),
+        unreadMessageCount: _count.messages,
+      }))
     );
   }
 

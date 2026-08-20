@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { safeNum } from "@/lib/adminAuth";
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -28,10 +29,10 @@ async function pendingTotalsForDoctor(doctorId: string) {
   for (const g of grouped) {
     if (g.paymentMethod === "CASH") {
       cashCount = g._count;
-      cashFeeOwed = g._sum.platformFee ?? 0;
+      cashFeeOwed = safeNum(g._sum.platformFee);
     } else if (g.paymentMethod === "ONLINE") {
       onlineCount = g._count;
-      onlinePayoutOwed = (g._sum.amount ?? 0) - (g._sum.platformFee ?? 0);
+      onlinePayoutOwed = safeNum(g._sum.amount) - safeNum(g._sum.platformFee);
     }
   }
 
@@ -55,10 +56,10 @@ export async function GET() {
     const entry = byDoctor.get(g.doctorId) ?? { cashCount: 0, onlineCount: 0, cashFeeOwed: 0, onlinePayoutOwed: 0 };
     if (g.paymentMethod === "CASH") {
       entry.cashCount = g._count;
-      entry.cashFeeOwed = g._sum.platformFee ?? 0;
+      entry.cashFeeOwed = safeNum(g._sum.platformFee);
     } else if (g.paymentMethod === "ONLINE") {
       entry.onlineCount = g._count;
-      entry.onlinePayoutOwed = (g._sum.amount ?? 0) - (g._sum.platformFee ?? 0);
+      entry.onlinePayoutOwed = safeNum(g._sum.amount) - safeNum(g._sum.platformFee);
     }
     byDoctor.set(g.doctorId, entry);
   }
