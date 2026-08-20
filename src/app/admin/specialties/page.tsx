@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Tag, Plus, Trash2, Loader2, EyeOff, Eye, AlertCircle } from "lucide-react";
+import { Tag, Plus, Trash2, Loader2, EyeOff, Eye, AlertCircle, Pencil, X, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SpecialtyRow {
@@ -18,7 +18,14 @@ export default function AdminSpecialties() {
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [rowError, setRowError] = useState<{ id: string; message: string } | null>(null);
+  const [editTarget, setEditTarget] = useState<SpecialtyRow | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editColor, setEditColor] = useState("#2563eb");
+  const [editError, setEditError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<SpecialtyRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const load = () => {
     fetch("/api/admin/specialties")
@@ -49,7 +56,6 @@ export default function AdminSpecialties() {
 
   const toggleActive = async (s: SpecialtyRow) => {
     setBusyId(s.id);
-    setRowError(null);
     await fetch(`/api/admin/specialties/${s.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -59,16 +65,47 @@ export default function AdminSpecialties() {
     load();
   };
 
-  const deleteSpecialty = async (s: SpecialtyRow) => {
-    if (!confirm(`Delete "${s.name}"?`)) return;
-    setBusyId(s.id);
-    setRowError(null);
-    const res = await fetch(`/api/admin/specialties/${s.id}`, { method: "DELETE" });
-    setBusyId(null);
+  const openEdit = (s: SpecialtyRow) => {
+    setEditTarget(s);
+    setEditName(s.name);
+    setEditColor(s.color);
+    setEditError("");
+  };
+
+  const saveEdit = async () => {
+    if (!editTarget) return;
+    const trimmed = editName.trim();
+    if (!trimmed) {
+      setEditError("Name is required");
+      return;
+    }
+    setSaving(true);
+    setEditError("");
+    const res = await fetch(`/api/admin/specialties/${editTarget.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: trimmed, color: editColor }),
+    });
+    setSaving(false);
     if (res.ok) {
+      setEditTarget(null);
       load();
     } else {
-      setRowError({ id: s.id, message: (await res.json().catch(() => ({}))).error ?? "Could not delete specialty." });
+      setEditError((await res.json().catch(() => ({}))).error ?? "Could not update specialty.");
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    setDeleteError("");
+    const res = await fetch(`/api/admin/specialties/${deleteTarget.id}`, { method: "DELETE" });
+    setDeleting(false);
+    if (res.ok) {
+      setDeleteTarget(null);
+      load();
+    } else {
+      setDeleteError((await res.json().catch(() => ({}))).error ?? "Could not delete specialty.");
     }
   };
 
@@ -133,6 +170,13 @@ export default function AdminSpecialties() {
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   <button
+                    onClick={() => openEdit(s)}
+                    disabled={busyId === s.id}
+                    className="btn-secondary py-1.5 px-3 text-xs"
+                  >
+                    <Pencil className="w-3.5 h-3.5" /> Edit
+                  </button>
+                  <button
                     onClick={() => toggleActive(s)}
                     disabled={busyId === s.id}
                     className="btn-secondary py-1.5 px-3 text-xs"
@@ -141,7 +185,7 @@ export default function AdminSpecialties() {
                     {s.isActive ? "Deactivate" : "Activate"}
                   </button>
                   <button
-                    onClick={() => deleteSpecialty(s)}
+                    onClick={() => { setDeleteTarget(s); setDeleteError(""); }}
                     disabled={busyId === s.id}
                     className="btn-secondary py-1.5 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50"
                   >
@@ -149,13 +193,87 @@ export default function AdminSpecialties() {
                   </button>
                 </div>
               </div>
-              {rowError?.id === s.id && (
-                <p className="text-xs text-red-500 flex items-center gap-1 mt-2">
-                  <AlertCircle className="w-3 h-3" /> {rowError.message}
-                </p>
-              )}
             </div>
           ))}
+        </div>
+      )}
+
+      {editTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-4">
+              <Pencil className="w-5 h-5 text-blue-600" />
+              <h3 className="font-bold text-slate-800">Edit Specialty</h3>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-end gap-3">
+                <div>
+                  <label className="input-label">Color</label>
+                  <input
+                    type="color"
+                    value={editColor}
+                    onChange={(e) => setEditColor(e.target.value)}
+                    className="w-11 h-11 rounded-lg border border-slate-200 cursor-pointer"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="input-label">Name</label>
+                  <input
+                    className="input-field"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                  />
+                </div>
+              </div>
+              {editError && (
+                <span className="text-sm text-red-500 flex items-center gap-1">
+                  <AlertCircle className="w-3.5 h-3.5" /> {editError}
+                </span>
+              )}
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setEditTarget(null)} className="btn-secondary flex-1">
+                <X className="w-3.5 h-3.5" /> Cancel
+              </button>
+              <button
+                onClick={saveEdit}
+                disabled={saving || !editName.trim()}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                {saving ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-3">
+              <Trash2 className="w-5 h-5 text-red-600" />
+              <h3 className="font-bold text-slate-800">Delete this specialty?</h3>
+            </div>
+            <p className="text-sm text-slate-500 mb-5">
+              This will permanently remove <span className="font-semibold text-slate-700">{deleteTarget.name}</span>. This action cannot be undone.
+            </p>
+            {deleteError && (
+              <p className="text-xs text-red-500 flex items-center gap-1 mb-3">
+                <AlertCircle className="w-3 h-3" /> {deleteError}
+              </p>
+            )}
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteTarget(null)} className="btn-secondary flex-1">Cancel</button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleting}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {deleting ? "Deleting…" : "Delete Specialty"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

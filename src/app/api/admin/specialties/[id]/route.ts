@@ -10,7 +10,7 @@ async function requireAdmin() {
   return null;
 }
 
-// PATCH: Toggle active state and/or change color
+// PATCH: Toggle active state and/or change name/color
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -19,16 +19,32 @@ export async function PATCH(
   if (denied) return denied;
 
   const { id } = await params;
-  const { isActive, color } = await req.json();
+  const { isActive, color, name } = await req.json();
 
-  const specialty = await prisma.specialty.update({
-    where: { id },
-    data: {
-      ...(typeof isActive === "boolean" ? { isActive } : {}),
-      ...(color ? { color } : {}),
-    },
-  });
-  return NextResponse.json(specialty);
+  let trimmedName: string | undefined;
+  if (typeof name === "string") {
+    trimmedName = name.trim();
+    if (!trimmedName) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    }
+  }
+
+  try {
+    const specialty = await prisma.specialty.update({
+      where: { id },
+      data: {
+        ...(typeof isActive === "boolean" ? { isActive } : {}),
+        ...(color ? { color } : {}),
+        ...(trimmedName ? { name: trimmedName } : {}),
+      },
+    });
+    return NextResponse.json(specialty);
+  } catch (err: unknown) {
+    if (err && typeof err === "object" && "code" in err && err.code === "P2002") {
+      return NextResponse.json({ error: "A specialty with this name already exists." }, { status: 409 });
+    }
+    throw err;
+  }
 }
 
 // DELETE: Remove a specialty — blocked if any doctor currently has it selected
