@@ -1,24 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Bell, BellOff, ExternalLink, X } from "lucide-react";
-import { isPushSupported, subscribeToPush } from "@/lib/pushClient";
+import { isPushSupported, subscribeToPush, isMac, openSystemNotificationSettings } from "@/lib/pushClient";
 
 const DISMISSED_KEY = "doconclick_push_prompt_dismissed";
 const GRANTED_HINT_DISMISSED_KEY = "doconclick_push_granted_hint_dismissed";
-
-function isMac(): boolean {
-  return typeof navigator !== "undefined" && /Mac/i.test(navigator.userAgent);
-}
-
-// Browser-level Notification permission can be "granted" while the OS itself
-// still silently drops the banner (e.g. macOS System Settings > Notifications
-// has the browser turned off, or Focus/Do Not Disturb is on) — there's no JS
-// API to detect that, so this link is offered unconditionally as a fallback,
-// not gated on any check. Deep link only exists on macOS; other platforms get
-// text-only guidance instead.
-function openSystemNotificationSettings() {
-  window.location.href = "x-apple.systempreferences:com.apple.preference.notifications";
-}
 
 export default function EnableNotificationsPrompt() {
   const [permission, setPermission] = useState<NotificationPermission | null>(null);

@@ -1,8 +1,43 @@
 import { deleteToken, getToken, onMessage } from "firebase/messaging";
 import { getMessagingInstance } from "@/lib/firebaseClient";
 
+const SUBSCRIBED_KEY = "doconclick_push_subscribed";
+
 export function isPushSupported(): boolean {
   return typeof window !== "undefined" && "serviceWorker" in navigator && "Notification" in window;
+}
+
+export function isMac(): boolean {
+  return typeof navigator !== "undefined" && /Mac/i.test(navigator.userAgent);
+}
+
+// Browser-level Notification permission can be "granted" while the OS itself
+// still silently drops the banner (e.g. macOS System Settings > Notifications
+// has the browser turned off, or Focus/Do Not Disturb is on) — there's no JS
+// API to detect that, so this link is offered unconditionally as a fallback,
+// not gated on any check. Deep link only exists on macOS; other platforms get
+// text-only guidance instead.
+export function openSystemNotificationSettings() {
+  window.location.href = "x-apple.systempreferences:com.apple.preference.notifications";
+}
+
+// Browser permission, once granted, can't be introspected or revoked via JS —
+// so "subscribed" for our own UI purposes is tracked separately here. This
+// flag is what lets a settings toggle show "off" after the user unsubscribes,
+// even though `Notification.permission` itself stays "granted" forever.
+export function isPushSubscribedLocally(): boolean {
+  return typeof window !== "undefined" && localStorage.getItem(SUBSCRIBED_KEY) === "1";
+}
+
+// Ground truth for "is this account currently getting push notifications" —
+// checks the server instead of the (possibly stale) local flag above, so a
+// settings toggle reflects reality even if permission was granted from a
+// different device/session or before this flag existed.
+export async function fetchPushSubscriptionStatus(): Promise<boolean> {
+  const res = await fetch("/api/push/subscribe").catch(() => null);
+  if (!res || !res.ok) return false;
+  const data = await res.json().catch(() => null);
+  return !!data?.subscribed;
 }
 
 export async function subscribeToPush(): Promise<boolean> {
@@ -26,6 +61,7 @@ export async function subscribeToPush(): Promise<boolean> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, userAgent: navigator.userAgent }),
   });
+  localStorage.setItem(SUBSCRIBED_KEY, "1");
   return true;
 }
 
@@ -69,4 +105,21 @@ export async function unsubscribeFromPush(): Promise<void> {
       body: JSON.stringify({ token }),
     }).catch(() => {});
   }
+  localStorage.removeItem(SUBSCRIBED_KEY);
+}
+
+// Account-wide opt-out for the settings toggle: clears this device's FCM
+// token and tells the server to drop every token on the account, so "off"
+// here actually means off everywhere, not just on the current browser.
+export async function unsubscribeAllPush(): Promise<void> {
+  const messaging = await getMessagingInstance();
+  if (messaging) {
+    await deleteToken(messaging).catch(() => {});
+  }
+  await fetch("/api/push/subscribe", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  }).catch(() => {});
+  localStorage.removeItem(SUBSCRIBED_KEY);
 }

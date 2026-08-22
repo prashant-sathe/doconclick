@@ -16,6 +16,7 @@ import { useSpecialties } from "@/lib/useSpecialties";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
+import NotificationSettings from "@/components/NotificationSettings";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -658,6 +659,8 @@ export default function DoctorProfilePage() {
                 onUploaded={(url) => setDocs((d) => ({ ...d, signatureUrl: url }))} />
             </div>
           </section>
+
+          <NotificationSettings />
 
           {saveError && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">{saveError}</div>

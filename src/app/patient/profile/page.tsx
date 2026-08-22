@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { computeCompleteness, type PatientProfileData } from "@/lib/profileCompleteness";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
+import NotificationSettings from "@/components/NotificationSettings";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import { CHRONIC_OPTIONS, BLOOD_GROUPS } from "@/lib/medicalOptions";
 import { computeBMI, bmiCategoryClasses } from "@/lib/bmi";
@@ -391,6 +392,8 @@ export default function PatientProfilePage() {
             <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><Camera className="w-4 h-4 text-purple-500" /> Profile Photo</h2>
             <PhotoUpload url={form.photoUrl} onUploaded={(url) => set("photoUrl", url)} />
           </section>
+
+          <NotificationSettings />
 
           {saveError && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">{saveError}</div>
