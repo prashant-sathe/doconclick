@@ -5,6 +5,7 @@ import { getAuthUser } from "@/lib/auth";
 import { getOpenAIClient, ASSISTANT_MODEL } from "@/lib/openai";
 import { ensureSpecialtiesSeeded } from "@/lib/specialties";
 import { haversine } from "@/lib/geo";
+import { isClinicOpenNow } from "@/lib/clinicAvailability";
 
 type InputItem = OpenAI.Responses.ResponseInputItem;
 type FunctionCall = OpenAI.Responses.ResponseFunctionToolCall;
@@ -123,7 +124,7 @@ async function findDoctors(patientId: string, args: { specialty: string; consult
         OR: [{ trialEndsAt: { gt: now } }, { subscriptionPaidUntil: { gt: now } }],
       },
     },
-    include: { doctorProfile: true },
+    include: { doctorProfile: true, clinics: { where: { isActive: true }, include: { slots: true } } },
     take: 20,
   });
 
@@ -135,6 +136,10 @@ async function findDoctors(patientId: string, args: { specialty: string; consult
         patientProfile?.lat != null && patientProfile?.lng != null && profile.lat != null && profile.lng != null
           ? haversine(patientProfile.lat, patientProfile.lng, profile.lat, profile.lng)
           : null;
+      const canHomeVisit =
+        profile.offersHomeVisit && !(distanceKm != null && distanceKm > profile.radius);
+      const canClinicVisit =
+        profile.offersClinic && d.clinics.some((c) => isClinicOpenNow(c.slots, now));
       return {
         id: d.id,
         name: d.name,
@@ -144,8 +149,8 @@ async function findDoctors(patientId: string, args: { specialty: string; consult
         distanceKm: distanceKm != null ? Math.round(distanceKm * 10) / 10 : null,
         fee: feeForConsultType(profile, args.consultType),
         availability: profile.availability,
-        offersHomeVisit: profile.offersHomeVisit,
-        offersClinic: profile.offersClinic,
+        offersHomeVisit: canHomeVisit,
+        offersClinic: canClinicVisit,
         offersVideo: profile.offersVideo,
       };
     });

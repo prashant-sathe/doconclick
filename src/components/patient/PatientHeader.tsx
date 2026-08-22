@@ -10,7 +10,7 @@ import PatientNotificationToast from "@/components/patient/PatientNotificationTo
 
 const NAV = [
   { href: "/patient/dashboard", label: "Find a Doctor" },
-  { href: "/patient/assistant", label: "Health Assistant", icon: Sparkles },
+  { href: "/patient/assistant", label: "Ask AI", icon: Sparkles },
   { href: "/patient/appointments", label: "Appointments", icon: CalendarCheck2 },
   { href: "/patient/saved", label: "Saved", icon: Bookmark },
   { href: "/patient/profile", label: "Profile", icon: UserCircle },

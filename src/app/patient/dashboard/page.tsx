@@ -107,10 +107,14 @@ const ALL_TYPES = [
   { id: "VIDEO", label: "Video Call", icon: Video },
 ];
 
-function defaultConsultType(profile: DoctorProfile | null | undefined): string {
+function defaultConsultType(doctor: Doctor | null | undefined): string {
+  const profile = doctor?.doctorProfile;
   if (!profile) return "CLINIC";
-  if (profile.offersHomeVisit) return "HOME";
-  if (profile.offersClinic !== false) return "CLINIC";
+  const clinics = doctor?.clinics ?? [];
+  const hasOpenClinic = clinics.length === 0 || clinics.some((c) => isClinicOpenNow(c.slots));
+  const hasHomeVisitReach = !(doctor?.distance != null && profile.radius != null && doctor.distance > profile.radius);
+  if (profile.offersHomeVisit && hasHomeVisitReach) return "HOME";
+  if (profile.offersClinic !== false && hasOpenClinic) return "CLINIC";
   if (profile.offersVideo) return "VIDEO";
   return "CLINIC";
 }
@@ -268,7 +272,7 @@ function PatientDashboardInner() {
       setSelectedDoctor(doc);
       setSelectedClinicId((findOpenClinic(doc.clinics) ?? doc.clinics[0])?.id ?? null);
       setPanelOpen(true);
-      setConsultType(defaultConsultType(doc.doctorProfile));
+      setConsultType(defaultConsultType(doc));
     }
   }, [doctors, deepLinkedDoctorId]);
 
@@ -401,7 +405,7 @@ function PatientDashboardInner() {
           setSelectedClinicId(clinic.id);
           setPanelOpen(true);
           setBookingOpen(false);
-          setConsultType(defaultConsultType(doc.doctorProfile));
+          setConsultType(defaultConsultType(doc));
           setSymptoms("");
           setRelation("Self");
           setDependentId(null);
@@ -543,7 +547,7 @@ function PatientDashboardInner() {
     if (!user?.id || !nearestAny) return;
     setEmergencyBusy(true);
     setEmergencyError("");
-    const type = defaultConsultType(nearestAny.doctorProfile);
+    const type = defaultConsultType(nearestAny);
     const fee = feeForConsultType(nearestAny.doctorProfile, type);
 
     const res = await fetch("/api/appointments", {
@@ -575,18 +579,34 @@ function PatientDashboardInner() {
   const fee = feeForConsultType(selectedDoctor?.doctorProfile, consultType);
 
   const eta = selectedDoctor?.distance != null ? estimateArrivalMinutes(selectedDoctor.distance) : null;
-  const availableTypes = ALL_TYPES.filter((t) => {
-    if (t.id === "HOME") return selectedDoctor?.doctorProfile?.offersHomeVisit !== false;
-    if (t.id === "CLINIC") return selectedDoctor?.doctorProfile?.offersClinic !== false;
-    if (t.id === "VIDEO") return selectedDoctor ? selectedDoctor.doctorProfile?.offersVideo === true : true;
-    return true;
-  });
 
   // The moment the appointment would actually happen — "now" for an
   // immediate booking, or the chosen date/time when scheduled later —
   // is what a clinic's open/closed hours get checked against.
   const effectiveBookingTime =
     scheduleMode === "LATER" && scheduledAt ? new Date(scheduledAt) : new Date(now);
+
+  // Whether any of the doctor's clinics is actually open at the effective
+  // booking time — doctors with no clinics at all keep the legacy
+  // unrestricted behavior (same fallback as clinicBookingBlocked below).
+  const hasOpenClinic =
+    !selectedDoctor || selectedDoctor.clinics.length === 0 ||
+    selectedDoctor.clinics.some((c) => isClinicOpenNow(c.slots, effectiveBookingTime));
+
+  // Home Visit is only offered within the doctor's stated consultation
+  // radius — beyond that they simply can't travel there. Unknown distance
+  // (no patient location yet) doesn't block it.
+  const homeVisitDistanceKm = selectedDoctor?.distance ?? null;
+  const homeVisitRadiusKm = selectedDoctor?.doctorProfile?.radius ?? null;
+  const hasHomeVisitReach = !(homeVisitDistanceKm != null && homeVisitRadiusKm != null && homeVisitDistanceKm > homeVisitRadiusKm);
+
+  const availableTypes = ALL_TYPES.filter((t) => {
+    if (t.id === "HOME") return selectedDoctor?.doctorProfile?.offersHomeVisit !== false && hasHomeVisitReach;
+    if (t.id === "CLINIC") return selectedDoctor?.doctorProfile?.offersClinic !== false && hasOpenClinic;
+    if (t.id === "VIDEO") return selectedDoctor ? selectedDoctor.doctorProfile?.offersVideo === true : true;
+    return true;
+  });
+
   // A Clinic Visit can only be confirmed once a specific, currently-open
   // clinic is selected — doctors with no clinics at all fall back to the
   // legacy unrestricted behavior.
@@ -596,15 +616,7 @@ function PatientDashboardInner() {
     selectedDoctor.clinics.length > 0 &&
     (!selectedClinic || !isClinicOpenNow(selectedClinic.slots, effectiveBookingTime));
 
-  // Home Visit is only offered within the doctor's stated consultation
-  // radius — beyond that they simply can't travel there.
-  const homeVisitDistanceKm = selectedDoctor?.distance ?? null;
-  const homeVisitRadiusKm = selectedDoctor?.doctorProfile?.radius ?? null;
-  const homeVisitBlocked =
-    consultType === "HOME" &&
-    homeVisitDistanceKm != null &&
-    homeVisitRadiusKm != null &&
-    homeVisitDistanceKm > homeVisitRadiusKm;
+  const homeVisitBlocked = consultType === "HOME" && !hasHomeVisitReach;
 
   // ── Derived loading flag ───────────────────────────────────────────────
   const isLoading = authLoading || !userPos;
@@ -662,10 +674,10 @@ function PatientDashboardInner() {
             )}
             <button
               onClick={() => router.push("/patient/assistant")}
-              className="hidden sm:flex w-8 h-8 rounded-xl gradient-primary items-center justify-center text-white hover:opacity-90 transition-opacity"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl gradient-primary text-white text-xs font-semibold hover:opacity-90 transition-opacity"
               title="Health Assistant"
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4" /> Ask AI
             </button>
             <button
               onClick={() => router.push("/patient/appointments")}
@@ -723,7 +735,7 @@ function PatientDashboardInner() {
                 setSelectedClinicId((findOpenClinic(nearest.clinics) ?? nearest.clinics[0])?.id ?? null);
                 setPanelOpen(true);
                 setBookingOpen(false);
-                setConsultType(defaultConsultType(nearest.doctorProfile));
+                setConsultType(defaultConsultType(nearest));
               }}
               className="glass-card rounded-2xl pl-3 pr-3 py-2.5 flex items-center gap-2 pointer-events-auto shadow-lg hover:scale-[1.02] transition-transform min-w-0 flex-1 sm:flex-initial"
             >
@@ -1141,7 +1153,7 @@ function PatientDashboardInner() {
 
                   {/* Fee cards */}
                   <div className="grid grid-cols-3 gap-3 mb-3">
-                    {selectedDoctor.doctorProfile.offersClinic !== false ? (
+                    {selectedDoctor.doctorProfile.offersClinic !== false && hasOpenClinic ? (
                       <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                         <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                         <p className="text-xs text-slate-500">Clinic Visit</p>
@@ -1150,7 +1162,9 @@ function PatientDashboardInner() {
                     ) : (
                       <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
                         <Building2 className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                        <p className="text-xs text-slate-400">Clinic visit not offered</p>
+                        <p className="text-xs text-slate-400">
+                          {selectedDoctor.doctorProfile.offersClinic === false ? "Clinic visit not offered" : "Clinic closed right now"}
+                        </p>
                       </div>
                     )}
                     {selectedDoctor.doctorProfile.offersVideo ? (
@@ -1165,7 +1179,7 @@ function PatientDashboardInner() {
                         <p className="text-xs text-slate-400">Video call not offered</p>
                       </div>
                     )}
-                    {selectedDoctor.doctorProfile.offersHomeVisit ? (
+                    {selectedDoctor.doctorProfile.offersHomeVisit && hasHomeVisitReach ? (
                       <div className="rounded-2xl p-4 border border-blue-200 bg-blue-50 text-center">
                         <Home className="w-5 h-5 text-blue-600 mx-auto mb-1" />
                         <p className="text-xs text-blue-600">Home Visit</p>
@@ -1177,7 +1191,9 @@ function PatientDashboardInner() {
                     ) : (
                       <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
                         <Home className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                        <p className="text-xs text-slate-400">Home visit not offered</p>
+                        <p className="text-xs text-slate-400">
+                          {selectedDoctor.doctorProfile.offersHomeVisit ? "Outside home visit range" : "Home visit not offered"}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -1201,7 +1217,7 @@ function PatientDashboardInner() {
                   )}
 
                   {/* CTA buttons */}
-                  {selectedDoctor.doctorProfile.offersHomeVisit && (
+                  {selectedDoctor.doctorProfile.offersHomeVisit && hasHomeVisitReach && (
                     <button
                       onClick={() => { setConsultType("HOME"); setBookingOpen(true); }}
                       className="btn-primary w-full justify-center py-3.5 text-base mb-2.5"
@@ -1210,7 +1226,7 @@ function PatientDashboardInner() {
                     </button>
                   )}
                   <div className="flex gap-2">
-                    {selectedDoctor.doctorProfile.offersClinic !== false && (
+                    {selectedDoctor.doctorProfile.offersClinic !== false && hasOpenClinic && (
                       <button
                         onClick={() => { setConsultType("CLINIC"); setBookingOpen(true); }}
                         className="btn-secondary justify-center py-3 text-sm flex-1"

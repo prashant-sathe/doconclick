@@ -44,6 +44,9 @@ export async function GET(
           isVerified: true,
           avgRating: true,
           totalReviews: true,
+          radius: true,
+          lat: true,
+          lng: true,
         },
       },
       clinics: {

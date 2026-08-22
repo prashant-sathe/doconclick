@@ -5,9 +5,11 @@ import Link from "next/link";
 import {
   ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp,
   MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck,
+  Building2, Video, Home,
 } from "lucide-react";
 import RatingStars from "@/components/patient/RatingStars";
 import { isDoctorAvailableNow } from "@/lib/availability";
+import { useAuth } from "@/components/AuthProvider";
 
 // Loosely typed mirror of the OpenAI Responses API's input/output items —
 // the client only needs enough shape to render and to echo the array back
@@ -32,6 +34,9 @@ interface AssistantDoctor {
   distanceKm: number | null;
   fee: number;
   availability: string;
+  offersHomeVisit: boolean;
+  offersClinic: boolean;
+  offersVideo: boolean;
 }
 
 type DisplayEntry =
@@ -155,6 +160,23 @@ function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
           <div className="mt-1.5">
             <RatingStars avgRating={doctor.avgRating} totalReviews={doctor.totalReviews} />
           </div>
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
+            {doctor.offersClinic && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 rounded-full px-2 py-0.5">
+                <Building2 className="w-3 h-3" /> Clinic
+              </span>
+            )}
+            {doctor.offersVideo && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 bg-blue-50 rounded-full px-2 py-0.5">
+                <Video className="w-3 h-3" /> Video call
+              </span>
+            )}
+            {doctor.offersHomeVisit && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 rounded-full px-2 py-0.5">
+                <Home className="w-3 h-3" /> Home visit
+              </span>
+            )}
+          </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[11px]">
             {doctor.distanceKm != null && (
               <span className="flex items-center gap-1 text-slate-500">
@@ -258,15 +280,37 @@ function WelcomeState({ onPick }: { onPick: (text: string) => void }) {
 
 export default function HealthAssistantPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [items, setItems] = useState<ConversationItem[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const storageKey = user ? `doconclick:assistant-chat:${user.id}` : null;
 
   useEffect(() => {
     requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }));
   }, [items, loading]);
+
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      const raw = sessionStorage.getItem(storageKey);
+      if (raw) setItems(JSON.parse(raw));
+    } catch {
+      // corrupted/unavailable storage — start with an empty conversation
+    }
+  }, [storageKey]);
+
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      if (items.length) sessionStorage.setItem(storageKey, JSON.stringify(items));
+      else sessionStorage.removeItem(storageKey);
+    } catch {
+      // storage unavailable (private browsing, quota) — conversation stays in-memory only
+    }
+  }, [items, storageKey]);
 
   const send = useCallback(
     async (text: string) => {

@@ -9,6 +9,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
+import { haversine } from "@/lib/geo";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 
@@ -23,6 +24,8 @@ interface Clinic {
   name: string;
   address: string;
   photoUrl: string | null;
+  lat: number;
+  lng: number;
   slots: ClinicSlot[];
 }
 
@@ -50,6 +53,9 @@ interface DoctorProfileData {
     isVerified: boolean;
     avgRating: number;
     totalReviews: number;
+    radius: number;
+    lat: number | null;
+    lng: number | null;
   } | null;
 }
 
@@ -87,6 +93,7 @@ export default function DoctorProfilePage() {
   const [reviews, setReviews] = useState<DoctorReview[]>([]);
   const [saved, setSaved] = useState(false);
   const [savingBookmark, setSavingBookmark] = useState(false);
+  const [userPos, setUserPos] = useState<[number, number] | null>(null);
 
   useEffect(() => {
     fetch(`/api/doctors/${id}`)
@@ -96,6 +103,14 @@ export default function DoctorProfilePage() {
       .then((r) => (r.ok ? r.json() : []))
       .then(setReviews);
   }, [id]);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]),
+      () => setUserPos(null),
+      { timeout: 8000 }
+    );
+  }, []);
 
   useEffect(() => {
     if (user?.role !== "PATIENT") return;
@@ -144,6 +159,15 @@ export default function DoctorProfilePage() {
   }
 
   const profile = doctor.doctorProfile;
+  const hasOpenClinic = doctor.clinics.length === 0 || doctor.clinics.some((c) => isClinicOpenNow(c.slots));
+
+  const homeBaseLat = profile.lat ?? doctor.clinics[0]?.lat ?? null;
+  const homeBaseLng = profile.lng ?? doctor.clinics[0]?.lng ?? null;
+  const distance =
+    userPos && homeBaseLat != null && homeBaseLng != null
+      ? haversine(userPos[0], userPos[1], homeBaseLat, homeBaseLng)
+      : null;
+  const hasHomeVisitReach = !(distance != null && distance > profile.radius);
 
   return (
     <div className="min-h-screen gradient-surface pb-16">
@@ -256,7 +280,7 @@ export default function DoctorProfilePage() {
 
           {/* Fee cards */}
           <div className="grid grid-cols-3 gap-3 mb-6">
-            {profile.offersClinic ? (
+            {profile.offersClinic && hasOpenClinic ? (
               <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                 <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                 <p className="text-xs text-slate-500">Clinic Visit</p>
@@ -265,7 +289,9 @@ export default function DoctorProfilePage() {
             ) : (
               <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
                 <Building2 className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                <p className="text-xs text-slate-400">Clinic visit not offered</p>
+                <p className="text-xs text-slate-400">
+                  {profile.offersClinic ? "Clinic closed right now" : "Clinic visit not offered"}
+                </p>
               </div>
             )}
             {profile.offersVideo ? (
@@ -280,7 +306,7 @@ export default function DoctorProfilePage() {
                 <p className="text-xs text-slate-400">Video call not offered</p>
               </div>
             )}
-            {profile.offersHomeVisit ? (
+            {profile.offersHomeVisit && hasHomeVisitReach ? (
               <div className="rounded-2xl p-4 border border-blue-200 bg-blue-50 text-center">
                 <Home className="w-5 h-5 text-blue-600 mx-auto mb-1" />
                 <p className="text-xs text-blue-600">Home Visit</p>
@@ -289,7 +315,9 @@ export default function DoctorProfilePage() {
             ) : (
               <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
                 <Home className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                <p className="text-xs text-slate-400">Home visit not offered</p>
+                <p className="text-xs text-slate-400">
+                  {profile.offersHomeVisit ? "Outside home visit range" : "Home visit not offered"}
+                </p>
               </div>
             )}
           </div>

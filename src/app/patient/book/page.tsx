@@ -74,10 +74,20 @@ const ALL_TYPES = [
   { id: "VIDEO",  label: "Video Call",   icon: Video },
 ];
 
-function defaultConsultType(profile: Doctor["doctorProfile"]): string {
+function defaultConsultType(doctor: Doctor | null | undefined, userPos: [number, number] | null = null): string {
+  const profile = doctor?.doctorProfile;
   if (!profile) return "CLINIC";
-  if (profile.offersClinic !== false) return "CLINIC";
-  if (profile.offersHomeVisit) return "HOME";
+  const clinics = doctor?.clinics ?? [];
+  const hasOpenClinic = clinics.length === 0 || clinics.some((c) => isClinicOpenNow(c.slots));
+  const homeBaseLat = profile.lat ?? clinics[0]?.lat ?? null;
+  const homeBaseLng = profile.lng ?? clinics[0]?.lng ?? null;
+  const distance =
+    userPos && homeBaseLat != null && homeBaseLng != null
+      ? haversine(userPos[0], userPos[1], homeBaseLat, homeBaseLng)
+      : null;
+  const hasHomeVisitReach = !(distance != null && profile.radius != null && distance > profile.radius);
+  if (profile.offersClinic !== false && hasOpenClinic) return "CLINIC";
+  if (profile.offersHomeVisit && hasHomeVisitReach) return "HOME";
   if (profile.offersVideo) return "VIDEO";
   return "CLINIC";
 }
@@ -123,7 +133,7 @@ function PatientBookInner() {
         const clinicId = preselectClinicId && preselected.clinics.some((c) => c.id === preselectClinicId)
           ? preselectClinicId
           : (findOpenClinic(preselected.clinics) ?? preselected.clinics[0])?.id ?? "";
-        setForm((f) => ({ ...f, doctorId: preselected.id, clinicId, consultType: defaultConsultType(preselected.doctorProfile) }));
+        setForm((f) => ({ ...f, doctorId: preselected.id, clinicId, consultType: defaultConsultType(preselected, userPos) }));
       }
     });
     navigator.geolocation.getCurrentPosition(
@@ -154,12 +164,6 @@ function PatientBookInner() {
       ? haversine(userPos[0], userPos[1], homeBaseLat, homeBaseLng)
       : null;
   const currentFee = feeForConsultType(selectedDoctor?.doctorProfile ?? null, form.consultType);
-  const availableTypes = ALL_TYPES.filter((t) => {
-    if (t.id === "HOME") return selectedDoctor?.doctorProfile?.offersHomeVisit !== false;
-    if (t.id === "CLINIC") return selectedDoctor?.doctorProfile?.offersClinic !== false;
-    if (t.id === "VIDEO") return selectedDoctor ? selectedDoctor.doctorProfile?.offersVideo === true : true;
-    return true;
-  });
 
   // An emergency always books immediately, overriding any manual schedule selection
   const effectiveScheduleMode = isEmergency ? "NOW" : scheduleMode;
@@ -168,6 +172,27 @@ function PatientBookInner() {
   // selected clinic's hours against, not just the current moment.
   const effectiveBookingTime =
     effectiveScheduleMode === "LATER" && scheduledAt ? new Date(scheduledAt) : new Date();
+
+  // Whether any of the doctor's clinics is actually open at the effective
+  // booking time — doctors with no clinics at all keep the legacy
+  // unrestricted behavior (same fallback as clinicBookingBlocked below).
+  const hasOpenClinic =
+    !selectedDoctor || selectedDoctor.clinics.length === 0 ||
+    selectedDoctor.clinics.some((c) => isClinicOpenNow(c.slots, effectiveBookingTime));
+
+  // Home Visit is only offered within the doctor's stated consultation
+  // radius — beyond that they simply can't travel there. Unknown distance
+  // (no location yet) doesn't block it.
+  const homeVisitRadiusKm = selectedDoctor?.doctorProfile?.radius ?? null;
+  const hasHomeVisitReach = !(distance != null && homeVisitRadiusKm != null && distance > homeVisitRadiusKm);
+
+  const availableTypes = ALL_TYPES.filter((t) => {
+    if (t.id === "HOME") return selectedDoctor?.doctorProfile?.offersHomeVisit !== false && hasHomeVisitReach;
+    if (t.id === "CLINIC") return selectedDoctor?.doctorProfile?.offersClinic !== false && hasOpenClinic;
+    if (t.id === "VIDEO") return selectedDoctor ? selectedDoctor.doctorProfile?.offersVideo === true : true;
+    return true;
+  });
+
   // A Clinic Visit can only be confirmed once a specific, currently-open
   // clinic is selected — doctors with no clinics at all keep the legacy
   // unrestricted behavior.
@@ -177,14 +202,7 @@ function PatientBookInner() {
     selectedDoctor.clinics.length > 0 &&
     (!selectedClinic || !isClinicOpenNow(selectedClinic.slots, effectiveBookingTime));
 
-  // Home Visit is only offered within the doctor's stated consultation
-  // radius — beyond that they simply can't travel there.
-  const homeVisitRadiusKm = selectedDoctor?.doctorProfile?.radius ?? null;
-  const homeVisitBlocked =
-    form.consultType === "HOME" &&
-    distance != null &&
-    homeVisitRadiusKm != null &&
-    distance > homeVisitRadiusKm;
+  const homeVisitBlocked = form.consultType === "HOME" && !hasHomeVisitReach;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -346,7 +364,7 @@ function PatientBookInner() {
               <select required className="input-field" value={form.doctorId} onChange={(e) => {
                 const doc = doctors.find((d) => d.id === e.target.value);
                 const clinicId = (findOpenClinic(doc?.clinics ?? []) ?? doc?.clinics[0])?.id ?? "";
-                setForm((f) => ({ ...f, doctorId: e.target.value, clinicId, consultType: defaultConsultType(doc?.doctorProfile ?? null) }));
+                setForm((f) => ({ ...f, doctorId: e.target.value, clinicId, consultType: defaultConsultType(doc, userPos) }));
               }}>
                 <option value="">— Choose a doctor —</option>
                 {visibleDoctors.map((d) => (
