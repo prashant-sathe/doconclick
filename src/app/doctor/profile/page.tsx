@@ -564,17 +564,21 @@ export default function DoctorProfilePage() {
                   <input type="checkbox" checked={form.offersVideo} onChange={(e) => set("offersVideo", e.target.checked)} className="w-4 h-4 accent-teal-500" />
                 </label>
               </div>
-              <div>
+              <div className={cn(!form.offersHomeVisit && "opacity-50")}>
                 <label className="input-label mb-2 flex items-center justify-between">
                   <span><MapPin className="inline w-3.5 h-3.5 mr-1" />Consultation Radius</span>
                   <span className="text-teal-600 font-bold">{form.radius} km</span>
                 </label>
                 <input type="range" min={5} max={20} step={1} value={form.radius}
                   onChange={(e) => set("radius", Number(e.target.value))}
-                  className="w-full accent-teal-500" />
+                  disabled={!form.offersHomeVisit}
+                  className="w-full accent-teal-500 disabled:cursor-not-allowed" />
                 <div className="flex justify-between text-[10px] text-slate-400 mt-1">
                   <span>5 km</span><span>20 km</span>
                 </div>
+                {!form.offersHomeVisit && (
+                  <p className="text-xs text-slate-400 mt-1.5">Turn on &quot;Offer Home Visits&quot; to set your service radius.</p>
+                )}
               </div>
             </div>
           </section>
