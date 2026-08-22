@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
+import { slugify } from "@/lib/utils";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -55,9 +56,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "File must be under 5MB" }, { status: 400 });
   }
 
-  const filename = `${authUser.id}-${type}-${Date.now()}.${ext}`;
+  const folder = `${slugify(authUser.name)}-${authUser.id}`;
+  const filename = `${type}-${Date.now()}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
-  const url = await uploadToS3(`doctor-docs/${filename}`, buffer, file.type);
+  const url = await uploadToS3(`doctor-docs/${folder}/${filename}`, buffer, file.type);
   const field = DOC_FIELD[type];
 
   try {

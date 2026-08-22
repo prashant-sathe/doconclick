@@ -28,3 +28,14 @@ export function formatDate(date: Date | string) {
 export function formatDoctorName(name: string) {
   return `Dr. ${name.replace(/^dr\.?\s*/i, "").trim()}`;
 }
+
+// Turns a display name into a URL/path-safe slug for use in storage keys.
+// Non-Latin names (e.g. Devanagari) collapse to "" — callers should combine
+// this with a unique id so the resulting path is still unique.
+export function slugify(text: string) {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}

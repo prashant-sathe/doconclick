@@ -83,7 +83,19 @@ function DoctorRow({
   return (
     <tr>
       <td>
-        <div className="font-semibold text-slate-900">{formatDoctorName(d.name)}</div>
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-slate-900">{formatDoctorName(d.name)}</span>
+          {(d.doctorProfile?.medRegCertUrl || d.doctorProfile?.degreeCertUrl || d.doctorProfile?.kycDocUrl) && (
+            <span className="badge badge-info" title="Documents uploaded — needs review">
+              <FileText className="w-3 h-3" /> Docs
+            </span>
+          )}
+          {d.doctorProfile?.registrationFeePaid && (
+            <span className="badge badge-success" title="Registration fee paid">
+              <CreditCard className="w-3 h-3" /> Paid
+            </span>
+          )}
+        </div>
         <div className="text-xs text-slate-400">{d.mobile}</div>
       </td>
       <td>{d.doctorProfile?.specialty ?? "—"}</td>
@@ -432,6 +444,8 @@ export default function AdminDoctors() {
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState("");
   const [filter, setFilter]     = useState("ALL");
+  const [docsOnly, setDocsOnly] = useState(false);
+  const [paidOnly, setPaidOnly] = useState(false);
   const [updating, setUpdating] = useState<string | null>(null);
   const [viewId, setViewId]     = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Doctor | null>(null);
@@ -468,6 +482,11 @@ export default function AdminDoctors() {
   const filtered = doctors
     .filter((d) => filter === "ALL" || d.doctorProfile?.status === filter)
     .filter((d) =>
+      !docsOnly ||
+      !!(d.doctorProfile?.medRegCertUrl || d.doctorProfile?.degreeCertUrl || d.doctorProfile?.kycDocUrl)
+    )
+    .filter((d) => !paidOnly || !!d.doctorProfile?.registrationFeePaid)
+    .filter((d) =>
       search === "" ||
       d.name.toLowerCase().includes(search.toLowerCase()) ||
       d.doctorProfile?.medRegNo.toLowerCase().includes(search.toLowerCase()) ||
@@ -502,6 +521,18 @@ export default function AdminDoctors() {
               {f}
             </button>
           ))}
+          <button onClick={() => setDocsOnly((v) => !v)}
+            className={cn("px-4 py-2 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5",
+              docsOnly ? "bg-blue-600 text-white border-blue-600 shadow-md" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+            )}>
+            <FileText className="w-3.5 h-3.5" /> Docs Uploaded
+          </button>
+          <button onClick={() => setPaidOnly((v) => !v)}
+            className={cn("px-4 py-2 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5",
+              paidOnly ? "bg-blue-600 text-white border-blue-600 shadow-md" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+            )}>
+            <CreditCard className="w-3.5 h-3.5" /> Payment Done
+          </button>
         </div>
       </div>
 
