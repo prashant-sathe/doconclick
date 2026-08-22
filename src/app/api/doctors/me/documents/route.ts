@@ -84,3 +84,42 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
   }
 }
+
+// DELETE: clears a document/photo slot. Same locked-once-verified guard as
+// POST — this doesn't remove the file from S3, just detaches it, matching
+// how "Replace" already leaves the old file orphaned there.
+export async function DELETE(req: Request) {
+  const authUser = await getAuthUser();
+  if (!authUser || authUser.role !== "DOCTOR") {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const body = await req.json().catch(() => ({}));
+  const type = body.type;
+  if (typeof type !== "string" || !(type in DOC_FIELD)) {
+    return NextResponse.json({ error: "Invalid document type" }, { status: 400 });
+  }
+
+  if (type !== "photo" && type !== "clinicPhoto" && type !== "signature") {
+    const profile = await prisma.doctorProfile.findUnique({ where: { userId: authUser.id } });
+    if (profile?.isVerified) {
+      return NextResponse.json(
+        { error: "Your credentials are already verified — verification documents can no longer be changed." },
+        { status: 403 }
+      );
+    }
+  }
+
+  const field = DOC_FIELD[type];
+
+  try {
+    const updated = await prisma.doctorProfile.update({
+      where: { userId: authUser.id },
+      data: { [field]: null },
+    });
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
+  }
+}

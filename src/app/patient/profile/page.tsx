@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Loader2, MapPin, Droplets, Ruler, Weight, AlertTriangle, Pill,
-  Scissors, PhoneCall, Camera, CheckCircle2, ArrowRight, Save, UploadCloud, User,
+  Scissors, PhoneCall, Camera, CheckCircle2, ArrowRight, Save, UploadCloud, User, Trash2,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { computeCompleteness, type PatientProfileData } from "@/lib/profileCompl
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import NotificationSettings from "@/components/NotificationSettings";
+import ImageCropModal from "@/components/ImageCropModal";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import { CHRONIC_OPTIONS, BLOOD_GROUPS } from "@/lib/medicalOptions";
 import { computeBMI, bmiCategoryClasses } from "@/lib/bmi";
@@ -67,12 +68,13 @@ function CompletionRing({ percent }: { percent: number }) {
 function PhotoUpload({ url, onUploaded }: { url: string; onUploaded: (url: string) => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
-  const upload = async (file: File) => {
+  const upload = async (fileOrBlob: File | Blob) => {
     setBusy(true);
     setError("");
     const form = new FormData();
-    form.append("file", file);
+    form.append("file", fileOrBlob, "photo.jpg");
     const res = await fetch("/api/patients/me/photo", { method: "POST", body: form });
     setBusy(false);
     if (res.ok) {
@@ -80,6 +82,18 @@ function PhotoUpload({ url, onUploaded }: { url: string; onUploaded: (url: strin
       onUploaded(data.photoUrl);
     } else {
       setError((await res.json().catch(() => ({}))).error ?? "Upload failed.");
+    }
+  };
+
+  const remove = async () => {
+    setBusy(true);
+    setError("");
+    const res = await fetch("/api/patients/me/photo", { method: "DELETE" });
+    setBusy(false);
+    if (res.ok) {
+      onUploaded("");
+    } else {
+      setError((await res.json().catch(() => ({}))).error ?? "Could not remove.");
     }
   };
 
@@ -94,15 +108,32 @@ function PhotoUpload({ url, onUploaded }: { url: string; onUploaded: (url: strin
         )}
       </div>
       <div>
-        <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer inline-flex">
-          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
-          {url ? "Replace Photo" : "Upload Photo"}
-          <input type="file" accept="image/jpeg,image/png" className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }} />
-        </label>
+        <div className="flex items-center gap-2">
+          <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer inline-flex">
+            {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
+            {url ? "Replace Photo" : "Upload Photo"}
+            <input type="file" accept="image/jpeg,image/png" className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) setPendingFile(f); e.target.value = ""; }} />
+          </label>
+          {url && (
+            <button type="button" onClick={remove} disabled={busy}
+              className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60" title="Remove">
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
         <p className="text-xs text-slate-400 mt-1.5">JPG or PNG, up to 5MB.</p>
         {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
       </div>
+      {pendingFile && (
+        <ImageCropModal
+          file={pendingFile}
+          aspect={1}
+          round
+          onCancel={() => setPendingFile(null)}
+          onConfirm={(blob) => { setPendingFile(null); upload(blob); }}
+        />
+      )}
     </div>
   );
 }

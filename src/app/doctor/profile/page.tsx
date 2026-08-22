@@ -7,7 +7,7 @@ import {
   CreditCard, Camera, FileText, Shield, BadgeCheck, CheckCircle2,
   Save, ArrowRight, UploadCloud, Home, Lock, Languages,
   QrCode, Copy, Check, Download, Building2,
-  ShieldCheck, AlertTriangle, Video,
+  ShieldCheck, AlertTriangle, Video, Trash2,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
@@ -17,6 +17,7 @@ import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import NotificationSettings from "@/components/NotificationSettings";
+import ImageCropModal from "@/components/ImageCropModal";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -70,7 +71,7 @@ function CompletionRing({ percent }: { percent: number }) {
   );
 }
 
-function DocSlot({ label, icon: Icon, url, type, locked, required, requiredNote, accept, onUploaded }: {
+function DocSlot({ label, icon: Icon, url, type, locked, required, requiredNote, accept, cropAspect, removable, onUploaded }: {
   label: string;
   icon: React.ElementType;
   url: string | null;
@@ -79,17 +80,20 @@ function DocSlot({ label, icon: Icon, url, type, locked, required, requiredNote,
   required?: boolean;
   requiredNote?: string;
   accept?: string;
+  cropAspect?: number;
+  removable?: boolean;
   onUploaded: (url: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
-  const upload = async (file: File) => {
+  const upload = async (fileOrBlob: File | Blob) => {
     setBusy(true);
     setError("");
     const form = new FormData();
     form.append("type", type);
-    form.append("file", file);
+    form.append("file", fileOrBlob, `${type}.jpg`);
     const res = await fetch("/api/doctors/me/documents", { method: "POST", body: form });
     setBusy(false);
     if (res.ok) {
@@ -99,6 +103,27 @@ function DocSlot({ label, icon: Icon, url, type, locked, required, requiredNote,
     } else {
       setError((await res.json().catch(() => ({}))).error ?? "Upload failed.");
     }
+  };
+
+  const remove = async () => {
+    setBusy(true);
+    setError("");
+    const res = await fetch("/api/doctors/me/documents", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type }),
+    });
+    setBusy(false);
+    if (res.ok) {
+      onUploaded("");
+    } else {
+      setError((await res.json().catch(() => ({}))).error ?? "Could not remove.");
+    }
+  };
+
+  const onFileSelected = (file: File) => {
+    if (cropAspect) setPendingFile(file);
+    else upload(file);
   };
 
   return (
@@ -132,12 +157,29 @@ function DocSlot({ label, icon: Icon, url, type, locked, required, requiredNote,
           <Lock className="w-3.5 h-3.5" /> Verified &amp; locked
         </span>
       ) : (
-      <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer flex-shrink-0">
-        {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
-        {url ? "Replace" : "Upload"}
-        <input type="file" accept={accept ?? ".pdf,.jpg,.jpeg,.png"} className="hidden"
-          onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }} />
-      </label>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer">
+          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
+          {url ? "Replace" : "Upload"}
+          <input type="file" accept={accept ?? ".pdf,.jpg,.jpeg,.png"} className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) onFileSelected(f); e.target.value = ""; }} />
+        </label>
+        {removable && url && (
+          <button type="button" onClick={remove} disabled={busy}
+            className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60" title="Remove">
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+      )}
+      {pendingFile && cropAspect && (
+        <ImageCropModal
+          file={pendingFile}
+          aspect={cropAspect}
+          round={type === "photo"}
+          onCancel={() => setPendingFile(null)}
+          onConfirm={(blob) => { setPendingFile(null); upload(blob); }}
+        />
       )}
     </div>
   );
@@ -640,10 +682,10 @@ export default function DoctorProfilePage() {
               </div>
             )}
             <div className="space-y-3">
-              <DocSlot label="Profile Photo" icon={Camera} url={docs.photoUrl} type="photo" onUploaded={(url) => setDocs((d) => ({ ...d, photoUrl: url }))} />
-              <DocSlot label="Registration Certificate" icon={BadgeCheck} url={docs.medRegCertUrl} type="medRegCert" locked={isVerified} required onUploaded={(url) => setDocs((d) => ({ ...d, medRegCertUrl: url }))} />
-              <DocSlot label="Medical Degree Certificate" icon={FileText} url={docs.degreeCertUrl} type="degreeCert" locked={isVerified} required onUploaded={(url) => setDocs((d) => ({ ...d, degreeCertUrl: url }))} />
-              <DocSlot label="Government ID (KYC)" icon={Shield} url={docs.kycDocUrl} type="kyc" locked={isVerified} required onUploaded={(url) => setDocs((d) => ({ ...d, kycDocUrl: url }))} />
+              <DocSlot label="Profile Photo" icon={Camera} url={docs.photoUrl} type="photo" accept=".jpg,.jpeg,.png" cropAspect={1} removable onUploaded={(url) => setDocs((d) => ({ ...d, photoUrl: url }))} />
+              <DocSlot label="Registration Certificate" icon={BadgeCheck} url={docs.medRegCertUrl} type="medRegCert" locked={isVerified} required removable onUploaded={(url) => setDocs((d) => ({ ...d, medRegCertUrl: url }))} />
+              <DocSlot label="Medical Degree Certificate" icon={FileText} url={docs.degreeCertUrl} type="degreeCert" locked={isVerified} required removable onUploaded={(url) => setDocs((d) => ({ ...d, degreeCertUrl: url }))} />
+              <DocSlot label="Government ID (KYC)" icon={Shield} url={docs.kycDocUrl} type="kyc" locked={isVerified} required removable onUploaded={(url) => setDocs((d) => ({ ...d, kycDocUrl: url }))} />
             </div>
           </section>
 
@@ -659,7 +701,7 @@ export default function DoctorProfilePage() {
             </p>
             <div className="space-y-3">
               <DocSlot label="Signature" icon={FileText} url={docs.signatureUrl} type="signature" accept=".jpg,.jpeg,.png"
-                required requiredNote="Required for your account to be approved — not uploaded yet"
+                required requiredNote="Required for your account to be approved — not uploaded yet" removable
                 onUploaded={(url) => setDocs((d) => ({ ...d, signatureUrl: url }))} />
             </div>
           </section>

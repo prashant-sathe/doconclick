@@ -45,3 +45,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
   }
 }
+
+// DELETE: clears the patient's profile photo. Doesn't remove the file from
+// S3, just detaches it — same as "Replace" already leaving the old file
+// orphaned there.
+export async function DELETE() {
+  const authUser = await getAuthUser();
+  if (!authUser || authUser.role !== "PATIENT") {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  try {
+    const updated = await prisma.patientProfile.update({
+      where: { userId: authUser.id },
+      data: { photoUrl: null },
+    });
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
+  }
+}

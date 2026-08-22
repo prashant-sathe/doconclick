@@ -12,6 +12,7 @@ import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import LocationPickerMap from "@/components/LocationPickerMap";
+import ImageCropModal from "@/components/ImageCropModal";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -71,12 +72,13 @@ function newClinic(): ClinicForm {
 function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded: (url: string) => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
-  const upload = async (file: File) => {
+  const upload = async (fileOrBlob: File | Blob) => {
     setBusy(true);
     setError("");
     const form = new FormData();
-    form.append("file", file);
+    form.append("file", fileOrBlob, "clinic-photo.jpg");
     const res = await fetch("/api/doctors/me/clinics/photo", { method: "POST", body: form });
     setBusy(false);
     if (res.ok) {
@@ -86,6 +88,11 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
       setError((await res.json().catch(() => ({}))).error ?? "Upload failed.");
     }
   };
+
+  // Clinic photos aren't persisted server-side until the clinic itself is
+  // saved (see the API route's comment), so "remove" is just clearing the
+  // local field — no separate delete call needed.
+  const remove = () => onUploaded("");
 
   return (
     <div>
@@ -105,10 +112,24 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
           {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
           {url ? "Replace Photo" : "Upload Photo"}
           <input type="file" accept=".jpg,.jpeg,.png" className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }} />
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) setPendingFile(f); e.target.value = ""; }} />
         </label>
+        {url && (
+          <button type="button" onClick={remove} disabled={busy}
+            className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60 flex-shrink-0" title="Remove">
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        )}
         {error && <span className="text-xs text-red-500">{error}</span>}
       </div>
+      {pendingFile && (
+        <ImageCropModal
+          file={pendingFile}
+          aspect={16 / 9}
+          onCancel={() => setPendingFile(null)}
+          onConfirm={(blob) => { setPendingFile(null); upload(blob); }}
+        />
+      )}
     </div>
   );
 }
