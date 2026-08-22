@@ -1,5 +1,6 @@
 "use client";
 import { Stethoscope } from "lucide-react";
+import { formatDoctorName } from "@/lib/utils";
 
 export interface PrescriptionMedicineData {
   name: string;
@@ -161,7 +162,7 @@ export default function PrescriptionDocument({
           <div style={{ flex: 1, border: `1px solid ${BORDER}`, borderRadius: 10, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: TEAL, marginBottom: 10 }}>Doctor Details</div>
             <Label>Name</Label>
-            <Value>{data.doctorName}</Value>
+            <Value>{formatDoctorName(data.doctorName)}</Value>
             <Label>Qualification</Label>
             <Value>{data.doctorQualification || "—"}</Value>
             <Label>Reg. No.</Label>
@@ -202,7 +203,7 @@ export default function PrescriptionDocument({
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 24 }}>
           <div style={{ width: 220, textAlign: "center" }}>
             <div style={{ borderTop: `1px solid ${INK}`, marginBottom: 6 }} />
-            <div style={{ fontSize: 13, fontWeight: 700, color: INK }}>{data.doctorName}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK }}>{formatDoctorName(data.doctorName)}</div>
             <div style={{ fontSize: 11, color: MUTED }}>{data.doctorQualification || ""}</div>
             <div style={{ fontSize: 11, color: MUTED }}>Reg. No.: {data.doctorRegNo || "—"}</div>
           </div>

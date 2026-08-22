@@ -15,6 +15,7 @@ import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { FREQUENCY_OPTIONS, DURATION_OPTIONS } from "@/lib/medicalOptions";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
+import { formatDoctorName } from "@/lib/utils";
 
 interface DoctorProfile {
   specialty: string;
@@ -429,7 +430,7 @@ export default function DoctorDashboard() {
             <Stethoscope className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-slate-900">{doctor?.name ?? user.name}</h1>
+            <h1 className="text-2xl font-extrabold text-slate-900">{formatDoctorName(doctor?.name ?? user.name)}</h1>
             <p className="text-slate-500 text-sm">
               {profile?.specialty ?? "Specialty pending"} · {profile?.qualification ?? "—"} ·{" "}
               <span className="text-amber-500 font-semibold inline-flex items-center gap-0.5">

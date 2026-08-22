@@ -10,7 +10,7 @@ import {
   ShieldCheck, AlertTriangle, Video,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 import { computeDoctorCompleteness, type DoctorProfileData } from "@/lib/doctorProfileCompleteness";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
@@ -239,7 +239,7 @@ export default function DoctorProfilePage() {
 
     ctx.fillStyle = "#0f172a";
     ctx.font = "bold 24px Arial, sans-serif";
-    ctx.fillText(user.name, W / 2, 95);
+    ctx.fillText(formatDoctorName(user.name), W / 2, 95);
 
     if (form.specialty) {
       ctx.fillStyle = "#64748b";

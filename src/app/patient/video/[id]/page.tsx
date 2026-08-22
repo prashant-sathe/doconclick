@@ -8,6 +8,7 @@ import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import VideoCallRoom from "@/components/VideoCallRoom";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
+import { formatDoctorName } from "@/lib/utils";
 
 interface VideoAppointment {
   status: string;
@@ -75,7 +76,7 @@ export default function PatientVideoCallPage() {
               <Stethoscope className="w-5 h-5 text-blue-600" />
             </div>
             <div className="min-w-0">
-              <p className="font-bold text-slate-900 truncate">{appt?.doctor.name ?? "…"}</p>
+              <p className="font-bold text-slate-900 truncate">{appt ? formatDoctorName(appt.doctor.name) : "…"}</p>
               <p className="text-xs text-slate-500">{appt?.doctor.doctorProfile?.specialty}</p>
             </div>
           </div>
@@ -87,7 +88,7 @@ export default function PatientVideoCallPage() {
           ) : !requestOpen ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">Video call opens once {appt.doctor.name} accepts this request.</p>
+              <p className="text-sm text-slate-500">Video call opens once {formatDoctorName(appt.doctor.name)} accepts this request.</p>
             </div>
           ) : !paid ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-3">

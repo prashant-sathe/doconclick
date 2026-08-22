@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Heart, CalendarCheck2, UserCircle, LogOut, Bell, Bookmark, Sparkles } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 import { usePatientNotifications } from "@/hooks/usePatientNotifications";
 import PatientNotificationToast from "@/components/patient/PatientNotificationToast";
 
@@ -79,7 +79,7 @@ export default function PatientHeader() {
 
         <div className="flex items-center gap-3 flex-shrink-0">
           <span className="text-sm text-slate-500 hidden sm:inline">
-            Hi, <strong className="text-slate-800">{user?.name?.split(" ")[0]}</strong>
+            Hi, <strong className="text-slate-800">{user?.name}</strong>
           </span>
 
           <div className="relative">
@@ -113,7 +113,7 @@ export default function PatientHeader() {
                         >
                           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[a.event] ?? "bg-slate-300"}`} />
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-slate-800 truncate">{a.doctor.name}</p>
+                            <p className="text-sm font-semibold text-slate-800 truncate">{formatDoctorName(a.doctor.name)}</p>
                             <p className="text-xs text-slate-400 mt-0.5">{STATUS_LABEL[a.event] ?? a.event} · {a.consultType}</p>
                           </div>
                         </button>

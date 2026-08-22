@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Users, Stethoscope, CalendarCheck, IndianRupee, AlertCircle, Clock, TrendingUp } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 
 interface Analytics {
   totalPatients: number;
@@ -147,7 +147,7 @@ export default function AdminOverview() {
               ) : data.recentAppointments.map((a) => (
                 <tr key={a.id}>
                   <td className="font-medium text-slate-900">{a.patient.name}</td>
-                  <td>{a.doctor.name}</td>
+                  <td>{formatDoctorName(a.doctor.name)}</td>
                   <td className="max-w-[200px] truncate">{a.symptoms}</td>
                   <td className="font-semibold">₹{a.amount}</td>
                   <td><span className={STATUS_STYLES[a.status] ?? "badge badge-gray"}>{a.status}</span></td>

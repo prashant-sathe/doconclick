@@ -6,7 +6,7 @@ import {
   Pill, Scissors, PhoneCall, DollarSign, CalendarCheck,
   CheckCircle2, AlertCircle, MessageCircle, Clock, RefreshCw, Trash2,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 
 // ── Types ──────────────────────────────────────────────────────
 interface PatientProfile {
@@ -159,7 +159,7 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
                       <div key={a.id} className="flex items-center justify-between px-4 py-3 gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-semibold text-slate-800">
-                            {a.doctor.name}
+                            {formatDoctorName(a.doctor.name)}
                             {a.doctor.doctorProfile?.specialty && (
                               <span className="text-slate-400 font-normal"> · {a.doctor.doctorProfile.specialty}</span>
                             )}

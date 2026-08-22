@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Stethoscope, LayoutDashboard, IndianRupee, UserCircle, Building2, LogOut, Bell, Clock } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
 import NotificationToast from "@/components/doctor/NotificationToast";
 
@@ -61,7 +61,7 @@ export default function DoctorHeader() {
 
         <div className="flex items-center gap-3 flex-shrink-0">
           <span className="text-sm text-slate-500 hidden sm:inline">
-            Hi, <strong className="text-slate-800">{user?.name?.split(" ")[0]}</strong>
+            Hi, <strong className="text-slate-800">{user && formatDoctorName(user.name)}</strong>
           </span>
 
           <div className="relative">

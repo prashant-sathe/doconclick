@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import ChatThread from "@/components/ChatThread";
+import { formatDoctorName } from "@/lib/utils";
 
 interface ChatAppointment {
   status: string;
@@ -57,7 +58,7 @@ export default function PatientChatPage() {
               <Stethoscope className="w-5 h-5 text-blue-600" />
             </div>
             <div className="min-w-0">
-              <p className="font-bold text-slate-900 truncate">{appt?.doctor.name ?? "…"}</p>
+              <p className="font-bold text-slate-900 truncate">{appt ? formatDoctorName(appt.doctor.name) : "…"}</p>
               <p className="text-xs text-slate-500">{appt?.doctor.doctorProfile?.specialty}</p>
             </div>
           </div>
@@ -69,7 +70,7 @@ export default function PatientChatPage() {
           ) : !chatOpen ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">Chat opens once {appt.doctor.name} accepts this request.</p>
+              <p className="text-sm text-slate-500">Chat opens once {formatDoctorName(appt.doctor.name)} accepts this request.</p>
             </div>
           ) : (
             <ChatThread appointmentId={params.id} meId={user.id} accent="blue" />

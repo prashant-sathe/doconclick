@@ -20,3 +20,11 @@ export function formatDate(date: Date | string) {
     year: "numeric",
   }).format(new Date(date));
 }
+
+// Doctor names are stored as free text and some already include a "Dr."
+// prefix (in varying forms — "Dr.", "Dr", with/without trailing period)
+// while others don't. Strip whatever prefix exists, then apply one
+// consistent "Dr. " so it's never shown doubled or in a mismatched form.
+export function formatDoctorName(name: string) {
+  return `Dr. ${name.replace(/^dr\.?\s*/i, "").trim()}`;
+}

@@ -6,7 +6,7 @@ import {
   Loader2, Heart, Building2, Video, Home, Clock, Languages, UserX, Bookmark, BookmarkCheck,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
 import { haversine } from "@/lib/geo";
@@ -220,7 +220,7 @@ export default function DoctorProfilePage() {
             )}
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-lg font-extrabold text-slate-900 leading-tight">{doctor.name}</h1>
+                <h1 className="text-lg font-extrabold text-slate-900 leading-tight">{formatDoctorName(doctor.name)}</h1>
                 {profile.isVerified && <VerifiedBadge />}
               </div>
               <p className="text-sm text-slate-500 mt-0.5">{profile.specialty}</p>

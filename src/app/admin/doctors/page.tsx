@@ -6,7 +6,7 @@ import {
   Clock, MapPin, CreditCard, CalendarCheck, TrendingUp, AlertCircle,
   CheckCircle2, User, BadgeCheck, Languages, FileText, Trash2,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 
 // ── Types ──────────────────────────────────────────────────────
 interface DoctorProfile {
@@ -83,7 +83,7 @@ function DoctorRow({
   return (
     <tr>
       <td>
-        <div className="font-semibold text-slate-900">{d.name}</div>
+        <div className="font-semibold text-slate-900">{formatDoctorName(d.name)}</div>
         <div className="text-xs text-slate-400">{d.mobile}</div>
       </td>
       <td>{d.doctorProfile?.specialty ?? "—"}</td>
@@ -227,7 +227,7 @@ function DoctorDrawer({
               {data?.name?.charAt(0) ?? "D"}
             </div>
             <div>
-              <div className="text-xl font-extrabold text-white">{data?.name ?? "Loading…"}</div>
+              <div className="text-xl font-extrabold text-white">{data ? formatDoctorName(data.name) : "Loading…"}</div>
               <div className="text-blue-100 text-sm mt-0.5">{p?.specialty ?? ""} · {p?.qualification ?? ""}</div>
               {p && (
                 <div className="mt-2 flex items-center gap-2">
@@ -565,7 +565,7 @@ export default function AdminDoctors() {
               <h3 className="font-bold text-slate-800">Delete this account?</h3>
             </div>
             <p className="text-sm text-slate-500 mb-5">
-              {deleteTarget.name} ({deleteTarget.mobile}) will be permanently blocked from logging in, and their mobile number will be freed for a new registration.
+              {formatDoctorName(deleteTarget.name)} ({deleteTarget.mobile}) will be permanently blocked from logging in, and their mobile number will be freed for a new registration.
               Their past appointments and earnings history are kept for your records. This cannot be undone.
             </p>
             <div className="flex gap-3">

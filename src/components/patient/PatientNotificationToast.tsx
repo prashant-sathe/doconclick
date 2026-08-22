@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, XCircle, Clock, Car, MapPinCheck, X } from "lucide-react";
 import type { AppointmentStatusEvent } from "@/hooks/usePatientNotifications";
+import { formatDoctorName } from "@/lib/utils";
 
 const AUTO_DISMISS_MS = 6000;
 
@@ -43,7 +44,7 @@ export default function PatientNotificationToast({ event, onDismiss }: {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-slate-900">{copy.title}</p>
-          <p className="text-xs text-slate-500 mt-0.5">{copy.message(event.doctor.name)}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{copy.message(formatDoctorName(event.doctor.name))}</p>
         </div>
         <span
           onClick={(e) => { e.stopPropagation(); onDismiss(); }}

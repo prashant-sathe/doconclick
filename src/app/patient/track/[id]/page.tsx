@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Car, MapPinCheck, Clock, Navigation, Loader2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { estimateArrivalMinutes } from "@/lib/eta";
+import { formatDoctorName } from "@/lib/utils";
 
 interface TrackedAppointment {
   id: string;
@@ -144,7 +145,7 @@ export default function PatientTrackDoctor() {
       ) : appt.doctorLat == null ? (
         <div className="absolute inset-0 z-30 flex items-center justify-center p-6">
           <div className="glass-card rounded-2xl p-6 text-center text-slate-500 max-w-sm">
-            Waiting for {appt.doctor.name} to start their journey…
+            Waiting for {formatDoctorName(appt.doctor.name)} to start their journey…
           </div>
         </div>
       ) : (
@@ -155,7 +156,7 @@ export default function PatientTrackDoctor() {
                 {appt.travelStatus === "ARRIVED" ? <MapPinCheck className="w-5 h-5 text-white" /> : <Car className="w-5 h-5 text-white" />}
               </div>
               <div className="min-w-0">
-                <p className="font-bold text-slate-900 truncate">{appt.doctor.name}</p>
+                <p className="font-bold text-slate-900 truncate">{formatDoctorName(appt.doctor.name)}</p>
                 <p className="text-xs text-slate-500">{appt.doctor.doctorProfile?.specialty}</p>
               </div>
             </div>

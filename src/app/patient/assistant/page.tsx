@@ -10,6 +10,7 @@ import {
 import RatingStars from "@/components/patient/RatingStars";
 import { isDoctorAvailableNow } from "@/lib/availability";
 import { useAuth } from "@/components/AuthProvider";
+import { formatDoctorName } from "@/lib/utils";
 
 // Loosely typed mirror of the OpenAI Responses API's input/output items —
 // the client only needs enough shape to render and to echo the array back
@@ -153,7 +154,7 @@ function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-sm font-bold text-slate-900 truncate">{doctor.name}</span>
+            <span className="text-sm font-bold text-slate-900 truncate">{formatDoctorName(doctor.name)}</span>
             <span className="text-sm font-bold text-slate-900 flex-shrink-0">₹{doctor.fee}</span>
           </div>
           <span className="badge badge-info mt-1.5">{doctor.specialty}</span>

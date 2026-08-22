@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Search, CalendarCheck } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 
 interface Appointment {
   id: string;
@@ -136,7 +136,7 @@ export default function AdminBookings() {
                         <div className="text-xs font-normal text-slate-400">{b.relation} of {b.patient.name}</div>
                       )}
                     </td>
-                    <td>{b.doctor.name}</td>
+                    <td>{formatDoctorName(b.doctor.name)}</td>
                     <td><span className={TYPE_BADGE[b.consultType] ?? "badge badge-gray"}>{b.consultType}</span></td>
                     <td className="max-w-[160px] truncate text-slate-600">{b.symptoms}</td>
                     <td className="font-semibold">₹{b.amount}</td>

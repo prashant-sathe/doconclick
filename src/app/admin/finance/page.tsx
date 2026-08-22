@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { IndianRupee, TrendingUp, Save, Wallet } from "lucide-react";
+import { formatDoctorName } from "@/lib/utils";
 
 interface Analytics {
   totalRevenue: number;
@@ -229,7 +230,7 @@ export default function AdminFinance() {
                 {pending.map((p) => (
                   <tr key={p.doctorId}>
                     <td className="py-3 pr-4">
-                      <p className="font-semibold text-slate-800">{p.doctorName}</p>
+                      <p className="font-semibold text-slate-800">{formatDoctorName(p.doctorName)}</p>
                       {p.bankDetails ? (
                         <p className="text-[11px] text-slate-400">{p.bankDetails}</p>
                       ) : (
@@ -268,7 +269,7 @@ export default function AdminFinance() {
             {history.map((s) => (
               <div key={s.id} className="py-3.5 flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-800">{s.doctor.name}</p>
+                  <p className="text-sm font-semibold text-slate-800">{formatDoctorName(s.doctor.name)}</p>
                   <p className="text-xs text-slate-400">
                     {new Date(s.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {s.cashCount} cash · {s.onlineCount} online
                     {s.settledByAdmin ? ` · by ${s.settledByAdmin.name}` : ""}
@@ -292,7 +293,7 @@ export default function AdminFinance() {
               <h3 className="font-bold text-slate-800">Doctor owes the platform</h3>
             </div>
             <p className="text-sm text-slate-500 mb-5">
-              {confirmNegative.doctorName} owes the platform ₹{Math.abs(confirmNegative.netAmount).toLocaleString("en-IN")} net
+              {formatDoctorName(confirmNegative.doctorName)} owes the platform ₹{Math.abs(confirmNegative.netAmount).toLocaleString("en-IN")} net
               (₹{confirmNegative.cashFeeOwed.toLocaleString("en-IN")} cash fee vs ₹{confirmNegative.onlinePayoutOwed.toLocaleString("en-IN")} online payout).
               Settling will record this as a net amount owed by the doctor. Continue?
             </p>

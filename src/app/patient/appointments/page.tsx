@@ -9,7 +9,7 @@ import {
   MessageCircle, Navigation,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
@@ -179,7 +179,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
           </div>
           <div className="min-w-0">
             <div className="font-bold text-slate-900 flex items-center gap-2 flex-wrap">
-              {a.doctor.name}
+              {formatDoctorName(a.doctor.name)}
               {a.isEmergency && (
                 <span className="badge badge-danger"><Siren className="w-3 h-3" /> Emergency</span>
               )}
@@ -204,7 +204,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       {a.status === "PENDING_APPROVAL" && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
           <span className="flex items-center gap-2">
-            <Clock className="w-4 h-4 flex-shrink-0" /> Waiting for {a.doctor.name} to accept this request.
+            <Clock className="w-4 h-4 flex-shrink-0" /> Waiting for {formatDoctorName(a.doctor.name)} to accept this request.
           </span>
           <span className="text-xs font-mono font-semibold text-amber-700 flex-shrink-0">
             {timeLeftMs > 0 ? `${formatCountdown(timeLeftMs)} left` : "Expiring…"}
@@ -213,12 +213,12 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       )}
       {a.status === "REJECTED" && (
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
-          <ThumbsDown className="w-4 h-4 flex-shrink-0 text-slate-400" /> {a.doctor.name} was unable to accept this request. No payment was taken.
+          <ThumbsDown className="w-4 h-4 flex-shrink-0 text-slate-400" /> {formatDoctorName(a.doctor.name)} was unable to accept this request. No payment was taken.
         </div>
       )}
       {a.status === "EXPIRED" && (
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
-          <Clock className="w-4 h-4 flex-shrink-0 text-slate-400" /> {a.doctor.name}{" "}didn&apos;t respond in time and may be too busy right now. No payment was taken — try booking again or choose another doctor.
+          <Clock className="w-4 h-4 flex-shrink-0 text-slate-400" /> {formatDoctorName(a.doctor.name)}{" "}didn&apos;t respond in time and may be too busy right now. No payment was taken — try booking again or choose another doctor.
         </div>
       )}
       {a.status === "SCHEDULED" && a.consultType === "CLINIC" && a.paymentStatus === "PAID" && clinicDirectionsUrl(a.doctor.doctorProfile) && (
@@ -229,7 +229,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
           className="bg-teal-50 border border-teal-200 rounded-xl px-4 py-3 text-sm text-teal-800 mb-3 flex items-center justify-between gap-2 hover:bg-teal-100 transition-colors"
         >
           <span className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 flex-shrink-0" /> {a.doctor.doctorProfile?.clinicName || `${a.doctor.name}'s clinic`}
+            <Building2 className="w-4 h-4 flex-shrink-0" /> {a.doctor.doctorProfile?.clinicName || `${formatDoctorName(a.doctor.name)}'s clinic`}
           </span>
           <span className="font-semibold underline flex items-center gap-1">
             <Navigation className="w-3.5 h-3.5" /> Get Directions
@@ -242,7 +242,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
           className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 mb-3 flex items-center justify-between gap-2 hover:bg-emerald-100 transition-colors"
         >
           <span className="flex items-center gap-2">
-            <Car className="w-4 h-4 flex-shrink-0" /> {a.doctor.name} is on the way
+            <Car className="w-4 h-4 flex-shrink-0" /> {formatDoctorName(a.doctor.name)} is on the way
           </span>
           <span className="font-semibold underline flex items-center gap-1">
             <MapPin className="w-3.5 h-3.5" /> Track Live
@@ -251,7 +251,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       )}
       {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
-          <MapPinCheck className="w-4 h-4 flex-shrink-0" /> {a.doctor.name} has arrived.
+          <MapPinCheck className="w-4 h-4 flex-shrink-0" /> {formatDoctorName(a.doctor.name)} has arrived.
         </div>
       )}
 
@@ -530,7 +530,7 @@ export default function PatientAppointments() {
               <h3 className="font-bold text-slate-800">Cancel this request?</h3>
             </div>
             <p className="text-sm text-slate-500 mb-5">
-              Your request to {cancelTarget.doctor.name} on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
+              Your request to {formatDoctorName(cancelTarget.doctor.name)} on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
             </p>
             <div className="flex gap-3">
               <button onClick={() => setCancelTarget(null)} className="btn-secondary flex-1">

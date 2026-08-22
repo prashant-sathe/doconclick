@@ -7,7 +7,7 @@ import {
   CalendarClock, Siren, Clock, IndianRupee,
   CalendarCheck2, Hash, ClipboardList, AlertTriangle, ShieldCheck, Users, Search, X,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { useSpecialties } from "@/lib/useSpecialties";
@@ -277,7 +277,7 @@ function PatientBookInner() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500">Doctor</span>
-                  <span className="font-semibold text-slate-800">{selectedDoctor?.name}</span>
+                  <span className="font-semibold text-slate-800">{selectedDoctor && formatDoctorName(selectedDoctor.name)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500">Consultation</span>
@@ -369,7 +369,7 @@ function PatientBookInner() {
                 <option value="">— Choose a doctor —</option>
                 {visibleDoctors.map((d) => (
                   <option key={d.id} value={d.id}>
-                    {d.name} — {d.doctorProfile?.specialty} (₹{feeForConsultType(d.doctorProfile, form.consultType)})
+                    {formatDoctorName(d.name)} — {d.doctorProfile?.specialty} (₹{feeForConsultType(d.doctorProfile, form.consultType)})
                   </option>
                 ))}
               </select>
@@ -378,7 +378,7 @@ function PatientBookInner() {
             {selectedDoctor?.doctorProfile && (
               <div className="bg-blue-50 rounded-xl p-4 text-sm text-blue-800">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold">{selectedDoctor.name}</span>
+                  <span className="font-semibold">{formatDoctorName(selectedDoctor.name)}</span>
                   {selectedDoctor.doctorProfile.isVerified && <VerifiedBadge />}
                 </div>
                 <div className="text-xs mt-0.5">{selectedDoctor.doctorProfile.specialty} · {selectedDoctor.doctorProfile.experience} yrs · {selectedDoctor.doctorProfile.availability}</div>
@@ -404,7 +404,7 @@ function PatientBookInner() {
                 <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1 text-xs text-red-800">
                   <p className="font-semibold">
-                    {selectedDoctor?.name} is {distance?.toFixed(1)} km away — too far for a home visit right now.
+                    {selectedDoctor && formatDoctorName(selectedDoctor.name)} is {distance?.toFixed(1)} km away — too far for a home visit right now.
                   </p>
                   <p className="mt-0.5">They only offer home visits within {homeVisitRadiusKm} km. Try Clinic Visit or Video Call instead.</p>
                 </div>
@@ -569,7 +569,7 @@ function PatientBookInner() {
                 )}
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-bold text-slate-900 text-sm truncate">{selectedDoctor.name}</span>
+                    <span className="font-bold text-slate-900 text-sm truncate">{formatDoctorName(selectedDoctor.name)}</span>
                     {selectedDoctor.doctorProfile.isVerified && <VerifiedBadge />}
                   </div>
                   <p className="text-xs text-slate-500">{selectedDoctor.doctorProfile.specialty}</p>

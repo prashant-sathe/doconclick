@@ -15,6 +15,7 @@ import { isClinicOpenNow, findOpenClinic } from "@/lib/clinicAvailability";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
 import { haversine } from "@/lib/geo";
+import { cn, formatDoctorName } from "@/lib/utils";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
@@ -568,7 +569,7 @@ function PatientDashboardInner() {
     setEmergencyBusy(false);
     if (res.ok) {
       setEmergencyResult({
-        doctorName: nearestAny.name,
+        doctorName: formatDoctorName(nearestAny.name),
         eta: estimateArrivalMinutes(nearestAny.distance ?? 0),
       });
     } else {
@@ -744,7 +745,7 @@ function PatientDashboardInner() {
                 style={{ backgroundColor: colorFor(nearest.doctorProfile.specialty) }}
               />
               <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
-                Nearest: <span className="text-blue-600">{nearest.name}</span>
+                Nearest: <span className="text-blue-600">{formatDoctorName(nearest.name)}</span>
                 {nearest.distance != null && (
                   <span className="text-slate-400 font-normal ml-1">
                     · {nearest.distance.toFixed(1)} km
@@ -837,7 +838,7 @@ function PatientDashboardInner() {
                   <div>
                     <h3 className="text-xl font-extrabold text-slate-900">Request Sent!</h3>
                     <p className="text-slate-500 text-sm mt-1">
-                      Waiting for {selectedDoctor.name} to confirm your {consultType === "HOME" ? "home visit" : "appointment"}.
+                      Waiting for {formatDoctorName(selectedDoctor.name)} to confirm your {consultType === "HOME" ? "home visit" : "appointment"}.
                     </p>
                     <p className="text-xs text-slate-400 font-mono mt-2">ID: {booked.id.slice(0, 14)}…</p>
                   </div>
@@ -856,7 +857,7 @@ function PatientDashboardInner() {
                 <div className="pb-6">
                   <h3 className="text-lg font-extrabold text-slate-900 mb-1">Confirm Booking</h3>
                   <p className="text-sm text-slate-500 mb-4">
-                    {selectedDoctor.name} · {selectedDoctor.doctorProfile.specialty}
+                    {formatDoctorName(selectedDoctor.name)} · {selectedDoctor.doctorProfile.specialty}
                   </p>
 
                   {/* Consult type */}
@@ -898,7 +899,7 @@ function PatientDashboardInner() {
                       <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-semibold text-red-800">
-                          {selectedDoctor.name} is {homeVisitDistanceKm?.toFixed(1)} km away — too far for a home visit right now.
+                          {formatDoctorName(selectedDoctor.name)} is {homeVisitDistanceKm?.toFixed(1)} km away — too far for a home visit right now.
                         </p>
                         <p className="text-xs text-red-700 mt-0.5">
                           They only offer home visits within {homeVisitRadiusKm} km. Try Clinic Visit or Video Call instead.
@@ -1073,7 +1074,7 @@ function PatientDashboardInner() {
                     </div>
                   )}
                   {/* Header */}
-                  <div className="flex items-start gap-4 mb-5">
+                  <div className="flex items-start gap-4 mb-5 pr-10">
                     {/* Avatar */}
                     {selectedDoctor.doctorProfile.photoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -1092,7 +1093,7 @@ function PatientDashboardInner() {
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-lg font-extrabold text-slate-900 leading-tight">{selectedDoctor.name}</h3>
+                        <h3 className="text-lg font-extrabold text-slate-900 leading-tight">{formatDoctorName(selectedDoctor.name)}</h3>
                         {selectedDoctor.doctorProfile.isVerified && <VerifiedBadge />}
                       </div>
                       <p className="text-sm text-slate-500 mt-0.5">{selectedDoctor.doctorProfile.specialty}</p>
@@ -1180,12 +1181,12 @@ function PatientDashboardInner() {
                       </div>
                     )}
                     {selectedDoctor.doctorProfile.offersHomeVisit && hasHomeVisitReach ? (
-                      <div className="rounded-2xl p-4 border border-blue-200 bg-blue-50 text-center">
-                        <Home className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-                        <p className="text-xs text-blue-600">Home Visit</p>
-                        <p className="text-base font-extrabold text-blue-700 mt-0.5">₹{selectedDoctor.doctorProfile.homeVisitFee}</p>
+                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
+                        <Home className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                        <p className="text-xs text-slate-500">Home Visit</p>
+                        <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.homeVisitFee}</p>
                         {selectedDoctor.distance != null && (
-                          <p className="text-[10px] text-blue-500 mt-0.5">~{estimateArrivalMinutes(selectedDoctor.distance)} min arrival</p>
+                          <p className="text-[10px] text-slate-400 mt-0.5">~{estimateArrivalMinutes(selectedDoctor.distance)} min arrival</p>
                         )}
                       </div>
                     ) : (
@@ -1217,31 +1218,44 @@ function PatientDashboardInner() {
                   )}
 
                   {/* CTA buttons */}
-                  {selectedDoctor.doctorProfile.offersHomeVisit && hasHomeVisitReach && (
-                    <button
-                      onClick={() => { setConsultType("HOME"); setBookingOpen(true); }}
-                      className="btn-primary w-full justify-center py-3.5 text-base mb-2.5"
-                    >
-                      <Home className="w-4 h-4" /> Request Home Visit
-                    </button>
-                  )}
-                  <div className="flex gap-2">
-                    {selectedDoctor.doctorProfile.offersClinic !== false && hasOpenClinic && (
-                      <button
-                        onClick={() => { setConsultType("CLINIC"); setBookingOpen(true); }}
-                        className="btn-secondary justify-center py-3 text-sm flex-1"
-                      >
-                        <Building2 className="w-4 h-4" /> Clinic Visit
-                      </button>
-                    )}
-                    {selectedDoctor.doctorProfile.offersVideo && (
-                      <button
-                        onClick={() => { setConsultType("VIDEO"); setBookingOpen(true); }}
-                        className="btn-secondary justify-center py-3 text-sm flex-1"
-                      >
-                        <Video className="w-4 h-4" /> Video Call
-                      </button>
-                    )}
+                  <div className="grid grid-cols-3 gap-2">
+                    {(() => {
+                      const clinicAvailable = selectedDoctor.doctorProfile.offersClinic !== false && hasOpenClinic;
+                      const videoAvailable = selectedDoctor.doctorProfile.offersVideo === true;
+                      const homeAvailable = selectedDoctor.doctorProfile.offersHomeVisit && hasHomeVisitReach;
+                      const baseClass = "flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-colors border";
+                      const availableClass = "border-blue-200 bg-blue-50 text-blue-600 hover:border-blue-600 hover:bg-blue-600 hover:text-white";
+                      const disabledClass = "border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed";
+                      const classFor = (available: boolean) => (available ? availableClass : disabledClass);
+                      return (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => { setConsultType("CLINIC"); setBookingOpen(true); }}
+                            disabled={!clinicAvailable}
+                            className={cn(baseClass, classFor(clinicAvailable))}
+                          >
+                            <Building2 className="w-4 h-4" /> Book Clinic Visit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setConsultType("VIDEO"); setBookingOpen(true); }}
+                            disabled={!videoAvailable}
+                            className={cn(baseClass, classFor(videoAvailable))}
+                          >
+                            <Video className="w-4 h-4" /> Book Video Consultation
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setConsultType("HOME"); setBookingOpen(true); }}
+                            disabled={!homeAvailable}
+                            className={cn(baseClass, classFor(homeAvailable))}
+                          >
+                            <Home className="w-4 h-4" /> Book Home Visit
+                          </button>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               )}
@@ -1275,7 +1289,7 @@ function PatientDashboardInner() {
                 </div>
                 <p className="text-sm text-slate-500 mb-4">
                   This is not an ambulance service. We&apos;ll immediately notify the nearest available doctor
-                  {nearestAny ? <> — <strong>{nearestAny.name}</strong> ({nearestAny.distance?.toFixed(1)} km away)</> : null}.
+                  {nearestAny ? <> — <strong>{formatDoctorName(nearestAny.name)}</strong> ({nearestAny.distance?.toFixed(1)} km away)</> : null}.
                 </p>
                 <textarea
                   rows={3}

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Heart, Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
 
 const navLinks = [
@@ -23,6 +23,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { user, loading, logout } = useAuth();
   const dashboardHref = user ? ROLE_HOME[user.role] ?? "/" : "/";
+  const displayName = user ? (user.role === "DOCTOR" ? formatDoctorName(user.name) : user.name) : "";
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/20 bg-white/90 backdrop-blur-xl">
@@ -61,7 +62,7 @@ export default function Navbar() {
           {loading ? null : user ? (
             <>
               <Link href={dashboardHref} className="btn-ghost gap-1.5">
-                <LayoutDashboard className="w-4 h-4" /> {user.name}
+                <LayoutDashboard className="w-4 h-4" /> {displayName}
               </Link>
               <button onClick={logout} className="btn-primary gap-1.5">
                 <LogOut className="w-4 h-4" /> Sign Out
@@ -100,7 +101,7 @@ export default function Navbar() {
             {loading ? null : user ? (
               <>
                 <Link href={dashboardHref} onClick={() => setOpen(false)} className="btn-secondary justify-center">
-                  {user.name}&apos;s Dashboard
+                  {displayName}&apos;s Dashboard
                 </Link>
                 <button
                   onClick={() => { setOpen(false); logout(); }}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, Bookmark, BookmarkX, Building2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
+import { formatDoctorName } from "@/lib/utils";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import RatingStars from "@/components/patient/RatingStars";
@@ -107,7 +108,7 @@ export default function SavedDoctorsPage() {
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-slate-900 truncate">{doctor.name}</span>
+                      <span className="font-bold text-slate-900 truncate">{formatDoctorName(doctor.name)}</span>
                       {profile?.status === "APPROVED" && <VerifiedBadge />}
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">{profile?.specialty}</p>
