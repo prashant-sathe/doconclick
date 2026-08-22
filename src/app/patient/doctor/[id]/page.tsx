@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
-  Loader2, Heart, Building2, Video, Home, Clock, Languages, UserX, Bookmark, BookmarkCheck,
+  Loader2, Building2, Video, Home, Clock, Languages, UserX, Bookmark, BookmarkCheck,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
@@ -72,9 +72,7 @@ function Header() {
     <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center shadow">
-            <Heart className="w-4 h-4 text-white" />
-          </div>
+          <img src="/logo-icon.png" alt="DocOnClick" className="w-8 h-8 object-contain" />
           <span className="font-extrabold text-slate-900">DocOnClick</span>
         </Link>
         <Link href={user ? "/patient/dashboard" : "/login"} className="btn-secondary py-2 px-3.5 text-sm">

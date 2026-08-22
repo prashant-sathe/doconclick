@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Heart, Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard } from "lucide-react";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
 
@@ -29,14 +29,8 @@ export default function Navbar() {
     <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/20 bg-white/90 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between gap-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-          <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-md">
-            <Heart className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <span className="text-xl font-extrabold text-slate-900 leading-none tracking-tight">DocOnClick</span>
-            <div className="text-[10px] font-semibold text-slate-400 tracking-wide uppercase leading-none mt-0.5">Healthcare Platform</div>
-          </div>
+        <Link href="/" className="flex items-center flex-shrink-0">
+          <img src="/logo.png" alt="DocOnClick" className="h-9 w-auto" />
         </Link>
 
         {/* Desktop nav */}

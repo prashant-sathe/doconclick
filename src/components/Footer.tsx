@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Heart, Mail, ArrowRight } from "lucide-react";
+import { Mail, ArrowRight } from "lucide-react";
 
 const footerLinks = {
   "Platform": [
@@ -51,14 +51,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2.5 mb-5">
-              <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-lg">
-                <Heart className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <div className="font-extrabold text-white text-lg leading-none">DocOnClick</div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-wide mt-0.5">Healthcare Platform</div>
-              </div>
+            <Link href="/" className="flex items-center mb-5">
+              <img src="/logo-dark.png" alt="DocOnClick" className="h-9 w-auto" />
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">
               India's most trusted on-demand healthcare platform. Connecting patients with verified doctors for home visits, video consultations, and clinic appointments.

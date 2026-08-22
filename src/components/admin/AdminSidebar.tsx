@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Stethoscope, Users, CalendarCheck,
-  DollarSign, MessageCircle, Settings, Heart, Tag,
+  DollarSign, MessageCircle, Settings, Tag,
   LogOut, ChevronRight, FileBarChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -30,9 +30,7 @@ export default function AdminSidebar() {
       {/* Logo */}
       <div className="px-6 py-5 border-b border-slate-200/70">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-lg">
-            <Heart className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo-icon.png" alt="DocOnClick" className="w-9 h-9 object-contain" />
           <div>
             <div className="font-bold text-slate-900 leading-tight">DocOnClick</div>
             <div className="text-xs text-slate-400 font-medium">Admin Panel</div>

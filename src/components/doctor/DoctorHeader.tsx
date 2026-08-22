@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Stethoscope, LayoutDashboard, IndianRupee, UserCircle, Building2, LogOut, Bell, Clock } from "lucide-react";
+import { LayoutDashboard, IndianRupee, UserCircle, Building2, LogOut, Bell, Clock } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
@@ -37,9 +37,7 @@ export default function DoctorHeader() {
     <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <Link href="/doctor/dashboard" className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-teal-500 flex items-center justify-center shadow">
-            <Stethoscope className="w-4 h-4 text-white" />
-          </div>
+          <img src="/logo-icon.png" alt="DocOnClick" className="w-8 h-8 object-contain" />
           <span className="font-extrabold text-slate-900 hidden sm:inline">DocOnClick</span>
         </Link>
 

@@ -3,24 +3,72 @@
 @theme {
   --font-sans: 'Inter', 'Outfit', system-ui, -apple-system, sans-serif;
 
-  /* Primary - Medical Blue */
-  --color-primary-50: hsl(213, 100%, 96%);
-  --color-primary-100: hsl(213, 100%, 91%);
-  --color-primary-200: hsl(213, 96%, 82%);
-  --color-primary-300: hsl(213, 95%, 70%);
-  --color-primary-400: hsl(213, 94%, 58%);
-  --color-primary-500: hsl(213, 94%, 45%);
-  --color-primary-600: hsl(213, 90%, 37%);
-  --color-primary-700: hsl(213, 85%, 30%);
-  --color-primary-800: hsl(213, 80%, 24%);
-  --color-primary-900: hsl(213, 75%, 18%);
+  /* Primary - Brand Navy (from the DocOnClick logo/marketing theme) */
+  --color-primary-50: hsl(219, 80%, 97%);
+  --color-primary-100: hsl(219, 75%, 93%);
+  --color-primary-200: hsl(219, 72%, 85%);
+  --color-primary-300: hsl(219, 70%, 72%);
+  --color-primary-400: hsl(219, 68%, 58%);
+  --color-primary-500: hsl(219, 70%, 46%);
+  --color-primary-600: hsl(219, 72%, 36%);
+  --color-primary-700: hsl(219, 74%, 28%);
+  --color-primary-800: hsl(219, 70%, 21%);
+  --color-primary-900: hsl(219, 65%, 16%);
+  --color-primary-950: hsl(219, 60%, 10%);
 
-  /* Accent - Teal/Mint */
-  --color-accent-400: hsl(172, 76%, 48%);
-  --color-accent-500: hsl(172, 76%, 40%);
-  --color-accent-600: hsl(172, 76%, 32%);
+  /* Accent - Brand Green (from the DocOnClick logo/marketing theme) */
+  --color-accent-50: hsl(162, 70%, 96%);
+  --color-accent-100: hsl(162, 65%, 90%);
+  --color-accent-200: hsl(162, 62%, 80%);
+  --color-accent-300: hsl(162, 60%, 65%);
+  --color-accent-400: hsl(162, 60%, 42%);
+  --color-accent-500: hsl(162, 65%, 32%);
+  --color-accent-600: hsl(162, 68%, 26%);
+  --color-accent-700: hsl(162, 70%, 20%);
+  --color-accent-800: hsl(162, 65%, 15%);
+  --color-accent-900: hsl(162, 60%, 11%);
 
-  /* Success */
+  /*
+   * Re-point Tailwind's built-in blue, emerald, and teal palettes at the
+   * same brand navy/green so the ~250 existing blue-600, emerald-500, etc
+   * utility classes across the app repaint to the brand colors without a
+   * per-file rewrite. Keep hue and ramp identical to primary/accent above.
+   */
+  --color-blue-50: hsl(219, 80%, 97%);
+  --color-blue-100: hsl(219, 75%, 93%);
+  --color-blue-200: hsl(219, 72%, 85%);
+  --color-blue-300: hsl(219, 70%, 72%);
+  --color-blue-400: hsl(219, 68%, 58%);
+  --color-blue-500: hsl(219, 70%, 46%);
+  --color-blue-600: hsl(219, 72%, 36%);
+  --color-blue-700: hsl(219, 74%, 28%);
+  --color-blue-800: hsl(219, 70%, 21%);
+  --color-blue-900: hsl(219, 65%, 16%);
+  --color-blue-950: hsl(219, 60%, 10%);
+
+  --color-emerald-50: hsl(162, 70%, 96%);
+  --color-emerald-100: hsl(162, 65%, 90%);
+  --color-emerald-200: hsl(162, 62%, 80%);
+  --color-emerald-300: hsl(162, 60%, 65%);
+  --color-emerald-400: hsl(162, 60%, 42%);
+  --color-emerald-500: hsl(162, 65%, 32%);
+  --color-emerald-600: hsl(162, 68%, 26%);
+  --color-emerald-700: hsl(162, 70%, 20%);
+  --color-emerald-800: hsl(162, 65%, 15%);
+  --color-emerald-900: hsl(162, 60%, 11%);
+
+  --color-teal-50: hsl(162, 70%, 96%);
+  --color-teal-100: hsl(162, 65%, 90%);
+  --color-teal-200: hsl(162, 62%, 80%);
+  --color-teal-300: hsl(162, 60%, 65%);
+  --color-teal-400: hsl(162, 60%, 42%);
+  --color-teal-500: hsl(162, 65%, 32%);
+  --color-teal-600: hsl(162, 68%, 26%);
+  --color-teal-700: hsl(162, 70%, 20%);
+  --color-teal-800: hsl(162, 65%, 15%);
+  --color-teal-900: hsl(162, 60%, 11%);
+
+  /* Success (kept distinct from accent-green so "success" state still reads separately) */
   --color-success-400: hsl(142, 71%, 50%);
   --color-success-500: hsl(142, 71%, 40%);
 
@@ -93,15 +141,15 @@
 
   /* Gradient backgrounds */
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(213, 94%, 45%) 0%, hsl(172, 76%, 40%) 100%);
+    background: linear-gradient(135deg, hsl(219, 70%, 26%) 0%, hsl(162, 65%, 32%) 100%);
   }
 
   .gradient-hero {
-    background: linear-gradient(135deg, hsl(213, 94%, 45%) 0%, hsl(213, 85%, 30%) 50%, hsl(172, 76%, 32%) 100%);
+    background: linear-gradient(135deg, hsl(219, 65%, 16%) 0%, hsl(219, 74%, 28%) 50%, hsl(162, 68%, 26%) 100%);
   }
 
   .gradient-surface {
-    background: linear-gradient(180deg, hsl(220, 20%, 98%) 0%, hsl(213, 100%, 96%) 100%);
+    background: linear-gradient(180deg, hsl(220, 20%, 98%) 0%, hsl(219, 80%, 97%) 100%);
   }
 
   /* Stat cards */
@@ -120,12 +168,12 @@
   /* Buttons */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed;
-    background: linear-gradient(135deg, hsl(213, 94%, 45%) 0%, hsl(213, 90%, 37%) 100%);
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    background: linear-gradient(135deg, hsl(162, 65%, 32%) 0%, hsl(162, 68%, 26%) 100%);
+    box-shadow: 0 4px 14px rgba(29, 135, 103, 0.35);
   }
   .btn-primary:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+    box-shadow: 0 6px 20px rgba(29, 135, 103, 0.45);
   }
   .btn-primary:active:not(:disabled) {
     transform: translateY(0);
@@ -133,12 +181,12 @@
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 border;
-    border-color: hsl(213, 100%, 91%);
-    color: hsl(213, 94%, 45%);
-    background: hsl(213, 100%, 96%);
+    border-color: hsl(219, 75%, 90%);
+    color: hsl(219, 70%, 30%);
+    background: hsl(219, 80%, 97%);
   }
   .btn-secondary:hover {
-    background: hsl(213, 100%, 91%);
+    background: hsl(219, 75%, 93%);
   }
 
   .btn-danger {
@@ -207,7 +255,7 @@
   }
   .sidebar-item.active {
     @apply bg-white text-primary-600 font-semibold;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 2px 8px rgba(26, 72, 158, 0.12);
   }
 
   /* Skeleton loader */
@@ -234,8 +282,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.3); }
-  50%       { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(26, 72, 158, 0.3); }
+  50%       { box-shadow: 0 0 0 8px rgba(26, 72, 158, 0); }
 }
 
 @keyframes taglineSlide {
@@ -271,7 +319,7 @@
   @apply w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300;
 }
 .step-circle.done    { @apply border-blue-600 bg-blue-600 text-white; }
-.step-circle.active  { @apply border-blue-600 bg-white text-blue-600; box-shadow: 0 0 0 4px rgba(37,99,235,0.15); }
+.step-circle.active  { @apply border-blue-600 bg-white text-blue-600; box-shadow: 0 0 0 4px rgba(26,72,158,0.15); }
 .step-circle.pending { @apply border-slate-300 bg-white text-slate-400; }
 .step-line { @apply flex-1 h-0.5 transition-all duration-300; }
 .step-line.done    { @apply bg-blue-600; }
@@ -284,12 +332,12 @@
 }
 .specialty-card:hover {
   @apply border-blue-200 -translate-y-1;
-  box-shadow: 0 8px 32px rgba(37,99,235,0.12);
+  box-shadow: 0 8px 32px rgba(26,72,158,0.12);
 }
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, hsl(213,94%,45%) 0%, hsl(172,76%,40%) 100%);
+  background: linear-gradient(135deg, hsl(219,70%,46%) 0%, hsl(162,65%,32%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -298,9 +346,9 @@
 /* Section */
 .section-tag {
   @apply inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider;
-  background: hsl(213,100%,96%);
-  color: hsl(213,94%,45%);
-  border: 1px solid hsl(213,100%,88%);
+  background: hsl(219,80%,97%);
+  color: hsl(219,70%,46%);
+  border: 1px solid hsl(219,72%,89%);
 }
 
 /* Card hover */
@@ -329,7 +377,7 @@
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, hsl(213,94%,45%), hsl(172,76%,40%));
+  background: linear-gradient(135deg, hsl(219,70%,46%), hsl(162,65%,32%));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;

@@ -654,9 +654,7 @@ function PatientDashboardInner() {
         <div className="flex items-start justify-between p-3 sm:p-4 gap-2 sm:gap-3">
           {/* Logo / title */}
           <div className="glass-card rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 pointer-events-auto shadow-lg min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl gradient-primary flex items-center justify-center shadow flex-shrink-0">
-              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            </div>
+            <img src="/logo-icon.png" alt="DocOnClick" className="w-8 h-8 sm:w-9 sm:h-9 object-contain flex-shrink-0" />
             <div className="min-w-0 hidden xs:block sm:block">
               <p className="text-sm font-bold text-slate-900 leading-none">DocOnClick</p>
               <p className="text-xs text-slate-500 mt-0.5 truncate">
