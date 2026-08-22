@@ -257,7 +257,7 @@ export default function DoctorProfilePage() {
       ctx.fillText("Scan to book an appointment", W / 2, QR_Y + QR_SIZE + 35);
 
       const link = document.createElement("a");
-      link.download = `doconclick-qr-${user.id}.png`;
+      link.download = `${formatDoctorName(user.name)}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     };
