@@ -4,13 +4,6 @@ import { Heart, Shield, Target, Users, Award, Stethoscope, TrendingUp, Globe } f
 
 export const metadata = { title: "About Us | DocOnClick", description: "Learn about DocOnClick's mission to make quality healthcare accessible to every Indian." };
 
-const TEAM = [
-  { name: "Dr. Arjun Mehta",  role: "Co-Founder & CMO",         spec: "Cardiologist, 15 yrs exp",    initial: "A" },
-  { name: "Priya Rajan",      role: "Co-Founder & CEO",          spec: "Health-Tech Entrepreneur",    initial: "P" },
-  { name: "Ravi Kumar",       role: "CTO",                       spec: "Ex-Google, Healthcare AI",    initial: "R" },
-  { name: "Sunita Nair",      role: "Head of Doctor Relations",  spec: "Healthcare Management, 10 yrs", initial: "S" },
-];
-
 const VALUES = [
   { icon: Heart,     title: "Patient First",         desc: "Every decision we make starts with one question: does this make the patient's life better?" },
   { icon: Shield,    title: "Trust & Safety",         desc: "Zero-compromise on doctor verification. Every credential checked. Every time." },
@@ -134,28 +127,6 @@ export default function AboutPage() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="py-20 gradient-surface">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-14">
-            <div className="section-tag mx-auto mb-4">The People Behind DocOnClick</div>
-            <h2 className="text-4xl font-extrabold text-slate-900 mb-4">Meet the <span className="gradient-text">Team</span></h2>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {TEAM.map(({ name, role, spec, initial }) => (
-              <div key={name} className="stat-card card-hover text-center">
-                <div className="w-20 h-20 rounded-full gradient-primary flex items-center justify-center mx-auto mb-4 text-2xl font-extrabold text-white shadow-lg">
-                  {initial}
-                </div>
-                <h3 className="font-bold text-slate-900 mb-1">{name}</h3>
-                <p className="text-blue-600 text-sm font-semibold mb-1">{role}</p>
-                <p className="text-slate-400 text-xs">{spec}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
