@@ -106,6 +106,9 @@ export default function DoctorVideoCallPage() {
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Loader2 className="w-6 h-6 text-teal-400 animate-spin" />
               <p className="text-sm text-slate-500">Video call unlocking in {unlockRemainingSec}s…</p>
+              <p className="text-xs text-slate-400">
+                Consultation will start at {new Date(unlockAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+              </p>
             </div>
           ) : (
             <VideoCallRoom appointmentId={params.id} accent="teal" leaveHref="/doctor/dashboard" />
