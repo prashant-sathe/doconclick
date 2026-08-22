@@ -6,6 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 
 const REGISTRATION_FEE = 99;
+const REGISTRATION_FEE_ORIGINAL = 499;
 const FREE_TRIAL_MONTHS = 6;
 const TRIAL_VALUE = DOCTOR_SUBSCRIPTION_FEE * FREE_TRIAL_MONTHS;
 
@@ -82,7 +83,10 @@ export default function DoctorPayment() {
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
             <div className="bg-slate-50 rounded-xl p-4 mb-3 flex justify-between items-center">
               <span className="text-slate-500 text-sm">Registration Fee</span>
-              <span className="font-extrabold text-blue-600 text-xl">₹{REGISTRATION_FEE}</span>
+              <span className="flex items-baseline gap-2">
+                <span className="text-slate-400 text-sm line-through">₹{REGISTRATION_FEE_ORIGINAL}</span>
+                <span className="font-extrabold text-blue-600 text-xl">₹{REGISTRATION_FEE}</span>
+              </span>
             </div>
 
             <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6 flex items-start gap-3">

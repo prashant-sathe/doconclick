@@ -361,7 +361,9 @@ export default function DoctorProfilePage() {
               <ShieldCheck className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-slate-900">Verify your account &amp; start onboarding patients</p>
-                <p className="text-sm text-slate-500 mt-0.5">Fill in your profile below, then pay a one-time ₹99 to activate your dashboard.</p>
+                <p className="text-sm text-slate-500 mt-0.5">
+                  Fill in your profile below, then pay a one-time <span className="line-through text-slate-400">₹499</span> <span className="font-semibold text-slate-700">₹99</span> to activate your dashboard.
+                </p>
               </div>
             </div>
             <Link href="/doctor/payment" className="btn-primary py-2.5 px-4 text-sm flex-shrink-0">
