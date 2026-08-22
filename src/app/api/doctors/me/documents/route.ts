@@ -9,14 +9,21 @@ const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
 };
+// Signature is embedded as an <img> in the prescription PDF, so a PDF upload
+// wouldn't render — restrict it to image formats only.
+const IMAGE_ONLY_TYPES: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+};
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
-const DOC_FIELD: Record<string, "photoUrl" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "clinicPhotoUrl"> = {
+const DOC_FIELD: Record<string, "photoUrl" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "clinicPhotoUrl" | "signatureUrl"> = {
   photo: "photoUrl",
   medRegCert: "medRegCertUrl",
   degreeCert: "degreeCertUrl",
   kyc: "kycDocUrl",
   clinicPhoto: "clinicPhotoUrl",
+  signature: "signatureUrl",
 };
 
 // POST: Doctor uploads a verification document or profile photo.
@@ -33,7 +40,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid document type" }, { status: 400 });
   }
 
-  if (type !== "photo" && type !== "clinicPhoto") {
+  if (type !== "photo" && type !== "clinicPhoto" && type !== "signature") {
     const profile = await prisma.doctorProfile.findUnique({ where: { userId: authUser.id } });
     if (profile?.isVerified) {
       return NextResponse.json(
@@ -48,9 +55,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
-  const ext = ALLOWED_TYPES[file.type];
+  const allowedTypes = type === "signature" ? IMAGE_ONLY_TYPES : ALLOWED_TYPES;
+  const ext = allowedTypes[file.type];
   if (!ext) {
-    return NextResponse.json({ error: "Only PDF, JPG, or PNG files are allowed" }, { status: 400 });
+    return NextResponse.json(
+      { error: type === "signature" ? "Only JPG or PNG images are allowed" : "Only PDF, JPG, or PNG files are allowed" },
+      { status: 400 }
+    );
   }
   if (file.size > MAX_SIZE_BYTES) {
     return NextResponse.json({ error: "File must be under 5MB" }, { status: 400 });

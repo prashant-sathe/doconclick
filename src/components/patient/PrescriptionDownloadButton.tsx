@@ -7,9 +7,13 @@ import PrescriptionDocument, { type PrescriptionData } from "./PrescriptionDocum
 export default function PrescriptionDownloadButton({
   appointmentId,
   patientId,
+  data: providedData,
 }: {
   appointmentId: string;
   patientId: string;
+  // Pre-fetched prescription data — used by callers (e.g. the admin drawer)
+  // that already loaded this data and can't hit the patient-only GET route.
+  data?: PrescriptionData;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,12 +24,17 @@ export default function PrescriptionDownloadButton({
     let container: HTMLDivElement | null = null;
     let root: ReturnType<typeof createRoot> | null = null;
     try {
-      const res = await fetch(`/api/appointments/${appointmentId}/prescription`);
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.error ?? "Could not load prescription");
+      let data: PrescriptionData;
+      if (providedData) {
+        data = providedData;
+      } else {
+        const res = await fetch(`/api/appointments/${appointmentId}/prescription`);
+        if (!res.ok) {
+          const body = await res.json().catch(() => null);
+          throw new Error(body?.error ?? "Could not load prescription");
+        }
+        data = await res.json();
       }
-      const data: PrescriptionData = await res.json();
 
       container = document.createElement("div");
       container.style.position = "fixed";
@@ -39,6 +48,18 @@ export default function PrescriptionDownloadButton({
 
       // Wait a full commit + paint cycle before snapshotting the off-screen node.
       await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
+      // The signature (or any other embedded image) loads over the network —
+      // wait for it, or html2canvas may snapshot before it's painted in.
+      const images = Array.from(container.querySelectorAll("img"));
+      await Promise.all(
+        images.map((img) =>
+          img.complete ? Promise.resolve() : new Promise<void>((resolve) => {
+            img.addEventListener("load", () => resolve(), { once: true });
+            img.addEventListener("error", () => resolve(), { once: true });
+          })
+        )
+      );
 
       const html2canvas = (await import("html2canvas")).default;
       const { jsPDF } = await import("jspdf");

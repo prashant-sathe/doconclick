@@ -138,6 +138,7 @@ model DoctorProfile {
   medRegCertUrl         String?
   degreeCertUrl         String?
   kycDocUrl             String?
+  signatureUrl          String?
   address               String?
   clinicName            String?
   clinicPhotoUrl        String?

@@ -28,6 +28,7 @@ interface DoctorProfile {
   medRegCertUrl: string | null;
   degreeCertUrl: string | null;
   kycDocUrl: string | null;
+  signatureUrl: string | null;
 }
 
 interface Doctor {
@@ -173,11 +174,11 @@ function DoctorDrawer({
   const [data, setData] = useState<DoctorDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  const [verifyError, setVerifyError] = useState("");
+  const [actionError, setActionError] = useState("");
 
   useEffect(() => {
     setLoading(true);
-    setVerifyError("");
+    setActionError("");
     fetch(`/api/admin/doctors/${doctorId}`)
       .then((r) => r.json())
       .then((d) => { setData(d); setLoading(false); });
@@ -185,13 +186,19 @@ function DoctorDrawer({
 
   const changeStatus = async (status: string) => {
     if (!data) return;
+    setActionError("");
     setUpdating(true);
-    await fetch(`/api/admin/doctors/${doctorId}`, {
+    const patchRes = await fetch(`/api/admin/doctors/${doctorId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
     setUpdating(false);
+    if (!patchRes.ok) {
+      const body = await patchRes.json().catch(() => ({}));
+      setActionError(body.error ?? "Could not update status.");
+      return;
+    }
     onStatusChange();
     // Refresh detail
     const res = await fetch(`/api/admin/doctors/${doctorId}`);
@@ -202,10 +209,10 @@ function DoctorDrawer({
     if (!data?.doctorProfile) return;
     const turningOn = !data.doctorProfile.isVerified;
     if (turningOn && !data.doctorProfile.registrationFeePaid) {
-      setVerifyError("Doctor hasn't paid the ₹99 registration fee yet.");
+      setActionError("Doctor hasn't paid the ₹99 registration fee yet.");
       return;
     }
-    setVerifyError("");
+    setActionError("");
     setUpdating(true);
     const patchRes = await fetch(`/api/admin/doctors/${doctorId}`, {
       method: "PATCH",
@@ -215,7 +222,7 @@ function DoctorDrawer({
     setUpdating(false);
     if (!patchRes.ok) {
       const body = await patchRes.json().catch(() => ({}));
-      setVerifyError(body.error ?? "Could not update verification status.");
+      setActionError(body.error ?? "Could not update verification status.");
       return;
     }
     const res = await fetch(`/api/admin/doctors/${doctorId}`);
@@ -272,8 +279,8 @@ function DoctorDrawer({
                   </button>
                 </div>
               )}
-              {verifyError && (
-                <p className="text-xs text-red-100 bg-red-500/30 rounded-lg px-2.5 py-1 mt-2">{verifyError}</p>
+              {actionError && (
+                <p className="text-xs text-red-100 bg-red-500/30 rounded-lg px-2.5 py-1 mt-2">{actionError}</p>
               )}
             </div>
           </div>
@@ -346,6 +353,7 @@ function DoctorDrawer({
                   { label: "Registration Certificate", url: p?.medRegCertUrl },
                   { label: "Medical Degree Certificate", url: p?.degreeCertUrl },
                   { label: "Government ID (KYC)", url: p?.kycDocUrl },
+                  { label: "Prescription Signature", url: p?.signatureUrl },
                 ].map(({ label, url }) => (
                   <div key={label} className="flex items-center justify-between px-4 py-3 gap-4">
                     <span className="text-sm text-slate-500">{label}</span>
@@ -391,7 +399,8 @@ function DoctorDrawer({
           <div className="flex-shrink-0 border-t border-slate-100 px-6 py-4 bg-white">
             <div className="flex gap-2">
               {p.status !== "APPROVED" && (
-                <button onClick={() => changeStatus("APPROVED")} disabled={updating} className="btn-success flex-1 justify-center py-2.5 text-sm">
+                <button onClick={() => changeStatus("APPROVED")} disabled={updating}
+                  className="btn-success flex-1 justify-center py-2.5 text-sm">
                   <CheckCircle className="w-4 h-4" /> Approve
                 </button>
               )}

@@ -24,6 +24,7 @@ export interface PrescriptionData {
   doctorSpecialty: string;
   clinicName: string | null;
   doctorNotes: string | null;
+  doctorSignatureUrl: string | null;
   medicines: PrescriptionMedicineData[];
 }
 
@@ -202,6 +203,14 @@ export default function PrescriptionDocument({
         {/* Sign-off */}
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 24 }}>
           <div style={{ width: 220, textAlign: "center" }}>
+            {data.doctorSignatureUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={`/api/files/download?url=${encodeURIComponent(data.doctorSignatureUrl)}&name=signature.png&disposition=inline`}
+                alt="Doctor's signature"
+                style={{ height: 48, objectFit: "contain", marginBottom: 4 }}
+              />
+            )}
             <div style={{ borderTop: `1px solid ${INK}`, marginBottom: 6 }} />
             <div style={{ fontSize: 13, fontWeight: 700, color: INK }}>{formatDoctorName(data.doctorName)}</div>
             <div style={{ fontSize: 11, color: MUTED }}>{data.doctorQualification || ""}</div>

@@ -69,13 +69,15 @@ function CompletionRing({ percent }: { percent: number }) {
   );
 }
 
-function DocSlot({ label, icon: Icon, url, type, locked, required, onUploaded }: {
+function DocSlot({ label, icon: Icon, url, type, locked, required, requiredNote, accept, onUploaded }: {
   label: string;
   icon: React.ElementType;
   url: string | null;
   type: string;
   locked?: boolean;
   required?: boolean;
+  requiredNote?: string;
+  accept?: string;
   onUploaded: (url: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -91,7 +93,7 @@ function DocSlot({ label, icon: Icon, url, type, locked, required, onUploaded }:
     setBusy(false);
     if (res.ok) {
       const data = await res.json();
-      const field = { photo: "photoUrl", medRegCert: "medRegCertUrl", degreeCert: "degreeCertUrl", kyc: "kycDocUrl" }[type] as string;
+      const field = { photo: "photoUrl", medRegCert: "medRegCertUrl", degreeCert: "degreeCertUrl", kyc: "kycDocUrl", signature: "signatureUrl" }[type] as string;
       onUploaded(data[field]);
     } else {
       setError((await res.json().catch(() => ({}))).error ?? "Upload failed.");
@@ -101,9 +103,10 @@ function DocSlot({ label, icon: Icon, url, type, locked, required, onUploaded }:
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-4">
       <div className="flex items-center gap-3 min-w-0">
-        {type === "photo" && url ? (
+        {(type === "photo" || type === "signature") && url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="Profile photo" className="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-slate-200" />
+          <img src={url} alt={type === "photo" ? "Profile photo" : "Signature"}
+            className={cn("flex-shrink-0 border border-slate-200 object-contain bg-white", type === "photo" ? "w-9 h-9 rounded-full object-cover" : "w-14 h-9 rounded-lg p-1")} />
         ) : (
           <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0", url ? "bg-emerald-50" : "bg-slate-100")}>
             <Icon className={cn("w-4 h-4", url ? "text-emerald-600" : "text-slate-400")} />
@@ -116,7 +119,7 @@ function DocSlot({ label, icon: Icon, url, type, locked, required, onUploaded }:
           {url ? (
             <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 font-medium hover:underline">Uploaded — view file</a>
           ) : required ? (
-            <p className="text-xs text-red-600 font-semibold">Required to get verified — not uploaded yet</p>
+            <p className="text-xs text-red-600 font-semibold">{requiredNote ?? "Required to get verified — not uploaded yet"}</p>
           ) : (
             <p className="text-xs text-slate-400">Not uploaded yet</p>
           )}
@@ -131,7 +134,7 @@ function DocSlot({ label, icon: Icon, url, type, locked, required, onUploaded }:
       <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer flex-shrink-0">
         {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
         {url ? "Replace" : "Upload"}
-        <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
+        <input type="file" accept={accept ?? ".pdf,.jpg,.jpeg,.png"} className="hidden"
           onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }} />
       </label>
       )}
@@ -147,7 +150,7 @@ export default function DoctorProfilePage() {
   const [days, setDays] = useState<string[]>(["Mon", "Tue", "Wed", "Thu", "Fri"]);
   const [fromTime, setFromTime] = useState("09:00");
   const [toTime, setToTime] = useState("18:00");
-  const [docs, setDocs] = useState({ photoUrl: null as string | null, medRegCertUrl: null as string | null, degreeCertUrl: null as string | null, kycDocUrl: null as string | null });
+  const [docs, setDocs] = useState({ photoUrl: null as string | null, medRegCertUrl: null as string | null, degreeCertUrl: null as string | null, kycDocUrl: null as string | null, signatureUrl: null as string | null });
   const [clinicCount, setClinicCount] = useState(0);
   const [isVerified, setIsVerified] = useState(false);
   const [registrationFeePaid, setRegistrationFeePaid] = useState(false);
@@ -199,7 +202,7 @@ export default function DoctorProfilePage() {
             setToTime(match[3]);
           }
         }
-        setDocs({ photoUrl: p.photoUrl ?? null, medRegCertUrl: p.medRegCertUrl ?? null, degreeCertUrl: p.degreeCertUrl ?? null, kycDocUrl: p.kycDocUrl ?? null });
+        setDocs({ photoUrl: p.photoUrl ?? null, medRegCertUrl: p.medRegCertUrl ?? null, degreeCertUrl: p.degreeCertUrl ?? null, kycDocUrl: p.kycDocUrl ?? null, signatureUrl: p.signatureUrl ?? null });
         setClinicCount(d.clinics?.length ?? 0);
         setIsVerified(!!p.isVerified);
         setRegistrationFeePaid(!!p.registrationFeePaid);
@@ -636,6 +639,23 @@ export default function DoctorProfilePage() {
               <DocSlot label="Registration Certificate" icon={BadgeCheck} url={docs.medRegCertUrl} type="medRegCert" locked={isVerified} required onUploaded={(url) => setDocs((d) => ({ ...d, medRegCertUrl: url }))} />
               <DocSlot label="Medical Degree Certificate" icon={FileText} url={docs.degreeCertUrl} type="degreeCert" locked={isVerified} required onUploaded={(url) => setDocs((d) => ({ ...d, degreeCertUrl: url }))} />
               <DocSlot label="Government ID (KYC)" icon={Shield} url={docs.kycDocUrl} type="kyc" locked={isVerified} required onUploaded={(url) => setDocs((d) => ({ ...d, kycDocUrl: url }))} />
+            </div>
+          </section>
+
+          <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><FileText className="w-4 h-4 text-teal-500" /> Prescription Signature</h2>
+            {!docs.signatureUrl && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-4">
+                Required for your account to be approved — upload an image of your signature so our admin team can review it.
+              </div>
+            )}
+            <p className="text-sm text-slate-500 mb-4">
+              It&apos;s printed on every prescription you generate for patients.
+            </p>
+            <div className="space-y-3">
+              <DocSlot label="Signature" icon={FileText} url={docs.signatureUrl} type="signature" accept=".jpg,.jpeg,.png"
+                required requiredNote="Required for your account to be approved — not uploaded yet"
+                onUploaded={(url) => setDocs((d) => ({ ...d, signatureUrl: url }))} />
             </div>
           </section>
 

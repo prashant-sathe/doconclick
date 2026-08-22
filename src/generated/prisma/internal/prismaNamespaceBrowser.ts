@@ -201,6 +201,7 @@ export const DoctorProfileScalarFieldEnum = {
   medRegCertUrl: 'medRegCertUrl',
   degreeCertUrl: 'degreeCertUrl',
   kycDocUrl: 'kycDocUrl',
+  signatureUrl: 'signatureUrl',
   address: 'address',
   clinicName: 'clinicName',
   clinicPhotoUrl: 'clinicPhotoUrl',
