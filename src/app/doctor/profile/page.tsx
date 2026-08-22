@@ -5,8 +5,8 @@ import Link from "next/link";
 import {
   Loader2, Award, Hash, Briefcase, IndianRupee, MapPin, Clock,
   CreditCard, Camera, FileText, Shield, BadgeCheck, CheckCircle2,
-  Save, ArrowRight, UploadCloud, Home, Navigation, Lock, Languages,
-  QrCode, Copy, Check, Download, Building2, Image as ImageIcon,
+  Save, ArrowRight, UploadCloud, Home, Lock, Languages,
+  QrCode, Copy, Check, Download, Building2,
   ShieldCheck, AlertTriangle, Video,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
@@ -16,8 +16,6 @@ import { useSpecialties } from "@/lib/useSpecialties";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
-import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
-import LocationPickerMap from "@/components/LocationPickerMap";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -38,10 +36,6 @@ interface FormState {
   bankName: string;
   bankAccount: string;
   ifsc: string;
-  address: string;
-  clinicName: string;
-  lat: number | null;
-  lng: number | null;
 }
 
 function daysUntil(target: Date): number {
@@ -51,7 +45,7 @@ function daysUntil(target: Date): number {
 const EMPTY_FORM: FormState = {
   specialty: "General Physician", qualification: "", languages: "", bio: "", medRegNo: "", experience: "",
   consultFee: "", videoFee: "", homeVisitFee: "", offersHomeVisit: true, offersClinic: true, offersVideo: false, radius: 10,
-  bankName: "", bankAccount: "", ifsc: "", address: "", clinicName: "", lat: null, lng: null,
+  bankName: "", bankAccount: "", ifsc: "",
 };
 
 function CompletionRing({ percent }: { percent: number }) {
@@ -75,12 +69,13 @@ function CompletionRing({ percent }: { percent: number }) {
   );
 }
 
-function DocSlot({ label, icon: Icon, url, type, locked, onUploaded }: {
+function DocSlot({ label, icon: Icon, url, type, locked, required, onUploaded }: {
   label: string;
   icon: React.ElementType;
   url: string | null;
   type: string;
   locked?: boolean;
+  required?: boolean;
   onUploaded: (url: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -115,9 +110,13 @@ function DocSlot({ label, icon: Icon, url, type, locked, onUploaded }: {
           </div>
         )}
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-800">{label}</p>
+          <p className="text-sm font-semibold text-slate-800">
+            {label} {required && <span className="text-red-500">*</span>}
+          </p>
           {url ? (
             <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 font-medium hover:underline">Uploaded — view file</a>
+          ) : required ? (
+            <p className="text-xs text-red-600 font-semibold">Required to get verified — not uploaded yet</p>
           ) : (
             <p className="text-xs text-slate-400">Not uploaded yet</p>
           )}
@@ -140,52 +139,6 @@ function DocSlot({ label, icon: Icon, url, type, locked, onUploaded }: {
   );
 }
 
-function CoverPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded: (url: string) => void }) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-
-  const upload = async (file: File) => {
-    setBusy(true);
-    setError("");
-    const form = new FormData();
-    form.append("type", "clinicPhoto");
-    form.append("file", file);
-    const res = await fetch("/api/doctors/me/documents", { method: "POST", body: form });
-    setBusy(false);
-    if (res.ok) {
-      const data = await res.json();
-      onUploaded(data.clinicPhotoUrl);
-    } else {
-      setError((await res.json().catch(() => ({}))).error ?? "Upload failed.");
-    }
-  };
-
-  return (
-    <div>
-      <div className="relative w-full h-36 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 mb-2">
-        {url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="Clinic cover photo" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-1.5">
-            <ImageIcon className="w-7 h-7" />
-            <span className="text-xs text-slate-400">No clinic photo yet</span>
-          </div>
-        )}
-      </div>
-      <div className="flex items-center gap-3">
-        <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer flex-shrink-0">
-          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
-          {url ? "Replace Clinic Photo" : "Upload Clinic Photo"}
-          <input type="file" accept=".jpg,.jpeg,.png" className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }} />
-        </label>
-        {error && <span className="text-xs text-red-500">{error}</span>}
-      </div>
-    </div>
-  );
-}
-
 export default function DoctorProfilePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -194,7 +147,8 @@ export default function DoctorProfilePage() {
   const [days, setDays] = useState<string[]>(["Mon", "Tue", "Wed", "Thu", "Fri"]);
   const [fromTime, setFromTime] = useState("09:00");
   const [toTime, setToTime] = useState("18:00");
-  const [docs, setDocs] = useState({ photoUrl: null as string | null, medRegCertUrl: null as string | null, degreeCertUrl: null as string | null, kycDocUrl: null as string | null, clinicPhotoUrl: null as string | null });
+  const [docs, setDocs] = useState({ photoUrl: null as string | null, medRegCertUrl: null as string | null, degreeCertUrl: null as string | null, kycDocUrl: null as string | null });
+  const [clinicCount, setClinicCount] = useState(0);
   const [isVerified, setIsVerified] = useState(false);
   const [registrationFeePaid, setRegistrationFeePaid] = useState(false);
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
@@ -232,10 +186,6 @@ export default function DoctorProfilePage() {
           offersVideo: p.offersVideo ?? false,
           radius: p.radius ?? 10,
           bankName: "", bankAccount: "", ifsc: "",
-          address: p.address ?? "",
-          clinicName: p.clinicName ?? "",
-          lat: p.lat ?? null,
-          lng: p.lng ?? null,
         });
         if (p.bankDetails) {
           const [bankName, bankAccount, ifscPart] = String(p.bankDetails).split(" | ");
@@ -249,7 +199,8 @@ export default function DoctorProfilePage() {
             setToTime(match[3]);
           }
         }
-        setDocs({ photoUrl: p.photoUrl ?? null, medRegCertUrl: p.medRegCertUrl ?? null, degreeCertUrl: p.degreeCertUrl ?? null, kycDocUrl: p.kycDocUrl ?? null, clinicPhotoUrl: p.clinicPhotoUrl ?? null });
+        setDocs({ photoUrl: p.photoUrl ?? null, medRegCertUrl: p.medRegCertUrl ?? null, degreeCertUrl: p.degreeCertUrl ?? null, kycDocUrl: p.kycDocUrl ?? null });
+        setClinicCount(d.clinics?.length ?? 0);
         setIsVerified(!!p.isVerified);
         setRegistrationFeePaid(!!p.registrationFeePaid);
         setTrialEndsAt(p.trialEndsAt ?? null);
@@ -322,19 +273,6 @@ export default function DoctorProfilePage() {
   const set = (k: keyof FormState, v: string | number | boolean | null) => { setSaved(false); setForm((f) => ({ ...f, [k]: v })); };
   const toggleDay = (d: string) => { setSaved(false); setDays((cur) => cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d]); };
 
-  const useCurrentLocation = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) => {
-      setSaved(false);
-      setForm((f) => ({
-        ...f,
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude,
-        address: f.address || `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
-      }));
-    });
-  };
-
   const completenessInput: DoctorProfileData = {
     qualification: form.qualification || null,
     medRegNo: form.medRegNo || null,
@@ -345,8 +283,7 @@ export default function DoctorProfilePage() {
     medRegCertUrl: docs.medRegCertUrl,
     degreeCertUrl: docs.degreeCertUrl,
     kycDocUrl: docs.kycDocUrl,
-    lat: form.lat,
-    lng: form.lng,
+    hasClinic: clinicCount > 0,
   };
   const completeness = computeDoctorCompleteness(completenessInput);
 
@@ -380,10 +317,6 @@ export default function DoctorProfilePage() {
         radius: form.radius,
         availability,
         bankDetails,
-        address: form.address,
-        clinicName: form.clinicName,
-        lat: form.lat,
-        lng: form.lng,
       }),
     });
     setSaving(false);
@@ -578,49 +511,20 @@ export default function DoctorProfilePage() {
 
           <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><MapPin className="w-4 h-4 text-red-500" /> Practice Location</h2>
-
-            <div className="mb-4">
-              <label className="input-label"><Building2 className="inline w-3.5 h-3.5 mr-1" />Clinic Name <span className="text-slate-400 font-normal normal-case">(optional)</span></label>
-              <input className="input-field" placeholder="e.g. Sunrise Family Clinic" value={form.clinicName} onChange={(e) => set("clinicName", e.target.value)} />
+            <p className="text-sm text-slate-500 mb-4">
+              Your clinic locations, photos, and day-wise hours are managed on the Clinics page — patients find you on the map using those locations.
+            </p>
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-4">
+              <span className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-slate-400" />
+                {clinicCount === 0
+                  ? "No clinics set up yet"
+                  : `${clinicCount} clinic${clinicCount === 1 ? "" : "s"} set up`}
+              </span>
+              <Link href="/doctor/clinics" className="btn-secondary py-1.5 px-3 text-xs flex-shrink-0">
+                Manage Clinics <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
-
-            <div className="mb-4">
-              <label className="input-label">Clinic Photo <span className="text-slate-400 font-normal normal-case">(optional)</span></label>
-              <p className="text-xs text-slate-400 mb-2">Shown as the cover photo on your public profile.</p>
-              <CoverPhotoUpload url={docs.clinicPhotoUrl} onUploaded={(url) => setDocs((d) => ({ ...d, clinicPhotoUrl: url }))} />
-            </div>
-
-            <p className="text-xs text-slate-400 mb-4">Patients find you on the map using this location — without it, you won&apos;t appear in search even once verified.</p>
-            <div className="flex gap-2 mb-2">
-              <div className="flex-1">
-                <AddressAutocomplete
-                  placeholder="Search your clinic or practice address…"
-                  value={form.address}
-                  onChange={(v) => set("address", v)}
-                  onSelect={(s) => setForm((f) => ({ ...f, lat: s.lat, lng: s.lon }))}
-                />
-              </div>
-              <button type="button" onClick={useCurrentLocation} className="btn-secondary flex-shrink-0 px-3 text-xs gap-1 self-start">
-                <Navigation className="w-3.5 h-3.5" /> Use Current
-              </button>
-            </div>
-            <div className="mb-3">
-              <LocationPickerMap
-                lat={form.lat}
-                lng={form.lng}
-                onChange={(lat, lng) => {
-                  setSaved(false);
-                  setForm((f) => ({ ...f, lat, lng }));
-                }}
-              />
-            </div>
-            {form.lat != null && form.lng != null ? (
-              <p className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" /> Location set ({form.lat.toFixed(4)}, {form.lng.toFixed(4)})
-              </p>
-            ) : (
-              <p className="text-xs text-amber-600">No location set yet — search an address or use your current location.</p>
-            )}
           </section>
 
           <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
@@ -671,6 +575,9 @@ export default function DoctorProfilePage() {
 
           <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><Clock className="w-4 h-4 text-blue-500" /> Available Timings</h2>
+            <p className="text-xs text-slate-400 mb-4">
+              Applies only to Home Visit and Video Call requests. Clinic Visit hours are set separately for each clinic on the Clinics page.
+            </p>
             <div className="flex flex-wrap gap-2 mb-4">
               {DAYS.map((d) => (
                 <button key={d} type="button" onClick={() => toggleDay(d)}
@@ -713,17 +620,20 @@ export default function DoctorProfilePage() {
 
           <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><Shield className="w-4 h-4 text-amber-500" /> Verification Documents</h2>
-            <p className="text-xs text-slate-400 mb-4">Reviewed by our admin team. Your profile only appears to patients once verified.</p>
-            {isVerified && (
+            {isVerified ? (
               <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 mb-4 flex items-center gap-2">
                 <BadgeCheck className="w-4 h-4 flex-shrink-0" /> Your credentials are verified. Documents are locked and can no longer be changed.
+              </div>
+            ) : (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-4">
+                The 3 documents marked <span className="text-red-500 font-bold">*</span> below are mandatory to verify your profile — your profile only appears to patients once verified. Upload them first so our admin team can verify you.
               </div>
             )}
             <div className="space-y-3">
               <DocSlot label="Profile Photo" icon={Camera} url={docs.photoUrl} type="photo" onUploaded={(url) => setDocs((d) => ({ ...d, photoUrl: url }))} />
-              <DocSlot label="Registration Certificate" icon={BadgeCheck} url={docs.medRegCertUrl} type="medRegCert" locked={isVerified} onUploaded={(url) => setDocs((d) => ({ ...d, medRegCertUrl: url }))} />
-              <DocSlot label="Medical Degree Certificate" icon={FileText} url={docs.degreeCertUrl} type="degreeCert" locked={isVerified} onUploaded={(url) => setDocs((d) => ({ ...d, degreeCertUrl: url }))} />
-              <DocSlot label="Government ID (KYC)" icon={Shield} url={docs.kycDocUrl} type="kyc" locked={isVerified} onUploaded={(url) => setDocs((d) => ({ ...d, kycDocUrl: url }))} />
+              <DocSlot label="Registration Certificate" icon={BadgeCheck} url={docs.medRegCertUrl} type="medRegCert" locked={isVerified} required onUploaded={(url) => setDocs((d) => ({ ...d, medRegCertUrl: url }))} />
+              <DocSlot label="Medical Degree Certificate" icon={FileText} url={docs.degreeCertUrl} type="degreeCert" locked={isVerified} required onUploaded={(url) => setDocs((d) => ({ ...d, degreeCertUrl: url }))} />
+              <DocSlot label="Government ID (KYC)" icon={Shield} url={docs.kycDocUrl} type="kyc" locked={isVerified} required onUploaded={(url) => setDocs((d) => ({ ...d, kycDocUrl: url }))} />
             </div>
           </section>
 

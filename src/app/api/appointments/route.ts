@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
+import { isClinicOpenNow } from "@/lib/clinicAvailability";
+import { haversine } from "@/lib/geo";
 
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
@@ -21,6 +23,9 @@ export async function POST(req: Request) {
       scheduledAt,
       isEmergency,
       followUpOfId,
+      clinicId,
+      patientLat,
+      patientLng,
     } = await req.json();
 
     if (!doctorId || !symptoms || !consultType) {
@@ -70,8 +75,55 @@ export async function POST(req: Request) {
     if (consultType === "HOME" && !doctor.doctorProfile.offersHomeVisit) {
       return NextResponse.json({ error: "This doctor does not offer home visits" }, { status: 400 });
     }
+
+    if (consultType === "HOME" && typeof patientLat === "number" && typeof patientLng === "number") {
+      let baseLat = doctor.doctorProfile.lat;
+      let baseLng = doctor.doctorProfile.lng;
+      if (baseLat == null || baseLng == null) {
+        const firstClinic = await prisma.clinic.findFirst({
+          where: { doctorId, isActive: true },
+          orderBy: { sortOrder: "asc" },
+        });
+        baseLat = firstClinic?.lat ?? null;
+        baseLng = firstClinic?.lng ?? null;
+      }
+      if (baseLat != null && baseLng != null) {
+        const distanceKm = haversine(patientLat, patientLng, baseLat, baseLng);
+        if (distanceKm > doctor.doctorProfile.radius) {
+          return NextResponse.json(
+            {
+              error: `This doctor only offers home visits within ${doctor.doctorProfile.radius} km, and you're ${distanceKm.toFixed(1)} km away. Home visit isn't available right now.`,
+            },
+            { status: 400 }
+          );
+        }
+      }
+    }
     if (consultType === "CLINIC" && !doctor.doctorProfile.offersClinic) {
       return NextResponse.json({ error: "This doctor does not offer clinic visits" }, { status: 400 });
+    }
+
+    if (consultType === "CLINIC") {
+      if (clinicId) {
+        const clinic = await prisma.clinic.findUnique({ where: { id: clinicId }, include: { slots: true } });
+        if (!clinic || clinic.doctorId !== doctorId || !clinic.isActive) {
+          return NextResponse.json({ error: "Please select a valid clinic location." }, { status: 400 });
+        }
+        const effectiveTime = scheduledAt ? new Date(scheduledAt) : new Date();
+        if (!isClinicOpenNow(clinic.slots, effectiveTime)) {
+          return NextResponse.json(
+            { error: "The doctor is not available at this clinic at the selected time. Please choose a different clinic or time." },
+            { status: 400 }
+          );
+        }
+      } else {
+        // A doctor with clinics must have one picked and validated above —
+        // only doctors with no clinics at all skip this (legacy fallback).
+        const clinicCount = await prisma.clinic.count({ where: { doctorId, isActive: true } });
+        if (clinicCount > 0) {
+          return NextResponse.json({ error: "Please select a clinic location." }, { status: 400 });
+        }
+      }
     }
     if (consultType === "VIDEO" && !doctor.doctorProfile.offersVideo) {
       return NextResponse.json({ error: "This doctor does not offer video consultations" }, { status: 400 });
@@ -105,6 +157,7 @@ export async function POST(req: Request) {
         paymentMethod: "ONLINE",
         isEmergency: Boolean(isEmergency),
         followUpOfId: followUpOfId ?? undefined,
+        clinicId: consultType === "CLINIC" && clinicId ? clinicId : undefined,
         ...(scheduledAt ? { scheduledAt: new Date(scheduledAt) } : {}),
       },
       include: {

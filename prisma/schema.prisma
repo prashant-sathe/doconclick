@@ -34,6 +34,7 @@ model User {
   paymentLogs       DoctorPaymentLog[] @relation("DoctorPaymentLogs")
   savedDoctors      SavedDoctor[] @relation("PatientSavedDoctors")
   savedByPatients   SavedDoctor[] @relation("DoctorSavedBy")
+  clinics           Clinic[]      @relation("DoctorClinics")
 }
 
 model SavedDoctor {
@@ -170,6 +171,8 @@ model Appointment {
   followUpOfId  String?
   followUpOf    Appointment? @relation("FollowUp", fields: [followUpOfId], references: [id])
   followUps     Appointment[] @relation("FollowUp")
+  clinicId      String?
+  clinic        Clinic?   @relation(fields: [clinicId], references: [id], onDelete: SetNull)
   scheduledAt   DateTime  @default(now())
   createdAt     DateTime  @default(now())
   review        Review?
@@ -256,6 +259,32 @@ model Complaint {
   description String
   status      String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
   createdAt   DateTime @default(now())
+}
+
+model Clinic {
+  id        String   @id @default(cuid())
+  doctorId  String
+  doctor    User     @relation("DoctorClinics", fields: [doctorId], references: [id], onDelete: Cascade)
+  name      String
+  address   String
+  photoUrl  String?
+  lat       Float
+  lng       Float
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  slots        ClinicSlot[]
+  appointments Appointment[]
+}
+
+model ClinicSlot {
+  id        String @id @default(cuid())
+  clinicId  String
+  clinic    Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  dayOfWeek String // Mon, Tue, Wed, Thu, Fri, Sat, Sun
+  fromTime  String // "HH:MM", 24h
+  toTime    String // "HH:MM", 24h
 }
 
 model Specialty {

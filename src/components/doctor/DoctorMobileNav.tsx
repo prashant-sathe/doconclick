@@ -2,13 +2,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, IndianRupee, UserCircle } from "lucide-react";
+import { LayoutDashboard, IndianRupee, Building2, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { computeDoctorCompleteness } from "@/lib/doctorProfileCompleteness";
 
 const TABS = [
   { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/doctor/earnings", label: "Earnings", icon: IndianRupee },
+  { href: "/doctor/clinics", label: "Clinics", icon: Building2 },
   { href: "/doctor/profile", label: "Profile", icon: UserCircle },
 ];
 
@@ -20,7 +21,10 @@ export default function DoctorMobileNav() {
     fetch("/api/doctors/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (d?.doctorProfile) setProfileIncomplete(computeDoctorCompleteness(d.doctorProfile).percent < 100);
+        if (d?.doctorProfile) {
+          const hasClinic = (d.clinics?.length ?? 0) > 0;
+          setProfileIncomplete(computeDoctorCompleteness({ ...d.doctorProfile, hasClinic }).percent < 100);
+        }
       })
       .catch(() => {});
   }, []);

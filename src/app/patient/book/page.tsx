@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { useSpecialties } from "@/lib/useSpecialties";
+import { isClinicOpenNow, findOpenClinic } from "@/lib/clinicAvailability";
 import { RELATIONS } from "@/lib/relations";
 import { haversine } from "@/lib/geo";
 import RatingStars from "@/components/patient/RatingStars";
@@ -20,9 +21,26 @@ import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import DependentPicker from "@/components/patient/DependentPicker";
 
+interface ClinicSlot {
+  dayOfWeek: string;
+  fromTime: string;
+  toTime: string;
+}
+
+interface Clinic {
+  id: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  sortOrder: number;
+  slots: ClinicSlot[];
+}
+
 interface Doctor {
   id: string;
   name: string;
+  clinics: Clinic[];
   doctorProfile: {
     photoUrl: string | null;
     specialty: string;
@@ -39,6 +57,7 @@ interface Doctor {
     offersVideo: boolean;
     avgRating: number;
     totalReviews: number;
+    radius: number;
     lat: number | null;
     lng: number | null;
   } | null;
@@ -77,12 +96,13 @@ function PatientBookInner() {
   const { colorFor } = useSpecialties();
   const followUpOfId = searchParams.get("followUpOf");
   const preselectDoctorId = searchParams.get("doctorId");
+  const preselectClinicId = searchParams.get("clinicId");
 
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [specialtyFilter, setSpecialtyFilter] = useState("");
   const [search, setSearch] = useState("");
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
-  const [form, setForm] = useState({ doctorId: "", symptoms: "", allergies: "", consultType: "CLINIC", relation: "Self" });
+  const [form, setForm] = useState({ doctorId: "", clinicId: "", symptoms: "", allergies: "", consultType: "CLINIC", relation: "Self" });
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const [dependentId, setDependentId] = useState<string | null>(null);
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
@@ -100,7 +120,10 @@ function PatientBookInner() {
       setDoctors(data);
       const preselected = preselectDoctorId && data.find((d) => d.id === preselectDoctorId);
       if (preselected) {
-        setForm((f) => ({ ...f, doctorId: preselected.id, consultType: defaultConsultType(preselected.doctorProfile) }));
+        const clinicId = preselectClinicId && preselected.clinics.some((c) => c.id === preselectClinicId)
+          ? preselectClinicId
+          : (findOpenClinic(preselected.clinics) ?? preselected.clinics[0])?.id ?? "";
+        setForm((f) => ({ ...f, doctorId: preselected.id, clinicId, consultType: defaultConsultType(preselected.doctorProfile) }));
       }
     });
     navigator.geolocation.getCurrentPosition(
@@ -123,9 +146,12 @@ function PatientBookInner() {
   });
 
   const selectedDoctor = doctors.find((d) => d.id === form.doctorId);
+  const selectedClinic = selectedDoctor?.clinics.find((c) => c.id === form.clinicId) ?? null;
+  const homeBaseLat = selectedDoctor?.doctorProfile?.lat ?? selectedDoctor?.clinics[0]?.lat ?? null;
+  const homeBaseLng = selectedDoctor?.doctorProfile?.lng ?? selectedDoctor?.clinics[0]?.lng ?? null;
   const distance =
-    userPos && selectedDoctor?.doctorProfile?.lat && selectedDoctor?.doctorProfile?.lng
-      ? haversine(userPos[0], userPos[1], selectedDoctor.doctorProfile.lat, selectedDoctor.doctorProfile.lng)
+    userPos && homeBaseLat != null && homeBaseLng != null
+      ? haversine(userPos[0], userPos[1], homeBaseLat, homeBaseLng)
       : null;
   const currentFee = feeForConsultType(selectedDoctor?.doctorProfile ?? null, form.consultType);
   const availableTypes = ALL_TYPES.filter((t) => {
@@ -137,6 +163,28 @@ function PatientBookInner() {
 
   // An emergency always books immediately, overriding any manual schedule selection
   const effectiveScheduleMode = isEmergency ? "NOW" : scheduleMode;
+
+  // The moment the appointment would actually happen — used to check the
+  // selected clinic's hours against, not just the current moment.
+  const effectiveBookingTime =
+    effectiveScheduleMode === "LATER" && scheduledAt ? new Date(scheduledAt) : new Date();
+  // A Clinic Visit can only be confirmed once a specific, currently-open
+  // clinic is selected — doctors with no clinics at all keep the legacy
+  // unrestricted behavior.
+  const clinicBookingBlocked =
+    form.consultType === "CLINIC" &&
+    selectedDoctor != null &&
+    selectedDoctor.clinics.length > 0 &&
+    (!selectedClinic || !isClinicOpenNow(selectedClinic.slots, effectiveBookingTime));
+
+  // Home Visit is only offered within the doctor's stated consultation
+  // radius — beyond that they simply can't travel there.
+  const homeVisitRadiusKm = selectedDoctor?.doctorProfile?.radius ?? null;
+  const homeVisitBlocked =
+    form.consultType === "HOME" &&
+    distance != null &&
+    homeVisitRadiusKm != null &&
+    distance > homeVisitRadiusKm;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,6 +198,7 @@ function PatientBookInner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         doctorId: form.doctorId,
+        clinicId: form.consultType === "CLINIC" ? form.clinicId : undefined,
         symptoms: form.symptoms,
         allergies: form.allergies,
         consultType: form.consultType,
@@ -159,6 +208,8 @@ function PatientBookInner() {
         isEmergency,
         consentGiven,
         followUpOfId: followUpOfId ?? undefined,
+        patientLat: userPos?.[0],
+        patientLng: userPos?.[1],
         ...(effectiveScheduleMode === "LATER" && scheduledAt
           ? { scheduledAt: new Date(scheduledAt).toISOString() }
           : {}),
@@ -294,7 +345,8 @@ function PatientBookInner() {
               <label className="input-label">Select Doctor</label>
               <select required className="input-field" value={form.doctorId} onChange={(e) => {
                 const doc = doctors.find((d) => d.id === e.target.value);
-                setForm((f) => ({ ...f, doctorId: e.target.value, consultType: defaultConsultType(doc?.doctorProfile ?? null) }));
+                const clinicId = (findOpenClinic(doc?.clinics ?? []) ?? doc?.clinics[0])?.id ?? "";
+                setForm((f) => ({ ...f, doctorId: e.target.value, clinicId, consultType: defaultConsultType(doc?.doctorProfile ?? null) }));
               }}>
                 <option value="">— Choose a doctor —</option>
                 {visibleDoctors.map((d) => (
@@ -325,6 +377,65 @@ function PatientBookInner() {
                     <Clock className="w-3.5 h-3.5" /> Arrives in ~{estimateArrivalMinutes(distance)} min ({distance.toFixed(1)} km)
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Home Visit distance gate */}
+            {homeVisitBlocked && (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 flex items-start gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="min-w-0 flex-1 text-xs text-red-800">
+                  <p className="font-semibold">
+                    {selectedDoctor?.name} is {distance?.toFixed(1)} km away — too far for a home visit right now.
+                  </p>
+                  <p className="mt-0.5">They only offer home visits within {homeVisitRadiusKm} km. Try Clinic Visit or Video Call instead.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Clinic location (only for Clinic Visit, when the doctor has clinics) */}
+            {form.consultType === "CLINIC" && selectedDoctor && selectedDoctor.clinics.length > 0 && (
+              <div>
+                <label className="input-label">Choose Clinic</label>
+                <select
+                  required
+                  className="input-field"
+                  value={form.clinicId}
+                  onChange={(e) => set("clinicId", e.target.value)}
+                >
+                  {selectedDoctor.clinics.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} — {isClinicOpenNow(c.slots, effectiveBookingTime) ? "Open" : "Closed"} {effectiveScheduleMode === "LATER" ? "at that time" : "now"}
+                    </option>
+                  ))}
+                </select>
+                {selectedClinic && (
+                  <p className="text-xs text-slate-500 mt-1.5">{selectedClinic.address}</p>
+                )}
+                {selectedClinic && !isClinicOpenNow(selectedClinic.slots, effectiveBookingTime) && (() => {
+                  const openClinic = findOpenClinic(selectedDoctor.clinics.filter((c) => c.id !== selectedClinic.id), effectiveBookingTime);
+                  return (
+                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 mt-2 flex items-start gap-2.5">
+                      <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1 text-xs text-red-800">
+                        <p className="font-semibold">
+                          Not available at this clinic {effectiveScheduleMode === "LATER" ? "at the selected time" : "right now"} — booking is disabled here.
+                        </p>
+                        {openClinic ? (
+                          <button
+                            type="button"
+                            onClick={() => set("clinicId", openClinic.id)}
+                            className="underline font-bold mt-0.5"
+                          >
+                            {effectiveScheduleMode === "LATER" ? "Available at that time" : "Currently available"} at {openClinic.name} — switch &amp; book here instead
+                          </button>
+                        ) : (
+                          <p className="mt-0.5">No clinic is available {effectiveScheduleMode === "LATER" ? "at the selected time" : "right now"} — please pick a different time or clinic.</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
@@ -410,7 +521,7 @@ function PatientBookInner() {
             )}
 
             {/* Submit lives here on mobile; the sticky summary card has its own on lg: */}
-            <button type="submit" disabled={loading || (!isEmergency && !consentGiven)} className="btn-primary w-full justify-center py-3.5 text-base lg:hidden">
+            <button type="submit" disabled={loading || (!isEmergency && !consentGiven) || clinicBookingBlocked || homeVisitBlocked} className="btn-primary w-full justify-center py-3.5 text-base lg:hidden">
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : `Confirm Booking (₹${currentFee})`}
             </button>
           </div>
@@ -475,7 +586,7 @@ function PatientBookInner() {
               </div>
             </div>
 
-            <button type="submit" disabled={loading || (!isEmergency && !consentGiven)} className="btn-primary w-full justify-center py-3.5 text-base mt-5">
+            <button type="submit" disabled={loading || (!isEmergency && !consentGiven) || clinicBookingBlocked || homeVisitBlocked} className="btn-primary w-full justify-center py-3.5 text-base mt-5">
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : "Confirm Booking"}
             </button>
           </div>

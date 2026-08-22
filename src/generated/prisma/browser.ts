@@ -83,6 +83,16 @@ export type Review = Prisma.ReviewModel
  */
 export type Complaint = Prisma.ComplaintModel
 /**
+ * Model Clinic
+ * 
+ */
+export type Clinic = Prisma.ClinicModel
+/**
+ * Model ClinicSlot
+ * 
+ */
+export type ClinicSlot = Prisma.ClinicSlotModel
+/**
  * Model Specialty
  * 
  */

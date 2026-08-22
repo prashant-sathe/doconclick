@@ -64,6 +64,8 @@ export const ModelName = {
   PrescriptionAttachment: 'PrescriptionAttachment',
   Review: 'Review',
   Complaint: 'Complaint',
+  Clinic: 'Clinic',
+  ClinicSlot: 'ClinicSlot',
   Specialty: 'Specialty',
   PlatformSettings: 'PlatformSettings'
 } as const
@@ -227,6 +229,7 @@ export const AppointmentScalarFieldEnum = {
   doctorLng: 'doctorLng',
   doctorLocationUpdatedAt: 'doctorLocationUpdatedAt',
   followUpOfId: 'followUpOfId',
+  clinicId: 'clinicId',
   scheduledAt: 'scheduledAt',
   createdAt: 'createdAt'
 } as const
@@ -321,6 +324,33 @@ export const ComplaintScalarFieldEnum = {
 } as const
 
 export type ComplaintScalarFieldEnum = (typeof ComplaintScalarFieldEnum)[keyof typeof ComplaintScalarFieldEnum]
+
+
+export const ClinicScalarFieldEnum = {
+  id: 'id',
+  doctorId: 'doctorId',
+  name: 'name',
+  address: 'address',
+  photoUrl: 'photoUrl',
+  lat: 'lat',
+  lng: 'lng',
+  sortOrder: 'sortOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt'
+} as const
+
+export type ClinicScalarFieldEnum = (typeof ClinicScalarFieldEnum)[keyof typeof ClinicScalarFieldEnum]
+
+
+export const ClinicSlotScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  dayOfWeek: 'dayOfWeek',
+  fromTime: 'fromTime',
+  toTime: 'toTime'
+} as const
+
+export type ClinicSlotScalarFieldEnum = (typeof ClinicSlotScalarFieldEnum)[keyof typeof ClinicSlotScalarFieldEnum]
 
 
 export const SpecialtyScalarFieldEnum = {

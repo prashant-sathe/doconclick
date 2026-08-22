@@ -46,6 +46,11 @@ export async function GET(
           totalReviews: true,
         },
       },
+      clinics: {
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+        include: { slots: true },
+      },
     },
   });
 

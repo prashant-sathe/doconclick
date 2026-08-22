@@ -20,7 +20,12 @@ export async function GET(req: Request) {
         OR: [{ trialEndsAt: { gt: now } }, { subscriptionPaidUntil: { gt: now } }],
       },
     },
-    include: { doctorProfile: true },
+    select: {
+      id: true,
+      name: true,
+      doctorProfile: true,
+      clinics: { where: { isActive: true }, orderBy: { sortOrder: "asc" }, include: { slots: true } },
+    },
   });
   return NextResponse.json(doctors);
 }

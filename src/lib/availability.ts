@@ -63,6 +63,36 @@ function parseTimeToMinutes(raw: string): number | null {
 
 const TIME_RANGE_RE = /(\d{1,2}(?::\d{2})?\s*(?:AM|PM)?)\s*[-–]\s*(\d{1,2}(?::\d{2})?\s*(?:AM|PM)?)\s*$/i;
 
+function minutesToHHMM(min: number): string {
+  const h = Math.floor(min / 60) % 24;
+  const m = min % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+// Parses a doctor's free-text `availability` string (e.g. "Mon, Tue, Wed
+// 9:00AM–6:00PM") into structured day/time rows, one per day. Used to
+// backfill ClinicSlot rows from legacy DoctorProfile.availability data.
+export function parseAvailabilityString(
+  availability: string | null | undefined
+): { dayOfWeek: string; fromTime: string; toTime: string }[] {
+  if (!availability) return [];
+
+  const timeMatch = availability.match(TIME_RANGE_RE);
+  if (!timeMatch || timeMatch.index == null) return [];
+
+  const fromMin = parseTimeToMinutes(timeMatch[1]);
+  const toMin = parseTimeToMinutes(timeMatch[2]);
+  if (fromMin == null || toMin == null) return [];
+
+  const dayPart = availability.slice(0, timeMatch.index).replace(/,\s*$/, "").trim();
+  const days = parseDays(dayPart);
+  if (days.length === 0) return [];
+
+  const fromTime = minutesToHHMM(fromMin);
+  const toTime = minutesToHHMM(toMin);
+  return days.map((dayOfWeek) => ({ dayOfWeek, fromTime, toTime }));
+}
+
 // Whether a doctor is currently within their set "Available Timings" window,
 // evaluated in IST regardless of the visitor's own timezone. Fails open
 // (returns true) on anything unparseable so a format we didn't anticipate

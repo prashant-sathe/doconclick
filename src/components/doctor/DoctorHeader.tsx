@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Stethoscope, LayoutDashboard, IndianRupee, UserCircle, LogOut, Bell, Clock } from "lucide-react";
+import { Stethoscope, LayoutDashboard, IndianRupee, UserCircle, Building2, LogOut, Bell, Clock } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
@@ -11,6 +11,7 @@ import NotificationToast from "@/components/doctor/NotificationToast";
 const NAV = [
   { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/doctor/earnings", label: "Earnings", icon: IndianRupee },
+  { href: "/doctor/clinics", label: "Clinics", icon: Building2 },
   { href: "/doctor/profile", label: "Profile", icon: UserCircle },
 ];
 

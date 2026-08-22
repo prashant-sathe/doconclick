@@ -8,8 +8,7 @@ export interface DoctorProfileData {
   medRegCertUrl: string | null;
   degreeCertUrl: string | null;
   kycDocUrl: string | null;
-  lat: number | null;
-  lng: number | null;
+  hasClinic: boolean;
 }
 
 export interface CompletenessItem {
@@ -33,7 +32,7 @@ export function computeDoctorCompleteness(profile: DoctorProfileData | null | un
     { label: "Qualification", done: has(profile?.qualification) },
     { label: "Registration Number", done: has(profile?.medRegNo) },
     { label: "Experience & Fees", done: !!profile && profile.experience > 0 && profile.consultFee > 0 },
-    { label: "Practice Location", done: profile?.lat != null && profile?.lng != null },
+    { label: "Practice Location", done: !!profile?.hasClinic },
     { label: "Bank Details", done: has(profile?.bankDetails) },
     { label: "Profile Photo", done: has(profile?.photoUrl) },
     { label: "Registration Certificate", done: has(profile?.medRegCertUrl) },

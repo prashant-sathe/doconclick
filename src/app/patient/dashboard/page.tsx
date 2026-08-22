@@ -11,6 +11,7 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isDoctorAvailableNow } from "@/lib/availability";
+import { isClinicOpenNow, findOpenClinic } from "@/lib/clinicAvailability";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
 import { haversine } from "@/lib/geo";
@@ -46,10 +47,34 @@ interface DoctorProfile {
   totalReviews: number;
 }
 
+interface ClinicSlot {
+  dayOfWeek: string;
+  fromTime: string;
+  toTime: string;
+}
+
+interface Clinic {
+  id: string;
+  name: string;
+  address: string;
+  photoUrl: string | null;
+  lat: number;
+  lng: number;
+  sortOrder: number;
+  slots: ClinicSlot[];
+}
+
 interface Doctor {
   id: string;
   name: string;
   doctorProfile: DoctorProfile | null;
+  clinics: Clinic[];
+  distance?: number; // km, computed client-side
+}
+
+interface ClinicMarker {
+  doctor: Doctor;
+  clinic: Clinic;
   distance?: number; // km, computed client-side
 }
 
@@ -120,6 +145,7 @@ function PatientDashboardInner() {
   const [search, setSearch] = useState("");
   const [now, setNow] = useState(() => Date.now());
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [selectedClinicId, setSelectedClinicId] = useState<string | null>(null);
   const [savedDoctorIds, setSavedDoctorIds] = useState<Set<string>>(new Set());
   const [savingBookmark, setSavingBookmark] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -134,11 +160,13 @@ function PatientDashboardInner() {
   const [scheduledAt, setScheduledAt] = useState("");
   const [booking, setBooking] = useState(false);
   const [booked, setBooked] = useState<{ id: string; fee: number } | null>(null);
+  const [bookingError, setBookingError] = useState("");
   const [reviews, setReviews] = useState<Review[]>([]);
   const [emergencyOpen, setEmergencyOpen] = useState(false);
   const [emergencyText, setEmergencyText] = useState("");
   const [emergencyBusy, setEmergencyBusy] = useState(false);
   const [emergencyResult, setEmergencyResult] = useState<{ doctorName: string; eta: number } | null>(null);
+  const [emergencyError, setEmergencyError] = useState("");
   const followUpOfId = searchParams.get("followUpOf");
   const deepLinkedDoctorId = searchParams.get("doctorId");
   const didDeepLink = useRef(false);
@@ -238,22 +266,23 @@ function PatientDashboardInner() {
       didDeepLink.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedDoctor(doc);
+      setSelectedClinicId((findOpenClinic(doc.clinics) ?? doc.clinics[0])?.id ?? null);
       setPanelOpen(true);
       setConsultType(defaultConsultType(doc.doctorProfile));
     }
   }, [doctors, deepLinkedDoctorId]);
 
   // ── Compute distances whenever userPos or doctors change ───────────────
+  // Falls back to the doctor's nearest clinic when their legacy doctorProfile
+  // lat/lng was never set (e.g. a doctor who only ever used the Clinics page) —
+  // still needed for Home Visit ETA and the nearest-doctor badge.
   const doctorsWithDist = useMemo(() => doctors.map((d) => {
-    if (!d.doctorProfile?.lat || !d.doctorProfile?.lng || !userPos) return d;
+    const lat = d.doctorProfile?.lat ?? d.clinics[0]?.lat ?? null;
+    const lng = d.doctorProfile?.lng ?? d.clinics[0]?.lng ?? null;
+    if (lat == null || lng == null || !userPos) return d;
     return {
       ...d,
-      distance: haversine(
-        userPos[0],
-        userPos[1],
-        d.doctorProfile.lat,
-        d.doctorProfile.lng
-      ),
+      distance: haversine(userPos[0], userPos[1], lat, lng),
     };
   }), [doctors, userPos]);
 
@@ -262,7 +291,14 @@ function PatientDashboardInner() {
     return doctorsWithDist.filter((d) => {
       const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
       const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
-      const isOpenNow = isDoctorAvailableNow(d.doctorProfile?.availability, new Date(now));
+      // Visible if EITHER at least one clinic is open right now (Clinic Visit —
+      // each clinic marker also shows its own open/closed state independently
+      // of this) OR the doctor's legacy Available Timings window covers now
+      // (Home Visit / Video Call, which aren't clinic-specific). A doctor with
+      // clinics is not exempt from the Available Timings check — otherwise
+      // they'd look permanently bookable for Home Visit regardless of it.
+      const hasOpenClinic = d.clinics.some((c) => isClinicOpenNow(c.slots, new Date(now)));
+      const isOpenNow = hasOpenClinic || isDoctorAvailableNow(d.doctorProfile?.availability, new Date(now));
       return matchesSpecialty && matchesSearch && isOpenNow;
     });
   }, [doctorsWithDist, specialtyFilter, search, now]);
@@ -276,6 +312,19 @@ function PatientDashboardInner() {
   const nearestAny = useMemo(() => [...doctorsWithDist].sort(
     (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
   )[0], [doctorsWithDist]);
+
+  // One marker per clinic, not per doctor — a doctor with several locations
+  // shows up as several pins.
+  const clinicMarkers = useMemo(() => {
+    const list: ClinicMarker[] = [];
+    for (const doc of filteredDoctors) {
+      for (const clinic of doc.clinics) {
+        const distance = userPos ? haversine(userPos[0], userPos[1], clinic.lat, clinic.lng) : undefined;
+        list.push({ doctor: doc, clinic, distance });
+      }
+    }
+    return list;
+  }, [filteredDoctors, userPos]);
 
   // ── Initialise Leaflet once map div is available ───────────────────────
   const initMap = useCallback(
@@ -309,16 +358,16 @@ function PatientDashboardInner() {
     []
   );
 
-  // ── Place / update markers ─────────────────────────────────────────────
-  const placeDoctorMarkers = useCallback(async () => {
+  // ── Place / update markers (one per clinic) ─────────────────────────────
+  const placeClinicMarkers = useCallback(async () => {
     if (!leafletMapRef.current) return;
     const L = (await import("leaflet")).default;
     const map = leafletMapRef.current;
-    const docList = filteredDoctors;
+    const markerList = clinicMarkers;
     const nearestId = nearest?.id;
-    const visibleIds = new Set(docList.map((d) => d.id));
+    const visibleIds = new Set(markerList.map((m) => m.clinic.id));
 
-    // Remove markers for doctors no longer in the filtered list
+    // Remove markers for clinics no longer in the filtered list
     markersRef.current.forEach((marker, id) => {
       if (!visibleIds.has(id)) {
         map.removeLayer(marker);
@@ -326,11 +375,11 @@ function PatientDashboardInner() {
       }
     });
 
-    docList.forEach((doc) => {
-      if (!doc.doctorProfile?.lat || !doc.doctorProfile?.lng) return;
-      const color = colorFor(doc.doctorProfile.specialty);
+    markerList.forEach(({ doctor: doc, clinic }) => {
+      const color = colorFor(doc.doctorProfile?.specialty ?? "");
       const isNearest = doc.id === nearestId;
-      const svgStr = makePinSvg(color, isNearest);
+      const isOpen = isClinicOpenNow(clinic.slots, new Date(now));
+      const svgStr = makePinSvg(isOpen ? color : "#94a3b8", isNearest);
       const icon = L.divIcon({
         html: svgStr,
         className: "",
@@ -339,16 +388,17 @@ function PatientDashboardInner() {
         popupAnchor: [0, -44],
       });
 
-      if (markersRef.current.has(doc.id)) {
+      if (markersRef.current.has(clinic.id)) {
         // update icon only
-        markersRef.current.get(doc.id)!.setIcon(icon);
+        markersRef.current.get(clinic.id)!.setIcon(icon);
         return;
       }
 
-      const marker = L.marker([doc.doctorProfile.lat, doc.doctorProfile.lng], { icon })
+      const marker = L.marker([clinic.lat, clinic.lng], { icon })
         .addTo(map)
         .on("click", () => {
           setSelectedDoctor(doc);
+          setSelectedClinicId(clinic.id);
           setPanelOpen(true);
           setBookingOpen(false);
           setConsultType(defaultConsultType(doc.doctorProfile));
@@ -357,12 +407,13 @@ function PatientDashboardInner() {
           setDependentId(null);
           setConsentGiven(false);
           setBooked(null);
+          setBookingError("");
           setScheduleMode("NOW");
         });
 
-      markersRef.current.set(doc.id, marker);
+      markersRef.current.set(clinic.id, marker);
     });
-  }, [filteredDoctors, nearest?.id, colorFor]);
+  }, [clinicMarkers, nearest?.id, colorFor, now]);
 
   // ── Add user position circle ───────────────────────────────────────────
   const addUserCircle = useCallback(async (pos: [number, number]) => {
@@ -389,7 +440,7 @@ function PatientDashboardInner() {
     const raf = requestAnimationFrame(async () => {
       await initMap(userPos);
       await addUserCircle(userPos);
-      await placeDoctorMarkers();
+      await placeClinicMarkers();
     });
     return () => cancelAnimationFrame(raf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -402,21 +453,23 @@ function PatientDashboardInner() {
   // to fire and incidentally re-place them.
   useEffect(() => {
     if (!leafletMapRef.current) return;
-    placeDoctorMarkers();
+    placeClinicMarkers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doctors, specialtyFilter, search, now, colorFor]);
 
-  // ── Fly to selected doctor ─────────────────────────────────────────────
+  const selectedClinic = selectedDoctor?.clinics.find((c) => c.id === selectedClinicId) ?? null;
+
+  // ── Fly to selected clinic (falls back to the doctor's legacy single location) ──
   useEffect(() => {
-    const lat = selectedDoctor?.doctorProfile?.lat;
-    const lng = selectedDoctor?.doctorProfile?.lng;
+    const lat = selectedClinic?.lat ?? selectedDoctor?.doctorProfile?.lat;
+    const lng = selectedClinic?.lng ?? selectedDoctor?.doctorProfile?.lng;
     if (!lat || !lng || !leafletMapRef.current) return;
     leafletMapRef.current.flyTo(
       [lat, lng],
       15,
       { duration: 0.8 }
     );
-  }, [selectedDoctor]);
+  }, [selectedDoctor, selectedClinic]);
 
   // ── Fetch reviews when a doctor's panel opens ───────────────────────────
   useEffect(() => {
@@ -455,6 +508,7 @@ function PatientDashboardInner() {
   const submitBooking = async () => {
     if (!user?.id || !selectedDoctor || !consentGiven) return;
     setBooking(true);
+    setBookingError("");
     const fee = feeForConsultType(selectedDoctor.doctorProfile, consultType);
 
     const res = await fetch("/api/appointments", {
@@ -470,6 +524,9 @@ function PatientDashboardInner() {
         amount: fee,
         paymentMethod: "ONLINE",
         followUpOfId: followUpOfId ?? undefined,
+        clinicId: consultType === "CLINIC" ? selectedClinicId : undefined,
+        patientLat: userPos?.[0],
+        patientLng: userPos?.[1],
         ...(scheduleMode === "LATER" && scheduledAt
           ? { scheduledAt: new Date(scheduledAt).toISOString() }
           : {}),
@@ -478,12 +535,14 @@ function PatientDashboardInner() {
     const data = await res.json();
     setBooking(false);
     if (res.ok) setBooked({ id: data.id, fee });
+    else setBookingError(data.error ?? "Booking failed. Please try again.");
   };
 
   // ── Emergency quick-book ────────────────────────────────────────────────
   const submitEmergency = async () => {
     if (!user?.id || !nearestAny) return;
     setEmergencyBusy(true);
+    setEmergencyError("");
     const type = defaultConsultType(nearestAny.doctorProfile);
     const fee = feeForConsultType(nearestAny.doctorProfile, type);
 
@@ -497,14 +556,19 @@ function PatientDashboardInner() {
         amount: fee,
         paymentMethod: "ONLINE",
         isEmergency: true,
+        patientLat: userPos?.[0],
+        patientLng: userPos?.[1],
       }),
     });
+    const data = await res.json().catch(() => ({}));
     setEmergencyBusy(false);
     if (res.ok) {
       setEmergencyResult({
         doctorName: nearestAny.name,
         eta: estimateArrivalMinutes(nearestAny.distance ?? 0),
       });
+    } else {
+      setEmergencyError(data.error ?? "Could not send the request. Please try again.");
     }
   };
 
@@ -517,6 +581,30 @@ function PatientDashboardInner() {
     if (t.id === "VIDEO") return selectedDoctor ? selectedDoctor.doctorProfile?.offersVideo === true : true;
     return true;
   });
+
+  // The moment the appointment would actually happen — "now" for an
+  // immediate booking, or the chosen date/time when scheduled later —
+  // is what a clinic's open/closed hours get checked against.
+  const effectiveBookingTime =
+    scheduleMode === "LATER" && scheduledAt ? new Date(scheduledAt) : new Date(now);
+  // A Clinic Visit can only be confirmed once a specific, currently-open
+  // clinic is selected — doctors with no clinics at all fall back to the
+  // legacy unrestricted behavior.
+  const clinicBookingBlocked =
+    consultType === "CLINIC" &&
+    selectedDoctor != null &&
+    selectedDoctor.clinics.length > 0 &&
+    (!selectedClinic || !isClinicOpenNow(selectedClinic.slots, effectiveBookingTime));
+
+  // Home Visit is only offered within the doctor's stated consultation
+  // radius — beyond that they simply can't travel there.
+  const homeVisitDistanceKm = selectedDoctor?.distance ?? null;
+  const homeVisitRadiusKm = selectedDoctor?.doctorProfile?.radius ?? null;
+  const homeVisitBlocked =
+    consultType === "HOME" &&
+    homeVisitDistanceKm != null &&
+    homeVisitRadiusKm != null &&
+    homeVisitDistanceKm > homeVisitRadiusKm;
 
   // ── Derived loading flag ───────────────────────────────────────────────
   const isLoading = authLoading || !userPos;
@@ -632,6 +720,7 @@ function PatientDashboardInner() {
             <button
               onClick={() => {
                 setSelectedDoctor(nearest);
+                setSelectedClinicId((findOpenClinic(nearest.clinics) ?? nearest.clinics[0])?.id ?? null);
                 setPanelOpen(true);
                 setBookingOpen(false);
                 setConsultType(defaultConsultType(nearest.doctorProfile));
@@ -655,7 +744,7 @@ function PatientDashboardInner() {
           )}
           <div className="ml-auto pointer-events-auto flex-shrink-0">
         <button
-          onClick={() => { setEmergencyOpen(true); setEmergencyText(""); setEmergencyResult(null); }}
+          onClick={() => { setEmergencyOpen(true); setEmergencyText(""); setEmergencyResult(null); setEmergencyError(""); }}
           className="w-12 h-12 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-xl text-white transition-colors"
           title="Emergency request"
           style={{ boxShadow: "0 0 0 6px rgba(239,68,68,0.18)" }}
@@ -685,7 +774,7 @@ function PatientDashboardInner() {
         <div className="glass-card rounded-2xl px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 pointer-events-auto">
           <Stethoscope className="w-4 h-4 text-blue-500" />
           <span className="text-xs sm:text-sm font-semibold text-slate-700">
-            {filteredDoctors.filter((d) => d.doctorProfile?.lat).length} doctors nearby
+            {clinicMarkers.length} clinics nearby
           </span>
         </div>
       </div>
@@ -791,6 +880,85 @@ function PatientDashboardInner() {
                     )}
                   </div>
 
+                  {/* Home Visit distance gate */}
+                  {homeVisitBlocked && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 mb-4 flex items-start gap-2.5">
+                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-red-800">
+                          {selectedDoctor.name} is {homeVisitDistanceKm?.toFixed(1)} km away — too far for a home visit right now.
+                        </p>
+                        <p className="text-xs text-red-700 mt-0.5">
+                          They only offer home visits within {homeVisitRadiusKm} km. Try Clinic Visit or Video Call instead.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Clinic location (only for Clinic Visit, when the doctor has clinics) */}
+                  {consultType === "CLINIC" && selectedDoctor.clinics.length > 0 && (
+                    <div className="mb-4">
+                      {selectedDoctor.clinics.length > 1 && (
+                        <div className="mb-2">
+                          <label className="input-label">Choose Clinic</label>
+                          <select
+                            className="input-field"
+                            value={selectedClinicId ?? ""}
+                            onChange={(e) => setSelectedClinicId(e.target.value)}
+                          >
+                            {selectedDoctor.clinics.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.name} — {isClinicOpenNow(c.slots, effectiveBookingTime) ? "Open" : "Closed"} {scheduleMode === "LATER" ? "at that time" : "now"}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                      {selectedClinic && (
+                        <div className="rounded-xl border border-slate-200 px-4 py-3 mb-2">
+                          <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                            <Building2 className="w-3.5 h-3.5 text-slate-400" /> {selectedClinic.name}
+                          </p>
+                          <p className="text-xs text-slate-500 mt-0.5">{selectedClinic.address}</p>
+                        </div>
+                      )}
+                      {selectedClinic && !isClinicOpenNow(selectedClinic.slots, effectiveBookingTime) && (() => {
+                        const openClinic = findOpenClinic(
+                          selectedDoctor.clinics.filter((c) => c.id !== selectedClinic.id),
+                          effectiveBookingTime
+                        );
+                        return (
+                          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 flex items-start gap-2.5">
+                            <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-semibold text-red-800">
+                                Not available at this clinic {scheduleMode === "LATER" ? "at the selected time" : "right now"} — booking is disabled here.
+                              </p>
+                              {openClinic ? (
+                                <>
+                                  <p className="text-xs text-red-700 mt-0.5">
+                                    {scheduleMode === "LATER" ? "Available at that time" : "Currently available"} at {openClinic.name} — {openClinic.address}
+                                  </p>
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedClinicId(openClinic.id)}
+                                    className="text-xs font-bold text-red-800 underline mt-1"
+                                  >
+                                    Switch &amp; book here instead
+                                  </button>
+                                </>
+                              ) : (
+                                <p className="text-xs text-red-700 mt-0.5">
+                                  No clinic is available {scheduleMode === "LATER" ? "at the selected time" : "right now"} — please pick a different time or clinic.
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+
                   {/* Now vs Schedule later */}
                   <label className="input-label mb-2 block">When?</label>
                   <div className="grid grid-cols-2 gap-2 mb-3">
@@ -859,6 +1027,9 @@ function PatientDashboardInner() {
                     </span>
                   </label>
 
+                  {bookingError && (
+                    <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mb-3">{bookingError}</div>
+                  )}
                   <div className="flex gap-3">
                     <button
                       onClick={() => setBookingOpen(false)}
@@ -868,7 +1039,7 @@ function PatientDashboardInner() {
                     </button>
                     <button
                       onClick={submitBooking}
-                      disabled={booking || !symptoms.trim() || !consentGiven || (scheduleMode === "LATER" && !scheduledAt) || (relation !== "Self" && !dependentId)}
+                      disabled={booking || !symptoms.trim() || !consentGiven || (scheduleMode === "LATER" && !scheduledAt) || (relation !== "Self" && !dependentId) || clinicBookingBlocked || homeVisitBlocked}
                       className="btn-primary flex-1 justify-center py-3"
                     >
                       {booking ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : `Confirm ₹${fee}`}
@@ -879,12 +1050,12 @@ function PatientDashboardInner() {
                 /* ── DOCTOR PROFILE CARD ───────────────────────────── */
                 <div className="pb-6">
                   {/* Clinic cover photo */}
-                  {selectedDoctor.doctorProfile.clinicPhotoUrl && (
+                  {(selectedClinic?.photoUrl ?? selectedDoctor.doctorProfile.clinicPhotoUrl) && (
                     <div className="w-full h-32 sm:h-40 rounded-2xl overflow-hidden bg-slate-100 mb-4 -mt-1">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={selectedDoctor.doctorProfile.clinicPhotoUrl}
-                        alt={selectedDoctor.doctorProfile.clinicName ? `${selectedDoctor.doctorProfile.clinicName} — clinic photo` : "Clinic photo"}
+                        src={selectedClinic?.photoUrl ?? selectedDoctor.doctorProfile.clinicPhotoUrl!}
+                        alt={(selectedClinic?.name ?? selectedDoctor.doctorProfile.clinicName) ? `${selectedClinic?.name ?? selectedDoctor.doctorProfile.clinicName} — clinic photo` : "Clinic photo"}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -914,7 +1085,12 @@ function PatientDashboardInner() {
                       </div>
                       <p className="text-sm text-slate-500 mt-0.5">{selectedDoctor.doctorProfile.specialty}</p>
                       <p className="text-xs text-slate-400 mt-0.5">{selectedDoctor.doctorProfile.qualification}</p>
-                      {selectedDoctor.doctorProfile.clinicName && (
+                      {selectedClinic ? (
+                        <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                          <Building2 className="w-3 h-3 flex-shrink-0" /> {selectedClinic.name}
+                          {selectedDoctor.clinics.length > 1 && ` (+${selectedDoctor.clinics.length - 1} more)`}
+                        </p>
+                      ) : selectedDoctor.doctorProfile.clinicName && (
                         <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                           <Building2 className="w-3 h-3 flex-shrink-0" /> {selectedDoctor.doctorProfile.clinicName}
                         </p>
@@ -1092,6 +1268,9 @@ function PatientDashboardInner() {
                   value={emergencyText}
                   onChange={(e) => setEmergencyText(e.target.value)}
                 />
+                {emergencyError && (
+                  <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mb-3">{emergencyError}</div>
+                )}
                 <div className="flex gap-3">
                   <button onClick={() => setEmergencyOpen(false)} className="btn-secondary flex-1 justify-center py-3">Cancel</button>
                   <button
