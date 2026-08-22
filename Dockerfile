@@ -2,8 +2,12 @@
 
 FROM node:22-alpine AS deps
 WORKDIR /app
-RUN apk add --no-cache python3 make g++ && npm install -g npm@latest
+RUN apk add --no-cache python3 make g++
 COPY package.json package-lock.json* ./
+# Use the npm bundled with this Node image, not `npm@latest` — npm 12 changed
+# its default install-scripts policy and silently *skips* postinstall for
+# prisma/better-sqlite3/sharp/esbuild (a warning, not a failure), which would
+# quietly break the Prisma engine and native image processing at runtime.
 RUN npm ci
 
 # Prisma-only stage: used directly (via `target: prisma`) as the one-off
