@@ -6,7 +6,7 @@ import {
   CalendarCheck, Clock, Video, Home, Building2, Stethoscope, Star,
   Loader2, Siren, CheckCircle2, XCircle, Paperclip, IndianRupee,
   Navigation, Plus, Trash2, History, ThumbsUp, ThumbsDown, Inbox,
-  Car, MapPinCheck, AlertTriangle, MessageCircle, Search, X,
+  Car, MapPinCheck, AlertTriangle, MessageCircle, Search, X, FileText,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
@@ -665,7 +665,7 @@ export default function DoctorDashboard() {
                             </span>
                           ) : (
                             <button onClick={() => setCompletingId(completingId === a.id ? null : a.id)} className="btn-primary py-1.5 px-3 text-xs">
-                              <CheckCircle2 className="w-3.5 h-3.5" /> Mark Complete
+                              <FileText className="w-3.5 h-3.5" /> Start Prescription
                             </button>
                           )
                         )}
