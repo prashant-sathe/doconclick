@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
 
 // Chat is only open once a booking has been accepted — matches the "once the
 // doctor accepts, patient and doctor can chat" requirement — and stays open
@@ -55,7 +56,7 @@ export async function POST(
   }
 
   const { id } = await params;
-  const { error } = await loadAndAuthorize(id, authUser.id);
+  const { error, appointment } = await loadAndAuthorize(id, authUser.id);
   if (error) return error;
 
   const { text } = await req.json();
@@ -66,6 +67,14 @@ export async function POST(
   const message = await prisma.message.create({
     data: { appointmentId: id, senderId: authUser.id, text: text.trim().slice(0, 2000) },
     include: { sender: { select: { id: true, name: true, role: true } } },
+  });
+
+  const recipientIsDoctor = appointment!.patientId === authUser.id;
+  const recipientId = recipientIsDoctor ? appointment!.doctorId : appointment!.patientId;
+  void sendPushToUser(recipientId, {
+    title: `New message from ${authUser.name}`,
+    body: message.text.slice(0, 120),
+    url: recipientIsDoctor ? `/doctor/chat/${id}` : `/patient/chat/${id}`,
   });
 
   return NextResponse.json(message);

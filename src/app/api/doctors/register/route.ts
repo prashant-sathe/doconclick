@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
+import { sendPushToAdmins } from "@/lib/firebaseAdmin";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -33,6 +34,12 @@ export async function POST(req: Request) {
         },
       },
       include: { doctorProfile: true },
+    });
+
+    void sendPushToAdmins({
+      title: "New doctor registration",
+      body: `${name} registered and is awaiting verification.`,
+      url: "/admin/doctors",
     });
 
     const payload: JWTPayload = { id: user.id, name: user.name, role: user.role, mobile: user.mobile };

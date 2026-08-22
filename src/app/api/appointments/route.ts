@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
 import { haversine } from "@/lib/geo";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
 
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
@@ -164,6 +165,12 @@ export async function POST(req: Request) {
         patient: { select: { name: true } },
         doctor: { select: { name: true } },
       },
+    });
+
+    void sendPushToUser(doctorId, {
+      title: "New appointment request",
+      body: `${appointment.patientName ?? appointment.patient.name} requested a ${consultType.toLowerCase()} consultation.`,
+      url: "/doctor/dashboard",
     });
 
     return NextResponse.json(appointment);

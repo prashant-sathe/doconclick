@@ -228,6 +228,7 @@ export type UserWhereInput = {
   savedDoctors?: Prisma.SavedDoctorListRelationFilter
   savedByPatients?: Prisma.SavedDoctorListRelationFilter
   clinics?: Prisma.ClinicListRelationFilter
+  pushTokens?: Prisma.PushTokenListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -254,6 +255,7 @@ export type UserOrderByWithRelationInput = {
   savedDoctors?: Prisma.SavedDoctorOrderByRelationAggregateInput
   savedByPatients?: Prisma.SavedDoctorOrderByRelationAggregateInput
   clinics?: Prisma.ClinicOrderByRelationAggregateInput
+  pushTokens?: Prisma.PushTokenOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -283,6 +285,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   savedDoctors?: Prisma.SavedDoctorListRelationFilter
   savedByPatients?: Prisma.SavedDoctorListRelationFilter
   clinics?: Prisma.ClinicListRelationFilter
+  pushTokens?: Prisma.PushTokenListRelationFilter
 }, "id" | "mobile" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -339,6 +342,7 @@ export type UserCreateInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -365,6 +369,7 @@ export type UserUncheckedCreateInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -391,6 +396,7 @@ export type UserUpdateInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -417,6 +423,7 @@ export type UserUncheckedUpdateInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -515,6 +522,20 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type UserCreateNestedOneWithoutPushTokensInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPushTokensInput, Prisma.UserUncheckedCreateWithoutPushTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPushTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPushTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPushTokensInput, Prisma.UserUncheckedCreateWithoutPushTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPushTokensInput
+  upsert?: Prisma.UserUpsertWithoutPushTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPushTokensInput, Prisma.UserUpdateWithoutPushTokensInput>, Prisma.UserUncheckedUpdateWithoutPushTokensInput>
 }
 
 export type UserCreateNestedOneWithoutSavedDoctorsInput = {
@@ -715,6 +736,126 @@ export type UserUpdateOneRequiredWithoutClinicsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutClinicsInput, Prisma.UserUpdateWithoutClinicsInput>, Prisma.UserUncheckedUpdateWithoutClinicsInput>
 }
 
+export type UserCreateWithoutPushTokensInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+}
+
+export type UserUncheckedCreateWithoutPushTokensInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+}
+
+export type UserCreateOrConnectWithoutPushTokensInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPushTokensInput, Prisma.UserUncheckedCreateWithoutPushTokensInput>
+}
+
+export type UserUpsertWithoutPushTokensInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPushTokensInput, Prisma.UserUncheckedUpdateWithoutPushTokensInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPushTokensInput, Prisma.UserUncheckedCreateWithoutPushTokensInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPushTokensInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPushTokensInput, Prisma.UserUncheckedUpdateWithoutPushTokensInput>
+}
+
+export type UserUpdateWithoutPushTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPushTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+}
+
 export type UserCreateWithoutSavedDoctorsInput = {
   id?: string
   name: string
@@ -738,6 +879,7 @@ export type UserCreateWithoutSavedDoctorsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSavedDoctorsInput = {
@@ -763,6 +905,7 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSavedDoctorsInput = {
@@ -793,6 +936,7 @@ export type UserCreateWithoutSavedByPatientsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSavedByPatientsInput = {
@@ -818,6 +962,7 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSavedByPatientsInput = {
@@ -859,6 +1004,7 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
@@ -884,6 +1030,7 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutSavedByPatientsInput = {
@@ -920,6 +1067,7 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
@@ -945,6 +1093,7 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPatientProfileInput = {
@@ -970,6 +1119,7 @@ export type UserCreateWithoutPatientProfileInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPatientProfileInput = {
@@ -995,6 +1145,7 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPatientProfileInput = {
@@ -1036,6 +1187,7 @@ export type UserUpdateWithoutPatientProfileInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPatientProfileInput = {
@@ -1061,6 +1213,7 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDoctorProfileInput = {
@@ -1086,6 +1239,7 @@ export type UserCreateWithoutDoctorProfileInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDoctorProfileInput = {
@@ -1111,6 +1265,7 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDoctorProfileInput = {
@@ -1152,6 +1307,7 @@ export type UserUpdateWithoutDoctorProfileInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDoctorProfileInput = {
@@ -1177,6 +1333,7 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAsPatientInput = {
@@ -1202,6 +1359,7 @@ export type UserCreateWithoutAsPatientInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsPatientInput = {
@@ -1227,6 +1385,7 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAsPatientInput = {
@@ -1257,6 +1416,7 @@ export type UserCreateWithoutAsDoctorInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsDoctorInput = {
@@ -1282,6 +1442,7 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAsDoctorInput = {
@@ -1323,6 +1484,7 @@ export type UserUpdateWithoutAsPatientInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsPatientInput = {
@@ -1348,6 +1510,7 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutAsDoctorInput = {
@@ -1384,6 +1547,7 @@ export type UserUpdateWithoutAsDoctorInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsDoctorInput = {
@@ -1409,6 +1573,7 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSettlementsInput = {
@@ -1434,6 +1599,7 @@ export type UserCreateWithoutSettlementsInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsInput = {
@@ -1459,6 +1625,7 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsInput = {
@@ -1489,6 +1656,7 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
@@ -1514,6 +1682,7 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsAdminedInput = {
@@ -1555,6 +1724,7 @@ export type UserUpdateWithoutSettlementsInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsInput = {
@@ -1580,6 +1750,7 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutSettlementsAdminedInput = {
@@ -1616,6 +1787,7 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
@@ -1641,6 +1813,7 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPaymentLogsInput = {
@@ -1666,6 +1839,7 @@ export type UserCreateWithoutPaymentLogsInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPaymentLogsInput = {
@@ -1691,6 +1865,7 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPaymentLogsInput = {
@@ -1732,6 +1907,7 @@ export type UserUpdateWithoutPaymentLogsInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentLogsInput = {
@@ -1757,6 +1933,7 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -1782,6 +1959,7 @@ export type UserCreateWithoutMessagesSentInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -1807,6 +1985,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -1848,6 +2027,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -1873,6 +2053,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReviewsGivenInput = {
@@ -1898,6 +2079,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsGivenInput = {
@@ -1923,6 +2105,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsGivenInput = {
@@ -1953,6 +2136,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsReceivedInput = {
@@ -1978,6 +2162,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsReceivedInput = {
@@ -2019,6 +2204,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsGivenInput = {
@@ -2044,6 +2230,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReviewsReceivedInput = {
@@ -2080,6 +2267,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
@@ -2105,6 +2293,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutComplaintsInput = {
@@ -2130,6 +2319,7 @@ export type UserCreateWithoutComplaintsInput = {
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsInput = {
@@ -2155,6 +2345,7 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsInput = {
@@ -2196,6 +2387,7 @@ export type UserUpdateWithoutComplaintsInput = {
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsInput = {
@@ -2221,6 +2413,7 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutClinicsInput = {
@@ -2246,6 +2439,7 @@ export type UserCreateWithoutClinicsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClinicsInput = {
@@ -2271,6 +2465,7 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClinicsInput = {
@@ -2312,6 +2507,7 @@ export type UserUpdateWithoutClinicsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClinicsInput = {
@@ -2337,6 +2533,7 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -2357,6 +2554,7 @@ export type UserCountOutputType = {
   savedDoctors: number
   savedByPatients: number
   clinics: number
+  pushTokens: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2372,6 +2570,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   savedDoctors?: boolean | UserCountOutputTypeCountSavedDoctorsArgs
   savedByPatients?: boolean | UserCountOutputTypeCountSavedByPatientsArgs
   clinics?: boolean | UserCountOutputTypeCountClinicsArgs
+  pushTokens?: boolean | UserCountOutputTypeCountPushTokensArgs
 }
 
 /**
@@ -2468,6 +2667,13 @@ export type UserCountOutputTypeCountClinicsArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.ClinicWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPushTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PushTokenWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2493,6 +2699,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   savedDoctors?: boolean | Prisma.User$savedDoctorsArgs<ExtArgs>
   savedByPatients?: boolean | Prisma.User$savedByPatientsArgs<ExtArgs>
   clinics?: boolean | Prisma.User$clinicsArgs<ExtArgs>
+  pushTokens?: boolean | Prisma.User$pushTokensArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2548,6 +2755,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   savedDoctors?: boolean | Prisma.User$savedDoctorsArgs<ExtArgs>
   savedByPatients?: boolean | Prisma.User$savedByPatientsArgs<ExtArgs>
   clinics?: boolean | Prisma.User$clinicsArgs<ExtArgs>
+  pushTokens?: boolean | Prisma.User$pushTokensArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2570,6 +2778,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     savedDoctors: Prisma.$SavedDoctorPayload<ExtArgs>[]
     savedByPatients: Prisma.$SavedDoctorPayload<ExtArgs>[]
     clinics: Prisma.$ClinicPayload<ExtArgs>[]
+    pushTokens: Prisma.$PushTokenPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2989,6 +3198,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   savedDoctors<T extends Prisma.User$savedDoctorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedDoctorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedDoctorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedByPatients<T extends Prisma.User$savedByPatientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedByPatientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedDoctorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clinics<T extends Prisma.User$clinicsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clinicsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClinicPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pushTokens<T extends Prisma.User$pushTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pushTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PushTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3743,6 +3953,30 @@ export type User$clinicsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.ClinicScalarFieldEnum | Prisma.ClinicScalarFieldEnum[]
+}
+
+/**
+ * User.pushTokens
+ */
+export type User$pushTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PushToken
+   */
+  select?: Prisma.PushTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PushToken
+   */
+  omit?: Prisma.PushTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PushTokenInclude<ExtArgs> | null
+  where?: Prisma.PushTokenWhereInput
+  orderBy?: Prisma.PushTokenOrderByWithRelationInput | Prisma.PushTokenOrderByWithRelationInput[]
+  cursor?: Prisma.PushTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PushTokenScalarFieldEnum | Prisma.PushTokenScalarFieldEnum[]
 }
 
 /**

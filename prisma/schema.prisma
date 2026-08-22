@@ -35,6 +35,16 @@ model User {
   savedDoctors      SavedDoctor[] @relation("PatientSavedDoctors")
   savedByPatients   SavedDoctor[] @relation("DoctorSavedBy")
   clinics           Clinic[]      @relation("DoctorClinics")
+  pushTokens        PushToken[]
+}
+
+model PushToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  userAgent String?
+  createdAt DateTime @default(now())
 }
 
 model SavedDoctor {

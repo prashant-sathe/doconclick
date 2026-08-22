@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { softDeleteUser } from "@/lib/userDeletion";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
+
+const STATUS_PUSH_COPY: Record<string, { title: string; body: string }> = {
+  APPROVED: { title: "Application approved", body: "Your doctor application has been approved." },
+  REJECTED: { title: "Application not approved", body: "Your doctor application was not approved this time." },
+  SUSPENDED: { title: "Account suspended", body: "Your account has been suspended by the admin." },
+};
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -95,6 +102,17 @@ export async function PATCH(
     where: { userId: id },
     data,
   });
+
+  if (data.status && STATUS_PUSH_COPY[data.status]) {
+    void sendPushToUser(id, { ...STATUS_PUSH_COPY[data.status], url: "/doctor/dashboard" });
+  }
+  if (data.isVerified === true) {
+    void sendPushToUser(id, {
+      title: "You're verified!",
+      body: "Your profile is now visible to patients.",
+      url: "/doctor/dashboard",
+    });
+  }
 
   return NextResponse.json(updated);
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
 
 // POST: Patient leaves a review for a completed appointment
 export async function POST(req: Request) {
@@ -55,6 +56,12 @@ export async function POST(req: Request) {
     });
 
     return created;
+  });
+
+  void sendPushToUser(appointment.doctorId, {
+    title: "New review",
+    body: `${authUser.name} left a ${ratingNum}★ review.`,
+    url: "/doctor/dashboard",
   });
 
   return NextResponse.json(review);

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { generateAgoraToken } from "@/lib/agora";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
 
 export async function GET(
   _req: Request,
@@ -39,6 +40,14 @@ export async function GET(
       { status: 403 }
     );
   }
+
+  const isPatient = authUser.id === appointment.patientId;
+  const otherPartyId = isPatient ? appointment.doctorId : appointment.patientId;
+  void sendPushToUser(otherPartyId, {
+    title: "Video call started",
+    body: `${authUser.name} has joined the video call.`,
+    url: isPatient ? `/doctor/video/${id}` : `/patient/video/${id}`,
+  });
 
   const { appId, token } = generateAgoraToken(id);
   return NextResponse.json({ appId, token, channel: id });

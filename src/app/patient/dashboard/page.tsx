@@ -20,6 +20,7 @@ import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
+import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import DependentPicker from "@/components/patient/DependentPicker";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 
@@ -645,6 +646,8 @@ function PatientDashboardInner() {
           </p>
         </div>
       )}
+
+      {!isLoading && <EnableNotificationsPrompt />}
 
       {/* ── Top bar ────────────────────────────────────────────────── */}
       <div className="absolute top-0 inset-x-0 z-20 pointer-events-none">

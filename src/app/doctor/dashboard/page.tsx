@@ -11,6 +11,7 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
+import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { FREQUENCY_OPTIONS, DURATION_OPTIONS } from "@/lib/medicalOptions";
@@ -439,6 +440,8 @@ export default function DoctorDashboard() {
             </p>
           </div>
         </div>
+
+        <EnableNotificationsPrompt />
 
         {/* Stat Strip */}
         <div className="grid grid-cols-3 gap-4 mb-8">

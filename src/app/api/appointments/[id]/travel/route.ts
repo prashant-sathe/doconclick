@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
 
 const VALID_STATUSES = ["ON_THE_WAY", "ARRIVED"];
+
+const TRAVEL_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string }> = {
+  ON_THE_WAY: { title: "Your doctor is on the way!", body: (d) => `${d} has started the journey to you.` },
+  ARRIVED: { title: "Your doctor has arrived!", body: (d) => `${d} is here for your visit.` },
+};
 
 // PATCH: Doctor starts/updates/ends a home-visit journey.
 // Called once to start (ON_THE_WAY + initial position), then repeatedly while
@@ -43,6 +49,14 @@ export async function PATCH(
           : {}),
       },
     });
+    const copy = TRAVEL_PUSH_COPY[travelStatus];
+    if (copy) {
+      void sendPushToUser(appointment.patientId, {
+        title: copy.title,
+        body: copy.body(authUser.name),
+        url: `/patient/track/${id}`,
+      });
+    }
     return NextResponse.json(updated);
   } catch (err) {
     console.error(err);

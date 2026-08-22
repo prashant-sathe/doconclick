@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
 
 export const APPOINTMENT_REQUEST_TIMEOUT_MS = 30 * 60 * 1000;
 
@@ -7,8 +8,22 @@ export const APPOINTMENT_REQUEST_TIMEOUT_MS = 30 * 60 * 1000;
 // background job — cheap no-op when nothing is stale.
 export async function expireStalePendingRequests() {
   const cutoff = new Date(Date.now() - APPOINTMENT_REQUEST_TIMEOUT_MS);
-  await prisma.appointment.updateMany({
+  const stale = await prisma.appointment.findMany({
     where: { status: "PENDING_APPROVAL", createdAt: { lt: cutoff } },
+    select: { id: true, patientId: true, doctor: { select: { name: true } } },
+  });
+  if (stale.length === 0) return;
+
+  await prisma.appointment.updateMany({
+    where: { id: { in: stale.map((a) => a.id) } },
     data: { status: "EXPIRED" },
   });
+
+  for (const a of stale) {
+    void sendPushToUser(a.patientId, {
+      title: "No response from doctor",
+      body: `${a.doctor.name} didn't respond in time.`,
+      url: "/patient/appointments",
+    });
+  }
 }

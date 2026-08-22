@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 import { useRouter } from "next/navigation";
 import { LogOut, Loader2 } from "lucide-react";
 import { unlockAudio } from "@/lib/playNotificationSound";
+import { listenForForegroundPush } from "@/lib/pushClient";
 
 type AuthUser = {
   id: string;
@@ -51,6 +52,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    listenForForegroundPush();
+  }, []);
 
   // Browsers only allow audio playback after a genuine user gesture. Unlocking
   // here — on the very first click/keypress/touch anywhere in the app,

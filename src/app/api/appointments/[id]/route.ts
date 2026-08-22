@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
+
+const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
+  SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
+  REJECTED: { title: "Request declined", body: (d) => `${d} was unable to accept your request.`, url: "/patient/appointments" },
+  COMPLETED: { title: "Consultation completed", body: (d) => `Your visit with ${d} is complete.`, url: "/patient/appointments" },
+  CANCELLED: { title: "Appointment cancelled", body: (d) => `Your appointment with ${d} was cancelled.`, url: "/patient/appointments" },
+};
 
 // Valid status transitions a doctor may make, keyed by the appointment's current status
 const DOCTOR_TRANSITIONS: Record<string, string[]> = {
@@ -91,6 +99,14 @@ export async function PATCH(
           : {}),
       },
     });
+    const copy = PATIENT_PUSH_COPY[status];
+    if (copy) {
+      void sendPushToUser(appointment.patientId, {
+        title: copy.title,
+        body: copy.body(authUser.name),
+        url: copy.url,
+      });
+    }
     return NextResponse.json(updated);
   }
 
@@ -107,6 +123,11 @@ export async function PATCH(
     const updated = await prisma.appointment.update({
       where: { id },
       data: { status: "CANCELLED" },
+    });
+    void sendPushToUser(appointment.doctorId, {
+      title: "Appointment cancelled",
+      body: `${authUser.name} cancelled their appointment request.`,
+      url: "/doctor/dashboard",
     });
     return NextResponse.json(updated);
   }

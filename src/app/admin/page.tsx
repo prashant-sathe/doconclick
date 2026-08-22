@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Users, Stethoscope, CalendarCheck, IndianRupee, AlertCircle, Clock, TrendingUp } from "lucide-react";
 import { cn, formatDoctorName } from "@/lib/utils";
+import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 
 interface Analytics {
   totalPatients: number;
@@ -81,6 +82,7 @@ export default function AdminOverview() {
 
   return (
     <div className="p-8">
+      <EnableNotificationsPrompt />
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>

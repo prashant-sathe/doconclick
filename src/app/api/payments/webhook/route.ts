@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyCashfreeWebhookSignature, DOCTOR_REGISTRATION_FEE, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
 
 interface CashfreeWebhookPayload {
   type: "PAYMENT_SUCCESS_WEBHOOK" | "PAYMENT_FAILED_WEBHOOK" | string;
@@ -85,6 +86,11 @@ export async function POST(req: Request) {
         },
       }),
     ]);
+    void sendPushToUser(profile.userId, {
+      title: "Registration fee received",
+      body: "Your application is now under review.",
+      url: "/doctor/dashboard",
+    });
     return NextResponse.json({ ok: true });
   }
 
@@ -125,10 +131,18 @@ export async function POST(req: Request) {
         },
       }),
     ]);
+    void sendPushToUser(profile.userId, {
+      title: "Subscription renewed",
+      body: "Your subscription is active.",
+      url: "/doctor/dashboard",
+    });
     return NextResponse.json({ ok: true });
   }
 
-  const appointment = await prisma.appointment.findFirst({ where: { cashfreeOrderId: orderId } });
+  const appointment = await prisma.appointment.findFirst({
+    where: { cashfreeOrderId: orderId },
+    include: { patient: { select: { name: true } } },
+  });
   if (!appointment) {
     console.error("Cashfree webhook: no appointment found for order", orderId);
     return NextResponse.json({ ok: true }); // ack anyway — nothing to retry into
@@ -149,6 +163,12 @@ export async function POST(req: Request) {
       paidAt: new Date(),
       cashfreePaymentId: payload.data.payment.cf_payment_id,
     },
+  });
+
+  void sendPushToUser(appointment.doctorId, {
+    title: "Payment received",
+    body: `Payment received for your consultation with ${appointment.patient.name}.`,
+    url: "/doctor/dashboard",
   });
 
   return NextResponse.json({ ok: true });
