@@ -187,11 +187,13 @@ export default function PrescriptionDocument({
           <div style={{ fontSize: 22, fontWeight: 800, color: TEAL, marginBottom: 12 }}>℞</div>
           {data.medicines.map((m, i) => (
             <div key={i} style={{ borderBottom: i < data.medicines.length - 1 ? `1px dashed ${BORDER}` : "none", padding: "10px 0" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: INK }}>
                   {i + 1}. {m.name}
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: TEAL, whiteSpace: "nowrap" }}>{m.duration}</div>
+                {m.duration && (
+                  <div style={{ fontSize: 12, fontWeight: 700, color: TEAL, whiteSpace: "nowrap" }}>· {m.duration}</div>
+                )}
               </div>
               <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>
                 {[m.dosage, m.frequency].filter(Boolean).join(" · ")}
