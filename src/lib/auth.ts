@@ -6,6 +6,10 @@ const JWT_SECRET = process.env.JWT_SECRET ?? "doconclick_super_secret_jwt_key_ch
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 
+// Stashes the admin's own token while they're impersonating another account,
+// so an "exit impersonation" action can restore it without re-authenticating.
+export const IMPERSONATOR_COOKIE_NAME = "doconclick_impersonator_token";
+
 // Browsers drop `Secure` cookies on plain HTTP origins, so a NODE_ENV=production
 // deployment served without TLS (e.g. straight to an EC2 IP) needs to opt out
 // via COOKIE_SECURE=false until a domain + HTTPS are in place.

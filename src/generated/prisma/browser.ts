@@ -128,6 +128,11 @@ export type Announcement = Prisma.AnnouncementModel
  */
 export type AnnouncementRecipient = Prisma.AnnouncementRecipientModel
 /**
+ * Model ImpersonationLog
+ * 
+ */
+export type ImpersonationLog = Prisma.ImpersonationLogModel
+/**
  * Model PlatformSettings
  * 
  */

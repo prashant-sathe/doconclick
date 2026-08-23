@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { LogOut, Loader2 } from "lucide-react";
 import { unlockAudio } from "@/lib/playNotificationSound";
 import { listenForForegroundPush } from "@/lib/pushClient";
+import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 
 type AuthUser = {
   id: string;
@@ -12,22 +13,32 @@ type AuthUser = {
   mobile: string;
 };
 
+type ImpersonatedBy = {
+  name: string;
+  role: string;
+};
+
 type AuthContextType = {
   user: AuthUser | null;
   loading: boolean;
+  impersonatedBy: ImpersonatedBy | null;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
+  exitImpersonation: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  impersonatedBy: null,
   logout: async () => {},
   refresh: async () => {},
+  exitImpersonation: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [impersonatedBy, setImpersonatedBy] = useState<ImpersonatedBy | null>(null);
   const [loading, setLoading] = useState(true);
   const [confirmingLogout, setConfirmingLogout] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -39,14 +50,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (res.ok) {
         const data = await res.json();
         setUser(data);
+        setImpersonatedBy(data.impersonatedBy ?? null);
       } else {
         setUser(null);
+        setImpersonatedBy(null);
       }
     } catch {
       setUser(null);
+      setImpersonatedBy(null);
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const exitImpersonation = useCallback(async () => {
+    await fetch("/api/admin/impersonate/exit", { method: "POST" });
+    window.location.href = "/admin";
   }, []);
 
   useEffect(() => {
@@ -87,7 +106,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout, refresh }}>
+    <AuthContext.Provider value={{ user, loading, impersonatedBy, logout, refresh, exitImpersonation }}>
+      {impersonatedBy && <ImpersonationBanner adminName={impersonatedBy.name} onExit={exitImpersonation} />}
       {children}
       {confirmingLogout && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">

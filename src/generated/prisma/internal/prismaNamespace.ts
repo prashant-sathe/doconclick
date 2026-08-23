@@ -419,6 +419,7 @@ export const ModelName = {
   Specialty: 'Specialty',
   Announcement: 'Announcement',
   AnnouncementRecipient: 'AnnouncementRecipient',
+  ImpersonationLog: 'ImpersonationLog',
   PlatformSettings: 'PlatformSettings'
 } as const
 
@@ -435,7 +436,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "doctorProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "specialty" | "announcement" | "announcementRecipient" | "platformSettings"
+    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "doctorProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2067,6 +2068,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ImpersonationLog: {
+      payload: Prisma.$ImpersonationLogPayload<ExtArgs>
+      fields: Prisma.ImpersonationLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ImpersonationLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ImpersonationLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload>
+        }
+        findFirst: {
+          args: Prisma.ImpersonationLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ImpersonationLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload>
+        }
+        findMany: {
+          args: Prisma.ImpersonationLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload>[]
+        }
+        create: {
+          args: Prisma.ImpersonationLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload>
+        }
+        createMany: {
+          args: Prisma.ImpersonationLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ImpersonationLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload>[]
+        }
+        delete: {
+          args: Prisma.ImpersonationLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload>
+        }
+        update: {
+          args: Prisma.ImpersonationLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.ImpersonationLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ImpersonationLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ImpersonationLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.ImpersonationLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpersonationLogPayload>
+        }
+        aggregate: {
+          args: Prisma.ImpersonationLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateImpersonationLog>
+        }
+        groupBy: {
+          args: Prisma.ImpersonationLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImpersonationLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ImpersonationLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImpersonationLogCountAggregateOutputType> | number
+        }
+      }
+    }
     PlatformSettings: {
       payload: Prisma.$PlatformSettingsPayload<ExtArgs>
       fields: Prisma.PlatformSettingsFieldRefs
@@ -2538,6 +2613,17 @@ export const AnnouncementRecipientScalarFieldEnum = {
 export type AnnouncementRecipientScalarFieldEnum = (typeof AnnouncementRecipientScalarFieldEnum)[keyof typeof AnnouncementRecipientScalarFieldEnum]
 
 
+export const ImpersonationLogScalarFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  targetUserId: 'targetUserId',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt'
+} as const
+
+export type ImpersonationLogScalarFieldEnum = (typeof ImpersonationLogScalarFieldEnum)[keyof typeof ImpersonationLogScalarFieldEnum]
+
+
 export const PlatformSettingsScalarFieldEnum = {
   id: 'id',
   clinicCommissionPercent: 'clinicCommissionPercent',
@@ -2845,6 +2931,7 @@ export type GlobalOmitConfig = {
   specialty?: Prisma.SpecialtyOmit
   announcement?: Prisma.AnnouncementOmit
   announcementRecipient?: Prisma.AnnouncementRecipientOmit
+  impersonationLog?: Prisma.ImpersonationLogOmit
   platformSettings?: Prisma.PlatformSettingsOmit
 }
 

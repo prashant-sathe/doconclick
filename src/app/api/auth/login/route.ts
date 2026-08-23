@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword, signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
+import { verifyPassword, signToken, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME, type JWTPayload } from "@/lib/auth";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -54,6 +54,15 @@ export async function POST(req: Request) {
       secure: COOKIE_SECURE,
       sameSite: "lax",
       maxAge: COOKIE_MAX_AGE,
+      path: "/",
+    });
+    // A fresh login should never inherit a leftover impersonation stash from
+    // a previous session that didn't exit cleanly.
+    response.cookies.set(IMPERSONATOR_COOKIE_NAME, "", {
+      httpOnly: true,
+      secure: COOKIE_SECURE,
+      sameSite: "lax",
+      maxAge: 0,
       path: "/",
     });
 

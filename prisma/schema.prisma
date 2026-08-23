@@ -40,6 +40,8 @@ model User {
   walletTransactionsAdjusted WalletTransaction[] @relation("WalletAdjustedBy")
   announcementsCreated   Announcement[]          @relation("AnnouncementsCreated")
   announcementRecipients AnnouncementRecipient[] @relation("AnnouncementRecipients")
+  impersonationsStarted  ImpersonationLog[]      @relation("ImpersonationsStarted")
+  impersonationsReceived ImpersonationLog[]      @relation("ImpersonationsReceived")
 }
 
 model PushToken {
@@ -378,6 +380,16 @@ model AnnouncementRecipient {
 
   @@unique([announcementId, userId])
   @@index([userId, seenAt])
+}
+
+model ImpersonationLog {
+  id           String    @id @default(cuid())
+  adminId      String
+  admin        User      @relation("ImpersonationsStarted", fields: [adminId], references: [id])
+  targetUserId String
+  targetUser   User      @relation("ImpersonationsReceived", fields: [targetUserId], references: [id])
+  startedAt    DateTime  @default(now())
+  endedAt      DateTime?
 }
 
 model PlatformSettings {

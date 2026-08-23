@@ -4,7 +4,7 @@ import {
   Search, Users, Eye, X, Phone, Mail, MapPin, Calendar,
   Activity, Droplets, Ruler, Weight, AlertTriangle,
   Pill, Scissors, PhoneCall, DollarSign, CalendarCheck,
-  CheckCircle2, AlertCircle, MessageCircle, Clock, RefreshCw, Trash2,
+  CheckCircle2, AlertCircle, MessageCircle, Clock, RefreshCw, Trash2, LogIn,
 } from "lucide-react";
 import { cn, formatDoctorName } from "@/lib/utils";
 
@@ -251,6 +251,8 @@ export default function AdminPatients() {
   const [viewId, setViewId]     = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Patient | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [impersonatingId, setImpersonatingId] = useState<string | null>(null);
+  const [impersonateError, setImpersonateError] = useState("");
 
   const load = useCallback(() => {
     setLoading(true);
@@ -268,6 +270,19 @@ export default function AdminPatients() {
     setDeleteTarget(null);
     setDeleting(false);
     await load();
+  };
+
+  const impersonate = async (patient: Patient) => {
+    setImpersonateError("");
+    setImpersonatingId(patient.id);
+    const res = await fetch(`/api/admin/impersonate/${patient.id}`, { method: "POST" });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setImpersonateError(body.error ?? "Could not log in as this patient.");
+      setImpersonatingId(null);
+      return;
+    }
+    window.location.href = "/patient/dashboard";
   };
 
   const filtered = patients.filter(
@@ -289,6 +304,12 @@ export default function AdminPatients() {
           <RefreshCw className="w-4 h-4" /> Refresh
         </button>
       </div>
+
+      {impersonateError && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+          {impersonateError}
+        </div>
+      )}
 
       {/* Search */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6">
@@ -349,6 +370,14 @@ export default function AdminPatients() {
                           className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
                         >
                           <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => impersonate(p)}
+                          disabled={impersonatingId === p.id}
+                          title="Log in as this patient"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg text-indigo-500 hover:bg-indigo-50 transition-colors disabled:opacity-40"
+                        >
+                          <LogIn className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeleteTarget(p)}

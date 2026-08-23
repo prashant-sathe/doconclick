@@ -73,6 +73,7 @@ export const ModelName = {
   Specialty: 'Specialty',
   Announcement: 'Announcement',
   AnnouncementRecipient: 'AnnouncementRecipient',
+  ImpersonationLog: 'ImpersonationLog',
   PlatformSettings: 'PlatformSettings'
 } as const
 
@@ -448,6 +449,17 @@ export const AnnouncementRecipientScalarFieldEnum = {
 } as const
 
 export type AnnouncementRecipientScalarFieldEnum = (typeof AnnouncementRecipientScalarFieldEnum)[keyof typeof AnnouncementRecipientScalarFieldEnum]
+
+
+export const ImpersonationLogScalarFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  targetUserId: 'targetUserId',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt'
+} as const
+
+export type ImpersonationLogScalarFieldEnum = (typeof ImpersonationLogScalarFieldEnum)[keyof typeof ImpersonationLogScalarFieldEnum]
 
 
 export const PlatformSettingsScalarFieldEnum = {

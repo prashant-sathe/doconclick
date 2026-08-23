@@ -233,6 +233,8 @@ export type UserWhereInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionListRelationFilter
   announcementsCreated?: Prisma.AnnouncementListRelationFilter
   announcementRecipients?: Prisma.AnnouncementRecipientListRelationFilter
+  impersonationsStarted?: Prisma.ImpersonationLogListRelationFilter
+  impersonationsReceived?: Prisma.ImpersonationLogListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -264,6 +266,8 @@ export type UserOrderByWithRelationInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionOrderByRelationAggregateInput
   announcementsCreated?: Prisma.AnnouncementOrderByRelationAggregateInput
   announcementRecipients?: Prisma.AnnouncementRecipientOrderByRelationAggregateInput
+  impersonationsStarted?: Prisma.ImpersonationLogOrderByRelationAggregateInput
+  impersonationsReceived?: Prisma.ImpersonationLogOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -298,6 +302,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   walletTransactionsAdjusted?: Prisma.WalletTransactionListRelationFilter
   announcementsCreated?: Prisma.AnnouncementListRelationFilter
   announcementRecipients?: Prisma.AnnouncementRecipientListRelationFilter
+  impersonationsStarted?: Prisma.ImpersonationLogListRelationFilter
+  impersonationsReceived?: Prisma.ImpersonationLogListRelationFilter
 }, "id" | "mobile" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -359,6 +365,8 @@ export type UserCreateInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -390,6 +398,8 @@ export type UserUncheckedCreateInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUpdateInput = {
@@ -421,6 +431,8 @@ export type UserUpdateInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -452,6 +464,8 @@ export type UserUncheckedUpdateInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -822,6 +836,34 @@ export type UserUpdateOneRequiredWithoutAnnouncementRecipientsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAnnouncementRecipientsInput, Prisma.UserUpdateWithoutAnnouncementRecipientsInput>, Prisma.UserUncheckedUpdateWithoutAnnouncementRecipientsInput>
 }
 
+export type UserCreateNestedOneWithoutImpersonationsStartedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutImpersonationsStartedInput, Prisma.UserUncheckedCreateWithoutImpersonationsStartedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutImpersonationsStartedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutImpersonationsReceivedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutImpersonationsReceivedInput, Prisma.UserUncheckedCreateWithoutImpersonationsReceivedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutImpersonationsReceivedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutImpersonationsStartedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutImpersonationsStartedInput, Prisma.UserUncheckedCreateWithoutImpersonationsStartedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutImpersonationsStartedInput
+  upsert?: Prisma.UserUpsertWithoutImpersonationsStartedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutImpersonationsStartedInput, Prisma.UserUpdateWithoutImpersonationsStartedInput>, Prisma.UserUncheckedUpdateWithoutImpersonationsStartedInput>
+}
+
+export type UserUpdateOneRequiredWithoutImpersonationsReceivedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutImpersonationsReceivedInput, Prisma.UserUncheckedCreateWithoutImpersonationsReceivedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutImpersonationsReceivedInput
+  upsert?: Prisma.UserUpsertWithoutImpersonationsReceivedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutImpersonationsReceivedInput, Prisma.UserUpdateWithoutImpersonationsReceivedInput>, Prisma.UserUncheckedUpdateWithoutImpersonationsReceivedInput>
+}
+
 export type UserCreateWithoutPushTokensInput = {
   id?: string
   name: string
@@ -850,6 +892,8 @@ export type UserCreateWithoutPushTokensInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutPushTokensInput = {
@@ -880,6 +924,8 @@ export type UserUncheckedCreateWithoutPushTokensInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutPushTokensInput = {
@@ -926,6 +972,8 @@ export type UserUpdateWithoutPushTokensInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPushTokensInput = {
@@ -956,6 +1004,8 @@ export type UserUncheckedUpdateWithoutPushTokensInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutSavedDoctorsInput = {
@@ -986,6 +1036,8 @@ export type UserCreateWithoutSavedDoctorsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutSavedDoctorsInput = {
@@ -1016,6 +1068,8 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutSavedDoctorsInput = {
@@ -1051,6 +1105,8 @@ export type UserCreateWithoutSavedByPatientsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutSavedByPatientsInput = {
@@ -1081,6 +1137,8 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutSavedByPatientsInput = {
@@ -1127,6 +1185,8 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
@@ -1157,6 +1217,8 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUpsertWithoutSavedByPatientsInput = {
@@ -1198,6 +1260,8 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
@@ -1228,6 +1292,8 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutPatientProfileInput = {
@@ -1258,6 +1324,8 @@ export type UserCreateWithoutPatientProfileInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutPatientProfileInput = {
@@ -1288,6 +1356,8 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutPatientProfileInput = {
@@ -1334,6 +1404,8 @@ export type UserUpdateWithoutPatientProfileInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPatientProfileInput = {
@@ -1364,6 +1436,8 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutDoctorProfileInput = {
@@ -1394,6 +1468,8 @@ export type UserCreateWithoutDoctorProfileInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutDoctorProfileInput = {
@@ -1424,6 +1500,8 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutDoctorProfileInput = {
@@ -1470,6 +1548,8 @@ export type UserUpdateWithoutDoctorProfileInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDoctorProfileInput = {
@@ -1500,6 +1580,8 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutAsPatientInput = {
@@ -1530,6 +1612,8 @@ export type UserCreateWithoutAsPatientInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutAsPatientInput = {
@@ -1560,6 +1644,8 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutAsPatientInput = {
@@ -1595,6 +1681,8 @@ export type UserCreateWithoutAsDoctorInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutAsDoctorInput = {
@@ -1625,6 +1713,8 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutAsDoctorInput = {
@@ -1671,6 +1761,8 @@ export type UserUpdateWithoutAsPatientInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsPatientInput = {
@@ -1701,6 +1793,8 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUpsertWithoutAsDoctorInput = {
@@ -1742,6 +1836,8 @@ export type UserUpdateWithoutAsDoctorInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsDoctorInput = {
@@ -1772,6 +1868,8 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutWalletInput = {
@@ -1802,6 +1900,8 @@ export type UserCreateWithoutWalletInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutWalletInput = {
@@ -1832,6 +1932,8 @@ export type UserUncheckedCreateWithoutWalletInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutWalletInput = {
@@ -1878,6 +1980,8 @@ export type UserUpdateWithoutWalletInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletInput = {
@@ -1908,6 +2012,8 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutWalletTransactionsAdjustedInput = {
@@ -1938,6 +2044,8 @@ export type UserCreateWithoutWalletTransactionsAdjustedInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
@@ -1968,6 +2076,8 @@ export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutWalletTransactionsAdjustedInput = {
@@ -2014,6 +2124,8 @@ export type UserUpdateWithoutWalletTransactionsAdjustedInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
@@ -2044,6 +2156,8 @@ export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutSettlementsInput = {
@@ -2074,6 +2188,8 @@ export type UserCreateWithoutSettlementsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsInput = {
@@ -2104,6 +2220,8 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsInput = {
@@ -2139,6 +2257,8 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
@@ -2169,6 +2289,8 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsAdminedInput = {
@@ -2215,6 +2337,8 @@ export type UserUpdateWithoutSettlementsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsInput = {
@@ -2245,6 +2369,8 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUpsertWithoutSettlementsAdminedInput = {
@@ -2286,6 +2412,8 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
@@ -2316,6 +2444,8 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutPaymentLogsInput = {
@@ -2346,6 +2476,8 @@ export type UserCreateWithoutPaymentLogsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutPaymentLogsInput = {
@@ -2376,6 +2508,8 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutPaymentLogsInput = {
@@ -2422,6 +2556,8 @@ export type UserUpdateWithoutPaymentLogsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentLogsInput = {
@@ -2452,6 +2588,8 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -2482,6 +2620,8 @@ export type UserCreateWithoutMessagesSentInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -2512,6 +2652,8 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -2558,6 +2700,8 @@ export type UserUpdateWithoutMessagesSentInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -2588,6 +2732,8 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutReviewsGivenInput = {
@@ -2618,6 +2764,8 @@ export type UserCreateWithoutReviewsGivenInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsGivenInput = {
@@ -2648,6 +2796,8 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsGivenInput = {
@@ -2683,6 +2833,8 @@ export type UserCreateWithoutReviewsReceivedInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsReceivedInput = {
@@ -2713,6 +2865,8 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsReceivedInput = {
@@ -2759,6 +2913,8 @@ export type UserUpdateWithoutReviewsGivenInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsGivenInput = {
@@ -2789,6 +2945,8 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUpsertWithoutReviewsReceivedInput = {
@@ -2830,6 +2988,8 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
@@ -2860,6 +3020,8 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutComplaintsInput = {
@@ -2890,6 +3052,8 @@ export type UserCreateWithoutComplaintsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsInput = {
@@ -2920,6 +3084,8 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsInput = {
@@ -2966,6 +3132,8 @@ export type UserUpdateWithoutComplaintsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsInput = {
@@ -2996,6 +3164,8 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutClinicsInput = {
@@ -3026,6 +3196,8 @@ export type UserCreateWithoutClinicsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutClinicsInput = {
@@ -3056,6 +3228,8 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutClinicsInput = {
@@ -3102,6 +3276,8 @@ export type UserUpdateWithoutClinicsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClinicsInput = {
@@ -3132,6 +3308,8 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutAnnouncementsCreatedInput = {
@@ -3162,6 +3340,8 @@ export type UserCreateWithoutAnnouncementsCreatedInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
@@ -3192,6 +3372,8 @@ export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementsCreatedInput = {
@@ -3238,6 +3420,8 @@ export type UserUpdateWithoutAnnouncementsCreatedInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
@@ -3268,6 +3452,8 @@ export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutAnnouncementRecipientsInput = {
@@ -3298,6 +3484,8 @@ export type UserCreateWithoutAnnouncementRecipientsInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
@@ -3328,6 +3516,8 @@ export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
   announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementRecipientsInput = {
@@ -3374,6 +3564,8 @@ export type UserUpdateWithoutAnnouncementRecipientsInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
@@ -3404,6 +3596,296 @@ export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
   announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+}
+
+export type UserCreateWithoutImpersonationsStartedInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+}
+
+export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+}
+
+export type UserCreateOrConnectWithoutImpersonationsStartedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutImpersonationsStartedInput, Prisma.UserUncheckedCreateWithoutImpersonationsStartedInput>
+}
+
+export type UserCreateWithoutImpersonationsReceivedInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+}
+
+export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+}
+
+export type UserCreateOrConnectWithoutImpersonationsReceivedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutImpersonationsReceivedInput, Prisma.UserUncheckedCreateWithoutImpersonationsReceivedInput>
+}
+
+export type UserUpsertWithoutImpersonationsStartedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutImpersonationsStartedInput, Prisma.UserUncheckedUpdateWithoutImpersonationsStartedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutImpersonationsStartedInput, Prisma.UserUncheckedCreateWithoutImpersonationsStartedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutImpersonationsStartedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutImpersonationsStartedInput, Prisma.UserUncheckedUpdateWithoutImpersonationsStartedInput>
+}
+
+export type UserUpdateWithoutImpersonationsStartedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+}
+
+export type UserUpsertWithoutImpersonationsReceivedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutImpersonationsReceivedInput, Prisma.UserUncheckedUpdateWithoutImpersonationsReceivedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutImpersonationsReceivedInput, Prisma.UserUncheckedCreateWithoutImpersonationsReceivedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutImpersonationsReceivedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutImpersonationsReceivedInput, Prisma.UserUncheckedUpdateWithoutImpersonationsReceivedInput>
+}
+
+export type UserUpdateWithoutImpersonationsReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+}
+
+export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 
@@ -3428,6 +3910,8 @@ export type UserCountOutputType = {
   walletTransactionsAdjusted: number
   announcementsCreated: number
   announcementRecipients: number
+  impersonationsStarted: number
+  impersonationsReceived: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3447,6 +3931,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   walletTransactionsAdjusted?: boolean | UserCountOutputTypeCountWalletTransactionsAdjustedArgs
   announcementsCreated?: boolean | UserCountOutputTypeCountAnnouncementsCreatedArgs
   announcementRecipients?: boolean | UserCountOutputTypeCountAnnouncementRecipientsArgs
+  impersonationsStarted?: boolean | UserCountOutputTypeCountImpersonationsStartedArgs
+  impersonationsReceived?: boolean | UserCountOutputTypeCountImpersonationsReceivedArgs
 }
 
 /**
@@ -3571,6 +4057,20 @@ export type UserCountOutputTypeCountAnnouncementRecipientsArgs<ExtArgs extends r
   where?: Prisma.AnnouncementRecipientWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountImpersonationsStartedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ImpersonationLogWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountImpersonationsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ImpersonationLogWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3601,6 +4101,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   walletTransactionsAdjusted?: boolean | Prisma.User$walletTransactionsAdjustedArgs<ExtArgs>
   announcementsCreated?: boolean | Prisma.User$announcementsCreatedArgs<ExtArgs>
   announcementRecipients?: boolean | Prisma.User$announcementRecipientsArgs<ExtArgs>
+  impersonationsStarted?: boolean | Prisma.User$impersonationsStartedArgs<ExtArgs>
+  impersonationsReceived?: boolean | Prisma.User$impersonationsReceivedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3661,6 +4163,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   walletTransactionsAdjusted?: boolean | Prisma.User$walletTransactionsAdjustedArgs<ExtArgs>
   announcementsCreated?: boolean | Prisma.User$announcementsCreatedArgs<ExtArgs>
   announcementRecipients?: boolean | Prisma.User$announcementRecipientsArgs<ExtArgs>
+  impersonationsStarted?: boolean | Prisma.User$impersonationsStartedArgs<ExtArgs>
+  impersonationsReceived?: boolean | Prisma.User$impersonationsReceivedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3688,6 +4192,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     walletTransactionsAdjusted: Prisma.$WalletTransactionPayload<ExtArgs>[]
     announcementsCreated: Prisma.$AnnouncementPayload<ExtArgs>[]
     announcementRecipients: Prisma.$AnnouncementRecipientPayload<ExtArgs>[]
+    impersonationsStarted: Prisma.$ImpersonationLogPayload<ExtArgs>[]
+    impersonationsReceived: Prisma.$ImpersonationLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -4112,6 +4618,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   walletTransactionsAdjusted<T extends Prisma.User$walletTransactionsAdjustedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$walletTransactionsAdjustedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WalletTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   announcementsCreated<T extends Prisma.User$announcementsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$announcementsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   announcementRecipients<T extends Prisma.User$announcementRecipientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$announcementRecipientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementRecipientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  impersonationsStarted<T extends Prisma.User$impersonationsStartedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$impersonationsStartedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ImpersonationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  impersonationsReceived<T extends Prisma.User$impersonationsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$impersonationsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ImpersonationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4981,6 +5489,54 @@ export type User$announcementRecipientsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.AnnouncementRecipientScalarFieldEnum | Prisma.AnnouncementRecipientScalarFieldEnum[]
+}
+
+/**
+ * User.impersonationsStarted
+ */
+export type User$impersonationsStartedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ImpersonationLog
+   */
+  select?: Prisma.ImpersonationLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ImpersonationLog
+   */
+  omit?: Prisma.ImpersonationLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpersonationLogInclude<ExtArgs> | null
+  where?: Prisma.ImpersonationLogWhereInput
+  orderBy?: Prisma.ImpersonationLogOrderByWithRelationInput | Prisma.ImpersonationLogOrderByWithRelationInput[]
+  cursor?: Prisma.ImpersonationLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ImpersonationLogScalarFieldEnum | Prisma.ImpersonationLogScalarFieldEnum[]
+}
+
+/**
+ * User.impersonationsReceived
+ */
+export type User$impersonationsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ImpersonationLog
+   */
+  select?: Prisma.ImpersonationLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ImpersonationLog
+   */
+  omit?: Prisma.ImpersonationLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpersonationLogInclude<ExtArgs> | null
+  where?: Prisma.ImpersonationLogWhereInput
+  orderBy?: Prisma.ImpersonationLogOrderByWithRelationInput | Prisma.ImpersonationLogOrderByWithRelationInput[]
+  cursor?: Prisma.ImpersonationLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ImpersonationLogScalarFieldEnum | Prisma.ImpersonationLogScalarFieldEnum[]
 }
 
 /**

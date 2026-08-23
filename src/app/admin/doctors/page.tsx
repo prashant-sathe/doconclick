@@ -4,7 +4,7 @@ import {
   CheckCircle, XCircle, PauseCircle, Search, RefreshCw, Stethoscope,
   Eye, X, Phone, Mail, Award, Hash, Briefcase, DollarSign,
   Clock, MapPin, CreditCard, CalendarCheck, TrendingUp, AlertCircle,
-  CheckCircle2, User, BadgeCheck, Languages, FileText, Trash2,
+  CheckCircle2, User, BadgeCheck, Languages, FileText, Trash2, LogIn,
 } from "lucide-react";
 import { cn, formatDoctorName } from "@/lib/utils";
 
@@ -74,13 +74,14 @@ const FILTERS = ["ALL", "PENDING", "APPROVED", "REJECTED", "SUSPENDED"];
 
 // ── Row in table ───────────────────────────────────────────────
 function DoctorRow({
-  d, updating, onStatus, onView, onDelete,
+  d, updating, onStatus, onView, onDelete, onImpersonate,
 }: {
   d: Doctor;
   updating: string | null;
   onStatus: (id: string, status: string) => void;
   onView: (d: Doctor) => void;
   onDelete: (d: Doctor) => void;
+  onImpersonate: (d: Doctor) => void;
 }) {
   return (
     <tr>
@@ -125,6 +126,12 @@ function DoctorRow({
             className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
           >
             <Eye className="w-4 h-4" />
+          </button>
+          {/* Log in as */}
+          <button onClick={() => onImpersonate(d)} disabled={updating === d.id}
+            title="Log in as this doctor"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-indigo-500 hover:bg-indigo-50 transition-colors disabled:opacity-40">
+            <LogIn className="w-4 h-4" />
           </button>
           {/* Approve */}
           {d.doctorProfile?.status !== "APPROVED" && (
@@ -463,6 +470,7 @@ export default function AdminDoctors() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [viewId, setViewId]     = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Doctor | null>(null);
+  const [impersonateError, setImpersonateError] = useState("");
 
   const load = useCallback(() => {
     setLoading(true);
@@ -493,6 +501,19 @@ export default function AdminDoctors() {
     setUpdating(null);
   };
 
+  const impersonate = async (doctor: Doctor) => {
+    setImpersonateError("");
+    setUpdating(doctor.id);
+    const res = await fetch(`/api/admin/impersonate/${doctor.id}`, { method: "POST" });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setImpersonateError(body.error ?? "Could not log in as this doctor.");
+      setUpdating(null);
+      return;
+    }
+    window.location.href = "/doctor/dashboard";
+  };
+
   const filtered = doctors
     .filter((d) => filter === "ALL" || d.doctorProfile?.status === filter)
     .filter((d) =>
@@ -518,6 +539,12 @@ export default function AdminDoctors() {
           <RefreshCw className="w-4 h-4" /> Refresh
         </button>
       </div>
+
+      {impersonateError && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+          {impersonateError}
+        </div>
+      )}
 
       {/* Filters + Search */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6 flex flex-wrap items-center gap-4">
@@ -581,7 +608,8 @@ export default function AdminDoctors() {
                   <DoctorRow key={d.id} d={d} updating={updating}
                     onStatus={updateStatus}
                     onView={(doc) => setViewId(doc.id)}
-                    onDelete={(doc) => setDeleteTarget(doc)} />
+                    onDelete={(doc) => setDeleteTarget(doc)}
+                    onImpersonate={impersonate} />
                 ))}
               </tbody>
             </table>

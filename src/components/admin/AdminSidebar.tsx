@@ -28,7 +28,10 @@ export default function AdminSidebar() {
   const { user, logout } = useAuth();
 
   return (
-    <aside className="h-screen w-64 fixed left-0 top-0 flex flex-col border-r border-slate-200/70 bg-slate-50/80 backdrop-blur-xl z-40">
+    <aside
+      className="w-64 fixed left-0 flex flex-col border-r border-slate-200/70 bg-slate-50/80 backdrop-blur-xl z-40"
+      style={{ top: "var(--imp-banner-h, 0px)", height: "calc(100vh - var(--imp-banner-h, 0px))" }}
+    >
       {/* Logo */}
       <div className="px-6 py-5 border-b border-slate-200/70">
         <div className="flex items-center gap-2.5">
