@@ -10,6 +10,11 @@ export interface PrescriptionMedicineData {
   instructions: string | null;
 }
 
+export interface PrescriptionTestData {
+  name: string;
+  instructions: string | null;
+}
+
 export interface PrescriptionData {
   id: string;
   scheduledAt: string;
@@ -26,6 +31,7 @@ export interface PrescriptionData {
   doctorNotes: string | null;
   doctorSignatureUrl: string | null;
   medicines: PrescriptionMedicineData[];
+  tests: PrescriptionTestData[];
 }
 
 // A4 @ 96dpi
@@ -191,6 +197,21 @@ export default function PrescriptionDocument({
             </div>
           ))}
         </div>
+
+        {/* Recommended Tests */}
+        {data.tests.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: TEAL, marginBottom: 10 }}>Recommended Tests</div>
+            {data.tests.map((t, i) => (
+              <div key={i} style={{ borderBottom: i < data.tests.length - 1 ? `1px dashed ${BORDER}` : "none", padding: "8px 0" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: INK }}>
+                  {i + 1}. {t.name}
+                </div>
+                {t.instructions && <div style={{ fontSize: 11, color: MUTED, marginTop: 2, fontStyle: "italic" }}>{t.instructions}</div>}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Notes/Advice */}
         {data.doctorNotes && (

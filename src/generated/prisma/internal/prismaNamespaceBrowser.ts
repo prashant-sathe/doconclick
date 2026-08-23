@@ -62,6 +62,7 @@ export const ModelName = {
   DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
   PrescriptionMedicine: 'PrescriptionMedicine',
+  PrescriptionTest: 'PrescriptionTest',
   PrescriptionAttachment: 'PrescriptionAttachment',
   Review: 'Review',
   Complaint: 'Complaint',
@@ -301,6 +302,16 @@ export const PrescriptionMedicineScalarFieldEnum = {
 } as const
 
 export type PrescriptionMedicineScalarFieldEnum = (typeof PrescriptionMedicineScalarFieldEnum)[keyof typeof PrescriptionMedicineScalarFieldEnum]
+
+
+export const PrescriptionTestScalarFieldEnum = {
+  id: 'id',
+  appointmentId: 'appointmentId',
+  name: 'name',
+  instructions: 'instructions'
+} as const
+
+export type PrescriptionTestScalarFieldEnum = (typeof PrescriptionTestScalarFieldEnum)[keyof typeof PrescriptionTestScalarFieldEnum]
 
 
 export const PrescriptionAttachmentScalarFieldEnum = {

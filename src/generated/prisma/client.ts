@@ -97,6 +97,11 @@ export type Message = Prisma.MessageModel
  */
 export type PrescriptionMedicine = Prisma.PrescriptionMedicineModel
 /**
+ * Model PrescriptionTest
+ * 
+ */
+export type PrescriptionTest = Prisma.PrescriptionTestModel
+/**
  * Model PrescriptionAttachment
  * 
  */

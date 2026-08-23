@@ -28,6 +28,7 @@ export async function GET(
       patient: { select: { name: true, patientProfile: { select: { age: true, gender: true } } } },
       doctor: { select: { name: true, doctorProfile: { select: { qualification: true, medRegNo: true, specialty: true, clinicName: true, signatureUrl: true } } } },
       medicines: true,
+      tests: true,
     },
   });
 
@@ -62,6 +63,10 @@ export async function GET(
       frequency: m.frequency,
       duration: m.duration,
       instructions: m.instructions,
+    })),
+    tests: appointment.tests.map((t) => ({
+      name: t.name,
+      instructions: t.instructions,
     })),
   });
 }

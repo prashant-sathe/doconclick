@@ -27,6 +27,7 @@ export async function GET(
         },
       },
       medicines: true,
+      tests: true,
       attachments: { orderBy: { createdAt: "asc" } },
     },
   });

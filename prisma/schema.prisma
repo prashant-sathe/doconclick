@@ -188,6 +188,7 @@ model Appointment {
   createdAt     DateTime  @default(now())
   review        Review?
   medicines     PrescriptionMedicine[]
+  tests         PrescriptionTest[]
   attachments   PrescriptionAttachment[]
   messages      Message[]
 }
@@ -237,6 +238,14 @@ model PrescriptionMedicine {
   dosage        String
   frequency     String
   duration      String
+  instructions  String?
+}
+
+model PrescriptionTest {
+  id            String      @id @default(cuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  name          String
   instructions  String?
 }
 

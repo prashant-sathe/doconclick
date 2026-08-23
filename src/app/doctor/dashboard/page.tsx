@@ -14,7 +14,7 @@ import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { playMessageChime } from "@/lib/playNotificationSound";
-import { FREQUENCY_OPTIONS, DURATION_OPTIONS } from "@/lib/medicalOptions";
+import { FREQUENCY_OPTIONS, DURATION_OPTIONS, TEST_SUGGESTIONS } from "@/lib/medicalOptions";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { formatDoctorName } from "@/lib/utils";
 
@@ -68,6 +68,11 @@ interface MedicineRow {
   instructions: string;
 }
 
+interface TestRow {
+  name: string;
+  instructions: string;
+}
+
 const TYPE_ICON: Record<string, React.ElementType> = { HOME: Home, CLINIC: Building2, VIDEO: Video };
 
 function patientLabel(a: Appointment): string {
@@ -84,17 +89,67 @@ function historyHref(a: Appointment): string {
   return a.dependentId ? `/doctor/patients/${a.patientId}?dependentId=${a.dependentId}` : `/doctor/patients/${a.patientId}`;
 }
 const EMPTY_ROW: MedicineRow = { name: "", dosage: "", frequency: "", frequencyOther: "", duration: "", durationOther: "", instructions: "" };
+const EMPTY_TEST_ROW: TestRow = { name: "", instructions: "" };
+
+// Prescriptions are drafted incrementally, so we snapshot the in-progress
+// medicines/notes/confirmation to localStorage keyed by appointment id — this
+// lets a doctor navigate away (or collapse the form) and come back without
+// losing what they'd already typed.
+function draftKeyFor(appointmentId: string) {
+  return `prescriptionDraft:${appointmentId}`;
+}
+function loadDraft(appointmentId: string): { medicines?: MedicineRow[]; tests?: TestRow[]; notes?: string; confirmed?: boolean } {
+  try {
+    const raw = localStorage.getItem(draftKeyFor(appointmentId));
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
 
 function CompleteVisitForm({ appt, onDone, onCancel }: {
   appt: Appointment;
   onDone: () => void;
   onCancel: () => void;
 }) {
-  const [notes, setNotes] = useState("");
+  const draftKey = draftKeyFor(appt.id);
+  const [notes, setNotes] = useState(() => {
+    const draft = loadDraft(appt.id).notes;
+    return typeof draft === "string" ? draft : "";
+  });
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState("");
-  const [medicines, setMedicines] = useState<MedicineRow[]>([{ ...EMPTY_ROW }]);
+  const [medicines, setMedicines] = useState<MedicineRow[]>(() => {
+    const draft = loadDraft(appt.id).medicines;
+    return Array.isArray(draft) && draft.length > 0 ? draft : [{ ...EMPTY_ROW }];
+  });
+  const [tests, setTests] = useState<TestRow[]>(() => {
+    const draft = loadDraft(appt.id).tests;
+    return Array.isArray(draft) && draft.length > 0 ? draft : [{ ...EMPTY_TEST_ROW }];
+  });
+  const [confirmed, setConfirmed] = useState(() => loadDraft(appt.id).confirmed === true);
   const [busy, setBusy] = useState(false);
+  const [confirmingComplete, setConfirmingComplete] = useState(false);
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
+
+  const hasMedicines = medicines.some((m) => m.name.trim());
+  const hasTests = tests.some((t) => t.name.trim());
+  const hasPrescriptionItems = hasMedicines || hasTests;
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(draftKey, JSON.stringify({ medicines, tests, notes, confirmed }));
+    } catch {
+      // ignore unavailable storage
+    }
+  }, [draftKey, medicines, tests, notes, confirmed]);
+  const clearDraft = () => {
+    try {
+      localStorage.removeItem(draftKey);
+    } catch {
+      // ignore unavailable storage
+    }
+  };
 
   const addFiles = (picked: FileList | null) => {
     if (!picked) return;
@@ -114,14 +169,18 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   const addRow = () => setMedicines((rows) => [...rows, { ...EMPTY_ROW }]);
   const removeRow = (i: number) => setMedicines((rows) => rows.filter((_, idx) => idx !== i));
 
+  const setTest = (i: number, k: keyof TestRow, v: string) => {
+    setTests((rows) => rows.map((r, idx) => (idx === i ? { ...r, [k]: v } : r)));
+  };
+  const addTestRow = () => setTests((rows) => [...rows, { ...EMPTY_TEST_ROW }]);
+  const removeTestRow = (i: number) => setTests((rows) => rows.filter((_, idx) => idx !== i));
+
   const submit = async () => {
+    if (!hasPrescriptionItems || !confirmed) return;
+    setConfirmingComplete(false);
     setBusy(true);
     setFileError("");
-    await fetch(`/api/appointments/${appt.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "COMPLETED", doctorNotes: notes }),
-    });
+
     const validMedicines = medicines
       .filter((m) => m.name.trim())
       .map((m) => ({
@@ -131,11 +190,14 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         duration: m.duration === "Other" ? m.durationOther.trim() : m.duration,
         instructions: m.instructions,
       }));
-    if (validMedicines.length > 0) {
+    const validTests = tests
+      .filter((t) => t.name.trim())
+      .map((t) => ({ name: t.name, instructions: t.instructions }));
+    if (validMedicines.length > 0 || validTests.length > 0) {
       await fetch(`/api/appointments/${appt.id}/prescription-items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ medicines: validMedicines }),
+        body: JSON.stringify({ medicines: validMedicines, tests: validTests }),
       });
     }
     if (files.length > 0) {
@@ -148,7 +210,14 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         return;
       }
     }
+    // Prescription is saved first; only then is the appointment closed.
+    await fetch(`/api/appointments/${appt.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "COMPLETED", doctorNotes: notes }),
+    });
     setBusy(false);
+    clearDraft();
     onDone();
   };
 
@@ -204,6 +273,51 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       </div>
 
       <div>
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Recommended Tests</p>
+        <datalist id="test-suggestions">
+          {TEST_SUGGESTIONS.map((o) => <option key={o} value={o} />)}
+        </datalist>
+        <div className="space-y-2">
+          {tests.map((t, i) => (
+            <div key={i} className="bg-white rounded-lg border border-slate-200 p-2.5 grid grid-cols-1 sm:grid-cols-3 gap-1.5 items-center">
+              <input
+                className="input-field text-xs py-1.5 sm:col-span-1"
+                placeholder="Test name (e.g. CBC, X-Ray Chest)"
+                list="test-suggestions"
+                value={t.name}
+                onChange={(e) => setTest(i, "name", e.target.value)}
+              />
+              <div className="flex gap-1.5 sm:col-span-2">
+                <input className="input-field text-xs py-1.5 flex-1" placeholder="Instructions (e.g. fasting required, optional)" value={t.instructions} onChange={(e) => setTest(i, "instructions", e.target.value)} />
+                {tests.length > 1 && (
+                  <button type="button" onClick={() => removeTestRow(i)} className="text-red-400 hover:text-red-600 flex-shrink-0">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        <button type="button" onClick={addTestRow} className="mt-2 text-xs text-teal-600 font-semibold flex items-center gap-1 hover:underline">
+          <Plus className="w-3.5 h-3.5" /> Add test
+        </button>
+      </div>
+
+      {hasPrescriptionItems && (
+        <label className="flex items-start gap-2.5 rounded-xl border border-teal-200 bg-white px-3 py-2.5 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={confirmed}
+            onChange={(e) => setConfirmed(e.target.checked)}
+            className="w-4 h-4 mt-0.5 accent-teal-600 flex-shrink-0"
+          />
+          <span className="text-xs text-slate-700">
+            I confirm that the medicines and tests listed above are exactly what I am prescribing and recommending to this patient, and I take responsibility for their accuracy.
+          </span>
+        </label>
+      )}
+
+      <div>
         <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer">
           <Paperclip className="w-3.5 h-3.5" />
           Attach reports/scans (PDF/JPG/PNG, optional, multiple allowed)
@@ -225,11 +339,67 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         {fileError && <p className="text-xs text-red-500 mt-1">{fileError}</p>}
       </div>
       <div className="flex gap-2">
-        <button onClick={onCancel} className="btn-secondary py-1.5 px-3 text-xs flex-1 justify-center">Cancel</button>
-        <button onClick={submit} disabled={busy} className="btn-primary py-1.5 px-3 text-xs flex-1 justify-center">
+        <button onClick={() => setConfirmingCancel(true)} className="btn-secondary py-1.5 px-3 text-xs flex-1 justify-center">Cancel</button>
+        <button
+          onClick={() => setConfirmingComplete(true)}
+          disabled={busy || !hasPrescriptionItems || !confirmed}
+          title={!hasPrescriptionItems ? "Please add at least one medicine or test before completing" : !confirmed ? "Please confirm the medicines and tests above first" : undefined}
+          className="btn-primary py-1.5 px-3 text-xs flex-1 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Mark Complete"}
         </button>
       </div>
+
+      {confirmingCancel && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-3">
+              <XCircle className="w-5 h-5 text-red-600" />
+              <h3 className="font-bold text-slate-800">Discard this prescription?</h3>
+            </div>
+            <p className="text-sm text-slate-500 mb-5">
+              Any medicines, tests, and notes you&apos;ve entered here will be lost.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmingCancel(false)} className="btn-secondary flex-1">
+                Keep Editing
+              </button>
+              <button
+                onClick={() => { clearDraft(); onCancel(); }}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmingComplete && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-3">
+              <CheckCircle2 className="w-5 h-5 text-teal-600" />
+              <h3 className="font-bold text-slate-800">Complete this visit?</h3>
+            </div>
+            <p className="text-sm text-slate-500 mb-5">
+              This saves the prescription and closes the appointment. {patientLabel(appt)} will be able to view it right away — this cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmingComplete(false)} className="btn-secondary flex-1">
+                Go Back
+              </button>
+              <button
+                onClick={submit}
+                disabled={busy}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Mark Complete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -637,11 +807,8 @@ export default function DoctorDashboard() {
                         </Link>
                         {a.consultType === "VIDEO" && a.paymentStatus === "PAID" && (
                           videoUnlockRemainingSec(a, now) > 0 ? (
-                            <span
-                              className="btn-secondary py-1.5 px-3 text-xs opacity-60 cursor-not-allowed"
-                              title={`Video call unlocking in ${videoUnlockRemainingSec(a, now)}s`}
-                            >
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <span className="btn-secondary py-1.5 px-3 text-xs opacity-60 cursor-not-allowed">
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Unlocking in {videoUnlockRemainingSec(a, now)}s
                             </span>
                           ) : (
                             <Link href={`/doctor/video/${a.id}`} className="btn-secondary py-1.5 px-3 text-xs" title="Join video call">

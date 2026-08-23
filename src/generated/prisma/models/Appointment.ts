@@ -437,6 +437,7 @@ export type AppointmentWhereInput = {
   clinic?: Prisma.XOR<Prisma.ClinicNullableScalarRelationFilter, Prisma.ClinicWhereInput> | null
   review?: Prisma.XOR<Prisma.ReviewNullableScalarRelationFilter, Prisma.ReviewWhereInput> | null
   medicines?: Prisma.PrescriptionMedicineListRelationFilter
+  tests?: Prisma.PrescriptionTestListRelationFilter
   attachments?: Prisma.PrescriptionAttachmentListRelationFilter
   messages?: Prisma.MessageListRelationFilter
 }
@@ -481,6 +482,7 @@ export type AppointmentOrderByWithRelationInput = {
   clinic?: Prisma.ClinicOrderByWithRelationInput
   review?: Prisma.ReviewOrderByWithRelationInput
   medicines?: Prisma.PrescriptionMedicineOrderByRelationAggregateInput
+  tests?: Prisma.PrescriptionTestOrderByRelationAggregateInput
   attachments?: Prisma.PrescriptionAttachmentOrderByRelationAggregateInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
 }
@@ -528,6 +530,7 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   clinic?: Prisma.XOR<Prisma.ClinicNullableScalarRelationFilter, Prisma.ClinicWhereInput> | null
   review?: Prisma.XOR<Prisma.ReviewNullableScalarRelationFilter, Prisma.ReviewWhereInput> | null
   medicines?: Prisma.PrescriptionMedicineListRelationFilter
+  tests?: Prisma.PrescriptionTestListRelationFilter
   attachments?: Prisma.PrescriptionAttachmentListRelationFilter
   messages?: Prisma.MessageListRelationFilter
 }, "id">
@@ -640,6 +643,7 @@ export type AppointmentCreateInput = {
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
@@ -678,6 +682,7 @@ export type AppointmentUncheckedCreateInput = {
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
@@ -716,6 +721,7 @@ export type AppointmentUpdateInput = {
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
@@ -754,6 +760,7 @@ export type AppointmentUncheckedUpdateInput = {
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
@@ -1238,6 +1245,20 @@ export type AppointmentUpdateOneRequiredWithoutMedicinesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AppointmentUpdateToOneWithWhereWithoutMedicinesInput, Prisma.AppointmentUpdateWithoutMedicinesInput>, Prisma.AppointmentUncheckedUpdateWithoutMedicinesInput>
 }
 
+export type AppointmentCreateNestedOneWithoutTestsInput = {
+  create?: Prisma.XOR<Prisma.AppointmentCreateWithoutTestsInput, Prisma.AppointmentUncheckedCreateWithoutTestsInput>
+  connectOrCreate?: Prisma.AppointmentCreateOrConnectWithoutTestsInput
+  connect?: Prisma.AppointmentWhereUniqueInput
+}
+
+export type AppointmentUpdateOneRequiredWithoutTestsNestedInput = {
+  create?: Prisma.XOR<Prisma.AppointmentCreateWithoutTestsInput, Prisma.AppointmentUncheckedCreateWithoutTestsInput>
+  connectOrCreate?: Prisma.AppointmentCreateOrConnectWithoutTestsInput
+  upsert?: Prisma.AppointmentUpsertWithoutTestsInput
+  connect?: Prisma.AppointmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AppointmentUpdateToOneWithWhereWithoutTestsInput, Prisma.AppointmentUpdateWithoutTestsInput>, Prisma.AppointmentUncheckedUpdateWithoutTestsInput>
+}
+
 export type AppointmentCreateNestedOneWithoutAttachmentsInput = {
   create?: Prisma.XOR<Prisma.AppointmentCreateWithoutAttachmentsInput, Prisma.AppointmentUncheckedCreateWithoutAttachmentsInput>
   connectOrCreate?: Prisma.AppointmentCreateOrConnectWithoutAttachmentsInput
@@ -1341,6 +1362,7 @@ export type AppointmentCreateWithoutPatientInput = {
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
@@ -1378,6 +1400,7 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
@@ -1425,6 +1448,7 @@ export type AppointmentCreateWithoutDoctorInput = {
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
@@ -1462,6 +1486,7 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
@@ -1577,6 +1602,7 @@ export type AppointmentCreateWithoutDependentInput = {
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
@@ -1614,6 +1640,7 @@ export type AppointmentUncheckedCreateWithoutDependentInput = {
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
@@ -1677,6 +1704,7 @@ export type AppointmentCreateWithoutFollowUpsInput = {
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
@@ -1714,6 +1742,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   createdAt?: Date | string
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
@@ -1756,6 +1785,7 @@ export type AppointmentCreateWithoutFollowUpOfInput = {
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
@@ -1793,6 +1823,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
@@ -1851,6 +1882,7 @@ export type AppointmentUpdateWithoutFollowUpsInput = {
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
@@ -1888,6 +1920,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
@@ -1941,6 +1974,7 @@ export type AppointmentCreateWithoutSettlementInput = {
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
@@ -1978,6 +2012,7 @@ export type AppointmentUncheckedCreateWithoutSettlementInput = {
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
@@ -2042,6 +2077,7 @@ export type AppointmentCreateWithoutMessagesInput = {
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
 }
 
@@ -2079,6 +2115,7 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
@@ -2132,6 +2169,7 @@ export type AppointmentUpdateWithoutMessagesInput = {
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
 }
 
@@ -2169,6 +2207,7 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
@@ -2205,6 +2244,7 @@ export type AppointmentCreateWithoutMedicinesInput = {
   followUps?: Prisma.AppointmentCreateNestedManyWithoutFollowUpOfInput
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
@@ -2242,6 +2282,7 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   createdAt?: Date | string
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
@@ -2295,6 +2336,7 @@ export type AppointmentUpdateWithoutMedicinesInput = {
   followUps?: Prisma.AppointmentUpdateManyWithoutFollowUpOfNestedInput
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
@@ -2332,6 +2374,175 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
+  attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
+}
+
+export type AppointmentCreateWithoutTestsInput = {
+  id?: string
+  symptoms: string
+  patientName?: string | null
+  relation?: string
+  allergies?: string | null
+  consentGiven?: boolean
+  consultType?: string
+  status?: string
+  paymentMethod?: string
+  paymentStatus?: string
+  paidAt?: Date | string | null
+  isEmergency?: boolean
+  amount?: number
+  platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
+  prescriptionUrl?: string | null
+  doctorNotes?: string | null
+  travelStatus?: string
+  doctorLat?: number | null
+  doctorLng?: number | null
+  doctorLocationUpdatedAt?: Date | string | null
+  scheduledAt?: Date | string
+  createdAt?: Date | string
+  patient: Prisma.UserCreateNestedOneWithoutAsPatientInput
+  doctor: Prisma.UserCreateNestedOneWithoutAsDoctorInput
+  dependent?: Prisma.PatientDependentCreateNestedOneWithoutAppointmentsInput
+  settlement?: Prisma.SettlementCreateNestedOneWithoutAppointmentsInput
+  followUpOf?: Prisma.AppointmentCreateNestedOneWithoutFollowUpsInput
+  followUps?: Prisma.AppointmentCreateNestedManyWithoutFollowUpOfInput
+  clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
+  review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
+  medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
+  messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
+}
+
+export type AppointmentUncheckedCreateWithoutTestsInput = {
+  id?: string
+  patientId: string
+  doctorId: string
+  symptoms: string
+  patientName?: string | null
+  relation?: string
+  allergies?: string | null
+  dependentId?: string | null
+  consentGiven?: boolean
+  consultType?: string
+  status?: string
+  paymentMethod?: string
+  paymentStatus?: string
+  paidAt?: Date | string | null
+  isEmergency?: boolean
+  amount?: number
+  platformFee?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
+  settlementId?: string | null
+  prescriptionUrl?: string | null
+  doctorNotes?: string | null
+  travelStatus?: string
+  doctorLat?: number | null
+  doctorLng?: number | null
+  doctorLocationUpdatedAt?: Date | string | null
+  followUpOfId?: string | null
+  clinicId?: string | null
+  scheduledAt?: Date | string
+  createdAt?: Date | string
+  followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
+  review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
+  medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
+}
+
+export type AppointmentCreateOrConnectWithoutTestsInput = {
+  where: Prisma.AppointmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppointmentCreateWithoutTestsInput, Prisma.AppointmentUncheckedCreateWithoutTestsInput>
+}
+
+export type AppointmentUpsertWithoutTestsInput = {
+  update: Prisma.XOR<Prisma.AppointmentUpdateWithoutTestsInput, Prisma.AppointmentUncheckedUpdateWithoutTestsInput>
+  create: Prisma.XOR<Prisma.AppointmentCreateWithoutTestsInput, Prisma.AppointmentUncheckedCreateWithoutTestsInput>
+  where?: Prisma.AppointmentWhereInput
+}
+
+export type AppointmentUpdateToOneWithWhereWithoutTestsInput = {
+  where?: Prisma.AppointmentWhereInput
+  data: Prisma.XOR<Prisma.AppointmentUpdateWithoutTestsInput, Prisma.AppointmentUncheckedUpdateWithoutTestsInput>
+}
+
+export type AppointmentUpdateWithoutTestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  consultType?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patient?: Prisma.UserUpdateOneRequiredWithoutAsPatientNestedInput
+  doctor?: Prisma.UserUpdateOneRequiredWithoutAsDoctorNestedInput
+  dependent?: Prisma.PatientDependentUpdateOneWithoutAppointmentsNestedInput
+  settlement?: Prisma.SettlementUpdateOneWithoutAppointmentsNestedInput
+  followUpOf?: Prisma.AppointmentUpdateOneWithoutFollowUpsNestedInput
+  followUps?: Prisma.AppointmentUpdateManyWithoutFollowUpOfNestedInput
+  clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
+  review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
+  medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
+}
+
+export type AppointmentUncheckedUpdateWithoutTestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  patientId?: Prisma.StringFieldUpdateOperationsInput | string
+  doctorId?: Prisma.StringFieldUpdateOperationsInput | string
+  symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dependentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  consultType?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settlementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  followUpOfId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
+  review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
@@ -2370,6 +2581,7 @@ export type AppointmentCreateWithoutAttachmentsInput = {
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
 
@@ -2407,6 +2619,7 @@ export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
@@ -2460,6 +2673,7 @@ export type AppointmentUpdateWithoutAttachmentsInput = {
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
 
@@ -2497,6 +2711,7 @@ export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
@@ -2533,6 +2748,7 @@ export type AppointmentCreateWithoutReviewInput = {
   followUps?: Prisma.AppointmentCreateNestedManyWithoutFollowUpOfInput
   clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
@@ -2570,6 +2786,7 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   createdAt?: Date | string
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
@@ -2623,6 +2840,7 @@ export type AppointmentUpdateWithoutReviewInput = {
   followUps?: Prisma.AppointmentUpdateManyWithoutFollowUpOfNestedInput
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
@@ -2660,6 +2878,7 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
@@ -2697,6 +2916,7 @@ export type AppointmentCreateWithoutClinicInput = {
   followUps?: Prisma.AppointmentCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
 }
@@ -2734,6 +2954,7 @@ export type AppointmentUncheckedCreateWithoutClinicInput = {
   followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
   medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
 }
@@ -2861,6 +3082,7 @@ export type AppointmentUpdateWithoutPatientInput = {
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
@@ -2898,6 +3120,7 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
@@ -2967,6 +3190,7 @@ export type AppointmentUpdateWithoutDoctorInput = {
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
@@ -3004,6 +3228,7 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
@@ -3105,6 +3330,7 @@ export type AppointmentUpdateWithoutDependentInput = {
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
@@ -3142,6 +3368,7 @@ export type AppointmentUncheckedUpdateWithoutDependentInput = {
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
@@ -3243,6 +3470,7 @@ export type AppointmentUpdateWithoutFollowUpOfInput = {
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
@@ -3280,6 +3508,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
@@ -3381,6 +3610,7 @@ export type AppointmentUpdateWithoutSettlementInput = {
   clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
@@ -3418,6 +3648,7 @@ export type AppointmentUncheckedUpdateWithoutSettlementInput = {
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
@@ -3519,6 +3750,7 @@ export type AppointmentUpdateWithoutClinicInput = {
   followUps?: Prisma.AppointmentUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
 }
@@ -3556,6 +3788,7 @@ export type AppointmentUncheckedUpdateWithoutClinicInput = {
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
   medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
 }
@@ -3600,6 +3833,7 @@ export type AppointmentUncheckedUpdateManyWithoutClinicInput = {
 export type AppointmentCountOutputType = {
   followUps: number
   medicines: number
+  tests: number
   attachments: number
   messages: number
 }
@@ -3607,6 +3841,7 @@ export type AppointmentCountOutputType = {
 export type AppointmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   followUps?: boolean | AppointmentCountOutputTypeCountFollowUpsArgs
   medicines?: boolean | AppointmentCountOutputTypeCountMedicinesArgs
+  tests?: boolean | AppointmentCountOutputTypeCountTestsArgs
   attachments?: boolean | AppointmentCountOutputTypeCountAttachmentsArgs
   messages?: boolean | AppointmentCountOutputTypeCountMessagesArgs
 }
@@ -3633,6 +3868,13 @@ export type AppointmentCountOutputTypeCountFollowUpsArgs<ExtArgs extends runtime
  */
 export type AppointmentCountOutputTypeCountMedicinesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PrescriptionMedicineWhereInput
+}
+
+/**
+ * AppointmentCountOutputType without action
+ */
+export type AppointmentCountOutputTypeCountTestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PrescriptionTestWhereInput
 }
 
 /**
@@ -3690,6 +3932,7 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   clinic?: boolean | Prisma.Appointment$clinicArgs<ExtArgs>
   review?: boolean | Prisma.Appointment$reviewArgs<ExtArgs>
   medicines?: boolean | Prisma.Appointment$medicinesArgs<ExtArgs>
+  tests?: boolean | Prisma.Appointment$testsArgs<ExtArgs>
   attachments?: boolean | Prisma.Appointment$attachmentsArgs<ExtArgs>
   messages?: boolean | Prisma.Appointment$messagesArgs<ExtArgs>
   _count?: boolean | Prisma.AppointmentCountOutputTypeDefaultArgs<ExtArgs>
@@ -3817,6 +4060,7 @@ export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.Internal
   clinic?: boolean | Prisma.Appointment$clinicArgs<ExtArgs>
   review?: boolean | Prisma.Appointment$reviewArgs<ExtArgs>
   medicines?: boolean | Prisma.Appointment$medicinesArgs<ExtArgs>
+  tests?: boolean | Prisma.Appointment$testsArgs<ExtArgs>
   attachments?: boolean | Prisma.Appointment$attachmentsArgs<ExtArgs>
   messages?: boolean | Prisma.Appointment$messagesArgs<ExtArgs>
   _count?: boolean | Prisma.AppointmentCountOutputTypeDefaultArgs<ExtArgs>
@@ -3850,6 +4094,7 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     clinic: Prisma.$ClinicPayload<ExtArgs> | null
     review: Prisma.$ReviewPayload<ExtArgs> | null
     medicines: Prisma.$PrescriptionMedicinePayload<ExtArgs>[]
+    tests: Prisma.$PrescriptionTestPayload<ExtArgs>[]
     attachments: Prisma.$PrescriptionAttachmentPayload<ExtArgs>[]
     messages: Prisma.$MessagePayload<ExtArgs>[]
   }
@@ -4287,6 +4532,7 @@ export interface Prisma__AppointmentClient<T, Null = never, ExtArgs extends runt
   clinic<T extends Prisma.Appointment$clinicArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$clinicArgs<ExtArgs>>): Prisma.Prisma__ClinicClient<runtime.Types.Result.GetResult<Prisma.$ClinicPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   review<T extends Prisma.Appointment$reviewArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$reviewArgs<ExtArgs>>): Prisma.Prisma__ReviewClient<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   medicines<T extends Prisma.Appointment$medicinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$medicinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrescriptionMedicinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tests<T extends Prisma.Appointment$testsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$testsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrescriptionTestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attachments<T extends Prisma.Appointment$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrescriptionAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messages<T extends Prisma.Appointment$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -4889,6 +5135,30 @@ export type Appointment$medicinesArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.PrescriptionMedicineScalarFieldEnum | Prisma.PrescriptionMedicineScalarFieldEnum[]
+}
+
+/**
+ * Appointment.tests
+ */
+export type Appointment$testsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PrescriptionTest
+   */
+  select?: Prisma.PrescriptionTestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PrescriptionTest
+   */
+  omit?: Prisma.PrescriptionTestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PrescriptionTestInclude<ExtArgs> | null
+  where?: Prisma.PrescriptionTestWhereInput
+  orderBy?: Prisma.PrescriptionTestOrderByWithRelationInput | Prisma.PrescriptionTestOrderByWithRelationInput[]
+  cursor?: Prisma.PrescriptionTestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PrescriptionTestScalarFieldEnum | Prisma.PrescriptionTestScalarFieldEnum[]
 }
 
 /**

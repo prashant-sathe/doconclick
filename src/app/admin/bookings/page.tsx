@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Search, CalendarCheck, Eye, X, FileText, Pill, Phone, Download } from "lucide-react";
+import { Search, CalendarCheck, Eye, X, FileText, Pill, FlaskConical, Phone, Download } from "lucide-react";
 import { cn, formatDoctorName } from "@/lib/utils";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
 import type { PrescriptionData } from "@/components/patient/PrescriptionDocument";
@@ -28,6 +28,12 @@ interface Medicine {
   instructions: string | null;
 }
 
+interface Test {
+  id: string;
+  name: string;
+  instructions: string | null;
+}
+
 interface Attachment {
   id: string;
   url: string;
@@ -50,6 +56,7 @@ interface AppointmentDetail extends Appointment {
   doctorNotes: string | null;
   prescriptionUrl: string | null;
   medicines: Medicine[];
+  tests: Test[];
   attachments: Attachment[];
 }
 
@@ -90,6 +97,7 @@ function toPrescriptionData(a: AppointmentDetail): PrescriptionData {
     medicines: a.medicines.map((m) => ({
       name: m.name, dosage: m.dosage, frequency: m.frequency, duration: m.duration, instructions: m.instructions,
     })),
+    tests: a.tests.map((t) => ({ name: t.name, instructions: t.instructions })),
   };
 }
 
@@ -160,11 +168,11 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
 
               {/* Documents / Reports / Prescription */}
               <Section title="Documents & Prescription" icon={FileText}>
-                {!hasDocuments && data.medicines.length === 0 ? (
+                {!hasDocuments && data.medicines.length === 0 && data.tests.length === 0 ? (
                   <div className="px-4 py-6 text-sm text-slate-400 text-center">No documents uploaded for this booking</div>
                 ) : (
                   <div className="p-4 space-y-4">
-                    {data.medicines.length > 0 && (
+                    {(data.medicines.length > 0 || data.tests.length > 0) && (
                       <PrescriptionDownloadButton
                         appointmentId={data.id}
                         patientId={data.patientId}
@@ -200,6 +208,21 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
                             <div key={m.id} className="text-sm text-slate-700 bg-white rounded-lg border border-slate-100 px-3 py-2">
                               <span className="font-semibold">{m.name}</span> — {m.dosage}, {m.frequency}, {m.duration}
                               {m.instructions && <div className="text-xs text-slate-400 mt-0.5">{m.instructions}</div>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {data.tests.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 mb-2">
+                          <FlaskConical className="w-3.5 h-3.5" /> Recommended Tests
+                        </div>
+                        <div className="space-y-1.5">
+                          {data.tests.map((t) => (
+                            <div key={t.id} className="text-sm text-slate-700 bg-white rounded-lg border border-slate-100 px-3 py-2">
+                              <span className="font-semibold">{t.name}</span>
+                              {t.instructions && <div className="text-xs text-slate-400 mt-0.5">{t.instructions}</div>}
                             </div>
                           ))}
                         </div>

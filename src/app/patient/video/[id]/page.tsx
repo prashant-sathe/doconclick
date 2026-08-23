@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Stethoscope, Clock, CreditCard } from "lucide-react";
+import { ArrowLeft, Loader2, Stethoscope, Clock, CreditCard, Video } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
@@ -27,6 +27,7 @@ export default function PatientVideoCallPage() {
   const [appt, setAppt] = useState<VideoAppointment | null>(null);
   const [error, setError] = useState("");
   const [now, setNow] = useState(() => Date.now());
+  const [started, setStarted] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push(`/login?next=/patient/video/${params.id}`);
@@ -105,6 +106,17 @@ export default function PatientVideoCallPage() {
               <p className="text-xs text-slate-400">
                 Consultation will start at {new Date(unlockAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
               </p>
+            </div>
+          ) : !started ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-3">
+              <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center">
+                <Video className="w-6 h-6 text-blue-600" />
+              </div>
+              <p className="text-sm text-slate-700 font-semibold">Ready to start the video call with {formatDoctorName(appt.doctor.name)}?</p>
+              <p className="text-xs text-slate-400 max-w-xs">This will turn on your camera and microphone.</p>
+              <button onClick={() => setStarted(true)} className="btn-primary py-2.5 px-5 text-sm mt-1">
+                <Video className="w-4 h-4" /> Start Video Call
+              </button>
             </div>
           ) : (
             <VideoCallRoom appointmentId={params.id} accent="blue" leaveHref="/patient/appointments" />
