@@ -2169,6 +2169,7 @@ export const AppointmentScalarFieldEnum = {
   consentGiven: 'consentGiven',
   consultType: 'consultType',
   status: 'status',
+  acceptedAt: 'acceptedAt',
   paymentMethod: 'paymentMethod',
   paymentStatus: 'paymentStatus',
   paidAt: 'paidAt',

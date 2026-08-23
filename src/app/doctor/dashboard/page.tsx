@@ -16,7 +16,7 @@ import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { FREQUENCY_OPTIONS, DURATION_OPTIONS, TEST_SUGGESTIONS } from "@/lib/medicalOptions";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
-import { formatDoctorName } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 
 interface DoctorProfile {
   specialty: string;
@@ -50,6 +50,7 @@ interface Appointment {
   isEmergency: boolean;
   travelStatus: string;
   scheduledAt: string;
+  acceptedAt: string | null;
   unreadMessageCount: number;
   patient: {
     name: string;
@@ -77,6 +78,15 @@ const TYPE_ICON: Record<string, React.ElementType> = { HOME: Home, CLINIC: Build
 
 function patientLabel(a: Appointment): string {
   return a.relation !== "Self" && a.patientName ? a.patientName : a.patient.name;
+}
+
+// Grace period after accepting a request within which a doctor can cancel
+// without the late-cancellation warning below.
+const CANCEL_GRACE_PERIOD_MS = 10 * 60 * 1000;
+
+function isLateCancellation(a: Appointment): boolean {
+  if (!a.acceptedAt) return false;
+  return Date.now() - new Date(a.acceptedAt).getTime() > CANCEL_GRACE_PERIOD_MS;
 }
 // Seconds left before a paid video appointment's "Join Video Call" button
 // unlocks; 0 once VIDEO_UNLOCK_DELAY_SECONDS has passed since payment.
@@ -934,9 +944,15 @@ export default function DoctorDashboard() {
               <XCircle className="w-5 h-5 text-red-600" />
               <h3 className="font-bold text-slate-800">Cancel this appointment?</h3>
             </div>
-            <p className="text-sm text-slate-500 mb-5">
+            <p className={cn("text-sm text-slate-500", isLateCancellation(cancelTarget) ? "mb-3" : "mb-5")}>
               {patientLabel(cancelTarget)}&apos;s appointment on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
             </p>
+            {isLateCancellation(cancelTarget) && (
+              <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-5 flex items-start gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                <span>You accepted this appointment more than 10 minutes ago. Cancelling this late may lead to a penalty on your account in the future.</span>
+              </div>
+            )}
             <div className="flex gap-3">
               <button onClick={() => setCancelTarget(null)} className="btn-secondary flex-1">
                 Keep Appointment

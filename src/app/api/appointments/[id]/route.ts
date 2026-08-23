@@ -94,6 +94,7 @@ export async function PATCH(
       data: {
         status,
         doctorNotes: doctorNotes ?? appointment.doctorNotes,
+        ...(status === "SCHEDULED" ? { acceptedAt: new Date() } : {}),
         ...(status === "COMPLETED" && appointment.paymentMethod === "CASH"
           ? { paymentStatus: "PAID" }
           : {}),

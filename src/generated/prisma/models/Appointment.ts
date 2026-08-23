@@ -52,6 +52,7 @@ export type AppointmentMinAggregateOutputType = {
   consentGiven: boolean | null
   consultType: string | null
   status: string | null
+  acceptedAt: Date | null
   paymentMethod: string | null
   paymentStatus: string | null
   paidAt: Date | null
@@ -85,6 +86,7 @@ export type AppointmentMaxAggregateOutputType = {
   consentGiven: boolean | null
   consultType: string | null
   status: string | null
+  acceptedAt: Date | null
   paymentMethod: string | null
   paymentStatus: string | null
   paidAt: Date | null
@@ -118,6 +120,7 @@ export type AppointmentCountAggregateOutputType = {
   consentGiven: number
   consultType: number
   status: number
+  acceptedAt: number
   paymentMethod: number
   paymentStatus: number
   paidAt: number
@@ -167,6 +170,7 @@ export type AppointmentMinAggregateInputType = {
   consentGiven?: true
   consultType?: true
   status?: true
+  acceptedAt?: true
   paymentMethod?: true
   paymentStatus?: true
   paidAt?: true
@@ -200,6 +204,7 @@ export type AppointmentMaxAggregateInputType = {
   consentGiven?: true
   consultType?: true
   status?: true
+  acceptedAt?: true
   paymentMethod?: true
   paymentStatus?: true
   paidAt?: true
@@ -233,6 +238,7 @@ export type AppointmentCountAggregateInputType = {
   consentGiven?: true
   consultType?: true
   status?: true
+  acceptedAt?: true
   paymentMethod?: true
   paymentStatus?: true
   paidAt?: true
@@ -353,6 +359,7 @@ export type AppointmentGroupByOutputType = {
   consentGiven: boolean
   consultType: string
   status: string
+  acceptedAt: Date | null
   paymentMethod: string
   paymentStatus: string
   paidAt: Date | null
@@ -409,6 +416,7 @@ export type AppointmentWhereInput = {
   consentGiven?: Prisma.BoolFilter<"Appointment"> | boolean
   consultType?: Prisma.StringFilter<"Appointment"> | string
   status?: Prisma.StringFilter<"Appointment"> | string
+  acceptedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   paymentMethod?: Prisma.StringFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringFilter<"Appointment"> | string
   paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -455,6 +463,7 @@ export type AppointmentOrderByWithRelationInput = {
   consentGiven?: Prisma.SortOrder
   consultType?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  acceptedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
   paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -504,6 +513,7 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   consentGiven?: Prisma.BoolFilter<"Appointment"> | boolean
   consultType?: Prisma.StringFilter<"Appointment"> | string
   status?: Prisma.StringFilter<"Appointment"> | string
+  acceptedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   paymentMethod?: Prisma.StringFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringFilter<"Appointment"> | string
   paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -550,6 +560,7 @@ export type AppointmentOrderByWithAggregationInput = {
   consentGiven?: Prisma.SortOrder
   consultType?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  acceptedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
   paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -591,6 +602,7 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   consentGiven?: Prisma.BoolWithAggregatesFilter<"Appointment"> | boolean
   consultType?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
   status?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
+  acceptedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   paymentMethod?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
   paidAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
@@ -621,6 +633,7 @@ export type AppointmentCreateInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -664,6 +677,7 @@ export type AppointmentUncheckedCreateInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -701,6 +715,7 @@ export type AppointmentUpdateInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -744,6 +759,7 @@ export type AppointmentUncheckedUpdateInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -784,6 +800,7 @@ export type AppointmentCreateManyInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -814,6 +831,7 @@ export type AppointmentUpdateManyMutationInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -844,6 +862,7 @@ export type AppointmentUncheckedUpdateManyInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -892,6 +911,7 @@ export type AppointmentCountOrderByAggregateInput = {
   consentGiven?: Prisma.SortOrder
   consultType?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  acceptedAt?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
@@ -932,6 +952,7 @@ export type AppointmentMaxOrderByAggregateInput = {
   consentGiven?: Prisma.SortOrder
   consultType?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  acceptedAt?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
@@ -965,6 +986,7 @@ export type AppointmentMinOrderByAggregateInput = {
   consentGiven?: Prisma.SortOrder
   consultType?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  acceptedAt?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
@@ -1361,6 +1383,7 @@ export type AppointmentCreateWithoutPatientInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -1402,6 +1425,7 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -1449,6 +1473,7 @@ export type AppointmentCreateWithoutDoctorInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -1490,6 +1515,7 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -1559,6 +1585,7 @@ export type AppointmentScalarWhereInput = {
   consentGiven?: Prisma.BoolFilter<"Appointment"> | boolean
   consultType?: Prisma.StringFilter<"Appointment"> | string
   status?: Prisma.StringFilter<"Appointment"> | string
+  acceptedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   paymentMethod?: Prisma.StringFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringFilter<"Appointment"> | string
   paidAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -1605,6 +1632,7 @@ export type AppointmentCreateWithoutDependentInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -1646,6 +1674,7 @@ export type AppointmentUncheckedCreateWithoutDependentInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -1709,6 +1738,7 @@ export type AppointmentCreateWithoutFollowUpsInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -1751,6 +1781,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -1792,6 +1823,7 @@ export type AppointmentCreateWithoutFollowUpOfInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -1834,6 +1866,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -1891,6 +1924,7 @@ export type AppointmentUpdateWithoutFollowUpsInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1933,6 +1967,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1985,6 +2020,7 @@ export type AppointmentCreateWithoutWalletTransactionInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2027,6 +2063,7 @@ export type AppointmentUncheckedCreateWithoutWalletTransactionInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2079,6 +2116,7 @@ export type AppointmentUpdateWithoutWalletTransactionInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2121,6 +2159,7 @@ export type AppointmentUncheckedUpdateWithoutWalletTransactionInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2157,6 +2196,7 @@ export type AppointmentCreateWithoutSettlementInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2199,6 +2239,7 @@ export type AppointmentUncheckedCreateWithoutSettlementInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2261,6 +2302,7 @@ export type AppointmentCreateWithoutMessagesInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2303,6 +2345,7 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2355,6 +2398,7 @@ export type AppointmentUpdateWithoutMessagesInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2397,6 +2441,7 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2433,6 +2478,7 @@ export type AppointmentCreateWithoutMedicinesInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2475,6 +2521,7 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2527,6 +2574,7 @@ export type AppointmentUpdateWithoutMedicinesInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2569,6 +2617,7 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2605,6 +2654,7 @@ export type AppointmentCreateWithoutTestsInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2647,6 +2697,7 @@ export type AppointmentUncheckedCreateWithoutTestsInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2699,6 +2750,7 @@ export type AppointmentUpdateWithoutTestsInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2741,6 +2793,7 @@ export type AppointmentUncheckedUpdateWithoutTestsInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2777,6 +2830,7 @@ export type AppointmentCreateWithoutAttachmentsInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2819,6 +2873,7 @@ export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2871,6 +2926,7 @@ export type AppointmentUpdateWithoutAttachmentsInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2913,6 +2969,7 @@ export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2949,6 +3006,7 @@ export type AppointmentCreateWithoutReviewInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -2991,6 +3049,7 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -3043,6 +3102,7 @@ export type AppointmentUpdateWithoutReviewInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3085,6 +3145,7 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3121,6 +3182,7 @@ export type AppointmentCreateWithoutClinicInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -3163,6 +3225,7 @@ export type AppointmentUncheckedCreateWithoutClinicInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -3227,6 +3290,7 @@ export type AppointmentCreateManyPatientInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -3259,6 +3323,7 @@ export type AppointmentCreateManyDoctorInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -3289,6 +3354,7 @@ export type AppointmentUpdateWithoutPatientInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3330,6 +3396,7 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3369,6 +3436,7 @@ export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3399,6 +3467,7 @@ export type AppointmentUpdateWithoutDoctorInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3440,6 +3509,7 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3479,6 +3549,7 @@ export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3511,6 +3582,7 @@ export type AppointmentCreateManyDependentInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -3541,6 +3613,7 @@ export type AppointmentUpdateWithoutDependentInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3582,6 +3655,7 @@ export type AppointmentUncheckedUpdateWithoutDependentInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3621,6 +3695,7 @@ export type AppointmentUncheckedUpdateManyWithoutDependentInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3654,6 +3729,7 @@ export type AppointmentCreateManyFollowUpOfInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -3683,6 +3759,7 @@ export type AppointmentUpdateWithoutFollowUpOfInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3725,6 +3802,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3764,6 +3842,7 @@ export type AppointmentUncheckedUpdateManyWithoutFollowUpOfInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3796,6 +3875,7 @@ export type AppointmentCreateManySettlementInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -3825,6 +3905,7 @@ export type AppointmentUpdateWithoutSettlementInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3867,6 +3948,7 @@ export type AppointmentUncheckedUpdateWithoutSettlementInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3906,6 +3988,7 @@ export type AppointmentUncheckedUpdateManyWithoutSettlementInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3938,6 +4021,7 @@ export type AppointmentCreateManyClinicInput = {
   consentGiven?: boolean
   consultType?: string
   status?: string
+  acceptedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
   paidAt?: Date | string | null
@@ -3967,6 +4051,7 @@ export type AppointmentUpdateWithoutClinicInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4009,6 +4094,7 @@ export type AppointmentUncheckedUpdateWithoutClinicInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4048,6 +4134,7 @@ export type AppointmentUncheckedUpdateManyWithoutClinicInput = {
   consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
   consultType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4147,6 +4234,7 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   consentGiven?: boolean
   consultType?: boolean
   status?: boolean
+  acceptedAt?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
   paidAt?: boolean
@@ -4194,6 +4282,7 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   consentGiven?: boolean
   consultType?: boolean
   status?: boolean
+  acceptedAt?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
   paidAt?: boolean
@@ -4233,6 +4322,7 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   consentGiven?: boolean
   consultType?: boolean
   status?: boolean
+  acceptedAt?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
   paidAt?: boolean
@@ -4272,6 +4362,7 @@ export type AppointmentSelectScalar = {
   consentGiven?: boolean
   consultType?: boolean
   status?: boolean
+  acceptedAt?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
   paidAt?: boolean
@@ -4293,7 +4384,7 @@ export type AppointmentSelectScalar = {
   createdAt?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "status" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "clinicId" | "scheduledAt" | "createdAt", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "status" | "acceptedAt" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "clinicId" | "scheduledAt" | "createdAt", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -4356,6 +4447,7 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     consentGiven: boolean
     consultType: string
     status: string
+    acceptedAt: Date | null
     paymentMethod: string
     paymentStatus: string
     paidAt: Date | null
@@ -4822,6 +4914,7 @@ export interface AppointmentFieldRefs {
   readonly consentGiven: Prisma.FieldRef<"Appointment", 'Boolean'>
   readonly consultType: Prisma.FieldRef<"Appointment", 'String'>
   readonly status: Prisma.FieldRef<"Appointment", 'String'>
+  readonly acceptedAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly paymentMethod: Prisma.FieldRef<"Appointment", 'String'>
   readonly paymentStatus: Prisma.FieldRef<"Appointment", 'String'>
   readonly paidAt: Prisma.FieldRef<"Appointment", 'DateTime'>
