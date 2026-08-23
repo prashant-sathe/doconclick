@@ -266,48 +266,78 @@ export default function DoctorProfilePage() {
     return () => { cancelled = true; };
   }, [user]);
 
-  const downloadBrandedQR = () => {
+  const buildBrandedQRCanvas = (): Promise<HTMLCanvasElement> => {
+    return new Promise((resolve, reject) => {
+      if (!qrDataUrl || !user) { reject(new Error("QR not ready")); return; }
+      const W = 420, H = 560, QR_SIZE = 300, QR_Y = 155;
+      const canvas = document.createElement("canvas");
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { reject(new Error("Canvas not supported")); return; }
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, W, H);
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "#0d9488";
+      ctx.font = "bold 28px Arial, sans-serif";
+      ctx.fillText("DocOnClick", W / 2, 50);
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 24px Arial, sans-serif";
+      ctx.fillText(formatDoctorName(user.name), W / 2, 95);
+
+      if (form.specialty) {
+        ctx.fillStyle = "#64748b";
+        ctx.font = "16px Arial, sans-serif";
+        ctx.fillText(form.specialty, W / 2, 122);
+      }
+
+      const qrImg = new Image();
+      qrImg.onload = () => {
+        const qrX = (W - QR_SIZE) / 2;
+        ctx.drawImage(qrImg, qrX, QR_Y, QR_SIZE, QR_SIZE);
+
+        ctx.fillStyle = "#475569";
+        ctx.font = "16px Arial, sans-serif";
+        ctx.fillText("Scan to book an appointment", W / 2, QR_Y + QR_SIZE + 35);
+
+        resolve(canvas);
+      };
+      qrImg.onerror = () => reject(new Error("Failed to load QR image"));
+      qrImg.src = qrDataUrl;
+    });
+  };
+
+  const triggerDownload = (href: string, filename: string) => {
+    const link = document.createElement("a");
+    link.download = filename;
+    link.href = href;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const downloadBrandedQR = async () => {
     if (!qrDataUrl || !user) return;
-    const W = 420, H = 560, QR_SIZE = 300, QR_Y = 155;
-    const canvas = document.createElement("canvas");
-    canvas.width = W;
-    canvas.height = H;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const canvas = await buildBrandedQRCanvas();
+    triggerDownload(canvas.toDataURL("image/png"), `${formatDoctorName(user.name)}.png`);
+  };
 
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, W, H);
-    ctx.textAlign = "center";
-
-    ctx.fillStyle = "#0d9488";
-    ctx.font = "bold 28px Arial, sans-serif";
-    ctx.fillText("DocOnClick", W / 2, 50);
-
-    ctx.fillStyle = "#0f172a";
-    ctx.font = "bold 24px Arial, sans-serif";
-    ctx.fillText(formatDoctorName(user.name), W / 2, 95);
-
-    if (form.specialty) {
-      ctx.fillStyle = "#64748b";
-      ctx.font = "16px Arial, sans-serif";
-      ctx.fillText(form.specialty, W / 2, 122);
-    }
-
-    const qrImg = new Image();
-    qrImg.onload = () => {
-      const qrX = (W - QR_SIZE) / 2;
-      ctx.drawImage(qrImg, qrX, QR_Y, QR_SIZE, QR_SIZE);
-
-      ctx.fillStyle = "#475569";
-      ctx.font = "16px Arial, sans-serif";
-      ctx.fillText("Scan to book an appointment", W / 2, QR_Y + QR_SIZE + 35);
-
-      const link = document.createElement("a");
-      link.download = `${formatDoctorName(user.name)}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    };
-    qrImg.src = qrDataUrl;
+  const downloadBrandedQRAsPDF = async () => {
+    if (!qrDataUrl || !user) return;
+    const canvas = await buildBrandedQRCanvas();
+    const { jsPDF } = await import("jspdf");
+    const imgWidthMm = 80;
+    const imgHeightMm = (canvas.height / canvas.width) * imgWidthMm;
+    const pdf = new jsPDF({ unit: "mm", format: "a5", orientation: "portrait" });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const x = (pageWidth - imgWidthMm) / 2;
+    const y = (pageHeight - imgHeightMm) / 2;
+    pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, imgWidthMm, imgHeightMm);
+    pdf.save(`${formatDoctorName(user.name)}.pdf`);
   };
 
   const copyLink = async () => {
@@ -494,9 +524,14 @@ export default function DoctorProfilePage() {
                     {linkCopied ? "Copied" : "Copy Link"}
                   </button>
                   {qrDataUrl && (
-                    <button type="button" onClick={downloadBrandedQR} className="btn-secondary py-2 px-3 text-xs">
-                      <Download className="w-3.5 h-3.5" /> Download QR Code
-                    </button>
+                    <>
+                      <button type="button" onClick={downloadBrandedQR} className="btn-secondary py-2 px-3 text-xs">
+                        <Download className="w-3.5 h-3.5" /> Download PNG
+                      </button>
+                      <button type="button" onClick={downloadBrandedQRAsPDF} className="btn-secondary py-2 px-3 text-xs">
+                        <FileText className="w-3.5 h-3.5" /> Download PDF
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
