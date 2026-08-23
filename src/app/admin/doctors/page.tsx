@@ -29,6 +29,7 @@ interface DoctorProfile {
   degreeCertUrl: string | null;
   kycDocUrl: string | null;
   signatureUrl: string | null;
+  photoUrl: string | null;
 }
 
 interface Doctor {
@@ -242,8 +243,12 @@ function DoctorDrawer({
         {/* Header */}
         <div className="gradient-hero px-6 py-6 flex items-start justify-between flex-shrink-0">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-white text-2xl font-extrabold border border-white/30">
-              {data?.name?.charAt(0) ?? "D"}
+            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-white text-2xl font-extrabold border border-white/30 overflow-hidden">
+              {p?.photoUrl ? (
+                <img src={p.photoUrl} alt={data?.name ?? "Doctor"} className="w-full h-full object-cover" />
+              ) : (
+                data?.name?.charAt(0) ?? "D"
+              )}
             </div>
             <div>
               <div className="text-xl font-extrabold text-white">{data ? formatDoctorName(data.name) : "Loading…"}</div>
