@@ -6,6 +6,7 @@ import { LayoutDashboard, IndianRupee, UserCircle, Building2, LogOut, Bell, Cloc
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
+import { useAnnouncementNotifications } from "@/hooks/useAnnouncementNotifications";
 import NotificationToast from "@/components/doctor/NotificationToast";
 
 const NAV = [
@@ -24,11 +25,13 @@ export default function DoctorHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const [bellOpen, setBellOpen] = useState(false);
-  const { pendingRequests, hasUnseen, activeToast, dismissToast, markSeen } = useDoctorNotifications(user?.id);
+  const { pendingRequests, hasUnseen: requestsUnseen, activeToast, dismissToast, markSeen } = useDoctorNotifications(user?.id);
+  const { announcements, hasUnseen: announcementsUnseen, markSeen: markAnnouncementsSeen } = useAnnouncementNotifications(user?.id);
+  const hasUnseen = requestsUnseen || announcementsUnseen;
 
   const toggleBell = () => {
     setBellOpen((open) => {
-      if (!open) markSeen();
+      if (!open) { markSeen(); markAnnouncementsSeen(); }
       return !open;
     });
   };
@@ -100,6 +103,30 @@ export default function DoctorHeader() {
                       ))}
                     </div>
                   )}
+                  <div className="px-4 py-3 border-b border-t border-slate-100">
+                    <h3 className="text-sm font-bold text-slate-800">Announcements</h3>
+                  </div>
+                  {announcements.length === 0 ? (
+                    <p className="text-sm text-slate-400 text-center py-6">No announcements yet.</p>
+                  ) : (
+                    <div className="divide-y divide-slate-50">
+                      {announcements.slice(0, 5).map((a) => (
+                        <button
+                          key={a.id}
+                          onClick={() => {
+                            setBellOpen(false);
+                            const url = a.buttons?.[0]?.url;
+                            if (url?.startsWith("/")) router.push(url);
+                          }}
+                          className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors"
+                        >
+                          <p className="text-sm font-semibold text-slate-800">{a.title}</p>
+                          <p className="text-xs text-slate-400 mt-0.5 truncate">{a.message}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   <Link
                     href="/doctor/dashboard"
                     onClick={() => setBellOpen(false)}

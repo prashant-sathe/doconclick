@@ -142,6 +142,16 @@ export type ClinicSlot = Prisma.ClinicSlotModel
  */
 export type Specialty = Prisma.SpecialtyModel
 /**
+ * Model Announcement
+ * 
+ */
+export type Announcement = Prisma.AnnouncementModel
+/**
+ * Model AnnouncementRecipient
+ * 
+ */
+export type AnnouncementRecipient = Prisma.AnnouncementRecipientModel
+/**
  * Model PlatformSettings
  * 
  */

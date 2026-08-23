@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { usePatientNotifications } from "@/hooks/usePatientNotifications";
 import { useWalletNotifications } from "@/hooks/useWalletNotifications";
+import { useAnnouncementNotifications } from "@/hooks/useAnnouncementNotifications";
 import PatientNotificationToast from "@/components/patient/PatientNotificationToast";
 import WalletNotificationToast from "@/components/patient/WalletNotificationToast";
 
@@ -59,11 +60,12 @@ export default function PatientHeader() {
     dismissToast: dismissWalletToast,
     markSeen: markWalletSeen,
   } = useWalletNotifications(user?.id);
-  const hasUnseen = apptUnseen || walletUnseen;
+  const { announcements, hasUnseen: announcementsUnseen, markSeen: markAnnouncementsSeen } = useAnnouncementNotifications(user?.id);
+  const hasUnseen = apptUnseen || walletUnseen || announcementsUnseen;
 
   const toggleBell = () => {
     setBellOpen((open) => {
-      if (!open) { markSeen(); markWalletSeen(); }
+      if (!open) { markSeen(); markWalletSeen(); markAnnouncementsSeen(); }
       return !open;
     });
   };
@@ -165,6 +167,30 @@ export default function PatientHeader() {
                             </p>
                             <p className="text-xs text-slate-400 mt-0.5">₹{t.amount}{t.balanceAfter != null ? ` · Balance ₹${t.balanceAfter}` : ""}</p>
                           </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="px-4 py-3 border-b border-t border-slate-100 sticky top-0 bg-white">
+                    <h3 className="text-sm font-bold text-slate-800">Announcements</h3>
+                  </div>
+                  {announcements.length === 0 ? (
+                    <p className="text-sm text-slate-400 text-center py-6">No announcements yet.</p>
+                  ) : (
+                    <div className="divide-y divide-slate-50">
+                      {announcements.slice(0, 5).map((a) => (
+                        <button
+                          key={a.id}
+                          onClick={() => {
+                            setBellOpen(false);
+                            const url = a.buttons?.[0]?.url;
+                            if (url?.startsWith("/")) router.push(url);
+                          }}
+                          className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors"
+                        >
+                          <p className="text-sm font-semibold text-slate-800">{a.title}</p>
+                          <p className="text-xs text-slate-400 mt-0.5 truncate">{a.message}</p>
                         </button>
                       ))}
                     </div>

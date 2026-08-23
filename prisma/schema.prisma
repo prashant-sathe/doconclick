@@ -38,6 +38,8 @@ model User {
   pushTokens        PushToken[]
   wallet            Wallet?
   walletTransactionsAdjusted WalletTransaction[] @relation("WalletAdjustedBy")
+  announcementsCreated   Announcement[]          @relation("AnnouncementsCreated")
+  announcementRecipients AnnouncementRecipient[] @relation("AnnouncementRecipients")
 }
 
 model PushToken {
@@ -346,6 +348,36 @@ model Specialty {
   color     String   @default("#2563eb")
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+}
+
+model Announcement {
+  id              String    @id @default(cuid())
+  title           String
+  message         String
+  bannerImageUrl  String?
+  buttons         Json?     // [{ label: string, url: string }], max 2 — enforced in API layer
+  audience        String    // DOCTOR, PATIENT, BOTH
+  status          String    @default("DRAFT") // DRAFT, SENT
+  createdByUserId String
+  createdBy       User      @relation("AnnouncementsCreated", fields: [createdByUserId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  sentAt          DateTime?
+
+  recipients AnnouncementRecipient[]
+}
+
+model AnnouncementRecipient {
+  id             String       @id @default(cuid())
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation("AnnouncementRecipients", fields: [userId], references: [id], onDelete: Cascade)
+  deliveredAt    DateTime     @default(now()) // row creation = fan-out time at Send
+  seenAt         DateTime?
+
+  @@unique([announcementId, userId])
+  @@index([userId, seenAt])
 }
 
 model PlatformSettings {

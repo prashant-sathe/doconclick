@@ -12,6 +12,7 @@ import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
+import AnnouncementPopup from "@/components/AnnouncementPopup";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { FREQUENCY_OPTIONS, DURATION_OPTIONS, TEST_SUGGESTIONS } from "@/lib/medicalOptions";
@@ -435,6 +436,7 @@ export default function DoctorDashboard() {
   const [upcomingExpanded, setUpcomingExpanded] = useState(false);
   const [completedExpanded, setCompletedExpanded] = useState(false);
   const [cancelledExpanded, setCancelledExpanded] = useState(false);
+  const [announcementsDone, setAnnouncementsDone] = useState(false);
   const PAGE_SIZE = 5;
 
   useEffect(() => {
@@ -621,7 +623,8 @@ export default function DoctorDashboard() {
           </div>
         </div>
 
-        <EnableNotificationsPrompt />
+        <AnnouncementPopup onAllSeen={() => setAnnouncementsDone(true)} />
+        {announcementsDone && <EnableNotificationsPrompt />}
 
         {/* Stat Strip */}
         <div className="grid grid-cols-3 gap-4 mb-8">

@@ -231,6 +231,8 @@ export type UserWhereInput = {
   pushTokens?: Prisma.PushTokenListRelationFilter
   wallet?: Prisma.XOR<Prisma.WalletNullableScalarRelationFilter, Prisma.WalletWhereInput> | null
   walletTransactionsAdjusted?: Prisma.WalletTransactionListRelationFilter
+  announcementsCreated?: Prisma.AnnouncementListRelationFilter
+  announcementRecipients?: Prisma.AnnouncementRecipientListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -260,6 +262,8 @@ export type UserOrderByWithRelationInput = {
   pushTokens?: Prisma.PushTokenOrderByRelationAggregateInput
   wallet?: Prisma.WalletOrderByWithRelationInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionOrderByRelationAggregateInput
+  announcementsCreated?: Prisma.AnnouncementOrderByRelationAggregateInput
+  announcementRecipients?: Prisma.AnnouncementRecipientOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -292,6 +296,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   pushTokens?: Prisma.PushTokenListRelationFilter
   wallet?: Prisma.XOR<Prisma.WalletNullableScalarRelationFilter, Prisma.WalletWhereInput> | null
   walletTransactionsAdjusted?: Prisma.WalletTransactionListRelationFilter
+  announcementsCreated?: Prisma.AnnouncementListRelationFilter
+  announcementRecipients?: Prisma.AnnouncementRecipientListRelationFilter
 }, "id" | "mobile" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -351,6 +357,8 @@ export type UserCreateInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -380,6 +388,8 @@ export type UserUncheckedCreateInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -409,6 +419,8 @@ export type UserUpdateInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -438,6 +450,8 @@ export type UserUncheckedUpdateInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -780,6 +794,34 @@ export type UserUpdateOneRequiredWithoutClinicsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutClinicsInput, Prisma.UserUpdateWithoutClinicsInput>, Prisma.UserUncheckedUpdateWithoutClinicsInput>
 }
 
+export type UserCreateNestedOneWithoutAnnouncementsCreatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementsCreatedInput, Prisma.UserUncheckedCreateWithoutAnnouncementsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAnnouncementsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAnnouncementsCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementsCreatedInput, Prisma.UserUncheckedCreateWithoutAnnouncementsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAnnouncementsCreatedInput
+  upsert?: Prisma.UserUpsertWithoutAnnouncementsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAnnouncementsCreatedInput, Prisma.UserUpdateWithoutAnnouncementsCreatedInput>, Prisma.UserUncheckedUpdateWithoutAnnouncementsCreatedInput>
+}
+
+export type UserCreateNestedOneWithoutAnnouncementRecipientsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementRecipientsInput, Prisma.UserUncheckedCreateWithoutAnnouncementRecipientsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAnnouncementRecipientsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAnnouncementRecipientsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementRecipientsInput, Prisma.UserUncheckedCreateWithoutAnnouncementRecipientsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAnnouncementRecipientsInput
+  upsert?: Prisma.UserUpsertWithoutAnnouncementRecipientsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAnnouncementRecipientsInput, Prisma.UserUpdateWithoutAnnouncementRecipientsInput>, Prisma.UserUncheckedUpdateWithoutAnnouncementRecipientsInput>
+}
+
 export type UserCreateWithoutPushTokensInput = {
   id?: string
   name: string
@@ -806,6 +848,8 @@ export type UserCreateWithoutPushTokensInput = {
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPushTokensInput = {
@@ -834,6 +878,8 @@ export type UserUncheckedCreateWithoutPushTokensInput = {
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPushTokensInput = {
@@ -878,6 +924,8 @@ export type UserUpdateWithoutPushTokensInput = {
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPushTokensInput = {
@@ -906,6 +954,8 @@ export type UserUncheckedUpdateWithoutPushTokensInput = {
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSavedDoctorsInput = {
@@ -934,6 +984,8 @@ export type UserCreateWithoutSavedDoctorsInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSavedDoctorsInput = {
@@ -962,6 +1014,8 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSavedDoctorsInput = {
@@ -995,6 +1049,8 @@ export type UserCreateWithoutSavedByPatientsInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSavedByPatientsInput = {
@@ -1023,6 +1079,8 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSavedByPatientsInput = {
@@ -1067,6 +1125,8 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
@@ -1095,6 +1155,8 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutSavedByPatientsInput = {
@@ -1134,6 +1196,8 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
@@ -1162,6 +1226,8 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPatientProfileInput = {
@@ -1190,6 +1256,8 @@ export type UserCreateWithoutPatientProfileInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPatientProfileInput = {
@@ -1218,6 +1286,8 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPatientProfileInput = {
@@ -1262,6 +1332,8 @@ export type UserUpdateWithoutPatientProfileInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPatientProfileInput = {
@@ -1290,6 +1362,8 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDoctorProfileInput = {
@@ -1318,6 +1392,8 @@ export type UserCreateWithoutDoctorProfileInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDoctorProfileInput = {
@@ -1346,6 +1422,8 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDoctorProfileInput = {
@@ -1390,6 +1468,8 @@ export type UserUpdateWithoutDoctorProfileInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDoctorProfileInput = {
@@ -1418,6 +1498,8 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAsPatientInput = {
@@ -1446,6 +1528,8 @@ export type UserCreateWithoutAsPatientInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsPatientInput = {
@@ -1474,6 +1558,8 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAsPatientInput = {
@@ -1507,6 +1593,8 @@ export type UserCreateWithoutAsDoctorInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsDoctorInput = {
@@ -1535,6 +1623,8 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAsDoctorInput = {
@@ -1579,6 +1669,8 @@ export type UserUpdateWithoutAsPatientInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsPatientInput = {
@@ -1607,6 +1699,8 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutAsDoctorInput = {
@@ -1646,6 +1740,8 @@ export type UserUpdateWithoutAsDoctorInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsDoctorInput = {
@@ -1674,6 +1770,8 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWalletInput = {
@@ -1702,6 +1800,8 @@ export type UserCreateWithoutWalletInput = {
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWalletInput = {
@@ -1730,6 +1830,8 @@ export type UserUncheckedCreateWithoutWalletInput = {
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWalletInput = {
@@ -1774,6 +1876,8 @@ export type UserUpdateWithoutWalletInput = {
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletInput = {
@@ -1802,6 +1906,8 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWalletTransactionsAdjustedInput = {
@@ -1830,6 +1936,8 @@ export type UserCreateWithoutWalletTransactionsAdjustedInput = {
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
@@ -1858,6 +1966,8 @@ export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWalletTransactionsAdjustedInput = {
@@ -1902,6 +2012,8 @@ export type UserUpdateWithoutWalletTransactionsAdjustedInput = {
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
@@ -1930,6 +2042,8 @@ export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSettlementsInput = {
@@ -1958,6 +2072,8 @@ export type UserCreateWithoutSettlementsInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsInput = {
@@ -1986,6 +2102,8 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsInput = {
@@ -2019,6 +2137,8 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
@@ -2047,6 +2167,8 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsAdminedInput = {
@@ -2091,6 +2213,8 @@ export type UserUpdateWithoutSettlementsInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsInput = {
@@ -2119,6 +2243,8 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutSettlementsAdminedInput = {
@@ -2158,6 +2284,8 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
@@ -2186,6 +2314,8 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPaymentLogsInput = {
@@ -2214,6 +2344,8 @@ export type UserCreateWithoutPaymentLogsInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPaymentLogsInput = {
@@ -2242,6 +2374,8 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPaymentLogsInput = {
@@ -2286,6 +2420,8 @@ export type UserUpdateWithoutPaymentLogsInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentLogsInput = {
@@ -2314,6 +2450,8 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -2342,6 +2480,8 @@ export type UserCreateWithoutMessagesSentInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -2370,6 +2510,8 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -2414,6 +2556,8 @@ export type UserUpdateWithoutMessagesSentInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -2442,6 +2586,8 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReviewsGivenInput = {
@@ -2470,6 +2616,8 @@ export type UserCreateWithoutReviewsGivenInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsGivenInput = {
@@ -2498,6 +2646,8 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsGivenInput = {
@@ -2531,6 +2681,8 @@ export type UserCreateWithoutReviewsReceivedInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsReceivedInput = {
@@ -2559,6 +2711,8 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsReceivedInput = {
@@ -2603,6 +2757,8 @@ export type UserUpdateWithoutReviewsGivenInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsGivenInput = {
@@ -2631,6 +2787,8 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReviewsReceivedInput = {
@@ -2670,6 +2828,8 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
@@ -2698,6 +2858,8 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutComplaintsInput = {
@@ -2726,6 +2888,8 @@ export type UserCreateWithoutComplaintsInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsInput = {
@@ -2754,6 +2918,8 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsInput = {
@@ -2798,6 +2964,8 @@ export type UserUpdateWithoutComplaintsInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsInput = {
@@ -2826,6 +2994,8 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutClinicsInput = {
@@ -2854,6 +3024,8 @@ export type UserCreateWithoutClinicsInput = {
   pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClinicsInput = {
@@ -2882,6 +3054,8 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClinicsInput = {
@@ -2926,6 +3100,8 @@ export type UserUpdateWithoutClinicsInput = {
   pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClinicsInput = {
@@ -2954,6 +3130,280 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAnnouncementsCreatedInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAnnouncementsCreatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementsCreatedInput, Prisma.UserUncheckedCreateWithoutAnnouncementsCreatedInput>
+}
+
+export type UserUpsertWithoutAnnouncementsCreatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAnnouncementsCreatedInput, Prisma.UserUncheckedUpdateWithoutAnnouncementsCreatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementsCreatedInput, Prisma.UserUncheckedCreateWithoutAnnouncementsCreatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAnnouncementsCreatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAnnouncementsCreatedInput, Prisma.UserUncheckedUpdateWithoutAnnouncementsCreatedInput>
+}
+
+export type UserUpdateWithoutAnnouncementsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAnnouncementRecipientsInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserCreateOrConnectWithoutAnnouncementRecipientsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementRecipientsInput, Prisma.UserUncheckedCreateWithoutAnnouncementRecipientsInput>
+}
+
+export type UserUpsertWithoutAnnouncementRecipientsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAnnouncementRecipientsInput, Prisma.UserUncheckedUpdateWithoutAnnouncementRecipientsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementRecipientsInput, Prisma.UserUncheckedCreateWithoutAnnouncementRecipientsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAnnouncementRecipientsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAnnouncementRecipientsInput, Prisma.UserUncheckedUpdateWithoutAnnouncementRecipientsInput>
+}
+
+export type UserUpdateWithoutAnnouncementRecipientsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 
@@ -2976,6 +3426,8 @@ export type UserCountOutputType = {
   clinics: number
   pushTokens: number
   walletTransactionsAdjusted: number
+  announcementsCreated: number
+  announcementRecipients: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2993,6 +3445,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   clinics?: boolean | UserCountOutputTypeCountClinicsArgs
   pushTokens?: boolean | UserCountOutputTypeCountPushTokensArgs
   walletTransactionsAdjusted?: boolean | UserCountOutputTypeCountWalletTransactionsAdjustedArgs
+  announcementsCreated?: boolean | UserCountOutputTypeCountAnnouncementsCreatedArgs
+  announcementRecipients?: boolean | UserCountOutputTypeCountAnnouncementRecipientsArgs
 }
 
 /**
@@ -3103,6 +3557,20 @@ export type UserCountOutputTypeCountWalletTransactionsAdjustedArgs<ExtArgs exten
   where?: Prisma.WalletTransactionWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAnnouncementsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AnnouncementWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAnnouncementRecipientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AnnouncementRecipientWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3131,6 +3599,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   pushTokens?: boolean | Prisma.User$pushTokensArgs<ExtArgs>
   wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
   walletTransactionsAdjusted?: boolean | Prisma.User$walletTransactionsAdjustedArgs<ExtArgs>
+  announcementsCreated?: boolean | Prisma.User$announcementsCreatedArgs<ExtArgs>
+  announcementRecipients?: boolean | Prisma.User$announcementRecipientsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3189,6 +3659,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   pushTokens?: boolean | Prisma.User$pushTokensArgs<ExtArgs>
   wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
   walletTransactionsAdjusted?: boolean | Prisma.User$walletTransactionsAdjustedArgs<ExtArgs>
+  announcementsCreated?: boolean | Prisma.User$announcementsCreatedArgs<ExtArgs>
+  announcementRecipients?: boolean | Prisma.User$announcementRecipientsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3214,6 +3686,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     pushTokens: Prisma.$PushTokenPayload<ExtArgs>[]
     wallet: Prisma.$WalletPayload<ExtArgs> | null
     walletTransactionsAdjusted: Prisma.$WalletTransactionPayload<ExtArgs>[]
+    announcementsCreated: Prisma.$AnnouncementPayload<ExtArgs>[]
+    announcementRecipients: Prisma.$AnnouncementRecipientPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3636,6 +4110,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   pushTokens<T extends Prisma.User$pushTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pushTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PushTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   wallet<T extends Prisma.User$walletArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$walletArgs<ExtArgs>>): Prisma.Prisma__WalletClient<runtime.Types.Result.GetResult<Prisma.$WalletPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   walletTransactionsAdjusted<T extends Prisma.User$walletTransactionsAdjustedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$walletTransactionsAdjustedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WalletTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  announcementsCreated<T extends Prisma.User$announcementsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$announcementsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  announcementRecipients<T extends Prisma.User$announcementRecipientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$announcementRecipientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementRecipientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4457,6 +4933,54 @@ export type User$walletTransactionsAdjustedArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.WalletTransactionScalarFieldEnum | Prisma.WalletTransactionScalarFieldEnum[]
+}
+
+/**
+ * User.announcementsCreated
+ */
+export type User$announcementsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Announcement
+   */
+  select?: Prisma.AnnouncementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Announcement
+   */
+  omit?: Prisma.AnnouncementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
+  where?: Prisma.AnnouncementWhereInput
+  orderBy?: Prisma.AnnouncementOrderByWithRelationInput | Prisma.AnnouncementOrderByWithRelationInput[]
+  cursor?: Prisma.AnnouncementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AnnouncementScalarFieldEnum | Prisma.AnnouncementScalarFieldEnum[]
+}
+
+/**
+ * User.announcementRecipients
+ */
+export type User$announcementRecipientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AnnouncementRecipient
+   */
+  select?: Prisma.AnnouncementRecipientSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AnnouncementRecipient
+   */
+  omit?: Prisma.AnnouncementRecipientOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementRecipientInclude<ExtArgs> | null
+  where?: Prisma.AnnouncementRecipientWhereInput
+  orderBy?: Prisma.AnnouncementRecipientOrderByWithRelationInput | Prisma.AnnouncementRecipientOrderByWithRelationInput[]
+  cursor?: Prisma.AnnouncementRecipientWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AnnouncementRecipientScalarFieldEnum | Prisma.AnnouncementRecipientScalarFieldEnum[]
 }
 
 /**

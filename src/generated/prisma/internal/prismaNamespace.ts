@@ -417,6 +417,8 @@ export const ModelName = {
   Clinic: 'Clinic',
   ClinicSlot: 'ClinicSlot',
   Specialty: 'Specialty',
+  Announcement: 'Announcement',
+  AnnouncementRecipient: 'AnnouncementRecipient',
   PlatformSettings: 'PlatformSettings'
 } as const
 
@@ -433,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "doctorProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "specialty" | "platformSettings"
+    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "doctorProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "specialty" | "announcement" | "announcementRecipient" | "platformSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1917,6 +1919,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Announcement: {
+      payload: Prisma.$AnnouncementPayload<ExtArgs>
+      fields: Prisma.AnnouncementFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AnnouncementFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AnnouncementFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload>
+        }
+        findFirst: {
+          args: Prisma.AnnouncementFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AnnouncementFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload>
+        }
+        findMany: {
+          args: Prisma.AnnouncementFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload>[]
+        }
+        create: {
+          args: Prisma.AnnouncementCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload>
+        }
+        createMany: {
+          args: Prisma.AnnouncementCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AnnouncementCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload>[]
+        }
+        delete: {
+          args: Prisma.AnnouncementDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload>
+        }
+        update: {
+          args: Prisma.AnnouncementUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload>
+        }
+        deleteMany: {
+          args: Prisma.AnnouncementDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AnnouncementUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AnnouncementUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload>[]
+        }
+        upsert: {
+          args: Prisma.AnnouncementUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementPayload>
+        }
+        aggregate: {
+          args: Prisma.AnnouncementAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAnnouncement>
+        }
+        groupBy: {
+          args: Prisma.AnnouncementGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnnouncementGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AnnouncementCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnnouncementCountAggregateOutputType> | number
+        }
+      }
+    }
+    AnnouncementRecipient: {
+      payload: Prisma.$AnnouncementRecipientPayload<ExtArgs>
+      fields: Prisma.AnnouncementRecipientFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AnnouncementRecipientFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AnnouncementRecipientFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload>
+        }
+        findFirst: {
+          args: Prisma.AnnouncementRecipientFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AnnouncementRecipientFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload>
+        }
+        findMany: {
+          args: Prisma.AnnouncementRecipientFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload>[]
+        }
+        create: {
+          args: Prisma.AnnouncementRecipientCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload>
+        }
+        createMany: {
+          args: Prisma.AnnouncementRecipientCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AnnouncementRecipientCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload>[]
+        }
+        delete: {
+          args: Prisma.AnnouncementRecipientDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload>
+        }
+        update: {
+          args: Prisma.AnnouncementRecipientUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload>
+        }
+        deleteMany: {
+          args: Prisma.AnnouncementRecipientDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AnnouncementRecipientUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AnnouncementRecipientUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload>[]
+        }
+        upsert: {
+          args: Prisma.AnnouncementRecipientUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnnouncementRecipientPayload>
+        }
+        aggregate: {
+          args: Prisma.AnnouncementRecipientAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAnnouncementRecipient>
+        }
+        groupBy: {
+          args: Prisma.AnnouncementRecipientGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnnouncementRecipientGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AnnouncementRecipientCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnnouncementRecipientCountAggregateOutputType> | number
+        }
+      }
+    }
     PlatformSettings: {
       payload: Prisma.$PlatformSettingsPayload<ExtArgs>
       fields: Prisma.PlatformSettingsFieldRefs
@@ -2360,6 +2510,34 @@ export const SpecialtyScalarFieldEnum = {
 export type SpecialtyScalarFieldEnum = (typeof SpecialtyScalarFieldEnum)[keyof typeof SpecialtyScalarFieldEnum]
 
 
+export const AnnouncementScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  message: 'message',
+  bannerImageUrl: 'bannerImageUrl',
+  buttons: 'buttons',
+  audience: 'audience',
+  status: 'status',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  sentAt: 'sentAt'
+} as const
+
+export type AnnouncementScalarFieldEnum = (typeof AnnouncementScalarFieldEnum)[keyof typeof AnnouncementScalarFieldEnum]
+
+
+export const AnnouncementRecipientScalarFieldEnum = {
+  id: 'id',
+  announcementId: 'announcementId',
+  userId: 'userId',
+  deliveredAt: 'deliveredAt',
+  seenAt: 'seenAt'
+} as const
+
+export type AnnouncementRecipientScalarFieldEnum = (typeof AnnouncementRecipientScalarFieldEnum)[keyof typeof AnnouncementRecipientScalarFieldEnum]
+
+
 export const PlatformSettingsScalarFieldEnum = {
   id: 'id',
   clinicCommissionPercent: 'clinicCommissionPercent',
@@ -2379,6 +2557,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -2393,6 +2579,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -2461,6 +2656,20 @@ export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMode
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 /**
@@ -2634,6 +2843,8 @@ export type GlobalOmitConfig = {
   clinic?: Prisma.ClinicOmit
   clinicSlot?: Prisma.ClinicSlotOmit
   specialty?: Prisma.SpecialtyOmit
+  announcement?: Prisma.AnnouncementOmit
+  announcementRecipient?: Prisma.AnnouncementRecipientOmit
   platformSettings?: Prisma.PlatformSettingsOmit
 }
 

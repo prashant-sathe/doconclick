@@ -19,6 +19,9 @@ function getMessagingClient() {
 
 // Best-effort push — never throws into the caller. A push failure should
 // never block or fail the write it's reporting on.
+// FCM caps sendEachForMulticast at 500 tokens per call.
+const FCM_BATCH_SIZE = 500;
+
 export async function sendPushToUsers(
   userIds: string[],
   payload: { title: string; body: string; url: string }
@@ -29,21 +32,27 @@ export async function sendPushToUsers(
     if (tokens.length === 0) return;
 
     const messaging = getMessagingClient();
-    const response = await messaging.sendEachForMulticast({
-      tokens: tokens.map((t) => t.token),
-      notification: { title: payload.title, body: payload.body },
-      webpush: { fcmOptions: { link: payload.url } },
-    });
+    let totalSuccess = 0;
+    const staleTokenIds: string[] = [];
 
-    console.log(
-      `sendPushToUsers(${userIds.join(",")}): ${response.successCount}/${tokens.length} delivered`,
-      response.responses.filter((r) => r.error).map((r) => r.error?.message)
-    );
+    for (let i = 0; i < tokens.length; i += FCM_BATCH_SIZE) {
+      const batch = tokens.slice(i, i + FCM_BATCH_SIZE);
+      const response = await messaging.sendEachForMulticast({
+        tokens: batch.map((t) => t.token),
+        notification: { title: payload.title, body: payload.body },
+        webpush: { fcmOptions: { link: payload.url } },
+      });
+      totalSuccess += response.successCount;
 
-    const staleTokenIds = response.responses
-      .map((r, i) => ({ r, id: tokens[i].id }))
-      .filter(({ r }) => r.error?.code === "messaging/registration-token-not-registered")
-      .map(({ id }) => id);
+      response.responses.forEach((r, idx) => {
+        if (r.error?.code === "messaging/registration-token-not-registered") {
+          staleTokenIds.push(batch[idx].id);
+        }
+      });
+    }
+
+    console.log(`sendPushToUsers(${userIds.join(",")}): ${totalSuccess}/${tokens.length} delivered`);
+
     if (staleTokenIds.length > 0) {
       await prisma.pushToken.deleteMany({ where: { id: { in: staleTokenIds } } });
     }

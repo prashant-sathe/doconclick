@@ -71,6 +71,8 @@ export const ModelName = {
   Clinic: 'Clinic',
   ClinicSlot: 'ClinicSlot',
   Specialty: 'Specialty',
+  Announcement: 'Announcement',
+  AnnouncementRecipient: 'AnnouncementRecipient',
   PlatformSettings: 'PlatformSettings'
 } as const
 
@@ -420,6 +422,34 @@ export const SpecialtyScalarFieldEnum = {
 export type SpecialtyScalarFieldEnum = (typeof SpecialtyScalarFieldEnum)[keyof typeof SpecialtyScalarFieldEnum]
 
 
+export const AnnouncementScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  message: 'message',
+  bannerImageUrl: 'bannerImageUrl',
+  buttons: 'buttons',
+  audience: 'audience',
+  status: 'status',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  sentAt: 'sentAt'
+} as const
+
+export type AnnouncementScalarFieldEnum = (typeof AnnouncementScalarFieldEnum)[keyof typeof AnnouncementScalarFieldEnum]
+
+
+export const AnnouncementRecipientScalarFieldEnum = {
+  id: 'id',
+  announcementId: 'announcementId',
+  userId: 'userId',
+  deliveredAt: 'deliveredAt',
+  seenAt: 'seenAt'
+} as const
+
+export type AnnouncementRecipientScalarFieldEnum = (typeof AnnouncementRecipientScalarFieldEnum)[keyof typeof AnnouncementRecipientScalarFieldEnum]
+
+
 export const PlatformSettingsScalarFieldEnum = {
   id: 'id',
   clinicCommissionPercent: 'clinicCommissionPercent',
@@ -439,6 +469,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -453,4 +491,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

@@ -21,6 +21,7 @@ import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
+import AnnouncementPopup from "@/components/AnnouncementPopup";
 import DependentPicker from "@/components/patient/DependentPicker";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 
@@ -171,6 +172,7 @@ function PatientDashboardInner() {
   const [emergencyOpen, setEmergencyOpen] = useState(false);
   const [emergencyText, setEmergencyText] = useState("");
   const [emergencyBusy, setEmergencyBusy] = useState(false);
+  const [announcementsDone, setAnnouncementsDone] = useState(false);
   const [emergencyResult, setEmergencyResult] = useState<{ doctorName: string; eta: number } | null>(null);
   const [emergencyError, setEmergencyError] = useState("");
   const followUpOfId = searchParams.get("followUpOf");
@@ -647,7 +649,8 @@ function PatientDashboardInner() {
         </div>
       )}
 
-      {!isLoading && <EnableNotificationsPrompt />}
+      {!isLoading && <AnnouncementPopup onAllSeen={() => setAnnouncementsDone(true)} />}
+      {!isLoading && announcementsDone && <EnableNotificationsPrompt />}
 
       {/* ── Top bar ────────────────────────────────────────────────── */}
       <div className="absolute top-0 inset-x-0 z-20 pointer-events-none">
