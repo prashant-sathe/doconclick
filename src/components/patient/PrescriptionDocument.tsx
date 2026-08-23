@@ -23,6 +23,7 @@ export interface PrescriptionData {
   relation: string;
   patientAge: number | null;
   patientGender: string | null;
+  patientAddress: string | null;
   doctorName: string;
   doctorQualification: string | null;
   doctorRegNo: string | null;
@@ -163,6 +164,8 @@ export default function PrescriptionDocument({
             <Value>{displayName}</Value>
             <Label>Age / Gender</Label>
             <Value>{ageGender || "—"}</Value>
+            <Label>Address</Label>
+            <Value>{data.patientAddress || "—"}</Value>
             <Label>Patient ID</Label>
             <div style={{ fontSize: 13, fontWeight: 600, color: INK }}>{ptId}</div>
           </div>

@@ -25,7 +25,7 @@ export async function GET(
   const appointment = await prisma.appointment.findUnique({
     where: { id },
     include: {
-      patient: { select: { name: true, patientProfile: { select: { age: true, gender: true } } } },
+      patient: { select: { name: true, patientProfile: { select: { age: true, gender: true, homeAddress: true } } } },
       doctor: { select: { name: true, doctorProfile: { select: { qualification: true, medRegNo: true, specialty: true, clinicName: true, signatureUrl: true } } } },
       medicines: true,
       tests: true,
@@ -50,6 +50,7 @@ export async function GET(
     relation: appointment.relation,
     patientAge: appointment.patient.patientProfile?.age ?? null,
     patientGender: appointment.patient.patientProfile?.gender ?? null,
+    patientAddress: appointment.patient.patientProfile?.homeAddress ?? null,
     doctorName: appointment.doctor.name,
     doctorQualification: appointment.doctor.doctorProfile?.qualification ?? null,
     doctorRegNo: appointment.doctor.doctorProfile?.medRegNo ?? null,

@@ -146,6 +146,8 @@ export default function PatientProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [addressError, setAddressError] = useState("");
+  const [pinCodeError, setPinCodeError] = useState("");
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/patient/profile");
@@ -203,17 +205,34 @@ export default function PatientProfilePage() {
     });
   };
 
+  const [locatingGPS, setLocatingGPS] = useState(false);
+
   const getGPS = () => {
     if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) => {
+    setLocatingGPS(true);
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude, longitude } = pos.coords;
+      let address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+      let pinCode: string | null = null;
+      try {
+        const res = await fetch(`/api/geocode/reverse?lat=${latitude}&lon=${longitude}`);
+        const data = await res.json();
+        if (data.label) address = data.label;
+        if (data.pinCode) pinCode = data.pinCode;
+      } catch {
+        // fall back to raw coordinates
+      }
       setSaved(false);
       setForm((f) => ({
         ...f,
-        location: `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude,
+        location: address,
+        homeAddress: address,
+        pinCode: pinCode ?? f.pinCode,
+        lat: latitude,
+        lng: longitude,
       }));
-    });
+      setLocatingGPS(false);
+    }, () => setLocatingGPS(false));
   };
 
   const bmi = computeBMI(Number(form.height), Number(form.weight));
@@ -240,6 +259,20 @@ export default function PatientProfilePage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let hasError = false;
+    if (!form.homeAddress.trim()) {
+      setAddressError("Home address is required.");
+      hasError = true;
+    } else {
+      setAddressError("");
+    }
+    if (!/^\d{6}$/.test(form.pinCode.trim())) {
+      setPinCodeError("A valid 6-digit PIN code is required.");
+      hasError = true;
+    } else {
+      setPinCodeError("");
+    }
+    if (hasError) return;
     setSaving(true);
     setSaveError("");
     const res = await fetch("/api/patients/me", {
@@ -313,19 +346,22 @@ export default function PatientProfilePage() {
                       onChange={(v) => set("location", v)}
                     />
                   </div>
-                  <button type="button" onClick={getGPS} className="btn-secondary flex-shrink-0 px-3 text-xs gap-1 self-start">
-                    <MapPin className="w-3.5 h-3.5" /> GPS
+                  <button type="button" onClick={getGPS} disabled={locatingGPS} className="btn-secondary flex-shrink-0 px-3 text-xs gap-1 self-start disabled:opacity-60">
+                    {locatingGPS ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
+                    {locatingGPS ? "Locating…" : "GPS"}
                   </button>
                 </div>
+                <p className="text-xs text-slate-400 mt-1">Tap GPS to fill your address from your current location.</p>
               </div>
               <div>
-                <label className="input-label">Home Address</label>
+                <label className="input-label">Home Address <span className="text-red-500">*</span></label>
                 <AddressAutocomplete
                   multiline
                   placeholder="Flat/House No., Street, Area, Society"
                   value={form.homeAddress}
                   onChange={(v) => set("homeAddress", v)}
                 />
+                {addressError && <p className="text-xs text-red-500 mt-1">{addressError}</p>}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -333,8 +369,9 @@ export default function PatientProfilePage() {
                   <input className="input-field" placeholder="e.g. Near Metro Station" value={form.landmark} onChange={(e) => set("landmark", e.target.value)} />
                 </div>
                 <div>
-                  <label className="input-label">PIN Code</label>
+                  <label className="input-label">PIN Code <span className="text-red-500">*</span></label>
                   <input className="input-field" placeholder="400001" maxLength={6} value={form.pinCode} onChange={(e) => set("pinCode", e.target.value)} />
+                  {pinCodeError && <p className="text-xs text-red-500 mt-1">{pinCodeError}</p>}
                 </div>
               </div>
             </div>

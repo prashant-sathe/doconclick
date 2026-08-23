@@ -17,7 +17,7 @@ export async function GET(
       patient: {
         select: {
           name: true, mobile: true, email: true,
-          patientProfile: { select: { age: true, gender: true } },
+          patientProfile: { select: { age: true, gender: true, homeAddress: true } },
         },
       },
       doctor: {

@@ -66,6 +66,13 @@ export async function PATCH(req: Request) {
     }
   }
 
+  if ("homeAddress" in body && !String(body.homeAddress ?? "").trim()) {
+    return NextResponse.json({ error: "Home address is required." }, { status: 400 });
+  }
+  if ("pinCode" in body && !/^\d{6}$/.test(String(body.pinCode ?? "").trim())) {
+    return NextResponse.json({ error: "A valid 6-digit PIN code is required." }, { status: 400 });
+  }
+
   try {
     const updated = await prisma.patientProfile.update({
       where: { userId: authUser.id },

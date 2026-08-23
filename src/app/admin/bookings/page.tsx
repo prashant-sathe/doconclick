@@ -51,7 +51,7 @@ interface AppointmentDetail extends Appointment {
   };
   patient: {
     name: string; mobile: string; email: string | null;
-    patientProfile: { age: number; gender: string } | null;
+    patientProfile: { age: number; gender: string; homeAddress: string | null } | null;
   };
   doctorNotes: string | null;
   prescriptionUrl: string | null;
@@ -87,6 +87,7 @@ function toPrescriptionData(a: AppointmentDetail): PrescriptionData {
     relation: a.relation,
     patientAge: a.patient.patientProfile?.age ?? null,
     patientGender: a.patient.patientProfile?.gender ?? null,
+    patientAddress: a.patient.patientProfile?.homeAddress ?? null,
     doctorName: a.doctor.name,
     doctorQualification: a.doctor.doctorProfile?.qualification ?? null,
     doctorRegNo: a.doctor.doctorProfile?.medRegNo ?? null,
