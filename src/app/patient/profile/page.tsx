@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Loader2, MapPin, Droplets, Ruler, Weight, AlertTriangle, Pill,
   Scissors, PhoneCall, Camera, CheckCircle2, ArrowRight, Save, UploadCloud, User, Trash2,
+  Wallet as WalletIcon,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -324,6 +325,20 @@ export default function PatientProfilePage() {
             </div>
           </div>
         </div>
+
+        <Link
+          href="/patient/wallet"
+          className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-6 flex items-center gap-3 hover:border-emerald-200 transition-colors"
+        >
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+            <WalletIcon className="w-5 h-5 text-emerald-600" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-slate-800">Wallet</p>
+            <p className="text-xs text-slate-400">Add money, pay for appointments, view transactions</p>
+          </div>
+          <ArrowRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
+        </Link>
 
         <div className="flex justify-end mb-6">
           <Link href="/patient/dashboard" className="btn-secondary gap-1.5 text-sm">

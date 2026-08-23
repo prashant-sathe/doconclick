@@ -53,6 +53,16 @@ export type DoctorProfile = Prisma.DoctorProfileModel
  */
 export type Appointment = Prisma.AppointmentModel
 /**
+ * Model Wallet
+ * 
+ */
+export type Wallet = Prisma.WalletModel
+/**
+ * Model WalletTransaction
+ * 
+ */
+export type WalletTransaction = Prisma.WalletTransactionModel
+/**
  * Model Settlement
  * 
  */

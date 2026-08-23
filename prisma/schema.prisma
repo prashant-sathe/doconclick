@@ -36,6 +36,8 @@ model User {
   savedByPatients   SavedDoctor[] @relation("DoctorSavedBy")
   clinics           Clinic[]      @relation("DoctorClinics")
   pushTokens        PushToken[]
+  wallet            Wallet?
+  walletTransactionsAdjusted WalletTransaction[] @relation("WalletAdjustedBy")
 }
 
 model PushToken {
@@ -191,6 +193,36 @@ model Appointment {
   tests         PrescriptionTest[]
   attachments   PrescriptionAttachment[]
   messages      Message[]
+  walletTransaction WalletTransaction?
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions WalletTransaction[]
+}
+
+model WalletTransaction {
+  id                String       @id @default(cuid())
+  walletId          String
+  wallet            Wallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  type              String       // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT
+  amount            Float        // always positive; direction implied by `type`
+  balanceAfter      Float?       // wallet.balance immediately after this row settled; null until status = SUCCESS
+  status            String       @default("SUCCESS") // PENDING, SUCCESS, FAILED — only TOPUP rows are ever created PENDING
+  appointmentId     String?      @unique // set for BOOKING_PAYMENT rows
+  appointment       Appointment? @relation(fields: [appointmentId], references: [id])
+  cashfreeOrderId   String?      // set for TOPUP rows
+  cashfreePaymentId String?
+  adminId           String?      // set for ADMIN_CREDIT/ADMIN_DEBIT rows
+  admin             User?        @relation("WalletAdjustedBy", fields: [adminId], references: [id])
+  note              String?      // admin adjustment reason
+  createdAt         DateTime     @default(now())
 }
 
 model Settlement {

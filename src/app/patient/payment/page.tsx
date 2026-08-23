@@ -2,7 +2,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CreditCard, Loader2, ShieldCheck, CheckCircle } from "lucide-react";
+import { CreditCard, Loader2, ShieldCheck, CheckCircle, Wallet } from "lucide-react";
 import { formatDoctorName } from "@/lib/utils";
 
 interface AppointmentSummary {
@@ -19,7 +19,9 @@ function PaymentContent() {
   const [appt, setAppt] = useState<AppointmentSummary | null>(null);
   const [loading, setLoading] = useState(!!apptId);
   const [paying, setPaying] = useState(false);
+  const [payingWallet, setPayingWallet] = useState(false);
   const [error, setError] = useState("");
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   useEffect(() => {
     if (!apptId) return;
@@ -29,6 +31,10 @@ function PaymentContent() {
         setAppt(await r.json());
       })
       .finally(() => setLoading(false));
+    fetch(`/api/wallet/me?take=0`)
+      .then((r) => r.json())
+      .then((d) => setWalletBalance(d.balance ?? 0))
+      .catch(() => {});
   }, [apptId]);
 
   const pay = async () => {
@@ -54,6 +60,26 @@ function PaymentContent() {
     const cashfree = await load({ mode: "production" });
     cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
     // Browser navigates away to Cashfree's hosted checkout from here.
+  };
+
+  const payWithWallet = async () => {
+    if (!apptId) { setError("Missing appointment reference."); return; }
+    setPayingWallet(true);
+    setError("");
+    const res = await fetch("/api/wallet/pay", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appointmentId: apptId }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setPayingWallet(false);
+      setError(data.error ?? "Could not pay with wallet. Please try again.");
+      return;
+    }
+    // Direct, synchronous result — no external redirect, so just flip the
+    // component straight to the "Already Paid" branch below.
+    setAppt((a) => (a ? { ...a, paymentStatus: "PAID" } : a));
   };
 
   if (loading) {
@@ -101,10 +127,39 @@ function PaymentContent() {
         </div>
       )}
 
-      <button onClick={pay} disabled={paying} className="btn-primary w-full justify-center py-3.5 text-base">
+      {(() => {
+        const canPayWithWallet = walletBalance != null && walletBalance >= appt.amount;
+        return (
+          <div className="mb-3">
+            <button
+              onClick={payWithWallet}
+              disabled={payingWallet || paying || !canPayWithWallet}
+              className="btn-secondary w-full justify-center py-3.5 text-base gap-1.5 disabled:opacity-60"
+            >
+              {payingWallet ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Paying from wallet…</>
+              ) : walletBalance == null ? (
+                <><Wallet className="w-4 h-4" /> Pay ₹{appt.amount} via Wallet</>
+              ) : canPayWithWallet ? (
+                <><Wallet className="w-4 h-4" /> Pay ₹{appt.amount} via Wallet (Balance ₹{walletBalance})</>
+              ) : (
+                <><Wallet className="w-4 h-4" /> Insufficient wallet balance</>
+              )}
+            </button>
+            {walletBalance != null && !canPayWithWallet && (
+              <p className="text-xs text-slate-400 text-center mt-1.5">
+                You need ₹{Math.ceil(appt.amount - walletBalance)} more —{" "}
+                <Link href="/patient/wallet" className="text-blue-600 font-semibold hover:underline">top up your wallet</Link>.
+              </p>
+            )}
+          </div>
+        );
+      })()}
+
+      <button onClick={pay} disabled={paying || payingWallet} className="btn-primary w-full justify-center py-3.5 text-base">
         {paying
           ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</>
-          : `Pay ₹${appt.amount}`}
+          : `Pay ₹${appt.amount} via Cashfree`}
       </button>
     </div>
   );

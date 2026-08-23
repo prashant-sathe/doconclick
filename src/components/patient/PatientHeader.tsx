@@ -2,11 +2,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { CalendarCheck2, UserCircle, LogOut, Bell, Bookmark, Sparkles } from "lucide-react";
+import { CalendarCheck2, UserCircle, LogOut, Bell, Bookmark, Sparkles, Wallet as WalletIcon } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { usePatientNotifications } from "@/hooks/usePatientNotifications";
+import { useWalletNotifications } from "@/hooks/useWalletNotifications";
 import PatientNotificationToast from "@/components/patient/PatientNotificationToast";
+import WalletNotificationToast from "@/components/patient/WalletNotificationToast";
+
+const WALLET_EVENT_LABEL: Record<string, string> = {
+  TOPUP: "Wallet topped up",
+  BOOKING_PAYMENT: "Wallet debited",
+  ADMIN_CREDIT: "Credited by admin",
+  ADMIN_DEBIT: "Debited by admin",
+};
 
 const NAV = [
   { href: "/patient/dashboard", label: "Find a Doctor" },
@@ -41,11 +50,20 @@ export default function PatientHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const [bellOpen, setBellOpen] = useState(false);
-  const { notableAppointments, hasUnseen, activeToast, dismissToast, markSeen } = usePatientNotifications(user?.id);
+  const { notableAppointments, hasUnseen: apptUnseen, activeToast, dismissToast, markSeen } = usePatientNotifications(user?.id);
+  const {
+    balance,
+    walletTransactions,
+    hasUnseen: walletUnseen,
+    activeToast: walletToast,
+    dismissToast: dismissWalletToast,
+    markSeen: markWalletSeen,
+  } = useWalletNotifications(user?.id);
+  const hasUnseen = apptUnseen || walletUnseen;
 
   const toggleBell = () => {
     setBellOpen((open) => {
-      if (!open) markSeen();
+      if (!open) { markSeen(); markWalletSeen(); }
       return !open;
     });
   };
@@ -80,6 +98,14 @@ export default function PatientHeader() {
             Hi, <strong className="text-slate-800">{user?.name}</strong>
           </span>
 
+          <Link
+            href="/patient/wallet"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition-colors"
+          >
+            <WalletIcon className="w-3.5 h-3.5" />
+            <span>{balance != null ? `₹${balance.toLocaleString("en-IN")}` : "—"}</span>
+          </Link>
+
           <div className="relative">
             <button
               onClick={toggleBell}
@@ -95,14 +121,14 @@ export default function PatientHeader() {
             {bellOpen && (
               <>
                 <div className="fixed inset-0 z-30" onClick={() => setBellOpen(false)} />
-                <div className="absolute right-0 top-full mt-2 w-80 max-w-[90vw] bg-white rounded-2xl border border-slate-100 shadow-xl z-40 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-slate-100">
+                <div className="absolute right-0 top-full mt-2 w-80 max-w-[90vw] bg-white rounded-2xl border border-slate-100 shadow-xl z-40 overflow-hidden max-h-[28rem] overflow-y-auto">
+                  <div className="px-4 py-3 border-b border-slate-100 sticky top-0 bg-white">
                     <h3 className="text-sm font-bold text-slate-800">Appointment Updates</h3>
                   </div>
                   {notableAppointments.length === 0 ? (
-                    <p className="text-sm text-slate-400 text-center py-8">No updates yet.</p>
+                    <p className="text-sm text-slate-400 text-center py-6">No updates yet.</p>
                   ) : (
-                    <div className="divide-y divide-slate-50 max-h-80 overflow-y-auto">
+                    <div className="divide-y divide-slate-50">
                       {notableAppointments.slice(0, 5).map((a) => (
                         <button
                           key={a.id}
@@ -118,6 +144,32 @@ export default function PatientHeader() {
                       ))}
                     </div>
                   )}
+
+                  <div className="px-4 py-3 border-b border-t border-slate-100 sticky top-0 bg-white">
+                    <h3 className="text-sm font-bold text-slate-800">Wallet</h3>
+                  </div>
+                  {walletTransactions.length === 0 ? (
+                    <p className="text-sm text-slate-400 text-center py-6">No wallet activity yet.</p>
+                  ) : (
+                    <div className="divide-y divide-slate-50">
+                      {walletTransactions.slice(0, 5).map((t) => (
+                        <button
+                          key={t.id}
+                          onClick={() => { setBellOpen(false); router.push("/patient/wallet"); }}
+                          className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors flex items-center gap-2.5"
+                        >
+                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${t.status === "FAILED" ? "bg-red-500" : "bg-emerald-500"}`} />
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-slate-800 truncate">
+                              {t.status === "FAILED" ? "Top-up failed" : (WALLET_EVENT_LABEL[t.type] ?? t.type)}
+                            </p>
+                            <p className="text-xs text-slate-400 mt-0.5">₹{t.amount}{t.balanceAfter != null ? ` · Balance ₹${t.balanceAfter}` : ""}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   <Link
                     href="/patient/appointments"
                     onClick={() => setBellOpen(false)}
@@ -137,6 +189,7 @@ export default function PatientHeader() {
       </div>
 
       {activeToast && <PatientNotificationToast event={activeToast} onDismiss={dismissToast} />}
+      {walletToast && <WalletNotificationToast event={walletToast} onDismiss={dismissWalletToast} />}
     </header>
   );
 }

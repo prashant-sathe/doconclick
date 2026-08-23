@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyCashfreeWebhookSignature, DOCTOR_REGISTRATION_FEE, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { WALLET_TOPUP_ORDER_PREFIX } from "@/lib/wallet";
 
 interface CashfreeWebhookPayload {
   type: "PAYMENT_SUCCESS_WEBHOOK" | "PAYMENT_FAILED_WEBHOOK" | string;
@@ -36,7 +37,28 @@ export async function POST(req: Request) {
   }
 
   if (payload.type === "PAYMENT_FAILED_WEBHOOK") {
-    console.log("Cashfree payment failed for order", payload.data?.order?.order_id);
+    const failedOrderId = payload.data?.order?.order_id;
+    console.log("Cashfree payment failed for order", failedOrderId);
+    // Only wallet top-ups need explicit failure handling here — a failed
+    // appointment/doctor-fee payment just leaves paymentStatus at PENDING,
+    // indistinguishable from "not yet paid" (the patient can just retry).
+    // A wallet TOPUP row, though, is created PENDING up front and must be
+    // settled to a terminal state or the top-up return page polls to a
+    // timeout instead of showing a clean failure.
+    if (failedOrderId?.startsWith(WALLET_TOPUP_ORDER_PREFIX)) {
+      const txn = await prisma.walletTransaction.findFirst({
+        where: { cashfreeOrderId: failedOrderId, status: "PENDING" },
+        include: { wallet: true },
+      });
+      if (txn) {
+        await prisma.walletTransaction.update({ where: { id: txn.id }, data: { status: "FAILED" } });
+        void sendPushToUser(txn.wallet.userId, {
+          title: "Wallet top-up failed",
+          body: `Your top-up of ₹${txn.amount} didn't go through. No amount was deducted.`,
+          url: "/patient/wallet",
+        });
+      }
+    }
     return NextResponse.json({ ok: true });
   }
 
@@ -135,6 +157,47 @@ export async function POST(req: Request) {
       title: "Subscription renewed",
       body: "Your subscription is active.",
       url: "/doctor/dashboard",
+    });
+    return NextResponse.json({ ok: true });
+  }
+
+  if (orderId.startsWith(WALLET_TOPUP_ORDER_PREFIX)) {
+    const txn = await prisma.walletTransaction.findFirst({
+      where: { cashfreeOrderId: orderId },
+      include: { wallet: true },
+    });
+    if (!txn) {
+      console.error("Cashfree webhook: no wallet transaction found for order", orderId);
+      return NextResponse.json({ ok: true });
+    }
+    if (txn.status !== "PENDING") {
+      // Already settled — Cashfree retries webhooks, this must be idempotent.
+      return NextResponse.json({ ok: true });
+    }
+    if (payload.data.order.order_amount !== txn.amount) {
+      console.error(
+        "Cashfree webhook amount mismatch for wallet top-up", txn.id,
+        "expected", txn.amount, "got", payload.data.order.order_amount
+      );
+      return NextResponse.json({ ok: true }); // don't credit; flagged for manual review
+    }
+
+    const wallet = await prisma.$transaction(async (tx) => {
+      const updated = await tx.wallet.update({
+        where: { id: txn.walletId },
+        data: { balance: { increment: txn.amount } },
+      });
+      await tx.walletTransaction.update({
+        where: { id: txn.id },
+        data: { status: "SUCCESS", balanceAfter: updated.balance, cashfreePaymentId: payload.data.payment.cf_payment_id },
+      });
+      return updated;
+    });
+
+    void sendPushToUser(txn.wallet.userId, {
+      title: "Wallet top-up successful",
+      body: `₹${txn.amount} added to your wallet. New balance ₹${wallet.balance}.`,
+      url: "/patient/wallet",
     });
     return NextResponse.json({ ok: true });
   }

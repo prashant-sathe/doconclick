@@ -58,6 +58,8 @@ export const ModelName = {
   PatientDependent: 'PatientDependent',
   DoctorProfile: 'DoctorProfile',
   Appointment: 'Appointment',
+  Wallet: 'Wallet',
+  WalletTransaction: 'WalletTransaction',
   Settlement: 'Settlement',
   DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
@@ -249,6 +251,35 @@ export const AppointmentScalarFieldEnum = {
 } as const
 
 export type AppointmentScalarFieldEnum = (typeof AppointmentScalarFieldEnum)[keyof typeof AppointmentScalarFieldEnum]
+
+
+export const WalletScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  balance: 'balance',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WalletScalarFieldEnum = (typeof WalletScalarFieldEnum)[keyof typeof WalletScalarFieldEnum]
+
+
+export const WalletTransactionScalarFieldEnum = {
+  id: 'id',
+  walletId: 'walletId',
+  type: 'type',
+  amount: 'amount',
+  balanceAfter: 'balanceAfter',
+  status: 'status',
+  appointmentId: 'appointmentId',
+  cashfreeOrderId: 'cashfreeOrderId',
+  cashfreePaymentId: 'cashfreePaymentId',
+  adminId: 'adminId',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type WalletTransactionScalarFieldEnum = (typeof WalletTransactionScalarFieldEnum)[keyof typeof WalletTransactionScalarFieldEnum]
 
 
 export const SettlementScalarFieldEnum = {

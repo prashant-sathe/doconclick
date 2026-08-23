@@ -11,6 +11,7 @@ const PROTECTED: { pattern: RegExp; roles: string[] }[] = [
   { pattern: /^\/patient\/book(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/patient\/assistant(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/patient\/payment(\/|$)/, roles: ["PATIENT"] },
+  { pattern: /^\/patient\/wallet(\/|$)/, roles: ["PATIENT"] },
 ];
 
 // Redirect destinations after login by role
