@@ -1,16 +1,12 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
-  ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp,
-  MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck,
-  Building2, Video, Home,
+  ChevronLeft, LifeBuoy, Info, Plus, ArrowUp,
+  CalendarClock, IndianRupee, BadgeCheck, MessageSquareWarning,
+  Ticket, Clock,
 } from "lucide-react";
-import RatingStars from "@/components/patient/RatingStars";
-import { isDoctorAvailableNow } from "@/lib/availability";
 import { useAuth } from "@/components/AuthProvider";
-import { formatDoctorName } from "@/lib/utils";
 import { renderChatText } from "@/lib/chatMarkdown";
 
 // Loosely typed mirror of the OpenAI Responses API's input/output items —
@@ -27,25 +23,20 @@ interface ConversationItem {
   [key: string]: unknown;
 }
 
-interface AssistantDoctor {
+interface SupportTicket {
   id: string;
-  name: string;
-  specialty: string;
-  avgRating: number;
-  totalReviews: number;
-  distanceKm: number | null;
-  fee: number;
-  availability: string;
-  offersHomeVisit: boolean;
-  offersClinic: boolean;
-  offersVideo: boolean;
+  subject: string;
+  description?: string;
+  status: string;
+  createdAt: string;
 }
 
 type DisplayEntry =
   | { kind: "user"; text: string; key: string }
   | { kind: "assistant"; text: string; key: string }
   | { kind: "chips"; options: string[]; active: boolean; key: string }
-  | { kind: "doctors"; doctors: AssistantDoctor[]; key: string };
+  | { kind: "ticket-created"; ticket: SupportTicket; key: string }
+  | { kind: "ticket-list"; tickets: SupportTicket[]; key: string };
 
 function extractText(content: ConversationItem["content"]): string {
   if (typeof content === "string") return content;
@@ -75,12 +66,19 @@ function buildDisplayEntries(items: ConversationItem[]): DisplayEntry[] {
       }
     } else if (item.type === "function_call_output") {
       const call = items.find((c) => c.type === "function_call" && c.call_id === item.call_id);
-      if (call?.name === "find_doctors") {
+      if (call?.name === "create_support_ticket") {
         try {
-          const doctors = JSON.parse(item.output ?? "[]") as AssistantDoctor[];
-          if (doctors.length) entries.push({ kind: "doctors", doctors, key: `d-${idx}` });
+          const ticket = JSON.parse(item.output ?? "{}") as SupportTicket;
+          if (ticket?.id) entries.push({ kind: "ticket-created", ticket, key: `tc-${idx}` });
         } catch {
-          // malformed tool output — skip rendering doctor cards for this turn
+          // malformed tool output — skip rendering for this turn
+        }
+      } else if (call?.name === "list_my_support_tickets") {
+        try {
+          const tickets = JSON.parse(item.output ?? "[]") as SupportTicket[];
+          if (tickets.length) entries.push({ kind: "ticket-list", tickets, key: `tl-${idx}` });
+        } catch {
+          // malformed tool output — skip rendering for this turn
         }
       }
     }
@@ -96,24 +94,38 @@ function buildDisplayEntries(items: ConversationItem[]): DisplayEntry[] {
   return entries;
 }
 
-const STARTER_PROMPTS: { icon: typeof Thermometer; tint: "blue" | "teal" | "amber" | "emerald"; text: string }[] = [
-  { icon: Thermometer, tint: "blue", text: "I have a fever and cough" },
-  { icon: Baby, tint: "teal", text: "My child has a skin rash" },
-  { icon: Activity, tint: "amber", text: "I've had a headache for 3 days" },
-  { icon: ClipboardCheck, tint: "emerald", text: "I need a routine health check-up" },
+const STARTER_PROMPTS: { icon: typeof CalendarClock; tint: "teal" | "amber" | "blue" | "rose"; text: string }[] = [
+  { icon: CalendarClock, tint: "teal", text: "What's on my schedule today?" },
+  { icon: IndianRupee, tint: "amber", text: "How much am I owed and when do I get settled?" },
+  { icon: BadgeCheck, tint: "blue", text: "Is my subscription and verification active?" },
+  { icon: MessageSquareWarning, tint: "rose", text: "I need to report an issue to the DocOnClick team" },
 ];
 
 const TINT_CLASSES: Record<string, string> = {
-  blue: "bg-blue-50 text-blue-600",
   teal: "bg-teal-50 text-teal-600",
   amber: "bg-amber-50 text-amber-600",
-  emerald: "bg-emerald-50 text-emerald-600",
+  blue: "bg-blue-50 text-blue-600",
+  rose: "bg-rose-50 text-rose-600",
 };
+
+const STATUS_CLASSES: Record<string, string> = {
+  OPEN: "bg-amber-50 text-amber-700 border-amber-100",
+  IN_PROGRESS: "bg-blue-50 text-blue-700 border-blue-100",
+  RESOLVED: "bg-emerald-50 text-emerald-700 border-emerald-100",
+};
+
+function StatusBadge({ status }: { status: string }) {
+  return (
+    <span className={`text-[10px] font-bold uppercase tracking-wide border rounded-full px-2 py-0.5 ${STATUS_CLASSES[status] ?? "bg-slate-50 text-slate-600 border-slate-200"}`}>
+      {status.replace("_", " ")}
+    </span>
+  );
+}
 
 function BotAvatar() {
   return (
-    <div className="w-7 h-7 rounded-[9px] gradient-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-      <Sparkles className="w-3.5 h-3.5 text-white" />
+    <div className="w-7 h-7 rounded-[9px] bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+      <LifeBuoy className="w-3.5 h-3.5 text-white" />
     </div>
   );
 }
@@ -131,75 +143,36 @@ function TypingIndicator() {
   );
 }
 
-function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
-  const available = isDoctorAvailableNow(doctor.availability);
-  const initials = doctor.name
-    .replace(/^Dr\.?\s*/i, "")
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join("")
-    .toUpperCase();
-
+function TicketCreatedCard({ ticket }: { ticket: SupportTicket }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-      <div className="flex gap-3">
-        <div className="relative flex-shrink-0">
-          <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center text-white font-bold text-sm">
-            {initials || "Dr"}
-          </div>
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center">
-            <BadgeCheck className="w-4 h-4 fill-emerald-100 text-emerald-600" />
-          </div>
-        </div>
-        <div className="flex-1 min-w-0">
+    <div className="ml-9 bg-white border border-teal-100 rounded-2xl p-4 shadow-sm">
+      <div className="flex items-center gap-2">
+        <Ticket className="w-4 h-4 text-teal-600 flex-shrink-0" />
+        <span className="text-sm font-bold text-slate-900">Ticket raised</span>
+        <StatusBadge status={ticket.status} />
+      </div>
+      <p className="text-sm text-slate-700 font-semibold mt-2">{ticket.subject}</p>
+      <p className="text-[11px] text-slate-400 mt-1">
+        Ref #{ticket.id.slice(-8)} · {new Date(ticket.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+      </p>
+    </div>
+  );
+}
+
+function TicketListCard({ tickets }: { tickets: SupportTicket[] }) {
+  return (
+    <div className="ml-9 flex flex-col gap-2">
+      {tickets.map((t) => (
+        <div key={t.id} className="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-sm font-bold text-slate-900 truncate">{formatDoctorName(doctor.name)}</span>
-            <span className="text-sm font-bold text-slate-900 flex-shrink-0">₹{doctor.fee}</span>
+            <span className="text-sm font-semibold text-slate-800 truncate">{t.subject}</span>
+            <StatusBadge status={t.status} />
           </div>
-          <span className="badge badge-info mt-1.5">{doctor.specialty}</span>
-          <div className="mt-1.5">
-            <RatingStars avgRating={doctor.avgRating} totalReviews={doctor.totalReviews} />
-          </div>
-          <div className="flex flex-wrap gap-1.5 mt-1.5">
-            {doctor.offersClinic && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 rounded-full px-2 py-0.5">
-                <Building2 className="w-3 h-3" /> Clinic
-              </span>
-            )}
-            {doctor.offersVideo && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 bg-blue-50 rounded-full px-2 py-0.5">
-                <Video className="w-3 h-3" /> Video call
-              </span>
-            )}
-            {doctor.offersHomeVisit && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 rounded-full px-2 py-0.5">
-                <Home className="w-3 h-3" /> Home visit
-              </span>
-            )}
-          </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[11px]">
-            {doctor.distanceKm != null && (
-              <span className="flex items-center gap-1 text-slate-500">
-                <MapPin className="w-3 h-3" /> {doctor.distanceKm} km away
-              </span>
-            )}
-            <span className={`flex items-center gap-1 font-semibold ${available ? "text-emerald-600" : "text-amber-600"}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${available ? "bg-emerald-500" : "bg-amber-500"}`} />
-              {available ? "Available now" : doctor.availability}
-            </span>
-          </div>
+          <p className="flex items-center gap-1 text-[11px] text-slate-400 mt-1.5">
+            <Clock className="w-3 h-3" /> {new Date(t.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+          </p>
         </div>
-      </div>
-      <div className="flex gap-2 mt-3">
-        <Link href={`/patient/doctor/${doctor.id}`} className="btn-ghost flex-1 justify-center py-2 text-xs">
-          View profile
-        </Link>
-        <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary flex-1 justify-center py-2 text-xs">
-          Book appointment
-        </Link>
-      </div>
+      ))}
     </div>
   );
 }
@@ -208,7 +181,7 @@ function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: strin
   if (entry.kind === "user") {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[75%] bg-primary-500 text-white text-sm leading-relaxed rounded-2xl rounded-br-md px-4 py-2.5 shadow-sm">
+        <div className="max-w-[75%] bg-teal-600 text-white text-sm leading-relaxed rounded-2xl rounded-br-md px-4 py-2.5 shadow-sm">
           {entry.text}
         </div>
       </div>
@@ -232,7 +205,7 @@ function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: strin
             key={opt}
             disabled={!entry.active}
             onClick={() => onChip(opt)}
-            className="rounded-full border border-blue-100 bg-blue-50 text-blue-600 text-xs font-semibold px-3.5 py-1.5 disabled:cursor-default enabled:hover:bg-blue-100 transition-colors"
+            className="rounded-full border border-teal-100 bg-teal-50 text-teal-700 text-xs font-semibold px-3.5 py-1.5 disabled:cursor-default enabled:hover:bg-teal-100 transition-colors"
           >
             {opt}
           </button>
@@ -240,25 +213,20 @@ function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: strin
       </div>
     );
   }
-  return (
-    <div className="ml-9 flex flex-col gap-3">
-      {entry.doctors.map((d) => (
-        <DoctorCard key={d.id} doctor={d} />
-      ))}
-    </div>
-  );
+  if (entry.kind === "ticket-created") return <TicketCreatedCard ticket={entry.ticket} />;
+  return <TicketListCard tickets={entry.tickets} />;
 }
 
 function WelcomeState({ onPick }: { onPick: (text: string) => void }) {
   return (
     <div className="h-full flex flex-col items-center justify-center gap-6 px-6 py-10 text-center">
-      <div className="w-16 h-16 rounded-[22px] gradient-primary flex items-center justify-center shadow-lg">
-        <Sparkles className="w-7 h-7 text-white" />
+      <div className="w-16 h-16 rounded-[22px] bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg">
+        <LifeBuoy className="w-7 h-7 text-white" />
       </div>
       <div>
-        <h1 className="gradient-text text-2xl font-extrabold tracking-tight">Hi, I&apos;m your Health Assistant</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Hi, I&apos;m your Support Assistant</h1>
         <p className="text-slate-500 text-sm mt-2 max-w-sm mx-auto leading-relaxed">
-          Tell me what&apos;s bothering you, and I&apos;ll help point you to the right doctor.
+          Ask about your schedule, earnings, account status, or raise an issue for the DocOnClick team.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
@@ -266,13 +234,12 @@ function WelcomeState({ onPick }: { onPick: (text: string) => void }) {
           <button
             key={text}
             onClick={() => onPick(text)}
-            className="flex items-center gap-3 bg-white border border-slate-200 rounded-2xl px-4 py-3.5 text-left shadow-sm hover:border-blue-200 hover:-translate-y-0.5 hover:shadow-md transition-all"
+            className="flex items-center gap-3 bg-white border border-slate-200 rounded-2xl px-4 py-3.5 text-left shadow-sm hover:border-teal-200 hover:-translate-y-0.5 hover:shadow-md transition-all"
           >
             <span className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${TINT_CLASSES[tint]}`}>
               <Icon className="w-4 h-4" />
             </span>
             <span className="text-[13.5px] font-semibold text-slate-800 flex-1">{text}</span>
-            <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
           </button>
         ))}
       </div>
@@ -280,7 +247,7 @@ function WelcomeState({ onPick }: { onPick: (text: string) => void }) {
   );
 }
 
-export default function HealthAssistantPage() {
+export default function DoctorSupportPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [items, setItems] = useState<ConversationItem[]>([]);
@@ -288,7 +255,7 @@ export default function HealthAssistantPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const storageKey = user ? `doconclick:assistant-chat:${user.id}` : null;
+  const storageKey = user ? `doconclick:doctor-support-chat:${user.id}` : null;
 
   useEffect(() => {
     requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }));
@@ -324,7 +291,7 @@ export default function HealthAssistantPage() {
       setInput("");
       setLoading(true);
       try {
-        const res = await fetch("/api/patient/assistant", {
+        const res = await fetch("/api/doctor/support-agent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ messages: nextItems }),
@@ -348,16 +315,16 @@ export default function HealthAssistantPage() {
       <header className="flex-shrink-0 bg-white/90 backdrop-blur-xl border-b border-slate-100 px-4 sm:px-7 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <button
-            onClick={() => router.push("/patient/dashboard")}
+            onClick={() => router.push("/doctor/dashboard")}
             className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors flex-shrink-0"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-4 h-4 text-white" />
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center flex-shrink-0">
+            <LifeBuoy className="w-4 h-4 text-white" />
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-bold text-slate-900 leading-tight truncate">Health Assistant</div>
+            <div className="text-sm font-bold text-slate-900 leading-tight truncate">Support Assistant</div>
             <div className="text-[11px] text-slate-400 font-medium">Powered by AI · Always available</div>
           </div>
         </div>
@@ -369,10 +336,10 @@ export default function HealthAssistantPage() {
         </button>
       </header>
 
-      <div className="flex-shrink-0 bg-blue-50 border-b border-blue-100 px-4 sm:px-7 py-2 flex items-center gap-2">
-        <Info className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
-        <span className="text-xs font-medium text-blue-700">
-          This assistant helps you find the right doctor. It does not provide diagnosis or emergency care — for urgent symptoms, call 112 or go to the nearest hospital.
+      <div className="flex-shrink-0 bg-teal-50 border-b border-teal-100 px-4 sm:px-7 py-2 flex items-center gap-2">
+        <Info className="w-3.5 h-3.5 text-teal-600 flex-shrink-0" />
+        <span className="text-xs font-medium text-teal-700">
+          I can look up your schedule, earnings, and account status, and raise a ticket for the DocOnClick team.
         </span>
       </div>
 
@@ -406,20 +373,20 @@ export default function HealthAssistantPage() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Describe how you're feeling…"
+            placeholder="Ask about your schedule, earnings, account…"
             disabled={loading}
             className="flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary text-white disabled:opacity-40 transition-opacity"
+            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-teal-500 to-teal-600 text-white disabled:opacity-40 transition-opacity"
           >
             <ArrowUp className="w-4 h-4" />
           </button>
         </form>
         <p className="text-center text-[11px] text-slate-400 mt-2">
-          Health Assistant can make mistakes. Always consult a doctor for medical advice.
+          Support Assistant can make mistakes. For urgent issues, raise a ticket.
         </p>
       </div>
     </div>

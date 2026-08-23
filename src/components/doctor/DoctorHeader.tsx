@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { LayoutDashboard, IndianRupee, UserCircle, Building2, LogOut, Bell, Clock } from "lucide-react";
+import { LayoutDashboard, IndianRupee, UserCircle, Building2, LogOut, Bell, Clock, Sparkles } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
@@ -13,6 +13,7 @@ const NAV = [
   { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/doctor/earnings", label: "Earnings", icon: IndianRupee },
   { href: "/doctor/clinics", label: "Clinics", icon: Building2 },
+  { href: "/doctor/support", label: "Support", icon: Sparkles },
   { href: "/doctor/profile", label: "Profile", icon: UserCircle },
 ];
 
@@ -57,8 +58,19 @@ export default function DoctorHeader() {
                 pathname === href ? "text-teal-600 bg-teal-50" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
               )}
             >
-              <Icon className="w-4 h-4" />
+              {href === "/doctor/support" ? (
+                <span className="flex items-center justify-center w-5 h-5 rounded-md gradient-primary">
+                  <Icon className="w-3 h-3 text-white" />
+                </span>
+              ) : (
+                <Icon className="w-4 h-4" />
+              )}
               {label}
+              {href === "/doctor/support" && (
+                <span className="text-[9px] font-extrabold tracking-wide text-white gradient-primary rounded-full px-1.5 py-[1px] leading-none">
+                  AI
+                </span>
+              )}
             </Link>
           ))}
         </nav>

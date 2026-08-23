@@ -749,8 +749,8 @@ export default function DoctorDashboard() {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
                 const patientLoc = a.patient.patientProfile;
                 return (
-                  <div key={a.id} className="px-6 py-4 hover:bg-slate-50/70 transition-colors">
-                    <div className="flex items-center justify-between gap-3">
+                  <div key={a.id} className="px-4 sm:px-6 py-4 hover:bg-slate-50/70 transition-colors">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-start gap-4 min-w-0">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${a.isEmergency ? "bg-red-50" : "bg-teal-50"}`}>
                           <Icon className={`w-5 h-5 ${a.isEmergency ? "text-red-500" : "text-teal-600"}`} />
@@ -806,7 +806,7 @@ export default function DoctorDashboard() {
                           )}
                         </div>
                       </div>
-                      <div className="flex gap-2 flex-shrink-0">
+                      <div className="flex flex-wrap gap-2 sm:flex-shrink-0">
                         <Link href={historyHref(a)} className="btn-secondary py-1.5 px-3 text-xs" title="Patient history">
                           <History className="w-3.5 h-3.5" />
                         </Link>

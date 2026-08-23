@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, IndianRupee, Building2, UserCircle } from "lucide-react";
+import { LayoutDashboard, IndianRupee, Building2, UserCircle, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { computeDoctorCompleteness } from "@/lib/doctorProfileCompleteness";
 
@@ -10,6 +10,7 @@ const TABS = [
   { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/doctor/earnings", label: "Earnings", icon: IndianRupee },
   { href: "/doctor/clinics", label: "Clinics", icon: Building2 },
+  { href: "/doctor/support", label: "Support", icon: Sparkles },
   { href: "/doctor/profile", label: "Profile", icon: UserCircle },
 ];
 
@@ -46,12 +47,27 @@ export default function DoctorMobileNav() {
             )}
           >
             <span className="relative">
-              <Icon className="w-5 h-5" />
+              {href === "/doctor/support" ? (
+                <span className="flex items-center justify-center w-6 h-6 rounded-lg gradient-primary shadow-sm shadow-teal-900/20">
+                  <Icon className="w-3.5 h-3.5 text-white" />
+                </span>
+              ) : (
+                <Icon className="w-5 h-5" />
+              )}
               {href === "/doctor/profile" && profileIncomplete && (
                 <span className="absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-red-500 border border-white" />
               )}
             </span>
-            {label}
+            {href === "/doctor/support" ? (
+              <span className="flex items-center gap-1">
+                {label}
+                <span className="text-[7px] font-extrabold tracking-wide text-white gradient-primary rounded-full px-1 py-[1px] leading-none">
+                  AI
+                </span>
+              </span>
+            ) : (
+              label
+            )}
           </Link>
         );
       })}
