@@ -68,7 +68,7 @@ export default function DoctorHeader() {
               title="Notifications"
               className="relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
             >
-              <Bell className="w-4 h-4" />
+              <Bell className={cn("w-4 h-4", hasUnseen && "animate-bell-ring")} />
               {hasUnseen && (
                 <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 border border-white" />
               )}

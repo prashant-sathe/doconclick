@@ -303,10 +303,22 @@
   100% { background-position: 200% center; }
 }
 
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0deg); }
+  4%  { transform: rotate(15deg); }
+  8%  { transform: rotate(-15deg); }
+  12% { transform: rotate(10deg); }
+  16% { transform: rotate(-10deg); }
+  20% { transform: rotate(6deg); }
+  24% { transform: rotate(-6deg); }
+  28% { transform: rotate(0deg); }
+}
+
 .animate-fade-in-up  { animation: fadeInUp 0.5s ease-out forwards; }
 .animate-slide-in    { animation: slideInLeft 0.4s ease-out forwards; }
 .animate-pulse-glow  { animation: pulse-glow 2s infinite; }
 .animate-float       { animation: float 3s ease-in-out infinite; }
+.animate-bell-ring   { animation: bellRing 2.5s ease-in-out infinite; transform-origin: 50% 0%; }
 
 .stagger-1 { animation-delay: 0.05s; opacity: 0; }
 .stagger-2 { animation-delay: 0.10s; opacity: 0; }
