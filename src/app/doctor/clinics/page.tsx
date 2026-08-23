@@ -172,11 +172,10 @@ function ClinicCard({ clinic, onChange, onSave, onDelete }: {
   const removeGroup = (groupIdx: number) => set("slotGroups", clinic.slotGroups.filter((_, i) => i !== groupIdx));
 
   const hasAnySlot = clinic.slotGroups.some((g) => g.days.length > 0);
-  const missingName = !clinic.name.trim();
   const missingAddress = !clinic.address.trim();
   const missingLocation = clinic.lat == null || clinic.lng == null;
   const missingSlot = !hasAnySlot;
-  const canSave = !missingName && !missingAddress && !missingLocation && !missingSlot;
+  const canSave = !missingAddress && !missingLocation && !missingSlot;
 
   return (
     <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
@@ -190,9 +189,10 @@ function ClinicCard({ clinic, onChange, onSave, onDelete }: {
       </div>
 
       <div>
-        <label className="input-label">Clinic Name <span className="text-red-500">*</span></label>
+        <label className="input-label">Clinic Name <span className="text-slate-400 font-normal normal-case">(optional)</span></label>
         <input className="input-field" placeholder="e.g. Sunrise Family Clinic" value={clinic.name}
           onChange={(e) => set("name", e.target.value)} />
+        <p className="text-xs text-slate-400 mt-1">Leave blank to use your name as the clinic name.</p>
       </div>
 
       <div>

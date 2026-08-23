@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { formatDoctorName } from "@/lib/utils";
 
 interface SlotInput {
   dayOfWeek: string;
@@ -39,8 +40,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   }
 
   const body: ClinicInput = await req.json();
-  if (!body.name?.trim() || !body.address?.trim() || body.lat == null || body.lng == null) {
-    return NextResponse.json({ error: "Name, address, and location are required." }, { status: 400 });
+  if (!body.address?.trim() || body.lat == null || body.lng == null) {
+    return NextResponse.json({ error: "Address and location are required." }, { status: 400 });
   }
   if (!body.slots?.length) {
     return NextResponse.json({ error: "Please set at least one day-wise time slot." }, { status: 400 });
@@ -54,7 +55,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     prisma.clinic.update({
       where: { id },
       data: {
-        name: body.name.trim(),
+        name: body.name?.trim() || `${formatDoctorName(authUser.name)}'s Clinic`,
         address: body.address.trim(),
         photoUrl: body.photoUrl || null,
         lat: body.lat,
