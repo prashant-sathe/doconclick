@@ -1064,11 +1064,11 @@ function PatientDashboardInner() {
                 /* ── DOCTOR PROFILE CARD ───────────────────────────── */
                 <div className="pb-6">
                   {/* Clinic cover photo */}
-                  {(selectedClinic?.photoUrl ?? selectedDoctor.doctorProfile.clinicPhotoUrl) && (
+                  {(selectedClinic ? selectedClinic.photoUrl : selectedDoctor.doctorProfile.clinicPhotoUrl) && (
                     <div className="w-full h-32 sm:h-40 rounded-2xl overflow-hidden bg-slate-100 mb-4 -mt-1">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={selectedClinic?.photoUrl ?? selectedDoctor.doctorProfile.clinicPhotoUrl!}
+                        src={(selectedClinic ? selectedClinic.photoUrl : selectedDoctor.doctorProfile.clinicPhotoUrl)!}
                         alt={(selectedClinic?.name ?? selectedDoctor.doctorProfile.clinicName) ? `${selectedClinic?.name ?? selectedDoctor.doctorProfile.clinicName} — clinic photo` : "Clinic photo"}
                         className="w-full h-full object-cover"
                       />

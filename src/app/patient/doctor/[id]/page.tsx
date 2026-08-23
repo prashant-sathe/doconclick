@@ -172,11 +172,11 @@ export default function DoctorProfilePage() {
       <Header />
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          {(doctor.clinics[0]?.photoUrl ?? profile.clinicPhotoUrl) && (
+          {(doctor.clinics.length > 0 ? doctor.clinics[0].photoUrl : profile.clinicPhotoUrl) && (
             <div className="w-full h-40 sm:h-48 bg-slate-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={doctor.clinics[0]?.photoUrl ?? profile.clinicPhotoUrl!}
+                src={(doctor.clinics.length > 0 ? doctor.clinics[0].photoUrl : profile.clinicPhotoUrl)!}
                 alt={(doctor.clinics[0]?.name ?? profile.clinicName) ? `${doctor.clinics[0]?.name ?? profile.clinicName} — clinic photo` : "Clinic photo"}
                 className="w-full h-full object-cover"
               />
