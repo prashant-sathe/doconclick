@@ -2,7 +2,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Heart, Shield, Target, Users, Award, Stethoscope, TrendingUp, Globe } from "lucide-react";
 
-export const metadata = { title: "About Us | DocOnClick", description: "Learn about DocOnClick's mission to make quality healthcare accessible to every Indian." };
+export const metadata = {
+  title: "About Us",
+  description: "Learn about DocOnClick's mission to make quality healthcare accessible to every Indian.",
+  alternates: { canonical: "/about" },
+};
 
 const VALUES = [
   { icon: Heart,     title: "Patient First",         desc: "Every decision we make starts with one question: does this make the patient's life better?" },
