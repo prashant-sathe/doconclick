@@ -379,6 +379,17 @@
   @apply text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2;
 }
 
+/* Leaflet doctor-marker hover tooltip — strip default box, our HTML supplies its own card */
+.doctor-marker-tooltip {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.doctor-marker-tooltip::before {
+  display: none;
+}
+
 /* Gradient accent border */
 .gradient-border {
   position: relative;

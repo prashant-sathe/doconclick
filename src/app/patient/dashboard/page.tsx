@@ -90,17 +90,66 @@ interface Review {
 }
 
 // ── Haversine distance (km) ────────────────────────────────────────────────
-// ── SVG pin creator ────────────────────────────────────────────────────────
-function makePinSvg(color: string, pulse = false) {
-  const outer = pulse
-    ? `<circle cx="16" cy="16" r="15" fill="${color}" opacity="0.2"><animate attributeName="r" values="12;18;12" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/></circle>`
+// ── HTML escaping for strings injected into raw marker/tooltip HTML ────────
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// ── Square avatar marker (photo, or initial if no photo) ───────────────────
+function makeAvatarMarkerHtml(opts: {
+  name: string;
+  photoUrl: string | null;
+  color: string;
+  isOpen: boolean;
+  pulse?: boolean;
+}) {
+  const { name, photoUrl, color, isOpen, pulse } = opts;
+  const bareName = name.replace(/^dr\.?\s*/i, "").trim();
+  const initial = escapeHtml((bareName[0] ?? name.trim()[0] ?? "?").toUpperCase());
+  const dim = isOpen ? "" : "filter:grayscale(70%);opacity:0.75;";
+  const face = photoUrl
+    ? `<img src="${escapeHtml(photoUrl)}" style="width:100%;height:100%;object-fit:cover;display:block;" />`
+    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,${color},${color}99);color:#fff;font-weight:800;font-size:18px;font-family:inherit;">${initial}</div>`;
+  const ring = pulse
+    ? `<span class="animate-pulse" style="position:absolute;inset:-6px;border-radius:16px;border:2px solid ${color};opacity:0.6;"></span>`
     : "";
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">
-    ${outer}
-    <path d="M16 0C7.16 0 0 7.16 0 16c0 10 16 24 16 24s16-14 16-24C32 7.16 24.84 0 16 0z" fill="${color}" stroke="white" stroke-width="2"/>
-    <circle cx="16" cy="16" r="7" fill="white" opacity="0.9"/>
-    <path d="M16 10v6l4 2" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  </svg>`;
+  return `<div style="position:relative;width:44px;height:44px;${dim}">
+    ${ring}
+    <div style="width:44px;height:44px;border-radius:12px;overflow:hidden;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.35);">${face}</div>
+    <div style="width:0;height:0;margin:-2px auto 0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid white;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.25));"></div>
+  </div>`;
+}
+
+// ── Hover tooltip content for a clinic marker ───────────────────────────────
+function makeMarkerTooltipHtml(opts: {
+  doctorName: string;
+  specialty: string;
+  avgRating: number;
+  totalReviews: number;
+  clinicName: string;
+  isOpen: boolean;
+  distanceKm?: number;
+}) {
+  const { doctorName, specialty, avgRating, totalReviews, clinicName, isOpen, distanceKm } = opts;
+  const statusColor = isOpen ? "#059669" : "#94a3b8";
+  const statusText = isOpen ? "Open now" : "Closed";
+  return `<div style="min-width:180px;padding:10px 12px;background:white;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.18);font-family:inherit;">
+    <div style="font-weight:800;font-size:13px;color:#0f172a;">${escapeHtml(doctorName)}</div>
+    <div style="font-size:12px;color:#475569;margin-top:1px;">${escapeHtml(specialty)}</div>
+    ${totalReviews > 0
+      ? `<div style="font-size:12px;color:#0f172a;margin-top:4px;">★ ${avgRating.toFixed(1)} <span style="color:#94a3b8;">(${totalReviews})</span></div>`
+      : ""}
+    <div style="font-size:11px;color:#64748b;margin-top:4px;">${escapeHtml(clinicName)}</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+      <span style="font-size:11px;font-weight:700;color:${statusColor};">${statusText}</span>
+      ${distanceKm != null ? `<span style="font-size:11px;color:#94a3b8;">${distanceKm.toFixed(1)} km</span>` : ""}
+    </div>
+  </div>`;
 }
 
 // ── CONSULT TYPE OPTIONS ───────────────────────────────────────────────────
@@ -383,27 +432,50 @@ function PatientDashboardInner() {
       }
     });
 
-    markerList.forEach(({ doctor: doc, clinic }) => {
+    markerList.forEach(({ doctor: doc, clinic, distance }) => {
       const color = colorFor(doc.doctorProfile?.specialty ?? "");
       const isNearest = doc.id === nearestId;
       const isOpen = isClinicOpenNow(clinic.slots, new Date(now));
-      const svgStr = makePinSvg(isOpen ? color : "#94a3b8", isNearest);
+      const html = makeAvatarMarkerHtml({
+        name: doc.name,
+        photoUrl: doc.doctorProfile?.photoUrl ?? null,
+        color,
+        isOpen,
+        pulse: isNearest,
+      });
       const icon = L.divIcon({
-        html: svgStr,
+        html,
         className: "",
-        iconSize: [32, 40],
-        iconAnchor: [16, 40],
-        popupAnchor: [0, -44],
+        iconSize: [44, 52],
+        iconAnchor: [22, 52],
+        popupAnchor: [0, -52],
+      });
+      const tooltipHtml = makeMarkerTooltipHtml({
+        doctorName: formatDoctorName(doc.name),
+        specialty: doc.doctorProfile?.specialty ?? "",
+        avgRating: doc.doctorProfile?.avgRating ?? 0,
+        totalReviews: doc.doctorProfile?.totalReviews ?? 0,
+        clinicName: clinic.name,
+        isOpen,
+        distanceKm: distance,
       });
 
       if (markersRef.current.has(clinic.id)) {
-        // update icon only
-        markersRef.current.get(clinic.id)!.setIcon(icon);
+        // update icon + tooltip only
+        const existing = markersRef.current.get(clinic.id)!;
+        existing.setIcon(icon);
+        existing.setTooltipContent(tooltipHtml);
         return;
       }
 
       const marker = L.marker([clinic.lat, clinic.lng], { icon })
         .addTo(map)
+        .bindTooltip(tooltipHtml, {
+          direction: "top",
+          offset: [0, -50],
+          opacity: 1,
+          className: "doctor-marker-tooltip",
+        })
         .on("click", () => {
           setSelectedDoctor(doc);
           setSelectedClinicId(clinic.id);
