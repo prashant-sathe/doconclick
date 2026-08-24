@@ -7,7 +7,7 @@ import {
   CreditCard, Camera, FileText, Shield, BadgeCheck, CheckCircle2,
   Save, ArrowRight, UploadCloud, Home, Lock, Languages,
   QrCode, Copy, Check, Download, Building2,
-  ShieldCheck, AlertTriangle, Video, Trash2,
+  ShieldCheck, AlertTriangle, Video, Trash2, LifeBuoy,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
@@ -430,6 +430,20 @@ export default function DoctorProfilePage() {
             </div>
           </div>
         </div>
+
+        <Link
+          href="/doctor/support/tickets"
+          className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-6 flex items-center gap-3 hover:border-teal-200 transition-colors"
+        >
+          <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center flex-shrink-0">
+            <LifeBuoy className="w-5 h-5 text-teal-600" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-slate-800">My Support Tickets</p>
+            <p className="text-xs text-slate-400">Track issues raised with the DocOnClick team</p>
+          </div>
+          <ArrowRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
+        </Link>
 
         {!registrationFeePaid && (
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-6 flex items-center justify-between gap-4 flex-wrap">

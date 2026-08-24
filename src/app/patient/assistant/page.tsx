@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp,
   MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck,
-  Building2, Video, Home,
+  Building2, Video, Home, Ticket, Clock,
 } from "lucide-react";
 import RatingStars from "@/components/patient/RatingStars";
 import { isDoctorAvailableNow } from "@/lib/availability";
@@ -42,11 +42,21 @@ interface AssistantDoctor {
   offersVideo: boolean;
 }
 
+interface SupportTicket {
+  id: string;
+  subject: string;
+  description?: string;
+  status: string;
+  createdAt: string;
+}
+
 type DisplayEntry =
   | { kind: "user"; text: string; key: string }
   | { kind: "assistant"; text: string; key: string }
   | { kind: "chips"; options: string[]; active: boolean; key: string }
-  | { kind: "doctors"; doctors: AssistantDoctor[]; key: string };
+  | { kind: "doctors"; doctors: AssistantDoctor[]; key: string }
+  | { kind: "ticket-created"; ticket: SupportTicket; key: string }
+  | { kind: "ticket-list"; tickets: SupportTicket[]; key: string };
 
 function extractText(content: ConversationItem["content"]): string {
   if (typeof content === "string") return content;
@@ -82,6 +92,20 @@ function buildDisplayEntries(items: ConversationItem[]): DisplayEntry[] {
           if (doctors.length) entries.push({ kind: "doctors", doctors, key: `d-${idx}` });
         } catch {
           // malformed tool output — skip rendering doctor cards for this turn
+        }
+      } else if (call?.name === "create_support_ticket") {
+        try {
+          const ticket = JSON.parse(item.output ?? "{}") as SupportTicket;
+          if (ticket?.id) entries.push({ kind: "ticket-created", ticket, key: `tc-${idx}` });
+        } catch {
+          // malformed tool output — skip rendering for this turn
+        }
+      } else if (call?.name === "list_my_support_tickets") {
+        try {
+          const tickets = JSON.parse(item.output ?? "[]") as SupportTicket[];
+          if (tickets.length) entries.push({ kind: "ticket-list", tickets, key: `tl-${idx}` });
+        } catch {
+          // malformed tool output — skip rendering for this turn
         }
       }
     }
@@ -214,6 +238,54 @@ function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
   );
 }
 
+const STATUS_CLASSES: Record<string, string> = {
+  OPEN: "bg-amber-50 text-amber-700 border-amber-100",
+  IN_PROGRESS: "bg-blue-50 text-blue-700 border-blue-100",
+  RESOLVED: "bg-emerald-50 text-emerald-700 border-emerald-100",
+};
+
+function StatusBadge({ status }: { status: string }) {
+  return (
+    <span className={`text-[10px] font-bold uppercase tracking-wide border rounded-full px-2 py-0.5 ${STATUS_CLASSES[status] ?? "bg-slate-50 text-slate-600 border-slate-200"}`}>
+      {status.replace("_", " ")}
+    </span>
+  );
+}
+
+function TicketCreatedCard({ ticket }: { ticket: SupportTicket }) {
+  return (
+    <div className="ml-9 bg-white border border-blue-100 rounded-2xl p-4 shadow-sm">
+      <div className="flex items-center gap-2">
+        <Ticket className="w-4 h-4 text-blue-600 flex-shrink-0" />
+        <span className="text-sm font-bold text-slate-900">Ticket raised</span>
+        <StatusBadge status={ticket.status} />
+      </div>
+      <p className="text-sm text-slate-700 font-semibold mt-2">{ticket.subject}</p>
+      <p className="text-[11px] text-slate-400 mt-1">
+        Ref #{ticket.id.slice(-8)} · {new Date(ticket.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+      </p>
+    </div>
+  );
+}
+
+function TicketListCard({ tickets }: { tickets: SupportTicket[] }) {
+  return (
+    <div className="ml-9 flex flex-col gap-2">
+      {tickets.map((t) => (
+        <div key={t.id} className="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-semibold text-slate-800 truncate">{t.subject}</span>
+            <StatusBadge status={t.status} />
+          </div>
+          <p className="flex items-center gap-1 text-[11px] text-slate-400 mt-1.5">
+            <Clock className="w-3 h-3" /> {new Date(t.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: string) => void }) {
   if (entry.kind === "user") {
     return (
@@ -250,6 +322,8 @@ function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: strin
       </div>
     );
   }
+  if (entry.kind === "ticket-created") return <TicketCreatedCard ticket={entry.ticket} />;
+  if (entry.kind === "ticket-list") return <TicketListCard tickets={entry.tickets} />;
   return (
     <div className="ml-9 flex flex-col gap-3">
       {entry.doctors.map((d) => (

@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Loader2, MapPin, Droplets, Ruler, Weight, AlertTriangle, Pill,
   Scissors, PhoneCall, Camera, CheckCircle2, ArrowRight, Save, UploadCloud, User, Trash2,
-  Wallet as WalletIcon,
+  Wallet as WalletIcon, LifeBuoy,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -336,6 +336,20 @@ export default function PatientProfilePage() {
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-slate-800">Wallet</p>
             <p className="text-xs text-slate-400">Add money, pay for appointments, view transactions</p>
+          </div>
+          <ArrowRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
+        </Link>
+
+        <Link
+          href="/patient/support"
+          className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-6 flex items-center gap-3 hover:border-blue-200 transition-colors"
+        >
+          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+            <LifeBuoy className="w-5 h-5 text-blue-600" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-slate-800">Help &amp; Support</p>
+            <p className="text-xs text-slate-400">Raise an issue and track its status</p>
           </div>
           <ArrowRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
         </Link>

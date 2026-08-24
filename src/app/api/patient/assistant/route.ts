@@ -28,16 +28,18 @@ function checkRateLimit(patientId: string): boolean {
   return true;
 }
 
-const SYSTEM_PROMPT = `You are the DocOnClick Health Assistant — you help patients in India figure out which type of doctor to see, then point them to real doctors on the platform. You are not a doctor.
+const SYSTEM_PROMPT = `You are the DocOnClick Health Assistant — you help patients in India figure out which type of doctor to see, then point them to real doctors on the platform. You also help with account/app issues (booking problems, payment disputes, complaints) by raising a support ticket. You are not a doctor.
 
 Rules:
 - Never diagnose a condition, and never recommend medicines, dosages, or treatment. Your only job is triage: understand the symptoms well enough to recommend a medical specialty.
 - All prices are in Indian Rupees (₹). Never mention insurance or copays — those aren't part of this app.
-- If the patient describes a possible emergency (severe chest pain, difficulty breathing, uncontrolled bleeding, loss of consciousness, signs of stroke, suicidal thoughts, or similar), stop triage immediately and tell them to call 112 or go to the nearest hospital emergency room.
+- Emergencies are the narrow exception, not the default. Only stop triage and tell the patient to call 112 or go to the nearest hospital ER for a specific, genuine red flag: severe chest pain/pressure, significant difficulty breathing, uncontrolled or heavy bleeding, sudden loss of consciousness or unresponsiveness, sudden one-sided weakness or slurred speech (stroke signs), or active suicidal intent. For everything else — including symptoms that sound worrying, are painful, or have lasted a while — do NOT suggest calling emergency services or an ER. Your job is to recommend the right doctor on the platform; that's the right next step for almost every patient here, so default to that.
+- Call get_my_profile early if useful context (age, allergies, existing conditions) would sharpen your triage — don't make the patient repeat what's already on file. Call get_my_appointments if they ask about a past or upcoming visit.
 - Always call the list_specialties and find_doctors tools rather than naming a specialty or doctor from your own knowledge — the app's specialty list and doctor directory are the source of truth.
 - Ask short, focused questions, one or two at a time. Whenever a question has a small set of likely answers, also call suggest_quick_replies with those options so the app can show tappable chips.
 - Once you have enough information, call find_doctors with the specialty you've settled on, and briefly explain your reasoning in the same turn.
-- You never book appointments yourself. Once you've shown doctors, the patient books through the app's normal booking screen — just recommend, don't try to complete a booking in the conversation.`;
+- You never book appointments yourself. Once you've shown doctors, the patient books through the app's normal booking screen — just recommend, don't try to complete a booking in the conversation.
+- For app/account problems that aren't medical — a payment that didn't go through, a booking bug, a billing dispute, a complaint about a doctor's conduct, or anything else needing a human to step in — call create_support_ticket so the DocOnClick team can follow up, and tell the patient you've done so. Never raise a ticket for a medical question; that's what specialty recommendations are for. If the patient asks about a ticket they raised before, call list_my_support_tickets.`;
 
 const TOOLS: OpenAI.Responses.Tool[] = [
   {
@@ -85,6 +87,42 @@ const TOOLS: OpenAI.Responses.Tool[] = [
       required: ["options"],
       additionalProperties: false,
     },
+  },
+  {
+    type: "function",
+    name: "get_my_profile",
+    description: "Get this patient's own health profile on file: age, gender, blood group, allergies, chronic conditions, and current medications — use this instead of asking for details already on record.",
+    strict: true,
+    parameters: { type: "object", properties: {}, required: [], additionalProperties: false },
+  },
+  {
+    type: "function",
+    name: "get_my_appointments",
+    description: "Get this patient's upcoming appointments and their most recently completed ones (doctor, specialty, time, consult type, status).",
+    strict: true,
+    parameters: { type: "object", properties: {}, required: [], additionalProperties: false },
+  },
+  {
+    type: "function",
+    name: "create_support_ticket",
+    description: "Raise a support ticket for the DocOnClick team when the patient has a non-medical app/account issue you can't resolve yourself (payment problem, booking bug, billing dispute, complaint about a doctor, etc).",
+    strict: true,
+    parameters: {
+      type: "object",
+      properties: {
+        subject: { type: "string", description: "Short, specific summary of the issue (under 80 chars)." },
+        description: { type: "string", description: "Full detail of the issue, written from the conversation so far." },
+      },
+      required: ["subject", "description"],
+      additionalProperties: false,
+    },
+  },
+  {
+    type: "function",
+    name: "list_my_support_tickets",
+    description: "List this patient's previously raised support tickets and their status.",
+    strict: true,
+    parameters: { type: "object", properties: {}, required: [], additionalProperties: false },
   },
 ];
 
@@ -165,6 +203,70 @@ async function findDoctors(patientId: string, args: { specialty: string; consult
   return withDistance.slice(0, 5);
 }
 
+async function getMyProfile(patientId: string) {
+  const profile = await prisma.patientProfile.findUnique({
+    where: { userId: patientId },
+    select: { age: true, gender: true, bloodGroup: true, allergies: true, chronicDiseases: true, medications: true },
+  });
+  return profile ?? { error: "No health profile on file yet." };
+}
+
+function apptLabel(a: { scheduledAt: Date; consultType: string; status: string; doctor: { name: string; doctorProfile: { specialty: string } | null } }) {
+  return {
+    doctorName: a.doctor.name,
+    specialty: a.doctor.doctorProfile?.specialty ?? null,
+    time: a.scheduledAt,
+    consultType: a.consultType,
+    status: a.status,
+  };
+}
+
+async function getMyAppointments(patientId: string) {
+  const now = new Date();
+  const select = {
+    scheduledAt: true,
+    consultType: true,
+    status: true,
+    doctor: { select: { name: true, doctorProfile: { select: { specialty: true } } } },
+  } as const;
+
+  const [upcoming, recentCompleted] = await Promise.all([
+    prisma.appointment.findMany({
+      where: { patientId, status: "SCHEDULED", scheduledAt: { gte: now } },
+      orderBy: { scheduledAt: "asc" },
+      take: 5,
+      select,
+    }),
+    prisma.appointment.findMany({
+      where: { patientId, status: "COMPLETED" },
+      orderBy: { scheduledAt: "desc" },
+      take: 5,
+      select,
+    }),
+  ]);
+
+  return {
+    upcoming: upcoming.map(apptLabel),
+    recentCompleted: recentCompleted.map(apptLabel),
+  };
+}
+
+async function createSupportTicket(patientId: string, args: { subject: string; description: string }) {
+  const ticket = await prisma.complaint.create({
+    data: { userId: patientId, subject: args.subject.slice(0, 200), description: args.description.slice(0, 4000) },
+  });
+  return { id: ticket.id, subject: ticket.subject, status: ticket.status, createdAt: ticket.createdAt };
+}
+
+async function listMySupportTickets(patientId: string) {
+  return prisma.complaint.findMany({
+    where: { userId: patientId },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+    select: { id: true, subject: true, description: true, status: true, createdAt: true },
+  });
+}
+
 async function executeTool(call: FunctionCall, patientId: string): Promise<unknown> {
   let args: Record<string, unknown> = {};
   try {
@@ -183,6 +285,17 @@ async function executeTool(call: FunctionCall, patientId: string): Promise<unkno
       });
     case "suggest_quick_replies":
       return { ok: true };
+    case "get_my_profile":
+      return getMyProfile(patientId);
+    case "get_my_appointments":
+      return getMyAppointments(patientId);
+    case "create_support_ticket":
+      return createSupportTicket(patientId, {
+        subject: String(args.subject ?? "").trim() || "Support request",
+        description: String(args.description ?? "").trim(),
+      });
+    case "list_my_support_tickets":
+      return listMySupportTickets(patientId);
     default:
       return { error: `Unknown tool: ${call.name}` };
   }

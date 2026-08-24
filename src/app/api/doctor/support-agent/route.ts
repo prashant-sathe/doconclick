@@ -38,8 +38,9 @@ What you know about how the platform works:
 - Reviews and ratings come from patients after a completed appointment and affect the doctor's public profile.
 
 Rules:
-- Always call the relevant tool (get_appointment_overview, get_earnings_summary, get_account_status) to fetch this doctor's real data before answering a question about their own schedule, money, or account — never guess numbers.
-- For anything you can't resolve yourself — a payment that seems missing, a technical bug, a dispute with a patient, an account or verification problem, or any request that needs a human decision — call create_support_ticket so the DocOnClick team can follow up, and tell the doctor you've done so. Write a clear, specific subject and description from the conversation so far; don't ask the doctor to repeat details you already have.
+- Always call the relevant tool (get_appointment_overview, get_earnings_summary, get_account_status, get_recent_reviews) to fetch this doctor's real data before answering a question about their own schedule, money, account, or reputation — never guess numbers.
+- Don't wait to be asked. If something in the doctor's real data looks like a problem — a growing unsettled balance with no recent settlement, a subscription about to lapse, an unusually low rating or a harsh recent review, an account stuck unverified — proactively point it out and offer to raise a ticket for it, even if the doctor hasn't complained about it themselves.
+- For anything you can't resolve yourself — a payment that seems missing, a technical bug, a dispute with a patient, an unfair review, an account or verification problem, or any request that needs a human decision — call create_support_ticket so the DocOnClick team can follow up, and tell the doctor you've done so. Write a clear, specific subject and description from the conversation so far and from whatever tool data you already pulled; don't ask the doctor to repeat details you already have.
 - If the doctor asks about a ticket they raised before, call list_my_support_tickets.
 - Whenever a question has a small set of likely answers, also call suggest_quick_replies with those options so the app can show tappable chips.
 - Keep answers short and specific to this platform. Never invent policies, fees, or dates you don't have from a tool or from the facts above.`;
@@ -63,6 +64,13 @@ const TOOLS: OpenAI.Responses.Tool[] = [
     type: "function",
     name: "get_account_status",
     description: "Get this doctor's verification status, registration fee status, trial/subscription status, and profile completeness with the list of missing items.",
+    strict: true,
+    parameters: { type: "object", properties: {}, required: [], additionalProperties: false },
+  },
+  {
+    type: "function",
+    name: "get_recent_reviews",
+    description: "Get this doctor's average rating and their most recent patient reviews (rating, comment, date) — use this before discussing reputation, a specific review, or a rating dispute.",
     strict: true,
     parameters: { type: "object", properties: {}, required: [], additionalProperties: false },
   },
@@ -158,7 +166,7 @@ async function getAppointmentOverview(doctorId: string) {
 const UNSETTLED_WHERE = { status: "COMPLETED", paymentStatus: "PAID", settlementId: null } as const;
 
 async function getEarningsSummary(doctorId: string) {
-  const [unsettledGrouped, lifetime, lastSettlement] = await Promise.all([
+  const [unsettledGrouped, lifetime, recentSettlements] = await Promise.all([
     prisma.appointment.groupBy({
       by: ["paymentMethod"],
       where: { ...UNSETTLED_WHERE, doctorId },
@@ -170,8 +178,9 @@ async function getEarningsSummary(doctorId: string) {
       _sum: { amount: true, platformFee: true },
       _count: true,
     }),
-    prisma.settlement.findFirst({ where: { doctorId }, orderBy: { createdAt: "desc" } }),
+    prisma.settlement.findMany({ where: { doctorId }, orderBy: { createdAt: "desc" }, take: 5 }),
   ]);
+  const lastSettlement = recentSettlements[0] ?? null;
 
   let cashCount = 0;
   let onlineCount = 0;
@@ -201,6 +210,35 @@ async function getEarningsSummary(doctorId: string) {
           createdAt: lastSettlement.createdAt,
         }
       : null,
+    settlementHistory: recentSettlements.map((s) => ({
+      netAmount: s.netAmount,
+      cashCount: s.cashCount,
+      onlineCount: s.onlineCount,
+      createdAt: s.createdAt,
+    })),
+  };
+}
+
+async function getRecentReviews(doctorId: string) {
+  const [profile, reviews] = await Promise.all([
+    prisma.doctorProfile.findUnique({ where: { userId: doctorId }, select: { avgRating: true, totalReviews: true } }),
+    prisma.review.findMany({
+      where: { doctorId },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: { rating: true, comment: true, createdAt: true, patient: { select: { name: true } } },
+    }),
+  ]);
+
+  return {
+    avgRating: profile?.avgRating ?? 0,
+    totalReviews: profile?.totalReviews ?? 0,
+    recent: reviews.map((r) => ({
+      rating: r.rating,
+      comment: r.comment,
+      createdAt: r.createdAt,
+      patientName: r.patient.name,
+    })),
   };
 }
 
@@ -280,6 +318,8 @@ async function executeTool(call: FunctionCall, doctorId: string): Promise<unknow
       return getEarningsSummary(doctorId);
     case "get_account_status":
       return getAccountStatus(doctorId);
+    case "get_recent_reviews":
+      return getRecentReviews(doctorId);
     case "create_support_ticket":
       return createSupportTicket(doctorId, {
         subject: String(args.subject ?? "").trim() || "Support request",
