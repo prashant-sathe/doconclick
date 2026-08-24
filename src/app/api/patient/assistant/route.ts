@@ -143,6 +143,7 @@ async function findDoctors(patientId: string, args: { specialty: string; consult
       return {
         id: d.id,
         name: d.name,
+        photoUrl: profile.photoUrl,
         specialty: profile.specialty,
         avgRating: profile.avgRating,
         totalReviews: profile.totalReviews,

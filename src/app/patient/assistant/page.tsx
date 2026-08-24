@@ -30,6 +30,7 @@ interface ConversationItem {
 interface AssistantDoctor {
   id: string;
   name: string;
+  photoUrl: string | null;
   specialty: string;
   avgRating: number;
   totalReviews: number;
@@ -146,9 +147,18 @@ function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
     <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
       <div className="flex gap-3">
         <div className="relative flex-shrink-0">
-          <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center text-white font-bold text-sm">
-            {initials || "Dr"}
-          </div>
+          {doctor.photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={doctor.photoUrl}
+              alt={doctor.name}
+              className="w-12 h-12 rounded-2xl object-cover"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center text-white font-bold text-sm">
+              {initials || "Dr"}
+            </div>
+          )}
           <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center">
             <BadgeCheck className="w-4 h-4 fill-emerald-100 text-emerald-600" />
           </div>
