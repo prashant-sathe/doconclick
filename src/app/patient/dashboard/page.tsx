@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isDoctorAvailableNow } from "@/lib/availability";
-import { isClinicOpenNow, findOpenClinic } from "@/lib/clinicAvailability";
+import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime } from "@/lib/clinicAvailability";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
 import { haversine } from "@/lib/geo";
@@ -1174,11 +1174,43 @@ function PatientDashboardInner() {
                       </div>
                       <p className="text-sm text-slate-500 mt-0.5">{selectedDoctor.doctorProfile.specialty}</p>
                       <p className="text-xs text-slate-400 mt-0.5">{selectedDoctor.doctorProfile.qualification}</p>
-                      {selectedClinic ? (
-                        <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                          <Building2 className="w-3 h-3 flex-shrink-0" /> {selectedClinic.name}
-                          {selectedDoctor.clinics.length > 1 && ` (+${selectedDoctor.clinics.length - 1} more)`}
-                        </p>
+                      {selectedDoctor.clinics.length > 0 ? (
+                        <div className="mt-1.5 space-y-1">
+                          {selectedDoctor.clinics.map((c) => {
+                            const open = isClinicOpenNow(c.slots, effectiveBookingTime);
+                            const isSelected = c.id === selectedClinicId;
+                            const next = open ? null : findNextOpening([c], effectiveBookingTime);
+                            const when = next
+                              ? next.daysAhead === 0 ? `today ${formatSlotTime(next.fromTime)}`
+                                : next.daysAhead === 1 ? `tomorrow ${formatSlotTime(next.fromTime)}`
+                                : `${next.dayOfWeek} ${formatSlotTime(next.fromTime)}`
+                              : null;
+                            return (
+                              <button
+                                key={c.id}
+                                type="button"
+                                onClick={() => setSelectedClinicId(c.id)}
+                                className={`w-full flex items-center justify-between gap-2 rounded-lg border px-2.5 py-1.5 text-left transition-colors ${
+                                  isSelected ? "border-blue-300 bg-blue-50" : "border-slate-200 hover:border-slate-300"
+                                }`}
+                              >
+                                <span className="flex items-center gap-1.5 min-w-0">
+                                  <Building2 className="w-3 h-3 flex-shrink-0 text-slate-400" />
+                                  <span className="text-xs font-medium text-slate-700 truncate">{c.name}</span>
+                                </span>
+                                {open ? (
+                                  <span className="badge badge-success !px-1.5 !py-0 text-[10px] flex-shrink-0">Available now</span>
+                                ) : when ? (
+                                  <span className="text-[10px] text-slate-500 flex-shrink-0 flex items-center gap-1">
+                                    <Clock className="w-3 h-3 flex-shrink-0 text-slate-400" /> Opens {when}
+                                  </span>
+                                ) : (
+                                  <span className="badge badge-gray !px-1.5 !py-0 text-[10px] flex-shrink-0">Closed</span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
                       ) : selectedDoctor.doctorProfile.clinicName && (
                         <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                           <Building2 className="w-3 h-3 flex-shrink-0" /> {selectedDoctor.doctorProfile.clinicName}

@@ -51,3 +51,59 @@ export function findOpenClinic<T extends { sortOrder: number; slots: ClinicSlotL
   const sorted = [...clinics].sort((a, b) => a.sortOrder - b.sortOrder);
   return sorted.find((clinic) => isClinicOpenNow(clinic.slots, now)) ?? null;
 }
+
+const DAY_ORDER = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+export interface NextOpening<T> {
+  clinic: T;
+  dayOfWeek: string;
+  fromTime: string;
+  daysAhead: number; // 0 = later today, 1 = tomorrow, ...
+}
+
+// Scans up to 7 days ahead (from `now`, in IST) across a doctor's clinics for
+// the earliest upcoming opening — used to tell a patient when/where a doctor
+// who's closed everywhere right now will next be available. Returns null if
+// none of the clinics have any slots configured (nothing to suggest).
+export function findNextOpening<T extends { slots: ClinicSlotLike[] }>(
+  clinics: T[],
+  now: Date = new Date()
+): NextOpening<T> | null {
+  const { weekday, minutes: nowMin } = nowInIst(now);
+  const todayIdx = DAY_ORDER.indexOf(weekday);
+  if (todayIdx === -1) return null;
+
+  for (let daysAhead = 0; daysAhead < 7; daysAhead++) {
+    const dayOfWeek = DAY_ORDER[(todayIdx + daysAhead) % 7];
+    let best: NextOpening<T> | null = null;
+    let bestMin = Infinity;
+
+    for (const clinic of clinics) {
+      for (const slot of clinic.slots) {
+        if (slot.dayOfWeek !== dayOfWeek) continue;
+        const fromMin = toMinutes(slot.fromTime);
+        if (fromMin == null) continue;
+        if (daysAhead === 0 && fromMin <= nowMin) continue; // already started/passed today
+        if (fromMin < bestMin) {
+          bestMin = fromMin;
+          best = { clinic, dayOfWeek, fromTime: slot.fromTime, daysAhead };
+        }
+      }
+    }
+
+    if (best) return best;
+  }
+
+  return null;
+}
+
+// "14:05" → "2:05 PM"
+export function formatSlotTime(hhmm: string): string {
+  const min = toMinutes(hhmm);
+  if (min == null) return hhmm;
+  const hour24 = Math.floor(min / 60);
+  const minute = min % 60;
+  const ampm = hour24 >= 12 ? "PM" : "AM";
+  const hour12 = hour24 % 12 || 12;
+  return `${hour12}:${String(minute).padStart(2, "0")} ${ampm}`;
+}
