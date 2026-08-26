@@ -15,18 +15,18 @@ import ConfirmDialog, { type ConfirmTone } from "@/components/ConfirmDialog";
 // ── Types ──────────────────────────────────────────────────────
 interface DoctorProfile {
   specialty: string;
-  qualification: string;
+  qualification: string | null;
   languages: string;
   bio: string | null;
   registrationFeePaid: boolean;
-  medRegNo: string;
+  medRegNo: string | null;
   experience: number;
   consultFee: number;
   videoFee: number;
   homeVisitFee: number;
   availability: string;
   radius: number;
-  bankDetails: string;
+  bankDetails: string | null;
   status: string;
   isVerified: boolean;
   medRegCertUrl: string | null;
@@ -536,8 +536,8 @@ export default function AdminDoctors() {
     .filter((d) =>
       search === "" ||
       d.name.toLowerCase().includes(search.toLowerCase()) ||
-      d.doctorProfile?.medRegNo.toLowerCase().includes(search.toLowerCase()) ||
-      d.doctorProfile?.specialty.toLowerCase().includes(search.toLowerCase())
+      (d.doctorProfile?.medRegNo?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
+      (d.doctorProfile?.specialty?.toLowerCase().includes(search.toLowerCase()) ?? false)
     );
 
   const columnDefs = useMemo<ColDef<Doctor>[]>(() => [
