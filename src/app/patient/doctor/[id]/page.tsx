@@ -276,49 +276,53 @@ export default function DoctorProfilePage() {
             </div>
           )}
 
-          {/* Fee cards */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            {profile.offersClinic && hasOpenClinic ? (
-              <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
-                <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                <p className="text-xs text-slate-500">Clinic Visit</p>
-                <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{profile.consultFee}</p>
+          {/* Fee cards — a service the doctor doesn't offer at all is left
+              out entirely rather than shown as disabled; only temporary
+              unavailability (clinic closed, outside home-visit range) still
+              renders a disabled card with a reason. */}
+          {(() => {
+            const offeredCount = [profile.offersClinic, profile.offersVideo, profile.offersHomeVisit].filter(Boolean).length;
+            if (offeredCount === 0) return null;
+            return (
+              <div className={cn("grid gap-3 mb-6", offeredCount === 1 ? "grid-cols-1" : offeredCount === 2 ? "grid-cols-2" : "grid-cols-3")}>
+                {profile.offersClinic && (
+                  hasOpenClinic ? (
+                    <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
+                      <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                      <p className="text-xs text-slate-500">Clinic Visit</p>
+                      <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{profile.consultFee}</p>
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
+                      <Building2 className="w-5 h-5 text-slate-300 mx-auto mb-1" />
+                      <p className="text-xs text-slate-400">Clinic closed right now</p>
+                    </div>
+                  )
+                )}
+                {profile.offersVideo && (
+                  <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
+                    <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                    <p className="text-xs text-slate-500">Video Call</p>
+                    <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{profile.videoFee}</p>
+                  </div>
+                )}
+                {profile.offersHomeVisit && (
+                  hasHomeVisitReach ? (
+                    <div className="rounded-2xl p-4 border border-blue-200 bg-blue-50 text-center">
+                      <Home className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                      <p className="text-xs text-blue-600">Home Visit</p>
+                      <p className="text-base font-extrabold text-blue-700 mt-0.5">₹{profile.homeVisitFee}</p>
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
+                      <Home className="w-5 h-5 text-slate-300 mx-auto mb-1" />
+                      <p className="text-xs text-slate-400">Outside home visit range</p>
+                    </div>
+                  )
+                )}
               </div>
-            ) : (
-              <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
-                <Building2 className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                <p className="text-xs text-slate-400">
-                  {profile.offersClinic ? "Clinic closed right now" : "Clinic visit not offered"}
-                </p>
-              </div>
-            )}
-            {profile.offersVideo ? (
-              <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
-                <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                <p className="text-xs text-slate-500">Video Call</p>
-                <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{profile.videoFee}</p>
-              </div>
-            ) : (
-              <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
-                <Video className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                <p className="text-xs text-slate-400">Video call not offered</p>
-              </div>
-            )}
-            {profile.offersHomeVisit && hasHomeVisitReach ? (
-              <div className="rounded-2xl p-4 border border-blue-200 bg-blue-50 text-center">
-                <Home className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-                <p className="text-xs text-blue-600">Home Visit</p>
-                <p className="text-base font-extrabold text-blue-700 mt-0.5">₹{profile.homeVisitFee}</p>
-              </div>
-            ) : (
-              <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
-                <Home className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                <p className="text-xs text-slate-400">
-                  {profile.offersHomeVisit ? "Outside home visit range" : "Home visit not offered"}
-                </p>
-              </div>
-            )}
-          </div>
+            );
+          })()}
 
           {/* Reviews */}
           {reviews.length > 0 && (

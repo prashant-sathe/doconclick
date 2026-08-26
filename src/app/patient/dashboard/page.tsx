@@ -370,18 +370,30 @@ function PatientDashboardInner() {
     (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
   )[0], [doctorsWithDist]);
 
+  // Doctors shown on the map: same specialty/search filters as the list
+  // below, but NOT the "open now" check — the map should always show every
+  // matching doctor, open or closed (closed clinics just render dimmed).
+  const mapDoctors = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return doctorsWithDist.filter((d) => {
+      const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
+      const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
+      return matchesSpecialty && matchesSearch;
+    });
+  }, [doctorsWithDist, specialtyFilter, search]);
+
   // One marker per clinic, not per doctor — a doctor with several locations
   // shows up as several pins.
   const clinicMarkers = useMemo(() => {
     const list: ClinicMarker[] = [];
-    for (const doc of filteredDoctors) {
+    for (const doc of mapDoctors) {
       for (const clinic of doc.clinics) {
         const distance = userPos ? haversine(userPos[0], userPos[1], clinic.lat, clinic.lng) : undefined;
         list.push({ doctor: doc, clinic, distance });
       }
     }
     return list;
-  }, [filteredDoctors, userPos]);
+  }, [mapDoctors, userPos]);
 
   // ── Initialise Leaflet once map div is available ───────────────────────
   const initMap = useCallback(
@@ -1260,52 +1272,60 @@ function PatientDashboardInner() {
                     </p>
                   )}
 
-                  {/* Fee cards */}
-                  <div className="grid grid-cols-3 gap-3 mb-3">
-                    {selectedDoctor.doctorProfile.offersClinic !== false && hasOpenClinic ? (
-                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
-                        <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                        <p className="text-xs text-slate-500">Clinic Visit</p>
-                        <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.consultFee}</p>
-                      </div>
-                    ) : (
-                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
-                        <Building2 className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                        <p className="text-xs text-slate-400">
-                          {selectedDoctor.doctorProfile.offersClinic === false ? "Clinic visit not offered" : "Clinic closed right now"}
-                        </p>
-                      </div>
-                    )}
-                    {selectedDoctor.doctorProfile.offersVideo ? (
-                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
-                        <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                        <p className="text-xs text-slate-500">Video Call</p>
-                        <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.videoFee}</p>
-                      </div>
-                    ) : (
-                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
-                        <Video className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                        <p className="text-xs text-slate-400">Video call not offered</p>
-                      </div>
-                    )}
-                    {selectedDoctor.doctorProfile.offersHomeVisit && hasHomeVisitReach ? (
-                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
-                        <Home className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                        <p className="text-xs text-slate-500">Home Visit</p>
-                        <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.homeVisitFee}</p>
-                        {selectedDoctor.distance != null && (
-                          <p className="text-[10px] text-slate-400 mt-0.5">~{estimateArrivalMinutes(selectedDoctor.distance)} min arrival</p>
+                  {/* Fee cards — a service the doctor doesn't offer at all is
+                      left out entirely rather than shown as disabled; only
+                      temporary unavailability (clinic closed, outside
+                      home-visit range) still renders a disabled card with a
+                      reason. */}
+                  {(() => {
+                    const offersClinic = selectedDoctor.doctorProfile.offersClinic !== false;
+                    const offersVideo = selectedDoctor.doctorProfile.offersVideo === true;
+                    const offersHome = selectedDoctor.doctorProfile.offersHomeVisit;
+                    const offeredCount = [offersClinic, offersVideo, offersHome].filter(Boolean).length;
+                    if (offeredCount === 0) return null;
+                    return (
+                      <div className={cn("grid gap-3 mb-3", offeredCount === 1 ? "grid-cols-1" : offeredCount === 2 ? "grid-cols-2" : "grid-cols-3")}>
+                        {offersClinic && (
+                          hasOpenClinic ? (
+                            <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
+                              <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                              <p className="text-xs text-slate-500">Clinic Visit</p>
+                              <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.consultFee}</p>
+                            </div>
+                          ) : (
+                            <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
+                              <Building2 className="w-5 h-5 text-slate-300 mx-auto mb-1" />
+                              <p className="text-xs text-slate-400">Clinic closed right now</p>
+                            </div>
+                          )
+                        )}
+                        {offersVideo && (
+                          <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
+                            <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                            <p className="text-xs text-slate-500">Video Call</p>
+                            <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.videoFee}</p>
+                          </div>
+                        )}
+                        {offersHome && (
+                          hasHomeVisitReach ? (
+                            <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
+                              <Home className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                              <p className="text-xs text-slate-500">Home Visit</p>
+                              <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.homeVisitFee}</p>
+                              {selectedDoctor.distance != null && (
+                                <p className="text-[10px] text-slate-400 mt-0.5">~{estimateArrivalMinutes(selectedDoctor.distance)} min arrival</p>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
+                              <Home className="w-5 h-5 text-slate-300 mx-auto mb-1" />
+                              <p className="text-xs text-slate-400">Outside home visit range</p>
+                            </div>
+                          )
                         )}
                       </div>
-                    ) : (
-                      <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
-                        <Home className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                        <p className="text-xs text-slate-400">
-                          {selectedDoctor.doctorProfile.offersHomeVisit ? "Outside home visit range" : "Home visit not offered"}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                    );
+                  })()}
 
                   {/* Reviews */}
                   {reviews.length > 0 && (
@@ -1325,18 +1345,26 @@ function PatientDashboardInner() {
                     </div>
                   )}
 
-                  {/* CTA buttons */}
-                  <div className="grid grid-cols-3 gap-2">
-                    {(() => {
-                      const clinicAvailable = selectedDoctor.doctorProfile.offersClinic !== false && hasOpenClinic;
-                      const videoAvailable = selectedDoctor.doctorProfile.offersVideo === true;
-                      const homeAvailable = selectedDoctor.doctorProfile.offersHomeVisit && hasHomeVisitReach;
-                      const baseClass = "flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-colors border";
-                      const availableClass = "border-blue-200 bg-blue-50 text-blue-600 hover:border-blue-600 hover:bg-blue-600 hover:text-white";
-                      const disabledClass = "border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed";
-                      const classFor = (available: boolean) => (available ? availableClass : disabledClass);
-                      return (
-                        <>
+                  {/* CTA buttons — a service the doctor doesn't offer at all
+                      is left out entirely rather than shown as a disabled
+                      button; only temporary unavailability (clinic closed,
+                      outside home-visit range) still renders a disabled
+                      button. */}
+                  {(() => {
+                    const offersClinic = selectedDoctor.doctorProfile.offersClinic !== false;
+                    const offersVideo = selectedDoctor.doctorProfile.offersVideo === true;
+                    const offersHome = selectedDoctor.doctorProfile.offersHomeVisit;
+                    const offeredCount = [offersClinic, offersVideo, offersHome].filter(Boolean).length;
+                    if (offeredCount === 0) return null;
+                    const clinicAvailable = offersClinic && hasOpenClinic;
+                    const homeAvailable = offersHome && hasHomeVisitReach;
+                    const baseClass = "flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-colors border";
+                    const availableClass = "border-blue-200 bg-blue-50 text-blue-600 hover:border-blue-600 hover:bg-blue-600 hover:text-white";
+                    const disabledClass = "border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed";
+                    const classFor = (available: boolean) => (available ? availableClass : disabledClass);
+                    return (
+                      <div className={cn("grid gap-2", offeredCount === 1 ? "grid-cols-1" : offeredCount === 2 ? "grid-cols-2" : "grid-cols-3")}>
+                        {offersClinic && (
                           <button
                             type="button"
                             onClick={() => { setConsultType("CLINIC"); setBookingOpen(true); }}
@@ -1345,14 +1373,17 @@ function PatientDashboardInner() {
                           >
                             <Building2 className="w-4 h-4" /> Book Clinic Visit
                           </button>
+                        )}
+                        {offersVideo && (
                           <button
                             type="button"
                             onClick={() => { setConsultType("VIDEO"); setBookingOpen(true); }}
-                            disabled={!videoAvailable}
-                            className={cn(baseClass, classFor(videoAvailable))}
+                            className={cn(baseClass, availableClass)}
                           >
                             <Video className="w-4 h-4" /> Book Video Consultation
                           </button>
+                        )}
+                        {offersHome && (
                           <button
                             type="button"
                             onClick={() => { setConsultType("HOME"); setBookingOpen(true); }}
@@ -1361,10 +1392,10 @@ function PatientDashboardInner() {
                           >
                             <Home className="w-4 h-4" /> Book Home Visit
                           </button>
-                        </>
-                      );
-                    })()}
-                  </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
