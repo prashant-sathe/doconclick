@@ -123,9 +123,9 @@ export default function Home() {
             </div>
 
             {/* Right — floating card stack */}
-            <div className="hidden lg:flex flex-col gap-4 items-end pb-8">
+            <div className="flex flex-col gap-4 items-center lg:items-end pb-8">
               {/* Consultation modes */}
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 w-80 animate-float" style={{ animationDelay: "0s" }}>
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 w-full max-w-xs sm:max-w-sm lg:w-80 animate-float" style={{ animationDelay: "0s" }}>
                 <p className="text-white font-bold mb-4 text-sm uppercase tracking-wider">Choose Consultation</p>
                 {[
                   { icon: HomeIcon,  label: "Home Visit",   sub: "Doctor at your door", color: "bg-emerald-400" },
@@ -145,7 +145,7 @@ export default function Home() {
               </div>
 
               {/* Live stats card */}
-              <div className="bg-white rounded-2xl shadow-2xl p-5 w-72 animate-float" style={{ animationDelay: "0.5s" }}>
+              <div className="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-xs sm:max-w-sm lg:w-72 animate-float" style={{ animationDelay: "0.5s" }}>
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-slate-700 font-bold text-sm">Live Activity</p>
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
