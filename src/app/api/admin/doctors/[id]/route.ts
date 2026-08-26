@@ -32,6 +32,7 @@ export async function GET(
     where: { id },
     include: {
       doctorProfile: true,
+      clinics: { orderBy: { sortOrder: "asc" } },
       asDoctor: {
         orderBy: { createdAt: "desc" },
         take: 10,

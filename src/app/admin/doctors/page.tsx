@@ -42,6 +42,7 @@ interface Doctor {
   email: string | null;
   createdAt: string;
   doctorProfile: DoctorProfile | null;
+  clinics: { id: string }[];
 }
 
 interface Appointment {
@@ -54,7 +55,15 @@ interface Appointment {
   patient: { name: string; mobile: string };
 }
 
+interface Clinic {
+  id: string;
+  name: string;
+  address: string;
+  isActive: boolean;
+}
+
 interface DoctorDetail extends Doctor {
+  clinics: Clinic[];
   asDoctor: Appointment[];
   stats: { totalEarnings: number; completedCount: number; scheduledCount: number; cancelledCount: number };
 }
@@ -256,6 +265,27 @@ function DoctorDrawer({
                 <Row icon={DollarSign} label="Home Visit Fee"   value={p ? `₹${p.homeVisitFee}` : "—"} />
                 <Row icon={Clock}      label="Availability"     value={p?.availability ?? "—"} />
                 <Row icon={MapPin}     label="Service Radius"   value={p ? `${p.radius} km` : "—"} />
+              </Section>
+
+              {/* Clinic Locations */}
+              <Section title="Clinic Locations" icon={MapPin}>
+                {(data?.clinics?.length ?? 0) === 0 ? (
+                  <div className="px-4 py-6 text-sm text-slate-400 text-center">
+                    No clinic added yet — this doctor hasn&apos;t set up a clinic location.
+                  </div>
+                ) : (
+                  data?.clinics.map((c) => (
+                    <div key={c.id} className="flex items-start justify-between px-4 py-3 gap-4">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-slate-800">{c.name}</p>
+                        <p className="text-xs text-slate-400">{c.address}</p>
+                      </div>
+                      <span className={cn("badge flex-shrink-0", c.isActive ? "badge-success" : "badge-gray")}>
+                        {c.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                  ))
+                )}
               </Section>
 
               {/* Bank */}
@@ -477,6 +507,18 @@ export default function AdminDoctors() {
       flex: 1,
       valueGetter: (p) => p.data?.doctorProfile?.medRegNo ?? "—",
       cellClass: "font-mono text-xs",
+    },
+    {
+      headerName: "Clinics",
+      field: "clinics",
+      width: 130,
+      valueGetter: (p) => p.data?.clinics.length ?? 0,
+      cellRenderer: (p: ICellRendererParams<Doctor>) =>
+        (p.value as number) > 0 ? (
+          <span className="badge badge-success"><MapPin className="w-3 h-3" /> {p.value} Clinic{p.value === 1 ? "" : "s"}</span>
+        ) : (
+          <span className="badge badge-gray">No Clinics</span>
+        ),
     },
     {
       headerName: "Experience",

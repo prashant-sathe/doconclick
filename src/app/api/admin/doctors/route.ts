@@ -9,6 +9,7 @@ export async function GET(req: Request) {
     where: { role: "DOCTOR", deletedAt: null },
     include: {
       doctorProfile: true,
+      clinics: { select: { id: true } },
     },
     orderBy: { createdAt: "desc" },
   });
