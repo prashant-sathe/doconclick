@@ -87,6 +87,26 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Founder */}
+      <section className="py-20 bg-white">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="text-center mb-14">
+            <div className="section-tag mx-auto mb-4">Leadership</div>
+            <h2 className="text-4xl font-extrabold text-slate-900 mb-4">Meet Our <span className="gradient-text">Founder</span></h2>
+          </div>
+          <div className="max-w-sm mx-auto stat-card card-hover text-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/team/founder-kalpesh-kalyani.jpg"
+              alt="Dr. Kalpesh Sandeep Kalyani"
+              className="w-32 h-32 rounded-2xl object-cover mx-auto mb-5 shadow"
+            />
+            <h3 className="text-lg font-bold text-slate-900">Dr. Kalpesh Sandeep Kalyani</h3>
+            <p className="text-sm font-semibold text-blue-600 mt-1">Founder, DocOnClick</p>
+          </div>
+        </div>
+      </section>
+
       {/* Values */}
       <section className="py-20 gradient-surface">
         <div className="mx-auto max-w-7xl px-6">
