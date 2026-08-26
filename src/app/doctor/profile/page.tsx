@@ -771,7 +771,7 @@ export default function DoctorProfilePage() {
               It&apos;s printed on every prescription you generate for patients.
             </p>
             <div className="space-y-3">
-              <DocSlot label="Signature" icon={FileText} url={docs.signatureUrl} type="signature" accept=".jpg,.jpeg,.png"
+              <DocSlot label="Signature" icon={FileText} url={docs.signatureUrl} type="signature" accept=".jpg,.jpeg,.png" cropAspect={2.5}
                 required requiredNote="Required for your account to be approved — not uploaded yet" removable
                 onUploaded={(url) => setDocs((d) => ({ ...d, signatureUrl: url }))} />
             </div>
