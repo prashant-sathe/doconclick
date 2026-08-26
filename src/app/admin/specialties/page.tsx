@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Tag, Plus, Trash2, Loader2, EyeOff, Eye, AlertCircle, Pencil, X, Check, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface SpecialtyRow {
   id: string;
@@ -27,6 +28,7 @@ export default function AdminSpecialties() {
   const [deleteTarget, setDeleteTarget] = useState<SpecialtyRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [deactivateTarget, setDeactivateTarget] = useState<SpecialtyRow | null>(null);
 
   const load = () => {
     fetch("/api/admin/specialties")
@@ -191,7 +193,7 @@ export default function AdminSpecialties() {
                     <Pencil className="w-3.5 h-3.5" /> Edit
                   </button>
                   <button
-                    onClick={() => toggleActive(s)}
+                    onClick={() => (s.isActive ? setDeactivateTarget(s) : toggleActive(s))}
                     disabled={busyId === s.id}
                     className="btn-secondary py-1.5 px-3 text-xs"
                   >
@@ -260,6 +262,23 @@ export default function AdminSpecialties() {
             </div>
           </div>
         </div>
+      )}
+
+      {deactivateTarget && (
+        <ConfirmDialog
+          icon={EyeOff}
+          title={`Deactivate ${deactivateTarget.name}?`}
+          message="Doctors won't be able to select this specialty on their profile, and patients won't see it as a filter on the map, until you reactivate it."
+          confirmLabel="Deactivate"
+          busyLabel="Deactivating…"
+          tone="warning"
+          busy={busyId === deactivateTarget.id}
+          onCancel={() => setDeactivateTarget(null)}
+          onConfirm={async () => {
+            await toggleActive(deactivateTarget);
+            setDeactivateTarget(null);
+          }}
+        />
       )}
 
       {deleteTarget && (

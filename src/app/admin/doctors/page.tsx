@@ -10,6 +10,7 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
+import ConfirmDialog, { type ConfirmTone } from "@/components/ConfirmDialog";
 
 // ── Types ──────────────────────────────────────────────────────
 interface DoctorProfile {
@@ -84,6 +85,43 @@ const APPT_BADGE: Record<string, string> = {
 
 const FILTERS = ["ALL", "PENDING", "APPROVED", "REJECTED", "SUSPENDED"];
 
+// Shared copy for the "are you sure?" dialog shown before a status change —
+// used by both the list row actions and the drawer footer buttons, since an
+// accidental click here immediately changes what patients can see/book.
+const STATUS_CONFIRM_CONFIG: Record<string, {
+  icon: React.ElementType;
+  title: (name: string) => string;
+  message: string;
+  confirmLabel: string;
+  busyLabel: string;
+  tone: ConfirmTone;
+}> = {
+  APPROVED: {
+    icon: CheckCircle,
+    title: (name) => `Approve ${name}?`,
+    message: "They'll become visible to patients and be able to accept new bookings immediately.",
+    confirmLabel: "Approve",
+    busyLabel: "Approving…",
+    tone: "success",
+  },
+  REJECTED: {
+    icon: XCircle,
+    title: (name) => `Reject ${name}'s application?`,
+    message: "They won't be shown to patients or able to accept bookings. You can approve them again later if needed.",
+    confirmLabel: "Reject",
+    busyLabel: "Rejecting…",
+    tone: "danger",
+  },
+  SUSPENDED: {
+    icon: PauseCircle,
+    title: (name) => `Suspend ${name}?`,
+    message: "They'll be immediately logged out of all activity and hidden from patients until you reactivate them.",
+    confirmLabel: "Suspend",
+    busyLabel: "Suspending…",
+    tone: "warning",
+  },
+};
+
 // ── Profile Drawer ─────────────────────────────────────────────
 function DoctorDrawer({
   doctorId,
@@ -98,6 +136,8 @@ function DoctorDrawer({
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [confirmStatus, setConfirmStatus] = useState<string | null>(null);
+  const [confirmUnverify, setConfirmUnverify] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -193,13 +233,13 @@ function DoctorDrawer({
                     {p.registrationFeePaid ? "Fee Paid" : "Fee Unpaid"}
                   </span>
                   <button
-                    onClick={toggleVerified}
+                    onClick={() => (p.isVerified ? setConfirmUnverify(true) : toggleVerified())}
                     disabled={updating || (!p.isVerified && !p.registrationFeePaid)}
                     className={cn(
                       "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold transition-colors disabled:opacity-50",
                       p.isVerified ? "bg-white text-emerald-600" : "bg-white/10 text-white hover:bg-white/20"
                     )}
-                    title={!p.isVerified && !p.registrationFeePaid ? "Doctor hasn't paid the registration fee yet" : "Toggle qualification verification"}
+                    title={!p.isVerified && !p.registrationFeePaid ? "Doctor hasn't paid the registration fee yet" : p.isVerified ? "Remove qualification verification" : "Mark qualification verified"}
                   >
                     <BadgeCheck className="w-3.5 h-3.5" />
                     {p.isVerified ? "Verified" : "Mark Verified"}
@@ -347,18 +387,18 @@ function DoctorDrawer({
           <div className="flex-shrink-0 border-t border-slate-100 px-6 py-4 bg-white">
             <div className="flex gap-2">
               {p.status !== "APPROVED" && (
-                <button onClick={() => changeStatus("APPROVED")} disabled={updating}
+                <button onClick={() => setConfirmStatus("APPROVED")} disabled={updating}
                   className="btn-success flex-1 justify-center py-2.5 text-sm">
                   <CheckCircle className="w-4 h-4" /> Approve
                 </button>
               )}
               {p.status !== "SUSPENDED" && (
-                <button onClick={() => changeStatus("SUSPENDED")} disabled={updating} className="btn-secondary flex-1 justify-center py-2.5 text-sm text-amber-600 border-amber-200 bg-amber-50 hover:bg-amber-100">
+                <button onClick={() => setConfirmStatus("SUSPENDED")} disabled={updating} className="btn-secondary flex-1 justify-center py-2.5 text-sm text-amber-600 border-amber-200 bg-amber-50 hover:bg-amber-100">
                   <PauseCircle className="w-4 h-4" /> Suspend
                 </button>
               )}
               {p.status !== "REJECTED" && (
-                <button onClick={() => changeStatus("REJECTED")} disabled={updating} className="btn-danger flex-1 justify-center py-2.5 text-sm">
+                <button onClick={() => setConfirmStatus("REJECTED")} disabled={updating} className="btn-danger flex-1 justify-center py-2.5 text-sm">
                   <XCircle className="w-4 h-4" /> Reject
                 </button>
               )}
@@ -366,6 +406,40 @@ function DoctorDrawer({
           </div>
         )}
       </div>
+
+      {confirmStatus && data && (
+        <ConfirmDialog
+          icon={STATUS_CONFIRM_CONFIG[confirmStatus].icon}
+          title={STATUS_CONFIRM_CONFIG[confirmStatus].title(formatDoctorName(data.name))}
+          message={STATUS_CONFIRM_CONFIG[confirmStatus].message}
+          confirmLabel={STATUS_CONFIRM_CONFIG[confirmStatus].confirmLabel}
+          busyLabel={STATUS_CONFIRM_CONFIG[confirmStatus].busyLabel}
+          tone={STATUS_CONFIRM_CONFIG[confirmStatus].tone}
+          busy={updating}
+          onCancel={() => setConfirmStatus(null)}
+          onConfirm={async () => {
+            await changeStatus(confirmStatus);
+            setConfirmStatus(null);
+          }}
+        />
+      )}
+
+      {confirmUnverify && data && (
+        <ConfirmDialog
+          icon={BadgeCheck}
+          title={`Remove verification from ${formatDoctorName(data.name)}?`}
+          message="Their qualification badge will disappear from patients' view immediately. You can re-verify them later if this was a mistake."
+          confirmLabel="Remove Verification"
+          busyLabel="Updating…"
+          tone="warning"
+          busy={updating}
+          onCancel={() => setConfirmUnverify(false)}
+          onConfirm={async () => {
+            await toggleVerified();
+            setConfirmUnverify(false);
+          }}
+        />
+      )}
     </>
   );
 }
@@ -406,6 +480,8 @@ export default function AdminDoctors() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [viewId, setViewId]     = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Doctor | null>(null);
+  const [statusTarget, setStatusTarget] = useState<{ doctor: Doctor; status: string } | null>(null);
+  const [impersonateTarget, setImpersonateTarget] = useState<Doctor | null>(null);
   const [impersonateError, setImpersonateError] = useState("");
 
   const load = useCallback(() => {
@@ -571,27 +647,27 @@ export default function AdminDoctors() {
               className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors">
               <Eye className="w-4 h-4" />
             </button>
-            <button onClick={() => impersonate(d)} disabled={updating === d.id}
+            <button onClick={() => setImpersonateTarget(d)} disabled={updating === d.id}
               title="Log in as this doctor"
               className="w-8 h-8 flex items-center justify-center rounded-lg text-indigo-500 hover:bg-indigo-50 transition-colors disabled:opacity-40">
               <LogIn className="w-4 h-4" />
             </button>
             {status !== "APPROVED" && (
-              <button onClick={() => updateStatus(d.id, "APPROVED")} disabled={updating === d.id}
+              <button onClick={() => setStatusTarget({ doctor: d, status: "APPROVED" })} disabled={updating === d.id}
                 title="Approve"
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors disabled:opacity-40">
                 <CheckCircle className="w-4 h-4" />
               </button>
             )}
             {status !== "REJECTED" && (
-              <button onClick={() => updateStatus(d.id, "REJECTED")} disabled={updating === d.id}
+              <button onClick={() => setStatusTarget({ doctor: d, status: "REJECTED" })} disabled={updating === d.id}
                 title="Reject"
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40">
                 <XCircle className="w-4 h-4" />
               </button>
             )}
             {status !== "SUSPENDED" && (
-              <button onClick={() => updateStatus(d.id, "SUSPENDED")} disabled={updating === d.id}
+              <button onClick={() => setStatusTarget({ doctor: d, status: "SUSPENDED" })} disabled={updating === d.id}
                 title="Suspend"
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-amber-500 hover:bg-amber-50 transition-colors disabled:opacity-40">
                 <PauseCircle className="w-4 h-4" />
@@ -696,26 +772,58 @@ export default function AdminDoctors() {
 
       {/* Delete confirmation */}
       {deleteTarget && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
-            <div className="flex items-center gap-2 mb-3">
-              <Trash2 className="w-5 h-5 text-red-600" />
-              <h3 className="font-bold text-slate-800">Delete this account?</h3>
-            </div>
-            <p className="text-sm text-slate-500 mb-5">
+        <ConfirmDialog
+          icon={Trash2}
+          title="Delete this account?"
+          message={
+            <>
               {formatDoctorName(deleteTarget.name)} ({deleteTarget.mobile}) will be permanently blocked from logging in, and their mobile number will be freed for a new registration.
               Their past appointments and earnings history are kept for your records. This cannot be undone.
-            </p>
-            <div className="flex gap-3">
-              <button onClick={() => setDeleteTarget(null)} className="btn-secondary flex-1">
-                Cancel
-              </button>
-              <button onClick={confirmDelete} disabled={updating === deleteTarget.id} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                {updating === deleteTarget.id ? "Deleting…" : "Delete Account"}
-              </button>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+          confirmLabel="Delete Account"
+          busyLabel="Deleting…"
+          tone="danger"
+          busy={updating === deleteTarget.id}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={confirmDelete}
+        />
+      )}
+
+      {/* Approve/Reject/Suspend confirmation */}
+      {statusTarget && (
+        <ConfirmDialog
+          icon={STATUS_CONFIRM_CONFIG[statusTarget.status].icon}
+          title={STATUS_CONFIRM_CONFIG[statusTarget.status].title(formatDoctorName(statusTarget.doctor.name))}
+          message={STATUS_CONFIRM_CONFIG[statusTarget.status].message}
+          confirmLabel={STATUS_CONFIRM_CONFIG[statusTarget.status].confirmLabel}
+          busyLabel={STATUS_CONFIRM_CONFIG[statusTarget.status].busyLabel}
+          tone={STATUS_CONFIRM_CONFIG[statusTarget.status].tone}
+          busy={updating === statusTarget.doctor.id}
+          onCancel={() => setStatusTarget(null)}
+          onConfirm={async () => {
+            await updateStatus(statusTarget.doctor.id, statusTarget.status);
+            setStatusTarget(null);
+          }}
+        />
+      )}
+
+      {/* Impersonate confirmation */}
+      {impersonateTarget && (
+        <ConfirmDialog
+          icon={LogIn}
+          title={`Log in as ${formatDoctorName(impersonateTarget.name)}?`}
+          message="You'll be switched into their account and see the app exactly as they do. Use “Exit impersonation” in the banner to return to your admin session."
+          confirmLabel="Log In"
+          busyLabel="Logging in…"
+          tone="primary"
+          busy={updating === impersonateTarget.id}
+          onCancel={() => setImpersonateTarget(null)}
+          onConfirm={async () => {
+            await impersonate(impersonateTarget);
+            setImpersonateTarget(null);
+          }}
+        />
       )}
     </div>
   );

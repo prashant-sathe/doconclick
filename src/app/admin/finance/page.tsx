@@ -5,6 +5,7 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { formatDoctorName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface Analytics {
   totalRevenue: number;
@@ -45,6 +46,8 @@ export default function AdminFinance() {
   const [history, setHistory] = useState<SettlementRecord[]>([]);
   const [settlingId, setSettlingId] = useState<string | null>(null);
   const [confirmNegative, setConfirmNegative] = useState<PendingSettlement | null>(null);
+  const [settleTarget, setSettleTarget] = useState<PendingSettlement | null>(null);
+  const [confirmSaveSettings, setConfirmSaveSettings] = useState(false);
 
   const loadSettlements = () => {
     fetch("/api/admin/finance/settlements").then((r) => r.json()).then(setPending);
@@ -159,7 +162,7 @@ export default function AdminFinance() {
       filter: false,
       cellRenderer: (p: ICellRendererParams<PendingSettlement>) => (
         <button
-          onClick={() => p.data && settleDoctor(p.data.doctorId)}
+          onClick={() => p.data && setSettleTarget(p.data)}
           disabled={settlingId === p.data?.doctorId}
           className="btn-primary text-xs py-1.5 px-3"
         >
@@ -315,7 +318,7 @@ export default function AdminFinance() {
           </div>
         </div>
         <button
-          onClick={saveSettings}
+          onClick={() => setConfirmSaveSettings(true)}
           disabled={saving}
           className="btn-primary gap-2"
         >
@@ -393,6 +396,54 @@ export default function AdminFinance() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Settle Now confirmation */}
+      {settleTarget && (
+        <ConfirmDialog
+          icon={Wallet}
+          title={`Settle with ${formatDoctorName(settleTarget.doctorName)}?`}
+          message={
+            <>
+              This clears their {settleTarget.cashCount} cash and {settleTarget.onlineCount} online due{settleTarget.cashCount + settleTarget.onlineCount === 1 ? "" : "s"} — net{" "}
+              <span className={settleTarget.netAmount < 0 ? "font-semibold text-red-600" : "font-semibold text-emerald-600"}>
+                {settleTarget.netAmount < 0 ? "−" : ""}₹{Math.abs(settleTarget.netAmount).toLocaleString("en-IN")}
+              </span>
+              . This is recorded permanently and cannot be undone.
+            </>
+          }
+          confirmLabel="Settle Now"
+          busyLabel="Settling…"
+          tone="primary"
+          busy={settlingId === settleTarget.doctorId}
+          onCancel={() => setSettleTarget(null)}
+          onConfirm={async () => {
+            await settleDoctor(settleTarget.doctorId);
+            setSettleTarget(null);
+          }}
+        />
+      )}
+
+      {/* Save commission settings confirmation */}
+      {confirmSaveSettings && (
+        <ConfirmDialog
+          icon={Save}
+          title="Update commission rates?"
+          message={
+            <>
+              New rates — Clinic {clinicCommission}%, Video {videoCommission}%, Home {homeCommission}% — apply to every appointment booked from now on. Appointments already booked keep their original rate.
+            </>
+          }
+          confirmLabel="Save Settings"
+          busyLabel="Saving…"
+          tone="primary"
+          busy={saving}
+          onCancel={() => setConfirmSaveSettings(false)}
+          onConfirm={async () => {
+            await saveSettings();
+            setConfirmSaveSettings(false);
+          }}
+        />
       )}
     </div>
   );

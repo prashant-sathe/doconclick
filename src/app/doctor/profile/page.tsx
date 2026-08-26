@@ -18,6 +18,7 @@ import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import NotificationSettings from "@/components/NotificationSettings";
 import ImageCropModal from "@/components/ImageCropModal";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -87,6 +88,7 @@ function DocSlot({ label, icon: Icon, url, type, locked, required, requiredNote,
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [confirmRemove, setConfirmRemove] = useState(false);
 
   const upload = async (fileOrBlob: File | Blob) => {
     setBusy(true);
@@ -165,7 +167,7 @@ function DocSlot({ label, icon: Icon, url, type, locked, required, requiredNote,
             onChange={(e) => { const f = e.target.files?.[0]; if (f) onFileSelected(f); e.target.value = ""; }} />
         </label>
         {removable && url && (
-          <button type="button" onClick={remove} disabled={busy}
+          <button type="button" onClick={() => setConfirmRemove(true)} disabled={busy}
             className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60" title="Remove">
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -179,6 +181,26 @@ function DocSlot({ label, icon: Icon, url, type, locked, required, requiredNote,
           round={type === "photo"}
           onCancel={() => setPendingFile(null)}
           onConfirm={(blob) => { setPendingFile(null); upload(blob); }}
+        />
+      )}
+      {confirmRemove && (
+        <ConfirmDialog
+          icon={Trash2}
+          title={`Remove ${label}?`}
+          message={
+            required
+              ? `You'll need to re-upload it before you can get verified or take bookings again.`
+              : `You can upload it again anytime.`
+          }
+          confirmLabel="Remove"
+          busyLabel="Removing…"
+          tone="danger"
+          busy={busy}
+          onCancel={() => setConfirmRemove(false)}
+          onConfirm={async () => {
+            await remove();
+            setConfirmRemove(false);
+          }}
         />
       )}
     </div>

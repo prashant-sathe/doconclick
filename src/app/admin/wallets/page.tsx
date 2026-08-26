@@ -8,6 +8,7 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { formatDoctorName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface WalletRow {
   userId: string;
@@ -56,6 +57,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [confirmNegative, setConfirmNegative] = useState<{ currentBalance: number; resultingBalance: number } | null>(null);
+  const [confirmAdjust, setConfirmAdjust] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -185,7 +187,12 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
                   />
                   {error && <p className="text-sm text-red-600">{error}</p>}
                   <button
-                    onClick={() => submit(false)}
+                    onClick={() => {
+                      const amt = Number(amount);
+                      if (!amt || amt <= 0) { setError("Enter a valid amount."); return; }
+                      setError("");
+                      setConfirmAdjust(true);
+                    }}
                     disabled={submitting}
                     className="btn-primary w-full justify-center disabled:opacity-60"
                   >
@@ -240,6 +247,29 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
           </p>
         </div>
       </div>
+
+      {/* Adjustment confirmation */}
+      {confirmAdjust && (
+        <ConfirmDialog
+          icon={direction === "CREDIT" ? PlusCircle : MinusCircle}
+          title={`${direction === "CREDIT" ? "Credit" : "Debit"} ₹${amount}?`}
+          message={
+            <>
+              This will {direction === "CREDIT" ? "add" : "deduct"} ₹{amount} {direction === "CREDIT" ? "to" : "from"} {data?.user?.name ?? "this patient"}&apos;s wallet
+              {note ? <> with note “{note}”</> : ""} — visible to them immediately in their transaction history. This cannot be undone from here.
+            </>
+          }
+          confirmLabel={direction === "CREDIT" ? "Apply Credit" : "Apply Debit"}
+          busyLabel="Applying…"
+          tone={direction === "CREDIT" ? "success" : "warning"}
+          busy={submitting}
+          onCancel={() => setConfirmAdjust(false)}
+          onConfirm={async () => {
+            await submit(false);
+            setConfirmAdjust(false);
+          }}
+        />
+      )}
 
       {/* Negative-balance acknowledgement */}
       {confirmNegative && (

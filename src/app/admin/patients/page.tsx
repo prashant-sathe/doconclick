@@ -10,6 +10,7 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 // ── Types ──────────────────────────────────────────────────────
 interface PatientProfile {
@@ -256,6 +257,7 @@ export default function AdminPatients() {
   const [deleting, setDeleting] = useState(false);
   const [impersonatingId, setImpersonatingId] = useState<string | null>(null);
   const [impersonateError, setImpersonateError] = useState("");
+  const [impersonateTarget, setImpersonateTarget] = useState<Patient | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -357,7 +359,7 @@ export default function AdminPatients() {
               <Eye className="w-4 h-4" />
             </button>
             <button
-              onClick={() => impersonate(patient)}
+              onClick={() => setImpersonateTarget(patient)}
               disabled={impersonatingId === patient.id}
               title="Log in as this patient"
               className="w-8 h-8 flex items-center justify-center rounded-lg text-indigo-500 hover:bg-indigo-50 transition-colors disabled:opacity-40"
@@ -442,26 +444,40 @@ export default function AdminPatients() {
 
       {/* Delete confirmation */}
       {deleteTarget && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
-            <div className="flex items-center gap-2 mb-3">
-              <Trash2 className="w-5 h-5 text-red-600" />
-              <h3 className="font-bold text-slate-800">Delete this account?</h3>
-            </div>
-            <p className="text-sm text-slate-500 mb-5">
+        <ConfirmDialog
+          icon={Trash2}
+          title="Delete this account?"
+          message={
+            <>
               {deleteTarget.name} ({deleteTarget.mobile}) will be permanently blocked from logging in, and their mobile number will be freed for a new registration.
               Their past appointment history is kept for the doctors who treated them. This cannot be undone.
-            </p>
-            <div className="flex gap-3">
-              <button onClick={() => setDeleteTarget(null)} className="btn-secondary flex-1">
-                Cancel
-              </button>
-              <button onClick={confirmDelete} disabled={deleting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                {deleting ? "Deleting…" : "Delete Account"}
-              </button>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+          confirmLabel="Delete Account"
+          busyLabel="Deleting…"
+          tone="danger"
+          busy={deleting}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={confirmDelete}
+        />
+      )}
+
+      {/* Impersonate confirmation */}
+      {impersonateTarget && (
+        <ConfirmDialog
+          icon={LogIn}
+          title={`Log in as ${impersonateTarget.name}?`}
+          message="You'll be switched into their account and see the app exactly as they do. Use “Exit impersonation” in the banner to return to your admin session."
+          confirmLabel="Log In"
+          busyLabel="Logging in…"
+          tone="primary"
+          busy={impersonatingId === impersonateTarget.id}
+          onCancel={() => setImpersonateTarget(null)}
+          onConfirm={async () => {
+            await impersonate(impersonateTarget);
+            setImpersonateTarget(null);
+          }}
+        />
       )}
     </div>
   );

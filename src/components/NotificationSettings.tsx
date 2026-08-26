@@ -6,6 +6,7 @@ import {
   isPushSupported, fetchPushSubscriptionStatus, subscribeToPush, unsubscribeAllPush,
   isMac, openSystemNotificationSettings,
 } from "@/lib/pushClient";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 // Profile-page counterpart to EnableNotificationsPrompt: that popup shows once
 // and can be dismissed forever, so this gives patients, doctors and admins a
@@ -22,6 +23,7 @@ export default function NotificationSettings() {
   const [permission, setPermission] = useState<NotificationPermission | null>(null);
   const [subscribed, setSubscribed] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [confirmDisable, setConfirmDisable] = useState(false);
 
   useEffect(() => {
     const ok = isPushSupported();
@@ -108,13 +110,30 @@ export default function NotificationSettings() {
           </div>
           <button
             type="button"
-            onClick={subscribed ? disable : enable}
+            onClick={subscribed ? () => setConfirmDisable(true) : enable}
             disabled={busy || checking}
             className={cn(subscribed ? "btn-secondary" : "btn-primary", "flex-shrink-0 disabled:opacity-60")}
           >
             {busy || checking ? <Loader2 className="w-4 h-4 animate-spin" /> : subscribed ? "Turn off" : "Enable"}
           </button>
         </div>
+      )}
+
+      {confirmDisable && (
+        <ConfirmDialog
+          icon={BellOff}
+          title="Turn off notifications?"
+          message="This turns off push notifications on every device you're signed in on, not just this one — you'll need to re-enable it separately on each device."
+          confirmLabel="Turn Off"
+          busyLabel="Turning off…"
+          tone="warning"
+          busy={busy}
+          onCancel={() => setConfirmDisable(false)}
+          onConfirm={async () => {
+            await disable();
+            setConfirmDisable(false);
+          }}
+        />
       )}
     </section>
   );

@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, Send, Paperclip, FileText, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface ChatMessage {
   id: string;
@@ -35,6 +36,8 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingPreviewUrl, setPendingPreviewUrl] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messageCountRef = useRef(0);
@@ -178,7 +181,10 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
           onChange={(e) => {
             const file = e.target.files?.[0];
             e.target.value = "";
-            if (file) attachFile(file);
+            if (file) {
+              setPendingFile(file);
+              setPendingPreviewUrl(file.type.startsWith("image/") ? URL.createObjectURL(file) : null);
+            }
           }}
         />
         <button
@@ -208,6 +214,41 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
         </button>
       </div>
+
+      {pendingFile && (
+        <ConfirmDialog
+          icon={pendingPreviewUrl ? Paperclip : FileText}
+          title="Send this file?"
+          message={
+            pendingPreviewUrl ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={pendingPreviewUrl} alt={pendingFile.name} className="w-full max-h-48 object-contain rounded-lg mb-2 bg-slate-50" />
+                It&apos;ll be sent to the other person right away — there&apos;s no way to unsend it once it&apos;s delivered.
+              </>
+            ) : (
+              <>
+                <span className="font-semibold text-slate-700">{pendingFile.name}</span> will be sent to the other person right away — there&apos;s no way to unsend it once it&apos;s delivered.
+              </>
+            )
+          }
+          confirmLabel="Send"
+          busyLabel="Sending…"
+          tone="primary"
+          busy={uploading}
+          onCancel={() => {
+            if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
+            setPendingFile(null);
+            setPendingPreviewUrl(null);
+          }}
+          onConfirm={async () => {
+            await attachFile(pendingFile);
+            if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
+            setPendingFile(null);
+            setPendingPreviewUrl(null);
+          }}
+        />
+      )}
     </div>
   );
 }

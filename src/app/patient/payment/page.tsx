@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CreditCard, Loader2, ShieldCheck, CheckCircle, Wallet } from "lucide-react";
 import { formatDoctorName } from "@/lib/utils";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface AppointmentSummary {
   id: string;
@@ -22,6 +23,7 @@ function PaymentContent() {
   const [payingWallet, setPayingWallet] = useState(false);
   const [error, setError] = useState("");
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [confirmWalletPay, setConfirmWalletPay] = useState(false);
 
   useEffect(() => {
     if (!apptId) return;
@@ -132,7 +134,7 @@ function PaymentContent() {
         return (
           <div className="mb-3">
             <button
-              onClick={payWithWallet}
+              onClick={() => setConfirmWalletPay(true)}
               disabled={payingWallet || paying || !canPayWithWallet}
               className="btn-secondary w-full justify-center py-3.5 text-base gap-1.5 disabled:opacity-60"
             >
@@ -161,6 +163,23 @@ function PaymentContent() {
           ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</>
           : `Pay ₹${appt.amount} via Cashfree`}
       </button>
+
+      {confirmWalletPay && (
+        <ConfirmDialog
+          icon={Wallet}
+          title={`Pay ₹${appt.amount} from your wallet?`}
+          message={`This deducts ₹${appt.amount} from your wallet balance right now to confirm your consultation with ${formatDoctorName(appt.doctor.name)}.`}
+          confirmLabel="Pay Now"
+          busyLabel="Paying…"
+          tone="primary"
+          busy={payingWallet}
+          onCancel={() => setConfirmWalletPay(false)}
+          onConfirm={async () => {
+            await payWithWallet();
+            setConfirmWalletPay(false);
+          }}
+        />
+      )}
     </div>
   );
 }

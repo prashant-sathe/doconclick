@@ -18,6 +18,7 @@ import { playMessageChime } from "@/lib/playNotificationSound";
 import { FREQUENCY_OPTIONS, DURATION_OPTIONS, TEST_SUGGESTIONS } from "@/lib/medicalOptions";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { cn, formatDoctorName } from "@/lib/utils";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface DoctorProfile {
   specialty: string;
@@ -433,6 +434,7 @@ export default function DoctorDashboard() {
   const [cancelling, setCancelling] = useState(false);
   const [rejectTarget, setRejectTarget] = useState<Appointment | null>(null);
   const [rejecting, setRejecting] = useState(false);
+  const [acceptTarget, setAcceptTarget] = useState<Appointment | null>(null);
   const [upcomingExpanded, setUpcomingExpanded] = useState(false);
   const [completedExpanded, setCompletedExpanded] = useState(false);
   const [cancelledExpanded, setCancelledExpanded] = useState(false);
@@ -720,7 +722,7 @@ export default function DoctorDashboard() {
                       <button onClick={() => setRejectTarget(a)} disabled={respondingId === a.id} className="btn-secondary py-1.5 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
                         <ThumbsDown className="w-3.5 h-3.5" /> Reject
                       </button>
-                      <button onClick={() => respond(a.id, "SCHEDULED")} disabled={respondingId === a.id} className="btn-primary py-1.5 px-3 text-xs">
+                      <button onClick={() => setAcceptTarget(a)} disabled={respondingId === a.id} className="btn-primary py-1.5 px-3 text-xs">
                         {respondingId === a.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ThumbsUp className="w-3.5 h-3.5" />} Accept
                       </button>
                     </div>
@@ -966,6 +968,24 @@ export default function DoctorDashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Accept confirmation */}
+      {acceptTarget && (
+        <ConfirmDialog
+          icon={ThumbsUp}
+          title={`Accept ${patientLabel(acceptTarget)}'s request?`}
+          message={`This confirms your ${acceptTarget.consultType.toLowerCase()} consultation with them. They'll be notified immediately. If you need to back out later, cancelling may carry a late-cancellation penalty.`}
+          confirmLabel="Accept"
+          busyLabel="Accepting…"
+          tone="success"
+          busy={respondingId === acceptTarget.id}
+          onCancel={() => setAcceptTarget(null)}
+          onConfirm={async () => {
+            await respond(acceptTarget.id, "SCHEDULED");
+            setAcceptTarget(null);
+          }}
+        />
       )}
 
       {/* Reject confirmation */}

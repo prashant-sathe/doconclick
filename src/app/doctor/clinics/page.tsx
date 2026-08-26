@@ -13,6 +13,7 @@ import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import LocationPickerMap from "@/components/LocationPickerMap";
 import ImageCropModal from "@/components/ImageCropModal";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -289,6 +290,8 @@ export default function DoctorClinicsPage() {
   const router = useRouter();
   const [clinics, setClinics] = useState<ClinicForm[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/clinics");
@@ -318,6 +321,14 @@ export default function DoctorClinicsPage() {
     const clinic = clinics[idx];
     if (clinic.id) await fetch(`/api/doctors/me/clinics/${clinic.id}`, { method: "DELETE" });
     setClinics((cur) => cur.filter((_, i) => i !== idx));
+  };
+
+  // A brand-new, never-saved card (no `id` yet) is just an empty draft — no
+  // confirmation needed to discard it. Only a clinic that's actually saved
+  // (and therefore live on the patient-facing map) needs a confirm gate.
+  const requestDeleteClinic = (idx: number) => {
+    if (clinics[idx].id) setDeleteIdx(idx);
+    else deleteClinic(idx);
   };
 
   const saveClinic = async (idx: number) => {
@@ -376,7 +387,7 @@ export default function DoctorClinicsPage() {
               clinic={clinic}
               onChange={(next) => updateAt(idx, next)}
               onSave={() => saveClinic(idx)}
-              onDelete={() => deleteClinic(idx)}
+              onDelete={() => requestDeleteClinic(idx)}
             />
           ))}
         </div>
@@ -391,6 +402,25 @@ export default function DoctorClinicsPage() {
           </Link>
         </div>
       </div>
+
+      {deleteIdx !== null && (
+        <ConfirmDialog
+          icon={Trash2}
+          title={`Delete ${clinics[deleteIdx].name || "this clinic"}?`}
+          message="Patients will no longer see this location on the map or be able to book here. Its address, hours, and photo will be permanently removed — you'll need to re-enter everything if you add it back."
+          confirmLabel="Delete Clinic"
+          busyLabel="Deleting…"
+          tone="danger"
+          busy={deleting}
+          onCancel={() => setDeleteIdx(null)}
+          onConfirm={async () => {
+            setDeleting(true);
+            await deleteClinic(deleteIdx);
+            setDeleting(false);
+            setDeleteIdx(null);
+          }}
+        />
+      )}
     </div>
   );
 }

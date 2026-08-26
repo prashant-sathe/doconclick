@@ -14,6 +14,7 @@ import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import NotificationSettings from "@/components/NotificationSettings";
 import ImageCropModal from "@/components/ImageCropModal";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import { CHRONIC_OPTIONS, BLOOD_GROUPS } from "@/lib/medicalOptions";
 import { computeBMI, bmiCategoryClasses } from "@/lib/bmi";
@@ -70,6 +71,7 @@ function PhotoUpload({ url, onUploaded }: { url: string; onUploaded: (url: strin
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [confirmRemove, setConfirmRemove] = useState(false);
 
   const upload = async (fileOrBlob: File | Blob) => {
     setBusy(true);
@@ -117,7 +119,7 @@ function PhotoUpload({ url, onUploaded }: { url: string; onUploaded: (url: strin
               onChange={(e) => { const f = e.target.files?.[0]; if (f) setPendingFile(f); e.target.value = ""; }} />
           </label>
           {url && (
-            <button type="button" onClick={remove} disabled={busy}
+            <button type="button" onClick={() => setConfirmRemove(true)} disabled={busy}
               className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60" title="Remove">
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -126,6 +128,22 @@ function PhotoUpload({ url, onUploaded }: { url: string; onUploaded: (url: strin
         <p className="text-xs text-slate-400 mt-1.5">JPG or PNG, up to 5MB.</p>
         {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
       </div>
+      {confirmRemove && (
+        <ConfirmDialog
+          icon={Trash2}
+          title="Remove profile photo?"
+          message="You can upload a new one anytime."
+          confirmLabel="Remove"
+          busyLabel="Removing…"
+          tone="danger"
+          busy={busy}
+          onCancel={() => setConfirmRemove(false)}
+          onConfirm={async () => {
+            await remove();
+            setConfirmRemove(false);
+          }}
+        />
+      )}
       {pendingFile && (
         <ImageCropModal
           file={pendingFile}
