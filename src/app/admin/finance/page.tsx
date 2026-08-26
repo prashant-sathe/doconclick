@@ -1,7 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { IndianRupee, TrendingUp, Save, Wallet } from "lucide-react";
+import { AgGridReact } from "ag-grid-react";
+import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { formatDoctorName } from "@/lib/utils";
+import { brandGridTheme } from "@/lib/agGridTheme";
 
 interface Analytics {
   totalRevenue: number;
@@ -95,6 +98,121 @@ export default function AdminFinance() {
     setConfirmNegative(null);
     loadSettlements();
   };
+
+  const pendingColumnDefs = useMemo<ColDef<PendingSettlement>[]>(() => [
+    {
+      headerName: "Doctor",
+      field: "doctorName",
+      minWidth: 220,
+      flex: 1.3,
+      cellRenderer: (p: ICellRendererParams<PendingSettlement>) => {
+        const row = p.data;
+        if (!row) return null;
+        return (
+          <div className="leading-tight py-1">
+            <div className="font-semibold text-slate-800">{formatDoctorName(row.doctorName)}</div>
+            {row.bankDetails ? (
+              <div className="text-[11px] text-slate-400">{row.bankDetails}</div>
+            ) : (
+              <div className="text-[11px] text-red-500">No bank details on file{row.doctorMobile ? ` · ${row.doctorMobile}` : ""}</div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      headerName: "Cash Fee Owed",
+      field: "cashFeeOwed",
+      minWidth: 170,
+      flex: 1,
+      cellRenderer: (p: ICellRendererParams<PendingSettlement>) => (
+        <span className="text-amber-600">₹{(p.value ?? 0).toLocaleString("en-IN")} <span className="text-slate-400">({p.data?.cashCount})</span></span>
+      ),
+    },
+    {
+      headerName: "Online Payout Owed",
+      field: "onlinePayoutOwed",
+      minWidth: 190,
+      flex: 1,
+      cellRenderer: (p: ICellRendererParams<PendingSettlement>) => (
+        <span className="text-purple-600">₹{(p.value ?? 0).toLocaleString("en-IN")} <span className="text-slate-400">({p.data?.onlineCount})</span></span>
+      ),
+    },
+    {
+      headerName: "Net",
+      field: "netAmount",
+      width: 140,
+      cellRenderer: (p: ICellRendererParams<PendingSettlement>) => {
+        const v = p.value ?? 0;
+        return (
+          <span className={`font-bold ${v < 0 ? "text-red-600" : "text-emerald-600"}`}>
+            {v < 0 ? "−" : ""}₹{Math.abs(v).toLocaleString("en-IN")}
+          </span>
+        );
+      },
+    },
+    {
+      headerName: "",
+      field: "doctorId",
+      width: 140,
+      sortable: false,
+      filter: false,
+      cellRenderer: (p: ICellRendererParams<PendingSettlement>) => (
+        <button
+          onClick={() => p.data && settleDoctor(p.data.doctorId)}
+          disabled={settlingId === p.data?.doctorId}
+          className="btn-primary text-xs py-1.5 px-3"
+        >
+          {settlingId === p.data?.doctorId ? "Settling…" : "Settle Now"}
+        </button>
+      ),
+    },
+  ], [settlingId]);
+
+  const historyColumnDefs = useMemo<ColDef<SettlementRecord>[]>(() => [
+    {
+      headerName: "Doctor",
+      field: "doctor.name",
+      minWidth: 180,
+      flex: 1.2,
+      valueFormatter: (p: ValueFormatterParams<SettlementRecord>) => formatDoctorName(p.value ?? ""),
+      cellClass: "font-semibold text-slate-800",
+    },
+    {
+      headerName: "Date",
+      field: "createdAt",
+      width: 140,
+      valueGetter: (p) => (p.data ? new Date(p.data.createdAt) : null),
+      valueFormatter: (p) => (p.value instanceof Date ? p.value.toLocaleDateString("en-IN", { dateStyle: "medium" }) : ""),
+      cellClass: "text-xs text-slate-500",
+      sort: "desc",
+    },
+    { headerName: "Cash", field: "cashCount", width: 100 },
+    { headerName: "Online", field: "onlineCount", width: 100 },
+    {
+      headerName: "Settled By",
+      field: "settledByAdmin.name",
+      minWidth: 140,
+      flex: 1,
+      valueFormatter: (p: ValueFormatterParams<SettlementRecord>) => p.value ?? "—",
+      cellClass: "text-xs text-slate-500",
+    },
+    {
+      headerName: "Net",
+      field: "netAmount",
+      width: 140,
+      cellRenderer: (p: ICellRendererParams<SettlementRecord>) => {
+        const v = p.value ?? 0;
+        return (
+          <span className={`font-bold ${v < 0 ? "text-red-600" : "text-emerald-600"}`}>
+            {v < 0 ? "−" : ""}₹{Math.abs(v).toLocaleString("en-IN")}
+          </span>
+        );
+      },
+    },
+  ], []);
+
+  const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true, filter: true }), []);
 
   return (
     <div className="p-8">
@@ -215,47 +333,14 @@ export default function AdminFinance() {
         {pending.length === 0 ? (
           <p className="text-sm text-slate-400 text-center py-8">Nothing to settle right now.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                  <th className="pb-3 pr-4">Doctor</th>
-                  <th className="pb-3 pr-4">Cash Fee Owed</th>
-                  <th className="pb-3 pr-4">Online Payout Owed</th>
-                  <th className="pb-3 pr-4">Net</th>
-                  <th className="pb-3"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {pending.map((p) => (
-                  <tr key={p.doctorId}>
-                    <td className="py-3 pr-4">
-                      <p className="font-semibold text-slate-800">{formatDoctorName(p.doctorName)}</p>
-                      {p.bankDetails ? (
-                        <p className="text-[11px] text-slate-400">{p.bankDetails}</p>
-                      ) : (
-                        <p className="text-[11px] text-red-500">No bank details on file{p.doctorMobile ? ` · ${p.doctorMobile}` : ""}</p>
-                      )}
-                    </td>
-                    <td className="py-3 pr-4 text-amber-600">₹{p.cashFeeOwed.toLocaleString("en-IN")} <span className="text-slate-400">({p.cashCount})</span></td>
-                    <td className="py-3 pr-4 text-purple-600">₹{p.onlinePayoutOwed.toLocaleString("en-IN")} <span className="text-slate-400">({p.onlineCount})</span></td>
-                    <td className={`py-3 pr-4 font-bold ${p.netAmount < 0 ? "text-red-600" : "text-emerald-600"}`}>
-                      {p.netAmount < 0 ? "−" : ""}₹{Math.abs(p.netAmount).toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3">
-                      <button
-                        onClick={() => settleDoctor(p.doctorId)}
-                        disabled={settlingId === p.doctorId}
-                        className="btn-primary text-xs py-1.5 px-3"
-                      >
-                        {settlingId === p.doctorId ? "Settling…" : "Settle Now"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <AgGridReact<PendingSettlement>
+            theme={brandGridTheme}
+            rowData={pending}
+            columnDefs={pendingColumnDefs}
+            defaultColDef={defaultColDef}
+            domLayout="autoHeight"
+            animateRows
+          />
         )}
       </div>
 
@@ -265,22 +350,17 @@ export default function AdminFinance() {
         {history.length === 0 ? (
           <p className="text-sm text-slate-400 text-center py-8">No settlements recorded yet.</p>
         ) : (
-          <div className="divide-y divide-slate-50">
-            {history.map((s) => (
-              <div key={s.id} className="py-3.5 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-800">{formatDoctorName(s.doctor.name)}</p>
-                  <p className="text-xs text-slate-400">
-                    {new Date(s.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {s.cashCount} cash · {s.onlineCount} online
-                    {s.settledByAdmin ? ` · by ${s.settledByAdmin.name}` : ""}
-                  </p>
-                </div>
-                <p className={`text-sm font-bold flex-shrink-0 ${s.netAmount < 0 ? "text-red-600" : "text-emerald-600"}`}>
-                  {s.netAmount < 0 ? "−" : ""}₹{Math.abs(s.netAmount).toLocaleString("en-IN")}
-                </p>
-              </div>
-            ))}
-          </div>
+          <AgGridReact<SettlementRecord>
+            theme={brandGridTheme}
+            rowData={history}
+            columnDefs={historyColumnDefs}
+            defaultColDef={defaultColDef}
+            domLayout="autoHeight"
+            pagination
+            paginationPageSize={10}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            animateRows
+          />
         )}
       </div>
 

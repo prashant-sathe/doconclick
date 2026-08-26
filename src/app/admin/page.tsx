@@ -1,8 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Users, Stethoscope, CalendarCheck, IndianRupee, AlertCircle, Clock, TrendingUp } from "lucide-react";
+import { AgGridReact } from "ag-grid-react";
+import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { cn, formatDoctorName } from "@/lib/utils";
+import { brandGridTheme } from "@/lib/agGridTheme";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
+
+type RecentAppointment = Analytics["recentAppointments"][number];
 
 interface Analytics {
   totalPatients: number;
@@ -78,6 +83,33 @@ export default function AdminOverview() {
     );
   }
 
+  const columnDefs: ColDef<RecentAppointment>[] = [
+    { headerName: "Patient", field: "patient.name", minWidth: 160, flex: 1, cellClass: "font-medium text-slate-900" },
+    {
+      headerName: "Doctor",
+      field: "doctor.name",
+      minWidth: 160,
+      flex: 1,
+      valueFormatter: (p: ValueFormatterParams<RecentAppointment>) => formatDoctorName(p.value ?? ""),
+    },
+    { headerName: "Symptoms", field: "symptoms", minWidth: 180, flex: 1.4, cellClass: "truncate text-slate-600" },
+    {
+      headerName: "Amount",
+      field: "amount",
+      width: 110,
+      valueFormatter: (p: ValueFormatterParams<RecentAppointment>) => `₹${p.value}`,
+      cellClass: "font-semibold",
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      width: 150,
+      cellRenderer: (p: ICellRendererParams<RecentAppointment>) => (
+        <span className={STATUS_STYLES[p.value as string] ?? "badge badge-gray"}>{p.value}</span>
+      ),
+    },
+  ];
+
   if (!data) return null;
 
   return (
@@ -132,32 +164,17 @@ export default function AdminOverview() {
           </div>
           <a href="/admin/bookings" className="text-xs font-semibold text-blue-600 hover:text-blue-700">View all →</a>
         </div>
-        <div className="overflow-x-auto">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Patient</th>
-                <th>Doctor</th>
-                <th>Symptoms</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.recentAppointments.length === 0 ? (
-                <tr><td colSpan={5} className="text-center py-8 text-slate-400">No appointments yet.</td></tr>
-              ) : data.recentAppointments.map((a) => (
-                <tr key={a.id}>
-                  <td className="font-medium text-slate-900">{a.patient.name}</td>
-                  <td>{formatDoctorName(a.doctor.name)}</td>
-                  <td className="max-w-[200px] truncate">{a.symptoms}</td>
-                  <td className="font-semibold">₹{a.amount}</td>
-                  <td><span className={STATUS_STYLES[a.status] ?? "badge badge-gray"}>{a.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {data.recentAppointments.length === 0 ? (
+          <div className="text-center py-8 text-slate-400">No appointments yet.</div>
+        ) : (
+          <AgGridReact<RecentAppointment>
+            theme={brandGridTheme}
+            rowData={data.recentAppointments}
+            columnDefs={columnDefs}
+            defaultColDef={{ sortable: true, resizable: true }}
+            domLayout="autoHeight"
+          />
+        )}
       </div>
     </div>
   );

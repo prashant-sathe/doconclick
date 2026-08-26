@@ -1,12 +1,15 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   Search, Users, Eye, X, Phone, Mail, MapPin, Calendar,
   Activity, Droplets, Ruler, Weight, AlertTriangle,
   Pill, Scissors, PhoneCall, DollarSign, CalendarCheck,
   CheckCircle2, AlertCircle, MessageCircle, Clock, RefreshCw, Trash2, LogIn,
 } from "lucide-react";
+import { AgGridReact } from "ag-grid-react";
+import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { cn, formatDoctorName } from "@/lib/utils";
+import { brandGridTheme } from "@/lib/agGridTheme";
 
 // ── Types ──────────────────────────────────────────────────────
 interface PatientProfile {
@@ -291,6 +294,91 @@ export default function AdminPatients() {
       p.mobile.includes(search)
   );
 
+  const columnDefs = useMemo<ColDef<Patient>[]>(() => [
+    {
+      headerName: "Patient",
+      field: "name",
+      minWidth: 190,
+      flex: 1.2,
+      cellRenderer: (p: ICellRendererParams<Patient>) => (
+        <div className="leading-tight py-1">
+          <div className="font-semibold text-slate-900">{p.data?.name}</div>
+          <div className="text-xs text-slate-400">{p.data?.email ?? "No email"}</div>
+        </div>
+      ),
+    },
+    { headerName: "Mobile", field: "mobile", width: 140, cellClass: "font-mono text-xs" },
+    {
+      headerName: "Age / Gender",
+      field: "patientProfile.age",
+      width: 140,
+      valueGetter: (p) => (p.data?.patientProfile ? `${p.data.patientProfile.age} / ${p.data.patientProfile.gender}` : "—"),
+    },
+    {
+      headerName: "Location",
+      field: "patientProfile.location",
+      minWidth: 140,
+      flex: 1,
+      valueFormatter: (p: ValueFormatterParams<Patient>) => p.value ?? "—",
+    },
+    {
+      headerName: "Total Bookings",
+      field: "asPatient",
+      width: 150,
+      valueGetter: (p) => p.data?.asPatient.length ?? 0,
+      cellRenderer: (p: ICellRendererParams<Patient>) => (
+        <span className="badge badge-info">{p.value} total</span>
+      ),
+    },
+    {
+      headerName: "Joined",
+      field: "createdAt",
+      width: 120,
+      valueGetter: (p) => (p.data ? new Date(p.data.createdAt) : null),
+      valueFormatter: (p) => (p.value instanceof Date ? p.value.toLocaleDateString("en-IN") : ""),
+      cellClass: "text-xs text-slate-400",
+    },
+    {
+      headerName: "Actions",
+      field: "id",
+      width: 120,
+      sortable: false,
+      filter: false,
+      cellRenderer: (p: ICellRendererParams<Patient>) => {
+        const patient = p.data;
+        if (!patient) return null;
+        return (
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setViewId(patient.id)}
+              title="View Full Profile"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
+            >
+              <Eye className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => impersonate(patient)}
+              disabled={impersonatingId === patient.id}
+              title="Log in as this patient"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-indigo-500 hover:bg-indigo-50 transition-colors disabled:opacity-40"
+            >
+              <LogIn className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setDeleteTarget(patient)}
+              title="Delete Account"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        );
+      },
+    },
+  ], [impersonatingId]);
+
+  const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true, filter: true }), []);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -327,76 +415,24 @@ export default function AdminPatients() {
           <div className="p-8 space-y-3">
             {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Patient</th>
-                  <th>Mobile</th>
-                  <th>Age / Gender</th>
-                  <th>Location</th>
-                  <th>Total Bookings</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr><td colSpan={7} className="text-center py-12 text-slate-400">
-                    <Users className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    No patients found.
-                  </td></tr>
-                ) : filtered.map((p) => (
-                  <tr key={p.id}>
-                    <td>
-                      <div className="font-semibold text-slate-900">{p.name}</div>
-                      <div className="text-xs text-slate-400">{p.email ?? "No email"}</div>
-                    </td>
-                    <td className="font-mono text-xs">{p.mobile}</td>
-                    <td>{p.patientProfile ? `${p.patientProfile.age} / ${p.patientProfile.gender}` : "—"}</td>
-                    <td>{p.patientProfile?.location ?? "—"}</td>
-                    <td>
-                      <span className="badge badge-info">{p.asPatient.length} total</span>
-                    </td>
-                    <td className="text-xs text-slate-400">
-                      {new Date(p.createdAt).toLocaleDateString("en-IN")}
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => setViewId(p.id)}
-                          title="View Full Profile"
-                          className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => impersonate(p)}
-                          disabled={impersonatingId === p.id}
-                          title="Log in as this patient"
-                          className="w-8 h-8 flex items-center justify-center rounded-lg text-indigo-500 hover:bg-indigo-50 transition-colors disabled:opacity-40"
-                        >
-                          <LogIn className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => setDeleteTarget(p)}
-                          title="Delete Account"
-                          className="w-8 h-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12 text-slate-400">
+            <Users className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            No patients found.
           </div>
+        ) : (
+          <AgGridReact<Patient>
+            theme={brandGridTheme}
+            rowData={filtered}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            domLayout="autoHeight"
+            pagination
+            paginationPageSize={10}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            animateRows
+          />
         )}
-        <div className="px-5 py-3.5 border-t border-slate-100 text-xs text-slate-400">
-          Showing {filtered.length} of {patients.length} patients
-        </div>
       </div>
 
       {/* Drawer */}

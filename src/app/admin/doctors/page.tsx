@@ -1,12 +1,15 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   CheckCircle, XCircle, PauseCircle, Search, RefreshCw, Stethoscope,
   Eye, X, Phone, Mail, Award, Hash, Briefcase, DollarSign,
   Clock, MapPin, CreditCard, CalendarCheck, TrendingUp, AlertCircle,
   CheckCircle2, User, BadgeCheck, Languages, FileText, Trash2, LogIn,
 } from "lucide-react";
+import { AgGridReact } from "ag-grid-react";
+import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { cn, formatDoctorName } from "@/lib/utils";
+import { brandGridTheme } from "@/lib/agGridTheme";
 
 // ── Types ──────────────────────────────────────────────────────
 interface DoctorProfile {
@@ -71,103 +74,6 @@ const APPT_BADGE: Record<string, string> = {
 };
 
 const FILTERS = ["ALL", "PENDING", "APPROVED", "REJECTED", "SUSPENDED"];
-
-// ── Row in table ───────────────────────────────────────────────
-function DoctorRow({
-  d, updating, onStatus, onView, onDelete, onImpersonate,
-}: {
-  d: Doctor;
-  updating: string | null;
-  onStatus: (id: string, status: string) => void;
-  onView: (d: Doctor) => void;
-  onDelete: (d: Doctor) => void;
-  onImpersonate: (d: Doctor) => void;
-}) {
-  return (
-    <tr>
-      <td>
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-slate-900">{formatDoctorName(d.name)}</span>
-          {(d.doctorProfile?.medRegCertUrl || d.doctorProfile?.degreeCertUrl || d.doctorProfile?.kycDocUrl) && (
-            <span className="badge badge-info" title="Documents uploaded — needs review">
-              <FileText className="w-3 h-3" /> Docs
-            </span>
-          )}
-          {d.doctorProfile?.registrationFeePaid && (
-            <span className="badge badge-success" title="Registration fee paid">
-              <CreditCard className="w-3 h-3" /> Paid
-            </span>
-          )}
-        </div>
-        <div className="text-xs text-slate-400">{d.mobile}</div>
-      </td>
-      <td>{d.doctorProfile?.specialty ?? "—"}</td>
-      <td className="font-mono text-xs">{d.doctorProfile?.medRegNo ?? "—"}</td>
-      <td>{d.doctorProfile?.experience ?? "—"} yrs</td>
-      <td>₹{d.doctorProfile?.consultFee ?? "—"}</td>
-      <td>
-        <span className={STATUS_BADGE[d.doctorProfile?.status ?? "PENDING"] ?? "badge badge-gray"}>
-          {d.doctorProfile?.status ?? "PENDING"}
-        </span>
-      </td>
-      <td>
-        {d.doctorProfile?.isVerified ? (
-          <span className="badge badge-success"><BadgeCheck className="w-3 h-3" /> Verified</span>
-        ) : (
-          <span className="badge badge-gray">Not Verified</span>
-        )}
-      </td>
-      <td>
-        <div className="flex items-center gap-1.5">
-          {/* View */}
-          <button
-            onClick={() => onView(d)}
-            title="View Profile"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-          {/* Log in as */}
-          <button onClick={() => onImpersonate(d)} disabled={updating === d.id}
-            title="Log in as this doctor"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-indigo-500 hover:bg-indigo-50 transition-colors disabled:opacity-40">
-            <LogIn className="w-4 h-4" />
-          </button>
-          {/* Approve */}
-          {d.doctorProfile?.status !== "APPROVED" && (
-            <button onClick={() => onStatus(d.id, "APPROVED")} disabled={updating === d.id}
-              title="Approve"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors disabled:opacity-40">
-              <CheckCircle className="w-4 h-4" />
-            </button>
-          )}
-          {/* Reject */}
-          {d.doctorProfile?.status !== "REJECTED" && (
-            <button onClick={() => onStatus(d.id, "REJECTED")} disabled={updating === d.id}
-              title="Reject"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40">
-              <XCircle className="w-4 h-4" />
-            </button>
-          )}
-          {/* Suspend */}
-          {d.doctorProfile?.status !== "SUSPENDED" && (
-            <button onClick={() => onStatus(d.id, "SUSPENDED")} disabled={updating === d.id}
-              title="Suspend"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-amber-500 hover:bg-amber-50 transition-colors disabled:opacity-40">
-              <PauseCircle className="w-4 h-4" />
-            </button>
-          )}
-          {/* Delete */}
-          <button onClick={() => onDelete(d)} disabled={updating === d.id}
-            title="Delete Account"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40">
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      </td>
-    </tr>
-  );
-}
 
 // ── Profile Drawer ─────────────────────────────────────────────
 function DoctorDrawer({
@@ -528,6 +434,140 @@ export default function AdminDoctors() {
       d.doctorProfile?.specialty.toLowerCase().includes(search.toLowerCase())
     );
 
+  const columnDefs = useMemo<ColDef<Doctor>[]>(() => [
+    {
+      headerName: "Doctor",
+      field: "name",
+      minWidth: 220,
+      flex: 1.3,
+      cellRenderer: (p: ICellRendererParams<Doctor>) => {
+        const d = p.data;
+        if (!d) return null;
+        return (
+          <div className="leading-tight py-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold text-slate-900">{formatDoctorName(d.name)}</span>
+              {(d.doctorProfile?.medRegCertUrl || d.doctorProfile?.degreeCertUrl || d.doctorProfile?.kycDocUrl) && (
+                <span className="badge badge-info" title="Documents uploaded — needs review">
+                  <FileText className="w-3 h-3" /> Docs
+                </span>
+              )}
+              {d.doctorProfile?.registrationFeePaid && (
+                <span className="badge badge-success" title="Registration fee paid">
+                  <CreditCard className="w-3 h-3" /> Paid
+                </span>
+              )}
+            </div>
+            <div className="text-xs text-slate-400">{d.mobile}</div>
+          </div>
+        );
+      },
+    },
+    {
+      headerName: "Specialty",
+      field: "doctorProfile.specialty",
+      minWidth: 140,
+      flex: 1,
+      valueGetter: (p) => p.data?.doctorProfile?.specialty ?? "—",
+    },
+    {
+      headerName: "Reg. No.",
+      field: "doctorProfile.medRegNo",
+      minWidth: 130,
+      flex: 1,
+      valueGetter: (p) => p.data?.doctorProfile?.medRegNo ?? "—",
+      cellClass: "font-mono text-xs",
+    },
+    {
+      headerName: "Experience",
+      field: "doctorProfile.experience",
+      width: 120,
+      valueGetter: (p) => p.data?.doctorProfile?.experience ?? null,
+      valueFormatter: (p) => (p.value != null ? `${p.value} yrs` : "—"),
+    },
+    {
+      headerName: "Fee (₹)",
+      field: "doctorProfile.consultFee",
+      width: 110,
+      valueGetter: (p) => p.data?.doctorProfile?.consultFee ?? null,
+      valueFormatter: (p) => (p.value != null ? `₹${p.value}` : "—"),
+    },
+    {
+      headerName: "Status",
+      field: "doctorProfile.status",
+      width: 140,
+      valueGetter: (p) => p.data?.doctorProfile?.status ?? "PENDING",
+      cellRenderer: (p: ICellRendererParams<Doctor>) => (
+        <span className={STATUS_BADGE[p.value as string] ?? "badge badge-gray"}>{p.value}</span>
+      ),
+    },
+    {
+      headerName: "Verified",
+      field: "doctorProfile.isVerified",
+      width: 140,
+      valueGetter: (p) => !!p.data?.doctorProfile?.isVerified,
+      cellRenderer: (p: ICellRendererParams<Doctor>) =>
+        p.value ? (
+          <span className="badge badge-success"><BadgeCheck className="w-3 h-3" /> Verified</span>
+        ) : (
+          <span className="badge badge-gray">Not Verified</span>
+        ),
+    },
+    {
+      headerName: "Actions",
+      field: "id",
+      minWidth: 220,
+      sortable: false,
+      filter: false,
+      cellRenderer: (p: ICellRendererParams<Doctor>) => {
+        const d = p.data;
+        if (!d) return null;
+        const status = d.doctorProfile?.status;
+        return (
+          <div className="flex items-center gap-1.5">
+            <button onClick={() => setViewId(d.id)} title="View Profile"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors">
+              <Eye className="w-4 h-4" />
+            </button>
+            <button onClick={() => impersonate(d)} disabled={updating === d.id}
+              title="Log in as this doctor"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-indigo-500 hover:bg-indigo-50 transition-colors disabled:opacity-40">
+              <LogIn className="w-4 h-4" />
+            </button>
+            {status !== "APPROVED" && (
+              <button onClick={() => updateStatus(d.id, "APPROVED")} disabled={updating === d.id}
+                title="Approve"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors disabled:opacity-40">
+                <CheckCircle className="w-4 h-4" />
+              </button>
+            )}
+            {status !== "REJECTED" && (
+              <button onClick={() => updateStatus(d.id, "REJECTED")} disabled={updating === d.id}
+                title="Reject"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40">
+                <XCircle className="w-4 h-4" />
+              </button>
+            )}
+            {status !== "SUSPENDED" && (
+              <button onClick={() => updateStatus(d.id, "SUSPENDED")} disabled={updating === d.id}
+                title="Suspend"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-amber-500 hover:bg-amber-50 transition-colors disabled:opacity-40">
+                <PauseCircle className="w-4 h-4" />
+              </button>
+            )}
+            <button onClick={() => setDeleteTarget(d)} disabled={updating === d.id}
+              title="Delete Account"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40">
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        );
+      },
+    },
+  ], [updating]);
+
+  const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true, filter: true }), []);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -583,41 +623,24 @@ export default function AdminDoctors() {
           <div className="p-8 space-y-3">
             {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Doctor</th>
-                  <th>Specialty</th>
-                  <th>Reg. No.</th>
-                  <th>Experience</th>
-                  <th>Fee (₹)</th>
-                  <th>Status</th>
-                  <th>Verified</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr><td colSpan={8} className="text-center py-12 text-slate-400">
-                    <Stethoscope className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    No doctors found.
-                  </td></tr>
-                ) : filtered.map((d) => (
-                  <DoctorRow key={d.id} d={d} updating={updating}
-                    onStatus={updateStatus}
-                    onView={(doc) => setViewId(doc.id)}
-                    onDelete={(doc) => setDeleteTarget(doc)}
-                    onImpersonate={impersonate} />
-                ))}
-              </tbody>
-            </table>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12 text-slate-400">
+            <Stethoscope className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            No doctors found.
           </div>
+        ) : (
+          <AgGridReact<Doctor>
+            theme={brandGridTheme}
+            rowData={filtered}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            domLayout="autoHeight"
+            pagination
+            paginationPageSize={10}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            animateRows
+          />
         )}
-        <div className="px-5 py-3.5 border-t border-slate-100 text-xs text-slate-400">
-          Showing {filtered.length} of {doctors.length} doctors
-        </div>
       </div>
 
       {/* Drawer */}

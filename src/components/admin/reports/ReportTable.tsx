@@ -1,6 +1,10 @@
 "use client";
+import { useMemo } from "react";
 import { Download, FileQuestion } from "lucide-react";
+import { AgGridReact } from "ag-grid-react";
+import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { cn } from "@/lib/utils";
+import { brandGridTheme } from "@/lib/agGridTheme";
 import { downloadCSV, toCSV, type CsvColumn } from "@/lib/csv";
 
 export interface ReportColumn<T> {
@@ -49,6 +53,20 @@ export default function ReportTable<T extends Record<string, unknown>>({
     downloadCSV(exportFilename, toCSV(rows, csvColumns));
   };
 
+  const columnDefs = useMemo<ColDef<T>[]>(() => columns.map((c) => ({
+    colId: c.key,
+    headerName: c.label,
+    flex: 1,
+    minWidth: 130,
+    cellClass: c.align === "right" ? "text-right" : undefined,
+    valueGetter: (p) => (p.data ? p.data[c.key] : undefined),
+    ...(c.render
+      ? { cellRenderer: (p: ICellRendererParams<T>) => (p.data ? c.render!(p.data) : null) }
+      : { valueFormatter: (p: ValueFormatterParams<T>) => (p.value === null || p.value === undefined || p.value === "" ? "—" : String(p.value)) }),
+  })), [columns]);
+
+  const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true, filter: true }), []);
+
   return (
     <div>
       {summaryCards && summaryCards.length > 0 && (
@@ -74,38 +92,23 @@ export default function ReportTable<T extends Record<string, unknown>>({
           <div className="p-8 space-y-3">
             {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  {columns.map((c) => (
-                    <th key={c.key} className={c.align === "right" ? "text-right" : undefined}>{c.label}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.length === 0 ? (
-                  <tr>
-                    <td colSpan={columns.length} className="text-center py-12 text-slate-400">
-                      <FileQuestion className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                      {emptyLabel}
-                    </td>
-                  </tr>
-                ) : (
-                  rows.map((row, i) => (
-                    <tr key={i}>
-                      {columns.map((c) => (
-                        <td key={c.key} className={c.align === "right" ? "text-right" : undefined}>
-                          {c.render ? c.render(row) : String(row[c.key] ?? "—")}
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+        ) : rows.length === 0 ? (
+          <div className="text-center py-12 text-slate-400">
+            <FileQuestion className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            {emptyLabel}
           </div>
+        ) : (
+          <AgGridReact<T>
+            theme={brandGridTheme}
+            rowData={rows}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            domLayout="autoHeight"
+            pagination
+            paginationPageSize={10}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            animateRows
+          />
         )}
       </div>
     </div>

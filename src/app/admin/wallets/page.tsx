@@ -1,10 +1,13 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   Search, Wallet as WalletIcon, Eye, X, Phone, Mail, RefreshCw,
   ArrowDownCircle, ArrowUpCircle, ShieldCheck, PlusCircle, MinusCircle, AlertTriangle,
 } from "lucide-react";
+import { AgGridReact } from "ag-grid-react";
+import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { formatDoctorName } from "@/lib/utils";
+import { brandGridTheme } from "@/lib/agGridTheme";
 
 interface WalletRow {
   userId: string;
@@ -293,6 +296,50 @@ export default function AdminWallets() {
     (r) => r.name.toLowerCase().includes(search.toLowerCase()) || r.mobile.includes(search)
   );
 
+  const columnDefs = useMemo<ColDef<WalletRow>[]>(() => [
+    {
+      headerName: "Patient",
+      field: "name",
+      minWidth: 190,
+      flex: 1.2,
+      cellRenderer: (p: ICellRendererParams<WalletRow>) => (
+        <div className="leading-tight py-1">
+          <div className="font-semibold text-slate-900">{p.data?.name}</div>
+          <div className="text-xs text-slate-400">{p.data?.email ?? "No email"}</div>
+        </div>
+      ),
+    },
+    { headerName: "Mobile", field: "mobile", width: 150, cellClass: "font-mono text-xs" },
+    {
+      headerName: "Balance",
+      field: "balance",
+      width: 160,
+      cellRenderer: (p: ICellRendererParams<WalletRow>) => (
+        <span className={(p.value ?? 0) < 0 ? "badge badge-danger" : "badge badge-success"}>
+          ₹{(p.value ?? 0).toLocaleString("en-IN")}
+        </span>
+      ),
+    },
+    {
+      headerName: "Actions",
+      field: "userId",
+      width: 90,
+      sortable: false,
+      filter: false,
+      cellRenderer: (p: ICellRendererParams<WalletRow>) => (
+        <button
+          onClick={() => p.data && setViewId(p.data.userId)}
+          title="View & Adjust Wallet"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+      ),
+    },
+  ], []);
+
+  const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true, filter: true }), []);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -333,53 +380,24 @@ export default function AdminWallets() {
           <div className="p-8 space-y-3">
             {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Patient</th>
-                  <th>Mobile</th>
-                  <th>Balance</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr><td colSpan={4} className="text-center py-12 text-slate-400">
-                    <WalletIcon className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    No patients found.
-                  </td></tr>
-                ) : filtered.map((r) => (
-                  <tr key={r.userId}>
-                    <td>
-                      <div className="font-semibold text-slate-900">{r.name}</div>
-                      <div className="text-xs text-slate-400">{r.email ?? "No email"}</div>
-                    </td>
-                    <td className="font-mono text-xs">{r.mobile}</td>
-                    <td>
-                      <span className={r.balance < 0 ? "badge badge-danger" : "badge badge-success"}>
-                        ₹{r.balance.toLocaleString("en-IN")}
-                      </span>
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => setViewId(r.userId)}
-                        title="View & Adjust Wallet"
-                        className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12 text-slate-400">
+            <WalletIcon className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            No patients found.
           </div>
+        ) : (
+          <AgGridReact<WalletRow>
+            theme={brandGridTheme}
+            rowData={filtered}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            domLayout="autoHeight"
+            pagination
+            paginationPageSize={10}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            animateRows
+          />
         )}
-        <div className="px-5 py-3.5 border-t border-slate-100 text-xs text-slate-400">
-          Showing {filtered.length} of {rows.length} patients
-        </div>
       </div>
 
       {viewId && (

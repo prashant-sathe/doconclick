@@ -51,6 +51,7 @@ export default function DoctorEarnings() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [settlements, setSettlements] = useState<SettlementRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(10);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/earnings");
@@ -117,9 +118,8 @@ export default function DoctorEarnings() {
   });
   const maxDay = Math.max(1, ...days.map((d) => d.value));
 
-  const recent = [...completed]
-    .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())
-    .slice(0, 10);
+  const recentAll = [...completed].sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
+  const recent = recentAll.slice(0, visibleCount);
 
   return (
     <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
@@ -205,6 +205,14 @@ export default function DoctorEarnings() {
                 </div>
               ))}
             </div>
+          )}
+          {visibleCount < recentAll.length && (
+            <button
+              onClick={() => setVisibleCount((v) => v + 10)}
+              className="w-full py-3 border-t border-slate-100 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+            >
+              Load {Math.min(10, recentAll.length - visibleCount)} more
+            </button>
           )}
         </div>
 

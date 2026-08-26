@@ -1,7 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, CalendarCheck, Eye, X, FileText, Pill, FlaskConical, Phone, Download } from "lucide-react";
+import { AgGridReact } from "ag-grid-react";
+import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { cn, formatDoctorName } from "@/lib/utils";
+import { brandGridTheme } from "@/lib/agGridTheme";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
 import type { PrescriptionData } from "@/components/patient/PrescriptionDocument";
 
@@ -293,6 +296,104 @@ export default function AdminBookings() {
 
   const totals = { revenue: bookings.filter(b => b.status === "COMPLETED").reduce((s, b) => s + b.amount, 0), platform: bookings.filter(b => b.status === "COMPLETED").reduce((s, b) => s + b.platformFee, 0) };
 
+  const columnDefs = useMemo<ColDef<Appointment>[]>(() => [
+    {
+      headerName: "Patient",
+      field: "patient.name",
+      minWidth: 190,
+      flex: 1.2,
+      cellRenderer: (p: ICellRendererParams<Appointment>) => {
+        const b = p.data;
+        if (!b) return null;
+        const name = b.relation !== "Self" && b.patientName ? b.patientName : b.patient.name;
+        return (
+          <div className="leading-tight py-1">
+            <div className="font-semibold text-slate-900">{name}</div>
+            {b.relation !== "Self" && (
+              <div className="text-xs font-normal text-slate-400">{b.relation} of {b.patient.name}</div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      headerName: "Doctor",
+      field: "doctor.name",
+      minWidth: 170,
+      flex: 1.2,
+      valueFormatter: (p: ValueFormatterParams<Appointment>) => formatDoctorName(p.value ?? ""),
+    },
+    {
+      headerName: "Type",
+      field: "consultType",
+      width: 110,
+      cellRenderer: (p: ICellRendererParams<Appointment>) => (
+        <span className={TYPE_BADGE[p.value as string] ?? "badge badge-gray"}>{p.value}</span>
+      ),
+    },
+    {
+      headerName: "Symptoms",
+      field: "symptoms",
+      minWidth: 160,
+      flex: 1.2,
+      tooltipField: "symptoms",
+      cellClass: "truncate text-slate-600",
+    },
+    {
+      headerName: "Amount",
+      field: "amount",
+      width: 110,
+      valueFormatter: (p: ValueFormatterParams<Appointment>) => `₹${p.value}`,
+      cellClass: "font-semibold",
+    },
+    {
+      headerName: "Platform Fee",
+      field: "platformFee",
+      width: 150,
+      valueFormatter: (p: ValueFormatterParams<Appointment>) => `₹${(p.value ?? 0).toFixed(0)}`,
+      cellClass: "text-emerald-600 font-semibold",
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      width: 175,
+      cellRenderer: (p: ICellRendererParams<Appointment>) => (
+        <span className={STATUS_BADGE[p.value as string] ?? "badge badge-gray"}>{p.value}</span>
+      ),
+    },
+    {
+      headerName: "Date",
+      field: "createdAt",
+      width: 120,
+      valueGetter: (p) => (p.data ? new Date(p.data.createdAt) : null),
+      valueFormatter: (p) => (p.value instanceof Date ? p.value.toLocaleDateString("en-IN") : ""),
+      cellClass: "text-xs text-slate-400",
+      sort: "desc",
+    },
+    {
+      headerName: "Actions",
+      field: "id",
+      width: 90,
+      sortable: false,
+      filter: false,
+      cellRenderer: (p: ICellRendererParams<Appointment>) => (
+        <button
+          onClick={() => p.data && setViewId(p.data.id)}
+          title="View Booking / Documents"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+      ),
+    },
+  ], []);
+
+  const defaultColDef = useMemo<ColDef>(() => ({
+    sortable: true,
+    resizable: true,
+    filter: true,
+  }), []);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -348,58 +449,24 @@ export default function AdminBookings() {
           <div className="p-8 space-y-3">
             {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Patient</th>
-                  <th>Doctor</th>
-                  <th>Type</th>
-                  <th>Symptoms</th>
-                  <th>Amount</th>
-                  <th>Platform Fee</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center py-12 text-slate-400">
-                    <CalendarCheck className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    No bookings found.
-                  </td></tr>
-                ) : filtered.map((b) => (
-                  <tr key={b.id}>
-                    <td className="font-semibold text-slate-900">
-                      {b.relation !== "Self" && b.patientName ? b.patientName : b.patient.name}
-                      {b.relation !== "Self" && (
-                        <div className="text-xs font-normal text-slate-400">{b.relation} of {b.patient.name}</div>
-                      )}
-                    </td>
-                    <td>{formatDoctorName(b.doctor.name)}</td>
-                    <td><span className={TYPE_BADGE[b.consultType] ?? "badge badge-gray"}>{b.consultType}</span></td>
-                    <td className="max-w-[160px] truncate text-slate-600">{b.symptoms}</td>
-                    <td className="font-semibold">₹{b.amount}</td>
-                    <td className="text-emerald-600 font-semibold">₹{b.platformFee.toFixed(0)}</td>
-                    <td><span className={STATUS_BADGE[b.status] ?? "badge badge-gray"}>{b.status}</span></td>
-                    <td className="text-xs text-slate-400">{new Date(b.createdAt).toLocaleDateString("en-IN")}</td>
-                    <td>
-                      <button onClick={() => setViewId(b.id)} title="View Booking / Documents"
-                        className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12 text-slate-400">
+            <CalendarCheck className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            No bookings found.
           </div>
+        ) : (
+          <AgGridReact<Appointment>
+            theme={brandGridTheme}
+            rowData={filtered}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            domLayout="autoHeight"
+            pagination
+            paginationPageSize={10}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            animateRows
+          />
         )}
-        <div className="px-5 py-3.5 border-t border-slate-100 text-xs text-slate-400">
-          Showing {filtered.length} of {bookings.length} bookings
-        </div>
       </div>
 
       {viewId && (
