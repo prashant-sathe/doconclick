@@ -184,6 +184,14 @@ function nowLocalInput() {
   return d.toISOString().slice(0, 16);
 }
 
+// "today 2:05 PM" / "tomorrow 9:00 AM" / "Mon 9:00 AM"
+function formatNextOpeningText(next: { daysAhead: number; dayOfWeek: string; fromTime: string } | null): string | null {
+  if (!next) return null;
+  if (next.daysAhead === 0) return `today ${formatSlotTime(next.fromTime)}`;
+  if (next.daysAhead === 1) return `tomorrow ${formatSlotTime(next.fromTime)}`;
+  return `${next.dayOfWeek} ${formatSlotTime(next.fromTime)}`;
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 // PAGE COMPONENT
 // ══════════════════════════════════════════════════════════════════════════
@@ -550,6 +558,13 @@ function PatientDashboardInner() {
   }, [doctors, specialtyFilter, search, now, colorFor]);
 
   const selectedClinic = selectedDoctor?.clinics.find((c) => c.id === selectedClinicId) ?? null;
+
+  // Distance shown in the doctor panel's chip row — follows whichever
+  // clinic the patient has selected, not just the doctor's first/legacy
+  // location (that one still drives Home Visit reachability separately).
+  const selectedClinicDistance = selectedClinic && userPos
+    ? haversine(userPos[0], userPos[1], selectedClinic.lat, selectedClinic.lng)
+    : selectedDoctor?.distance ?? null;
 
   // ── Fly to selected clinic (falls back to the doctor's legacy single location) ──
   useEffect(() => {
@@ -1191,12 +1206,7 @@ function PatientDashboardInner() {
                           {selectedDoctor.clinics.map((c) => {
                             const open = isClinicOpenNow(c.slots, effectiveBookingTime);
                             const isSelected = c.id === selectedClinicId;
-                            const next = open ? null : findNextOpening([c], effectiveBookingTime);
-                            const when = next
-                              ? next.daysAhead === 0 ? `today ${formatSlotTime(next.fromTime)}`
-                                : next.daysAhead === 1 ? `tomorrow ${formatSlotTime(next.fromTime)}`
-                                : `${next.dayOfWeek} ${formatSlotTime(next.fromTime)}`
-                              : null;
+                            const when = open ? null : formatNextOpeningText(findNextOpening([c], effectiveBookingTime));
                             return (
                               <button
                                 key={c.id}
@@ -1253,14 +1263,25 @@ function PatientDashboardInner() {
                   {/* Chips row */}
                   <div className="flex flex-wrap gap-2 mb-5">
                     <span className="badge badge-info">{selectedDoctor.doctorProfile.experience} yrs exp</span>
-                    {selectedDoctor.distance != null && (
+                    {selectedClinicDistance != null && (
                       <span className="badge badge-success">
-                        <Navigation className="w-3 h-3" /> {selectedDoctor.distance.toFixed(1)} km
+                        <Navigation className="w-3 h-3" /> {selectedClinicDistance.toFixed(1)} km
                       </span>
                     )}
-                    <span className="badge badge-gray">
-                      <Clock className="w-3 h-3" /> {selectedDoctor.doctorProfile.availability}
-                    </span>
+                    {selectedDoctor.clinics.length > 0 ? (() => {
+                      const clinicForHours = selectedClinic ?? selectedDoctor.clinics[0];
+                      const open = isClinicOpenNow(clinicForHours.slots, effectiveBookingTime);
+                      const when = open ? null : formatNextOpeningText(findNextOpening([clinicForHours], effectiveBookingTime));
+                      return (
+                        <span className={`badge ${open ? "badge-success" : "badge-gray"}`}>
+                          <Clock className="w-3 h-3" /> {open ? "Open now" : when ? `Opens ${when}` : "Closed"}
+                        </span>
+                      );
+                    })() : (
+                      <span className="badge badge-gray">
+                        <Clock className="w-3 h-3" /> {selectedDoctor.doctorProfile.availability}
+                      </span>
+                    )}
                     <span className="badge badge-purple">
                       <Languages className="w-3 h-3" /> {selectedDoctor.doctorProfile.languages}
                     </span>
