@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 const VALID_STATUSES = ["ON_THE_WAY", "ARRIVED"];
 
@@ -21,6 +22,8 @@ export async function PATCH(
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   const { id } = await params;
   const appointment = await prisma.appointment.findUnique({ where: { id } });

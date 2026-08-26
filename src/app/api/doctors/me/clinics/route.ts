@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { formatDoctorName } from "@/lib/utils";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 interface SlotInput {
   dayOfWeek: string;
@@ -25,6 +26,8 @@ export async function GET() {
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   const clinics = await prisma.clinic.findMany({
     where: { doctorId: authUser.id },
@@ -40,6 +43,8 @@ export async function POST(req: Request) {
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   const body: ClinicInput = await req.json();
   if (!body.address?.trim() || body.lat == null || body.lng == null) {

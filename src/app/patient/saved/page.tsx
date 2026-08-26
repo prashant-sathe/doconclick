@@ -122,9 +122,18 @@ export default function SavedDoctorsPage() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2 flex-shrink-0">
-                    <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary py-2 px-3 text-xs whitespace-nowrap">
-                      Book Again
-                    </Link>
+                    {profile?.status === "APPROVED" ? (
+                      <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary py-2 px-3 text-xs whitespace-nowrap">
+                        Book Again
+                      </Link>
+                    ) : (
+                      <span
+                        title="This doctor is currently unavailable for booking"
+                        className="btn-secondary py-2 px-3 text-xs whitespace-nowrap opacity-50 cursor-not-allowed"
+                      >
+                        Unavailable
+                      </span>
+                    )}
                     <button
                       onClick={() => remove(doctor.id)}
                       disabled={removingId === doctor.id}

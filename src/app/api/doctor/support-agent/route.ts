@@ -5,6 +5,7 @@ import { getAuthUser } from "@/lib/auth";
 import { getOpenAIClient, ASSISTANT_MODEL } from "@/lib/openai";
 import { safeNum } from "@/lib/adminAuth";
 import { computeDoctorCompleteness } from "@/lib/doctorProfileCompleteness";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 type InputItem = OpenAI.Responses.ResponseInputItem;
 type FunctionCall = OpenAI.Responses.ResponseFunctionToolCall;
@@ -339,6 +340,8 @@ export async function POST(req: Request) {
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   if (!checkRateLimit(authUser.id)) {
     return NextResponse.json({ error: "Too many requests. Please try again in a bit." }, { status: 429 });

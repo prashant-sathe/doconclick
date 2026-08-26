@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -17,6 +18,8 @@ export async function POST(req: Request) {
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   const form = await req.formData();
   const file = form.get("file");

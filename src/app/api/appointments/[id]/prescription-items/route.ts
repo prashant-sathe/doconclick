@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 interface MedicineInput {
   name: string;
@@ -24,6 +25,8 @@ export async function POST(
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   const { id } = await params;
   const appointment = await prisma.appointment.findUnique({ where: { id } });

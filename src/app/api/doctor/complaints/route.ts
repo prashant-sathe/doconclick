@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 // GET: the current doctor's own support tickets — raised via the Support
 // Assistant chat's create_support_ticket tool, listed here for a plain
@@ -10,6 +11,8 @@ export async function GET() {
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   const complaints = await prisma.complaint.findMany({
     where: { userId: authUser.id },

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { formatDoctorName } from "@/lib/utils";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 interface SlotInput {
   dayOfWeek: string;
@@ -32,6 +33,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   const { id } = await params;
   const existing = await loadOwnedClinic(authUser.id, id);
@@ -76,6 +79,8 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   const { id } = await params;
   const existing = await loadOwnedClinic(authUser.id, id);

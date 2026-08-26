@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { generateAgoraToken } from "@/lib/agora";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 export async function GET(
   _req: Request,
@@ -18,6 +19,10 @@ export async function GET(
   const appointment = await prisma.appointment.findUnique({ where: { id } });
   if (!appointment || (appointment.patientId !== authUser.id && appointment.doctorId !== authUser.id)) {
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
+  }
+  if (authUser.id === appointment.doctorId) {
+    const suspendedResponse = await requireActiveDoctor(authUser);
+    if (suspendedResponse) return suspendedResponse;
   }
   if (appointment.consultType !== "VIDEO" || appointment.status !== "SCHEDULED") {
     return NextResponse.json(

@@ -6,6 +6,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { findReassignmentDoctor } from "@/lib/doctorMatching";
 import { getOrCreateWallet } from "@/lib/wallet";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
   SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
@@ -70,6 +71,8 @@ export async function PATCH(
     if (appointment.doctorId !== authUser.id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
+    const suspendedResponse = await requireActiveDoctor(authUser);
+    if (suspendedResponse) return suspendedResponse;
     if (appointment.status === "EXPIRED") {
       return NextResponse.json(
         { error: "This request timed out and the patient has already been notified — it can no longer be accepted." },

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 // GET: The currently logged-in doctor's own profile
 export async function GET() {
@@ -8,6 +9,8 @@ export async function GET() {
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   const doctor = await prisma.user.findUnique({
     where: { id: authUser.id },
@@ -59,6 +62,8 @@ export async function PATCH(req: Request) {
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const suspendedResponse = await requireActiveDoctor(authUser);
+  if (suspendedResponse) return suspendedResponse;
 
   const body = await req.json();
   const data: Record<string, string | number | boolean | null> = {};

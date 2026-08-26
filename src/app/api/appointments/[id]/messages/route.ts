@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 // Chat is only open once a booking has been accepted — matches the "once the
 // doctor accepts, patient and doctor can chat" requirement — and stays open
@@ -67,6 +68,11 @@ export async function POST(
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  if (authUser.role === "DOCTOR") {
+    const suspendedResponse = await requireActiveDoctor(authUser);
+    if (suspendedResponse) return suspendedResponse;
   }
 
   const { id } = await params;

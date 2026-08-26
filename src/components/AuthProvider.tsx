@@ -1,10 +1,16 @@
 "use client";
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Loader2 } from "lucide-react";
+import { LogOut, Loader2, ShieldAlert } from "lucide-react";
 import { unlockAudio } from "@/lib/playNotificationSound";
 import { listenForForegroundPush } from "@/lib/pushClient";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
+
+// How often an already-open tab re-checks whether it's been suspended —
+// doesn't need to be as tight as chat/notification polling, just tight
+// enough that a suspended doctor can't keep working indefinitely in a tab
+// that was already open when the admin suspended them.
+const SUSPENSION_RECHECK_MS = 30000;
 
 type AuthUser = {
   id: string;
@@ -42,22 +48,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [confirmingLogout, setConfirmingLogout] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [suspended, setSuspended] = useState(false);
+  const [suspendedMessage, setSuspendedMessage] = useState("");
   const router = useRouter();
 
   const refresh = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/me");
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => null);
+      if (res.status === 403 && data?.suspended) {
+        setUser(data);
+        setImpersonatedBy(null);
+        setSuspended(true);
+        setSuspendedMessage(data.suspendedMessage ?? "Your account has been suspended.");
+      } else if (res.ok) {
         setUser(data);
         setImpersonatedBy(data.impersonatedBy ?? null);
+        setSuspended(false);
       } else {
         setUser(null);
         setImpersonatedBy(null);
+        setSuspended(false);
       }
     } catch {
       setUser(null);
       setImpersonatedBy(null);
+      setSuspended(false);
     } finally {
       setLoading(false);
     }
@@ -70,6 +86,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     refresh();
+    const interval = setInterval(refresh, SUSPENSION_RECHECK_MS);
+    return () => clearInterval(interval);
   }, [refresh]);
 
   useEffect(() => {
@@ -100,6 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoggingOut(true);
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
+    setSuspended(false);
     setLoggingOut(false);
     setConfirmingLogout(false);
     router.push("/login");
@@ -108,7 +127,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{ user, loading, impersonatedBy, logout, refresh, exitImpersonation }}>
       {impersonatedBy && <ImpersonationBanner adminName={impersonatedBy.name} onExit={exitImpersonation} />}
-      {children}
+      {suspended ? (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-8 max-w-sm w-full text-center">
+            <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
+              <ShieldAlert className="w-7 h-7 text-red-500" />
+            </div>
+            <h3 className="text-lg font-extrabold text-slate-900">Account Suspended</h3>
+            <p className="text-sm text-slate-500 mt-2 leading-relaxed">{suspendedMessage}</p>
+            <button
+              type="button"
+              onClick={confirmLogout}
+              disabled={loggingOut}
+              className="btn-secondary w-full justify-center mt-6 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+              Sign Out
+            </button>
+          </div>
+        </div>
+      ) : (
+        children
+      )}
       {confirmingLogout && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
