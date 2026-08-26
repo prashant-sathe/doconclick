@@ -16,6 +16,7 @@ const WALLET_EVENT_LABEL: Record<string, string> = {
   BOOKING_PAYMENT: "Wallet debited",
   ADMIN_CREDIT: "Credited by admin",
   ADMIN_DEBIT: "Debited by admin",
+  REASSIGNMENT_CREDIT: "Cancelled appointment refunded",
 };
 
 const NAV = [

@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { findReassignmentDoctor } from "@/lib/doctorMatching";
+import { getOrCreateWallet } from "@/lib/wallet";
+import { commissionPercentForConsultType } from "@/lib/platformFee";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
   SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
@@ -89,6 +92,114 @@ export async function PATCH(
         { status: 400 }
       );
     }
+
+    // A doctor cancelling an already-accepted (SCHEDULED) appointment leaves
+    // the patient stranded otherwise — try to auto-book the nearest other
+    // available doctor in their place. Any online payment already collected
+    // can't carry over (the new appointment starts unpaid), so it's credited
+    // to the patient's wallet instead of lost.
+    if (status === "CANCELLED") {
+      const doctorProfile = await prisma.doctorProfile.findUnique({
+        where: { userId: appointment.doctorId },
+        select: { specialty: true },
+      });
+      const wasPaid = appointment.paymentStatus === "PAID";
+      const candidate = doctorProfile
+        ? await findReassignmentDoctor({
+            excludeDoctorId: appointment.doctorId,
+            specialty: doctorProfile.specialty,
+            consultType: appointment.consultType,
+            patientId: appointment.patientId,
+          })
+        : null;
+
+      let newAmount = 0;
+      let newPlatformFee = 0;
+      if (candidate) {
+        const settings = await prisma.platformSettings.findFirst();
+        const commission = commissionPercentForConsultType(settings, appointment.consultType);
+        newAmount = candidate.fee;
+        newPlatformFee = (newAmount * commission) / 100;
+      }
+
+      const { cancelled, reassigned } = await prisma.$transaction(async (tx) => {
+        const cancelled = await tx.appointment.update({
+          where: { id },
+          data: { status: "CANCELLED", doctorNotes: doctorNotes ?? appointment.doctorNotes },
+        });
+
+        if (wasPaid) {
+          const wallet = await getOrCreateWallet(tx, appointment.patientId);
+          const updatedWallet = await tx.wallet.update({
+            where: { id: wallet.id },
+            data: { balance: { increment: appointment.amount } },
+          });
+          await tx.walletTransaction.create({
+            data: {
+              walletId: wallet.id,
+              type: "REASSIGNMENT_CREDIT",
+              amount: appointment.amount,
+              balanceAfter: updatedWallet.balance,
+              status: "SUCCESS",
+              note: `Refund for appointment ${appointment.id}, cancelled by the doctor`,
+            },
+          });
+        }
+
+        const reassigned = candidate
+          ? await tx.appointment.create({
+              data: {
+                patientId: appointment.patientId,
+                doctorId: candidate.id,
+                symptoms: appointment.symptoms,
+                patientName: appointment.patientName,
+                relation: appointment.relation,
+                allergies: appointment.allergies,
+                dependentId: appointment.dependentId ?? undefined,
+                consentGiven: appointment.consentGiven,
+                consultType: appointment.consultType,
+                isEmergency: appointment.isEmergency,
+                amount: newAmount,
+                platformFee: newPlatformFee,
+                status: "PENDING_APPROVAL",
+                paymentMethod: appointment.paymentMethod,
+                paymentStatus: "PENDING",
+                clinicId: candidate.clinicId ?? undefined,
+                scheduledAt: appointment.scheduledAt,
+                reassignedFromId: appointment.id,
+              },
+            })
+          : null;
+
+        return { cancelled, reassigned };
+      });
+
+      if (reassigned && candidate) {
+        void sendPushToUser(candidate.id, {
+          title: "New appointment request",
+          body: `${appointment.patientName ?? "A patient"} needs a ${appointment.consultType.toLowerCase()} consultation.`,
+          url: "/doctor/dashboard",
+        });
+        void sendPushToUser(appointment.patientId, {
+          title: "Your appointment was reassigned",
+          body: wasPaid
+            ? `${authUser.name} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and credited ₹${appointment.amount} back to your wallet — pay again once they accept.`
+            : `${authUser.name} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and sent them your request.`,
+          url: "/patient/appointments",
+        });
+      } else {
+        void sendPushToUser(appointment.patientId, {
+          title: "Appointment cancelled",
+          body: wasPaid
+            ? `${authUser.name} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — ₹${appointment.amount} has been credited to your wallet. Please book again.`
+            : `${authUser.name} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — please book again.`,
+          url: "/patient/appointments",
+        });
+      }
+
+      return NextResponse.json(cancelled);
+    }
+
     const updated = await prisma.appointment.update({
       where: { id },
       data: {

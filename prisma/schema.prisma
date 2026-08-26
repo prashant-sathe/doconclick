@@ -189,6 +189,13 @@ model Appointment {
   followUpOfId  String?
   followUpOf    Appointment? @relation("FollowUp", fields: [followUpOfId], references: [id])
   followUps     Appointment[] @relation("FollowUp")
+  // Set on the new appointment created when a doctor cancels an accepted
+  // (SCHEDULED) appointment and the system auto-books the nearest other
+  // available doctor in its place. The cancelled appointment itself keeps
+  // status CANCELLED — `reassignedTo` on it points at the replacement.
+  reassignedFromId String?      @unique
+  reassignedFrom   Appointment? @relation("Reassignment", fields: [reassignedFromId], references: [id], onDelete: SetNull)
+  reassignedTo     Appointment? @relation("Reassignment")
   clinicId      String?
   clinic        Clinic?   @relation(fields: [clinicId], references: [id], onDelete: SetNull)
   scheduledAt   DateTime  @default(now())
@@ -216,7 +223,7 @@ model WalletTransaction {
   id                String       @id @default(cuid())
   walletId          String
   wallet            Wallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
-  type              String       // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT
+  type              String       // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT, REASSIGNMENT_CREDIT
   amount            Float        // always positive; direction implied by `type`
   balanceAfter      Float?       // wallet.balance immediately after this row settled; null until status = SUCCESS
   status            String       @default("SUCCESS") // PENDING, SUCCESS, FAILED — only TOPUP rows are ever created PENDING

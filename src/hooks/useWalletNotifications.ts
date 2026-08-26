@@ -4,7 +4,7 @@ import { startRingingAlert } from "@/lib/playNotificationSound";
 
 export interface WalletTxnEvent {
   id: string;
-  type: string; // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT
+  type: string; // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT, REASSIGNMENT_CREDIT
   status: string; // SUCCESS, FAILED — PENDING rows aren't notable yet
   amount: number;
   balanceAfter: number | null;

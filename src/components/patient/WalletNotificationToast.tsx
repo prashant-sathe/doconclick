@@ -12,6 +12,7 @@ const TYPE_COPY: Record<string, { title: string; message: (e: WalletTxnEvent) =>
   BOOKING_PAYMENT: { title: "Wallet debited", message: (e) => `₹${e.amount} paid for an appointment. New balance ₹${e.balanceAfter}.`, icon: Wallet, color: "text-blue-600", bg: "bg-blue-50" },
   ADMIN_CREDIT: { title: "Wallet credited by admin", message: (e) => `₹${e.amount} added.${e.note ? ` ${e.note}` : ""} New balance ₹${e.balanceAfter}.`, icon: ShieldCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
   ADMIN_DEBIT: { title: "Wallet debited by admin", message: (e) => `₹${e.amount} deducted.${e.note ? ` ${e.note}` : ""} New balance ₹${e.balanceAfter}.`, icon: ShieldCheck, color: "text-amber-600", bg: "bg-amber-50" },
+  REASSIGNMENT_CREDIT: { title: "Appointment cancelled — refunded", message: (e) => `₹${e.amount} credited to your wallet. New balance ₹${e.balanceAfter}.`, icon: Wallet, color: "text-emerald-600", bg: "bg-emerald-50" },
 };
 
 const FAILED_COPY = { title: "Wallet top-up failed", message: (e: WalletTxnEvent) => `Your top-up of ₹${e.amount} didn't go through.`, icon: XCircle, color: "text-red-600", bg: "bg-red-50" };

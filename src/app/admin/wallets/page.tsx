@@ -37,9 +37,10 @@ const TYPE_LABEL: Record<string, string> = {
   BOOKING_PAYMENT: "Appointment payment",
   ADMIN_CREDIT: "Admin credit",
   ADMIN_DEBIT: "Admin debit",
+  REASSIGNMENT_CREDIT: "Cancelled appointment refund",
 };
 
-const CREDIT_TYPES = new Set(["TOPUP", "ADMIN_CREDIT"]);
+const CREDIT_TYPES = new Set(["TOPUP", "ADMIN_CREDIT", "REASSIGNMENT_CREDIT"]);
 
 // ── Wallet Detail Drawer ─────────────────────────────────────
 function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose: () => void; onAdjusted: () => void }) {

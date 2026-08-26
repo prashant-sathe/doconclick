@@ -19,9 +19,12 @@ export async function GET() {
       orderBy: { scheduledAt: "desc" },
       include: {
         doctor: { select: { name: true, doctorProfile: { select: { specialty: true, photoUrl: true, clinicName: true, address: true, lat: true, lng: true } } } },
+        clinic: { select: { name: true, address: true, lat: true, lng: true } },
         review: true,
         medicines: true,
         attachments: true,
+        reassignedTo: { select: { id: true, doctor: { select: { name: true } } } },
+        reassignedFrom: { select: { id: true, doctor: { select: { name: true } } } },
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });

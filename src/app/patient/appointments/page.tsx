@@ -6,7 +6,7 @@ import {
   Loader2, CalendarClock, Stethoscope, Home, Building2, Video,
   FileText, Star, X, Wallet, CreditCard, Siren, RotateCcw, Clock,
   Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin,
-  MessageCircle, Navigation,
+  MessageCircle, Navigation, UserCheck,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
@@ -56,6 +56,10 @@ interface Appointment {
   };
   review: { id: string; rating: number; comment: string | null } | null;
   medicines: Medicine[];
+  clinic: { name: string; address: string; lat: number; lng: number } | null;
+  reassignedFromId: string | null;
+  reassignedTo: { id: string; doctor: { name: string } } | null;
+  reassignedFrom: { id: string; doctor: { name: string } } | null;
 }
 
 const TYPE_ICON: Record<string, React.ElementType> = { HOME: Home, CLINIC: Building2, VIDEO: Video };
@@ -201,6 +205,12 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
 
       <p className="text-sm text-slate-600 mb-3">{a.symptoms}</p>
 
+      {a.status === "PENDING_APPROVAL" && a.reassignedFromId && a.reassignedFrom && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
+          <UserCheck className="w-4 h-4 flex-shrink-0" />
+          {formatDoctorName(a.reassignedFrom.doctor.name)} had an emergency and couldn&apos;t continue with your appointment, so we&apos;ve assigned you to {formatDoctorName(a.doctor.name)} instead.
+        </div>
+      )}
       {a.status === "PENDING_APPROVAL" && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
           <span className="flex items-center gap-2">
@@ -209,6 +219,12 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
           <span className="text-xs font-mono font-semibold text-amber-700 flex-shrink-0">
             {timeLeftMs > 0 ? `${formatCountdown(timeLeftMs)} left` : "Expiring…"}
           </span>
+        </div>
+      )}
+      {a.status === "CANCELLED" && a.reassignedTo && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
+          <UserCheck className="w-4 h-4 flex-shrink-0" />
+          {formatDoctorName(a.doctor.name)} had an emergency and couldn&apos;t continue with this appointment, so we&apos;ve assigned you to {formatDoctorName(a.reassignedTo.doctor.name)} instead — check your pending requests.
         </div>
       )}
       {a.status === "REJECTED" && (
@@ -221,17 +237,23 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
           <Clock className="w-4 h-4 flex-shrink-0 text-slate-400" /> {formatDoctorName(a.doctor.name)}{" "}didn&apos;t respond in time and may be too busy right now. No payment was taken — try booking again or choose another doctor.
         </div>
       )}
-      {a.status === "SCHEDULED" && a.consultType === "CLINIC" && a.paymentStatus === "PAID" && clinicDirectionsUrl(a.doctor.doctorProfile) && (
+      {a.consultType === "CLINIC" &&
+        ((a.status === "SCHEDULED" && a.paymentStatus === "PAID") || (a.status === "PENDING_APPROVAL" && a.reassignedFromId)) &&
+        (a.clinic || clinicDirectionsUrl(a.doctor.doctorProfile)) && (
         <a
-          href={clinicDirectionsUrl(a.doctor.doctorProfile)!}
+          href={(a.clinic ? clinicDirectionsUrl(a.clinic) : clinicDirectionsUrl(a.doctor.doctorProfile))!}
           target="_blank"
           rel="noopener noreferrer"
           className="bg-teal-50 border border-teal-200 rounded-xl px-4 py-3 text-sm text-teal-800 mb-3 flex items-center justify-between gap-2 hover:bg-teal-100 transition-colors"
         >
-          <span className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 flex-shrink-0" /> {a.doctor.doctorProfile?.clinicName || `${formatDoctorName(a.doctor.name)}'s clinic`}
+          <span className="flex items-center gap-2 min-w-0">
+            <Building2 className="w-4 h-4 flex-shrink-0" />
+            <span className="truncate">
+              {a.clinic?.name || a.doctor.doctorProfile?.clinicName || `${formatDoctorName(a.doctor.name)}'s clinic`}
+              {a.clinic?.address && <span className="text-teal-600"> — {a.clinic.address}</span>}
+            </span>
           </span>
-          <span className="font-semibold underline flex items-center gap-1">
+          <span className="font-semibold underline flex items-center gap-1 flex-shrink-0">
             <Navigation className="w-3.5 h-3.5" /> Get Directions
           </span>
         </a>
@@ -252,6 +274,13 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
           <MapPinCheck className="w-4 h-4 flex-shrink-0" /> {formatDoctorName(a.doctor.name)} has arrived.
+        </div>
+      )}
+      {needsPayment && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
+          <span className="flex items-center gap-2">
+            <CardIcon className="w-4 h-4 flex-shrink-0" /> Payment pending — pay ₹{a.amount} to confirm your visit with {formatDoctorName(a.doctor.name)}.
+          </span>
         </div>
       )}
 

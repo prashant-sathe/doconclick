@@ -249,6 +249,7 @@ export const AppointmentScalarFieldEnum = {
   doctorLng: 'doctorLng',
   doctorLocationUpdatedAt: 'doctorLocationUpdatedAt',
   followUpOfId: 'followUpOfId',
+  reassignedFromId: 'reassignedFromId',
   clinicId: 'clinicId',
   scheduledAt: 'scheduledAt',
   createdAt: 'createdAt'

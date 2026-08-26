@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export interface WalletTransaction {
   id: string;
-  type: string; // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT
+  type: string; // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT, REASSIGNMENT_CREDIT
   status: string; // PENDING, SUCCESS, FAILED
   amount: number;
   balanceAfter: number | null;
