@@ -2482,6 +2482,9 @@ export const MessageScalarFieldEnum = {
   appointmentId: 'appointmentId',
   senderId: 'senderId',
   text: 'text',
+  fileUrl: 'fileUrl',
+  fileName: 'fileName',
+  fileType: 'fileType',
   readAt: 'readAt',
   createdAt: 'createdAt'
 } as const

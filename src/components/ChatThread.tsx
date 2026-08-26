@@ -1,13 +1,22 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Send } from "lucide-react";
+import { Loader2, Send, Paperclip, FileText, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ChatMessage {
   id: string;
   text: string;
   createdAt: string;
+  fileUrl: string | null;
+  fileName: string | null;
+  fileType: string | null;
   sender: { id: string; name: string; role: string };
+}
+
+const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
+
+function downloadUrl(fileUrl: string, fileName: string | null, disposition: "inline" | "attachment") {
+  return `/api/files/download?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName ?? "file")}&disposition=${disposition}`;
 }
 
 interface ChatThreadProps {
@@ -24,7 +33,10 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
   const [error, setError] = useState("");
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const messageCountRef = useRef(0);
 
   const load = useCallback(async () => {
@@ -67,6 +79,35 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
     else setError((await res.json().catch(() => ({}))).error ?? "Could not send message.");
   };
 
+  const attachFile = async (file: File) => {
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      setUploadError("File must be under 5MB.");
+      return;
+    }
+    setUploading(true);
+    setUploadError("");
+    const form = new FormData();
+    form.append("file", file);
+    const uploadRes = await fetch(`/api/appointments/${appointmentId}/messages/upload`, {
+      method: "POST",
+      body: form,
+    });
+    if (!uploadRes.ok) {
+      setUploading(false);
+      setUploadError((await uploadRes.json().catch(() => ({}))).error ?? "Could not upload file.");
+      return;
+    }
+    const { url, fileName, fileType } = await uploadRes.json();
+    const sendRes = await fetch(`/api/appointments/${appointmentId}/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: "", fileUrl: url, fileName, fileType }),
+    });
+    setUploading(false);
+    if (sendRes.ok) load();
+    else setUploadError((await sendRes.json().catch(() => ({}))).error ?? "Could not send file.");
+  };
+
   const accentBubble = accent === "teal" ? "bg-teal-600" : "bg-blue-600";
   const accentBtn = accent === "teal" ? "bg-teal-600 hover:bg-teal-700" : "bg-blue-600 hover:bg-blue-700";
   const accentRing = accent === "teal" ? "focus:ring-teal-200" : "focus:ring-blue-200";
@@ -93,7 +134,27 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                   "max-w-[75%] rounded-2xl px-4 py-2.5 text-sm shadow-sm",
                   mine ? `${accentBubble} text-white rounded-br-sm` : "bg-white text-slate-700 border border-slate-100 rounded-bl-sm"
                 )}>
-                  <p className="whitespace-pre-wrap break-words">{m.text}</p>
+                  {m.fileUrl && (
+                    m.fileType?.startsWith("image/") ? (
+                      <a href={downloadUrl(m.fileUrl, m.fileName, "inline")} target="_blank" rel="noopener noreferrer" className="block mb-1.5 -mx-1">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={downloadUrl(m.fileUrl, m.fileName, "inline")} alt={m.fileName ?? "Attachment"} className="max-w-full rounded-lg max-h-64 object-cover" />
+                      </a>
+                    ) : (
+                      <a
+                        href={downloadUrl(m.fileUrl, m.fileName, "attachment")}
+                        className={cn(
+                          "flex items-center gap-2 rounded-lg px-2.5 py-2 mb-1.5 text-xs font-medium",
+                          mine ? "bg-white/15 hover:bg-white/25" : "bg-slate-50 hover:bg-slate-100"
+                        )}
+                      >
+                        <FileText className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate flex-1">{m.fileName ?? "Attachment"}</span>
+                        <Download className="w-3.5 h-3.5 flex-shrink-0" />
+                      </a>
+                    )
+                  )}
+                  {m.text && <p className="whitespace-pre-wrap break-words">{m.text}</p>}
                   <p className={cn("text-[10px] mt-1", mine ? "text-white/70" : "text-slate-400")}>
                     {new Date(m.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
                   </p>
@@ -105,7 +166,30 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
         <div ref={bottomRef} />
       </div>
 
+      {uploadError && (
+        <div className="px-3 pt-2 text-xs text-red-500 bg-white border-t border-slate-100">{uploadError}</div>
+      )}
       <div className="border-t border-slate-100 bg-white p-3 flex items-end gap-2">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.jpg,.jpeg,.png"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = "";
+            if (file) attachFile(file);
+          }}
+        />
+        <button
+          type="button"
+          title="Attach a medical report (PDF/JPG/PNG, under 5MB)"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading || sending}
+          className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Paperclip className="w-4 h-4" />}
+        </button>
         <textarea
           rows={1}
           className={cn("input-field resize-none flex-1 py-2.5", accentRing)}

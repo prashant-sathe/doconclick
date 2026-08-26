@@ -29,6 +29,9 @@ export type MessageMinAggregateOutputType = {
   appointmentId: string | null
   senderId: string | null
   text: string | null
+  fileUrl: string | null
+  fileName: string | null
+  fileType: string | null
   readAt: Date | null
   createdAt: Date | null
 }
@@ -38,6 +41,9 @@ export type MessageMaxAggregateOutputType = {
   appointmentId: string | null
   senderId: string | null
   text: string | null
+  fileUrl: string | null
+  fileName: string | null
+  fileType: string | null
   readAt: Date | null
   createdAt: Date | null
 }
@@ -47,6 +53,9 @@ export type MessageCountAggregateOutputType = {
   appointmentId: number
   senderId: number
   text: number
+  fileUrl: number
+  fileName: number
+  fileType: number
   readAt: number
   createdAt: number
   _all: number
@@ -58,6 +67,9 @@ export type MessageMinAggregateInputType = {
   appointmentId?: true
   senderId?: true
   text?: true
+  fileUrl?: true
+  fileName?: true
+  fileType?: true
   readAt?: true
   createdAt?: true
 }
@@ -67,6 +79,9 @@ export type MessageMaxAggregateInputType = {
   appointmentId?: true
   senderId?: true
   text?: true
+  fileUrl?: true
+  fileName?: true
+  fileType?: true
   readAt?: true
   createdAt?: true
 }
@@ -76,6 +91,9 @@ export type MessageCountAggregateInputType = {
   appointmentId?: true
   senderId?: true
   text?: true
+  fileUrl?: true
+  fileName?: true
+  fileType?: true
   readAt?: true
   createdAt?: true
   _all?: true
@@ -158,6 +176,9 @@ export type MessageGroupByOutputType = {
   appointmentId: string
   senderId: string
   text: string
+  fileUrl: string | null
+  fileName: string | null
+  fileType: string | null
   readAt: Date | null
   createdAt: Date
   _count: MessageCountAggregateOutputType | null
@@ -188,6 +209,9 @@ export type MessageWhereInput = {
   appointmentId?: Prisma.StringFilter<"Message"> | string
   senderId?: Prisma.StringFilter<"Message"> | string
   text?: Prisma.StringFilter<"Message"> | string
+  fileUrl?: Prisma.StringNullableFilter<"Message"> | string | null
+  fileName?: Prisma.StringNullableFilter<"Message"> | string | null
+  fileType?: Prisma.StringNullableFilter<"Message"> | string | null
   readAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   appointment?: Prisma.XOR<Prisma.AppointmentScalarRelationFilter, Prisma.AppointmentWhereInput>
@@ -199,6 +223,9 @@ export type MessageOrderByWithRelationInput = {
   appointmentId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   text?: Prisma.SortOrder
+  fileUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileName?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileType?: Prisma.SortOrderInput | Prisma.SortOrder
   readAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   appointment?: Prisma.AppointmentOrderByWithRelationInput
@@ -213,6 +240,9 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   appointmentId?: Prisma.StringFilter<"Message"> | string
   senderId?: Prisma.StringFilter<"Message"> | string
   text?: Prisma.StringFilter<"Message"> | string
+  fileUrl?: Prisma.StringNullableFilter<"Message"> | string | null
+  fileName?: Prisma.StringNullableFilter<"Message"> | string | null
+  fileType?: Prisma.StringNullableFilter<"Message"> | string | null
   readAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   appointment?: Prisma.XOR<Prisma.AppointmentScalarRelationFilter, Prisma.AppointmentWhereInput>
@@ -224,6 +254,9 @@ export type MessageOrderByWithAggregationInput = {
   appointmentId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   text?: Prisma.SortOrder
+  fileUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileName?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileType?: Prisma.SortOrderInput | Prisma.SortOrder
   readAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.MessageCountOrderByAggregateInput
@@ -239,6 +272,9 @@ export type MessageScalarWhereWithAggregatesInput = {
   appointmentId?: Prisma.StringWithAggregatesFilter<"Message"> | string
   senderId?: Prisma.StringWithAggregatesFilter<"Message"> | string
   text?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  fileUrl?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
+  fileName?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
+  fileType?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   readAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Message"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
 }
@@ -246,6 +282,9 @@ export type MessageScalarWhereWithAggregatesInput = {
 export type MessageCreateInput = {
   id?: string
   text: string
+  fileUrl?: string | null
+  fileName?: string | null
+  fileType?: string | null
   readAt?: Date | string | null
   createdAt?: Date | string
   appointment: Prisma.AppointmentCreateNestedOneWithoutMessagesInput
@@ -257,6 +296,9 @@ export type MessageUncheckedCreateInput = {
   appointmentId: string
   senderId: string
   text: string
+  fileUrl?: string | null
+  fileName?: string | null
+  fileType?: string | null
   readAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -264,6 +306,9 @@ export type MessageUncheckedCreateInput = {
 export type MessageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.AppointmentUpdateOneRequiredWithoutMessagesNestedInput
@@ -275,6 +320,9 @@ export type MessageUncheckedUpdateInput = {
   appointmentId?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -284,6 +332,9 @@ export type MessageCreateManyInput = {
   appointmentId: string
   senderId: string
   text: string
+  fileUrl?: string | null
+  fileName?: string | null
+  fileType?: string | null
   readAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -291,6 +342,9 @@ export type MessageCreateManyInput = {
 export type MessageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -300,6 +354,9 @@ export type MessageUncheckedUpdateManyInput = {
   appointmentId?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -319,6 +376,9 @@ export type MessageCountOrderByAggregateInput = {
   appointmentId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   text?: Prisma.SortOrder
+  fileUrl?: Prisma.SortOrder
+  fileName?: Prisma.SortOrder
+  fileType?: Prisma.SortOrder
   readAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -328,6 +388,9 @@ export type MessageMaxOrderByAggregateInput = {
   appointmentId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   text?: Prisma.SortOrder
+  fileUrl?: Prisma.SortOrder
+  fileName?: Prisma.SortOrder
+  fileType?: Prisma.SortOrder
   readAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -337,6 +400,9 @@ export type MessageMinOrderByAggregateInput = {
   appointmentId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   text?: Prisma.SortOrder
+  fileUrl?: Prisma.SortOrder
+  fileName?: Prisma.SortOrder
+  fileType?: Prisma.SortOrder
   readAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -428,6 +494,9 @@ export type MessageUncheckedUpdateManyWithoutAppointmentNestedInput = {
 export type MessageCreateWithoutSenderInput = {
   id?: string
   text: string
+  fileUrl?: string | null
+  fileName?: string | null
+  fileType?: string | null
   readAt?: Date | string | null
   createdAt?: Date | string
   appointment: Prisma.AppointmentCreateNestedOneWithoutMessagesInput
@@ -437,6 +506,9 @@ export type MessageUncheckedCreateWithoutSenderInput = {
   id?: string
   appointmentId: string
   text: string
+  fileUrl?: string | null
+  fileName?: string | null
+  fileType?: string | null
   readAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -475,6 +547,9 @@ export type MessageScalarWhereInput = {
   appointmentId?: Prisma.StringFilter<"Message"> | string
   senderId?: Prisma.StringFilter<"Message"> | string
   text?: Prisma.StringFilter<"Message"> | string
+  fileUrl?: Prisma.StringNullableFilter<"Message"> | string | null
+  fileName?: Prisma.StringNullableFilter<"Message"> | string | null
+  fileType?: Prisma.StringNullableFilter<"Message"> | string | null
   readAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
 }
@@ -482,6 +557,9 @@ export type MessageScalarWhereInput = {
 export type MessageCreateWithoutAppointmentInput = {
   id?: string
   text: string
+  fileUrl?: string | null
+  fileName?: string | null
+  fileType?: string | null
   readAt?: Date | string | null
   createdAt?: Date | string
   sender: Prisma.UserCreateNestedOneWithoutMessagesSentInput
@@ -491,6 +569,9 @@ export type MessageUncheckedCreateWithoutAppointmentInput = {
   id?: string
   senderId: string
   text: string
+  fileUrl?: string | null
+  fileName?: string | null
+  fileType?: string | null
   readAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -525,6 +606,9 @@ export type MessageCreateManySenderInput = {
   id?: string
   appointmentId: string
   text: string
+  fileUrl?: string | null
+  fileName?: string | null
+  fileType?: string | null
   readAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -532,6 +616,9 @@ export type MessageCreateManySenderInput = {
 export type MessageUpdateWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointment?: Prisma.AppointmentUpdateOneRequiredWithoutMessagesNestedInput
@@ -541,6 +628,9 @@ export type MessageUncheckedUpdateWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appointmentId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -549,6 +639,9 @@ export type MessageUncheckedUpdateManyWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appointmentId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -557,6 +650,9 @@ export type MessageCreateManyAppointmentInput = {
   id?: string
   senderId: string
   text: string
+  fileUrl?: string | null
+  fileName?: string | null
+  fileType?: string | null
   readAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -564,6 +660,9 @@ export type MessageCreateManyAppointmentInput = {
 export type MessageUpdateWithoutAppointmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sender?: Prisma.UserUpdateOneRequiredWithoutMessagesSentNestedInput
@@ -573,6 +672,9 @@ export type MessageUncheckedUpdateWithoutAppointmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -581,6 +683,9 @@ export type MessageUncheckedUpdateManyWithoutAppointmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -592,6 +697,9 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   appointmentId?: boolean
   senderId?: boolean
   text?: boolean
+  fileUrl?: boolean
+  fileName?: boolean
+  fileType?: boolean
   readAt?: boolean
   createdAt?: boolean
   appointment?: boolean | Prisma.AppointmentDefaultArgs<ExtArgs>
@@ -603,6 +711,9 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   appointmentId?: boolean
   senderId?: boolean
   text?: boolean
+  fileUrl?: boolean
+  fileName?: boolean
+  fileType?: boolean
   readAt?: boolean
   createdAt?: boolean
   appointment?: boolean | Prisma.AppointmentDefaultArgs<ExtArgs>
@@ -614,6 +725,9 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   appointmentId?: boolean
   senderId?: boolean
   text?: boolean
+  fileUrl?: boolean
+  fileName?: boolean
+  fileType?: boolean
   readAt?: boolean
   createdAt?: boolean
   appointment?: boolean | Prisma.AppointmentDefaultArgs<ExtArgs>
@@ -625,11 +739,14 @@ export type MessageSelectScalar = {
   appointmentId?: boolean
   senderId?: boolean
   text?: boolean
+  fileUrl?: boolean
+  fileName?: boolean
+  fileType?: boolean
   readAt?: boolean
   createdAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appointmentId" | "senderId" | "text" | "readAt" | "createdAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appointmentId" | "senderId" | "text" | "fileUrl" | "fileName" | "fileType" | "readAt" | "createdAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   appointment?: boolean | Prisma.AppointmentDefaultArgs<ExtArgs>
   sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -654,6 +771,9 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     appointmentId: string
     senderId: string
     text: string
+    fileUrl: string | null
+    fileName: string | null
+    fileType: string | null
     readAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["message"]>
@@ -1085,6 +1205,9 @@ export interface MessageFieldRefs {
   readonly appointmentId: Prisma.FieldRef<"Message", 'String'>
   readonly senderId: Prisma.FieldRef<"Message", 'String'>
   readonly text: Prisma.FieldRef<"Message", 'String'>
+  readonly fileUrl: Prisma.FieldRef<"Message", 'String'>
+  readonly fileName: Prisma.FieldRef<"Message", 'String'>
+  readonly fileType: Prisma.FieldRef<"Message", 'String'>
   readonly readAt: Prisma.FieldRef<"Message", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Message", 'DateTime'>
 }
