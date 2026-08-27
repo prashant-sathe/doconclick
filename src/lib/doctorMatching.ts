@@ -9,6 +9,11 @@ export interface ReassignmentCandidate {
   fee: number;
 }
 
+// If the cancelled appointment was with a doctor this close to the patient, the
+// replacement doctor must be within the same range — the patient booked local,
+// so keep them local rather than shunting them to a far-away clinic/home visit.
+const LOCAL_REASSIGN_RADIUS_KM = 20;
+
 // Finds the nearest doctor who can take over a cancelled appointment: same
 // specialty as the original doctor, offers the same consult type, and is
 // currently reachable/open for it — excluding the doctor who cancelled.
@@ -25,6 +30,26 @@ export async function findReassignmentDoctor(params: {
     where: { userId: patientId },
     select: { lat: true, lng: true },
   });
+
+  // Was the cancelled appointment a "local" one (patient and original doctor
+  // within LOCAL_REASSIGN_RADIUS_KM)? If so, candidates must be local too.
+  // Not applicable to VIDEO (remote) or when a location is unknown.
+  let enforceLocalRadius = false;
+  if (consultType !== "VIDEO" && patientProfile?.lat != null && patientProfile?.lng != null) {
+    const originalDoctor = await prisma.user.findUnique({
+      where: { id: excludeDoctorId },
+      select: {
+        doctorProfile: { select: { lat: true, lng: true } },
+        clinics: { where: { isActive: true }, orderBy: { sortOrder: "asc" }, take: 1, select: { lat: true, lng: true } },
+      },
+    });
+    const originalLat = originalDoctor?.doctorProfile?.lat ?? originalDoctor?.clinics[0]?.lat ?? null;
+    const originalLng = originalDoctor?.doctorProfile?.lng ?? originalDoctor?.clinics[0]?.lng ?? null;
+    if (originalLat != null && originalLng != null) {
+      const originalDistanceKm = haversine(patientProfile.lat, patientProfile.lng, originalLat, originalLng);
+      enforceLocalRadius = originalDistanceKm <= LOCAL_REASSIGN_RADIUS_KM;
+    }
+  }
 
   const doctors = await prisma.user.findMany({
     where: {
@@ -57,6 +82,10 @@ export async function findReassignmentDoctor(params: {
       patientProfile?.lat != null && patientProfile?.lng != null && baseLat != null && baseLng != null
         ? haversine(patientProfile.lat, patientProfile.lng, baseLat, baseLng)
         : null;
+
+    // Original appointment was local — a replacement further than 20 km (or of
+    // unknown distance) isn't an acceptable stand-in.
+    if (enforceLocalRadius && (distanceKm == null || distanceKm > LOCAL_REASSIGN_RADIUS_KM)) continue;
 
     if (consultType === "VIDEO") {
       if (profile.offersVideo !== true) continue;
