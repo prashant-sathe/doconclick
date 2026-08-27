@@ -143,16 +143,35 @@ function PatientBookInner() {
   const [appointmentId, setAppointmentId] = useState("");
   const [error, setError] = useState("");
 
+  // Point the form at a doctor: pick an open clinic (else the first), the best
+  // consult type, and — when that clinic is closed right now — pre-arm "Schedule
+  // Later" with its next opening so the patient never lands on a disabled Confirm.
+  const selectDoctor = (doc: Doctor | null | undefined, preferredClinicId?: string) => {
+    if (!doc) { setForm((f) => ({ ...f, doctorId: "", clinicId: "" })); return; }
+    const clinicId = (preferredClinicId && doc.clinics.some((c) => c.id === preferredClinicId) ? preferredClinicId : null)
+      ?? (findOpenClinic(doc.clinics) ?? doc.clinics[0])?.id
+      ?? "";
+    const consultType = defaultConsultType(doc, userPos);
+    setForm((f) => ({ ...f, doctorId: doc.id, clinicId, consultType }));
+
+    const chosenClinic = doc.clinics.find((c) => c.id === clinicId);
+    if (consultType === "CLINIC" && chosenClinic && !isClinicOpenNow(chosenClinic.slots)) {
+      const next = findNextOpening([chosenClinic], new Date());
+      if (next) {
+        setScheduleMode("LATER");
+        setScheduledAt(nextOpeningLocalInput(next));
+      }
+    } else {
+      setScheduleMode("NOW");
+      setScheduledAt("");
+    }
+  };
+
   useEffect(() => {
     fetch("/api/doctors").then((r) => r.json()).then((data: Doctor[]) => {
       setDoctors(data);
       const preselected = preselectDoctorId && data.find((d) => d.id === preselectDoctorId);
-      if (preselected) {
-        const clinicId = preselectClinicId && preselected.clinics.some((c) => c.id === preselectClinicId)
-          ? preselectClinicId
-          : (findOpenClinic(preselected.clinics) ?? preselected.clinics[0])?.id ?? "";
-        setForm((f) => ({ ...f, doctorId: preselected.id, clinicId, consultType: defaultConsultType(preselected, userPos) }));
-      }
+      if (preselected) selectDoctor(preselected, preselectClinicId ?? undefined);
     });
     navigator.geolocation.getCurrentPosition(
       (pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]),
@@ -392,9 +411,7 @@ function PatientBookInner() {
             <div>
               <label className="input-label">Select Doctor</label>
               <select required className="input-field" value={form.doctorId} onChange={(e) => {
-                const doc = doctors.find((d) => d.id === e.target.value);
-                const clinicId = (findOpenClinic(doc?.clinics ?? []) ?? doc?.clinics[0])?.id ?? "";
-                setForm((f) => ({ ...f, doctorId: e.target.value, clinicId, consultType: defaultConsultType(doc, userPos) }));
+                selectDoctor(doctors.find((d) => d.id === e.target.value));
               }}>
                 <option value="">— Choose a doctor —</option>
                 {visibleDoctors.map((d) => (

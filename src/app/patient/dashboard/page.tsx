@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
-import { isDoctorAvailableNow } from "@/lib/availability";
 import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime, formatClinicHours } from "@/lib/clinicAvailability";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
@@ -366,44 +365,30 @@ function PatientDashboardInner() {
     };
   }), [doctors, userPos]);
 
-  const filteredDoctors = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return doctorsWithDist.filter((d) => {
-      const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
-      const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
-      // Visible if EITHER at least one clinic is open right now (Clinic Visit —
-      // each clinic marker also shows its own open/closed state independently
-      // of this) OR the doctor's legacy Available Timings window covers now
-      // (Home Visit / Video Call, which aren't clinic-specific). A doctor with
-      // clinics is not exempt from the Available Timings check — otherwise
-      // they'd look permanently bookable for Home Visit regardless of it.
-      const hasOpenClinic = d.clinics.some((c) => isClinicOpenNow(c.slots, new Date(now)));
-      const isOpenNow = hasOpenClinic || isDoctorAvailableNow(d.doctorProfile?.availability, new Date(now));
-      return matchesSpecialty && matchesSearch && isOpenNow;
-    });
-  }, [doctorsWithDist, specialtyFilter, search, now]);
-
-  const sorted = useMemo(() => [...filteredDoctors].sort(
-    (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
-  ), [filteredDoctors]);
-  const nearest = sorted[0];
-
-  // Nearest doctor regardless of specialty filter — used for emergency requests
-  const nearestAny = useMemo(() => [...doctorsWithDist].sort(
-    (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
-  )[0], [doctorsWithDist]);
-
-  // Doctors shown on the map: same specialty/search filters as the list
-  // below, but NOT the "open now" check — the map should always show every
-  // matching doctor, open or closed (closed clinics just render dimmed).
+  // The one filtered set the map page works with: matches the search + specialty
+  // filter AND has at least one clinic pin on the map. Deliberately NOT gated on
+  // "open right now" — a closed clinic still renders a (dimmed) pin and is
+  // bookable for a future slot, so search results and map pins stay in sync.
   const mapDoctors = useMemo(() => {
     const q = search.trim().toLowerCase();
     return doctorsWithDist.filter((d) => {
       const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
       const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
-      return matchesSpecialty && matchesSearch;
+      const onMap = d.clinics.length > 0; // a doctor with no clinic has no pin
+      return matchesSpecialty && matchesSearch && onMap;
     });
   }, [doctorsWithDist, specialtyFilter, search]);
+
+  const sorted = useMemo(() => [...mapDoctors].sort(
+    (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
+  ), [mapDoctors]);
+  const nearest = sorted[0];
+
+  // Nearest doctor regardless of specialty filter — used for emergency requests.
+  // Also restricted to doctors that actually have a location/pin.
+  const nearestAny = useMemo(() => [...doctorsWithDist]
+    .filter((d) => d.clinics.length > 0 || (d.doctorProfile?.lat != null && d.doctorProfile?.lng != null))
+    .sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity))[0], [doctorsWithDist]);
 
   // One marker per clinic, not per doctor — a doctor with several locations
   // shows up as several pins.
@@ -1388,20 +1373,21 @@ function PatientDashboardInner() {
                     if (offeredCount === 0) return null;
                     return (
                       <div className={cn("grid gap-3 mb-3", offeredCount === 1 ? "grid-cols-1" : offeredCount === 2 ? "grid-cols-2" : "grid-cols-3")}>
-                        {offersClinic && (
-                          hasOpenClinic ? (
+                        {offersClinic && (() => {
+                          const next = hasOpenClinic ? null : formatNextOpeningText(findNextOpening(selectedDoctor.clinics, new Date(now)));
+                          return (
                             <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
-                              <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                              <Building2 className={cn("w-5 h-5 mx-auto mb-1", hasOpenClinic ? "text-blue-500" : "text-slate-400")} />
                               <p className="text-xs text-slate-500">Clinic Visit</p>
                               <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.consultFee}</p>
+                              {!hasOpenClinic && (
+                                <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                                  {next ? `Closed now · opens ${next}` : "Closed now · schedule for later"}
+                                </p>
+                              )}
                             </div>
-                          ) : (
-                            <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
-                              <Building2 className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                              <p className="text-xs text-slate-400">Clinic closed right now</p>
-                            </div>
-                          )
-                        )}
+                          );
+                        })()}
                         {offersVideo && (
                           <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                             <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
@@ -1459,7 +1445,9 @@ function PatientDashboardInner() {
                     const offersHome = selectedDoctor.doctorProfile.offersHomeVisit;
                     const offeredCount = [offersClinic, offersVideo, offersHome].filter(Boolean).length;
                     if (offeredCount === 0) return null;
-                    const clinicAvailable = offersClinic && hasOpenClinic;
+                    // Clinic Visit is bookable even when closed now — the patient
+                    // schedules it for an upcoming open slot in the booking panel.
+                    const clinicAvailable = offersClinic;
                     const homeAvailable = offersHome && hasHomeVisitReach;
                     const baseClass = "flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-colors border";
                     const availableClass = "border-blue-200 bg-blue-50 text-blue-600 hover:border-blue-600 hover:bg-blue-600 hover:text-white";
@@ -1470,7 +1458,22 @@ function PatientDashboardInner() {
                         {offersClinic && (
                           <button
                             type="button"
-                            onClick={() => { setConsultType("CLINIC"); setBookingOpen(true); }}
+                            onClick={() => {
+                              setConsultType("CLINIC");
+                              // Clinic closed now → open the panel already on
+                              // "Schedule Later" at the next opening, so Confirm
+                              // isn't disabled on arrival.
+                              const c = selectedClinic ?? selectedDoctor.clinics[0];
+                              const next = c && !isClinicOpenNow(c.slots) ? findNextOpening([c], new Date(now)) : null;
+                              if (next) {
+                                setScheduleMode("LATER");
+                                setScheduledAt(nextOpeningLocalInput(next));
+                              } else {
+                                setScheduleMode("NOW");
+                                setScheduledAt("");
+                              }
+                              setBookingOpen(true);
+                            }}
                             disabled={!clinicAvailable}
                             className={cn(baseClass, classFor(clinicAvailable))}
                           >
@@ -1480,7 +1483,7 @@ function PatientDashboardInner() {
                         {offersVideo && (
                           <button
                             type="button"
-                            onClick={() => { setConsultType("VIDEO"); setBookingOpen(true); }}
+                            onClick={() => { setConsultType("VIDEO"); setScheduleMode("NOW"); setScheduledAt(""); setBookingOpen(true); }}
                             className={cn(baseClass, availableClass)}
                           >
                             <Video className="w-4 h-4" /> Book Video Consultation
@@ -1489,7 +1492,7 @@ function PatientDashboardInner() {
                         {offersHome && (
                           <button
                             type="button"
-                            onClick={() => { setConsultType("HOME"); setBookingOpen(true); }}
+                            onClick={() => { setConsultType("HOME"); setScheduleMode("NOW"); setScheduledAt(""); setBookingOpen(true); }}
                             disabled={!homeAvailable}
                             className={cn(baseClass, classFor(homeAvailable))}
                           >

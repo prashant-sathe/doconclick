@@ -8,7 +8,7 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useSpecialties } from "@/lib/useSpecialties";
-import { isClinicOpenNow } from "@/lib/clinicAvailability";
+import { isClinicOpenNow, findNextOpening, formatSlotTime } from "@/lib/clinicAvailability";
 import { haversine } from "@/lib/geo";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
@@ -158,6 +158,12 @@ export default function DoctorProfilePage() {
 
   const profile = doctor.doctorProfile;
   const hasOpenClinic = doctor.clinics.length === 0 || doctor.clinics.some((c) => isClinicOpenNow(c.slots));
+  // Even when no clinic is open right now, a patient can still book a clinic
+  // visit for an upcoming open slot — surface when that is.
+  const nextClinicOpening = hasOpenClinic ? null : findNextOpening(doctor.clinics, new Date());
+  const nextOpeningLabel = nextClinicOpening
+    ? `${nextClinicOpening.daysAhead === 0 ? "today" : nextClinicOpening.daysAhead === 1 ? "tomorrow" : nextClinicOpening.dayOfWeek} ${formatSlotTime(nextClinicOpening.fromTime)}`
+    : null;
 
   const homeBaseLat = profile.lat ?? doctor.clinics[0]?.lat ?? null;
   const homeBaseLng = profile.lng ?? doctor.clinics[0]?.lng ?? null;
@@ -258,6 +264,7 @@ export default function DoctorProfilePage() {
               <div className="space-y-2">
                 {doctor.clinics.map((clinic) => {
                   const open = isClinicOpenNow(clinic.slots);
+                  const next = open ? null : findNextOpening([clinic], new Date());
                   return (
                     <div key={clinic.id} className="bg-slate-50 rounded-xl px-3.5 py-2.5 flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -265,6 +272,11 @@ export default function DoctorProfilePage() {
                           <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" /> {clinic.name}
                         </p>
                         <p className="text-xs text-slate-500 mt-0.5">{clinic.address}</p>
+                        {next && (
+                          <p className="text-[11px] text-slate-400 mt-0.5">
+                            Opens {next.daysAhead === 0 ? "today" : next.daysAhead === 1 ? "tomorrow" : next.dayOfWeek} {formatSlotTime(next.fromTime)}
+                          </p>
+                        )}
                       </div>
                       <span className={cn("badge flex-shrink-0", open ? "badge-success" : "badge-gray")}>
                         {open ? "Open now" : "Closed now"}
@@ -286,18 +298,16 @@ export default function DoctorProfilePage() {
             return (
               <div className={cn("grid gap-3 mb-6", offeredCount === 1 ? "grid-cols-1" : offeredCount === 2 ? "grid-cols-2" : "grid-cols-3")}>
                 {profile.offersClinic && (
-                  hasOpenClinic ? (
-                    <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
-                      <Building2 className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                      <p className="text-xs text-slate-500">Clinic Visit</p>
-                      <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{profile.consultFee}</p>
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
-                      <Building2 className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                      <p className="text-xs text-slate-400">Clinic closed right now</p>
-                    </div>
-                  )
+                  <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
+                    <Building2 className={cn("w-5 h-5 mx-auto mb-1", hasOpenClinic ? "text-blue-500" : "text-slate-400")} />
+                    <p className="text-xs text-slate-500">Clinic Visit</p>
+                    <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{profile.consultFee}</p>
+                    {!hasOpenClinic && (
+                      <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                        {nextOpeningLabel ? `Closed now · opens ${nextOpeningLabel}` : "Closed now · schedule for later"}
+                      </p>
+                    )}
+                  </div>
                 )}
                 {profile.offersVideo && (
                   <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
