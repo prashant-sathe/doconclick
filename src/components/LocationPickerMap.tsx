@@ -41,10 +41,15 @@ export default function LocationPickerMap({ lat, lng, onChange, height = 280 }: 
     (async () => {
       if (!mapRef.current || leafletMapRef.current) return;
       const L = (await import("leaflet")).default;
-      if (cancelled) return;
+      if (cancelled || !mapRef.current || leafletMapRef.current) return;
+
+      // A container left initialized by a torn-down instance (StrictMode double
+      // mount / async race) would make L.map throw — clear the stale id first.
+      const container = mapRef.current as HTMLDivElement & { _leaflet_id?: number };
+      if (container._leaflet_id != null) delete container._leaflet_id;
 
       const start: [number, number] = lat != null && lng != null ? [lat, lng] : DEFAULT_CENTER;
-      const map = L.map(mapRef.current, { zoomControl: false }).setView(start, lat != null ? 15 : 4);
+      const map = L.map(container, { zoomControl: false }).setView(start, lat != null ? 15 : 4);
       L.control.zoom({ position: "bottomright" }).addTo(map);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap contributors",
@@ -78,9 +83,17 @@ export default function LocationPickerMap({ lat, lng, onChange, height = 280 }: 
 
     return () => {
       cancelled = true;
-      leafletMapRef.current?.remove();
+      const map = leafletMapRef.current;
       leafletMapRef.current = null;
       markerRef.current = null;
+      leafletRef.current = null;
+      if (map) {
+        // Halt any in-flight pan/zoom animation first — otherwise its queued
+        // requestAnimationFrame callback fires after the panes are gone and
+        // throws "Cannot read properties of undefined (reading '_leaflet_pos')".
+        try { map.stop(); } catch { /* already torn down */ }
+        try { map.remove(); } catch { /* already torn down */ }
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -92,23 +105,31 @@ export default function LocationPickerMap({ lat, lng, onChange, height = 280 }: 
     const L = leafletRef.current;
     const map = leafletMapRef.current;
     if (!L || !map || lat == null || lng == null) return;
+    // The map may have been torn down (card unmounted after a save re-keys it)
+    // between this render and this effect — bail before touching Leaflet internals.
+    const container = map.getContainer();
+    if (!container || !container.isConnected) return;
     const last = lastEmittedRef.current;
     const isInternal = !!last && Math.abs(last.lat - lat) < 1e-7 && Math.abs(last.lng - lng) < 1e-7;
 
-    if (!markerRef.current) {
-      const icon = L.divIcon({ html: pinSvg(), className: "", iconSize: [32, 40], iconAnchor: [16, 40] });
-      const marker = L.marker([lat, lng], { icon, draggable: true, zIndexOffset: 1000 }).addTo(map);
-      marker.on("dragend", () => {
-        const p = marker.getLatLng();
-        lastEmittedRef.current = { lat: p.lat, lng: p.lng };
-        onChangeRef.current(p.lat, p.lng);
-      });
-      markerRef.current = marker;
-    } else {
-      markerRef.current.setLatLng([lat, lng]);
-    }
+    try {
+      if (!markerRef.current) {
+        const icon = L.divIcon({ html: pinSvg(), className: "", iconSize: [32, 40], iconAnchor: [16, 40] });
+        const marker = L.marker([lat, lng], { icon, draggable: true, zIndexOffset: 1000 }).addTo(map);
+        marker.on("dragend", () => {
+          const p = marker.getLatLng();
+          lastEmittedRef.current = { lat: p.lat, lng: p.lng };
+          onChangeRef.current(p.lat, p.lng);
+        });
+        markerRef.current = marker;
+      } else {
+        markerRef.current.setLatLng([lat, lng]);
+      }
 
-    if (!isInternal) map.flyTo([lat, lng], Math.max(map.getZoom(), 15));
+      // setView (no animation) instead of flyTo — an animated pan schedules a
+      // requestAnimationFrame loop that throws if the map is removed mid-flight.
+      if (!isInternal) map.setView([lat, lng], Math.max(map.getZoom(), 15), { animate: false });
+    } catch { /* map torn down mid-update */ }
   }, [lat, lng]);
 
   return (

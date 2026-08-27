@@ -97,6 +97,37 @@ export function findNextOpening<T extends { slots: ClinicSlotLike[] }>(
   return null;
 }
 
+const DAY_LABEL: Record<string, string> = {
+  Sun: "Sun", Mon: "Mon", Tue: "Tue", Wed: "Wed", Thu: "Thu", Fri: "Fri", Sat: "Sat",
+};
+
+export interface ClinicDayHours {
+  dayOfWeek: string; // "Mon"
+  label: string; // "Mon"
+  ranges: string[]; // ["9:00 AM – 1:00 PM", "5:00 PM – 8:00 PM"]
+}
+
+// Groups a clinic's slots by weekday (Mon→Sun order), each day's time ranges
+// sorted by start time — for showing a patient when the clinic is actually open.
+export function formatClinicHours(slots: ClinicSlotLike[]): ClinicDayHours[] {
+  const byDay = new Map<string, { from: number; text: string }[]>();
+  for (const slot of slots) {
+    const fromMin = toMinutes(slot.fromTime);
+    if (fromMin == null || toMinutes(slot.toTime) == null) continue;
+    const list = byDay.get(slot.dayOfWeek) ?? [];
+    list.push({ from: fromMin, text: `${formatSlotTime(slot.fromTime)} – ${formatSlotTime(slot.toTime)}` });
+    byDay.set(slot.dayOfWeek, list);
+  }
+  const weekOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  return weekOrder
+    .filter((day) => byDay.has(day))
+    .map((day) => ({
+      dayOfWeek: day,
+      label: DAY_LABEL[day] ?? day,
+      ranges: (byDay.get(day) ?? []).sort((a, b) => a.from - b.from).map((r) => r.text),
+    }));
+}
+
 // "14:05" → "2:05 PM"
 export function formatSlotTime(hhmm: string): string {
   const min = toMinutes(hhmm);

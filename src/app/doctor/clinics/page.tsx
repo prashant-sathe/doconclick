@@ -30,6 +30,7 @@ interface SlotGroup {
 }
 
 interface ClinicForm {
+  uid: string; // stable local key — survives the null→real id transition on save
   id: string | null; // null = not yet saved
   name: string;
   address: string;
@@ -62,8 +63,17 @@ function groupSlots(slots: Slot[]): SlotGroup[] {
   return groups;
 }
 
+// Stable local key for a form row. crypto.randomUUID is only defined in a
+// secure context (fails over a LAN IP), so fall back to a random string.
+let uidCounter = 0;
+function makeUid(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  return `uid-${Date.now().toString(36)}-${(uidCounter++).toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
 function newClinic(): ClinicForm {
   return {
+    uid: makeUid(),
     id: null, name: "", address: "", photoUrl: null, lat: null, lng: null,
     slotGroups: [{ days: [], fromTime: "09:00", toTime: "18:00" }],
     saving: false, saved: false, error: "",
@@ -298,19 +308,28 @@ export default function DoctorClinicsPage() {
     if (!authLoading && user && user.role !== "DOCTOR") router.push("/login");
   }, [authLoading, user, router]);
 
+  // Load once per authenticated doctor. Keyed on user.id, NOT the whole `user`
+  // object — AuthProvider re-polls every 30s and hands back a fresh `user`
+  // reference each time, and refetching here would blow away any unsaved clinic
+  // rows the doctor is still editing.
   useEffect(() => {
     if (!user || user.role !== "DOCTOR") return;
+    let cancelled = false;
     fetch("/api/doctors/me/clinics")
       .then((r) => r.json())
       .then((data: ClinicApiShape[]) => {
+        if (cancelled) return;
         setClinics(data.map((c) => ({
+          uid: makeUid(),
           id: c.id, name: c.name, address: c.address, photoUrl: c.photoUrl, lat: c.lat, lng: c.lng,
           slotGroups: c.slots.length ? groupSlots(c.slots) : [{ days: [], fromTime: "09:00", toTime: "18:00" }],
           saving: false, saved: false, error: "",
         })));
         setLoading(false);
       });
-  }, [user]);
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const updateAt = (idx: number, next: ClinicForm) =>
     setClinics((cur) => cur.map((c, i) => (i === idx ? next : c)));
@@ -383,7 +402,7 @@ export default function DoctorClinicsPage() {
         <div className="space-y-6">
           {clinics.map((clinic, idx) => (
             <ClinicCard
-              key={clinic.id ?? `new-${idx}`}
+              key={clinic.uid}
               clinic={clinic}
               onChange={(next) => updateAt(idx, next)}
               onSave={() => saveClinic(idx)}

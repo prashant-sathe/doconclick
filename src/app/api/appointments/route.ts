@@ -73,6 +73,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
     }
 
+    // A scheduled booking can only be placed for a future moment — the client
+    // restricts the picker, this guards a hand-crafted request.
+    if (scheduledAt) {
+      const when = new Date(scheduledAt);
+      if (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()) {
+        return NextResponse.json({ error: "Please pick a time in the future." }, { status: 400 });
+      }
+    }
+
     if (consultType === "HOME" && !doctor.doctorProfile.offersHomeVisit) {
       return NextResponse.json({ error: "This doctor does not offer home visits" }, { status: 400 });
     }

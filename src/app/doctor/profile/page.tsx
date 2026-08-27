@@ -233,11 +233,16 @@ export default function DoctorProfilePage() {
     if (!authLoading && user && user.role !== "DOCTOR") router.push("/login");
   }, [authLoading, user, router]);
 
+  // Load once per authenticated doctor — keyed on user.id, not the whole `user`
+  // object (AuthProvider re-polls every 30s and returns a fresh reference each
+  // time; refetching would overwrite whatever the doctor is currently typing).
   useEffect(() => {
     if (!user || user.role !== "DOCTOR") return;
+    let cancelled = false;
     fetch("/api/doctors/me")
       .then((r) => r.json())
       .then((d) => {
+        if (cancelled) return;
         const p = d.doctorProfile ?? {};
         setForm({
           specialty: p.specialty ?? "General Physician",
@@ -275,7 +280,9 @@ export default function DoctorProfilePage() {
         setSubscriptionPaidUntil(p.subscriptionPaidUntil ?? null);
         setLoading(false);
       });
-  }, [user, router]);
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const profileUrl = user ? `${window.location.origin}/patient/doctor/${user.id}` : "";
 
@@ -286,7 +293,8 @@ export default function DoctorProfilePage() {
       QRCode.toDataURL(`${window.location.origin}/patient/doctor/${user.id}`, { width: 220, margin: 1 })
     ).then((url) => { if (!cancelled) setQrDataUrl(url); });
     return () => { cancelled = true; };
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const buildBrandedQRCanvas = (): Promise<HTMLCanvasElement> => {
     return new Promise((resolve, reject) => {

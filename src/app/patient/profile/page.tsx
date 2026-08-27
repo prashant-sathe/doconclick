@@ -173,11 +173,16 @@ export default function PatientProfilePage() {
     if (!authLoading && user && user.role !== "PATIENT") router.push("/login");
   }, [authLoading, user, router]);
 
+  // Load once per authenticated patient — keyed on user.id, not the whole
+  // `user` object (AuthProvider re-polls every 30s and returns a fresh
+  // reference; refetching would overwrite whatever the patient is typing).
   useEffect(() => {
     if (!user || user.role !== "PATIENT") return;
+    let cancelled = false;
     fetch("/api/patients/me")
       .then((r) => r.json())
       .then((d) => {
+        if (cancelled) return;
         const p = d.patientProfile ?? {};
         setForm({
           location: p.location ?? "",
@@ -207,7 +212,9 @@ export default function PatientProfilePage() {
         });
         setLoading(false);
       });
-  }, [user]);
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const set = (k: keyof FormState, v: string) => { setSaved(false); setForm((f) => ({ ...f, [k]: v })); };
   const toggleChronic = (o: string) => {

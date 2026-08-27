@@ -4,14 +4,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   MapPin, Video, Home, Building2, Loader2,
-  CalendarClock, Siren, Clock, IndianRupee,
+  CalendarClock, Clock, IndianRupee,
   CalendarCheck2, Hash, ClipboardList, AlertTriangle, ShieldCheck, Users, Search, X,
 } from "lucide-react";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { useSpecialties } from "@/lib/useSpecialties";
-import { isClinicOpenNow, findOpenClinic } from "@/lib/clinicAvailability";
+import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime, formatClinicHours, type NextOpening } from "@/lib/clinicAvailability";
 import { RELATIONS } from "@/lib/relations";
 import { haversine } from "@/lib/geo";
 import RatingStars from "@/components/patient/RatingStars";
@@ -20,6 +20,7 @@ import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import DependentPicker from "@/components/patient/DependentPicker";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface ClinicSlot {
   dayOfWeek: string;
@@ -66,6 +67,23 @@ interface Doctor {
 function nowLocalInput() {
   const d = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
   return d.toISOString().slice(0, 16);
+}
+
+// A <input type="datetime-local"> value ("YYYY-MM-DDTHH:MM") for the start of an
+// upcoming clinic opening — used to prefill the scheduler so the patient can
+// only land on a time the clinic is actually open.
+function nextOpeningLocalInput(opening: NextOpening<unknown>) {
+  const d = new Date();
+  d.setDate(d.getDate() + opening.daysAhead);
+  const [h, m] = opening.fromTime.split(":").map(Number);
+  d.setHours(h, m, 0, 0);
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
+function openingWhenLabel(opening: NextOpening<unknown>) {
+  const day = opening.daysAhead === 0 ? "today" : opening.daysAhead === 1 ? "tomorrow" : opening.dayOfWeek;
+  return `${day} at ${formatSlotTime(opening.fromTime)}`;
 }
 
 const ALL_TYPES = [
@@ -117,8 +135,8 @@ function PatientBookInner() {
   const [dependentId, setDependentId] = useState<string | null>(null);
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
-  const [isEmergency, setIsEmergency] = useState(false);
   const [consentGiven, setConsentGiven] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [booked, setBooked] = useState(false);
   const [fee, setFee] = useState(0);
@@ -165,20 +183,10 @@ function PatientBookInner() {
       : null;
   const currentFee = feeForConsultType(selectedDoctor?.doctorProfile ?? null, form.consultType);
 
-  // An emergency always books immediately, overriding any manual schedule selection
-  const effectiveScheduleMode = isEmergency ? "NOW" : scheduleMode;
-
   // The moment the appointment would actually happen — used to check the
   // selected clinic's hours against, not just the current moment.
   const effectiveBookingTime =
-    effectiveScheduleMode === "LATER" && scheduledAt ? new Date(scheduledAt) : new Date();
-
-  // Whether any of the doctor's clinics is actually open at the effective
-  // booking time — doctors with no clinics at all keep the legacy
-  // unrestricted behavior (same fallback as clinicBookingBlocked below).
-  const hasOpenClinic =
-    !selectedDoctor || selectedDoctor.clinics.length === 0 ||
-    selectedDoctor.clinics.some((c) => isClinicOpenNow(c.slots, effectiveBookingTime));
+    scheduleMode === "LATER" && scheduledAt ? new Date(scheduledAt) : new Date();
 
   // Home Visit is only offered within the doctor's stated consultation
   // radius — beyond that they simply can't travel there. Unknown distance
@@ -188,14 +196,17 @@ function PatientBookInner() {
 
   const availableTypes = ALL_TYPES.filter((t) => {
     if (t.id === "HOME") return selectedDoctor?.doctorProfile?.offersHomeVisit !== false && hasHomeVisitReach;
-    if (t.id === "CLINIC") return selectedDoctor?.doctorProfile?.offersClinic !== false && hasOpenClinic;
+    // Clinic stays offered even when every clinic is closed right now — the
+    // patient can still schedule the visit for an upcoming open slot.
+    if (t.id === "CLINIC") return selectedDoctor?.doctorProfile?.offersClinic !== false;
     if (t.id === "VIDEO") return selectedDoctor ? selectedDoctor.doctorProfile?.offersVideo === true : true;
     return true;
   });
 
-  // A Clinic Visit can only be confirmed once a specific, currently-open
-  // clinic is selected — doctors with no clinics at all keep the legacy
-  // unrestricted behavior.
+  // A Clinic Visit can only be confirmed once a specific clinic is selected
+  // that is open at the effective booking time — i.e. "now" for an immediate
+  // booking, or the chosen slot for a scheduled one. Doctors with no clinics
+  // at all keep the legacy unrestricted behavior.
   const clinicBookingBlocked =
     form.consultType === "CLINIC" &&
     selectedDoctor != null &&
@@ -204,12 +215,31 @@ function PatientBookInner() {
 
   const homeVisitBlocked = form.consultType === "HOME" && !hasHomeVisitReach;
 
-  const submit = async (e: React.FormEvent) => {
+  // The "Confirm Booking" button only validates and opens the confirmation
+  // dialog — the request itself is fired from confirmAndBook once the patient
+  // says yes in the dialog.
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.id) { router.push("/login"); return; }
-    if (!isEmergency && !consentGiven) { setError("Please agree to the consent statement to continue."); return; }
+    if (!consentGiven) { setError("Please agree to the consent statement to continue."); return; }
     if (form.relation !== "Self" && !dependentId) { setError("Please select or add the family member this visit is for."); return; }
+    if (clinicBookingBlocked) {
+      setError(
+        scheduleMode === "LATER"
+          ? "The clinic isn't open at the time you picked. Choose a time within the clinic's hours."
+          : "This clinic is closed right now. Switch to Schedule Later and pick a time when it's open."
+      );
+      return;
+    }
+    if (scheduleMode === "LATER" && scheduledAt && new Date(scheduledAt).getTime() <= new Date().getTime()) {
+      setError("Please pick a time in the future.");
+      return;
+    }
     setError("");
+    setConfirmOpen(true);
+  };
+
+  const confirmAndBook = async () => {
     setLoading(true);
     const res = await fetch("/api/appointments", {
       method: "POST",
@@ -223,18 +253,18 @@ function PatientBookInner() {
         dependentId,
         amount: currentFee,
         paymentMethod: "ONLINE",
-        isEmergency,
         consentGiven,
         followUpOfId: followUpOfId ?? undefined,
         patientLat: userPos?.[0],
         patientLng: userPos?.[1],
-        ...(effectiveScheduleMode === "LATER" && scheduledAt
+        ...(scheduleMode === "LATER" && scheduledAt
           ? { scheduledAt: new Date(scheduledAt).toISOString() }
           : {}),
       }),
     });
     const data = await res.json();
     setLoading(false);
+    setConfirmOpen(false);
     if (res.ok) { setFee(currentFee); setAppointmentId(data.id); setBooked(true); }
     else setError(data.error ?? "Booking failed. Please try again.");
   };
@@ -285,7 +315,7 @@ function PatientBookInner() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 flex items-center gap-1.5"><CalendarCheck2 className="w-3.5 h-3.5" /> When</span>
-                  <span className="font-semibold text-slate-800">{effectiveScheduleMode === "LATER" && scheduledAt ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "Now"}</span>
+                  <span className="font-semibold text-slate-800">{scheduleMode === "LATER" && scheduledAt ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "Now"}</span>
                 </div>
                 <div className="flex items-center justify-between pt-3 border-t border-slate-200">
                   <span className="text-slate-500 flex items-center gap-1.5"><IndianRupee className="w-3.5 h-3.5" /> Total</span>
@@ -423,32 +453,71 @@ function PatientBookInner() {
                 >
                   {selectedDoctor.clinics.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.name} — {isClinicOpenNow(c.slots, effectiveBookingTime) ? "Open" : "Closed"} {effectiveScheduleMode === "LATER" ? "at that time" : "now"}
+                      {c.name} — {isClinicOpenNow(c.slots, effectiveBookingTime) ? "Open" : "Closed"} {scheduleMode === "LATER" ? "at that time" : "now"}
                     </option>
                   ))}
                 </select>
                 {selectedClinic && (
                   <p className="text-xs text-slate-500 mt-1.5">{selectedClinic.address}</p>
                 )}
+
+                {/* When this clinic is open — so the patient knows which times they can schedule */}
+                {selectedClinic && (() => {
+                  const hours = formatClinicHours(selectedClinic.slots);
+                  if (hours.length === 0) return null;
+                  return (
+                    <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold text-slate-600 flex items-center gap-1.5 mb-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" /> Clinic hours
+                      </p>
+                      <ul className="space-y-0.5">
+                        {hours.map((h) => (
+                          <li key={h.dayOfWeek} className="text-xs text-slate-600 flex justify-between gap-3">
+                            <span className="font-medium text-slate-500">{h.label}</span>
+                            <span className="text-right">{h.ranges.join(", ")}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })()}
+
                 {selectedClinic && !isClinicOpenNow(selectedClinic.slots, effectiveBookingTime) && (() => {
                   const openClinic = findOpenClinic(selectedDoctor.clinics.filter((c) => c.id !== selectedClinic.id), effectiveBookingTime);
+                  const nextHere = findNextOpening([selectedClinic], new Date());
                   return (
                     <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 mt-2 flex items-start gap-2.5">
                       <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1 text-xs text-red-800">
                         <p className="font-semibold">
-                          Not available at this clinic {effectiveScheduleMode === "LATER" ? "at the selected time" : "right now"} — booking is disabled here.
+                          Not available at this clinic {scheduleMode === "LATER" ? "at the selected time" : "right now"} — booking is disabled here.
                         </p>
-                        {openClinic ? (
+                        {openClinic && (
                           <button
                             type="button"
                             onClick={() => set("clinicId", openClinic.id)}
-                            className="underline font-bold mt-0.5"
+                            className="underline font-bold mt-0.5 block"
                           >
-                            {effectiveScheduleMode === "LATER" ? "Available at that time" : "Currently available"} at {openClinic.name} — switch &amp; book here instead
+                            {scheduleMode === "LATER" ? "Available at that time" : "Currently available"} at {openClinic.name} — switch &amp; book here instead
                           </button>
-                        ) : (
-                          <p className="mt-0.5">No clinic is available {effectiveScheduleMode === "LATER" ? "at the selected time" : "right now"} — please pick a different time or clinic.</p>
+                        )}
+                        {nextHere && (
+                          <p className="mt-1.5 pt-1.5 border-t border-red-200">
+                            Want an appointment at {selectedClinic.name}?{" "}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setScheduleMode("LATER");
+                                setScheduledAt(nextOpeningLocalInput(nextHere));
+                              }}
+                              className="underline font-bold"
+                            >
+                              Schedule it for {openingWhenLabel(nextHere)}
+                            </button>
+                          </p>
+                        )}
+                        {!openClinic && !nextHere && (
+                          <p className="mt-0.5">No clinic is available {scheduleMode === "LATER" ? "at the selected time" : "right now"} — please pick a different time or clinic.</p>
                         )}
                       </div>
                     </div>
@@ -461,18 +530,18 @@ function PatientBookInner() {
             <div>
               <label className="input-label mb-2 block">When?</label>
               <div className="grid grid-cols-2 gap-3">
-                <button type="button" disabled={isEmergency} onClick={() => setScheduleMode("NOW")}
-                  className={cn("py-2.5 rounded-xl border text-xs font-semibold transition-all disabled:opacity-50",
-                    effectiveScheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                <button type="button" onClick={() => setScheduleMode("NOW")}
+                  className={cn("py-2.5 rounded-xl border text-xs font-semibold transition-all",
+                    scheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
                   Book Now
                 </button>
-                <button type="button" disabled={isEmergency} onClick={() => setScheduleMode("LATER")}
-                  className={cn("py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50",
-                    effectiveScheduleMode === "LATER" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                <button type="button" onClick={() => setScheduleMode("LATER")}
+                  className={cn("py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5",
+                    scheduleMode === "LATER" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
                   <CalendarClock className="w-3.5 h-3.5" /> Schedule Later
                 </button>
               </div>
-              {effectiveScheduleMode === "LATER" && (
+              {scheduleMode === "LATER" && (
                 <input type="datetime-local" required className="input-field mt-3" min={nowLocalInput()}
                   value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
               )}
@@ -511,25 +580,15 @@ function PatientBookInner() {
                 value={form.allergies} onChange={(e) => set("allergies", e.target.value)} />
             </div>
 
-            {/* Emergency toggle */}
-            <label className="flex items-center gap-2.5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 cursor-pointer">
-              <input type="checkbox" checked={isEmergency} onChange={(e) => setIsEmergency(e.target.checked)}
-                className="w-4 h-4 accent-red-500" />
-              <Siren className="w-4 h-4 text-red-500 flex-shrink-0" />
-              <span className="text-sm font-semibold text-red-700">This is an emergency (books now, pay online after)</span>
-            </label>
-
             {/* Consent */}
-            {!isEmergency && (
-              <label className="flex items-start gap-2.5 rounded-xl border border-slate-200 px-4 py-3 cursor-pointer">
-                <input type="checkbox" checked={consentGiven} onChange={(e) => setConsentGiven(e.target.checked)}
-                  className="w-4 h-4 mt-0.5 accent-blue-500 flex-shrink-0" />
-                <span className="text-xs text-slate-600 flex items-start gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
-                  I confirm the information above is accurate and I consent to this doctor accessing my medical profile and treating me for this consultation.
-                </span>
-              </label>
-            )}
+            <label className="flex items-start gap-2.5 rounded-xl border border-slate-200 px-4 py-3 cursor-pointer">
+              <input type="checkbox" checked={consentGiven} onChange={(e) => setConsentGiven(e.target.checked)}
+                className="w-4 h-4 mt-0.5 accent-blue-500 flex-shrink-0" />
+              <span className="text-xs text-slate-600 flex items-start gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
+                I confirm the information above is accurate and I consent to this doctor accessing my medical profile and treating me for this consultation.
+              </span>
+            </label>
 
             {error && (
               <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
@@ -539,7 +598,7 @@ function PatientBookInner() {
             )}
 
             {/* Submit lives here on mobile; the sticky summary card has its own on lg: */}
-            <button type="submit" disabled={loading || (!isEmergency && !consentGiven) || clinicBookingBlocked || homeVisitBlocked} className="btn-primary w-full justify-center py-3.5 text-base lg:hidden">
+            <button type="submit" disabled={loading || !consentGiven || clinicBookingBlocked || homeVisitBlocked} className="btn-primary w-full justify-center py-3.5 text-base lg:hidden">
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : `Confirm Booking (₹${currentFee})`}
             </button>
           </div>
@@ -586,7 +645,7 @@ function PatientBookInner() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-500 flex items-center gap-1.5"><CalendarCheck2 className="w-3.5 h-3.5" /> When</span>
-                <span className="font-semibold text-slate-800">{effectiveScheduleMode === "LATER" ? "Scheduled" : "Now"}</span>
+                <span className="font-semibold text-slate-800">{scheduleMode === "LATER" ? "Scheduled" : "Now"}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-500">Payment</span>
@@ -604,13 +663,57 @@ function PatientBookInner() {
               </div>
             </div>
 
-            <button type="submit" disabled={loading || (!isEmergency && !consentGiven) || clinicBookingBlocked || homeVisitBlocked} className="btn-primary w-full justify-center py-3.5 text-base mt-5">
+            <button type="submit" disabled={loading || !consentGiven || clinicBookingBlocked || homeVisitBlocked} className="btn-primary w-full justify-center py-3.5 text-base mt-5">
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : "Confirm Booking"}
             </button>
           </div>
         </div>
         </form>
       </div>
+
+      {confirmOpen && selectedDoctor && (
+        <ConfirmDialog
+          icon={CalendarCheck2}
+          tone="primary"
+          title="Confirm this booking?"
+          confirmLabel={`Confirm (₹${currentFee})`}
+          busyLabel="Booking…"
+          cancelLabel="Go back"
+          busy={loading}
+          onCancel={() => setConfirmOpen(false)}
+          onConfirm={confirmAndBook}
+          message={
+            <div className="space-y-1.5">
+              <div className="flex justify-between gap-3">
+                <span>Doctor</span>
+                <span className="font-semibold text-slate-700 text-right">{formatDoctorName(selectedDoctor.name)}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Consultation</span>
+                <span className="font-semibold text-slate-700 text-right">{typeLabel}</span>
+              </div>
+              {form.consultType === "CLINIC" && selectedClinic && (
+                <div className="flex justify-between gap-3">
+                  <span>Clinic</span>
+                  <span className="font-semibold text-slate-700 text-right">{selectedClinic.name}</span>
+                </div>
+              )}
+              <div className="flex justify-between gap-3">
+                <span>When</span>
+                <span className="font-semibold text-slate-700 text-right">
+                  {scheduleMode === "LATER" && scheduledAt
+                    ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })
+                    : "Now"}
+                </span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Payment</span>
+                <span className="font-semibold text-slate-700 text-right">Online, after the doctor accepts</span>
+              </div>
+            </div>
+          }
+        />
+      )}
     </div>
   );
 }

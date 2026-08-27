@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isDoctorAvailableNow } from "@/lib/availability";
-import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime } from "@/lib/clinicAvailability";
+import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime, formatClinicHours } from "@/lib/clinicAvailability";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
 import { haversine } from "@/lib/geo";
@@ -23,6 +23,7 @@ import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import DependentPicker from "@/components/patient/DependentPicker";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -192,6 +193,18 @@ function formatNextOpeningText(next: { daysAhead: number; dayOfWeek: string; fro
   return `${next.dayOfWeek} ${formatSlotTime(next.fromTime)}`;
 }
 
+// A <input type="datetime-local"> value for the start of an upcoming clinic
+// opening — used to prefill the scheduler so a "book it here anyway" tap lands
+// on a time the clinic is actually open.
+function nextOpeningLocalInput(next: { daysAhead: number; fromTime: string }) {
+  const d = new Date();
+  d.setDate(d.getDate() + next.daysAhead);
+  const [h, m] = next.fromTime.split(":").map(Number);
+  d.setHours(h, m, 0, 0);
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 // PAGE COMPONENT
 // ══════════════════════════════════════════════════════════════════════════
@@ -223,6 +236,7 @@ function PatientDashboardInner() {
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
   const [booking, setBooking] = useState(false);
+  const [confirmBookingOpen, setConfirmBookingOpen] = useState(false);
   const [booked, setBooked] = useState<{ id: string; fee: number } | null>(null);
   const [bookingError, setBookingError] = useState("");
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -291,7 +305,8 @@ function PatientDashboardInner() {
     fetch("/api/patients/me/saved-doctors")
       .then((r) => (r.ok ? r.json() : []))
       .then((list: { doctor: { id: string } }[]) => setSavedDoctorIds(new Set(list.map((s) => s.doctor.id))));
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const toggleSaveDoctor = async () => {
     if (!selectedDoctor) return;
@@ -508,6 +523,7 @@ function PatientDashboardInner() {
           setConsentGiven(false);
           setBooked(null);
           setBookingError("");
+          setConfirmBookingOpen(false);
           setScheduleMode("NOW");
         });
 
@@ -612,7 +628,27 @@ function PatientDashboardInner() {
   }, [user, router]);
 
   // ── Booking submit ─────────────────────────────────────────────────────
-  const submitBooking = async () => {
+  // "Confirm ₹X" only opens the confirmation dialog; confirmAndBook fires the
+  // actual request once the patient confirms.
+  const submitBooking = () => {
+    if (!user?.id || !selectedDoctor || !consentGiven) return;
+    if (clinicBookingBlocked) {
+      setBookingError(
+        scheduleMode === "LATER"
+          ? "The clinic isn't open at the time you picked. Choose a time within the clinic's hours."
+          : "This clinic is closed right now. Switch to Schedule Later and pick a time when it's open."
+      );
+      return;
+    }
+    if (scheduleMode === "LATER" && scheduledAt && new Date(scheduledAt).getTime() <= new Date().getTime()) {
+      setBookingError("Please pick a time in the future.");
+      return;
+    }
+    setBookingError("");
+    setConfirmBookingOpen(true);
+  };
+
+  const confirmAndBook = async () => {
     if (!user?.id || !selectedDoctor || !consentGiven) return;
     setBooking(true);
     setBookingError("");
@@ -641,6 +677,7 @@ function PatientDashboardInner() {
     });
     const data = await res.json();
     setBooking(false);
+    setConfirmBookingOpen(false);
     if (res.ok) setBooked({ id: data.id, fee });
     else setBookingError(data.error ?? "Booking failed. Please try again.");
   };
@@ -705,7 +742,9 @@ function PatientDashboardInner() {
 
   const availableTypes = ALL_TYPES.filter((t) => {
     if (t.id === "HOME") return selectedDoctor?.doctorProfile?.offersHomeVisit !== false && hasHomeVisitReach;
-    if (t.id === "CLINIC") return selectedDoctor?.doctorProfile?.offersClinic !== false && hasOpenClinic;
+    // Clinic stays offered even when every clinic is closed right now — the
+    // patient can still schedule the visit for an upcoming open slot.
+    if (t.id === "CLINIC") return selectedDoctor?.doctorProfile?.offersClinic !== false;
     if (t.id === "VIDEO") return selectedDoctor ? selectedDoctor.doctorProfile?.offersVideo === true : true;
     return true;
   });
@@ -1038,6 +1077,28 @@ function PatientDashboardInner() {
                           <p className="text-xs text-slate-500 mt-0.5">{selectedClinic.address}</p>
                         </div>
                       )}
+
+                      {/* When this clinic is open — so the patient knows which times they can schedule */}
+                      {selectedClinic && (() => {
+                        const hours = formatClinicHours(selectedClinic.slots);
+                        if (hours.length === 0) return null;
+                        return (
+                          <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 mb-2">
+                            <p className="text-xs font-semibold text-slate-600 flex items-center gap-1.5 mb-1.5">
+                              <Clock className="w-3.5 h-3.5 text-slate-400" /> Clinic hours
+                            </p>
+                            <ul className="space-y-0.5">
+                              {hours.map((h) => (
+                                <li key={h.dayOfWeek} className="text-xs text-slate-600 flex justify-between gap-3">
+                                  <span className="font-medium text-slate-500">{h.label}</span>
+                                  <span className="text-right">{h.ranges.join(", ")}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        );
+                      })()}
+
                       {selectedClinic && !isClinicOpenNow(selectedClinic.slots, effectiveBookingTime) && (() => {
                         const openClinic = findOpenClinic(
                           selectedDoctor.clinics.filter((c) => c.id !== selectedClinic.id),
@@ -1068,6 +1129,27 @@ function PatientDashboardInner() {
                                   No clinic is available {scheduleMode === "LATER" ? "at the selected time" : "right now"} — please pick a different time or clinic.
                                 </p>
                               )}
+
+                              {/* You can still book a future appointment at THIS clinic */}
+                              {(() => {
+                                const nextHere = findNextOpening([selectedClinic], new Date(now));
+                                if (!nextHere) return null;
+                                return (
+                                  <p className="text-xs text-red-700 mt-1.5 pt-1.5 border-t border-red-200">
+                                    Want an appointment at {selectedClinic.name}?{" "}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setScheduleMode("LATER");
+                                        setScheduledAt(nextOpeningLocalInput(nextHere));
+                                      }}
+                                      className="font-bold text-red-800 underline"
+                                    >
+                                      Schedule it for {formatNextOpeningText(nextHere)}
+                                    </button>
+                                  </p>
+                                );
+                              })()}
                             </div>
                           </div>
                         );
@@ -1475,6 +1557,50 @@ function PatientDashboardInner() {
             )}
           </div>
         </div>
+      )}
+
+      {confirmBookingOpen && bookingOpen && selectedDoctor && (
+        <ConfirmDialog
+          icon={CalendarCheck2}
+          tone="primary"
+          title="Confirm this booking?"
+          confirmLabel={`Confirm (₹${fee})`}
+          busyLabel="Booking…"
+          cancelLabel="Go back"
+          busy={booking}
+          onCancel={() => setConfirmBookingOpen(false)}
+          onConfirm={confirmAndBook}
+          message={
+            <div className="space-y-1.5">
+              <div className="flex justify-between gap-3">
+                <span>Doctor</span>
+                <span className="font-semibold text-slate-700 text-right">{formatDoctorName(selectedDoctor.name)}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Consultation</span>
+                <span className="font-semibold text-slate-700 text-right">{ALL_TYPES.find((t) => t.id === consultType)?.label}</span>
+              </div>
+              {consultType === "CLINIC" && selectedClinic && (
+                <div className="flex justify-between gap-3">
+                  <span>Clinic</span>
+                  <span className="font-semibold text-slate-700 text-right">{selectedClinic.name}</span>
+                </div>
+              )}
+              <div className="flex justify-between gap-3">
+                <span>When</span>
+                <span className="font-semibold text-slate-700 text-right">
+                  {scheduleMode === "LATER" && scheduledAt
+                    ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })
+                    : "Now"}
+                </span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Payment</span>
+                <span className="font-semibold text-slate-700 text-right">Online, after the doctor accepts</span>
+              </div>
+            </div>
+          }
+        />
       )}
 
       {/* ── Tap hint (shown when no panel is open) ──────────────────── */}
