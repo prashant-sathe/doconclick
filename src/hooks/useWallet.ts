@@ -22,6 +22,7 @@ export function useWallet(take = 20) {
         setBalance(d.balance ?? 0);
         setTransactions(d.transactions ?? []);
       })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [take]);
 

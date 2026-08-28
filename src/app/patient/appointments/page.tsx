@@ -13,6 +13,8 @@ import { cn, formatDoctorName } from "@/lib/utils";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
+import { downloadOrShareUrl } from "@/lib/nativeDownload";
+import { isNative } from "@/lib/platform";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 
@@ -173,6 +175,19 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
   const router = useRouter();
   const needsPayment = a.status === "SCHEDULED" && a.paymentMethod === "ONLINE" && a.paymentStatus === "PENDING";
   const timeLeftMs = REQUEST_TIMEOUT_MS - (now - new Date(a.createdAt).getTime());
+  const [downloadingAtt, setDownloadingAtt] = useState<string | null>(null);
+
+  // Web: the <a target="_blank"> opens the file as before. Native: <a> can't
+  // open/download inside the WebView, so intercept and use the OS share sheet.
+  const onAttachmentClick = (e: React.MouseEvent, att: Attachment, fileName: string) => {
+    if (!isNative()) return;
+    e.preventDefault();
+    if (downloadingAtt) return;
+    setDownloadingAtt(att.id);
+    downloadOrShareUrl(att.url, fileName)
+      .catch(() => {})
+      .finally(() => setDownloadingAtt(null));
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
@@ -335,7 +350,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
             Video call unlocks after payment
           </span>
         )}
-        {(a.status === "SCHEDULED" || a.status === "COMPLETED") && (
+        {a.status === "SCHEDULED" && (
           <Link href={`/patient/chat/${a.id}`} className="relative btn-secondary py-2 px-3 text-xs">
             <MessageCircle className="w-3.5 h-3.5" /> Chat
             {a.unreadMessageCount > 0 && (
@@ -356,12 +371,25 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
             </Link>
           )
         )}
-        {a.status === "COMPLETED" && a.attachments.map((att, i) => (
-          <a key={att.id} href={att.url} target="_blank" rel="noopener noreferrer" className="btn-secondary py-2 px-3 text-xs">
-            <FileText className="w-3.5 h-3.5" />
-            {a.attachments.length > 1 ? `File ${i + 1}` : "View Attached File"}
-          </a>
-        ))}
+        {a.status === "COMPLETED" && a.attachments.map((att, i) => {
+          const label = a.attachments.length > 1 ? `File ${i + 1}` : "View Attached File";
+          const fileName = att.fileName || att.url.split("/").pop()?.split("?")[0] || `attachment-${i + 1}`;
+          return (
+            <a
+              key={att.id}
+              href={att.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => onAttachmentClick(e, att, fileName)}
+              className="btn-secondary py-2 px-3 text-xs"
+            >
+              {downloadingAtt === att.id
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                : <FileText className="w-3.5 h-3.5" />}
+              {label}
+            </a>
+          );
+        })}
         {a.status === "COMPLETED" && (a.medicines.length > 0 || !!a.doctorNotes) && (
           <PrescriptionDownloadButton appointmentId={a.id} patientId={patientId} />
         )}
@@ -405,14 +433,15 @@ export default function PatientAppointments() {
   const unreadTotalRef = useRef<number | null>(null);
   const load = useCallback(() => {
     fetch("/api/appointments/me")
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : []))
       .then((d: Appointment[]) => {
         setAppointments(d);
         setLoading(false);
         const total = d.reduce((sum, a) => sum + a.unreadMessageCount, 0);
         if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
         unreadTotalRef.current = total;
-      });
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   useEffect(() => {

@@ -40,7 +40,8 @@ export default function PatientChatPage() {
     </div>;
   }
 
-  const chatOpen = appt?.status === "SCHEDULED" || appt?.status === "COMPLETED";
+  const chatOpen = appt?.status === "SCHEDULED";
+  const chatClosed = appt?.status === "COMPLETED";
 
   return (
     <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
@@ -70,7 +71,11 @@ export default function PatientChatPage() {
           ) : !chatOpen ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">Chat opens once {formatDoctorName(appt.doctor.name)} accepts this request.</p>
+              <p className="text-sm text-slate-500">
+                {chatClosed
+                  ? "This chat has closed now that your visit is complete."
+                  : `Chat opens once ${formatDoctorName(appt.doctor.name)} accepts this request.`}
+              </p>
             </div>
           ) : (
             <ChatThread appointmentId={params.id} meId={user.id} accent="blue" />

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matches the web app's .gradient-surface background so the native
+         splash screen doesn't flash a mismatched color before hand-off. -->
+    <color name="splashBackground">#F8FAFC</color>
+</resources>

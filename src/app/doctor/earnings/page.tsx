@@ -66,14 +66,15 @@ export default function DoctorEarnings() {
         if (!d?.doctorProfile?.registrationFeePaid) { router.push("/doctor/profile"); return; }
         if (!hasActiveDoctorSubscription(d.doctorProfile)) { router.push("/doctor/subscribe"); return; }
         return Promise.all([
-          fetch("/api/appointments/me").then((r) => r.json()),
+          fetch("/api/appointments/me").then((r) => (r.ok ? r.json() : [])),
           fetch("/api/doctor/settlements").then((r) => (r.ok ? r.json() : [])),
         ]).then(([appts, settled]) => {
           setAppointments(appts);
           setSettlements(settled);
           setLoading(false);
         });
-      });
+      })
+      .catch(() => setLoading(false));
   }, [user, router]);
 
   if (authLoading || loading || !user) {

@@ -1,4 +1,8 @@
 "use client";
+import "leaflet/dist/leaflet.css";
+import markerIconUrl from "leaflet/dist/images/marker-icon.png";
+import markerIcon2xUrl from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadowUrl from "leaflet/dist/images/marker-shadow.png";
 import { Suspense, useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -15,6 +19,7 @@ import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
 import { haversine } from "@/lib/geo";
 import { cn, formatDoctorName } from "@/lib/utils";
+import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
@@ -267,26 +272,24 @@ function PatientDashboardInner() {
       setUserPos([18.5204, 73.8567]); // Pune fallback
     }, 8000);
 
-    if (!navigator.geolocation) {
+    if (!isNative() && !navigator.geolocation) {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
+    getCurrentPositionCompat({ timeout: 8000 })
+      .then((pos) => {
         if (settled) return;
         settled = true;
         window.clearTimeout(fallback);
         setUserPos([pos.coords.latitude, pos.coords.longitude]);
-      },
-      () => {
+      })
+      .catch(() => {
         if (settled) return;
         settled = true;
         window.clearTimeout(fallback);
         setPosError(true);
         setUserPos([18.5204, 73.8567]); // Pune fallback
-      },
-      { timeout: 8000 }
-    );
+      });
 
     return () => window.clearTimeout(fallback);
   }, []);
@@ -294,8 +297,9 @@ function PatientDashboardInner() {
   // ── Fetch doctors ──────────────────────────────────────────────────────
   useEffect(() => {
     fetch("/api/doctors")
-      .then((r) => r.json())
-      .then((data: Doctor[]) => setDoctors(data));
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: Doctor[]) => setDoctors(data))
+      .catch(() => {});
   }, []);
 
   // ── Fetch this patient's bookmarked doctors, for the save toggle in the detail panel ──
@@ -413,8 +417,9 @@ function PatientDashboardInner() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
-        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconUrl: markerIconUrl.src,
+        iconRetinaUrl: markerIcon2xUrl.src,
+        shadowUrl: markerShadowUrl.src,
       });
 
       const map = L.map(mapRef.current, {
@@ -750,13 +755,6 @@ function PatientDashboardInner() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-slate-900">
-      {/* ── Leaflet CSS ─────────────────────────────────────────────── */}
-      {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      />
-
       {/* ── Map container (always mounted so Leaflet can find it) ──────── */}
       <div ref={mapRef} className="absolute inset-0 z-0" />
 

@@ -1,7 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Bell, BellOff, ExternalLink, X } from "lucide-react";
-import { isPushSupported, subscribeToPush, isMac, openSystemNotificationSettings } from "@/lib/pushClient";
+import {
+  isPushSupported, subscribeToPush, isMac, openSystemNotificationSettings, getPushPermissionState,
+} from "@/lib/pushClient";
+import { isNative } from "@/lib/platform";
 
 const DISMISSED_KEY = "doconclick_push_prompt_dismissed";
 const GRANTED_HINT_DISMISSED_KEY = "doconclick_push_granted_hint_dismissed";
@@ -14,14 +17,15 @@ export default function EnableNotificationsPrompt() {
 
   useEffect(() => {
     if (!isPushSupported()) return;
-    const current = Notification.permission;
-    setPermission(current);
-    if (current === "default" && !localStorage.getItem(DISMISSED_KEY)) {
-      setVisible(true);
-    }
-    if (current === "granted" && !localStorage.getItem(GRANTED_HINT_DISMISSED_KEY)) {
-      setHintVisible(true);
-    }
+    getPushPermissionState().then((current) => {
+      setPermission(current);
+      if (current === "default" && !localStorage.getItem(DISMISSED_KEY)) {
+        setVisible(true);
+      }
+      if (current === "granted" && !localStorage.getItem(GRANTED_HINT_DISMISSED_KEY)) {
+        setHintVisible(true);
+      }
+    });
   }, []);
 
   if (permission === null) return null;
@@ -40,7 +44,7 @@ export default function EnableNotificationsPrompt() {
     setBusy(true);
     const ok = await subscribeToPush().catch(() => false);
     setBusy(false);
-    setPermission(Notification.permission);
+    setPermission(await getPushPermissionState());
     dismiss();
     if (ok) setHintVisible(true);
   };
@@ -54,11 +58,14 @@ export default function EnableNotificationsPrompt() {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-slate-900">Notifications are blocked</p>
           <p className="text-xs text-slate-500 mt-0.5">
-            You&apos;ve blocked notifications for this site in your browser. Allow them from your browser&apos;s
-            site settings, then reload this page.
-            {isMac() && " If they still don't show up, your Mac's system notification settings may also be blocking them."}
+            {isNative()
+              ? "Notifications are turned off for this app. Enable them from your phone's Settings → Apps → DocOnClick → Notifications."
+              : <>You&apos;ve blocked notifications for this site in your browser. Allow them from your browser&apos;s
+                  site settings, then reload this page.
+                  {isMac() && " If they still don't show up, your Mac's system notification settings may also be blocking them."}
+                </>}
           </p>
-          {isMac() && (
+          {!isNative() && isMac() && (
             <button
               onClick={openSystemNotificationSettings}
               className="text-xs font-semibold px-3 py-1.5 rounded-lg text-amber-700 hover:bg-amber-100 mt-2 inline-flex items-center gap-1"

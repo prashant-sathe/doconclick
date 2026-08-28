@@ -25,12 +25,14 @@ const ROLE_HOME: Record<string, string> = {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip API routes, static files, auth pages, and public pages
+  // Skip API routes, static files, and public pages — but not "/login",
+  // which still needs the token check below so an already-authenticated
+  // visitor gets redirected to their dashboard instead of seeing the form.
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
+    pathname.startsWith("/.well-known/") ||
     pathname.startsWith("/favicon") ||
-    pathname === "/login" ||
     pathname === "/" ||
     pathname === "/patient/register" ||
     pathname === "/doctor/register"

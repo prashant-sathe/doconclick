@@ -32,8 +32,7 @@ export default function DoctorMobileNav() {
 
   return (
     <nav
-      className="sm:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-xl border-t border-slate-200 flex items-stretch"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="safe-bottom sm:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-xl border-t border-slate-200 flex items-stretch"
     >
       {TABS.map(({ href, label, icon: Icon }) => {
         const active = pathname === href;

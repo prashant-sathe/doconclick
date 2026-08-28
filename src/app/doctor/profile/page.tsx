@@ -279,7 +279,8 @@ export default function DoctorProfilePage() {
         setTrialEndsAt(p.trialEndsAt ?? null);
         setSubscriptionPaidUntil(p.subscriptionPaidUntil ?? null);
         setLoading(false);
-      });
+      })
+      .catch(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
@@ -438,7 +439,6 @@ export default function DoctorProfilePage() {
 
   return (
     <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       <DoctorHeader />
       <DoctorMobileNav />
 

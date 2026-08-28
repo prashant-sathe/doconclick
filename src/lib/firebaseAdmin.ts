@@ -40,6 +40,11 @@ export async function sendPushToUsers(
       const response = await messaging.sendEachForMulticast({
         tokens: batch.map((t) => t.token),
         notification: { title: payload.title, body: payload.body },
+        // `webpush.fcmOptions.link` is a web-push-only convenience the
+        // browser's push service reads directly; native listeners
+        // (pushNotificationActionPerformed) read `data` instead, so both are
+        // needed for tap-to-navigate to work on every platform.
+        data: { url: payload.url },
         webpush: { fcmOptions: { link: payload.url } },
       });
       totalSuccess += response.successCount;

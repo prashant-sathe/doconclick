@@ -39,7 +39,7 @@ export default function DoctorHeader() {
 
   return (
     <header
-      className="sticky z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100"
+      className="safe-top sticky z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100"
       style={{ top: "var(--imp-banner-h, 0px)" }}
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">

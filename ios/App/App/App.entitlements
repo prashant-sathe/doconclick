@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- APNs. "development" is correct for debug builds and TestFlight;
+	     App Store distribution rewrites this to "production" automatically.
+	     Requires the Push Notifications capability on the App ID in the
+	     Apple Developer portal (add it via Xcode > Signing & Capabilities). -->
+	<key>aps-environment</key>
+	<string>development</string>
+	<!-- Universal Links: open https://doconclick.co.in/... links in the app.
+	     Needs /.well-known/apple-app-site-association on the site with this
+	     app's <TeamID>.com.doconclick.app, and the "Associated Domains"
+	     capability enabled on the App ID in the Apple Developer portal. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:doconclick.co.in</string>
+	</array>
+</dict>
+</plist>

@@ -14,6 +14,7 @@ import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime, formatClinicHours, type NextOpening } from "@/lib/clinicAvailability";
 import { RELATIONS } from "@/lib/relations";
 import { haversine } from "@/lib/geo";
+import { getCurrentPositionCompat } from "@/lib/platform";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
@@ -168,16 +169,14 @@ function PatientBookInner() {
   };
 
   useEffect(() => {
-    fetch("/api/doctors").then((r) => r.json()).then((data: Doctor[]) => {
+    fetch("/api/doctors").then((r) => (r.ok ? r.json() : [])).then((data: Doctor[]) => {
       setDoctors(data);
       const preselected = preselectDoctorId && data.find((d) => d.id === preselectDoctorId);
       if (preselected) selectDoctor(preselected, preselectClinicId ?? undefined);
-    });
-    navigator.geolocation.getCurrentPosition(
-      (pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]),
-      () => setUserPos(null),
-      { timeout: 8000 }
-    );
+    }).catch(() => {});
+    getCurrentPositionCompat({ timeout: 8000 })
+      .then((pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]))
+      .catch(() => setUserPos(null));
     fetch("/api/patients/me").then((r) => r.json()).then((d) => {
       const known = d.patientProfile?.allergies;
       if (known) set("allergies", known);

@@ -4,9 +4,10 @@ import { Bell, BellOff, ExternalLink, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   isPushSupported, fetchPushSubscriptionStatus, subscribeToPush, unsubscribeAllPush,
-  isMac, openSystemNotificationSettings,
+  isMac, openSystemNotificationSettings, getPushPermissionState,
 } from "@/lib/pushClient";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { isNative } from "@/lib/platform";
 
 // Profile-page counterpart to EnableNotificationsPrompt: that popup shows once
 // and can be dismissed forever, so this gives patients, doctors and admins a
@@ -29,7 +30,7 @@ export default function NotificationSettings() {
     const ok = isPushSupported();
     setSupported(ok);
     if (!ok) return;
-    setPermission(Notification.permission);
+    getPushPermissionState().then(setPermission);
     fetchPushSubscriptionStatus()
       .then(setSubscribed)
       .finally(() => setChecking(false));
@@ -39,7 +40,7 @@ export default function NotificationSettings() {
     setBusy(true);
     const ok = await subscribeToPush().catch(() => false);
     setBusy(false);
-    setPermission(Notification.permission);
+    setPermission(await getPushPermissionState());
     setSubscribed(ok);
   };
 
@@ -75,11 +76,14 @@ export default function NotificationSettings() {
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-slate-900">Notifications are blocked</p>
             <p className="text-xs text-slate-500 mt-0.5">
-              You&apos;ve blocked notifications for this site in your browser. Allow them from your browser&apos;s
-              site settings, then reload this page.
-              {isMac() && " If they still don't show up, your Mac's system notification settings may also be blocking them."}
+              {isNative()
+                ? "Notifications are turned off for this app. Enable them from your phone's Settings → Apps → DocOnClick → Notifications."
+                : <>You&apos;ve blocked notifications for this site in your browser. Allow them from your browser&apos;s
+                    site settings, then reload this page.
+                    {isMac() && " If they still don't show up, your Mac's system notification settings may also be blocking them."}
+                  </>}
             </p>
-            {isMac() && (
+            {!isNative() && isMac() && (
               <button
                 type="button"
                 onClick={openSystemNotificationSettings}

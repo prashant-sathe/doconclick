@@ -1,18 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { randomUUID } from "crypto";
-import { prisma } from "@/lib/prisma";
-import { signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
+import { signToken, COOKIE_SECURE } from "@/lib/auth";
 import { STATE_COOKIE_NAME, decodeState, externalOrigin } from "@/lib/googleOAuth";
+import { resolveGoogleUser } from "@/lib/googleAuth";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
-
-const ROLE_HOME: Record<string, string> = {
-  ADMIN: "/admin",
-  DOCTOR: "/doctor/dashboard",
-  PATIENT: "/patient/dashboard",
-};
 
 type GoogleUserInfo = {
   email?: string;
@@ -77,45 +70,20 @@ export async function GET(req: Request) {
       return failureRedirect(origin, "google_no_email");
     }
 
-    let user = await prisma.user.findUnique({ where: { email: googleUser.email } });
+    const resolved = await resolveGoogleUser({
+      email: googleUser.email,
+      name: googleUser.name,
+      role: state.role,
+      intent: state.intent,
+      next: state.next,
+    });
 
-    if (!user && state.intent === "reset") {
-      // Forgot-password flow: never create an account here — if no existing
-      // account uses this Google email, this reset method just isn't available.
-      return failureRedirect(origin, "google_no_account");
+    if ("error" in resolved) {
+      return failureRedirect(origin, resolved.error);
     }
 
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          name: googleUser.name || googleUser.email.split("@")[0],
-          email: googleUser.email,
-          mobile: `pending_${randomUUID()}`,
-          password: "",
-          role: state.role,
-          ...(state.role === "DOCTOR"
-            ? { doctorProfile: { create: { status: "PENDING" } } }
-            : { patientProfile: { create: { age: 0, gender: "" } } }),
-        },
-      });
-    }
-
-    const payload: JWTPayload = {
-      id: user.id,
-      name: user.name,
-      role: user.role,
-      mobile: user.mobile,
-    };
-    const token = signToken(payload);
-
-    const destination =
-      state.intent === "reset"
-        ? "/reset-password"
-        : user.mobile.startsWith("pending_")
-          ? "/complete-profile"
-          : state.next || ROLE_HOME[user.role] || "/";
-
-    const response = NextResponse.redirect(new URL(destination, origin));
+    const token = signToken(resolved.payload);
+    const response = NextResponse.redirect(new URL(resolved.destination, origin));
     response.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: COOKIE_SECURE,

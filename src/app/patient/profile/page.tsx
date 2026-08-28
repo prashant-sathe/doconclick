@@ -18,6 +18,7 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import { CHRONIC_OPTIONS, BLOOD_GROUPS } from "@/lib/medicalOptions";
 import { computeBMI, bmiCategoryClasses } from "@/lib/bmi";
+import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 
 interface FormState {
   location: string;
@@ -211,7 +212,8 @@ export default function PatientProfilePage() {
           lng: p.lng ?? null,
         });
         setLoading(false);
-      });
+      })
+      .catch(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
@@ -234,31 +236,33 @@ export default function PatientProfilePage() {
   const [locatingGPS, setLocatingGPS] = useState(false);
 
   const getGPS = () => {
-    if (!navigator.geolocation) return;
+    if (!isNative() && !navigator.geolocation) return;
     setLocatingGPS(true);
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const { latitude, longitude } = pos.coords;
-      let address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-      let pinCode: string | null = null;
-      try {
-        const res = await fetch(`/api/geocode/reverse?lat=${latitude}&lon=${longitude}`);
-        const data = await res.json();
-        if (data.label) address = data.label;
-        if (data.pinCode) pinCode = data.pinCode;
-      } catch {
-        // fall back to raw coordinates
-      }
-      setSaved(false);
-      setForm((f) => ({
-        ...f,
-        location: address,
-        homeAddress: address,
-        pinCode: pinCode ?? f.pinCode,
-        lat: latitude,
-        lng: longitude,
-      }));
-      setLocatingGPS(false);
-    }, () => setLocatingGPS(false));
+    getCurrentPositionCompat()
+      .then(async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        let address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        let pinCode: string | null = null;
+        try {
+          const res = await fetch(`/api/geocode/reverse?lat=${latitude}&lon=${longitude}`);
+          const data = await res.json();
+          if (data.label) address = data.label;
+          if (data.pinCode) pinCode = data.pinCode;
+        } catch {
+          // fall back to raw coordinates
+        }
+        setSaved(false);
+        setForm((f) => ({
+          ...f,
+          location: address,
+          homeAddress: address,
+          pinCode: pinCode ?? f.pinCode,
+          lat: latitude,
+          lng: longitude,
+        }));
+        setLocatingGPS(false);
+      })
+      .catch(() => setLocatingGPS(false));
   };
 
   const bmi = computeBMI(Number(form.height), Number(form.weight));

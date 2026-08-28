@@ -3,6 +3,7 @@ import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Download, Loader2, AlertCircle } from "lucide-react";
 import PrescriptionDocument, { type PrescriptionData } from "./PrescriptionDocument";
+import { saveOrShareFile } from "@/lib/nativeDownload";
 
 export default function PrescriptionDownloadButton({
   appointmentId,
@@ -89,7 +90,14 @@ export default function PrescriptionDownloadButton({
         heightLeft -= pageH;
       }
 
-      pdf.save(`Prescription-${appointmentId}.pdf`);
+      const fileName = `Prescription-${appointmentId}.pdf`;
+      // `pdf.save()` is a no-op inside the Capacitor WebView — on native, write
+      // the file out and open the OS share sheet instead.
+      const handledNatively = await saveOrShareFile(
+        fileName,
+        pdf.output("datauristring").split(",")[1],
+      );
+      if (!handledNatively) pdf.save(fileName);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate PDF");
     } finally {

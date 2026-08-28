@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>DocOnClick — Connection problem</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: #F8FAFC;
+      color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      min-height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 32px 24px calc(32px + env(safe-area-inset-bottom));
+    }
+    .icon {
+      width: 72px; height: 72px; border-radius: 20px;
+      background: #eef2ff;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .icon svg { width: 38px; height: 38px; stroke: #235dc7; }
+    h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+    p { font-size: 14px; color: #64748b; max-width: 300px; line-height: 1.5; margin-top: 6px; }
+    button {
+      margin-top: 24px; appearance: none; border: 0;
+      background: #235dc7; color: #fff;
+      font-size: 15px; font-weight: 600;
+      padding: 13px 28px; border-radius: 12px; cursor: pointer;
+    }
+    button:active { opacity: 0.85; }
+    .hint { margin-top: 14px; font-size: 12px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h.01" />
+        <path d="M8.5 16.4a5 5 0 0 1 7 0" />
+        <path d="M5 12.8a10 10 0 0 1 14 0" />
+        <path d="m3 3 18 18" stroke="#ef4444" />
+      </svg>
+    </div>
+    <h1>Can&rsquo;t reach DocOnClick</h1>
+    <p id="msg">
+      The app couldn&rsquo;t connect. Check your internet connection and try again in a moment.
+    </p>
+    <button type="button" id="retry">Try again</button>
+    <div class="hint" id="status"></div>
+  </div>
+
+  <script>
+    (function () {
+      // errorPath pages get NO Capacitor bridge (no window.Capacitor, no
+      // WEBVIEW_SERVER_URL), so this is plain JS with a hardcoded origin. That
+      // origin is in `server.allowNavigation`, so navigating to it stays inside
+      // the WebView rather than opening the system browser.
+      var HOME = "https://doconclick.co.in/login";
+      var statusEl = document.getElementById("status");
+      var msgEl = document.getElementById("msg");
+
+      function paint() {
+        if (navigator.onLine) {
+          statusEl.textContent = "";
+          msgEl.textContent = "The app couldn't reach the server. It may be a brief outage — try again in a moment.";
+        } else {
+          statusEl.textContent = "You're offline";
+          msgEl.textContent = "You're not connected to the internet. We'll retry automatically once you're back online.";
+        }
+      }
+
+      document.getElementById("retry").addEventListener("click", function () {
+        window.location.replace(HOME);
+      });
+
+      // Only auto-retry on a real offline -> online transition, never on load
+      // (navigator.onLine is true whenever there's any network, even when the
+      // server itself is unreachable — retrying then just loops).
+      window.addEventListener("online", function () {
+        statusEl.textContent = "Back online — reconnecting…";
+        setTimeout(function () { window.location.replace(HOME); }, 800);
+      });
+      window.addEventListener("offline", paint);
+
+      paint();
+    })();
+  </script>
+</body>
+</html>

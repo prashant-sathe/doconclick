@@ -4,10 +4,10 @@ import { getAuthUser } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 
-// Chat is only open once a booking has been accepted — matches the "once the
-// doctor accepts, patient and doctor can chat" requirement — and stays open
-// after completion for post-visit follow-up questions.
-const CHAT_ENABLED_STATUSES = ["SCHEDULED", "COMPLETED"];
+// Chat is open only while a booking is accepted and still upcoming
+// (SCHEDULED). It closes for everyone once the visit is COMPLETED (and was
+// never open for PENDING_APPROVAL / REJECTED / CANCELLED).
+const CHAT_ENABLED_STATUSES = ["SCHEDULED"];
 
 // A message's fileUrl must point at our own upload bucket — it's only ever
 // meant to be set from the upload endpoint's response, never a client-typed
@@ -29,12 +29,11 @@ export async function loadAndAuthorize(id: string, userId: string) {
     return { error: NextResponse.json({ error: "Appointment not found" }, { status: 404 }) };
   }
   if (!CHAT_ENABLED_STATUSES.includes(appointment.status)) {
-    return {
-      error: NextResponse.json(
-        { error: "Chat opens once the doctor accepts this appointment." },
-        { status: 403 }
-      ),
-    };
+    const message =
+      appointment.status === "COMPLETED"
+        ? "This chat has closed now that the visit is complete."
+        : "Chat opens once the doctor accepts this appointment.";
+    return { error: NextResponse.json({ error: message }, { status: 403 }) };
   }
   return { appointment };
 }

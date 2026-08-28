@@ -10,6 +10,7 @@ import { cn, formatDoctorName } from "@/lib/utils";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow, findNextOpening, formatSlotTime } from "@/lib/clinicAvailability";
 import { haversine } from "@/lib/geo";
+import { getCurrentPositionCompat } from "@/lib/platform";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 
@@ -103,11 +104,9 @@ export default function DoctorProfilePage() {
   }, [id]);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]),
-      () => setUserPos(null),
-      { timeout: 8000 }
-    );
+    getCurrentPositionCompat({ timeout: 8000 })
+      .then((pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]))
+      .catch(() => setUserPos(null));
   }, []);
 
   useEffect(() => {

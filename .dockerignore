@@ -12,3 +12,11 @@ public/uploads
 deploy
 *.md
 .DS_Store
+
+# Capacitor native projects — not part of the web/server build. Excluding
+# them keeps the Docker build context small (they carry build/ and .gradle/
+# caches that can be gigabytes).
+android
+ios
+assets
+capacitor.config.ts

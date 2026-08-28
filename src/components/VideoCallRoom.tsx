@@ -27,6 +27,37 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const localTracksRef = useRef<{ audio: IMicrophoneAudioTrack; video: ICameraVideoTrack } | null>(null);
 
+  // Keep the screen on for the whole time this call page is open. Uses the
+  // Wake Lock API on web and the OS flag on native; both no-op on failure.
+  useEffect(() => {
+    let active = true;
+    import("@capacitor-community/keep-awake")
+      .then(({ KeepAwake }) => { if (active) return KeepAwake.keepAwake(); })
+      .catch(() => {});
+    return () => {
+      active = false;
+      import("@capacitor-community/keep-awake")
+        .then(({ KeepAwake }) => KeepAwake.allowSleep())
+        .catch(() => {});
+    };
+  }, []);
+
+  // iOS: WKWebView tends to route WebRTC call audio to the earpiece. Force the
+  // speaker while the call page is open (no-op on web / Android; headphones
+  // still take priority). Restore the system default on leave.
+  useEffect(() => {
+    let active = true;
+    import("@capgo/capacitor-audio-session")
+      .then(({ AudioSession }) => { if (active) return AudioSession.overrideOutput("speaker"); })
+      .catch(() => {});
+    return () => {
+      active = false;
+      import("@capgo/capacitor-audio-session")
+        .then(({ AudioSession }) => AudioSession.overrideOutput("default"))
+        .catch(() => {});
+    };
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 

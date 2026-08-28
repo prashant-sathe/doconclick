@@ -106,6 +106,23 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Native app shell only (class set by NativeBootstrap): no browser-style
+     bounce/glow and no long-press text-selection callout, so it stops
+     feeling like a website. Left untouched on web. */
+  html.native-app body {
+    overscroll-behavior: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  html.native-app input,
+  html.native-app textarea,
+  html.native-app [contenteditable] {
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     letter-spacing: -0.025em;
@@ -377,6 +394,25 @@
 }
 .form-section-title {
   @apply text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2;
+}
+
+/* Safe-area top padding for sticky headers inside the native app shell, so
+   content clears the status bar / notch. No-op on web (both resolve to 0).
+
+   iOS WKWebView populates env(safe-area-inset-*). Android (Capacitor 8, which
+   is now always edge-to-edge on targetSdk 36) does NOT — its SystemBars plugin
+   instead injects --safe-area-inset-* custom properties onto <html>. Cover
+   both: prefer the injected var, fall back to env(). */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+  padding-top: var(--safe-area-inset-top, env(safe-area-inset-top));
+}
+
+/* Same idea for fixed bottom bars (mobile tab nav) clearing the home
+   indicator / gesture bar. */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom));
 }
 
 /* Leaflet doctor-marker hover tooltip — strip default box, our HTML supplies its own card */

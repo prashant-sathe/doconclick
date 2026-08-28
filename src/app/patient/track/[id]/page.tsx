@@ -1,4 +1,8 @@
 "use client";
+import "leaflet/dist/leaflet.css";
+import markerIconUrl from "leaflet/dist/images/marker-icon.png";
+import markerIcon2xUrl from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadowUrl from "leaflet/dist/images/marker-shadow.png";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -79,8 +83,9 @@ export default function PatientTrackDoctor() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
-        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconUrl: markerIconUrl.src,
+        iconRetinaUrl: markerIcon2xUrl.src,
+        shadowUrl: markerShadowUrl.src,
       });
 
       if (!leafletMapRef.current) {
@@ -124,8 +129,6 @@ export default function PatientTrackDoctor() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-slate-900">
-      {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       <div ref={mapRef} className="absolute inset-0 z-0" />
 
       <div className="absolute top-4 left-4 z-20">

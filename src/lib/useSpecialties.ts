@@ -12,8 +12,9 @@ export function useSpecialties() {
 
   useEffect(() => {
     fetch("/api/specialties")
-      .then((r) => r.json())
-      .then((d) => { setSpecialties(d); setLoading(false); });
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d) => { setSpecialties(d); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
 
   const colorFor = useCallback(

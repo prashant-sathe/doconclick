@@ -1,14 +1,33 @@
 import { deleteToken, getToken, onMessage } from "firebase/messaging";
 import { getMessagingInstance } from "@/lib/firebaseClient";
+import { isNative, nativePlatform } from "@/lib/platform";
 
 const SUBSCRIBED_KEY = "doconclick_push_subscribed";
+const NATIVE_TOKEN_KEY = "doconclick_native_push_token";
 
 export function isPushSupported(): boolean {
+  if (isNative()) return true;
   return typeof window !== "undefined" && "serviceWorker" in navigator && "Notification" in window;
 }
 
 export function isMac(): boolean {
   return typeof navigator !== "undefined" && /Mac/i.test(navigator.userAgent);
+}
+
+// Native has its own OS-level permission model (checked via the Capacitor
+// plugin), unrelated to the DOM Notification API's `Notification.permission`
+// — that global exists inside the WebView but doesn't reflect real push
+// permission state there, so callers must go through this instead of
+// reading `Notification.permission` directly once native is in play.
+export async function getPushPermissionState(): Promise<NotificationPermission> {
+  if (isNative()) {
+    const { PushNotifications } = await import("@capacitor/push-notifications");
+    const { receive } = await PushNotifications.checkPermissions();
+    if (receive === "granted") return "granted";
+    if (receive === "denied") return "denied";
+    return "default";
+  }
+  return Notification.permission;
 }
 
 // Browser-level Notification permission can be "granted" while the OS itself
@@ -40,7 +59,31 @@ export async function fetchPushSubscriptionStatus(): Promise<boolean> {
   return !!data?.subscribed;
 }
 
+async function subscribeToPushNative(): Promise<boolean> {
+  const { PushNotifications } = await import("@capacitor/push-notifications");
+
+  const { receive } = await PushNotifications.requestPermissions();
+  if (receive !== "granted") return false;
+
+  const token = await new Promise<string | null>((resolve) => {
+    PushNotifications.addListener("registration", (t) => resolve(t.value));
+    PushNotifications.addListener("registrationError", () => resolve(null));
+    PushNotifications.register();
+  });
+  if (!token) return false;
+
+  await fetch("/api/push/subscribe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, userAgent: `capacitor-${nativePlatform()}` }),
+  });
+  localStorage.setItem(NATIVE_TOKEN_KEY, token);
+  localStorage.setItem(SUBSCRIBED_KEY, "1");
+  return true;
+}
+
 export async function subscribeToPush(): Promise<boolean> {
+  if (isNative()) return subscribeToPushNative();
   if (!isPushSupported()) return false;
 
   const messaging = await getMessagingInstance();
@@ -77,6 +120,10 @@ export async function subscribeToPush(): Promise<boolean> {
 // require `registration.showNotification()` instead. Click handling for
 // these lives in the service worker's `notificationclick` listener, not here.
 export async function listenForForegroundPush(): Promise<void> {
+  // Native foreground delivery is handled by the OS + the
+  // pushNotificationActionPerformed listener in NativeBootstrap — this
+  // function is web-only (service worker based).
+  if (isNative()) return;
   if (!isPushSupported() || Notification.permission !== "granted") return;
   const messaging = await getMessagingInstance();
   if (!messaging) return;
@@ -93,6 +140,20 @@ export async function listenForForegroundPush(): Promise<void> {
 }
 
 export async function unsubscribeFromPush(): Promise<void> {
+  if (isNative()) {
+    const token = localStorage.getItem(NATIVE_TOKEN_KEY);
+    if (token) {
+      await fetch("/api/push/subscribe", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      }).catch(() => {});
+    }
+    localStorage.removeItem(NATIVE_TOKEN_KEY);
+    localStorage.removeItem(SUBSCRIBED_KEY);
+    return;
+  }
+
   const messaging = await getMessagingInstance();
   if (!messaging) return;
 
@@ -112,14 +173,17 @@ export async function unsubscribeFromPush(): Promise<void> {
 // token and tells the server to drop every token on the account, so "off"
 // here actually means off everywhere, not just on the current browser.
 export async function unsubscribeAllPush(): Promise<void> {
-  const messaging = await getMessagingInstance();
-  if (messaging) {
-    await deleteToken(messaging).catch(() => {});
+  if (!isNative()) {
+    const messaging = await getMessagingInstance();
+    if (messaging) {
+      await deleteToken(messaging).catch(() => {});
+    }
   }
   await fetch("/api/push/subscribe", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({}),
   }).catch(() => {});
+  localStorage.removeItem(NATIVE_TOKEN_KEY);
   localStorage.removeItem(SUBSCRIBED_KEY);
 }

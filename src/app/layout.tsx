@@ -1,11 +1,21 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
+import { NativeBootstrap } from "@/components/NativeBootstrap";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+
+// viewportFit: "cover" lets content draw under the status bar/notch inside
+// the native app shell, so env(safe-area-inset-*) below actually activates.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -53,7 +63,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    // suppressHydrationWarning: the Capacitor native shell injects
+    // --safe-area-inset-* as an inline style on <html> before React
+    // hydrates, which otherwise mismatches the SSR output and made
+    // hydration fail silently app-wide inside the Android WebView.
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -61,7 +75,11 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <NativeBootstrap />
+          <OfflineBanner />
+          {children}
+        </AuthProvider>
       </body>
       <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
     </html>

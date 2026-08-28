@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- android:windowSplashScreenBrandingImage is a real API 31+ framework
+         attribute with no androidx compat-library wrapper (unlike the other
+         windowSplashScreen* items in the base styles.xml), so it can only be
+         set here in a version-qualified override. -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen.IconBackground">
+        <item name="android:windowSplashScreenBrandingImage">@drawable/splash_branding</item>
+    </style>
+</resources>

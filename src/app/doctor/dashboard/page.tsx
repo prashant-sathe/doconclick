@@ -19,6 +19,8 @@ import { FREQUENCY_OPTIONS, DURATION_OPTIONS, TEST_SUGGESTIONS } from "@/lib/med
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { cn, formatDoctorName } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { isNative, getCurrentPositionCompat } from "@/lib/platform";
+import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
 
 interface DoctorProfile {
   specialty: string;
@@ -214,7 +216,18 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
     }
     if (files.length > 0) {
       const form = new FormData();
-      files.forEach((f) => form.append("file", f));
+      // Re-read each picked File into memory before appending: on Android the
+      // WebView can't stream a content:// -backed File into a fetch() multipart
+      // body, which fails the whole request with "Failed to fetch".
+      for (const f of files) {
+        const bytes = await new Promise<ArrayBuffer>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as ArrayBuffer);
+          reader.onerror = () => reject(reader.error ?? new Error("Could not read the file"));
+          reader.readAsArrayBuffer(f);
+        });
+        form.append("file", new Blob([bytes], { type: f.type || "application/octet-stream" }), f.name);
+      }
       const res = await fetch(`/api/appointments/${appt.id}/prescription`, { method: "POST", body: form });
       if (!res.ok) {
         setBusy(false);
@@ -464,14 +477,15 @@ export default function DoctorDashboard() {
   const unreadTotalRef = useRef<number | null>(null);
   const loadAppointments = useCallback(() => {
     fetch("/api/appointments/me")
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : []))
       .then((d: Appointment[]) => {
         setAppointments(d);
         setLoadingAppts(false);
         const total = d.reduce((sum, a) => sum + a.unreadMessageCount, 0);
         if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
         unreadTotalRef.current = total;
-      });
+      })
+      .catch(() => setLoadingAppts(false));
   }, []);
 
   // Ticks the video-call payment-unlock countdown independently of the 5s data poll.
@@ -540,8 +554,29 @@ export default function DoctorDashboard() {
   };
 
   const startJourney = (apptId: string) => {
-    if (!navigator.geolocation) return;
     setStartingJourneyId(apptId);
+
+    if (isNative()) {
+      // Native: a background-geolocation watcher survives the app being
+      // backgrounded/screen locked, unlike navigator.geolocation below.
+      getCurrentPositionCompat({ enableHighAccuracy: true })
+        .then(async (pos) => {
+          await sendPosition(apptId, "ON_THE_WAY", pos.coords.latitude, pos.coords.longitude);
+          setStartingJourneyId(null);
+          loadAppointments();
+          lastSentRef.current = Date.now();
+          await startBackgroundLocationWatch((lat, lng) => {
+            const now = Date.now();
+            if (now - lastSentRef.current < 10000) return; // throttle to ~1 update/10s
+            lastSentRef.current = now;
+            sendPosition(apptId, "ON_THE_WAY", lat, lng);
+          });
+        })
+        .catch(() => setStartingJourneyId(null));
+      return;
+    }
+
+    if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         await sendPosition(apptId, "ON_THE_WAY", pos.coords.latitude, pos.coords.longitude);
@@ -565,7 +600,9 @@ export default function DoctorDashboard() {
   };
 
   const markArrived = async (apptId: string) => {
-    if (watchIdRef.current != null) {
+    if (isNative()) {
+      await stopBackgroundLocationWatch();
+    } else if (watchIdRef.current != null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
     }
@@ -575,7 +612,11 @@ export default function DoctorDashboard() {
 
   useEffect(() => {
     return () => {
-      if (watchIdRef.current != null) navigator.geolocation.clearWatch(watchIdRef.current);
+      if (isNative()) {
+        stopBackgroundLocationWatch();
+      } else if (watchIdRef.current != null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
     };
   }, []);
 

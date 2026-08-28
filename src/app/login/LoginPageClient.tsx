@@ -1,10 +1,11 @@
 "use client";
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Phone, Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
+import { isNative } from "@/lib/platform";
 
 const ROLE_HOME: Record<string, string> = {
   ADMIN:   "/admin",
@@ -175,11 +176,21 @@ function LoginForm() {
 }
 
 export default function LoginPageClient() {
+  // Capacitor.isNativePlatform() is already `true` by the time the client
+  // hydrates, but the server always renders as web (no `window`) — calling
+  // isNative() directly here would mismatch the SSR output and silently
+  // break hydration for the whole page. Default to the server's answer and
+  // correct it after mount, once hydration has safely committed.
+  const [native, setNative] = useState(false);
+  useEffect(() => setNative(isNative()), []);
+
   return (
     <div className="min-h-screen gradient-surface flex items-center justify-center p-6">
-      <div className="fixed top-5 left-6">
-        <Link href="/" className="btn-ghost gap-1.5 text-sm">← Home</Link>
-      </div>
+      {!native && (
+        <div className="fixed top-5 left-6">
+          <Link href="/" className="btn-ghost gap-1.5 text-sm">← Home</Link>
+        </div>
+      )}
       <Suspense fallback={<div className="text-slate-400">Loading…</div>}>
         <LoginForm />
       </Suspense>

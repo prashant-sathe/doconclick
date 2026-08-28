@@ -37,8 +37,8 @@ export async function verifyPassword(plain: string, hash: string): Promise<boole
 // ──────────────────────────────────────────────────────────────
 // JWT helpers
 // ──────────────────────────────────────────────────────────────
-export function signToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+export function signToken(payload: JWTPayload, expiresIn: jwt.SignOptions["expiresIn"] = "7d"): string {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn });
 }
 
 export function verifyToken(token: string): JWTPayload | null {

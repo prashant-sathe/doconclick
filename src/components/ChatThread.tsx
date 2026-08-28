@@ -1,8 +1,10 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Send, Paperclip, FileText, Download } from "lucide-react";
+import { Loader2, Send, Paperclip, FileText, Download, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { downloadOrShareUrl } from "@/lib/nativeDownload";
+import { isNative } from "@/lib/platform";
 
 interface ChatMessage {
   id: string;
@@ -15,6 +17,21 @@ interface ChatMessage {
 }
 
 const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
+
+const EXT_MIME: Record<string, string> = {
+  pdf: "application/pdf",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+};
+
+// Android's file picker sometimes hands back a File with an empty `type`;
+// fall back to the extension so the server's MIME allow-list still passes.
+function resolveMime(file: File): string {
+  if (file.type) return file.type;
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+  return EXT_MIME[ext] ?? "application/octet-stream";
+}
 
 function downloadUrl(fileUrl: string, fileName: string | null, disposition: "inline" | "attachment") {
   return `/api/files/download?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName ?? "file")}&disposition=${disposition}`;
@@ -38,6 +55,8 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
   const [uploadError, setUploadError] = useState("");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [pendingPreviewUrl, setPendingPreviewUrl] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messageCountRef = useRef(0);
@@ -89,26 +108,55 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
     }
     setUploading(true);
     setUploadError("");
-    const form = new FormData();
-    form.append("file", file);
-    const uploadRes = await fetch(`/api/appointments/${appointmentId}/messages/upload`, {
-      method: "POST",
-      body: form,
-    });
-    if (!uploadRes.ok) {
+    try {
+      // A File straight from <input type="file"> is backed by a content:// URI
+      // on Android; the WebView often can't stream those bytes into a fetch()
+      // multipart body ("Failed to fetch"). Re-read into memory via FileReader
+      // (the reliable path for content:// URIs) and send a fresh Blob, matching
+      // what the image-crop uploads already do.
+      const bytes = await new Promise<ArrayBuffer>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as ArrayBuffer);
+        reader.onerror = () => reject(reader.error ?? new Error("Could not read the file"));
+        reader.readAsArrayBuffer(file);
+      });
+      const blob = new Blob([bytes], { type: resolveMime(file) });
+      const form = new FormData();
+      form.append("file", blob, file.name);
+
+      const uploadRes = await fetch(`/api/appointments/${appointmentId}/messages/upload`, {
+        method: "POST",
+        body: form,
+      });
+      if (!uploadRes.ok) {
+        setUploadError((await uploadRes.json().catch(() => ({}))).error ?? "Could not upload file.");
+        return;
+      }
+      const { url, fileName, fileType } = await uploadRes.json();
+      const sendRes = await fetch(`/api/appointments/${appointmentId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: "", fileUrl: url, fileName, fileType }),
+      });
+      if (sendRes.ok) load();
+      else setUploadError((await sendRes.json().catch(() => ({}))).error ?? "Could not send file.");
+    } catch {
+      setUploadError("Could not upload that file. Please try again.");
+    } finally {
       setUploading(false);
-      setUploadError((await uploadRes.json().catch(() => ({}))).error ?? "Could not upload file.");
-      return;
     }
-    const { url, fileName, fileType } = await uploadRes.json();
-    const sendRes = await fetch(`/api/appointments/${appointmentId}/messages`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: "", fileUrl: url, fileName, fileType }),
-    });
-    setUploading(false);
-    if (sendRes.ok) load();
-    else setUploadError((await sendRes.json().catch(() => ({}))).error ?? "Could not send file.");
+  };
+
+  // Web: let the <a> download normally. Native: the WebView ignores <a download>,
+  // so intercept and hand the file to the OS share sheet instead.
+  const onAttachmentClick = (e: React.MouseEvent, m: ChatMessage) => {
+    if (!isNative() || !m.fileUrl) return;
+    e.preventDefault();
+    if (downloadingId) return;
+    setDownloadingId(m.id);
+    downloadOrShareUrl(downloadUrl(m.fileUrl, m.fileName, "attachment"), m.fileName ?? "attachment")
+      .catch(() => setError("Could not download that attachment."))
+      .finally(() => setDownloadingId(null));
   };
 
   const accentBubble = accent === "teal" ? "bg-teal-600" : "bg-blue-600";
@@ -139,13 +187,18 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                 )}>
                   {m.fileUrl && (
                     m.fileType?.startsWith("image/") ? (
-                      <a href={downloadUrl(m.fileUrl, m.fileName, "inline")} target="_blank" rel="noopener noreferrer" className="block mb-1.5 -mx-1">
+                      <button
+                        type="button"
+                        onClick={() => setLightboxUrl(downloadUrl(m.fileUrl!, m.fileName, "inline"))}
+                        className="block mb-1.5 -mx-1 w-full"
+                      >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={downloadUrl(m.fileUrl, m.fileName, "inline")} alt={m.fileName ?? "Attachment"} className="max-w-full rounded-lg max-h-64 object-cover" />
-                      </a>
+                      </button>
                     ) : (
                       <a
                         href={downloadUrl(m.fileUrl, m.fileName, "attachment")}
+                        onClick={(e) => onAttachmentClick(e, m)}
                         className={cn(
                           "flex items-center gap-2 rounded-lg px-2.5 py-2 mb-1.5 text-xs font-medium",
                           mine ? "bg-white/15 hover:bg-white/25" : "bg-slate-50 hover:bg-slate-100"
@@ -153,7 +206,9 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                       >
                         <FileText className="w-4 h-4 flex-shrink-0" />
                         <span className="truncate flex-1">{m.fileName ?? "Attachment"}</span>
-                        <Download className="w-3.5 h-3.5 flex-shrink-0" />
+                        {downloadingId === m.id
+                          ? <Loader2 className="w-3.5 h-3.5 flex-shrink-0 animate-spin" />
+                          : <Download className="w-3.5 h-3.5 flex-shrink-0" />}
                       </a>
                     )
                   )}
@@ -248,6 +303,31 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
             setPendingPreviewUrl(null);
           }}
         />
+      )}
+
+      {lightboxUrl && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setLightboxUrl(null)}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxUrl(null)}
+            className="absolute top-4 right-4 text-white/80 hover:text-white"
+            aria-label="Close"
+          >
+            <X className="w-7 h-7" />
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={lightboxUrl}
+            alt="Attachment"
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-full max-w-full object-contain rounded-lg"
+          />
+        </div>
       )}
     </div>
   );

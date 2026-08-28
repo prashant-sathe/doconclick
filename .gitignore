@@ -43,3 +43,16 @@ next-env.d.ts
 
 # user-uploaded files (dev-local storage; use cloud storage in production)
 /public/uploads/
+
+# Capacitor (android/ios native projects are committed; build output isn't)
+/android/app/build/
+/android/build/
+/android/.gradle/
+/android/local.properties
+/android/app/src/main/assets/public/
+/android/app/src/main/assets/capacitor.config.json
+/android/captures/
+/ios/App/App/public/
+/ios/App/Pods/
+/ios/App/build/
+/ios/App/DerivedData/

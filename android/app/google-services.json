@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "642151905827",
+    "project_id": "doconclick",
+    "storage_bucket": "doconclick.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642151905827:android:e488b262e48e0333450f96",
+        "android_client_info": {
+          "package_name": "com.doconclick.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWaNtqIcoEJ9ZXe5oGW3nLfr0BSwd6nY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642151905827:android:81f74c24365169f7450f96",
+        "android_client_info": {
+          "package_name": "com.doconclick.doconclick_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWaNtqIcoEJ9ZXe5oGW3nLfr0BSwd6nY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

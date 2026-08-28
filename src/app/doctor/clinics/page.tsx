@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
+import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
@@ -155,8 +156,8 @@ function ClinicCard({ clinic, onChange, onSave, onDelete }: {
     onChange({ ...clinic, [key]: value, saved: false });
 
   const useCurrentLocation = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) => {
+    if (!isNative() && !navigator.geolocation) return;
+    getCurrentPositionCompat().then((pos) => {
       onChange({
         ...clinic,
         lat: pos.coords.latitude,
@@ -316,7 +317,7 @@ export default function DoctorClinicsPage() {
     if (!user || user.role !== "DOCTOR") return;
     let cancelled = false;
     fetch("/api/doctors/me/clinics")
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : []))
       .then((data: ClinicApiShape[]) => {
         if (cancelled) return;
         setClinics(data.map((c) => ({
@@ -326,7 +327,8 @@ export default function DoctorClinicsPage() {
           saving: false, saved: false, error: "",
         })));
         setLoading(false);
-      });
+      })
+      .catch(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
@@ -387,7 +389,6 @@ export default function DoctorClinicsPage() {
 
   return (
     <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       <DoctorHeader />
       <DoctorMobileNav />
 
