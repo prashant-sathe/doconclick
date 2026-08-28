@@ -46,6 +46,7 @@ export function ImpersonationBanner({
     <div
       ref={barRef}
       className="fixed top-0 inset-x-0 z-[95] bg-amber-500 text-amber-950 px-4 py-2 flex flex-wrap items-center justify-center gap-3 text-sm font-semibold shadow-md"
+      style={{ paddingTop: "calc(0.5rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
     >
       <span>
         Viewing as this account — logged in as admin <strong>{adminName}</strong>

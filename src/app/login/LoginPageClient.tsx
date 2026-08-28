@@ -185,7 +185,7 @@ export default function LoginPageClient() {
   useEffect(() => setNative(isNative()), []);
 
   return (
-    <div className="min-h-screen gradient-surface flex items-center justify-center p-6">
+    <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       {!native && (
         <div className="fixed top-5 left-6">
           <Link href="/" className="btn-ghost gap-1.5 text-sm">← Home</Link>

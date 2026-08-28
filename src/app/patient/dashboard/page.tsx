@@ -775,7 +775,10 @@ function PatientDashboardInner() {
 
       {/* ── Top bar ────────────────────────────────────────────────── */}
       <div className="absolute top-0 inset-x-0 z-20 pointer-events-none">
-        <div className="flex items-start justify-between p-3 sm:p-4 gap-2 sm:gap-3">
+        <div
+          className="flex items-start justify-between p-3 sm:p-4 gap-2 sm:gap-3"
+          style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
+        >
           {/* Logo / title */}
           <div className="glass-card rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 pointer-events-auto shadow-lg min-w-0">
             <img src="/logo-icon.png" alt="DocOnClick" className="w-8 h-8 sm:w-9 sm:h-9 object-contain flex-shrink-0" />
@@ -908,7 +911,7 @@ function PatientDashboardInner() {
       </div>
 
       {/* ── Doctor count badge ──────────────────────────────────────── */}
-      <div className="absolute bottom-20 sm:bottom-6 right-4 z-20 pointer-events-none">
+      <div className="absolute bottom-[calc(5rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] sm:bottom-6 right-4 z-20 pointer-events-none">
         <div className="glass-card rounded-2xl px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 pointer-events-auto">
           <Stethoscope className="w-4 h-4 text-blue-500" />
           <span className="text-xs sm:text-sm font-semibold text-slate-700">
@@ -938,6 +941,7 @@ function PatientDashboardInner() {
               backdropFilter: "blur(24px)",
               boxShadow: "0 -8px 40px rgba(0,0,0,0.15)",
               animation: "slideUp 0.35s cubic-bezier(0.32,0.72,0,1)",
+              paddingBottom: "var(--safe-area-inset-bottom, env(safe-area-inset-bottom))",
             }}
           >
             {/* Drag handle */}

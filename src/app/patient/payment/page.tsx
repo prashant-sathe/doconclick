@@ -186,8 +186,8 @@ function PaymentContent() {
 
 export default function PatientPayment() {
   return (
-    <div className="min-h-screen gradient-surface flex items-center justify-center p-6">
-      <div className="fixed top-5 left-6">
+    <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
+      <div className="fixed top-[calc(1.25rem_+_var(--safe-area-inset-top,env(safe-area-inset-top)))] left-6">
         <Link href="/patient/appointments" className="btn-ghost gap-1.5 text-sm">← Back</Link>
       </div>
       <div className="w-full max-w-md">

@@ -131,7 +131,7 @@ export default function PatientTrackDoctor() {
     <div className="relative w-screen h-screen overflow-hidden bg-slate-900">
       <div ref={mapRef} className="absolute inset-0 z-0" />
 
-      <div className="absolute top-4 left-4 z-20">
+      <div className="absolute top-[calc(1rem_+_var(--safe-area-inset-top,env(safe-area-inset-top)))] left-4 z-20">
         <Link href="/patient/appointments" className="glass-card rounded-xl px-3 py-2 flex items-center gap-1.5 text-sm font-semibold text-slate-700 shadow-lg">
           <ArrowLeft className="w-4 h-4" /> Back
         </Link>
@@ -152,7 +152,7 @@ export default function PatientTrackDoctor() {
           </div>
         </div>
       ) : (
-        <div className="absolute bottom-6 inset-x-0 z-20 flex justify-center px-4">
+        <div className="absolute bottom-[calc(1.5rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] inset-x-0 z-20 flex justify-center px-4">
           <div className="glass-card rounded-2xl p-5 w-full max-w-sm shadow-xl">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-11 h-11 rounded-xl bg-teal-500 flex items-center justify-center flex-shrink-0">

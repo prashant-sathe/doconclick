@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { KeyRound, ShieldCheck } from "lucide-react";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
+import { useIsNativeApp } from "@/hooks/useIsNativeApp";
 
 const ERROR_MESSAGES: Record<string, string> = {
   google_no_account: "No DocOnClick account uses that Google email. Sign in with your mobile number instead, or create an account.",
@@ -56,10 +57,14 @@ function ForgotPasswordContent() {
 }
 
 export default function ForgotPasswordPage() {
+  const native = useIsNativeApp();
+
   return (
-    <div className="min-h-screen gradient-surface flex items-center justify-center p-6">
-      <div className="fixed top-5 left-6">
-        <Link href="/" className="btn-ghost gap-1.5 text-sm">← Home</Link>
+    <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
+      <div className="fixed top-[calc(1.25rem_+_var(--safe-area-inset-top,env(safe-area-inset-top)))] left-6 z-10">
+        <Link href={native ? "/login" : "/"} className="btn-ghost gap-1.5 text-sm">
+          ← {native ? "Back" : "Home"}
+        </Link>
       </div>
       <Suspense fallback={<div className="text-slate-400">Loading…</div>}>
         <ForgotPasswordContent />

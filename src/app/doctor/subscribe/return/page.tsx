@@ -35,7 +35,7 @@ export default function DoctorSubscribeReturn() {
   }, []);
 
   return (
-    <div className="min-h-screen gradient-surface flex items-center justify-center p-6">
+    <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       {status === "checking" && (
         <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
           <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto mb-5" />

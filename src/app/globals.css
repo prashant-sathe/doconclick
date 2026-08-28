@@ -415,6 +415,16 @@
   padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom));
 }
 
+/* Full-viewport pages that own no sticky header (auth, payment result,
+   subscribe, complete-profile). Drop-in replacement for a plain `p-6`:
+   identical 1.5rem inset on web, grown past the status bar / home indicator
+   inside the native app shell. */
+.safe-screen {
+  padding: 1.5rem;
+  padding-top: calc(1.5rem + var(--safe-area-inset-top, env(safe-area-inset-top)));
+  padding-bottom: calc(1.5rem + var(--safe-area-inset-bottom, env(safe-area-inset-bottom)));
+}
+
 /* Leaflet doctor-marker hover tooltip — strip default box, our HTML supplies its own card */
 .doctor-marker-tooltip {
   background: transparent;

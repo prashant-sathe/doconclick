@@ -313,7 +313,10 @@ export default function DoctorSupportPage() {
 
   return (
     <div className="h-dvh flex flex-col bg-surface-50">
-      <header className="flex-shrink-0 bg-white/90 backdrop-blur-xl border-b border-slate-100 px-4 sm:px-7 py-3 flex items-center justify-between gap-3">
+      <header
+        className="flex-shrink-0 bg-white/90 backdrop-blur-xl border-b border-slate-100 px-4 sm:px-7 py-3 flex items-center justify-between gap-3"
+        style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
+      >
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={() => router.push("/doctor/dashboard")}
@@ -371,7 +374,10 @@ export default function DoctorSupportPage() {
         )}
       </div>
 
-      <div className="flex-shrink-0 border-t border-slate-100 bg-white px-4 sm:px-10 py-4">
+      <div
+        className="flex-shrink-0 border-t border-slate-100 bg-white px-4 sm:px-10 pt-4"
+        style={{ paddingBottom: "calc(1rem + var(--safe-area-inset-bottom, env(safe-area-inset-bottom)))" }}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();

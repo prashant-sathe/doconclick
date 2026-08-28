@@ -70,7 +70,7 @@ interface DoctorReview {
 function Header() {
   const { user } = useAuth();
   return (
-    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100">
+    <header className="safe-top sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-2">
           <img src="/logo-icon.png" alt="DocOnClick" className="w-8 h-8 object-contain" />

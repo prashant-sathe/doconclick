@@ -55,7 +55,7 @@ export default function DoctorPayment() {
   }
 
   return (
-    <div className="min-h-screen gradient-surface flex items-center justify-center p-6">
+    <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">

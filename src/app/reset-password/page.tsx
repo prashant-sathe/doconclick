@@ -55,7 +55,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen gradient-surface flex items-center justify-center p-6">
+    <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-xl">

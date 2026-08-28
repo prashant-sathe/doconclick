@@ -26,7 +26,7 @@ export default function Navbar() {
   const displayName = user ? (user.role === "DOCTOR" ? formatDoctorName(user.name) : user.name) : "";
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/20 bg-white/90 backdrop-blur-xl">
+    <nav className="safe-top fixed top-0 inset-x-0 z-50 border-b border-white/20 bg-white/90 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between gap-6">
         {/* Logo */}
         <Link href="/" className="flex items-center flex-shrink-0">
