@@ -93,15 +93,19 @@ export function NativeBootstrap() {
       }
 
       // --- Push notifications: alert channel + tap routing ---
+      // Firebase Cloud Messaging directly (via @capacitor-firebase/messaging)
+      // rather than @capacitor/push-notifications — the latter hands back a raw
+      // APNs token on iOS, which the FCM backend (firebase-admin) can't deliver
+      // to. This plugin returns a real FCM token on both platforms.
       try {
-        const { PushNotifications } = await import("@capacitor/push-notifications");
+        const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
         if (cancelled) return;
 
         if (platform === "android") {
           // Distinct from the Phase 4 foreground-service "sharing your
           // location" channel, so alerts and the location-tracking
           // persistent notification don't share settings/sound.
-          PushNotifications.createChannel({
+          FirebaseMessaging.createChannel({
             id: "doconclick-alerts",
             name: "Appointment alerts",
             description: "Appointment updates, doctor arrival, and other DocOnClick alerts",
@@ -110,11 +114,11 @@ export function NativeBootstrap() {
           }).catch(() => {});
         }
 
-        const tapListener = await PushNotifications.addListener(
-          "pushNotificationActionPerformed",
-          (action) => {
-            const url = action.notification.data?.url;
-            if (typeof url === "string" && url) router.push(url);
+        const tapListener = await FirebaseMessaging.addListener(
+          "notificationActionPerformed",
+          (event) => {
+            const data = event.notification?.data as { url?: string } | undefined;
+            if (data?.url) router.push(data.url);
           },
         );
         cleanups.push(() => tapListener.remove());

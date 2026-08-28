@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- An invisible "icon" for the Android 12+ system splash: a solid fill in the
+     splash background colour, so the OS launch splash renders as a plain
+     #F8FAFC screen with nothing on it. The only branded splash is then the
+     dynamic, admin-uploaded overlay (SplashOverlay.tsx). Android 12+ does not
+     allow removing the system splash entirely — this makes it imperceptible. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/splashBackground" />
+    <size android:width="288dp" android:height="288dp" />
+</shape>

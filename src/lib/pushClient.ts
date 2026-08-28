@@ -21,8 +21,8 @@ export function isMac(): boolean {
 // reading `Notification.permission` directly once native is in play.
 export async function getPushPermissionState(): Promise<NotificationPermission> {
   if (isNative()) {
-    const { PushNotifications } = await import("@capacitor/push-notifications");
-    const { receive } = await PushNotifications.checkPermissions();
+    const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
+    const { receive } = await FirebaseMessaging.checkPermissions();
     if (receive === "granted") return "granted";
     if (receive === "denied") return "denied";
     return "default";
@@ -60,16 +60,17 @@ export async function fetchPushSubscriptionStatus(): Promise<boolean> {
 }
 
 async function subscribeToPushNative(): Promise<boolean> {
-  const { PushNotifications } = await import("@capacitor/push-notifications");
+  const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
 
-  const { receive } = await PushNotifications.requestPermissions();
+  const { receive } = await FirebaseMessaging.requestPermissions();
   if (receive !== "granted") return false;
 
-  const token = await new Promise<string | null>((resolve) => {
-    PushNotifications.addListener("registration", (t) => resolve(t.value));
-    PushNotifications.addListener("registrationError", () => resolve(null));
-    PushNotifications.register();
-  });
+  // A real FCM registration token — the same thing on Android, and on iOS the
+  // plugin exchanges the APNs device token with Firebase for one. This is what
+  // the firebase-admin backend (sendEachForMulticast) needs; the raw APNs
+  // token the old @capacitor/push-notifications flow sent could never be
+  // delivered to.
+  const { token } = await FirebaseMessaging.getToken();
   if (!token) return false;
 
   await fetch("/api/push/subscribe", {
@@ -142,6 +143,8 @@ export async function listenForForegroundPush(): Promise<void> {
 export async function unsubscribeFromPush(): Promise<void> {
   if (isNative()) {
     const token = localStorage.getItem(NATIVE_TOKEN_KEY);
+    const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
+    await FirebaseMessaging.deleteToken().catch(() => {});
     if (token) {
       await fetch("/api/push/subscribe", {
         method: "DELETE",
@@ -173,7 +176,10 @@ export async function unsubscribeFromPush(): Promise<void> {
 // token and tells the server to drop every token on the account, so "off"
 // here actually means off everywhere, not just on the current browser.
 export async function unsubscribeAllPush(): Promise<void> {
-  if (!isNative()) {
+  if (isNative()) {
+    const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
+    await FirebaseMessaging.deleteToken().catch(() => {});
+  } else {
     const messaging = await getMessagingInstance();
     if (messaging) {
       await deleteToken(messaging).catch(() => {});

@@ -471,6 +471,9 @@ export const PlatformSettingsScalarFieldEnum = {
   clinicCommissionPercent: 'clinicCommissionPercent',
   videoCommissionPercent: 'videoCommissionPercent',
   homeCommissionPercent: 'homeCommissionPercent',
+  splashImageUrl: 'splashImageUrl',
+  splashFit: 'splashFit',
+  splashBgColor: 'splashBgColor',
   updatedAt: 'updatedAt'
 } as const
 

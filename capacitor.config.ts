@@ -1,3 +1,4 @@
+/// <reference types="@capacitor-firebase/messaging" />
 import type { CapacitorConfig } from "@capacitor/cli";
 
 // Points the native shell's WebView at the deployed production origin (this app
@@ -39,6 +40,20 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: false,
   },
+  experimental: {
+    ios: {
+      spm: {
+        // @capacitor-firebase/messaging pulls the Firebase iOS SDK over
+        // SwiftPM; symlinking its checkout avoids a SwiftPM package-identity
+        // collision (capawesome-team/capacitor-firebase#959). Capacitor CLI 8.4+.
+        packageOptions: {
+          "@capacitor-firebase/messaging": {
+            symlink: true,
+          },
+        },
+      },
+    },
+  },
   plugins: {
     SocialLogin: {
       // Only "Continue with Google" is used. Disabling the rest keeps the
@@ -59,8 +74,8 @@ const config: CapacitorConfig = {
       launchFadeOutDuration: 200,
       backgroundColor: "#F8FAFC",
     },
-    PushNotifications: {
-      // Show heads-up alerts even while the app is foregrounded.
+    FirebaseMessaging: {
+      // iOS: show heads-up alerts even while the app is foregrounded.
       presentationOptions: ["badge", "sound", "alert"],
     },
     Keyboard: {

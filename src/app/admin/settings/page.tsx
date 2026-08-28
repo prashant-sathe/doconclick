@@ -1,6 +1,7 @@
 "use client";
 import { Settings, Info } from "lucide-react";
 import NotificationSettings from "@/components/NotificationSettings";
+import SplashSettings from "@/components/SplashSettings";
 
 export default function AdminSettings() {
   return (
@@ -9,7 +10,7 @@ export default function AdminSettings() {
         <h1 className="text-2xl font-extrabold text-slate-900">Platform Settings</h1>
         <p className="text-slate-500 text-sm mt-1">General configuration for DocOnClick.</p>
       </div>
-      <div className="max-w-lg space-y-6">
+      <div className="max-w-2xl space-y-6">
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
@@ -27,6 +28,8 @@ export default function AdminSettings() {
         </div>
 
         <NotificationSettings />
+
+        <SplashSettings />
       </div>
     </div>
   );

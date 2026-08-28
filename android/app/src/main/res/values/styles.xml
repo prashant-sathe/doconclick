@@ -17,16 +17,21 @@
 
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen.IconBackground">
-        <item name="android:background">@drawable/splash</item>
+        <!-- Plain colour, not a logo drawable: the branded splash is the
+             dynamic (admin-uploaded) overlay rendered by the WebView
+             (SplashOverlay.tsx). Showing a logo here too made it look like
+             two separate splash screens. -->
+        <item name="android:background">@color/splashBackground</item>
         <!-- Android 12+ (API 31+) uses the real system Splash Screen API instead
              of the drawable above, and shows only the launcher icon unless these
              are set explicitly. The branding image (wordmark under the icon) is
              a real platform attribute with no compat-library wrapper, so it's
              set via android:windowSplashScreenBrandingImage in values-v31 instead. -->
         <item name="windowSplashScreenBackground">@color/splashBackground</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
-        <!-- Without this, Android draws a default white disc behind a
-             foreground-only icon; make it blend into the page instead. -->
+        <!-- Invisible icon: the only branded splash is the dynamic overlay
+             (SplashOverlay.tsx). Android 12+ won't let the system splash be
+             removed, so it's rendered as a plain #F8FAFC screen instead. -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_blank_icon</item>
         <item name="windowSplashScreenIconBackgroundColor">@color/splashBackground</item>
     </style>
 </resources>

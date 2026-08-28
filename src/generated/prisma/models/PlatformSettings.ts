@@ -43,6 +43,9 @@ export type PlatformSettingsMinAggregateOutputType = {
   clinicCommissionPercent: number | null
   videoCommissionPercent: number | null
   homeCommissionPercent: number | null
+  splashImageUrl: string | null
+  splashFit: string | null
+  splashBgColor: string | null
   updatedAt: Date | null
 }
 
@@ -51,6 +54,9 @@ export type PlatformSettingsMaxAggregateOutputType = {
   clinicCommissionPercent: number | null
   videoCommissionPercent: number | null
   homeCommissionPercent: number | null
+  splashImageUrl: string | null
+  splashFit: string | null
+  splashBgColor: string | null
   updatedAt: Date | null
 }
 
@@ -59,6 +65,9 @@ export type PlatformSettingsCountAggregateOutputType = {
   clinicCommissionPercent: number
   videoCommissionPercent: number
   homeCommissionPercent: number
+  splashImageUrl: number
+  splashFit: number
+  splashBgColor: number
   updatedAt: number
   _all: number
 }
@@ -81,6 +90,9 @@ export type PlatformSettingsMinAggregateInputType = {
   clinicCommissionPercent?: true
   videoCommissionPercent?: true
   homeCommissionPercent?: true
+  splashImageUrl?: true
+  splashFit?: true
+  splashBgColor?: true
   updatedAt?: true
 }
 
@@ -89,6 +101,9 @@ export type PlatformSettingsMaxAggregateInputType = {
   clinicCommissionPercent?: true
   videoCommissionPercent?: true
   homeCommissionPercent?: true
+  splashImageUrl?: true
+  splashFit?: true
+  splashBgColor?: true
   updatedAt?: true
 }
 
@@ -97,6 +112,9 @@ export type PlatformSettingsCountAggregateInputType = {
   clinicCommissionPercent?: true
   videoCommissionPercent?: true
   homeCommissionPercent?: true
+  splashImageUrl?: true
+  splashFit?: true
+  splashBgColor?: true
   updatedAt?: true
   _all?: true
 }
@@ -192,6 +210,9 @@ export type PlatformSettingsGroupByOutputType = {
   clinicCommissionPercent: number
   videoCommissionPercent: number
   homeCommissionPercent: number
+  splashImageUrl: string | null
+  splashFit: string
+  splashBgColor: string
   updatedAt: Date
   _count: PlatformSettingsCountAggregateOutputType | null
   _avg: PlatformSettingsAvgAggregateOutputType | null
@@ -223,6 +244,9 @@ export type PlatformSettingsWhereInput = {
   clinicCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   videoCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   homeCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  splashImageUrl?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
+  splashFit?: Prisma.StringFilter<"PlatformSettings"> | string
+  splashBgColor?: Prisma.StringFilter<"PlatformSettings"> | string
   updatedAt?: Prisma.DateTimeFilter<"PlatformSettings"> | Date | string
 }
 
@@ -231,6 +255,9 @@ export type PlatformSettingsOrderByWithRelationInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  splashImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  splashFit?: Prisma.SortOrder
+  splashBgColor?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -242,6 +269,9 @@ export type PlatformSettingsWhereUniqueInput = Prisma.AtLeast<{
   clinicCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   videoCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   homeCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  splashImageUrl?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
+  splashFit?: Prisma.StringFilter<"PlatformSettings"> | string
+  splashBgColor?: Prisma.StringFilter<"PlatformSettings"> | string
   updatedAt?: Prisma.DateTimeFilter<"PlatformSettings"> | Date | string
 }, "id">
 
@@ -250,6 +280,9 @@ export type PlatformSettingsOrderByWithAggregationInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  splashImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  splashFit?: Prisma.SortOrder
+  splashBgColor?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PlatformSettingsCountOrderByAggregateInput
   _avg?: Prisma.PlatformSettingsAvgOrderByAggregateInput
@@ -266,6 +299,9 @@ export type PlatformSettingsScalarWhereWithAggregatesInput = {
   clinicCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   videoCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   homeCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  splashImageUrl?: Prisma.StringNullableWithAggregatesFilter<"PlatformSettings"> | string | null
+  splashFit?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
+  splashBgColor?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PlatformSettings"> | Date | string
 }
 
@@ -274,6 +310,9 @@ export type PlatformSettingsCreateInput = {
   clinicCommissionPercent?: number
   videoCommissionPercent?: number
   homeCommissionPercent?: number
+  splashImageUrl?: string | null
+  splashFit?: string
+  splashBgColor?: string
   updatedAt?: Date | string
 }
 
@@ -282,6 +321,9 @@ export type PlatformSettingsUncheckedCreateInput = {
   clinicCommissionPercent?: number
   videoCommissionPercent?: number
   homeCommissionPercent?: number
+  splashImageUrl?: string | null
+  splashFit?: string
+  splashBgColor?: string
   updatedAt?: Date | string
 }
 
@@ -290,6 +332,9 @@ export type PlatformSettingsUpdateInput = {
   clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  splashFit?: Prisma.StringFieldUpdateOperationsInput | string
+  splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -298,6 +343,9 @@ export type PlatformSettingsUncheckedUpdateInput = {
   clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  splashFit?: Prisma.StringFieldUpdateOperationsInput | string
+  splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -306,6 +354,9 @@ export type PlatformSettingsCreateManyInput = {
   clinicCommissionPercent?: number
   videoCommissionPercent?: number
   homeCommissionPercent?: number
+  splashImageUrl?: string | null
+  splashFit?: string
+  splashBgColor?: string
   updatedAt?: Date | string
 }
 
@@ -314,6 +365,9 @@ export type PlatformSettingsUpdateManyMutationInput = {
   clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  splashFit?: Prisma.StringFieldUpdateOperationsInput | string
+  splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -322,6 +376,9 @@ export type PlatformSettingsUncheckedUpdateManyInput = {
   clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  splashFit?: Prisma.StringFieldUpdateOperationsInput | string
+  splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -330,6 +387,9 @@ export type PlatformSettingsCountOrderByAggregateInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  splashImageUrl?: Prisma.SortOrder
+  splashFit?: Prisma.SortOrder
+  splashBgColor?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -344,6 +404,9 @@ export type PlatformSettingsMaxOrderByAggregateInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  splashImageUrl?: Prisma.SortOrder
+  splashFit?: Prisma.SortOrder
+  splashBgColor?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -352,6 +415,9 @@ export type PlatformSettingsMinOrderByAggregateInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  splashImageUrl?: Prisma.SortOrder
+  splashFit?: Prisma.SortOrder
+  splashBgColor?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -368,6 +434,9 @@ export type PlatformSettingsSelect<ExtArgs extends runtime.Types.Extensions.Inte
   clinicCommissionPercent?: boolean
   videoCommissionPercent?: boolean
   homeCommissionPercent?: boolean
+  splashImageUrl?: boolean
+  splashFit?: boolean
+  splashBgColor?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["platformSettings"]>
 
@@ -376,6 +445,9 @@ export type PlatformSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   clinicCommissionPercent?: boolean
   videoCommissionPercent?: boolean
   homeCommissionPercent?: boolean
+  splashImageUrl?: boolean
+  splashFit?: boolean
+  splashBgColor?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["platformSettings"]>
 
@@ -384,6 +456,9 @@ export type PlatformSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   clinicCommissionPercent?: boolean
   videoCommissionPercent?: boolean
   homeCommissionPercent?: boolean
+  splashImageUrl?: boolean
+  splashFit?: boolean
+  splashBgColor?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["platformSettings"]>
 
@@ -392,10 +467,13 @@ export type PlatformSettingsSelectScalar = {
   clinicCommissionPercent?: boolean
   videoCommissionPercent?: boolean
   homeCommissionPercent?: boolean
+  splashImageUrl?: boolean
+  splashFit?: boolean
+  splashBgColor?: boolean
   updatedAt?: boolean
 }
 
-export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "updatedAt", ExtArgs["result"]["platformSettings"]>
+export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "splashImageUrl" | "splashFit" | "splashBgColor" | "updatedAt", ExtArgs["result"]["platformSettings"]>
 
 export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlatformSettings"
@@ -405,6 +483,9 @@ export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.In
     clinicCommissionPercent: number
     videoCommissionPercent: number
     homeCommissionPercent: number
+    splashImageUrl: string | null
+    splashFit: string
+    splashBgColor: string
     updatedAt: Date
   }, ExtArgs["result"]["platformSettings"]>
   composites: {}
@@ -833,6 +914,9 @@ export interface PlatformSettingsFieldRefs {
   readonly clinicCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly videoCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly homeCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly splashImageUrl: Prisma.FieldRef<"PlatformSettings", 'String'>
+  readonly splashFit: Prisma.FieldRef<"PlatformSettings", 'String'>
+  readonly splashBgColor: Prisma.FieldRef<"PlatformSettings", 'String'>
   readonly updatedAt: Prisma.FieldRef<"PlatformSettings", 'DateTime'>
 }
     

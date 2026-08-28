@@ -407,5 +407,13 @@ model PlatformSettings {
   clinicCommissionPercent Float    @default(10)
   videoCommissionPercent  Float    @default(10)
   homeCommissionPercent   Float    @default(10)
+  // Mobile app splash: admin uploads an image that the native shell shows over
+  // the WebView while it boots (the real native splash is baked into the app
+  // binary and can't change without a store update — this is the dynamic layer
+  // on top). splashFit: "cover" (full-bleed) or "contain" (centred logo on
+  // splashBgColor). See SplashOverlay.tsx / /api/app-config.
+  splashImageUrl          String?
+  splashFit               String   @default("cover") // "cover", "contain"
+  splashBgColor           String   @default("#F8FAFC")
   updatedAt               DateTime @updatedAt
 }

@@ -4,6 +4,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import { NativeBootstrap } from "@/components/NativeBootstrap";
+import { SplashOverlay } from "@/components/SplashOverlay";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 
@@ -75,6 +76,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <SplashOverlay />
         <AuthProvider>
           <NativeBootstrap />
           <OfflineBanner />
