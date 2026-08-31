@@ -33,6 +33,7 @@ export async function GET() {
         ...a,
         amount: safeNum(a.amount),
         platformFee: safeNum(a.platformFee),
+        discountAmount: safeNum(a.discountAmount),
         unreadMessageCount: _count.messages,
       }))
     );

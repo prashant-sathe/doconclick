@@ -74,7 +74,9 @@ export const ModelName = {
   Announcement: 'Announcement',
   AnnouncementRecipient: 'AnnouncementRecipient',
   ImpersonationLog: 'ImpersonationLog',
-  PlatformSettings: 'PlatformSettings'
+  PlatformSettings: 'PlatformSettings',
+  Coupon: 'Coupon',
+  CouponRedemption: 'CouponRedemption'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -239,6 +241,9 @@ export const AppointmentScalarFieldEnum = {
   isEmergency: 'isEmergency',
   amount: 'amount',
   platformFee: 'platformFee',
+  couponId: 'couponId',
+  couponCode: 'couponCode',
+  discountAmount: 'discountAmount',
   cashfreeOrderId: 'cashfreeOrderId',
   cashfreePaymentId: 'cashfreePaymentId',
   settlementId: 'settlementId',
@@ -308,6 +313,8 @@ export const DoctorPaymentLogScalarFieldEnum = {
   doctorId: 'doctorId',
   type: 'type',
   amount: 'amount',
+  couponCode: 'couponCode',
+  discountAmount: 'discountAmount',
   cashfreePaymentId: 'cashfreePaymentId',
   createdAt: 'createdAt'
 } as const
@@ -478,6 +485,46 @@ export const PlatformSettingsScalarFieldEnum = {
 } as const
 
 export type PlatformSettingsScalarFieldEnum = (typeof PlatformSettingsScalarFieldEnum)[keyof typeof PlatformSettingsScalarFieldEnum]
+
+
+export const CouponScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  description: 'description',
+  discountType: 'discountType',
+  discountValue: 'discountValue',
+  maxDiscount: 'maxDiscount',
+  minAmount: 'minAmount',
+  appliesTo: 'appliesTo',
+  consultTypes: 'consultTypes',
+  maxRedemptions: 'maxRedemptions',
+  perUserLimit: 'perUserLimit',
+  usedCount: 'usedCount',
+  startsAt: 'startsAt',
+  expiresAt: 'expiresAt',
+  isActive: 'isActive',
+  createdByAdminId: 'createdByAdminId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CouponScalarFieldEnum = (typeof CouponScalarFieldEnum)[keyof typeof CouponScalarFieldEnum]
+
+
+export const CouponRedemptionScalarFieldEnum = {
+  id: 'id',
+  couponId: 'couponId',
+  userId: 'userId',
+  kind: 'kind',
+  appointmentId: 'appointmentId',
+  orderId: 'orderId',
+  discountAmount: 'discountAmount',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CouponRedemptionScalarFieldEnum = (typeof CouponRedemptionScalarFieldEnum)[keyof typeof CouponRedemptionScalarFieldEnum]
 
 
 export const SortOrder = {

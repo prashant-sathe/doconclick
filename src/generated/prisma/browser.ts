@@ -137,3 +137,13 @@ export type ImpersonationLog = Prisma.ImpersonationLogModel
  * 
  */
 export type PlatformSettings = Prisma.PlatformSettingsModel
+/**
+ * Model Coupon
+ * 
+ */
+export type Coupon = Prisma.CouponModel
+/**
+ * Model CouponRedemption
+ * 
+ */
+export type CouponRedemption = Prisma.CouponRedemptionModel

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { releaseCouponRedemption } from "@/lib/coupons";
 
 export const APPOINTMENT_REQUEST_TIMEOUT_MS = 30 * 60 * 1000;
 
@@ -18,6 +19,15 @@ export async function expireStalePendingRequests() {
     where: { id: { in: stale.map((a) => a.id) } },
     data: { status: "EXPIRED" },
   });
+
+  // Free any coupon slots that were reserved but never paid for.
+  const reserved = await prisma.couponRedemption.findMany({
+    where: { appointmentId: { in: stale.map((a) => a.id) }, status: "RESERVED" },
+    select: { appointmentId: true },
+  });
+  for (const r of reserved) {
+    if (r.appointmentId) await releaseCouponRedemption(prisma, { appointmentId: r.appointmentId });
+  }
 
   for (const a of stale) {
     void sendPushToUser(a.patientId, {

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, CheckCircle, Loader2, ShieldCheck, Gift } from "lucide-react";
+import { CreditCard, CheckCircle, Loader2, ShieldCheck, Gift, TicketPercent, X } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 
@@ -17,6 +17,10 @@ export default function DoctorPayment() {
   const [alreadyPaid, setAlreadyPaid] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState("");
+  const [couponInput, setCouponInput] = useState("");
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  const [coupon, setCoupon] = useState<{ code: string; discountAmount: number; netAmount: number } | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/payment");
@@ -31,10 +35,32 @@ export default function DoctorPayment() {
       .finally(() => setChecking(false));
   }, [user]);
 
+  const payable = coupon ? coupon.netAmount : REGISTRATION_FEE;
+
+  const applyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setApplyingCoupon(true);
+    setCouponError("");
+    const res = await fetch("/api/coupons/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: couponInput.trim(), context: "DOCTOR_REGISTRATION" }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setApplyingCoupon(false);
+    if (!res.ok) { setCouponError(data.error ?? "Could not apply that coupon."); return; }
+    setCoupon({ code: data.code, discountAmount: data.discountAmount, netAmount: data.netAmount });
+    setCouponInput("");
+  };
+
   const pay = async () => {
     setPaying(true);
     setError("");
-    const res = await fetch("/api/doctors/registration-fee/create-order", { method: "POST" });
+    const res = await fetch("/api/doctors/registration-fee/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(coupon ? { code: coupon.code } : {}),
+    });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       setPaying(false);
@@ -81,12 +107,47 @@ export default function DoctorPayment() {
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
-            <div className="bg-slate-50 rounded-xl p-4 mb-3 flex justify-between items-center">
-              <span className="text-slate-500 text-sm">Registration Fee</span>
-              <span className="flex items-baseline gap-2">
-                <span className="text-slate-400 text-sm line-through">₹{REGISTRATION_FEE_ORIGINAL}</span>
-                <span className="font-extrabold text-blue-600 text-xl">₹{REGISTRATION_FEE}</span>
-              </span>
+            <div className="bg-slate-50 rounded-xl p-4 mb-3">
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 text-sm">Registration Fee</span>
+                <span className="flex items-baseline gap-2">
+                  <span className="text-slate-400 text-sm line-through">₹{REGISTRATION_FEE_ORIGINAL}</span>
+                  <span className={`font-extrabold text-xl ${coupon ? "text-slate-400 line-through" : "text-blue-600"}`}>₹{REGISTRATION_FEE}</span>
+                </span>
+              </div>
+              {coupon && (
+                <div className="flex justify-between items-center pt-2 mt-2 border-t border-slate-200">
+                  <span className="text-sm font-semibold text-slate-900">You pay</span>
+                  <span className="font-extrabold text-blue-600 text-xl">₹{coupon.netAmount}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="mb-3">
+              {coupon ? (
+                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 text-sm">
+                  <span className="flex items-center gap-2 font-semibold text-emerald-700">
+                    <TicketPercent className="w-4 h-4" /> {coupon.code} — ₹{coupon.discountAmount} off
+                  </span>
+                  <button onClick={() => setCoupon(null)} className="text-emerald-700 hover:text-emerald-900" aria-label="Remove coupon">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    className="input-field flex-1 uppercase"
+                    placeholder="Coupon code"
+                    value={couponInput}
+                    onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") applyCoupon(); }}
+                  />
+                  <button onClick={applyCoupon} disabled={applyingCoupon || !couponInput.trim()} className="btn-secondary px-4 disabled:opacity-60">
+                    {applyingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+                  </button>
+                </div>
+              )}
+              {couponError && <p className="text-xs text-red-500 mt-1.5">{couponError}</p>}
             </div>
 
             <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6 flex items-start gap-3">
@@ -109,7 +170,7 @@ export default function DoctorPayment() {
             )}
 
             <button onClick={pay} disabled={paying} className="btn-primary w-full justify-center py-3.5 text-base">
-              {paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</> : `Pay ₹${REGISTRATION_FEE}`}
+              {paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</> : `Pay ₹${payable}`}
             </button>
           </div>
         )}

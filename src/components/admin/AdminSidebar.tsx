@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Stethoscope, Users, CalendarCheck,
   DollarSign, MessageCircle, Settings, Tag,
-  LogOut, ChevronRight, FileBarChart, Wallet, Megaphone,
+  LogOut, ChevronRight, FileBarChart, Wallet, Megaphone, TicketPercent,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
@@ -18,6 +18,7 @@ const navItems = [
   { href: "/admin/finance",    label: "Finance",     icon: DollarSign },
   { href: "/admin/wallets",    label: "Wallets",     icon: Wallet },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
+  { href: "/admin/coupons",    label: "Coupons",     icon: TicketPercent },
   { href: "/admin/reports",    label: "Reports",     icon: FileBarChart },
   { href: "/admin/complaints", label: "Complaints",  icon: MessageCircle },
   { href: "/admin/settings",   label: "Settings",    icon: Settings },

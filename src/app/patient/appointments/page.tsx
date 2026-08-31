@@ -42,6 +42,8 @@ interface Appointment {
   patientName: string | null;
   relation: string;
   amount: number;
+  discountAmount: number;
+  couponCode: string | null;
   paymentMethod: string;
   paymentStatus: string;
   paidAt: string | null;
@@ -294,7 +296,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       {needsPayment && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
           <span className="flex items-center gap-2">
-            <CardIcon className="w-4 h-4 flex-shrink-0" /> Payment pending — pay ₹{a.amount} to confirm your visit with {formatDoctorName(a.doctor.name)}.
+            <CardIcon className="w-4 h-4 flex-shrink-0" /> Payment pending — pay ₹{Math.max(0, a.amount - a.discountAmount)}{a.discountAmount > 0 ? ` (${a.couponCode} applied)` : ""} to confirm your visit with {formatDoctorName(a.doctor.name)}.
           </span>
         </div>
       )}

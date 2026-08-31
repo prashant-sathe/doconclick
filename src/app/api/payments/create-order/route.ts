@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
 import { createCashfreeOrder } from "@/lib/cashfree";
+import { netPayable } from "@/lib/coupons";
 
 // POST: Creates a real Cashfree order for an appointment's online payment
 // and returns a payment_session_id for the client to redirect into checkout.
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
   try {
     const { paymentSessionId } = await createCashfreeOrder({
       orderId,
-      amount: appointment.amount,
+      amount: netPayable(appointment),
       customerId: authUser.id,
       customerName: authUser.name,
       customerPhone: authUser.mobile,

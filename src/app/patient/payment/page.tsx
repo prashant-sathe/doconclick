@@ -2,13 +2,15 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CreditCard, Loader2, ShieldCheck, CheckCircle, Wallet } from "lucide-react";
+import { CreditCard, Loader2, ShieldCheck, CheckCircle, Wallet, TicketPercent, X } from "lucide-react";
 import { formatDoctorName } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface AppointmentSummary {
   id: string;
   amount: number;
+  discountAmount: number;
+  couponCode: string | null;
   paymentStatus: string;
   doctor: { name: string };
 }
@@ -24,6 +26,9 @@ function PaymentContent() {
   const [error, setError] = useState("");
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [confirmWalletPay, setConfirmWalletPay] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState("");
 
   useEffect(() => {
     if (!apptId) return;
@@ -62,6 +67,40 @@ function PaymentContent() {
     const cashfree = await load({ mode: "production" });
     cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
     // Browser navigates away to Cashfree's hosted checkout from here.
+  };
+
+  const netPayable = appt ? Math.max(0, Math.round((appt.amount - appt.discountAmount) * 100) / 100) : 0;
+
+  const applyCoupon = async () => {
+    if (!apptId || !couponInput.trim()) return;
+    setApplyingCoupon(true);
+    setCouponError("");
+    const res = await fetch("/api/coupons/apply", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appointmentId: apptId, code: couponInput.trim() }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setApplyingCoupon(false);
+    if (!res.ok) {
+      setCouponError(data.error ?? "Could not apply that coupon.");
+      return;
+    }
+    setAppt((a) => (a ? { ...a, discountAmount: data.discountAmount, couponCode: data.coupon.code } : a));
+    setCouponInput("");
+  };
+
+  const removeCoupon = async () => {
+    if (!apptId) return;
+    setApplyingCoupon(true);
+    setCouponError("");
+    await fetch("/api/coupons/apply", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appointmentId: apptId }),
+    }).catch(() => {});
+    setApplyingCoupon(false);
+    setAppt((a) => (a ? { ...a, discountAmount: 0, couponCode: null } : a));
   };
 
   const payWithWallet = async () => {
@@ -112,14 +151,58 @@ function PaymentContent() {
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-md w-full">
-      <div className="bg-slate-50 rounded-xl p-4 mb-6">
+      <div className="bg-slate-50 rounded-xl p-4 mb-4">
         <div className="flex justify-between text-sm">
           <span className="text-slate-500">Consultation with {formatDoctorName(appt.doctor.name)}</span>
+          <span className="text-slate-700">₹{appt.amount}</span>
         </div>
+        {appt.discountAmount > 0 && (
+          <div className="flex justify-between text-sm mt-1.5 text-emerald-600">
+            <span>Coupon {appt.couponCode}</span>
+            <span>−₹{appt.discountAmount}</span>
+          </div>
+        )}
         <div className="flex justify-between font-bold pt-2 mt-2 border-t border-slate-200 text-base">
-          <span className="text-slate-900">Amount</span>
-          <span className="text-blue-600">₹{appt.amount}</span>
+          <span className="text-slate-900">{appt.discountAmount > 0 ? "You pay" : "Amount"}</span>
+          <span className="text-blue-600">₹{netPayable}</span>
         </div>
+      </div>
+
+      {/* Coupon */}
+      <div className="mb-4">
+        {appt.couponCode ? (
+          <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 text-sm">
+            <span className="flex items-center gap-2 font-semibold text-emerald-700">
+              <TicketPercent className="w-4 h-4" /> {appt.couponCode} applied
+            </span>
+            <button
+              onClick={removeCoupon}
+              disabled={applyingCoupon}
+              className="text-emerald-700 hover:text-emerald-900 disabled:opacity-50"
+              aria-label="Remove coupon"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <input
+              className="input-field flex-1 uppercase"
+              placeholder="Coupon code"
+              value={couponInput}
+              onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
+              onKeyDown={(e) => { if (e.key === "Enter") applyCoupon(); }}
+            />
+            <button
+              onClick={applyCoupon}
+              disabled={applyingCoupon || !couponInput.trim()}
+              className="btn-secondary px-4 disabled:opacity-60"
+            >
+              {applyingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+            </button>
+          </div>
+        )}
+        {couponError && <p className="text-xs text-red-500 mt-1.5">{couponError}</p>}
       </div>
 
       {error && (
@@ -130,7 +213,7 @@ function PaymentContent() {
       )}
 
       {(() => {
-        const canPayWithWallet = walletBalance != null && walletBalance >= appt.amount;
+        const canPayWithWallet = walletBalance != null && walletBalance >= netPayable;
         return (
           <div className="mb-3">
             <button
@@ -141,16 +224,16 @@ function PaymentContent() {
               {payingWallet ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Paying from wallet…</>
               ) : walletBalance == null ? (
-                <><Wallet className="w-4 h-4" /> Pay ₹{appt.amount} via Wallet</>
+                <><Wallet className="w-4 h-4" /> Pay ₹{netPayable} via Wallet</>
               ) : canPayWithWallet ? (
-                <><Wallet className="w-4 h-4" /> Pay ₹{appt.amount} via Wallet (Balance ₹{walletBalance})</>
+                <><Wallet className="w-4 h-4" /> Pay ₹{netPayable} via Wallet (Balance ₹{walletBalance})</>
               ) : (
                 <><Wallet className="w-4 h-4" /> Insufficient wallet balance</>
               )}
             </button>
             {walletBalance != null && !canPayWithWallet && (
               <p className="text-xs text-slate-400 text-center mt-1.5">
-                You need ₹{Math.ceil(appt.amount - walletBalance)} more —{" "}
+                You need ₹{Math.ceil(netPayable - walletBalance)} more —{" "}
                 <Link href="/patient/wallet" className="text-blue-600 font-semibold hover:underline">top up your wallet</Link>.
               </p>
             )}
@@ -161,14 +244,14 @@ function PaymentContent() {
       <button onClick={pay} disabled={paying || payingWallet} className="btn-primary w-full justify-center py-3.5 text-base">
         {paying
           ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</>
-          : `Pay ₹${appt.amount} via Cashfree`}
+          : `Pay ₹${netPayable} via Cashfree`}
       </button>
 
       {confirmWalletPay && (
         <ConfirmDialog
           icon={Wallet}
-          title={`Pay ₹${appt.amount} from your wallet?`}
-          message={`This deducts ₹${appt.amount} from your wallet balance right now to confirm your consultation with ${formatDoctorName(appt.doctor.name)}.`}
+          title={`Pay ₹${netPayable} from your wallet?`}
+          message={`This deducts ₹${netPayable} from your wallet balance right now to confirm your consultation with ${formatDoctorName(appt.doctor.name)}.`}
           confirmLabel="Pay Now"
           busyLabel="Paying…"
           tone="primary"

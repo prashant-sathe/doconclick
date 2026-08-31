@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { verifyCashfreeWebhookSignature, DOCTOR_REGISTRATION_FEE, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { WALLET_TOPUP_ORDER_PREFIX } from "@/lib/wallet";
+import { netPayable, confirmCouponRedemption, releaseCouponRedemption } from "@/lib/coupons";
 
 interface CashfreeWebhookPayload {
   type: "PAYMENT_SUCCESS_WEBHOOK" | "PAYMENT_FAILED_WEBHOOK" | string;
@@ -59,6 +60,10 @@ export async function POST(req: Request) {
         });
       }
     }
+    // Free any coupon slot a doctor reserved for this failed fee payment.
+    if (failedOrderId && (failedOrderId.startsWith("docreg") || failedOrderId.startsWith("docsub"))) {
+      await prisma.$transaction((tx) => releaseCouponRedemption(tx, { orderId: failedOrderId })).catch(() => {});
+    }
     return NextResponse.json({ ok: true });
   }
 
@@ -78,10 +83,16 @@ export async function POST(req: Request) {
       console.error("Cashfree webhook: no doctor profile found for order", orderId);
       return NextResponse.json({ ok: true });
     }
-    if (payload.data.order.order_amount !== DOCTOR_REGISTRATION_FEE) {
+    const redemption = await prisma.couponRedemption.findUnique({
+      where: { orderId },
+      include: { coupon: { select: { code: true } } },
+    });
+    const discount = redemption?.status === "RESERVED" ? redemption.discountAmount : 0;
+    const expected = Math.round((DOCTOR_REGISTRATION_FEE - discount) * 100) / 100;
+    if (payload.data.order.order_amount !== expected) {
       console.error(
         "Cashfree webhook amount mismatch for doctor registration", profile.id,
-        "expected", DOCTOR_REGISTRATION_FEE, "got", payload.data.order.order_amount
+        "expected", expected, "got", payload.data.order.order_amount
       );
       return NextResponse.json({ ok: true });
     }
@@ -103,9 +114,15 @@ export async function POST(req: Request) {
         data: {
           doctorId: profile.userId,
           type: "REGISTRATION",
-          amount: DOCTOR_REGISTRATION_FEE,
+          amount: payload.data.order.order_amount,
+          couponCode: discount > 0 ? redemption?.coupon.code ?? null : null,
+          discountAmount: discount,
           cashfreePaymentId: payload.data.payment.cf_payment_id,
         },
+      }),
+      prisma.couponRedemption.updateMany({
+        where: { orderId, status: "RESERVED" },
+        data: { status: "CONFIRMED" },
       }),
     ]);
     void sendPushToUser(profile.userId, {
@@ -122,10 +139,16 @@ export async function POST(req: Request) {
       console.error("Cashfree webhook: no doctor profile found for order", orderId);
       return NextResponse.json({ ok: true });
     }
-    if (payload.data.order.order_amount !== DOCTOR_SUBSCRIPTION_FEE) {
+    const redemption = await prisma.couponRedemption.findUnique({
+      where: { orderId },
+      include: { coupon: { select: { code: true } } },
+    });
+    const discount = redemption?.status === "RESERVED" ? redemption.discountAmount : 0;
+    const expected = Math.round((DOCTOR_SUBSCRIPTION_FEE - discount) * 100) / 100;
+    if (payload.data.order.order_amount !== expected) {
       console.error(
         "Cashfree webhook amount mismatch for doctor subscription", profile.id,
-        "expected", DOCTOR_SUBSCRIPTION_FEE, "got", payload.data.order.order_amount
+        "expected", expected, "got", payload.data.order.order_amount
       );
       return NextResponse.json({ ok: true });
     }
@@ -148,9 +171,15 @@ export async function POST(req: Request) {
         data: {
           doctorId: profile.userId,
           type: "SUBSCRIPTION",
-          amount: DOCTOR_SUBSCRIPTION_FEE,
+          amount: payload.data.order.order_amount,
+          couponCode: discount > 0 ? redemption?.coupon.code ?? null : null,
+          discountAmount: discount,
           cashfreePaymentId: payload.data.payment.cf_payment_id,
         },
+      }),
+      prisma.couponRedemption.updateMany({
+        where: { orderId, status: "RESERVED" },
+        data: { status: "CONFIRMED" },
       }),
     ]);
     void sendPushToUser(profile.userId, {
@@ -211,21 +240,27 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true }); // ack anyway — nothing to retry into
   }
 
-  if (payload.data.order.order_amount !== appointment.amount) {
+  // The order was created for the coupon-discounted amount, so that's what to
+  // reconcile against — not the doctor's full fee.
+  const expectedAmount = netPayable(appointment);
+  if (payload.data.order.order_amount !== expectedAmount) {
     console.error(
       "Cashfree webhook amount mismatch for appointment", appointment.id,
-      "expected", appointment.amount, "got", payload.data.order.order_amount
+      "expected", expectedAmount, "got", payload.data.order.order_amount
     );
     return NextResponse.json({ ok: true }); // don't mark paid; flagged above for manual review
   }
 
-  await prisma.appointment.update({
-    where: { id: appointment.id },
-    data: {
-      paymentStatus: "PAID",
-      paidAt: new Date(),
-      cashfreePaymentId: payload.data.payment.cf_payment_id,
-    },
+  await prisma.$transaction(async (tx) => {
+    await tx.appointment.update({
+      where: { id: appointment.id },
+      data: {
+        paymentStatus: "PAID",
+        paidAt: new Date(),
+        cashfreePaymentId: payload.data.payment.cf_payment_id,
+      },
+    });
+    await confirmCouponRedemption(tx, { appointmentId: appointment.id });
   });
 
   void sendPushToUser(appointment.doctorId, {

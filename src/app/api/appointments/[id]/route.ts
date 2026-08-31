@@ -7,6 +7,7 @@ import { findReassignmentDoctor } from "@/lib/doctorMatching";
 import { getOrCreateWallet } from "@/lib/wallet";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { netPayable, releaseCouponRedemption } from "@/lib/coupons";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
   SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
@@ -107,6 +108,9 @@ export async function PATCH(
         select: { specialty: true },
       });
       const wasPaid = appointment.paymentStatus === "PAID";
+      // The patient only ever paid the coupon-discounted amount, so that's
+      // what gets refunded to their wallet.
+      const refundAmount = netPayable(appointment);
       const candidate = doctorProfile
         ? await findReassignmentDoctor({
             excludeDoctorId: appointment.doctorId,
@@ -135,18 +139,21 @@ export async function PATCH(
           const wallet = await getOrCreateWallet(tx, appointment.patientId);
           const updatedWallet = await tx.wallet.update({
             where: { id: wallet.id },
-            data: { balance: { increment: appointment.amount } },
+            data: { balance: { increment: refundAmount } },
           });
           await tx.walletTransaction.create({
             data: {
               walletId: wallet.id,
               type: "REASSIGNMENT_CREDIT",
-              amount: appointment.amount,
+              amount: refundAmount,
               balanceAfter: updatedWallet.balance,
               status: "SUCCESS",
               note: `Refund for appointment ${appointment.id}, cancelled by the doctor`,
             },
           });
+        } else {
+          // Unpaid: free the coupon slot the patient had reserved.
+          await releaseCouponRedemption(tx, { appointmentId: id });
         }
 
         const reassigned = candidate
@@ -186,7 +193,7 @@ export async function PATCH(
         void sendPushToUser(appointment.patientId, {
           title: "Your appointment was reassigned",
           body: wasPaid
-            ? `${authUser.name} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and credited ₹${appointment.amount} back to your wallet — pay again once they accept.`
+            ? `${authUser.name} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and credited ₹${refundAmount} back to your wallet — pay again once they accept.`
             : `${authUser.name} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and sent them your request.`,
           url: "/patient/appointments",
         });
@@ -194,7 +201,7 @@ export async function PATCH(
         void sendPushToUser(appointment.patientId, {
           title: "Appointment cancelled",
           body: wasPaid
-            ? `${authUser.name} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — ₹${appointment.amount} has been credited to your wallet. Please book again.`
+            ? `${authUser.name} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — ₹${refundAmount} has been credited to your wallet. Please book again.`
             : `${authUser.name} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — please book again.`,
           url: "/patient/appointments",
         });

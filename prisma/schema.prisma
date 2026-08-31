@@ -42,6 +42,8 @@ model User {
   announcementRecipients AnnouncementRecipient[] @relation("AnnouncementRecipients")
   impersonationsStarted  ImpersonationLog[]      @relation("ImpersonationsStarted")
   impersonationsReceived ImpersonationLog[]      @relation("ImpersonationsReceived")
+  couponsCreated         Coupon[]               @relation("CouponsCreatedByAdmin")
+  couponRedemptions      CouponRedemption[]
 }
 
 model PushToken {
@@ -176,6 +178,14 @@ model Appointment {
   isEmergency   Boolean   @default(false)
   amount        Float     @default(0)
   platformFee   Float     @default(0)
+  // Coupon applied at payment checkout. The platform absorbs the discount:
+  // the patient pays `amount - discountAmount`, but the doctor's payout and
+  // `platformFee` are still computed off the full `amount`. `couponCode` is
+  // denormalised so it survives the coupon row being deleted.
+  couponId       String?
+  coupon         Coupon?  @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  couponCode     String?
+  discountAmount Float    @default(0)
   cashfreeOrderId   String?
   cashfreePaymentId String?
   settlementId  String?
@@ -206,6 +216,7 @@ model Appointment {
   attachments   PrescriptionAttachment[]
   messages      Message[]
   walletTransaction WalletTransaction?
+  couponRedemption  CouponRedemption?
 }
 
 model Wallet {
@@ -258,7 +269,9 @@ model DoctorPaymentLog {
   doctorId          String
   doctor            User     @relation("DoctorPaymentLogs", fields: [doctorId], references: [id])
   type              String   // REGISTRATION, SUBSCRIPTION
-  amount            Float
+  amount            Float    // amount actually charged (after any coupon discount)
+  couponCode        String?
+  discountAmount    Float    @default(0)
   cashfreePaymentId String?
   createdAt         DateTime @default(now())
 }
@@ -416,4 +429,55 @@ model PlatformSettings {
   splashFit               String   @default("cover") // "cover", "contain"
   splashBgColor           String   @default("#F8FAFC")
   updatedAt               DateTime @updatedAt
+}
+
+// Promotional discount code, created by an admin and applied by a patient at
+// payment checkout. See src/lib/coupons.ts and /api/coupons/apply.
+model Coupon {
+  id             String   @id @default(cuid())
+  code           String   @unique // stored UPPERCASE
+  description    String?
+  discountType   String   @default("PERCENT") // PERCENT, FLAT
+  discountValue  Float     // percent (0-100) or rupee amount
+  maxDiscount    Float?    // cap in rupees, only meaningful for PERCENT
+  minAmount      Float    @default(0) // minimum base amount to qualify
+  // What this coupon can be used for — CSV of APPOINTMENT, DOCTOR_REGISTRATION,
+  // DOCTOR_SUBSCRIPTION. Empty/null is treated as APPOINTMENT only.
+  appliesTo      String   @default("APPOINTMENT")
+  consultTypes   String?  // CSV of CLINIC,VIDEO,HOME — null/empty means all (APPOINTMENT only)
+  maxRedemptions Int?     // total cap across all users — null means unlimited
+  perUserLimit   Int      @default(1)
+  // Reserved+confirmed slot counter. Incremented atomically when a patient
+  // applies the coupon, decremented if they remove it or the appointment is
+  // cancelled unpaid. Guards `maxRedemptions` without a race.
+  usedCount      Int      @default(0)
+  startsAt       DateTime?
+  expiresAt      DateTime?
+  isActive       Boolean  @default(true)
+  createdByAdminId String?
+  createdByAdmin   User?  @relation("CouponsCreatedByAdmin", fields: [createdByAdminId], references: [id], onDelete: SetNull)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  redemptions    CouponRedemption[]
+  appointments   Appointment[]
+}
+
+model CouponRedemption {
+  id            String   @id @default(cuid())
+  couponId      String
+  coupon        Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Exactly one of these identifies what the coupon was used on:
+  //  - appointmentId for a patient booking payment (kind APPOINTMENT)
+  //  - orderId (the Cashfree order id) for a doctor registration/subscription fee
+  kind          String   @default("APPOINTMENT") // APPOINTMENT, DOCTOR_REGISTRATION, DOCTOR_SUBSCRIPTION
+  appointmentId String?  @unique
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  orderId       String?  @unique
+  discountAmount Float
+  status        String   @default("RESERVED") // RESERVED, CONFIRMED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

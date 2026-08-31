@@ -28,10 +28,12 @@ export type AggregateDoctorPaymentLog = {
 
 export type DoctorPaymentLogAvgAggregateOutputType = {
   amount: number | null
+  discountAmount: number | null
 }
 
 export type DoctorPaymentLogSumAggregateOutputType = {
   amount: number | null
+  discountAmount: number | null
 }
 
 export type DoctorPaymentLogMinAggregateOutputType = {
@@ -39,6 +41,8 @@ export type DoctorPaymentLogMinAggregateOutputType = {
   doctorId: string | null
   type: string | null
   amount: number | null
+  couponCode: string | null
+  discountAmount: number | null
   cashfreePaymentId: string | null
   createdAt: Date | null
 }
@@ -48,6 +52,8 @@ export type DoctorPaymentLogMaxAggregateOutputType = {
   doctorId: string | null
   type: string | null
   amount: number | null
+  couponCode: string | null
+  discountAmount: number | null
   cashfreePaymentId: string | null
   createdAt: Date | null
 }
@@ -57,6 +63,8 @@ export type DoctorPaymentLogCountAggregateOutputType = {
   doctorId: number
   type: number
   amount: number
+  couponCode: number
+  discountAmount: number
   cashfreePaymentId: number
   createdAt: number
   _all: number
@@ -65,10 +73,12 @@ export type DoctorPaymentLogCountAggregateOutputType = {
 
 export type DoctorPaymentLogAvgAggregateInputType = {
   amount?: true
+  discountAmount?: true
 }
 
 export type DoctorPaymentLogSumAggregateInputType = {
   amount?: true
+  discountAmount?: true
 }
 
 export type DoctorPaymentLogMinAggregateInputType = {
@@ -76,6 +86,8 @@ export type DoctorPaymentLogMinAggregateInputType = {
   doctorId?: true
   type?: true
   amount?: true
+  couponCode?: true
+  discountAmount?: true
   cashfreePaymentId?: true
   createdAt?: true
 }
@@ -85,6 +97,8 @@ export type DoctorPaymentLogMaxAggregateInputType = {
   doctorId?: true
   type?: true
   amount?: true
+  couponCode?: true
+  discountAmount?: true
   cashfreePaymentId?: true
   createdAt?: true
 }
@@ -94,6 +108,8 @@ export type DoctorPaymentLogCountAggregateInputType = {
   doctorId?: true
   type?: true
   amount?: true
+  couponCode?: true
+  discountAmount?: true
   cashfreePaymentId?: true
   createdAt?: true
   _all?: true
@@ -190,6 +206,8 @@ export type DoctorPaymentLogGroupByOutputType = {
   doctorId: string
   type: string
   amount: number
+  couponCode: string | null
+  discountAmount: number
   cashfreePaymentId: string | null
   createdAt: Date
   _count: DoctorPaymentLogCountAggregateOutputType | null
@@ -222,6 +240,8 @@ export type DoctorPaymentLogWhereInput = {
   doctorId?: Prisma.StringFilter<"DoctorPaymentLog"> | string
   type?: Prisma.StringFilter<"DoctorPaymentLog"> | string
   amount?: Prisma.FloatFilter<"DoctorPaymentLog"> | number
+  couponCode?: Prisma.StringNullableFilter<"DoctorPaymentLog"> | string | null
+  discountAmount?: Prisma.FloatFilter<"DoctorPaymentLog"> | number
   cashfreePaymentId?: Prisma.StringNullableFilter<"DoctorPaymentLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"DoctorPaymentLog"> | Date | string
   doctor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -232,6 +252,8 @@ export type DoctorPaymentLogOrderByWithRelationInput = {
   doctorId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  couponCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
   cashfreePaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   doctor?: Prisma.UserOrderByWithRelationInput
@@ -245,6 +267,8 @@ export type DoctorPaymentLogWhereUniqueInput = Prisma.AtLeast<{
   doctorId?: Prisma.StringFilter<"DoctorPaymentLog"> | string
   type?: Prisma.StringFilter<"DoctorPaymentLog"> | string
   amount?: Prisma.FloatFilter<"DoctorPaymentLog"> | number
+  couponCode?: Prisma.StringNullableFilter<"DoctorPaymentLog"> | string | null
+  discountAmount?: Prisma.FloatFilter<"DoctorPaymentLog"> | number
   cashfreePaymentId?: Prisma.StringNullableFilter<"DoctorPaymentLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"DoctorPaymentLog"> | Date | string
   doctor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -255,6 +279,8 @@ export type DoctorPaymentLogOrderByWithAggregationInput = {
   doctorId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  couponCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
   cashfreePaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.DoctorPaymentLogCountOrderByAggregateInput
@@ -272,6 +298,8 @@ export type DoctorPaymentLogScalarWhereWithAggregatesInput = {
   doctorId?: Prisma.StringWithAggregatesFilter<"DoctorPaymentLog"> | string
   type?: Prisma.StringWithAggregatesFilter<"DoctorPaymentLog"> | string
   amount?: Prisma.FloatWithAggregatesFilter<"DoctorPaymentLog"> | number
+  couponCode?: Prisma.StringNullableWithAggregatesFilter<"DoctorPaymentLog"> | string | null
+  discountAmount?: Prisma.FloatWithAggregatesFilter<"DoctorPaymentLog"> | number
   cashfreePaymentId?: Prisma.StringNullableWithAggregatesFilter<"DoctorPaymentLog"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"DoctorPaymentLog"> | Date | string
 }
@@ -280,6 +308,8 @@ export type DoctorPaymentLogCreateInput = {
   id?: string
   type: string
   amount: number
+  couponCode?: string | null
+  discountAmount?: number
   cashfreePaymentId?: string | null
   createdAt?: Date | string
   doctor: Prisma.UserCreateNestedOneWithoutPaymentLogsInput
@@ -290,6 +320,8 @@ export type DoctorPaymentLogUncheckedCreateInput = {
   doctorId: string
   type: string
   amount: number
+  couponCode?: string | null
+  discountAmount?: number
   cashfreePaymentId?: string | null
   createdAt?: Date | string
 }
@@ -298,6 +330,8 @@ export type DoctorPaymentLogUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctor?: Prisma.UserUpdateOneRequiredWithoutPaymentLogsNestedInput
@@ -308,6 +342,8 @@ export type DoctorPaymentLogUncheckedUpdateInput = {
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -317,6 +353,8 @@ export type DoctorPaymentLogCreateManyInput = {
   doctorId: string
   type: string
   amount: number
+  couponCode?: string | null
+  discountAmount?: number
   cashfreePaymentId?: string | null
   createdAt?: Date | string
 }
@@ -325,6 +363,8 @@ export type DoctorPaymentLogUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -334,6 +374,8 @@ export type DoctorPaymentLogUncheckedUpdateManyInput = {
   doctorId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -353,12 +395,15 @@ export type DoctorPaymentLogCountOrderByAggregateInput = {
   doctorId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  couponCode?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
   cashfreePaymentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type DoctorPaymentLogAvgOrderByAggregateInput = {
   amount?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
 }
 
 export type DoctorPaymentLogMaxOrderByAggregateInput = {
@@ -366,6 +411,8 @@ export type DoctorPaymentLogMaxOrderByAggregateInput = {
   doctorId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  couponCode?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
   cashfreePaymentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -375,12 +422,15 @@ export type DoctorPaymentLogMinOrderByAggregateInput = {
   doctorId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  couponCode?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
   cashfreePaymentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type DoctorPaymentLogSumOrderByAggregateInput = {
   amount?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
 }
 
 export type DoctorPaymentLogCreateNestedManyWithoutDoctorInput = {
@@ -429,6 +479,8 @@ export type DoctorPaymentLogCreateWithoutDoctorInput = {
   id?: string
   type: string
   amount: number
+  couponCode?: string | null
+  discountAmount?: number
   cashfreePaymentId?: string | null
   createdAt?: Date | string
 }
@@ -437,6 +489,8 @@ export type DoctorPaymentLogUncheckedCreateWithoutDoctorInput = {
   id?: string
   type: string
   amount: number
+  couponCode?: string | null
+  discountAmount?: number
   cashfreePaymentId?: string | null
   createdAt?: Date | string
 }
@@ -475,6 +529,8 @@ export type DoctorPaymentLogScalarWhereInput = {
   doctorId?: Prisma.StringFilter<"DoctorPaymentLog"> | string
   type?: Prisma.StringFilter<"DoctorPaymentLog"> | string
   amount?: Prisma.FloatFilter<"DoctorPaymentLog"> | number
+  couponCode?: Prisma.StringNullableFilter<"DoctorPaymentLog"> | string | null
+  discountAmount?: Prisma.FloatFilter<"DoctorPaymentLog"> | number
   cashfreePaymentId?: Prisma.StringNullableFilter<"DoctorPaymentLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"DoctorPaymentLog"> | Date | string
 }
@@ -483,6 +539,8 @@ export type DoctorPaymentLogCreateManyDoctorInput = {
   id?: string
   type: string
   amount: number
+  couponCode?: string | null
+  discountAmount?: number
   cashfreePaymentId?: string | null
   createdAt?: Date | string
 }
@@ -491,6 +549,8 @@ export type DoctorPaymentLogUpdateWithoutDoctorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -499,6 +559,8 @@ export type DoctorPaymentLogUncheckedUpdateWithoutDoctorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -507,6 +569,8 @@ export type DoctorPaymentLogUncheckedUpdateManyWithoutDoctorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -518,6 +582,8 @@ export type DoctorPaymentLogSelect<ExtArgs extends runtime.Types.Extensions.Inte
   doctorId?: boolean
   type?: boolean
   amount?: boolean
+  couponCode?: boolean
+  discountAmount?: boolean
   cashfreePaymentId?: boolean
   createdAt?: boolean
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -528,6 +594,8 @@ export type DoctorPaymentLogSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   doctorId?: boolean
   type?: boolean
   amount?: boolean
+  couponCode?: boolean
+  discountAmount?: boolean
   cashfreePaymentId?: boolean
   createdAt?: boolean
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -538,6 +606,8 @@ export type DoctorPaymentLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   doctorId?: boolean
   type?: boolean
   amount?: boolean
+  couponCode?: boolean
+  discountAmount?: boolean
   cashfreePaymentId?: boolean
   createdAt?: boolean
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -548,11 +618,13 @@ export type DoctorPaymentLogSelectScalar = {
   doctorId?: boolean
   type?: boolean
   amount?: boolean
+  couponCode?: boolean
+  discountAmount?: boolean
   cashfreePaymentId?: boolean
   createdAt?: boolean
 }
 
-export type DoctorPaymentLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "doctorId" | "type" | "amount" | "cashfreePaymentId" | "createdAt", ExtArgs["result"]["doctorPaymentLog"]>
+export type DoctorPaymentLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "doctorId" | "type" | "amount" | "couponCode" | "discountAmount" | "cashfreePaymentId" | "createdAt", ExtArgs["result"]["doctorPaymentLog"]>
 export type DoctorPaymentLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -573,6 +645,8 @@ export type $DoctorPaymentLogPayload<ExtArgs extends runtime.Types.Extensions.In
     doctorId: string
     type: string
     amount: number
+    couponCode: string | null
+    discountAmount: number
     cashfreePaymentId: string | null
     createdAt: Date
   }, ExtArgs["result"]["doctorPaymentLog"]>
@@ -1003,6 +1077,8 @@ export interface DoctorPaymentLogFieldRefs {
   readonly doctorId: Prisma.FieldRef<"DoctorPaymentLog", 'String'>
   readonly type: Prisma.FieldRef<"DoctorPaymentLog", 'String'>
   readonly amount: Prisma.FieldRef<"DoctorPaymentLog", 'Float'>
+  readonly couponCode: Prisma.FieldRef<"DoctorPaymentLog", 'String'>
+  readonly discountAmount: Prisma.FieldRef<"DoctorPaymentLog", 'Float'>
   readonly cashfreePaymentId: Prisma.FieldRef<"DoctorPaymentLog", 'String'>
   readonly createdAt: Prisma.FieldRef<"DoctorPaymentLog", 'DateTime'>
 }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { getOrCreateWallet } from "@/lib/wallet";
+import { netPayable, confirmCouponRedemption } from "@/lib/coupons";
 
 // POST: pays an already-SCHEDULED appointment out of the patient's wallet
 // balance. Unlike Cashfree, this is a direct authenticated server call with
@@ -36,12 +37,16 @@ export async function POST(req: Request) {
       const freshAppt = await tx.appointment.findUnique({ where: { id: appointmentId } });
       if (!freshAppt || freshAppt.paymentStatus === "PAID") throw new Error("ALREADY_PAID");
 
+      // What the patient actually pays — the doctor's fee less any coupon
+      // discount the platform is absorbing.
+      const payable = netPayable(freshAppt);
+
       // Guarded conditional update instead of read-then-write: a double-click
       // or two concurrent requests must not both pass a balance check before
       // either commits. If the WHERE clause doesn't match, count is 0.
       const decremented = await tx.wallet.updateMany({
-        where: { userId: authUser.id, balance: { gte: appointment.amount } },
-        data: { balance: { decrement: appointment.amount } },
+        where: { userId: authUser.id, balance: { gte: payable } },
+        data: { balance: { decrement: payable } },
       });
       if (decremented.count === 0) throw new Error("INSUFFICIENT_BALANCE");
 
@@ -50,7 +55,7 @@ export async function POST(req: Request) {
         data: {
           walletId: wallet.id,
           type: "BOOKING_PAYMENT",
-          amount: appointment.amount,
+          amount: payable,
           balanceAfter: wallet.balance,
           status: "SUCCESS",
           appointmentId: appointment.id,
@@ -60,13 +65,14 @@ export async function POST(req: Request) {
         where: { id: appointment.id },
         data: { paymentStatus: "PAID", paidAt: new Date() },
       });
+      await confirmCouponRedemption(tx, { appointmentId: appointment.id });
 
-      return { wallet, updatedAppt };
+      return { wallet, updatedAppt, payable };
     });
 
     void sendPushToUser(authUser.id, {
       title: "Wallet debited",
-      body: `₹${appointment.amount} deducted for your appointment. New balance ₹${result.wallet.balance}.`,
+      body: `₹${result.payable} deducted for your appointment. New balance ₹${result.wallet.balance}.`,
       url: "/patient/wallet",
     });
     void sendPushToUser(appointment.doctorId, {
