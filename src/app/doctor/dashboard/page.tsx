@@ -645,7 +645,7 @@ export default function DoctorDashboard() {
     .reduce((sum, a) => sum + (a.amount - a.platformFee), 0);
 
   return (
-    <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
+    <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
       <DoctorHeader />
       <DoctorMobileNav />
 

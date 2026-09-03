@@ -123,7 +123,7 @@ export default function DoctorEarnings() {
   const recent = recentAll.slice(0, visibleCount);
 
   return (
-    <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
+    <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
       <DoctorHeader />
       <DoctorMobileNav />
 

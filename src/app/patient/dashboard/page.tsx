@@ -795,7 +795,7 @@ function PatientDashboardInner() {
             {profilePercent != null && profilePercent < 100 && (
               <button
                 onClick={() => router.push("/patient/profile")}
-                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors"
+                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors"
                 title="Complete your profile"
               >
                 Profile {profilePercent}%
@@ -803,19 +803,19 @@ function PatientDashboardInner() {
             )}
             <button
               onClick={() => router.push("/patient/assistant")}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl gradient-primary text-white text-xs font-semibold hover:opacity-90 transition-opacity"
+              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl gradient-primary text-white text-xs font-semibold hover:opacity-90 transition-opacity"
               title="Health Assistant"
             >
               <Sparkles className="w-4 h-4" /> Ask AI
             </button>
             <button
               onClick={() => router.push("/patient/appointments")}
-              className="hidden sm:flex w-8 h-8 rounded-xl bg-blue-50 items-center justify-center text-blue-500 hover:bg-blue-100 transition-colors"
+              className="hidden lg:flex w-8 h-8 rounded-xl bg-blue-50 items-center justify-center text-blue-500 hover:bg-blue-100 transition-colors"
               title="My Appointments"
             >
               <CalendarCheck2 className="w-4 h-4" />
             </button>
-            <div className="text-right hidden md:block">
+            <div className="text-right hidden xl:block">
               <p className="text-xs font-semibold text-slate-900 leading-none">{user?.name}</p>
               <p className="text-xs text-slate-500 mt-0.5">Patient</p>
             </div>
@@ -897,7 +897,7 @@ function PatientDashboardInner() {
       </div>
 
       {/* ── Legend ─────────────────────────────────────────────────── */}
-      <div className="hidden sm:block absolute bottom-6 left-4 z-20 pointer-events-none">
+      <div className="hidden lg:block absolute bottom-6 left-4 z-20 pointer-events-none">
         <div className="glass-card rounded-2xl p-3 flex flex-col gap-1.5 max-w-[170px]">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Specialties</p>
           {specialties.slice(0, 5).map(({ name, color }) => (
@@ -911,7 +911,7 @@ function PatientDashboardInner() {
       </div>
 
       {/* ── Doctor count badge ──────────────────────────────────────── */}
-      <div className="absolute bottom-[calc(5rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] sm:bottom-6 right-4 z-20 pointer-events-none">
+      <div className="absolute bottom-[calc(5rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-6 right-4 z-20 pointer-events-none">
         <div className="glass-card rounded-2xl px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 pointer-events-auto">
           <Stethoscope className="w-4 h-4 text-blue-500" />
           <span className="text-xs sm:text-sm font-semibold text-slate-700">

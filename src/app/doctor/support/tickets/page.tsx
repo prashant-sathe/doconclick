@@ -55,7 +55,7 @@ export default function DoctorSupportTicketsPage() {
   }
 
   return (
-    <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
+    <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
       <DoctorHeader />
       <DoctorMobileNav />
       <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6">

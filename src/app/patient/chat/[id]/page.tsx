@@ -44,7 +44,7 @@ export default function PatientChatPage() {
   const chatClosed = appt?.status === "COMPLETED";
 
   return (
-    <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
+    <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
       <PatientHeader />
       <PatientMobileNav />
 

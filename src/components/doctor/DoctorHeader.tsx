@@ -48,13 +48,16 @@ export default function DoctorHeader() {
           <span className="font-extrabold text-slate-900 hidden sm:inline">DocOnClick</span>
         </Link>
 
-        <nav className="hidden sm:flex items-center gap-1">
+        {/* Desktop nav — shown from lg up; below that the fixed bottom
+            DoctorMobileNav handles navigation (tablet portrait can't fit
+            the full row without overflowing the header off-screen). */}
+        <nav className="hidden lg:flex items-center gap-1">
           {NAV.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               className={cn(
-                "px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-colors",
+                "px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors",
                 pathname === href ? "text-teal-600 bg-teal-50" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
               )}
             >
@@ -76,7 +79,7 @@ export default function DoctorHeader() {
         </nav>
 
         <div className="flex items-center gap-3 flex-shrink-0">
-          <span className="text-sm text-slate-500 hidden sm:inline">
+          <span className="text-sm text-slate-500 hidden xl:inline">
             Hi, <strong className="text-slate-800">{user && formatDoctorName(user.name)}</strong>
           </span>
 
@@ -155,7 +158,7 @@ export default function DoctorHeader() {
           </div>
 
           <button onClick={logout} className="btn-ghost gap-1.5 text-sm text-red-500 hover:text-red-600 px-2.5 sm:px-3.5">
-            <LogOut className="w-4 h-4" /> <span className="hidden sm:inline">Sign Out</span>
+            <LogOut className="w-4 h-4" /> <span className="hidden lg:inline">Sign Out</span>
           </button>
         </div>
       </div>

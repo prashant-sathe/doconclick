@@ -62,7 +62,7 @@ export default function PatientVideoCallPage() {
   const unlockRemainingSec = Math.max(0, Math.ceil((unlockAt - now) / 1000));
 
   return (
-    <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
+    <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
       <PatientHeader />
       <PatientMobileNav />
 

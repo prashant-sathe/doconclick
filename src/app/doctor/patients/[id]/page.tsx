@@ -105,7 +105,7 @@ function DoctorPatientHistoryInner() {
   const bmi = subject?.height && subject?.weight ? computeBMI(subject.height, subject.weight) : null;
 
   return (
-    <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
+    <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
       <DoctorHeader />
       <DoctorMobileNav />
 

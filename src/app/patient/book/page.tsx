@@ -295,7 +295,7 @@ function PatientBookInner() {
 
   if (booked) {
     return (
-      <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
+      <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
         <PatientHeader />
         <PatientMobileNav />
         <div className="flex items-center justify-center p-6">
@@ -350,7 +350,7 @@ function PatientBookInner() {
   const typeLabel = ALL_TYPES.find((t) => t.id === form.consultType)?.label;
 
   return (
-    <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
+    <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
       <PatientHeader />
       <PatientMobileNav />
 

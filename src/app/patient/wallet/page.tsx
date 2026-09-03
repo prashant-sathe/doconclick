@@ -28,7 +28,7 @@ export default function WalletPage() {
   const [showTopUp, setShowTopUp] = useState(false);
 
   return (
-    <div className="min-h-screen gradient-surface pb-24 sm:pb-10">
+    <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
       <PatientHeader />
       <PatientMobileNav />
       <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
