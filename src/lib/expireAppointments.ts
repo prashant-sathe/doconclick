@@ -8,9 +8,19 @@ export const APPOINTMENT_REQUEST_TIMEOUT_MS = 30 * 60 * 1000;
 // the timeout window. Called lazily from read/write routes rather than a
 // background job — cheap no-op when nothing is stale.
 export async function expireStalePendingRequests() {
-  const cutoff = new Date(Date.now() - APPOINTMENT_REQUEST_TIMEOUT_MS);
+  const now = new Date();
+  const cutoff = new Date(now.getTime() - APPOINTMENT_REQUEST_TIMEOUT_MS);
   const stale = await prisma.appointment.findMany({
-    where: { status: "PENDING_APPROVAL", createdAt: { lt: cutoff } },
+    // A request expires only once BOTH are true: the 30-min response window
+    // has passed AND the appointment's own scheduled time is in the past.
+    // For a "book now" request scheduledAt ≈ createdAt, so the second clause
+    // is a no-op and behaviour is unchanged. For a request scheduled days
+    // out, the doctor has until the appointment time to respond — no timer.
+    where: {
+      status: "PENDING_APPROVAL",
+      createdAt: { lt: cutoff },
+      scheduledAt: { lt: now },
+    },
     select: { id: true, patientId: true, doctor: { select: { name: true } } },
   });
   if (stale.length === 0) return;

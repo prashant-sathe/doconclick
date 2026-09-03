@@ -177,6 +177,10 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
   const router = useRouter();
   const needsPayment = a.status === "SCHEDULED" && a.paymentMethod === "ONLINE" && a.paymentStatus === "PENDING";
   const timeLeftMs = REQUEST_TIMEOUT_MS - (now - new Date(a.createdAt).getTime());
+  // A booking made for a future slot (more than the response window ahead)
+  // isn't on the 30-min accept clock — the doctor has until the slot time.
+  const scheduledForLater =
+    new Date(a.scheduledAt).getTime() > new Date(a.createdAt).getTime() + REQUEST_TIMEOUT_MS;
   const [downloadingAtt, setDownloadingAtt] = useState<string | null>(null);
 
   // Web: the <a target="_blank"> opens the file as before. Native: <a> can't
@@ -231,11 +235,16 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       {a.status === "PENDING_APPROVAL" && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
           <span className="flex items-center gap-2">
-            <Clock className="w-4 h-4 flex-shrink-0" /> Waiting for {formatDoctorName(a.doctor.name)} to accept this request.
+            <Clock className="w-4 h-4 flex-shrink-0" />
+            {scheduledForLater
+              ? `Waiting for ${formatDoctorName(a.doctor.name)} to confirm your scheduled appointment.`
+              : `Waiting for ${formatDoctorName(a.doctor.name)} to accept this request.`}
           </span>
-          <span className="text-xs font-mono font-semibold text-amber-700 flex-shrink-0">
-            {timeLeftMs > 0 ? `${formatCountdown(timeLeftMs)} left` : "Expiring…"}
-          </span>
+          {!scheduledForLater && (
+            <span className="text-xs font-mono font-semibold text-amber-700 flex-shrink-0">
+              {timeLeftMs > 0 ? `${formatCountdown(timeLeftMs)} left` : "Expiring…"}
+            </span>
+          )}
         </div>
       )}
       {a.status === "CANCELLED" && a.reassignedTo && (
