@@ -94,7 +94,7 @@ function formatCountdown(ms: number): string {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-// Seconds left before a paid video appointment's "Join Video Call" button
+// Seconds left before a paid video appointment's "Join Video Consultation" button
 // unlocks; 0 once VIDEO_UNLOCK_DELAY_SECONDS has passed since payment.
 function videoUnlockRemainingSec(a: Appointment, now: number): number {
   if (!a.paidAt) return 0;
@@ -301,7 +301,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       {needsPayment && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
           <span className="flex items-center gap-2">
-            <CardIcon className="w-4 h-4 flex-shrink-0" /> Payment pending — pay ₹{Math.max(0, a.amount - a.discountAmount)}{a.discountAmount > 0 ? ` (${a.couponCode} applied)` : ""} to confirm your visit with {formatDoctorName(a.doctor.name)}.
+            <CardIcon className="w-4 h-4 flex-shrink-0" /> Payment pending — pay ₹{Math.max(0, a.amount - a.discountAmount)}{a.discountAmount > 0 ? ` (${a.couponCode} applied)` : ""} to confirm your consultation with {formatDoctorName(a.doctor.name)}.
           </span>
         </div>
       )}
@@ -374,7 +374,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
             </span>
           ) : (
             <Link href={`/patient/video/${a.id}`} className="btn-secondary py-2 px-3 text-xs">
-              <Video className="w-3.5 h-3.5" /> Join Video Call
+              <Video className="w-3.5 h-3.5" /> Join Video Consultation
             </Link>
           )
         )}
@@ -511,7 +511,7 @@ export default function PatientAppointments() {
           </div>
           <div>
             <h1 className="text-xl font-extrabold text-slate-900">My Appointments</h1>
-            <p className="text-slate-500 text-sm">Track requests, upcoming visits, and past consultations.</p>
+            <p className="text-slate-500 text-sm">Track requests, upcoming appointments, and past consultations.</p>
           </div>
         </div>
 

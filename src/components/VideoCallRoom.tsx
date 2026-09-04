@@ -65,7 +65,7 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
       const res = await fetch(`/api/appointments/${appointmentId}/video-token`);
       if (!res.ok) {
         if (cancelled) return;
-        setError((await res.json().catch(() => ({}))).error ?? "Could not start the video call.");
+        setError((await res.json().catch(() => ({}))).error ?? "Could not start the video consultation.");
         setStatus("error");
         return;
       }
@@ -104,7 +104,7 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
 
     join().catch((err) => {
       if (cancelled) return;
-      setError(err instanceof Error ? err.message : "Could not start the video call.");
+      setError(err instanceof Error ? err.message : "Could not start the video consultation.");
       setStatus("error");
     });
 

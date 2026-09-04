@@ -14,7 +14,7 @@ const EVENT_COPY: Record<string, { title: string; message: (doctor: string) => s
   ARRIVED: { title: "Your doctor has arrived!", message: (d) => `${d} is here for your visit.`, icon: MapPinCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
   REJECTED: { title: "Request declined", message: (d) => `${d} was unable to accept your request.`, icon: XCircle, color: "text-red-600", bg: "bg-red-50" },
   EXPIRED: { title: "No response from doctor", message: (d) => `${d} didn't respond in time.`, icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
-  COMPLETED: { title: "Consultation completed", message: (d) => `Your visit with ${d} is complete.`, icon: CheckCircle2, color: "text-blue-600", bg: "bg-blue-50" },
+  COMPLETED: { title: "Consultation completed", message: (d) => `Your consultation with ${d} is complete.`, icon: CheckCircle2, color: "text-blue-600", bg: "bg-blue-50" },
   CANCELLED: { title: "Appointment cancelled", message: (d) => `Your appointment with ${d} was cancelled.`, icon: XCircle, color: "text-slate-500", bg: "bg-slate-100" },
 };
 

@@ -126,7 +126,7 @@ export const REPORT_CONFIGS: ReportConfig[] = [
   {
     slug: "revenue-by-consult-type",
     title: "Revenue by Consult Type",
-    description: "Clinic vs Home Visit vs Video revenue breakdown.",
+    description: "Clinic vs Home Visit vs Video Consultation revenue breakdown.",
     category: "Platform Revenue & Bookings",
     endpoint: "/api/admin/reports/revenue-by-consult-type",
     dateFilter: true,

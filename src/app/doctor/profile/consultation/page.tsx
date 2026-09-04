@@ -92,15 +92,15 @@ export default function ConsultationSettingsPage() {
     >
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="input-label">Clinic Fee (₹)</label>
+          <label className="input-label">Clinic Consultation Fee (₹)</label>
           <input type="number" min={0} inputMode="numeric" className="input-field" placeholder="500" value={form.consultFee} onChange={(e) => set({ consultFee: e.target.value })} />
         </div>
         <div>
-          <label className="input-label">Video Fee (₹)</label>
+          <label className="input-label">Video Consultation Fee (₹)</label>
           <input type="number" min={0} inputMode="numeric" className="input-field" placeholder="400" value={form.videoFee} onChange={(e) => set({ videoFee: e.target.value })} />
         </div>
         <div>
-          <label className="input-label">Home Visit (₹)</label>
+          <label className="input-label">Home Visit Fee (₹)</label>
           <input type="number" min={0} inputMode="numeric" className="input-field" placeholder="800" value={form.homeVisitFee} onChange={(e) => set({ homeVisitFee: e.target.value })} />
         </div>
       </div>
@@ -108,7 +108,7 @@ export default function ConsultationSettingsPage() {
       <div className="space-y-2">
         {toggleRow(Building2, "Offer Clinic Visits", "offersClinic")}
         {toggleRow(Home, "Offer Home Visits", "offersHomeVisit")}
-        {toggleRow(Video, "Offer Video Call Consultation", "offersVideo")}
+        {toggleRow(Video, "Offer Video Consultations", "offersVideo")}
       </div>
 
       <div className={cn(!form.offersHomeVisit && "opacity-50")}>

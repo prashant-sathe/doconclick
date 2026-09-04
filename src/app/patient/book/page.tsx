@@ -91,7 +91,7 @@ function openingWhenLabel(opening: NextOpening<unknown>) {
 const ALL_TYPES = [
   { id: "CLINIC", label: "Clinic Visit", icon: Building2 },
   { id: "HOME",   label: "Home Visit",   icon: Home },
-  { id: "VIDEO",  label: "Video Call",   icon: Video },
+  { id: "VIDEO",  label: "Video Consultation", icon: Video },
 ];
 
 function defaultConsultType(doctor: Doctor | null | undefined, userPos: [number, number] | null = null): string {
@@ -516,7 +516,7 @@ function PatientBookInner() {
                   <p className="font-semibold">
                     {selectedDoctor && formatDoctorName(selectedDoctor.name)} is {distance?.toFixed(1)} km away — too far for a home visit right now.
                   </p>
-                  <p className="mt-0.5">They only offer home visits within {homeVisitRadiusKm} km. Try Clinic Visit or Video Call instead.</p>
+                  <p className="mt-0.5">They only offer home visits within {homeVisitRadiusKm} km. Try Clinic Visit or Video Consultation instead.</p>
                 </div>
               </div>
             )}

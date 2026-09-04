@@ -26,13 +26,13 @@ export async function GET(
   }
   if (appointment.consultType !== "VIDEO" || appointment.status !== "SCHEDULED") {
     return NextResponse.json(
-      { error: "Video call is only available for scheduled video consultations." },
+      { error: "This appointment is not a scheduled video consultation." },
       { status: 403 }
     );
   }
   if (appointment.paymentStatus !== "PAID") {
     return NextResponse.json(
-      { error: "Payment is required before joining the video call." },
+      { error: "Payment is required before joining the video consultation." },
       { status: 403 }
     );
   }
@@ -41,7 +41,7 @@ export async function GET(
     : 0; // defensive: PAID but no paidAt somehow — don't block
   if (Date.now() < unlockAt) {
     return NextResponse.json(
-      { error: "Video call is unlocking…", availableAt: new Date(unlockAt).toISOString() },
+      { error: "Video consultation is unlocking…", availableAt: new Date(unlockAt).toISOString() },
       { status: 403 }
     );
   }
@@ -49,8 +49,8 @@ export async function GET(
   const isPatient = authUser.id === appointment.patientId;
   const otherPartyId = isPatient ? appointment.doctorId : appointment.patientId;
   void sendPushToUser(otherPartyId, {
-    title: "Video call started",
-    body: `${authUser.name} has joined the video call.`,
+    title: "Video consultation started",
+    body: `${authUser.name} has joined the video consultation.`,
     url: isPatient ? `/doctor/video/${id}` : `/patient/video/${id}`,
   });
 

@@ -55,7 +55,7 @@ export default function AvailabilitySettingsPage() {
   return (
     <DoctorProfileSubShell
       title="Available Timings"
-      description="Applies to Home Visit and Video Call requests. Clinic hours are set per clinic on the Clinics page."
+      description="Applies to Home Visit and Video Consultation requests. Clinic hours are set per clinic on the Clinics page."
       icon={<Clock className="w-5 h-5" />}
       tint="bg-blue-50 text-blue-500"
       loading={loading}

@@ -351,7 +351,7 @@ export default function DoctorProfilePage() {
                 {profile.offersVideo && (
                   <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                     <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                    <p className="text-xs text-slate-500">Video Call</p>
+                    <p className="text-xs text-slate-500">Video Consultation</p>
                     <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{profile.videoFee}</p>
                   </div>
                 )}

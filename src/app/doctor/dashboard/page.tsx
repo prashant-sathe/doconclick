@@ -93,7 +93,7 @@ function isLateCancellation(a: Appointment): boolean {
   if (!a.acceptedAt) return false;
   return Date.now() - new Date(a.acceptedAt).getTime() > CANCEL_GRACE_PERIOD_MS;
 }
-// Seconds left before a paid video appointment's "Join Video Call" button
+// Seconds left before a paid video appointment's "Join Video Consultation" button
 // unlocks; 0 once VIDEO_UNLOCK_DELAY_SECONDS has passed since payment.
 function videoUnlockRemainingSec(a: Appointment, now: number): number {
   if (!a.paidAt) return 0;
@@ -252,7 +252,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       <textarea
         rows={2}
         className="input-field resize-none"
-        placeholder="Visit notes / diagnosis (optional)…"
+        placeholder="Consultation notes / diagnosis (optional)…"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
       />
@@ -406,7 +406,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <CheckCircle2 className="w-5 h-5 text-teal-600" />
-              <h3 className="font-bold text-slate-800">Complete this visit?</h3>
+              <h3 className="font-bold text-slate-800">Complete this consultation?</h3>
             </div>
             <p className="text-sm text-slate-500 mb-5">
               This saves the prescription and closes the appointment. {patientLabel(appt)} will be able to view it right away — this cannot be undone.
@@ -697,7 +697,7 @@ export default function DoctorDashboard() {
               Today · {new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}
             </span>
             <span className="text-[11px] font-bold bg-white/15 rounded-full px-2.5 py-1 flex-shrink-0">
-              {todayUpcoming.length} visit{todayUpcoming.length === 1 ? "" : "s"} today
+              {todayUpcoming.length} appointment{todayUpcoming.length === 1 ? "" : "s"} today
             </span>
           </div>
           {nextAppt ? (
@@ -711,7 +711,7 @@ export default function DoctorDashboard() {
               </p>
             </>
           ) : (
-            <p className="text-[15px] font-bold">No more visits scheduled today</p>
+            <p className="text-[15px] font-bold">No more appointments scheduled today</p>
           )}
           <div className="h-px bg-white/15 my-3.5" />
           <div className="grid grid-cols-3 gap-2">
@@ -720,7 +720,7 @@ export default function DoctorDashboard() {
               <p className="text-[15px] font-extrabold mt-0.5">₹{todayEarnings.toLocaleString("en-IN")}</p>
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Total Consults</p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Total Consultations</p>
               <p className="text-[15px] font-extrabold mt-0.5">{completedAll.length}</p>
             </div>
             <div>
@@ -877,7 +877,7 @@ export default function DoctorDashboard() {
                               <IndianRupee className="w-3 h-3" /> {a.amount} · {
                                 a.paymentMethod === "ONLINE"
                                   ? (a.paymentStatus === "PAID" ? "Paid Online" : "Payment Pending")
-                                  : "Cash on visit"
+                                  : "Cash Payment"
                               }
                             </div>
                             {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
@@ -911,7 +911,7 @@ export default function DoctorDashboard() {
                               </span>
                             ) : (
                               <Link href={`/doctor/video/${a.id}`} className="btn-primary flex-1 h-11 justify-center">
-                                <Video className="w-4 h-4" /> Join Video Call
+                                <Video className="w-4 h-4" /> Join Video Consultation
                               </Link>
                             )
                           )}
@@ -1008,7 +1008,7 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-              <h2 className="font-bold text-slate-800">Recent Completed Visits</h2>
+              <h2 className="font-bold text-slate-800">Recent Completed Consultations</h2>
             </div>
             <div className="divide-y divide-slate-50">
               {(completedExpanded ? completed : completed.slice(0, PAGE_SIZE)).map((a) => (

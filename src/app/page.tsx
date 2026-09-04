@@ -56,7 +56,7 @@ const SPECIALTIES = [
 const HOW_STEPS = [
   { n: "01", title: "Register in 2 mins", desc: "Create your patient profile with basic details. No lengthy forms." },
   { n: "02", title: "Choose a Doctor",    desc: "Browse verified specialists. Filter by specialty, location & availability." },
-  { n: "03", title: "Book Instantly",     desc: "Pick Home Visit, Video Call, or Clinic. Confirm in one click." },
+  { n: "03", title: "Book Instantly",     desc: "Pick Home Visit, Video Consultation, or Clinic. Confirm in one click." },
   { n: "04", title: "Get Treated",        desc: "Your doctor arrives or connects on time. Pay securely online." },
 ];
 
@@ -129,7 +129,7 @@ export default function Home() {
                 <p className="text-white font-bold mb-4 text-sm uppercase tracking-wider">Choose Consultation</p>
                 {[
                   { icon: HomeIcon,  label: "Home Visit",   sub: "Doctor at your door", color: "bg-emerald-400" },
-                  { icon: Video,     label: "Video Call",   sub: "Instant online consult", color: "bg-blue-400" },
+                  { icon: Video,     label: "Video Consultation", sub: "Instant online consult", color: "bg-blue-400" },
                   { icon: Building2, label: "Clinic Visit", sub: "Book an appointment", color: "bg-purple-400" },
                 ].map(({ icon: Icon, label, sub, color }) => (
                   <div key={label} className="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 cursor-pointer transition-all mb-2 last:mb-0">
@@ -255,7 +255,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { icon: HomeIcon,  color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", title: "Home Visit", desc: "A verified doctor visits you at your home. Perfect for elderly patients, post-surgery care, and urgent situations.", perks: ["Doctor arrives in 30-90 min", "Real-time tracking", "No travel needed"] },
-              { icon: Video,     color: "text-blue-600",    bg: "bg-blue-50",    border: "border-blue-100",    title: "Video Consultation", desc: "Consult top specialists from the comfort of your home via HD video. Get prescriptions and follow-ups online.", perks: ["Instant connection", "HD video call", "Digital prescription"] },
+              { icon: Video,     color: "text-blue-600",    bg: "bg-blue-50",    border: "border-blue-100",    title: "Video Consultation", desc: "Consult top specialists from the comfort of your home via HD video. Get prescriptions and follow-ups online.", perks: ["Instant connection", "HD video consultation", "Digital prescription"] },
               { icon: Building2, color: "text-purple-600",  bg: "bg-purple-50",  border: "border-purple-100",  title: "Clinic Visit",  desc: "Book a confirmed slot at the doctor's clinic — zero waiting time. Walk in exactly when your appointment is.", perks: ["Zero waiting time", "Confirmed slot", "In-person examination"] },
             ].map(({ icon: Icon, color, bg, border, title, desc, perks }) => (
               <div key={title} className={`stat-card card-hover border ${border}`}>

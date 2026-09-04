@@ -163,7 +163,7 @@ function makeMarkerTooltipHtml(opts: {
 const ALL_TYPES = [
   { id: "HOME", label: "Home Visit", icon: Home },
   { id: "CLINIC", label: "Clinic Visit", icon: Building2 },
-  { id: "VIDEO", label: "Video Call", icon: Video },
+  { id: "VIDEO", label: "Video Consultation", icon: Video },
 ];
 
 function defaultConsultType(doctor: Doctor | null | undefined): string {
@@ -1141,7 +1141,7 @@ function PatientDashboardInner() {
                     <IndianRupee className="w-4 h-4 text-blue-600" />
                     <span className="text-sm font-bold text-blue-700">{fee}</span>
                     <span className="text-xs text-blue-500">
-                      {consultType === "HOME" ? "Home visit fee" : consultType === "CLINIC" ? "Clinic fee" : "Video fee"}
+                      {consultType === "HOME" ? "Home Visit Fee" : consultType === "CLINIC" ? "Clinic Consultation Fee" : "Video Consultation Fee"}
                     </span>
                     {consultType === "HOME" && eta != null && (
                       <span className="text-xs text-blue-600 font-semibold ml-auto flex items-center gap-1">
@@ -1159,7 +1159,7 @@ function PatientDashboardInner() {
                           {formatDoctorName(selectedDoctor.name)} is {homeVisitDistanceKm?.toFixed(1)} km away — too far for a home visit right now.
                         </p>
                         <p className="text-xs text-red-700 mt-0.5">
-                          They only offer home visits within {homeVisitRadiusKm} km. Try Clinic Visit or Video Call instead.
+                          They only offer home visits within {homeVisitRadiusKm} km. Try Clinic Visit or Video Consultation instead.
                         </p>
                       </div>
                     </div>
@@ -1523,7 +1523,7 @@ function PatientDashboardInner() {
                         {offersVideo && (
                           <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                             <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                            <p className="text-xs text-slate-500">Video Call</p>
+                            <p className="text-xs text-slate-500">Video Consultation</p>
                             <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.videoFee}</p>
                           </div>
                         )}

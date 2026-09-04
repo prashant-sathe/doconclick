@@ -288,7 +288,7 @@ export default function AdminFinance() {
           </div>
         </div>
         <div className="form-group mb-4">
-          <label className="input-label">Video Call Commission (%)</label>
+          <label className="input-label">Video Consultation Commission (%)</label>
           <div className="relative">
             <input
               type="number"

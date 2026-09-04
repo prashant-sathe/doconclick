@@ -80,7 +80,7 @@ export default function DoctorChatPage() {
               <Clock className="w-6 h-6 text-amber-400" />
               <p className="text-sm text-slate-500">
                 {chatClosed
-                  ? `This chat closed when the visit with ${patientLabel(appt)} was completed.`
+                  ? `This chat closed when the consultation with ${patientLabel(appt)} was completed.`
                   : `Accept this request to start chatting with ${patientLabel(appt)}.`}
               </p>
             </div>

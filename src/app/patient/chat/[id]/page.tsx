@@ -73,7 +73,7 @@ export default function PatientChatPage() {
               <Clock className="w-6 h-6 text-amber-400" />
               <p className="text-sm text-slate-500">
                 {chatClosed
-                  ? "This chat has closed now that your visit is complete."
+                  ? "This chat has closed now that your consultation is complete."
                   : `Chat opens once ${formatDoctorName(appt.doctor.name)} accepts this request.`}
               </p>
             </div>

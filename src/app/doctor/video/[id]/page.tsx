@@ -96,7 +96,7 @@ export default function DoctorVideoCallPage() {
           ) : !requestOpen ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">Accept this request to start a video call with {patientLabel(appt)}.</p>
+              <p className="text-sm text-slate-500">Accept this request to start a video consultation with {patientLabel(appt)}.</p>
             </div>
           ) : !paid ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
@@ -106,7 +106,7 @@ export default function DoctorVideoCallPage() {
           ) : unlockRemainingSec > 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Loader2 className="w-6 h-6 text-teal-400 animate-spin" />
-              <p className="text-sm text-slate-500">Video call unlocking in {unlockRemainingSec}s…</p>
+              <p className="text-sm text-slate-500">Video consultation unlocking in {unlockRemainingSec}s…</p>
               <p className="text-xs text-slate-400">
                 Consultation will start at {new Date(unlockAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
               </p>
@@ -116,10 +116,10 @@ export default function DoctorVideoCallPage() {
               <div className="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center">
                 <Video className="w-6 h-6 text-teal-600" />
               </div>
-              <p className="text-sm text-slate-700 font-semibold">Ready to start the video call with {patientLabel(appt)}?</p>
+              <p className="text-sm text-slate-700 font-semibold">Ready to start the video consultation with {patientLabel(appt)}?</p>
               <p className="text-xs text-slate-400 max-w-xs">This will turn on your camera and microphone.</p>
               <button onClick={() => setStarted(true)} className="btn-primary py-2.5 px-5 text-sm mt-1">
-                <Video className="w-4 h-4" /> Start Video Call
+                <Video className="w-4 h-4" /> Start Video Consultation
               </button>
             </div>
           ) : (
