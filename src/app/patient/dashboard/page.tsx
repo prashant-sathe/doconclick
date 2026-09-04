@@ -7,7 +7,7 @@ import { Suspense, useEffect, useRef, useState, useCallback, useMemo } from "rea
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   MapPin, Home, Building2, Video, Stethoscope, Clock,
-  ChevronDown, X, Loader2, CheckCircle, LogOut, Languages,
+  ChevronDown, X, Loader2, CheckCircle, UserCircle, Languages,
   Navigation, AlertCircle, IndianRupee, CalendarClock, Siren,
   CalendarCheck2, AlertTriangle, ShieldCheck, Users, Search,
   Bookmark, BookmarkCheck, Sparkles, Compass, RefreshCw, Crosshair,
@@ -215,7 +215,7 @@ function nextOpeningLocalInput(next: { daysAhead: number; fromTime: string }) {
 // PAGE COMPONENT
 // ══════════════════════════════════════════════════════════════════════════
 function PatientDashboardInner() {
-  const { user, logout, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { specialties, colorFor } = useSpecialties();
@@ -930,16 +930,16 @@ function PatientDashboardInner() {
             onClick={() => setLocationPickerOpen(true)}
             className="glass-card rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 pointer-events-auto shadow-lg min-w-0 text-left"
           >
-            <img src="/logo-icon.png" alt="DocOnClick" className="w-8 h-8 sm:w-9 sm:h-9 object-contain flex-shrink-0" />
-            <div className="min-w-0 hidden xs:block sm:block">
-              <p className="text-sm font-bold text-slate-900 leading-none">DocOnClick</p>
+            <div className="min-w-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="DocOnClick" className="h-6 sm:h-7 w-auto object-contain" />
               <p className={cn("text-xs mt-0.5 truncate", customLabel ? "text-blue-600 font-semibold" : "text-slate-500")}>
                 {customLabel ? `📍 ${customLabel}` : posError ? "📍 Set your location" : "📍 Your location · Change"}
               </p>
             </div>
           </button>
 
-          {/* Right: profile + appointments + user + logout */}
+          {/* Right: quick actions + profile */}
           <div className="glass-card rounded-2xl px-2.5 sm:px-4 py-2.5 sm:py-3 flex items-center gap-1.5 sm:gap-3 pointer-events-auto shadow-lg flex-shrink-0">
             {profilePercent != null && profilePercent < 100 && (
               <button
@@ -964,16 +964,12 @@ function PatientDashboardInner() {
             >
               <CalendarCheck2 className="w-4 h-4" />
             </button>
-            <div className="text-right hidden xl:block">
-              <p className="text-xs font-semibold text-slate-900 leading-none">{user?.name}</p>
-              <p className="text-xs text-slate-500 mt-0.5">Patient</p>
-            </div>
             <button
-              onClick={logout}
-              className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100 transition-colors flex-shrink-0"
-              title="Sign out"
+              onClick={() => router.push("/patient/profile")}
+              className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors flex-shrink-0"
+              title="Profile"
             >
-              <LogOut className="w-4 h-4" />
+              <UserCircle className="w-4 h-4" />
             </button>
           </div>
         </div>

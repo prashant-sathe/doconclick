@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { CalendarCheck2, UserCircle, LogOut, Bell, Bookmark, Sparkles, Wallet as WalletIcon } from "lucide-react";
+import { CalendarCheck2, UserCircle, Bell, Bookmark, Sparkles, Wallet as WalletIcon } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { usePatientNotifications } from "@/hooks/usePatientNotifications";
@@ -48,7 +48,7 @@ const STATUS_DOT: Record<string, string> = {
 };
 
 export default function PatientHeader() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [bellOpen, setBellOpen] = useState(false);
@@ -77,9 +77,9 @@ export default function PatientHeader() {
       style={{ top: "var(--imp-banner-h, 0px)" }}
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-        <Link href="/patient/dashboard" className="flex items-center gap-2 flex-shrink-0">
-          <img src="/logo-icon.png" alt="DocOnClick" className="w-8 h-8 object-contain" />
-          <span className="font-extrabold text-slate-900 hidden sm:inline">DocOnClick</span>
+        <Link href="/patient/dashboard" className="flex items-center flex-shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="DocOnClick" className="h-7 sm:h-8 w-auto object-contain" />
         </Link>
 
         {/* Desktop nav — shown from lg up; below that the fixed bottom
@@ -214,9 +214,6 @@ export default function PatientHeader() {
             )}
           </div>
 
-          <button onClick={logout} className="btn-ghost gap-1.5 text-sm text-red-500 hover:text-red-600 px-2.5 sm:px-3.5">
-            <LogOut className="w-4 h-4" /> <span className="hidden lg:inline">Sign Out</span>
-          </button>
         </div>
       </div>
 
