@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { getOpenAIClient, ASSISTANT_MODEL } from "@/lib/openai";
 import { ensureSpecialtiesSeeded } from "@/lib/specialties";
-import { haversine } from "@/lib/geo";
+import { haversine, withinSearchRadius } from "@/lib/geo";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
 
 type InputItem = OpenAI.Responses.ResponseInputItem;
@@ -37,7 +37,7 @@ Rules:
 - Call get_my_profile early if useful context (age, allergies, existing conditions) would sharpen your triage — don't make the patient repeat what's already on file. Call get_my_appointments if they ask about a past or upcoming visit.
 - Always call the list_specialties and find_doctors tools rather than naming a specialty or doctor from your own knowledge — the app's specialty list and doctor directory are the source of truth.
 - Ask short, focused questions, one or two at a time. Whenever a question has a small set of likely answers, also call suggest_quick_replies with those options so the app can show tappable chips.
-- Once you have enough information, call find_doctors with the specialty you've settled on, and briefly explain your reasoning in the same turn.
+- Once you have enough information, call find_doctors with the specialty you've settled on, and briefly explain your reasoning in the same turn. find_doctors already respects the patient's chosen search range — if it returns no doctors and a range is set, say so and suggest widening the range in their profile (Profile → Doctor Search Range).
 - You never book appointments yourself. Once you've shown doctors, the patient books through the app's normal booking screen — just recommend, don't try to complete a booking in the conversation.
 - For app/account problems that aren't medical — a payment that didn't go through, a booking bug, a billing dispute, a complaint about a doctor's conduct, or anything else needing a human to step in — call create_support_ticket so the DocOnClick team can follow up, and tell the patient you've done so. Never raise a ticket for a medical question; that's what specialty recommendations are for. If the patient asks about a ticket they raised before, call list_my_support_tickets.`;
 
@@ -52,7 +52,7 @@ const TOOLS: OpenAI.Responses.Tool[] = [
   {
     type: "function",
     name: "find_doctors",
-    description: "Find approved, verified doctors on the platform for a given specialty, sorted by distance from the patient. Returns up to 5 doctors.",
+    description: "Find approved, verified doctors on the platform for a given specialty, sorted by distance from the patient. Returns { searchRadiusKm, doctors } — up to 5 doctors already filtered to the patient's chosen search range (searchRadiusKm; null means no limit). Doctors offering video are included regardless of distance. If doctors is empty and searchRadiusKm is set, tell the patient no in-range doctors were found and suggest they widen their search range in their profile.",
     strict: true,
     parameters: {
       type: "object",
@@ -147,8 +147,9 @@ function feeForConsultType(
 async function findDoctors(patientId: string, args: { specialty: string; consultType: string }) {
   const patientProfile = await prisma.patientProfile.findUnique({
     where: { userId: patientId },
-    select: { lat: true, lng: true },
+    select: { lat: true, lng: true, searchRadiusKm: true },
   });
+  const radiusKm = patientProfile?.searchRadiusKm ?? null;
 
   const now = new Date();
   const doctors = await prisma.user.findMany({
@@ -194,13 +195,20 @@ async function findDoctors(patientId: string, args: { specialty: string; consult
       };
     });
 
-  withDistance.sort((a, b) => {
+  const inRange = withDistance.filter((d) =>
+    withinSearchRadius(d.distanceKm, radiusKm, d.offersVideo)
+  );
+
+  inRange.sort((a, b) => {
     if (a.distanceKm == null) return 1;
     if (b.distanceKm == null) return -1;
     return a.distanceKm - b.distanceKm;
   });
 
-  return withDistance.slice(0, 5);
+  return {
+    searchRadiusKm: radiusKm,
+    doctors: inRange.slice(0, 5),
+  };
 }
 
 async function getMyProfile(patientId: string) {

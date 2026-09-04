@@ -2,10 +2,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, Bookmark, BookmarkX, Building2 } from "lucide-react";
+import { Loader2, Bookmark, BookmarkX, Building2, Compass, ChevronDown } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
-import { formatDoctorName } from "@/lib/utils";
+import { cn, formatDoctorName } from "@/lib/utils";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import RatingStars from "@/components/patient/RatingStars";
@@ -13,6 +13,8 @@ import VerifiedBadge from "@/components/patient/VerifiedBadge";
 
 interface SavedDoctorEntry {
   id: string;
+  distanceKm: number | null;
+  inRange: boolean;
   doctor: {
     id: string;
     name: string;
@@ -26,6 +28,7 @@ interface SavedDoctorEntry {
       avgRating: number;
       totalReviews: number;
       status: string;
+      offersVideo: boolean;
     } | null;
   };
 }
@@ -35,13 +38,19 @@ export default function SavedDoctorsPage() {
   const router = useRouter();
   const { colorFor } = useSpecialties();
   const [saved, setSaved] = useState<SavedDoctorEntry[]>([]);
+  const [searchRadiusKm, setSearchRadiusKm] = useState<number | null>(null);
+  const [showOutOfRange, setShowOutOfRange] = useState(false);
   const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
   const load = () => {
     fetch("/api/patients/me/saved-doctors")
-      .then((r) => (r.ok ? r.json() : []))
-      .then((d) => { setSaved(d); setLoading(false); });
+      .then((r) => (r.ok ? r.json() : { saved: [] }))
+      .then((d) => {
+        setSaved(Array.isArray(d) ? d : d.saved ?? []);
+        setSearchRadiusKm(Array.isArray(d) ? null : d.searchRadiusKm ?? null);
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -89,64 +98,94 @@ export default function SavedDoctorsPage() {
               Find a doctor to save
             </Link>
           </div>
-        ) : (
-          <div className="space-y-3">
-            {saved.map(({ id, doctor }) => {
-              const profile = doctor.doctorProfile;
-              return (
-                <div key={id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4">
-                  {profile?.photoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={profile.photoUrl} alt={doctor.name} className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 shadow" />
-                  ) : (
-                    <div
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-lg font-extrabold shadow"
-                      style={{ background: `linear-gradient(135deg, ${colorFor(profile?.specialty ?? "")}, ${colorFor(profile?.specialty ?? "")}99)` }}
-                    >
-                      {doctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-slate-900 truncate">{formatDoctorName(doctor.name)}</span>
-                      {profile?.status === "APPROVED" && <VerifiedBadge />}
-                    </div>
-                    <p className="text-xs text-slate-500 mt-0.5">{profile?.specialty}</p>
-                    {profile?.clinicName && (
-                      <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1 truncate">
-                        <Building2 className="w-3 h-3 flex-shrink-0" /> {profile.clinicName}
-                      </p>
-                    )}
-                    <div className="mt-1">
-                      <RatingStars avgRating={profile?.avgRating ?? 0} totalReviews={profile?.totalReviews ?? 0} />
-                    </div>
+        ) : (() => {
+          const inRange = saved.filter((s) => s.inRange);
+          const outOfRange = saved.filter((s) => !s.inRange);
+          const renderCard = (entry: SavedDoctorEntry, dimmed = false) => {
+            const { id, doctor, distanceKm } = entry;
+            const profile = doctor.doctorProfile;
+            return (
+              <div key={id} className={cn("bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4", dimmed && "opacity-60")}>
+                {profile?.photoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={profile.photoUrl} alt={doctor.name} className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 shadow" />
+                ) : (
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-lg font-extrabold shadow"
+                    style={{ background: `linear-gradient(135deg, ${colorFor(profile?.specialty ?? "")}, ${colorFor(profile?.specialty ?? "")}99)` }}
+                  >
+                    {doctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
                   </div>
-                  <div className="flex flex-col gap-2 flex-shrink-0">
-                    {profile?.status === "APPROVED" ? (
-                      <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary py-2 px-3 text-xs whitespace-nowrap">
-                        Book Again
-                      </Link>
-                    ) : (
-                      <span
-                        title="This doctor is currently unavailable for booking"
-                        className="btn-secondary py-2 px-3 text-xs whitespace-nowrap opacity-50 cursor-not-allowed"
-                      >
-                        Unavailable
-                      </span>
-                    )}
-                    <button
-                      onClick={() => remove(doctor.id)}
-                      disabled={removingId === doctor.id}
-                      className="btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50"
-                    >
-                      <BookmarkX className="w-3.5 h-3.5" /> Remove
-                    </button>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-slate-900 truncate">{formatDoctorName(doctor.name)}</span>
+                    {profile?.status === "APPROVED" && <VerifiedBadge />}
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {profile?.specialty}
+                    {distanceKm != null && <span className="text-slate-400"> · {distanceKm} km away</span>}
+                  </p>
+                  {profile?.clinicName && (
+                    <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1 truncate">
+                      <Building2 className="w-3 h-3 flex-shrink-0" /> {profile.clinicName}
+                    </p>
+                  )}
+                  <div className="mt-1">
+                    <RatingStars avgRating={profile?.avgRating ?? 0} totalReviews={profile?.totalReviews ?? 0} />
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
+                <div className="flex flex-col gap-2 flex-shrink-0">
+                  {profile?.status === "APPROVED" ? (
+                    <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary py-2 px-3 text-xs whitespace-nowrap">
+                      Book Again
+                    </Link>
+                  ) : (
+                    <span
+                      title="This doctor is currently unavailable for booking"
+                      className="btn-secondary py-2 px-3 text-xs whitespace-nowrap opacity-50 cursor-not-allowed"
+                    >
+                      Unavailable
+                    </span>
+                  )}
+                  <button
+                    onClick={() => remove(doctor.id)}
+                    disabled={removingId === doctor.id}
+                    className="btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50"
+                  >
+                    <BookmarkX className="w-3.5 h-3.5" /> Remove
+                  </button>
+                </div>
+              </div>
+            );
+          };
+
+          return (
+            <div className="space-y-3">
+              {inRange.map((e) => renderCard(e))}
+
+              {inRange.length === 0 && outOfRange.length > 0 && (
+                <p className="text-sm text-slate-400 text-center py-6">
+                  All your saved doctors are outside your {searchRadiusKm} km search range.
+                </p>
+              )}
+
+              {outOfRange.length > 0 && (
+                <div className="pt-2">
+                  <button
+                    onClick={() => setShowOutOfRange((v) => !v)}
+                    className="w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 py-2"
+                  >
+                    <Compass className="w-3.5 h-3.5" />
+                    {outOfRange.length} saved {outOfRange.length === 1 ? "doctor" : "doctors"} outside your {searchRadiusKm} km range
+                    <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", showOutOfRange && "rotate-180")} />
+                  </button>
+                  {showOutOfRange && <div className="space-y-3 mt-2">{outOfRange.map((e) => renderCard(e, true))}</div>}
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

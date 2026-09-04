@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { normalizeSearchRadiusKm } from "@/lib/geo";
 
 const EDITABLE_FIELDS = [
   "location",
@@ -19,6 +20,7 @@ const EDITABLE_FIELDS = [
   "photoUrl",
   "lat",
   "lng",
+  "searchRadiusKm",
 ] as const;
 
 // GET: The logged-in patient's own profile
@@ -59,7 +61,9 @@ export async function PATCH(req: Request) {
   for (const key of EDITABLE_FIELDS) {
     if (!(key in body)) continue;
     const value = body[key];
-    if (key === "height" || key === "weight" || key === "lat" || key === "lng") {
+    if (key === "searchRadiusKm") {
+      data[key] = normalizeSearchRadiusKm(value);
+    } else if (key === "height" || key === "weight" || key === "lat" || key === "lng") {
       data[key] = value === "" || value == null ? null : Number(value);
     } else {
       data[key] = value === "" || value == null ? null : String(value);
@@ -74,10 +78,20 @@ export async function PATCH(req: Request) {
   }
 
   try {
-    const updated = await prisma.patientProfile.update({
-      where: { userId: authUser.id },
-      data,
-    });
+    let updated;
+    try {
+      updated = await prisma.patientProfile.update({ where: { userId: authUser.id }, data });
+    } catch (err) {
+      // A dev server still running against a pre-migration Prisma client will
+      // reject the newer `searchRadiusKm` field — save the rest rather than
+      // failing the whole request. Self-heals once the server is restarted.
+      if ("searchRadiusKm" in data) {
+        delete data.searchRadiusKm;
+        updated = await prisma.patientProfile.update({ where: { userId: authUser.id }, data });
+      } else {
+        throw err;
+      }
+    }
     return NextResponse.json(updated);
   } catch (err) {
     console.error(err);

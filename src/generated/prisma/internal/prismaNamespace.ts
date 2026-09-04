@@ -2461,7 +2461,8 @@ export const PatientProfileScalarFieldEnum = {
   emergencyContactPhone: 'emergencyContactPhone',
   photoUrl: 'photoUrl',
   lat: 'lat',
-  lng: 'lng'
+  lng: 'lng',
+  searchRadiusKm: 'searchRadiusKm'
 } as const
 
 export type PatientProfileScalarFieldEnum = (typeof PatientProfileScalarFieldEnum)[keyof typeof PatientProfileScalarFieldEnum]

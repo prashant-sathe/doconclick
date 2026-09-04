@@ -88,7 +88,12 @@ function buildDisplayEntries(items: ConversationItem[]): DisplayEntry[] {
       const call = items.find((c) => c.type === "function_call" && c.call_id === item.call_id);
       if (call?.name === "find_doctors") {
         try {
-          const doctors = JSON.parse(item.output ?? "[]") as AssistantDoctor[];
+          const parsed = JSON.parse(item.output ?? "{}") as
+            | AssistantDoctor[]
+            | { doctors?: AssistantDoctor[] };
+          // Tool output is { searchRadiusKm, doctors }; tolerate the legacy
+          // bare-array shape too.
+          const doctors = Array.isArray(parsed) ? parsed : parsed.doctors ?? [];
           if (doctors.length) entries.push({ kind: "doctors", doctors, key: `d-${idx}` });
         } catch {
           // malformed tool output — skip rendering doctor cards for this turn

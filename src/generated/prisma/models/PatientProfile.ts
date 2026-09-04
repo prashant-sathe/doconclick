@@ -32,6 +32,7 @@ export type PatientProfileAvgAggregateOutputType = {
   weight: number | null
   lat: number | null
   lng: number | null
+  searchRadiusKm: number | null
 }
 
 export type PatientProfileSumAggregateOutputType = {
@@ -40,6 +41,7 @@ export type PatientProfileSumAggregateOutputType = {
   weight: number | null
   lat: number | null
   lng: number | null
+  searchRadiusKm: number | null
 }
 
 export type PatientProfileMinAggregateOutputType = {
@@ -63,6 +65,7 @@ export type PatientProfileMinAggregateOutputType = {
   photoUrl: string | null
   lat: number | null
   lng: number | null
+  searchRadiusKm: number | null
 }
 
 export type PatientProfileMaxAggregateOutputType = {
@@ -86,6 +89,7 @@ export type PatientProfileMaxAggregateOutputType = {
   photoUrl: string | null
   lat: number | null
   lng: number | null
+  searchRadiusKm: number | null
 }
 
 export type PatientProfileCountAggregateOutputType = {
@@ -109,6 +113,7 @@ export type PatientProfileCountAggregateOutputType = {
   photoUrl: number
   lat: number
   lng: number
+  searchRadiusKm: number
   _all: number
 }
 
@@ -119,6 +124,7 @@ export type PatientProfileAvgAggregateInputType = {
   weight?: true
   lat?: true
   lng?: true
+  searchRadiusKm?: true
 }
 
 export type PatientProfileSumAggregateInputType = {
@@ -127,6 +133,7 @@ export type PatientProfileSumAggregateInputType = {
   weight?: true
   lat?: true
   lng?: true
+  searchRadiusKm?: true
 }
 
 export type PatientProfileMinAggregateInputType = {
@@ -150,6 +157,7 @@ export type PatientProfileMinAggregateInputType = {
   photoUrl?: true
   lat?: true
   lng?: true
+  searchRadiusKm?: true
 }
 
 export type PatientProfileMaxAggregateInputType = {
@@ -173,6 +181,7 @@ export type PatientProfileMaxAggregateInputType = {
   photoUrl?: true
   lat?: true
   lng?: true
+  searchRadiusKm?: true
 }
 
 export type PatientProfileCountAggregateInputType = {
@@ -196,6 +205,7 @@ export type PatientProfileCountAggregateInputType = {
   photoUrl?: true
   lat?: true
   lng?: true
+  searchRadiusKm?: true
   _all?: true
 }
 
@@ -306,6 +316,7 @@ export type PatientProfileGroupByOutputType = {
   photoUrl: string | null
   lat: number | null
   lng: number | null
+  searchRadiusKm: number | null
   _count: PatientProfileCountAggregateOutputType | null
   _avg: PatientProfileAvgAggregateOutputType | null
   _sum: PatientProfileSumAggregateOutputType | null
@@ -352,6 +363,7 @@ export type PatientProfileWhereInput = {
   photoUrl?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
   lat?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
   lng?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
+  searchRadiusKm?: Prisma.IntNullableFilter<"PatientProfile"> | number | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   dependents?: Prisma.PatientDependentListRelationFilter
 }
@@ -377,6 +389,7 @@ export type PatientProfileOrderByWithRelationInput = {
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  searchRadiusKm?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   dependents?: Prisma.PatientDependentOrderByRelationAggregateInput
 }
@@ -405,6 +418,7 @@ export type PatientProfileWhereUniqueInput = Prisma.AtLeast<{
   photoUrl?: Prisma.StringNullableFilter<"PatientProfile"> | string | null
   lat?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
   lng?: Prisma.FloatNullableFilter<"PatientProfile"> | number | null
+  searchRadiusKm?: Prisma.IntNullableFilter<"PatientProfile"> | number | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   dependents?: Prisma.PatientDependentListRelationFilter
 }, "id" | "userId">
@@ -430,6 +444,7 @@ export type PatientProfileOrderByWithAggregationInput = {
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  searchRadiusKm?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PatientProfileCountOrderByAggregateInput
   _avg?: Prisma.PatientProfileAvgOrderByAggregateInput
   _max?: Prisma.PatientProfileMaxOrderByAggregateInput
@@ -461,6 +476,7 @@ export type PatientProfileScalarWhereWithAggregatesInput = {
   photoUrl?: Prisma.StringNullableWithAggregatesFilter<"PatientProfile"> | string | null
   lat?: Prisma.FloatNullableWithAggregatesFilter<"PatientProfile"> | number | null
   lng?: Prisma.FloatNullableWithAggregatesFilter<"PatientProfile"> | number | null
+  searchRadiusKm?: Prisma.IntNullableWithAggregatesFilter<"PatientProfile"> | number | null
 }
 
 export type PatientProfileCreateInput = {
@@ -483,6 +499,7 @@ export type PatientProfileCreateInput = {
   photoUrl?: string | null
   lat?: number | null
   lng?: number | null
+  searchRadiusKm?: number | null
   user: Prisma.UserCreateNestedOneWithoutPatientProfileInput
   dependents?: Prisma.PatientDependentCreateNestedManyWithoutPatientProfileInput
 }
@@ -508,6 +525,7 @@ export type PatientProfileUncheckedCreateInput = {
   photoUrl?: string | null
   lat?: number | null
   lng?: number | null
+  searchRadiusKm?: number | null
   dependents?: Prisma.PatientDependentUncheckedCreateNestedManyWithoutPatientProfileInput
 }
 
@@ -531,6 +549,7 @@ export type PatientProfileUpdateInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  searchRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   user?: Prisma.UserUpdateOneRequiredWithoutPatientProfileNestedInput
   dependents?: Prisma.PatientDependentUpdateManyWithoutPatientProfileNestedInput
 }
@@ -556,6 +575,7 @@ export type PatientProfileUncheckedUpdateInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  searchRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   dependents?: Prisma.PatientDependentUncheckedUpdateManyWithoutPatientProfileNestedInput
 }
 
@@ -580,6 +600,7 @@ export type PatientProfileCreateManyInput = {
   photoUrl?: string | null
   lat?: number | null
   lng?: number | null
+  searchRadiusKm?: number | null
 }
 
 export type PatientProfileUpdateManyMutationInput = {
@@ -602,6 +623,7 @@ export type PatientProfileUpdateManyMutationInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  searchRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type PatientProfileUncheckedUpdateManyInput = {
@@ -625,6 +647,7 @@ export type PatientProfileUncheckedUpdateManyInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  searchRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type PatientProfileNullableScalarRelationFilter = {
@@ -653,6 +676,7 @@ export type PatientProfileCountOrderByAggregateInput = {
   photoUrl?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  searchRadiusKm?: Prisma.SortOrder
 }
 
 export type PatientProfileAvgOrderByAggregateInput = {
@@ -661,6 +685,7 @@ export type PatientProfileAvgOrderByAggregateInput = {
   weight?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  searchRadiusKm?: Prisma.SortOrder
 }
 
 export type PatientProfileMaxOrderByAggregateInput = {
@@ -684,6 +709,7 @@ export type PatientProfileMaxOrderByAggregateInput = {
   photoUrl?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  searchRadiusKm?: Prisma.SortOrder
 }
 
 export type PatientProfileMinOrderByAggregateInput = {
@@ -707,6 +733,7 @@ export type PatientProfileMinOrderByAggregateInput = {
   photoUrl?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  searchRadiusKm?: Prisma.SortOrder
 }
 
 export type PatientProfileSumOrderByAggregateInput = {
@@ -715,6 +742,7 @@ export type PatientProfileSumOrderByAggregateInput = {
   weight?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  searchRadiusKm?: Prisma.SortOrder
 }
 
 export type PatientProfileScalarRelationFilter = {
@@ -812,6 +840,7 @@ export type PatientProfileCreateWithoutUserInput = {
   photoUrl?: string | null
   lat?: number | null
   lng?: number | null
+  searchRadiusKm?: number | null
   dependents?: Prisma.PatientDependentCreateNestedManyWithoutPatientProfileInput
 }
 
@@ -835,6 +864,7 @@ export type PatientProfileUncheckedCreateWithoutUserInput = {
   photoUrl?: string | null
   lat?: number | null
   lng?: number | null
+  searchRadiusKm?: number | null
   dependents?: Prisma.PatientDependentUncheckedCreateNestedManyWithoutPatientProfileInput
 }
 
@@ -874,6 +904,7 @@ export type PatientProfileUpdateWithoutUserInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  searchRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   dependents?: Prisma.PatientDependentUpdateManyWithoutPatientProfileNestedInput
 }
 
@@ -897,6 +928,7 @@ export type PatientProfileUncheckedUpdateWithoutUserInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  searchRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   dependents?: Prisma.PatientDependentUncheckedUpdateManyWithoutPatientProfileNestedInput
 }
 
@@ -920,6 +952,7 @@ export type PatientProfileCreateWithoutDependentsInput = {
   photoUrl?: string | null
   lat?: number | null
   lng?: number | null
+  searchRadiusKm?: number | null
   user: Prisma.UserCreateNestedOneWithoutPatientProfileInput
 }
 
@@ -944,6 +977,7 @@ export type PatientProfileUncheckedCreateWithoutDependentsInput = {
   photoUrl?: string | null
   lat?: number | null
   lng?: number | null
+  searchRadiusKm?: number | null
 }
 
 export type PatientProfileCreateOrConnectWithoutDependentsInput = {
@@ -982,6 +1016,7 @@ export type PatientProfileUpdateWithoutDependentsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  searchRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   user?: Prisma.UserUpdateOneRequiredWithoutPatientProfileNestedInput
 }
 
@@ -1006,6 +1041,7 @@ export type PatientProfileUncheckedUpdateWithoutDependentsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  searchRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 
@@ -1060,6 +1096,7 @@ export type PatientProfileSelect<ExtArgs extends runtime.Types.Extensions.Intern
   photoUrl?: boolean
   lat?: boolean
   lng?: boolean
+  searchRadiusKm?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   dependents?: boolean | Prisma.PatientProfile$dependentsArgs<ExtArgs>
   _count?: boolean | Prisma.PatientProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -1086,6 +1123,7 @@ export type PatientProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   photoUrl?: boolean
   lat?: boolean
   lng?: boolean
+  searchRadiusKm?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["patientProfile"]>
 
@@ -1110,6 +1148,7 @@ export type PatientProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   photoUrl?: boolean
   lat?: boolean
   lng?: boolean
+  searchRadiusKm?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["patientProfile"]>
 
@@ -1134,9 +1173,10 @@ export type PatientProfileSelectScalar = {
   photoUrl?: boolean
   lat?: boolean
   lng?: boolean
+  searchRadiusKm?: boolean
 }
 
-export type PatientProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "age" | "gender" | "location" | "homeAddress" | "landmark" | "pinCode" | "bloodGroup" | "height" | "weight" | "allergies" | "chronicDiseases" | "medications" | "surgeries" | "emergencyContactName" | "emergencyContactPhone" | "photoUrl" | "lat" | "lng", ExtArgs["result"]["patientProfile"]>
+export type PatientProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "age" | "gender" | "location" | "homeAddress" | "landmark" | "pinCode" | "bloodGroup" | "height" | "weight" | "allergies" | "chronicDiseases" | "medications" | "surgeries" | "emergencyContactName" | "emergencyContactPhone" | "photoUrl" | "lat" | "lng" | "searchRadiusKm", ExtArgs["result"]["patientProfile"]>
 export type PatientProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   dependents?: boolean | Prisma.PatientProfile$dependentsArgs<ExtArgs>
@@ -1176,6 +1216,7 @@ export type $PatientProfilePayload<ExtArgs extends runtime.Types.Extensions.Inte
     photoUrl: string | null
     lat: number | null
     lng: number | null
+    searchRadiusKm: number | null
   }, ExtArgs["result"]["patientProfile"]>
   composites: {}
 }
@@ -1621,6 +1662,7 @@ export interface PatientProfileFieldRefs {
   readonly photoUrl: Prisma.FieldRef<"PatientProfile", 'String'>
   readonly lat: Prisma.FieldRef<"PatientProfile", 'Float'>
   readonly lng: Prisma.FieldRef<"PatientProfile", 'Float'>
+  readonly searchRadiusKm: Prisma.FieldRef<"PatientProfile", 'Int'>
 }
     
 

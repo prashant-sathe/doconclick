@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
-  Loader2, Building2, Video, Home, Clock, Languages, UserX, Bookmark, BookmarkCheck,
+  Loader2, Building2, Video, Home, Clock, Languages, UserX, Bookmark, BookmarkCheck, Compass, X,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow, findNextOpening, formatSlotTime } from "@/lib/clinicAvailability";
-import { haversine } from "@/lib/geo";
+import { haversine, withinSearchRadius } from "@/lib/geo";
 import { getCurrentPositionCompat } from "@/lib/platform";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
@@ -93,6 +93,8 @@ export default function DoctorProfilePage() {
   const [saved, setSaved] = useState(false);
   const [savingBookmark, setSavingBookmark] = useState(false);
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
+  const [searchRadiusKm, setSearchRadiusKm] = useState<number | null>(null);
+  const [rangeNoticeDismissed, setRangeNoticeDismissed] = useState(false);
 
   useEffect(() => {
     fetch(`/api/doctors/${id}`)
@@ -111,9 +113,20 @@ export default function DoctorProfilePage() {
 
   useEffect(() => {
     if (user?.role !== "PATIENT") return;
+    fetch("/api/patients/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setSearchRadiusKm(d?.patientProfile?.searchRadiusKm ?? null))
+      .catch(() => {});
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.role !== "PATIENT") return;
     fetch("/api/patients/me/saved-doctors")
-      .then((r) => (r.ok ? r.json() : []))
-      .then((list: { doctor: { id: string } }[]) => setSaved(list.some((s) => s.doctor.id === id)));
+      .then((r) => (r.ok ? r.json() : { saved: [] }))
+      .then((d: { saved?: { doctor: { id: string } }[] } | { doctor: { id: string } }[]) => {
+        const list = Array.isArray(d) ? d : d.saved ?? [];
+        setSaved(list.some((s) => s.doctor.id === id));
+      });
   }, [user, id]);
 
   const toggleSave = async () => {
@@ -172,10 +185,28 @@ export default function DoctorProfilePage() {
       : null;
   const hasHomeVisitReach = !(distance != null && distance > profile.radius);
 
+  const outOfRange =
+    !rangeNoticeDismissed &&
+    !withinSearchRadius(distance, searchRadiusKm, profile.offersVideo);
+
   return (
     <div className="min-h-screen gradient-surface pb-16">
       <Header />
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+        {outOfRange && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5 text-sm text-amber-800">
+            <Compass className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <div className="min-w-0 flex-1">
+              {formatDoctorName(doctor.name)} is
+              {distance != null ? ` about ${distance.toFixed(0)} km away` : " outside your area"}, beyond the{" "}
+              {searchRadiusKm} km search range set in your{" "}
+              <Link href="/patient/profile" className="font-semibold underline">profile</Link>. You can still book.
+            </div>
+            <button onClick={() => setRangeNoticeDismissed(true)} aria-label="Dismiss" className="text-amber-600 hover:text-amber-800 flex-shrink-0">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           {(doctor.clinics.length > 0 ? doctor.clinics[0].photoUrl : profile.clinicPhotoUrl) && (
             <div className="w-full h-40 sm:h-48 bg-slate-100">

@@ -90,6 +90,12 @@ model PatientProfile {
   lat                   Float?
   lng                   Float?
 
+  // How far the patient wants to look for doctors, in km. null = "Any
+  // distance" (no limit). Applied everywhere doctors are listed — map,
+  // assistant, saved list, booking — except that doctors offering video
+  // are always shown (video doesn't depend on distance).
+  searchRadiusKm        Int?
+
   dependents PatientDependent[]
 }
 

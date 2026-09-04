@@ -5,11 +5,12 @@ import Link from "next/link";
 import {
   Loader2, MapPin, Droplets, Ruler, Weight, AlertTriangle, Pill,
   Scissors, PhoneCall, Camera, CheckCircle2, ArrowRight, Save, UploadCloud, User, Trash2,
-  Wallet as WalletIcon, LifeBuoy,
+  Wallet as WalletIcon, LifeBuoy, Compass,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
 import { computeCompleteness, type PatientProfileData } from "@/lib/profileCompleteness";
+import { SEARCH_RADIUS_MIN_KM, SEARCH_RADIUS_MAX_KM } from "@/lib/geo";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import NotificationSettings from "@/components/NotificationSettings";
@@ -38,14 +39,18 @@ interface FormState {
   photoUrl: string;
   lat: number | null;
   lng: number | null;
+  // null = "Any distance" (no limit)
+  searchRadiusKm: number | null;
 }
 
 const EMPTY_FORM: FormState = {
   location: "", homeAddress: "", landmark: "", pinCode: "", bloodGroup: "",
   height: "", weight: "", allergies: "", chronicDiseases: [], otherChronicText: "", medications: "",
   surgeries: "", emergencyContactName: "", emergencyContactPhone: "", photoUrl: "",
-  lat: null, lng: null,
+  lat: null, lng: null, searchRadiusKm: null,
 };
+
+const DEFAULT_RADIUS_KM = 25;
 
 function CompletionRing({ percent }: { percent: number }) {
   const r = 32;
@@ -210,6 +215,7 @@ export default function PatientProfilePage() {
           photoUrl: p.photoUrl ?? "",
           lat: p.lat ?? null,
           lng: p.lng ?? null,
+          searchRadiusKm: p.searchRadiusKm ?? null,
         });
         setLoading(false);
       })
@@ -219,6 +225,7 @@ export default function PatientProfilePage() {
   }, [user?.id]);
 
   const set = (k: keyof FormState, v: string) => { setSaved(false); setForm((f) => ({ ...f, [k]: v })); };
+  const setRadius = (v: number | null) => { setSaved(false); setForm((f) => ({ ...f, searchRadiusKm: v })); };
   const toggleChronic = (o: string) => {
     setSaved(false);
     setForm((f) => {
@@ -433,6 +440,69 @@ export default function PatientProfilePage() {
                 </div>
               </div>
             </div>
+          </section>
+
+          {/* Doctor search range */}
+          <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            <h2 className="font-bold text-slate-800 mb-1 flex items-center gap-2"><Compass className="w-4 h-4 text-blue-500" /> Doctor Search Range</h2>
+            <p className="text-xs text-slate-400 mb-4">
+              The map shows only clinics within this distance of your location. Search, the Assistant and your saved list also keep doctors who offer video, wherever they are.
+            </p>
+
+            <div className="flex items-center gap-2 mb-4">
+              <button
+                type="button"
+                onClick={() => setRadius(null)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
+                  form.searchRadiusKm == null
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                )}
+              >
+                Any distance
+              </button>
+              <button
+                type="button"
+                onClick={() => setRadius(form.searchRadiusKm ?? DEFAULT_RADIUS_KM)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
+                  form.searchRadiusKm != null
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                )}
+              >
+                Within a set distance
+              </button>
+            </div>
+
+            {form.searchRadiusKm != null && (
+              <div>
+                <div className="flex items-baseline justify-between mb-2">
+                  <label className="input-label mb-0">Show doctors up to</label>
+                  <span className="text-sm font-extrabold text-blue-600">{form.searchRadiusKm} km</span>
+                </div>
+                <input
+                  type="range"
+                  min={SEARCH_RADIUS_MIN_KM}
+                  max={SEARCH_RADIUS_MAX_KM}
+                  step={1}
+                  value={form.searchRadiusKm}
+                  onChange={(e) => setRadius(Number(e.target.value))}
+                  className="w-full accent-blue-600"
+                />
+                <div className="flex justify-between text-[11px] text-slate-400 mt-1">
+                  <span>{SEARCH_RADIUS_MIN_KM} km</span>
+                  <span>{SEARCH_RADIUS_MAX_KM} km</span>
+                </div>
+                {!form.lat && (
+                  <p className="text-xs text-amber-600 mt-2 flex items-start gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                    Set your location above so we can measure distance to doctors.
+                  </p>
+                )}
+              </div>
+            )}
           </section>
 
           {/* Medical Info */}

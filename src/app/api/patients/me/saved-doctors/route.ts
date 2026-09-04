@@ -1,13 +1,26 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { haversine, withinSearchRadius } from "@/lib/geo";
 
-// GET: the current patient's bookmarked doctors
+// GET: the current patient's bookmarked doctors, each tagged with distance
+// and whether it falls inside the patient's chosen search range.
 export async function GET() {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+
+  // Distance/range enrichment is best-effort: if the patient profile can't be
+  // read (e.g. a dev server still running against a pre-migration Prisma
+  // client), the saved list must still load rather than 500.
+  const patientProfile = await prisma.patientProfile
+    .findUnique({
+      where: { userId: authUser.id },
+      select: { lat: true, lng: true, searchRadiusKm: true },
+    })
+    .catch(() => null);
+  const radiusKm = patientProfile?.searchRadiusKm ?? null;
 
   const saved = await prisma.savedDoctor.findMany({
     where: { patientId: authUser.id },
@@ -28,14 +41,59 @@ export async function GET() {
               avgRating: true,
               totalReviews: true,
               status: true,
+              offersVideo: true,
+              lat: true,
+              lng: true,
             },
+          },
+          clinics: {
+            where: { isActive: true },
+            orderBy: { sortOrder: "asc" },
+            select: { lat: true, lng: true },
+            take: 1,
           },
         },
       },
     },
   });
 
-  return NextResponse.json(saved.map((s) => ({ id: s.id, createdAt: s.createdAt, doctor: s.doctor })));
+  const entries = saved.map((s) => {
+    const profile = s.doctor.doctorProfile;
+    const docLat = profile?.lat ?? s.doctor.clinics[0]?.lat ?? null;
+    const docLng = profile?.lng ?? s.doctor.clinics[0]?.lng ?? null;
+    const distanceKm =
+      patientProfile?.lat != null && patientProfile?.lng != null && docLat != null && docLng != null
+        ? Math.round(haversine(patientProfile.lat, patientProfile.lng, docLat, docLng) * 10) / 10
+        : null;
+    const inRange = withinSearchRadius(distanceKm, radiusKm, profile?.offersVideo ?? false);
+    return {
+      id: s.id,
+      createdAt: s.createdAt,
+      distanceKm,
+      inRange,
+      doctor: {
+        id: s.doctor.id,
+        name: s.doctor.name,
+        // Coordinates are only needed server-side for the distance maths above.
+        doctorProfile: profile
+          ? {
+              specialty: profile.specialty,
+              photoUrl: profile.photoUrl,
+              clinicName: profile.clinicName,
+              qualification: profile.qualification,
+              experience: profile.experience,
+              consultFee: profile.consultFee,
+              avgRating: profile.avgRating,
+              totalReviews: profile.totalReviews,
+              status: profile.status,
+              offersVideo: profile.offersVideo,
+            }
+          : null,
+      },
+    };
+  });
+
+  return NextResponse.json({ searchRadiusKm: radiusKm, saved: entries });
 }
 
 // POST: bookmark a doctor for later booking

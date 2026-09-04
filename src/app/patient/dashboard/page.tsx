@@ -10,14 +10,14 @@ import {
   ChevronDown, X, Loader2, CheckCircle, LogOut, Languages,
   Navigation, AlertCircle, IndianRupee, CalendarClock, Siren,
   CalendarCheck2, AlertTriangle, ShieldCheck, Users, Search,
-  Bookmark, BookmarkCheck, Sparkles,
+  Bookmark, BookmarkCheck, Sparkles, Compass, RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime, formatClinicHours } from "@/lib/clinicAvailability";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
-import { haversine } from "@/lib/geo";
+import { haversine, withinSearchRadius } from "@/lib/geo";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import RatingStars from "@/components/patient/RatingStars";
@@ -224,6 +224,8 @@ function PatientDashboardInner() {
   const [posError, setPosError] = useState(false);
   const [specialtyFilter, setSpecialtyFilter] = useState("");
   const [search, setSearch] = useState("");
+  // Patient's "doctor search range" preference (km); null = no limit.
+  const [searchRadiusKm, setSearchRadiusKm] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [selectedClinicId, setSelectedClinicId] = useState<string | null>(null);
@@ -256,6 +258,7 @@ function PatientDashboardInner() {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<import("leaflet").Map | null>(null);
   const markersRef = useRef<Map<string, import("leaflet").Marker>>(new Map());
+  const userLayersRef = useRef<import("leaflet").Layer[]>([]);
 
   // ── Get user geolocation ───────────────────────────────────────────────
   // Some mobile browsers/WebViews never invoke either getCurrentPosition
@@ -294,22 +297,45 @@ function PatientDashboardInner() {
     return () => window.clearTimeout(fallback);
   }, []);
 
-  // ── Fetch doctors ──────────────────────────────────────────────────────
-  useEffect(() => {
-    fetch("/api/doctors")
-      .then((r) => (r.ok ? r.json() : []))
-      .then((data: Doctor[]) => setDoctors(data))
-      .catch(() => {});
+  // Re-acquire GPS on demand (used by the map's refresh control). Unlike the
+  // mount effect there's no fallback timer — a manual refresh just keeps the
+  // last known position if the lookup fails.
+  const acquireLocation = useCallback(async () => {
+    try {
+      const pos = await getCurrentPositionCompat({ timeout: 8000 });
+      setUserPos([pos.coords.latitude, pos.coords.longitude]);
+    } catch {
+      /* keep current position */
+    }
   }, []);
 
+  // ── Fetch doctors ──────────────────────────────────────────────────────
+  const loadDoctors = useCallback(async () => {
+    try {
+      const r = await fetch("/api/doctors");
+      if (r.ok) setDoctors(await r.json());
+    } catch {
+      /* keep current list */
+    }
+  }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { loadDoctors(); }, [loadDoctors]);
+
   // ── Fetch this patient's bookmarked doctors, for the save toggle in the detail panel ──
-  useEffect(() => {
+  const loadSavedDoctors = useCallback(async () => {
     if (!user || user.role !== "PATIENT") return;
-    fetch("/api/patients/me/saved-doctors")
-      .then((r) => (r.ok ? r.json() : []))
-      .then((list: { doctor: { id: string } }[]) => setSavedDoctorIds(new Set(list.map((s) => s.doctor.id))));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+    try {
+      const r = await fetch("/api/patients/me/saved-doctors");
+      const d: { saved?: { doctor: { id: string } }[] } | { doctor: { id: string } }[] =
+        r.ok ? await r.json() : { saved: [] };
+      const list = Array.isArray(d) ? d : d.saved ?? [];
+      setSavedDoctorIds(new Set(list.map((s) => s.doctor.id)));
+    } catch {
+      /* keep current set */
+    }
+  }, [user]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { loadSavedDoctors(); }, [loadSavedDoctors]);
 
   const toggleSaveDoctor = async () => {
     if (!selectedDoctor) return;
@@ -373,15 +399,29 @@ function PatientDashboardInner() {
   // filter AND has at least one clinic pin on the map. Deliberately NOT gated on
   // "open right now" — a closed clinic still renders a (dimmed) pin and is
   // bookable for a future slot, so search results and map pins stay in sync.
+  // Distance from the patient to a specific clinic, or null when unknown.
+  const clinicDistance = useCallback(
+    (clinic: { lat: number; lng: number }) =>
+      userPos ? haversine(userPos[0], userPos[1], clinic.lat, clinic.lng) : null,
+    [userPos],
+  );
+
   const mapDoctors = useMemo(() => {
     const q = search.trim().toLowerCase();
     return doctorsWithDist.filter((d) => {
       const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
       const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
-      const onMap = d.clinics.length > 0; // a doctor with no clinic has no pin
-      return matchesSpecialty && matchesSearch && onMap;
+      // The map is a proximity tool: a doctor shows only if they have at least
+      // one clinic pin *within the search range*. The "video is location-
+      // independent" exception deliberately does NOT apply to map pins — a far
+      // video doctor still surfaces in search, the Assistant and saved list,
+      // just not as a misleading pin 100 km away.
+      const hasClinicInRange = d.clinics.some((c) =>
+        withinSearchRadius(clinicDistance(c), searchRadiusKm, false),
+      );
+      return matchesSpecialty && matchesSearch && hasClinicInRange;
     });
-  }, [doctorsWithDist, specialtyFilter, search]);
+  }, [doctorsWithDist, specialtyFilter, search, searchRadiusKm, clinicDistance]);
 
   const sorted = useMemo(() => [...mapDoctors].sort(
     (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
@@ -390,9 +430,17 @@ function PatientDashboardInner() {
 
   // Nearest doctor regardless of specialty filter — used for emergency requests.
   // Also restricted to doctors that actually have a location/pin.
-  const nearestAny = useMemo(() => [...doctorsWithDist]
-    .filter((d) => d.clinics.length > 0 || (d.doctorProfile?.lat != null && d.doctorProfile?.lng != null))
-    .sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity))[0], [doctorsWithDist]);
+  const nearestAny = useMemo(() => {
+    const located = [...doctorsWithDist]
+      .filter((d) => d.clinics.length > 0 || (d.doctorProfile?.lat != null && d.doctorProfile?.lng != null))
+      .sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+    // Honour the patient's search-range preference, but never leave an
+    // emergency with nobody — fall back to the absolute nearest doctor.
+    const inRange = located.filter((d) =>
+      withinSearchRadius(d.distance, searchRadiusKm, d.doctorProfile?.offersVideo ?? false)
+    );
+    return inRange[0] ?? located[0];
+  }, [doctorsWithDist, searchRadiusKm]);
 
   // One marker per clinic, not per doctor — a doctor with several locations
   // shows up as several pins.
@@ -400,12 +448,15 @@ function PatientDashboardInner() {
     const list: ClinicMarker[] = [];
     for (const doc of mapDoctors) {
       for (const clinic of doc.clinics) {
-        const distance = userPos ? haversine(userPos[0], userPos[1], clinic.lat, clinic.lng) : undefined;
-        list.push({ doctor: doc, clinic, distance });
+        const d = clinicDistance(clinic);
+        // Each pin is filtered on its own distance — a doctor with a nearby
+        // clinic and a far one only pins the nearby location.
+        if (!withinSearchRadius(d, searchRadiusKm, false)) continue;
+        list.push({ doctor: doc, clinic, distance: d ?? undefined });
       }
     }
     return list;
-  }, [mapDoctors, userPos]);
+  }, [mapDoctors, clinicDistance, searchRadiusKm]);
 
   // ── Initialise Leaflet once map div is available ───────────────────────
   const initMap = useCallback(
@@ -534,8 +585,13 @@ function PatientDashboardInner() {
       iconSize: [14, 14],
       iconAnchor: [7, 7],
     });
-    L.marker(pos, { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
-    L.circle(pos, { radius: 300, color: "#2563eb", fillColor: "#2563eb", fillOpacity: 0.06, weight: 1.5 }).addTo(map);
+    // Drop any previous user marker/circle first so a location refresh doesn't
+    // stack duplicates.
+    userLayersRef.current.forEach((layer) => map.removeLayer(layer));
+    userLayersRef.current = [
+      L.marker(pos, { icon: userIcon, zIndexOffset: 1000 }).addTo(map),
+      L.circle(pos, { radius: 300, color: "#2563eb", fillColor: "#2563eb", fillOpacity: 0.06, weight: 1.5 }).addTo(map),
+    ];
   }, []);
 
   // ── Boot sequence: wait for userPos then init map ──────────────────────
@@ -545,6 +601,9 @@ function PatientDashboardInner() {
     // DOM before Leaflet tries to find it (avoids "Map container not found")
     const raf = requestAnimationFrame(async () => {
       await initMap(userPos);
+      // On a location refresh the map already exists — recentre it on the
+      // new position.
+      leafletMapRef.current?.setView(userPos, leafletMapRef.current.getZoom());
       await addUserCircle(userPos);
       await placeClinicMarkers();
     });
@@ -599,23 +658,35 @@ function PatientDashboardInner() {
     if (!authLoading && user && user.role !== "PATIENT") router.push("/login");
   }, [authLoading, user, router]);
 
-  // ── Nudge to complete profile once per session ──────────────────────────
+  // ── Load the patient profile: completion %, search range, allergies ─────
   const [profilePercent, setProfilePercent] = useState<number | null>(null);
-  useEffect(() => {
+  const loadProfile = useCallback(async () => {
     if (!user || user.role !== "PATIENT") return;
-    fetch("/api/patients/me")
-      .then((r) => r.json())
-      .then((d) => {
-        const { percent } = computeCompleteness(d.patientProfile);
-        setProfilePercent(percent);
-        if (d.patientProfile?.allergies) setAllergies(d.patientProfile.allergies);
-        if (percent < 100 && !sessionStorage.getItem("profilePromptSeen")) {
-          sessionStorage.setItem("profilePromptSeen", "1");
-          router.replace("/patient/profile");
-        }
-      })
-      .catch(() => {});
+    try {
+      const d = await (await fetch("/api/patients/me")).json();
+      const { percent } = computeCompleteness(d.patientProfile);
+      setProfilePercent(percent);
+      setSearchRadiusKm(d.patientProfile?.searchRadiusKm ?? null);
+      if (d.patientProfile?.allergies) setAllergies(d.patientProfile.allergies);
+      if (percent < 100 && !sessionStorage.getItem("profilePromptSeen")) {
+        sessionStorage.setItem("profilePromptSeen", "1");
+        router.replace("/patient/profile");
+      }
+    } catch {
+      /* keep current values */
+    }
   }, [user, router]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { loadProfile(); }, [loadProfile]);
+
+  // ── Manual refresh of everything the map shows ─────────────────────────
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshMap = useCallback(async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    await Promise.allSettled([loadDoctors(), loadSavedDoctors(), loadProfile(), acquireLocation()]);
+    setRefreshing(false);
+  }, [refreshing, loadDoctors, loadSavedDoctors, loadProfile, acquireLocation]);
 
   // ── Booking submit ─────────────────────────────────────────────────────
   // "Confirm ₹X" only opens the confirmation dialog; confirmAndBook fires the
@@ -852,6 +923,13 @@ function PatientDashboardInner() {
               )}
             </div>
             <SpecialtyFilter value={specialtyFilter} onChange={setSpecialtyFilter} />
+            {searchRadiusKm != null && (
+              <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
+                <Compass className="w-3 h-3 flex-shrink-0" />
+                Showing clinics within {searchRadiusKm} km.{" "}
+                <button type="button" onClick={() => router.push("/patient/profile")} className="font-semibold text-blue-600 hover:underline">Change</button>
+              </p>
+            )}
           </div>
         </div>
 
@@ -883,7 +961,15 @@ function PatientDashboardInner() {
               <Navigation className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
             </button>
           )}
-          <div className="ml-auto pointer-events-auto flex-shrink-0">
+          <div className="ml-auto pointer-events-auto flex-shrink-0 flex items-center gap-2">
+        <button
+          onClick={refreshMap}
+          disabled={refreshing}
+          className="w-11 h-11 rounded-full glass-card flex items-center justify-center shadow-lg text-slate-600 hover:text-blue-600 transition-colors disabled:opacity-60"
+          title="Refresh doctors & location"
+        >
+          <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
+        </button>
         <button
           onClick={() => { setEmergencyOpen(true); setEmergencyText(""); setEmergencyResult(null); setEmergencyError(""); }}
           className="w-12 h-12 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-xl text-white transition-colors"

@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   MapPin, Video, Home, Building2, Loader2,
   CalendarClock, Clock, IndianRupee,
-  CalendarCheck2, Hash, ClipboardList, AlertTriangle, ShieldCheck, Users, Search, X,
+  CalendarCheck2, Hash, ClipboardList, AlertTriangle, ShieldCheck, Users, Search, X, Compass,
 } from "lucide-react";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
@@ -13,7 +13,7 @@ import { estimateArrivalMinutes } from "@/lib/eta";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime, formatClinicHours, type NextOpening } from "@/lib/clinicAvailability";
 import { RELATIONS } from "@/lib/relations";
-import { haversine } from "@/lib/geo";
+import { haversine, withinSearchRadius } from "@/lib/geo";
 import { getCurrentPositionCompat } from "@/lib/platform";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
@@ -131,6 +131,9 @@ function PatientBookInner() {
   const [specialtyFilter, setSpecialtyFilter] = useState("");
   const [search, setSearch] = useState("");
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
+  // Patient's "doctor search range" preference (km); null = no limit.
+  const [searchRadiusKm, setSearchRadiusKm] = useState<number | null>(null);
+  const [radiusOverride, setRadiusOverride] = useState(false);
   const [form, setForm] = useState({ doctorId: "", clinicId: "", symptoms: "", allergies: "", consultType: "CLINIC", relation: "Self" });
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const [dependentId, setDependentId] = useState<string | null>(null);
@@ -180,18 +183,34 @@ function PatientBookInner() {
     fetch("/api/patients/me").then((r) => r.json()).then((d) => {
       const known = d.patientProfile?.allergies;
       if (known) set("allergies", known);
+      setSearchRadiusKm(d.patientProfile?.searchRadiusKm ?? null);
     }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Distance (km) of a doctor from the patient's current location, or null.
+  const doctorDistance = (d: Doctor): number | null => {
+    const lat = d.doctorProfile?.lat ?? d.clinics[0]?.lat ?? null;
+    const lng = d.doctorProfile?.lng ?? d.clinics[0]?.lng ?? null;
+    return userPos && lat != null && lng != null ? haversine(userPos[0], userPos[1], lat, lng) : null;
+  };
 
   const visibleDoctors = doctors.filter((d) => {
     const q = search.trim().toLowerCase();
     const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
     const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
-    return matchesSpecialty && matchesSearch;
+    const inRange =
+      radiusOverride ||
+      d.id === preselectDoctorId ||
+      withinSearchRadius(doctorDistance(d), searchRadiusKm, d.doctorProfile?.offersVideo ?? false);
+    return matchesSpecialty && matchesSearch && inRange;
   });
 
   const selectedDoctor = doctors.find((d) => d.id === form.doctorId);
+  const selectedOutOfRange =
+    !!selectedDoctor &&
+    !radiusOverride &&
+    !withinSearchRadius(doctorDistance(selectedDoctor), searchRadiusKm, selectedDoctor.doctorProfile?.offersVideo ?? false);
   const selectedClinic = selectedDoctor?.clinics.find((c) => c.id === form.clinicId) ?? null;
   const homeBaseLat = selectedDoctor?.doctorProfile?.lat ?? selectedDoctor?.clinics[0]?.lat ?? null;
   const homeBaseLng = selectedDoctor?.doctorProfile?.lng ?? selectedDoctor?.clinics[0]?.lng ?? null;
@@ -363,6 +382,32 @@ function PatientBookInner() {
           <p className="text-slate-500 mt-2">Choose your doctor and consultation type.</p>
         </div>
 
+        {selectedOutOfRange && selectedDoctor && (
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-lg mx-auto text-center">
+            <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
+              <Compass className="w-7 h-7 text-amber-500" />
+            </div>
+            <h2 className="text-xl font-extrabold text-slate-900 mb-1.5">Outside your search range</h2>
+            <p className="text-sm text-slate-500 mb-6">
+              {formatDoctorName(selectedDoctor.name)} is
+              {(() => { const d = doctorDistance(selectedDoctor); return d != null ? ` about ${d.toFixed(0)} km away` : " far from your saved location"; })()},
+              beyond the {searchRadiusKm} km range you set in your profile.
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <button type="button" onClick={() => setRadiusOverride(true)} className="btn-primary w-full justify-center py-3">
+                Book anyway
+              </button>
+              <Link href="/patient/profile" className="btn-secondary w-full justify-center py-3">
+                Change my search range
+              </Link>
+              <Link href="/patient/dashboard" className="text-sm font-semibold text-blue-600 hover:underline py-1">
+                Find doctors near me
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {!selectedOutOfRange && (
         <form onSubmit={submit} className="lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 lg:items-start lg:min-w-0">
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-lg mx-auto lg:max-w-none lg:mx-0 lg:min-w-0">
           <div className="space-y-5">
@@ -685,6 +730,7 @@ function PatientBookInner() {
           </div>
         </div>
         </form>
+        )}
       </div>
 
       {confirmOpen && selectedDoctor && (
