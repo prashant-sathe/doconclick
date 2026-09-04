@@ -11,6 +11,7 @@ import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow, findNextOpening, formatSlotTime } from "@/lib/clinicAvailability";
 import { haversine, withinSearchRadius } from "@/lib/geo";
 import { getCurrentPositionCompat } from "@/lib/platform";
+import { readPatientLocation } from "@/lib/patientLocation";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 
@@ -106,6 +107,14 @@ export default function DoctorProfilePage() {
   }, [id]);
 
   useEffect(() => {
+    // Honour a location the patient pinned on the map (e.g. booking for a
+    // relative in another city) over this device's GPS.
+    const pinned = readPatientLocation();
+    if (pinned) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setUserPos([pinned.lat, pinned.lng]);
+      return;
+    }
     getCurrentPositionCompat({ timeout: 8000 })
       .then((pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]))
       .catch(() => setUserPos(null));

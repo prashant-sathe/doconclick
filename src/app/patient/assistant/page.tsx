@@ -12,6 +12,7 @@ import { isDoctorAvailableNow } from "@/lib/availability";
 import { useAuth } from "@/components/AuthProvider";
 import { formatDoctorName } from "@/lib/utils";
 import { renderChatText } from "@/lib/chatMarkdown";
+import { readPatientLocation } from "@/lib/patientLocation";
 
 // Loosely typed mirror of the OpenAI Responses API's input/output items —
 // the client only needs enough shape to render and to echo the array back
@@ -413,10 +414,14 @@ export default function HealthAssistantPage() {
       setInput("");
       setLoading(true);
       try {
+        const pinned = readPatientLocation();
         const res = await fetch("/api/patient/assistant", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: nextItems }),
+          body: JSON.stringify({
+            messages: nextItems,
+            ...(pinned ? { location: { lat: pinned.lat, lng: pinned.lng, label: pinned.label } } : {}),
+          }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Something went wrong. Please try again.");

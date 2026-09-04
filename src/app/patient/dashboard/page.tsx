@@ -29,6 +29,7 @@ import AnnouncementPopup from "@/components/AnnouncementPopup";
 import DependentPicker from "@/components/patient/DependentPicker";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { readPatientLocation, writePatientLocation } from "@/lib/patientLocation";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -261,13 +262,31 @@ function PatientDashboardInner() {
   const markersRef = useRef<Map<string, import("leaflet").Marker>>(new Map());
   const userLayersRef = useRef<import("leaflet").Layer[]>([]);
 
-  // ── Get user geolocation ───────────────────────────────────────────────
+  // A patient can browse around a place other than their GPS position (e.g.
+  // booking for a relative in another city). `customLabel` is non-null while
+  // that's active; the coordinates live in `userPos` like any other.
+  const [customLabel, setCustomLabel] = useState<string | null>(null);
+  const [locationPickerOpen, setLocationPickerOpen] = useState(false);
+  const [locationQuery, setLocationQuery] = useState("");
+  const [locatingGps, setLocatingGps] = useState(false);
+  const [pickingOnMap, setPickingOnMap] = useState(false);
+
+  // ── Set the reference location: a stored custom place, else GPS ─────────
   // Some mobile browsers/WebViews never invoke either getCurrentPosition
   // callback (geolocation missing, permission prompt left unanswered, etc.),
   // which used to leave userPos — and therefore the whole map — stuck at
   // null forever. A JS-level fallback timer guarantees we always fall back
   // to the Pune default instead of silently showing no markers.
   useEffect(() => {
+    const stored = readPatientLocation();
+    if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setUserPos([stored.lat, stored.lng]);
+      setCustomLabel(stored.label);
+      setPosError(false);
+      return;
+    }
+
     let settled = false;
     const fallback = window.setTimeout(() => {
       if (settled) return;
@@ -302,6 +321,7 @@ function PatientDashboardInner() {
   // mount effect there's no fallback timer — a manual refresh just keeps the
   // last known position if the lookup fails.
   const acquireLocation = useCallback(async () => {
+    if (readPatientLocation()) return; // a custom place is pinned — leave it
     try {
       const pos = await getCurrentPositionCompat({ timeout: 8000 });
       setUserPos([pos.coords.latitude, pos.coords.longitude]);
@@ -311,21 +331,21 @@ function PatientDashboardInner() {
     }
   }, []);
 
-  // Manual location entry — a fallback for when the browser can't get GPS
-  // (permission denied, or an on-screen overlay blocks the prompt: Android's
-  // "This site can't ask for your permission").
-  const [locationPickerOpen, setLocationPickerOpen] = useState(false);
-  const [locationQuery, setLocationQuery] = useState("");
-  const [locatingGps, setLocatingGps] = useState(false);
-
-  const setManualLocation = (lat: number, lng: number) => {
+  // Pin a chosen place as the browse location, shared with the booking page.
+  const applyCustomLocation = (lat: number, lng: number, label: string) => {
     setUserPos([lat, lng]);
+    setCustomLabel(label);
     setPosError(false);
     setLocationPickerOpen(false);
+    setPickingOnMap(false);
     setLocationQuery("");
+    writePatientLocation({ lat, lng, label });
   };
 
-  const retryGps = async () => {
+  // Drop the custom place and go back to the device's GPS.
+  const switchToMyLocation = async () => {
+    setCustomLabel(null);
+    writePatientLocation(null);
     setLocatingGps(true);
     try {
       const pos = await getCurrentPositionCompat({ timeout: 8000 });
@@ -337,6 +357,27 @@ function PatientDashboardInner() {
     } finally {
       setLocatingGps(false);
     }
+  };
+
+  // "Pick on map" — take whatever the map is centred on, name it, pin it.
+  const [confirmingPick, setConfirmingPick] = useState(false);
+  const confirmMapPick = async () => {
+    const map = leafletMapRef.current;
+    if (!map) { setPickingOnMap(false); return; }
+    const c = map.getCenter();
+    setConfirmingPick(true);
+    let label = `${c.lat.toFixed(3)}, ${c.lng.toFixed(3)}`;
+    try {
+      const r = await fetch(`/api/geocode/reverse?lat=${c.lat}&lon=${c.lng}`);
+      if (r.ok) {
+        const d = await r.json();
+        if (d?.label) label = String(d.label).split(",").slice(0, 2).join(",").trim();
+      }
+    } catch {
+      /* keep the coordinate label */
+    }
+    setConfirmingPick(false);
+    applyCustomLocation(c.lat, c.lng, label);
   };
 
   // ── Fetch doctors ──────────────────────────────────────────────────────
@@ -436,6 +477,10 @@ function PatientDashboardInner() {
     [userPos],
   );
 
+  // "Show all" from the empty-state banner temporarily lifts the radius filter.
+  const [ignoreRadius, setIgnoreRadius] = useState(false);
+  const effectiveRadiusKm = ignoreRadius ? null : searchRadiusKm;
+
   const mapDoctors = useMemo(() => {
     const q = search.trim().toLowerCase();
     return doctorsWithDist.filter((d) => {
@@ -447,11 +492,11 @@ function PatientDashboardInner() {
       // video doctor still surfaces in search, the Assistant and saved list,
       // just not as a misleading pin 100 km away.
       const hasClinicInRange = d.clinics.some((c) =>
-        withinSearchRadius(clinicDistance(c), searchRadiusKm, false),
+        withinSearchRadius(clinicDistance(c), effectiveRadiusKm, false),
       );
       return matchesSpecialty && matchesSearch && hasClinicInRange;
     });
-  }, [doctorsWithDist, specialtyFilter, search, searchRadiusKm, clinicDistance]);
+  }, [doctorsWithDist, specialtyFilter, search, effectiveRadiusKm, clinicDistance]);
 
   const sorted = useMemo(() => [...mapDoctors].sort(
     (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
@@ -467,10 +512,10 @@ function PatientDashboardInner() {
     // Honour the patient's search-range preference, but never leave an
     // emergency with nobody — fall back to the absolute nearest doctor.
     const inRange = located.filter((d) =>
-      withinSearchRadius(d.distance, searchRadiusKm, d.doctorProfile?.offersVideo ?? false)
+      withinSearchRadius(d.distance, effectiveRadiusKm, d.doctorProfile?.offersVideo ?? false)
     );
     return inRange[0] ?? located[0];
-  }, [doctorsWithDist, searchRadiusKm]);
+  }, [doctorsWithDist, effectiveRadiusKm]);
 
   // One marker per clinic, not per doctor — a doctor with several locations
   // shows up as several pins.
@@ -481,12 +526,12 @@ function PatientDashboardInner() {
         const d = clinicDistance(clinic);
         // Each pin is filtered on its own distance — a doctor with a nearby
         // clinic and a far one only pins the nearby location.
-        if (!withinSearchRadius(d, searchRadiusKm, false)) continue;
+        if (!withinSearchRadius(d, effectiveRadiusKm, false)) continue;
         list.push({ doctor: doc, clinic, distance: d ?? undefined });
       }
     }
     return list;
-  }, [mapDoctors, clinicDistance, searchRadiusKm]);
+  }, [mapDoctors, clinicDistance, effectiveRadiusKm]);
 
   // ── Initialise Leaflet once map div is available ───────────────────────
   const initMap = useCallback(
@@ -875,7 +920,7 @@ function PatientDashboardInner() {
       {!isLoading && announcementsDone && <EnableNotificationsPrompt />}
 
       {/* ── Top bar ────────────────────────────────────────────────── */}
-      <div className="absolute top-0 inset-x-0 z-20 pointer-events-none">
+      <div className={cn("absolute top-0 inset-x-0 z-20 pointer-events-none", pickingOnMap && "hidden")}>
         <div
           className="flex items-start justify-between p-3 sm:p-4 gap-2 sm:gap-3"
           style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
@@ -888,8 +933,8 @@ function PatientDashboardInner() {
             <img src="/logo-icon.png" alt="DocOnClick" className="w-8 h-8 sm:w-9 sm:h-9 object-contain flex-shrink-0" />
             <div className="min-w-0 hidden xs:block sm:block">
               <p className="text-sm font-bold text-slate-900 leading-none">DocOnClick</p>
-              <p className="text-xs text-slate-500 mt-0.5 truncate">
-                {posError ? "📍 Set your location" : "📍 Your location · Change"}
+              <p className={cn("text-xs mt-0.5 truncate", customLabel ? "text-blue-600 font-semibold" : "text-slate-500")}>
+                {customLabel ? `📍 ${customLabel}` : posError ? "📍 Set your location" : "📍 Your location · Change"}
               </p>
             </div>
           </button>
@@ -959,8 +1004,15 @@ function PatientDashboardInner() {
             {searchRadiusKm != null && (
               <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
                 <Compass className="w-3 h-3 flex-shrink-0" />
-                Showing clinics within {searchRadiusKm} km.{" "}
-                <button type="button" onClick={() => router.push("/patient/profile")} className="font-semibold text-blue-600 hover:underline">Change</button>
+                {ignoreRadius ? (
+                  <>Showing all clinics.{" "}
+                    <button type="button" onClick={() => setIgnoreRadius(false)} className="font-semibold text-blue-600 hover:underline">Limit to {searchRadiusKm} km</button>
+                  </>
+                ) : (
+                  <>Showing clinics within {searchRadiusKm} km.{" "}
+                    <button type="button" onClick={() => router.push("/patient/profile")} className="font-semibold text-blue-600 hover:underline">Change</button>
+                  </>
+                )}
               </p>
             )}
           </div>
@@ -969,7 +1021,17 @@ function PatientDashboardInner() {
         {/* Nearest doctor badge (or the "set location" prompt) + emergency
             button, same row so they never collide */}
         <div className="flex items-center gap-2 px-3 sm:px-4 mt-2.5">
-          {posError ? (
+          {customLabel ? (
+            <button
+              onClick={switchToMyLocation}
+              className="glass-card rounded-2xl px-3 py-2.5 flex items-center gap-2 pointer-events-auto shadow-lg border border-blue-200 min-w-0 flex-1 sm:flex-initial"
+            >
+              <MapPin className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+              <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
+                {customLabel} <span className="text-blue-600">· Use my location</span>
+              </span>
+            </button>
+          ) : posError ? (
             <button
               onClick={() => setLocationPickerOpen(true)}
               className="glass-card rounded-2xl px-3 py-2.5 flex items-center gap-2 pointer-events-auto shadow-lg border border-amber-200 min-w-0 flex-1 sm:flex-initial"
@@ -1027,7 +1089,7 @@ function PatientDashboardInner() {
       </div>
 
       {/* ── Legend ─────────────────────────────────────────────────── */}
-      <div className="hidden lg:block absolute bottom-6 left-4 z-20 pointer-events-none">
+      <div className={cn("hidden lg:block absolute bottom-6 left-4 z-20 pointer-events-none", pickingOnMap && "lg:hidden")}>
         <div className="glass-card rounded-2xl p-3 flex flex-col gap-1.5 max-w-[170px]">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Specialties</p>
           {specialties.slice(0, 5).map(({ name, color }) => (
@@ -1041,7 +1103,7 @@ function PatientDashboardInner() {
       </div>
 
       {/* ── Doctor count badge ──────────────────────────────────────── */}
-      <div className="absolute bottom-[calc(5rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-6 right-4 z-20 pointer-events-none">
+      <div className={cn("absolute bottom-[calc(5rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-6 right-4 z-20 pointer-events-none", pickingOnMap && "hidden")}>
         <div className="glass-card rounded-2xl px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 pointer-events-auto">
           <Stethoscope className="w-4 h-4 text-blue-500" />
           <span className="text-xs sm:text-sm font-semibold text-slate-700">
@@ -1660,6 +1722,23 @@ function PatientDashboardInner() {
                 </p>
                 <button onClick={() => setEmergencyOpen(false)} className="btn-primary w-full justify-center py-3">Close</button>
               </div>
+            ) : customLabel ? (
+              <>
+                <div className="flex items-center gap-2 mb-2">
+                  <Siren className="w-5 h-5 text-red-500" />
+                  <h3 className="text-lg font-extrabold text-slate-900">Emergency Request</h3>
+                </div>
+                <p className="text-sm text-slate-500 mb-4">
+                  You&apos;re browsing doctors near <strong>{customLabel}</strong>. An emergency request must go from
+                  your own location — switch back first.
+                </p>
+                <div className="flex gap-3">
+                  <button onClick={() => setEmergencyOpen(false)} className="btn-secondary flex-1 justify-center py-3">Cancel</button>
+                  <button onClick={() => { setEmergencyOpen(false); switchToMyLocation(); }} className="btn-primary flex-1 justify-center py-3">
+                    Use my location
+                  </button>
+                </div>
+              </>
             ) : (
               <>
                 <div className="flex items-center gap-2 mb-2">
@@ -1740,10 +1819,22 @@ function PatientDashboardInner() {
         />
       )}
 
+      {/* ── Empty state: nothing within the search radius ───────────── */}
+      {!panelOpen && !emergencyOpen && !pickingOnMap && doctors.length > 0
+        && clinicMarkers.length === 0 && searchRadiusKm != null && !ignoreRadius && (
+        <div className="absolute bottom-[calc(9rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-24 inset-x-0 z-20 flex justify-center px-4 pointer-events-none">
+          <div className="glass-card rounded-2xl px-4 py-2.5 flex items-center gap-2 text-xs shadow border border-amber-200 pointer-events-auto max-w-full">
+            <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+            <span className="text-slate-600 truncate">No clinics within {searchRadiusKm} km of {customLabel ?? "here"}.</span>
+            <button onClick={() => setIgnoreRadius(true)} className="font-semibold text-blue-600 flex-shrink-0">Show all</button>
+          </div>
+        </div>
+      )}
+
       {/* ── Tap hint (shown when no panel is open) ──────────────────── */}
       {/* Sits clear above the "clinics nearby" badge — on phones the two
           floating chips used to collide at the bottom edge. */}
-      {!panelOpen && !emergencyOpen && doctors.length > 0 && (
+      {!panelOpen && !emergencyOpen && !pickingOnMap && clinicMarkers.length > 0 && (
         <div className="absolute bottom-[calc(9rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-24 inset-x-0 z-20 flex justify-center pointer-events-none">
           <div className="glass-card rounded-full px-4 py-2 flex items-center gap-2 text-xs text-slate-500 shadow">
             <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
@@ -1752,29 +1843,40 @@ function PatientDashboardInner() {
         </div>
       )}
 
-      {/* ── Manual location picker ──────────────────────────────────── */}
+      {/* ── Location picker ─────────────────────────────────────────── */}
       {locationPickerOpen && (
         <div className="absolute inset-0 z-50 flex items-start justify-center p-4 pt-24 bg-black/30" onClick={() => setLocationPickerOpen(false)}>
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-1">
-              <h3 className="font-extrabold text-slate-900">Set your location</h3>
+              <h3 className="font-extrabold text-slate-900">Choose a location</h3>
               <button onClick={() => setLocationPickerOpen(false)} className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <p className="text-xs text-slate-400 mb-4">Search an area, or let the browser use your GPS.</p>
+            <p className="text-xs text-slate-400 mb-4">
+              {customLabel
+                ? <>Showing doctors near <span className="font-semibold text-slate-600">{customLabel}</span>. Booking for someone in another city? Set their area here.</>
+                : "Search an area to browse doctors there — e.g. when booking for a relative in another city."}
+            </p>
 
             <AddressAutocomplete
               value={locationQuery}
               onChange={setLocationQuery}
-              onSelect={(s) => setManualLocation(s.lat, s.lon)}
+              onSelect={(s) => applyCustomLocation(s.lat, s.lon, s.label.split(",").slice(0, 2).join(",").trim())}
               placeholder="Search city, area or society…"
             />
 
             <button
-              onClick={retryGps}
+              onClick={() => { setLocationPickerOpen(false); setPickingOnMap(true); }}
+              className="btn-secondary w-full justify-center py-2.5 mt-3 gap-1.5 text-sm"
+            >
+              <MapPin className="w-4 h-4" /> Pick an exact spot on the map
+            </button>
+
+            <button
+              onClick={switchToMyLocation}
               disabled={locatingGps}
-              className="btn-secondary w-full justify-center py-2.5 mt-3 gap-1.5 text-sm disabled:opacity-60"
+              className="w-full justify-center py-2.5 mt-2 gap-1.5 text-sm flex items-center font-semibold text-blue-600 disabled:opacity-60"
             >
               {locatingGps
                 ? <><Loader2 className="w-4 h-4 animate-spin" /> Locating…</>
@@ -1782,6 +1884,37 @@ function PatientDashboardInner() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* ── Pick-on-map mode ───────────────────────────────────────── */}
+      {pickingOnMap && (
+        <>
+          {/* Fixed centre pin */}
+          <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
+            <div className="flex flex-col items-center -mt-6">
+              <MapPin className="w-9 h-9 text-blue-600 drop-shadow-lg" fill="#2563eb" fillOpacity={0.25} />
+              <div className="w-2 h-2 rounded-full bg-blue-600 -mt-1 shadow" />
+            </div>
+          </div>
+          {/* Top bar */}
+          <div className="absolute top-0 inset-x-0 z-50 p-3 pointer-events-none" style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}>
+            <div className="glass-card rounded-2xl px-4 py-3 flex items-center gap-2 shadow-lg pointer-events-auto">
+              <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
+              <span className="text-sm font-semibold text-slate-700 flex-1">Move the map to the location</span>
+              <button onClick={() => setPickingOnMap(false)} className="text-sm font-semibold text-slate-400">Cancel</button>
+            </div>
+          </div>
+          {/* Confirm button */}
+          <div className="absolute bottom-0 inset-x-0 z-50 p-4 pointer-events-none" style={{ paddingBottom: "calc(1rem + var(--safe-area-inset-bottom, env(safe-area-inset-bottom)))" }}>
+            <button
+              onClick={confirmMapPick}
+              disabled={confirmingPick}
+              className="btn-primary w-full justify-center py-3.5 text-base pointer-events-auto disabled:opacity-70"
+            >
+              {confirmingPick ? <><Loader2 className="w-4 h-4 animate-spin" /> Setting…</> : "Set this location"}
+            </button>
+          </div>
+        </>
       )}
 
       {/* ── Slide-up keyframe ───────────────────────────────────────── */}

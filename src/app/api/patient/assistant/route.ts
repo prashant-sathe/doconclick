@@ -52,7 +52,7 @@ const TOOLS: OpenAI.Responses.Tool[] = [
   {
     type: "function",
     name: "find_doctors",
-    description: "Find approved, verified doctors on the platform for a given specialty, sorted by distance from the patient. Returns { searchRadiusKm, doctors } — up to 5 doctors already filtered to the patient's chosen search range (searchRadiusKm; null means no limit). Doctors offering video are included regardless of distance. If doctors is empty and searchRadiusKm is set, tell the patient no in-range doctors were found and suggest they widen their search range in their profile.",
+    description: "Find approved, verified doctors on the platform for a given specialty, sorted by distance. Returns { searchRadiusKm, doctors, searchingNear? } — up to 5 doctors already filtered to the patient's chosen search range (searchRadiusKm; null means no limit). Doctors offering video are included regardless of distance. If `searchingNear` is present, the results are around that place (the patient picked it on the map, e.g. for a relative in another city) — mention it. If doctors is empty and searchRadiusKm is set, say no in-range doctors were found and suggest widening the search range in the profile.",
     strict: true,
     parameters: {
       type: "object",
@@ -144,12 +144,22 @@ function feeForConsultType(
   return profile.consultFee;
 }
 
-async function findDoctors(patientId: string, args: { specialty: string; consultType: string }) {
+type Origin = { lat: number; lng: number; label?: string } | null;
+
+async function findDoctors(
+  patientId: string,
+  args: { specialty: string; consultType: string },
+  origin: Origin,
+) {
   const patientProfile = await prisma.patientProfile.findUnique({
     where: { userId: patientId },
     select: { lat: true, lng: true, searchRadiusKm: true },
   });
   const radiusKm = patientProfile?.searchRadiusKm ?? null;
+  // A location the patient pinned on the map (e.g. booking for a relative in
+  // another city) overrides their saved profile coordinates.
+  const fromLat = origin?.lat ?? patientProfile?.lat ?? null;
+  const fromLng = origin?.lng ?? patientProfile?.lng ?? null;
 
   const now = new Date();
   const doctors = await prisma.user.findMany({
@@ -172,8 +182,8 @@ async function findDoctors(patientId: string, args: { specialty: string; consult
     .map((d) => {
       const profile = d.doctorProfile!;
       const distanceKm =
-        patientProfile?.lat != null && patientProfile?.lng != null && profile.lat != null && profile.lng != null
-          ? haversine(patientProfile.lat, patientProfile.lng, profile.lat, profile.lng)
+        fromLat != null && fromLng != null && profile.lat != null && profile.lng != null
+          ? haversine(fromLat, fromLng, profile.lat, profile.lng)
           : null;
       const canHomeVisit =
         profile.offersHomeVisit && !(distanceKm != null && distanceKm > profile.radius);
@@ -207,6 +217,7 @@ async function findDoctors(patientId: string, args: { specialty: string; consult
 
   return {
     searchRadiusKm: radiusKm,
+    ...(origin?.label ? { searchingNear: origin.label } : {}),
     doctors: inRange.slice(0, 5),
   };
 }
@@ -275,7 +286,7 @@ async function listMySupportTickets(patientId: string) {
   });
 }
 
-async function executeTool(call: FunctionCall, patientId: string): Promise<unknown> {
+async function executeTool(call: FunctionCall, patientId: string, origin: Origin): Promise<unknown> {
   let args: Record<string, unknown> = {};
   try {
     args = JSON.parse(call.arguments || "{}");
@@ -290,7 +301,7 @@ async function executeTool(call: FunctionCall, patientId: string): Promise<unkno
       return findDoctors(patientId, {
         specialty: String(args.specialty ?? ""),
         consultType: String(args.consultType ?? "CLINIC"),
-      });
+      }, origin);
     case "suggest_quick_replies":
       return { ok: true };
     case "get_my_profile":
@@ -319,7 +330,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Too many requests. Please try again in a bit." }, { status: 429 });
   }
 
-  let body: { messages?: unknown };
+  let body: { messages?: unknown; location?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -329,6 +340,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing messages" }, { status: 400 });
   }
   const priorItems = body.messages as InputItem[];
+
+  const loc = body.location as { lat?: unknown; lng?: unknown; label?: unknown } | undefined;
+  const origin: Origin =
+    loc && typeof loc.lat === "number" && typeof loc.lng === "number"
+      ? { lat: loc.lat, lng: loc.lng, label: typeof loc.label === "string" ? loc.label : undefined }
+      : null;
 
   let client;
   try {
@@ -362,7 +379,7 @@ export async function POST(req: Request) {
       if (calls.length === 0) break;
 
       for (const call of calls) {
-        const result = await executeTool(call, authUser.id);
+        const result = await executeTool(call, authUser.id, origin);
         newItems.push({
           type: "function_call_output",
           call_id: call.call_id,

@@ -8,6 +8,7 @@ import { useSpecialties } from "@/lib/useSpecialties";
 import { cn, formatDoctorName } from "@/lib/utils";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
+import { readPatientLocation } from "@/lib/patientLocation";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 
@@ -39,14 +40,18 @@ export default function SavedDoctorsPage() {
   const { colorFor } = useSpecialties();
   const [saved, setSaved] = useState<SavedDoctorEntry[]>([]);
   const [searchRadiusKm, setSearchRadiusKm] = useState<number | null>(null);
+  const [pinnedLabel, setPinnedLabel] = useState<string | null>(null);
   const [showOutOfRange, setShowOutOfRange] = useState(false);
   const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
   const load = () => {
-    fetch("/api/patients/me/saved-doctors")
+    const pinned = readPatientLocation();
+    const qs = pinned ? `?lat=${pinned.lat}&lng=${pinned.lng}` : "";
+    fetch(`/api/patients/me/saved-doctors${qs}`)
       .then((r) => (r.ok ? r.json() : { saved: [] }))
       .then((d) => {
+        setPinnedLabel(pinned?.label ?? null);
         setSaved(Array.isArray(d) ? d : d.saved ?? []);
         setSearchRadiusKm(Array.isArray(d) ? null : d.searchRadiusKm ?? null);
         setLoading(false);
@@ -81,10 +86,18 @@ export default function SavedDoctorsPage() {
       <PatientHeader />
       <PatientMobileNav />
       <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-extrabold text-slate-900">Saved Doctors</h1>
           <p className="text-slate-500 text-sm">Doctors you&apos;ve bookmarked for a quick re-booking later.</p>
         </div>
+
+        {pinnedLabel && (
+          <div className="mb-6 flex items-center gap-2 text-xs bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-4 py-2.5">
+            <Compass className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="flex-1 min-w-0">Distances shown from <span className="font-semibold">{pinnedLabel}</span></span>
+            <Link href="/patient/dashboard" className="font-semibold flex-shrink-0 underline">Change</Link>
+          </div>
+        )}
 
         {loading ? (
           <div className="space-y-3">

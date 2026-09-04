@@ -15,6 +15,7 @@ import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime, forma
 import { RELATIONS } from "@/lib/relations";
 import { haversine, withinSearchRadius } from "@/lib/geo";
 import { getCurrentPositionCompat } from "@/lib/platform";
+import { readPatientLocation } from "@/lib/patientLocation";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
@@ -134,6 +135,7 @@ function PatientBookInner() {
   // Patient's "doctor search range" preference (km); null = no limit.
   const [searchRadiusKm, setSearchRadiusKm] = useState<number | null>(null);
   const [radiusOverride, setRadiusOverride] = useState(false);
+  const [pinnedLocationLabel, setPinnedLocationLabel] = useState<string | null>(null);
   const [form, setForm] = useState({ doctorId: "", clinicId: "", symptoms: "", allergies: "", consultType: "CLINIC", relation: "Self" });
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const [dependentId, setDependentId] = useState<string | null>(null);
@@ -177,9 +179,18 @@ function PatientBookInner() {
       const preselected = preselectDoctorId && data.find((d) => d.id === preselectDoctorId);
       if (preselected) selectDoctor(preselected, preselectClinicId ?? undefined);
     }).catch(() => {});
-    getCurrentPositionCompat({ timeout: 8000 })
-      .then((pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]))
-      .catch(() => setUserPos(null));
+    // A location the patient pinned on the map (e.g. for a relative in another
+    // city) takes precedence over this device's GPS.
+    const pinned = readPatientLocation();
+    if (pinned) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setUserPos([pinned.lat, pinned.lng]);
+      setPinnedLocationLabel(pinned.label);
+    } else {
+      getCurrentPositionCompat({ timeout: 8000 })
+        .then((pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]))
+        .catch(() => setUserPos(null));
+    }
     fetch("/api/patients/me").then((r) => r.json()).then((d) => {
       const known = d.patientProfile?.allergies;
       if (known) set("allergies", known);
@@ -381,6 +392,14 @@ function PatientBookInner() {
           <h1 className="text-3xl font-extrabold text-slate-900">Book Consultation</h1>
           <p className="text-slate-500 mt-2">Choose your doctor and consultation type.</p>
         </div>
+
+        {pinnedLocationLabel && (
+          <div className="max-w-lg mx-auto lg:max-w-none mb-4 flex items-center gap-2 text-xs bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-4 py-2.5">
+            <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="flex-1 min-w-0">Showing doctors near <span className="font-semibold">{pinnedLocationLabel}</span></span>
+            <Link href="/patient/dashboard" className="font-semibold flex-shrink-0 underline">Change</Link>
+          </div>
+        )}
 
         {selectedOutOfRange && selectedDoctor && (
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-lg mx-auto text-center">

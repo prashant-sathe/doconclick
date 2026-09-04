@@ -5,7 +5,7 @@ import { haversine, withinSearchRadius } from "@/lib/geo";
 
 // GET: the current patient's bookmarked doctors, each tagged with distance
 // and whether it falls inside the patient's chosen search range.
-export async function GET() {
+export async function GET(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -21,6 +21,14 @@ export async function GET() {
     })
     .catch(() => null);
   const radiusKm = patientProfile?.searchRadiusKm ?? null;
+
+  // A location the patient pinned on the map overrides their profile coords.
+  const sp = new URL(req.url).searchParams;
+  const pinnedLat = Number(sp.get("lat"));
+  const pinnedLng = Number(sp.get("lng"));
+  const hasPinned = Number.isFinite(pinnedLat) && Number.isFinite(pinnedLng) && sp.has("lat");
+  const fromLat = hasPinned ? pinnedLat : patientProfile?.lat ?? null;
+  const fromLng = hasPinned ? pinnedLng : patientProfile?.lng ?? null;
 
   const saved = await prisma.savedDoctor.findMany({
     where: { patientId: authUser.id },
@@ -62,8 +70,8 @@ export async function GET() {
     const docLat = profile?.lat ?? s.doctor.clinics[0]?.lat ?? null;
     const docLng = profile?.lng ?? s.doctor.clinics[0]?.lng ?? null;
     const distanceKm =
-      patientProfile?.lat != null && patientProfile?.lng != null && docLat != null && docLng != null
-        ? Math.round(haversine(patientProfile.lat, patientProfile.lng, docLat, docLng) * 10) / 10
+      fromLat != null && fromLng != null && docLat != null && docLng != null
+        ? Math.round(haversine(fromLat, fromLng, docLat, docLng) * 10) / 10
         : null;
     const inRange = withinSearchRadius(distanceKm, radiusKm, profile?.offersVideo ?? false);
     return {
