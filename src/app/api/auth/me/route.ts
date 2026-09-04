@@ -31,8 +31,14 @@ export async function GET() {
   const impersonatorToken = cookieStore.get(IMPERSONATOR_COOKIE_NAME)?.value;
   const impersonator = impersonatorToken ? verifyToken(impersonatorToken) : null;
 
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { termsAcceptedAt: true },
+  });
+
   return NextResponse.json({
     ...user,
+    termsAcceptedAt: dbUser?.termsAcceptedAt ?? null,
     impersonatedBy: impersonator ? { name: impersonator.name, role: impersonator.role } : null,
   });
 }

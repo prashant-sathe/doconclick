@@ -18,6 +18,7 @@ model User {
   password  String   @default("")
   role      String   @default("PATIENT") // PATIENT, DOCTOR, ADMIN
   photoUrl  String?  // admin's own profile photo — patients/doctors use their profile-table column instead
+  termsAcceptedAt DateTime? // set when the patient/doctor accepts the Terms of Service + Privacy Policy gate
   deletedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

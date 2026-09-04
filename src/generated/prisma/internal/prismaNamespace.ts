@@ -2413,6 +2413,7 @@ export const UserScalarFieldEnum = {
   password: 'password',
   role: 'role',
   photoUrl: 'photoUrl',
+  termsAcceptedAt: 'termsAcceptedAt',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

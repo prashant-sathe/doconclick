@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Loader2, MapPin, HeartPulse, PhoneCall, Compass, Bell, Wallet as WalletIcon,
-  LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2, Lock,
+  LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2, Lock, FileCheck,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -237,6 +237,8 @@ export default function PatientProfilePage() {
             title="Change Password" />
           <Row href="/patient/support" tint="bg-indigo-50 text-indigo-500" icon={<LifeBuoy className="w-4 h-4" />}
             title="Help & Support" />
+          <Row href="/patient/profile/terms" tint="bg-slate-100 text-slate-500" icon={<FileCheck className="w-4 h-4" />}
+            title="Terms & Privacy Policy" />
         </Group>
 
         <button

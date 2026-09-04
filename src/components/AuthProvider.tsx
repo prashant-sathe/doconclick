@@ -1,10 +1,12 @@
 "use client";
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Loader2, ShieldAlert } from "lucide-react";
+import { LogOut, Loader2, ShieldAlert, FileCheck } from "lucide-react";
 import { unlockAudio } from "@/lib/playNotificationSound";
 import { listenForForegroundPush } from "@/lib/pushClient";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
+import LegalContent from "@/components/LegalContent";
+import { TERMS_OF_SERVICE, PRIVACY_POLICY, LEGAL_LAST_UPDATED } from "@/lib/legalContent";
 
 // How often an already-open tab re-checks whether it's been suspended —
 // doesn't need to be as tight as chat/notification polling, just tight
@@ -17,6 +19,7 @@ type AuthUser = {
   name: string;
   role: string;
   mobile: string;
+  termsAcceptedAt?: string | null;
 };
 
 type ImpersonatedBy = {
@@ -50,6 +53,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loggingOut, setLoggingOut] = useState(false);
   const [suspended, setSuspended] = useState(false);
   const [suspendedMessage, setSuspendedMessage] = useState("");
+  const [tosChecked, setTosChecked] = useState(false);
+  const [privacyChecked, setPrivacyChecked] = useState(false);
+  const [acceptingTerms, setAcceptingTerms] = useState(false);
   const router = useRouter();
 
   const refresh = useCallback(async () => {
@@ -78,6 +84,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     }
   }, []);
+
+  const acceptTerms = async () => {
+    setAcceptingTerms(true);
+    try {
+      await fetch("/api/auth/accept-terms", { method: "POST" });
+      await refresh();
+      setTosChecked(false);
+      setPrivacyChecked(false);
+    } finally {
+      setAcceptingTerms(false);
+    }
+  };
 
   const exitImpersonation = useCallback(async () => {
     await fetch("/api/admin/impersonate/exit", { method: "POST" });
@@ -124,6 +142,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/login");
   };
 
+  // Impersonation is skipped here so an admin testing a doctor/patient
+  // account never gets blocked by (or silently accepts) that account's gate.
+  const needsTerms =
+    !!user && !suspended && !impersonatedBy &&
+    (user.role === "PATIENT" || user.role === "DOCTOR") && !user.termsAcceptedAt;
+
   return (
     <AuthContext.Provider value={{ user, loading, impersonatedBy, logout, refresh, exitImpersonation }}>
       {impersonatedBy && <ImpersonationBanner adminName={impersonatedBy.name} onExit={exitImpersonation} />}
@@ -144,6 +168,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
               Sign Out
             </button>
+          </div>
+        </div>
+      ) : needsTerms ? (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 sm:p-6">
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 max-w-lg w-full max-h-[90vh] flex flex-col">
+            <div className="p-6 sm:p-8 pb-4 text-center flex-shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-3">
+                <FileCheck className="w-7 h-7 text-blue-500" />
+              </div>
+              <h3 className="text-lg font-extrabold text-slate-900">Terms of Service and Privacy Policy</h3>
+              <p className="text-xs text-slate-400 mt-1">Last updated {LEGAL_LAST_UPDATED}</p>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 sm:px-8 space-y-8">
+              <LegalContent title="Terms of Service" sections={TERMS_OF_SERVICE} />
+              <LegalContent title="Privacy Policy" sections={PRIVACY_POLICY} />
+            </div>
+            <div className="p-6 sm:p-8 pt-4 flex-shrink-0 border-t border-slate-100 space-y-3">
+              <label className="flex items-start gap-2.5 text-sm text-slate-700 cursor-pointer">
+                <input type="checkbox" className="mt-0.5" checked={tosChecked} onChange={(e) => setTosChecked(e.target.checked)} />
+                I accept the Terms of Service
+              </label>
+              <label className="flex items-start gap-2.5 text-sm text-slate-700 cursor-pointer">
+                <input type="checkbox" className="mt-0.5" checked={privacyChecked} onChange={(e) => setPrivacyChecked(e.target.checked)} />
+                I accept the Privacy Policy
+              </label>
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={confirmLogout}
+                  disabled={acceptingTerms}
+                  className="btn-secondary flex-1 disabled:opacity-60"
+                >
+                  Sign Out
+                </button>
+                <button
+                  type="button"
+                  onClick={acceptTerms}
+                  disabled={!tosChecked || !privacyChecked || acceptingTerms}
+                  className="btn-primary flex-1 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {acceptingTerms ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  Submit
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
