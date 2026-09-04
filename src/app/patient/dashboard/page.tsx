@@ -1332,7 +1332,7 @@ function PatientDashboardInner() {
                     </div>
                   )}
                   {/* Header */}
-                  <div className="flex items-start gap-4 mb-5 pr-10">
+                  <div className="flex items-start gap-4 mb-4 pr-10">
                     {/* Avatar */}
                     {selectedDoctor.doctorProfile.photoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -1356,43 +1356,6 @@ function PatientDashboardInner() {
                       </div>
                       <p className="text-sm text-slate-500 mt-0.5">{selectedDoctor.doctorProfile.specialty}</p>
                       <p className="text-xs text-slate-400 mt-0.5">{selectedDoctor.doctorProfile.qualification}</p>
-                      {selectedDoctor.clinics.length > 0 ? (
-                        <div className="mt-1.5 space-y-1">
-                          {selectedDoctor.clinics.map((c) => {
-                            const open = isClinicOpenNow(c.slots, effectiveBookingTime);
-                            const isSelected = c.id === selectedClinicId;
-                            const when = open ? null : formatNextOpeningText(findNextOpening([c], effectiveBookingTime));
-                            return (
-                              <button
-                                key={c.id}
-                                type="button"
-                                onClick={() => setSelectedClinicId(c.id)}
-                                className={`w-full flex items-center justify-between gap-2 rounded-lg border px-2.5 py-1.5 text-left transition-colors ${
-                                  isSelected ? "border-blue-300 bg-blue-50" : "border-slate-200 hover:border-slate-300"
-                                }`}
-                              >
-                                <span className="flex items-center gap-1.5 min-w-0">
-                                  <Building2 className="w-3 h-3 flex-shrink-0 text-slate-400" />
-                                  <span className="text-xs font-medium text-slate-700 truncate">{c.name}</span>
-                                </span>
-                                {open ? (
-                                  <span className="badge badge-success !px-1.5 !py-0 text-[10px] flex-shrink-0">Available now</span>
-                                ) : when ? (
-                                  <span className="text-[10px] text-slate-500 flex-shrink-0 flex items-center gap-1">
-                                    <Clock className="w-3 h-3 flex-shrink-0 text-slate-400" /> Opens {when}
-                                  </span>
-                                ) : (
-                                  <span className="badge badge-gray !px-1.5 !py-0 text-[10px] flex-shrink-0">Closed</span>
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ) : selectedDoctor.doctorProfile.clinicName && (
-                        <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                          <Building2 className="w-3 h-3 flex-shrink-0" /> {selectedDoctor.doctorProfile.clinicName}
-                        </p>
-                      )}
                       <div className="mt-1.5">
                         <RatingStars
                           avgRating={selectedDoctor.doctorProfile.avgRating}
@@ -1414,6 +1377,45 @@ function PatientDashboardInner() {
                       {savedDoctorIds.has(selectedDoctor.id) ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                     </button>
                   </div>
+
+                  {/* Clinic list — full panel width */}
+                  {selectedDoctor.clinics.length > 0 ? (
+                    <div className="space-y-1.5 mb-5">
+                      {selectedDoctor.clinics.map((c) => {
+                        const open = isClinicOpenNow(c.slots, effectiveBookingTime);
+                        const isSelected = c.id === selectedClinicId;
+                        const when = open ? null : formatNextOpeningText(findNextOpening([c], effectiveBookingTime));
+                        return (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => setSelectedClinicId(c.id)}
+                            className={`w-full flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                              isSelected ? "border-blue-300 bg-blue-50" : "border-slate-200 hover:border-slate-300"
+                            }`}
+                          >
+                            <span className="flex items-center gap-2 min-w-0">
+                              <Building2 className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" />
+                              <span className="text-xs font-medium text-slate-700 truncate">{c.name}</span>
+                            </span>
+                            {open ? (
+                              <span className="badge badge-success !px-2 !py-0.5 text-[10px] flex-shrink-0">Available now</span>
+                            ) : when ? (
+                              <span className="text-[11px] text-slate-500 flex-shrink-0 flex items-center gap-1">
+                                <Clock className="w-3 h-3 flex-shrink-0 text-slate-400" /> Opens {when}
+                              </span>
+                            ) : (
+                              <span className="badge badge-gray !px-2 !py-0.5 text-[10px] flex-shrink-0">Closed</span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : selectedDoctor.doctorProfile.clinicName && (
+                    <p className="text-xs text-slate-500 mb-5 flex items-center gap-1.5">
+                      <Building2 className="w-3.5 h-3.5 flex-shrink-0" /> {selectedDoctor.doctorProfile.clinicName}
+                    </p>
+                  )}
 
                   {/* Chips row */}
                   <div className="flex flex-wrap gap-2 mb-5">
