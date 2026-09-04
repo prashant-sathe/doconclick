@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
 
 const ROLE_HOME: Record<string, string> = {
   ADMIN: "/admin",
@@ -27,8 +28,8 @@ export default function ResetPassword() {
     e.preventDefault();
     setError("");
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    if (password.length < PASSWORD_MIN_LENGTH) {
+      setError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`);
       return;
     }
     if (password !== confirmPassword) {

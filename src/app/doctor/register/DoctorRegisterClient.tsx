@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { useAuth } from "@/components/AuthProvider";
+import { isValidMobile, isValidEmail, normalizeMobile, nameError, PASSWORD_MIN_LENGTH } from "@/lib/validation";
 
 export default function DoctorRegisterClient() {
   const router = useRouter();
@@ -27,15 +28,19 @@ export default function DoctorRegisterClient() {
     e.preventDefault();
     setError("");
     if (!form.name || !form.mobile) { setError("Please fill all required fields."); return; }
+    const nameErr = nameError(form.name);
+    if (nameErr) { setError(nameErr); return; }
+    if (!isValidMobile(form.mobile)) { setError("Enter a valid 10-digit Indian mobile number."); return; }
+    if (form.email && !isValidEmail(form.email)) { setError("Enter a valid email address, or leave it blank."); return; }
+    if (form.password.length < PASSWORD_MIN_LENGTH) { setError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`); return; }
     if (form.password !== form.confirmPassword) { setError("Passwords do not match."); return; }
-    if (form.password.length < 6) { setError("Password must be at least 6 characters."); return; }
 
     setLoading(true);
     const res = await fetch("/api/doctors/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: form.name, mobile: form.mobile, email: form.email, password: form.password,
+        name: form.name.trim(), mobile: normalizeMobile(form.mobile), email: form.email.trim(), password: form.password,
       }),
     });
     const data = await res.json();
@@ -67,7 +72,7 @@ export default function DoctorRegisterClient() {
             </div>
             <div>
               <label className="input-label"><Phone className="inline w-3.5 h-3.5 mr-1" />Mobile Number *</label>
-              <input required className="input-field" placeholder="9800000000" value={form.mobile} onChange={(e) => set("mobile", e.target.value)} />
+              <input required type="tel" inputMode="numeric" maxLength={10} className="input-field" placeholder="9800000000" value={form.mobile} onChange={(e) => set("mobile", e.target.value.replace(/\D/g, "").slice(0, 10))} />
             </div>
             <div>
               <label className="input-label">Email (optional)</label>

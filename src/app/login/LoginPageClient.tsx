@@ -6,6 +6,7 @@ import { Phone, Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { isNative } from "@/lib/platform";
+import { isValidMobile, normalizeMobile } from "@/lib/validation";
 
 const ROLE_HOME: Record<string, string> = {
   ADMIN:   "/admin",
@@ -38,13 +39,14 @@ function LoginForm() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.mobile || !form.password) { setError("Please enter your mobile number and password."); return; }
+    if (!isValidMobile(form.mobile)) { setError("Enter a valid 10-digit mobile number."); return; }
     setLoading(true);
     setError("");
 
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ mobile: normalizeMobile(form.mobile), password: form.password }),
     });
 
     const data = await res.json();
@@ -82,11 +84,13 @@ function LoginForm() {
             <input
               required
               type="tel"
+              inputMode="numeric"
               autoComplete="username"
+              maxLength={10}
               className="input-field"
-              placeholder="Enter your mobile number"
+              placeholder="10-digit mobile number"
               value={form.mobile}
-              onChange={(e) => set("mobile", e.target.value)}
+              onChange={(e) => set("mobile", e.target.value.replace(/\D/g, "").slice(0, 10))}
             />
           </div>
 

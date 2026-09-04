@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Phone, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import { isValidMobile, normalizeMobile } from "@/lib/validation";
 
 const ROLE_HOME: Record<string, string> = {
   ADMIN: "/admin",
@@ -23,13 +24,14 @@ export default function CompleteProfile() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isValidMobile(mobile)) { setError("Enter a valid 10-digit mobile number."); return; }
     setLoading(true);
     setError("");
 
     const res = await fetch("/api/auth/mobile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mobile }),
+      body: JSON.stringify({ mobile: normalizeMobile(mobile) }),
     });
     const data = await res.json();
 
@@ -68,11 +70,13 @@ export default function CompleteProfile() {
               <input
                 required
                 type="tel"
+                inputMode="numeric"
                 autoComplete="tel"
+                maxLength={10}
                 className="input-field"
                 placeholder="Enter your 10-digit mobile number"
                 value={mobile}
-                onChange={(e) => { setMobile(e.target.value); setError(""); }}
+                onChange={(e) => { setMobile(e.target.value.replace(/\D/g, "").slice(0, 10)); setError(""); }}
               />
             </div>
 

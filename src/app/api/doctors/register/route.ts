@@ -2,27 +2,27 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
 import { sendPushToAdmins } from "@/lib/firebaseAdmin";
+import { validateRegistration } from "@/lib/validation";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { name, mobile, email, password } = body;
+  const body = await req.json().catch(() => ({}));
 
-  if (!name || !mobile || !password) {
-    return NextResponse.json({ error: "All required fields must be filled." }, { status: 400 });
+  const result = validateRegistration(body);
+  if ("error" in result) {
+    return NextResponse.json({ error: result.error }, { status: 400 });
   }
-
-  const normalizedEmail = typeof email === "string" && email.trim() ? email.trim() : null;
+  const { name, mobile, email, password } = result.data;
 
   try {
     const existing = await prisma.user.findUnique({ where: { mobile } });
     if (existing) {
       return NextResponse.json({ error: "This mobile number is already registered. Try signing in instead." }, { status: 409 });
     }
-    if (normalizedEmail) {
-      const existingEmail = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+    if (email) {
+      const existingEmail = await prisma.user.findUnique({ where: { email } });
       if (existingEmail) {
         return NextResponse.json({ error: "This email is already registered. Try signing in instead." }, { status: 409 });
       }
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       data: {
         name,
         mobile,
-        email: normalizedEmail,
+        email,
         password: hashed,
         role: "DOCTOR",
         doctorProfile: {

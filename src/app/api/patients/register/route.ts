@@ -1,25 +1,36 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
+import { validateRegistration } from "@/lib/validation";
+
+const GENDERS = ["Male", "Female", "Other"];
 
 // POST: Register a new patient
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { name, mobile, email, age, gender, location, password } = body;
+  const body = await req.json().catch(() => ({}));
+  const { age, gender, location } = body;
 
-  if (!name || !mobile || !password || !age || !gender) {
-    return NextResponse.json({ error: "All required fields must be filled." }, { status: 400 });
+  const result = validateRegistration(body);
+  if ("error" in result) {
+    return NextResponse.json({ error: result.error }, { status: 400 });
   }
+  const { name, mobile, email, password } = result.data;
 
-  const normalizedEmail = typeof email === "string" && email.trim() ? email.trim() : null;
+  const ageNum = Number(age);
+  if (!Number.isInteger(ageNum) || ageNum < 1 || ageNum > 120) {
+    return NextResponse.json({ error: "Enter a valid date of birth." }, { status: 400 });
+  }
+  if (!GENDERS.includes(String(gender))) {
+    return NextResponse.json({ error: "Select a gender." }, { status: 400 });
+  }
 
   try {
     const existing = await prisma.user.findUnique({ where: { mobile } });
     if (existing) {
       return NextResponse.json({ error: "This mobile number is already registered. Try signing in instead." }, { status: 409 });
     }
-    if (normalizedEmail) {
-      const existingEmail = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+    if (email) {
+      const existingEmail = await prisma.user.findUnique({ where: { email } });
       if (existingEmail) {
         return NextResponse.json({ error: "This email is already registered. Try signing in instead." }, { status: 409 });
       }
@@ -32,11 +43,11 @@ export async function POST(req: Request) {
       data: {
         name,
         mobile,
-        email: normalizedEmail,
+        email,
         password: hashed,
         role: "PATIENT",
         patientProfile: {
-          create: { age: Number(age), gender, location: location || null },
+          create: { age: ageNum, gender: String(gender), location: location || null },
         },
       },
     });

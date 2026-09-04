@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, hashPassword } from "@/lib/auth";
+import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
 
 // PATCH: Set a new password for the logged-in user. Reached only after the
 // forgot-password flow verifies identity via "Sign in with Google" — the
@@ -13,8 +14,8 @@ export async function PATCH(req: Request) {
   }
 
   const { password } = await req.json().catch(() => ({ password: undefined }));
-  if (!password || password.length < 6) {
-    return NextResponse.json({ error: "Password must be at least 6 characters." }, { status: 400 });
+  if (typeof password !== "string" || password.length < PASSWORD_MIN_LENGTH) {
+    return NextResponse.json({ error: `Password must be at least ${PASSWORD_MIN_LENGTH} characters.` }, { status: 400 });
   }
 
   const hashed = await hashPassword(password);

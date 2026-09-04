@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword, signToken, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME, type JWTPayload } from "@/lib/auth";
+import { normalizeMobile, MOBILE_REGEX } from "@/lib/validation";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
 export async function POST(req: Request) {
   try {
-    const { mobile, password } = await req.json();
+    const { mobile, password } = await req.json().catch(() => ({}));
 
     if (!mobile || !password) {
       return NextResponse.json(
@@ -16,7 +17,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const user = await prisma.user.findUnique({ where: { mobile } });
+    const normalizedMobile = normalizeMobile(String(mobile));
+    if (!MOBILE_REGEX.test(normalizedMobile)) {
+      return NextResponse.json(
+        { error: "Enter a valid 10-digit mobile number." },
+        { status: 400 }
+      );
+    }
+
+    const user = await prisma.user.findUnique({ where: { mobile: normalizedMobile } });
 
     if (!user || !user.password) {
       return NextResponse.json(
