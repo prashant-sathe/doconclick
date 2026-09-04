@@ -70,7 +70,7 @@ export default function AdminOverview() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="mb-8">
           <div className="skeleton h-8 w-48 mb-2" />
           <div className="skeleton h-4 w-72" />
@@ -113,7 +113,7 @@ export default function AdminOverview() {
   if (!data) return null;
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <EnableNotificationsPrompt />
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">

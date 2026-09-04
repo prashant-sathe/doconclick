@@ -218,7 +218,7 @@ export default function AdminFinance() {
   const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true, filter: true }), []);
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-slate-900">Finance & Commission</h1>
         <p className="text-slate-500 text-sm mt-1">Manage platform earnings and commission settings.</p>

@@ -7,7 +7,7 @@ const CATEGORIES = ["Doctor Financials", "Platform Revenue & Bookings", "Payouts
 
 export default function ReportsHub() {
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-8 flex items-center gap-3">
         <div className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
           <FileBarChart className="w-5.5 h-5.5" />

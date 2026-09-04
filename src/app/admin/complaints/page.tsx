@@ -46,7 +46,7 @@ export default function AdminComplaints() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-slate-900">Support & Complaints</h1>
         <p className="text-slate-500 text-sm mt-1">Review and resolve patient and doctor complaints.</p>
@@ -68,15 +68,15 @@ export default function AdminComplaints() {
             const Icon = STATUS_ICON[c.status] ?? AlertCircle;
             return (
               <div key={c.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                  <div className="flex items-start gap-4 min-w-0">
                     <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5",
                       c.status === "RESOLVED" ? "bg-emerald-50 text-emerald-500" : c.status === "IN_PROGRESS" ? "bg-amber-50 text-amber-500" : "bg-red-50 text-red-500"
                     )}>
                       <Icon className="w-5 h-5" />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="font-bold text-slate-900">{c.subject}</span>
                         <span className={STATUS_BADGE[c.status]}>{c.status.replace("_", " ")}</span>
                         <span className="badge badge-gray text-xs">{c.user.role}</span>

@@ -5,7 +5,7 @@ import SplashSettings from "@/components/SplashSettings";
 
 export default function AdminSettings() {
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-slate-900">Platform Settings</h1>
         <p className="text-slate-500 text-sm mt-1">General configuration for DocOnClick.</p>

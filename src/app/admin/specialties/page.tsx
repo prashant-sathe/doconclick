@@ -115,7 +115,7 @@ export default function AdminSpecialties() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-slate-900">Specialties</h1>
         <p className="text-slate-500 text-sm mt-1">
@@ -176,15 +176,15 @@ export default function AdminSpecialties() {
         <div className="space-y-3">
           {filtered.map((s) => (
             <div key={s.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
-                  <span className={cn("font-semibold text-slate-900", !s.isActive && "text-slate-400 line-through")}>{s.name}</span>
-                  <span className={s.isActive ? "badge badge-success" : "badge badge-gray"}>
+                  <span className={cn("font-semibold text-slate-900 truncate", !s.isActive && "text-slate-400 line-through")}>{s.name}</span>
+                  <span className={cn("flex-shrink-0", s.isActive ? "badge badge-success" : "badge badge-gray")}>
                     {s.isActive ? "Active" : "Inactive"}
                   </span>
                 </div>
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={() => openEdit(s)}
                     disabled={busyId === s.id}

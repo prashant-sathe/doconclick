@@ -146,7 +146,7 @@ export default function AnnouncementDetailPage() {
 
   if (loading || !announcement) {
     return (
-      <div className="p-8 max-w-3xl">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-3xl">
         <div className="skeleton h-8 w-64 rounded-lg mb-6" />
         <div className="skeleton h-96 rounded-2xl" />
       </div>
@@ -157,7 +157,7 @@ export default function AnnouncementDetailPage() {
   const AudienceIcon = AUDIENCE_ICON[announcement.audience] ?? Users;
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl">
       <Link href="/admin/announcements" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 mb-4">
         <ArrowLeft className="w-4 h-4" /> Back to Announcements
       </Link>

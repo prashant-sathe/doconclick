@@ -30,7 +30,7 @@ export default function AdminAnnouncements() {
   }, []);
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900">Announcements</h1>

@@ -19,10 +19,10 @@ export default function EditCouponPage() {
   }, [id]);
 
   if (error) {
-    return <div className="p-8 text-slate-400">{error}</div>;
+    return <div className="p-4 sm:p-6 lg:p-8 text-slate-400">{error}</div>;
   }
   if (!coupon) {
-    return <div className="p-8 flex items-center gap-2 text-slate-400"><Loader2 className="w-4 h-4 animate-spin" /> Loading…</div>;
+    return <div className="p-4 sm:p-6 lg:p-8 flex items-center gap-2 text-slate-400"><Loader2 className="w-4 h-4 animate-spin" /> Loading…</div>;
   }
   return <CouponForm coupon={coupon} />;
 }

@@ -42,7 +42,7 @@ export default function ReportDetailPage() {
 
   if (!config) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <p className="text-slate-500">Unknown report.</p>
         <button onClick={() => router.push("/admin/reports")} className="btn-ghost gap-2 mt-4">
           <ArrowLeft className="w-4 h-4" /> Back to Reports
@@ -54,7 +54,7 @@ export default function ReportDetailPage() {
   const summaryCards: SummaryCard[] | undefined = config.summaryCards?.({ summary }, rows);
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <button onClick={() => router.push("/admin/reports")} className="btn-ghost gap-2 mb-4 text-sm">
         <ArrowLeft className="w-4 h-4" /> Back to Reports
       </button>

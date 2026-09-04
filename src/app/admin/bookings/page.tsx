@@ -395,7 +395,7 @@ export default function AdminBookings() {
   }), []);
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900">Booking Management</h1>
@@ -446,7 +446,7 @@ export default function AdminBookings() {
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-8 space-y-3">
+          <div className="p-4 sm:p-6 lg:p-8 space-y-3">
             {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
           </div>
         ) : filtered.length === 0 ? (
