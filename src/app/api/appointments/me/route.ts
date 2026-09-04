@@ -42,7 +42,7 @@ export async function GET() {
   if (authUser.role === "DOCTOR") {
     const appointments = await prisma.appointment.findMany({
       where: { doctorId: authUser.id },
-      orderBy: [{ isEmergency: "desc" }, { createdAt: "desc" }],
+      orderBy: [{ createdAt: "desc" }],
       include: {
         patient: {
           select: {

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Clock } from "lucide-react";
 import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import { useDoctorProfile, patchDoctorProfile } from "@/lib/useDoctorProfile";
 import { cn } from "@/lib/utils";
@@ -55,6 +56,8 @@ export default function AvailabilitySettingsPage() {
     <DoctorProfileSubShell
       title="Available Timings"
       description="Applies to Home Visit and Video Call requests. Clinic hours are set per clinic on the Clinics page."
+      icon={<Clock className="w-5 h-5" />}
+      tint="bg-blue-50 text-blue-500"
       loading={loading}
       saving={saving}
       saved={saved}

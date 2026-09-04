@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Loader2, ArrowLeft, User, Droplets, AlertTriangle, Pill,
   Scissors, PhoneCall, CalendarClock, Star, Stethoscope, Paperclip, Users,
+  Home, Building2, Video,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
@@ -63,6 +64,26 @@ interface PatientHistory {
   dependent: (MedicalInfo & { name: string; relation: string }) | null;
   appointments: HistoryAppointment[];
 }
+
+const TYPE_ICON: Record<string, React.ElementType> = { HOME: Home, CLINIC: Building2, VIDEO: Video };
+
+const STATUS_LABEL: Record<string, string> = {
+  PENDING_APPROVAL: "Waiting for response",
+  SCHEDULED: "Confirmed",
+  COMPLETED: "Completed",
+  CANCELLED: "Cancelled",
+  REJECTED: "Declined",
+  EXPIRED: "Expired",
+};
+
+const STATUS_BADGE: Record<string, string> = {
+  PENDING_APPROVAL: "badge badge-warning",
+  SCHEDULED: "badge badge-info",
+  COMPLETED: "badge badge-success",
+  CANCELLED: "badge badge-gray",
+  REJECTED: "badge badge-danger",
+  EXPIRED: "badge badge-gray",
+};
 
 function DoctorPatientHistoryInner() {
   const params = useParams<{ id: string }>();
@@ -138,6 +159,7 @@ function DoctorPatientHistoryInner() {
                 </div>
               </div>
 
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Medical Snapshot</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="bg-red-50 rounded-xl p-3">
                   <Droplets className="w-3.5 h-3.5 text-red-500 mb-1" />
@@ -179,16 +201,18 @@ function DoctorPatientHistoryInner() {
               <CalendarClock className="w-4 h-4" /> Visit History with You ({data.appointments.length})
             </h2>
             <div className="space-y-3">
-              {data.appointments.map((a) => (
+              {data.appointments.map((a) => {
+                const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
+                return (
                 <div key={a.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Stethoscope className="w-4 h-4 text-teal-500" />
+                      <Icon className="w-4 h-4 text-teal-500" />
                       <span className="font-semibold text-slate-800 text-sm">
                         {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
                       </span>
                     </div>
-                    <span className="badge badge-gray">{a.status}</span>
+                    <span className={STATUS_BADGE[a.status] ?? "badge badge-gray"}>{STATUS_LABEL[a.status] ?? a.status}</span>
                   </div>
                   <p className="text-sm text-slate-600 mb-2">{a.symptoms}</p>
                   {a.doctorNotes && <p className="text-xs text-slate-500 mb-2"><strong>Notes:</strong> {a.doctorNotes}</p>}
@@ -220,7 +244,8 @@ function DoctorPatientHistoryInner() {
                     </div>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </>
         ) : (

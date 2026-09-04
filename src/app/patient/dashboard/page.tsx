@@ -7,8 +7,8 @@ import { Suspense, useEffect, useRef, useState, useCallback, useMemo } from "rea
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   MapPin, Home, Building2, Video, Stethoscope, Clock,
-  ChevronDown, X, Loader2, CheckCircle, UserCircle, Languages,
-  Navigation, AlertCircle, IndianRupee, CalendarClock, Siren,
+  ChevronDown, X, Loader2, UserCircle, Languages,
+  Navigation, AlertCircle, IndianRupee, CalendarClock,
   CalendarCheck2, AlertTriangle, ShieldCheck, Users, Search,
   Bookmark, BookmarkCheck, Sparkles, Compass, RefreshCw, Crosshair,
 } from "lucide-react";
@@ -248,12 +248,7 @@ function PatientDashboardInner() {
   const [booked, setBooked] = useState<{ id: string; fee: number } | null>(null);
   const [bookingError, setBookingError] = useState("");
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [emergencyOpen, setEmergencyOpen] = useState(false);
-  const [emergencyText, setEmergencyText] = useState("");
-  const [emergencyBusy, setEmergencyBusy] = useState(false);
   const [announcementsDone, setAnnouncementsDone] = useState(false);
-  const [emergencyResult, setEmergencyResult] = useState<{ doctorName: string; eta: number } | null>(null);
-  const [emergencyError, setEmergencyError] = useState("");
   const followUpOfId = searchParams.get("followUpOf");
   const deepLinkedDoctorId = searchParams.get("doctorId");
   const didDeepLink = useRef(false);
@@ -502,20 +497,6 @@ function PatientDashboardInner() {
     (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
   ), [mapDoctors]);
   const nearest = sorted[0];
-
-  // Nearest doctor regardless of specialty filter — used for emergency requests.
-  // Also restricted to doctors that actually have a location/pin.
-  const nearestAny = useMemo(() => {
-    const located = [...doctorsWithDist]
-      .filter((d) => d.clinics.length > 0 || (d.doctorProfile?.lat != null && d.doctorProfile?.lng != null))
-      .sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
-    // Honour the patient's search-range preference, but never leave an
-    // emergency with nobody — fall back to the absolute nearest doctor.
-    const inRange = located.filter((d) =>
-      withinSearchRadius(d.distance, effectiveRadiusKm, d.doctorProfile?.offersVideo ?? false)
-    );
-    return inRange[0] ?? located[0];
-  }, [doctorsWithDist, effectiveRadiusKm]);
 
   // One marker per clinic, not per doctor — a doctor with several locations
   // shows up as several pins.
@@ -818,40 +799,6 @@ function PatientDashboardInner() {
     else setBookingError(data.error ?? "Booking failed. Please try again.");
   };
 
-  // ── Emergency quick-book ────────────────────────────────────────────────
-  const submitEmergency = async () => {
-    if (!user?.id || !nearestAny) return;
-    setEmergencyBusy(true);
-    setEmergencyError("");
-    const type = defaultConsultType(nearestAny);
-    const fee = feeForConsultType(nearestAny.doctorProfile, type);
-
-    const res = await fetch("/api/appointments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        doctorId: nearestAny.id,
-        symptoms: emergencyText || "Emergency request",
-        consultType: type,
-        amount: fee,
-        paymentMethod: "ONLINE",
-        isEmergency: true,
-        patientLat: userPos?.[0],
-        patientLng: userPos?.[1],
-      }),
-    });
-    const data = await res.json().catch(() => ({}));
-    setEmergencyBusy(false);
-    if (res.ok) {
-      setEmergencyResult({
-        doctorName: formatDoctorName(nearestAny.name),
-        eta: estimateArrivalMinutes(nearestAny.distance ?? 0),
-      });
-    } else {
-      setEmergencyError(data.error ?? "Could not send the request. Please try again.");
-    }
-  };
-
   const fee = feeForConsultType(selectedDoctor?.doctorProfile, consultType);
 
   const eta = selectedDoctor?.distance != null ? estimateArrivalMinutes(selectedDoctor.distance) : null;
@@ -974,27 +921,40 @@ function PatientDashboardInner() {
           </div>
         </div>
 
-        {/* Search + specialty filter chips */}
+        {/* Search, filters, refresh and where-you're-searching info — one
+            card instead of three separate floating rows, so glancing at the
+            top of the screen reads as "identity" then "search", not five
+            competing pills. */}
         <div className="px-3 sm:px-4 pointer-events-auto">
           <div className="glass-card rounded-2xl p-2.5 max-w-full">
-            <div className="relative mb-2">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search doctor or specialty…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-8 pr-8 py-2 rounded-xl border border-slate-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
+            <div className="flex items-center gap-2 mb-2">
+              <div className="relative flex-1 min-w-0">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search doctor or specialty…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-8 pr-8 py-2 rounded-xl border border-slate-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={refreshMap}
+                disabled={refreshing}
+                className="w-9 h-9 rounded-xl bg-white/80 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 transition-colors disabled:opacity-60 flex-shrink-0"
+                title="Refresh doctors & location"
+              >
+                <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
+              </button>
             </div>
             <SpecialtyFilter value={specialtyFilter} onChange={setSpecialtyFilter} />
             {searchRadiusKm != null && (
@@ -1011,75 +971,55 @@ function PatientDashboardInner() {
                 )}
               </p>
             )}
-          </div>
-        </div>
 
-        {/* Nearest doctor badge (or the "set location" prompt) + emergency
-            button, same row so they never collide */}
-        <div className="flex items-center gap-2 px-3 sm:px-4 mt-2.5">
-          {customLabel ? (
-            <button
-              onClick={switchToMyLocation}
-              className="glass-card rounded-2xl px-3 py-2.5 flex items-center gap-2 pointer-events-auto shadow-lg border border-blue-200 min-w-0 flex-1 sm:flex-initial"
-            >
-              <MapPin className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
-              <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
-                {customLabel} <span className="text-blue-600">· Use my location</span>
-              </span>
-            </button>
-          ) : posError ? (
-            <button
-              onClick={() => setLocationPickerOpen(true)}
-              className="glass-card rounded-2xl px-3 py-2.5 flex items-center gap-2 pointer-events-auto shadow-lg border border-amber-200 min-w-0 flex-1 sm:flex-initial"
-            >
-              <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-              <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
-                Showing Pune — <span className="text-blue-600">Set your location</span>
-              </span>
-            </button>
-          ) : nearest?.doctorProfile && (
-            <button
-              onClick={() => {
-                setSelectedDoctor(nearest);
-                setSelectedClinicId((findOpenClinic(nearest.clinics) ?? nearest.clinics[0])?.id ?? null);
-                setPanelOpen(true);
-                setBookingOpen(false);
-                setConsultType(defaultConsultType(nearest));
-              }}
-              className="glass-card rounded-2xl pl-3 pr-3 py-2.5 flex items-center gap-2 pointer-events-auto shadow-lg hover:scale-[1.02] transition-transform min-w-0 flex-1 sm:flex-initial"
-            >
-              <div
-                className="w-2 h-2 rounded-full animate-pulse flex-shrink-0"
-                style={{ backgroundColor: colorFor(nearest.doctorProfile.specialty) }}
-              />
-              <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
-                Nearest: <span className="text-blue-600">{formatDoctorName(nearest.name)}</span>
-                {nearest.distance != null && (
-                  <span className="text-slate-400 font-normal ml-1">
-                    · {nearest.distance.toFixed(1)} km
-                  </span>
-                )}
-              </span>
-              <Navigation className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
-            </button>
-          )}
-          <div className="ml-auto pointer-events-auto flex-shrink-0 flex items-center gap-2">
-        <button
-          onClick={refreshMap}
-          disabled={refreshing}
-          className="w-11 h-11 rounded-full glass-card flex items-center justify-center shadow-lg text-slate-600 hover:text-blue-600 transition-colors disabled:opacity-60"
-          title="Refresh doctors & location"
-        >
-          <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
-        </button>
-        <button
-          onClick={() => { setEmergencyOpen(true); setEmergencyText(""); setEmergencyResult(null); setEmergencyError(""); }}
-          className="w-12 h-12 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-xl text-white transition-colors"
-          title="Emergency request"
-          style={{ boxShadow: "0 0 0 6px rgba(239,68,68,0.18)" }}
-        >
-          <Siren className="w-5 h-5" />
-        </button>
+            {/* Where you're searching from — folded into the same card
+                instead of its own floating pill below. */}
+            {customLabel ? (
+              <button
+                onClick={switchToMyLocation}
+                className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
+              >
+                <MapPin className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
+                  {customLabel} <span className="text-blue-600">· Use my location</span>
+                </span>
+              </button>
+            ) : posError ? (
+              <button
+                onClick={() => setLocationPickerOpen(true)}
+                className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
+              >
+                <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
+                  Showing Pune — <span className="text-blue-600">Set your location</span>
+                </span>
+              </button>
+            ) : nearest?.doctorProfile && (
+              <button
+                onClick={() => {
+                  setSelectedDoctor(nearest);
+                  setSelectedClinicId((findOpenClinic(nearest.clinics) ?? nearest.clinics[0])?.id ?? null);
+                  setPanelOpen(true);
+                  setBookingOpen(false);
+                  setConsultType(defaultConsultType(nearest));
+                }}
+                className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
+              >
+                <div
+                  className="w-2 h-2 rounded-full animate-pulse flex-shrink-0"
+                  style={{ backgroundColor: colorFor(nearest.doctorProfile.specialty) }}
+                />
+                <span className="text-xs font-semibold text-slate-700 truncate min-w-0 flex-1">
+                  Nearest: <span className="text-blue-600">{formatDoctorName(nearest.name)}</span>
+                  {nearest.distance != null && (
+                    <span className="text-slate-400 font-normal ml-1">
+                      · {nearest.distance.toFixed(1)} km
+                    </span>
+                  )}
+                </span>
+                <Navigation className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -1701,76 +1641,6 @@ function PatientDashboardInner() {
         </>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════
-          EMERGENCY MODAL
-      ══════════════════════════════════════════════════════════════ */}
-      {emergencyOpen && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
-            {emergencyResult ? (
-              <div className="text-center py-2">
-                <div className="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-emerald-500" />
-                </div>
-                <h3 className="text-lg font-extrabold text-slate-900 mb-1">Request Sent</h3>
-                <p className="text-sm text-slate-500 mb-4">
-                  {emergencyResult.doctorName} has been notified and flagged as urgent — waiting for them to accept. Estimated arrival once accepted: ~{emergencyResult.eta} min. Pay online from My Appointments once accepted.
-                </p>
-                <button onClick={() => setEmergencyOpen(false)} className="btn-primary w-full justify-center py-3">Close</button>
-              </div>
-            ) : customLabel ? (
-              <>
-                <div className="flex items-center gap-2 mb-2">
-                  <Siren className="w-5 h-5 text-red-500" />
-                  <h3 className="text-lg font-extrabold text-slate-900">Emergency Request</h3>
-                </div>
-                <p className="text-sm text-slate-500 mb-4">
-                  You&apos;re browsing doctors near <strong>{customLabel}</strong>. An emergency request must go from
-                  your own location — switch back first.
-                </p>
-                <div className="flex gap-3">
-                  <button onClick={() => setEmergencyOpen(false)} className="btn-secondary flex-1 justify-center py-3">Cancel</button>
-                  <button onClick={() => { setEmergencyOpen(false); switchToMyLocation(); }} className="btn-primary flex-1 justify-center py-3">
-                    Use my location
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center gap-2 mb-2">
-                  <Siren className="w-5 h-5 text-red-500" />
-                  <h3 className="text-lg font-extrabold text-slate-900">Emergency Request</h3>
-                </div>
-                <p className="text-sm text-slate-500 mb-4">
-                  This is not an ambulance service. We&apos;ll immediately notify the nearest available doctor
-                  {nearestAny ? <> — <strong>{formatDoctorName(nearestAny.name)}</strong> ({nearestAny.distance?.toFixed(1)} km away)</> : null}.
-                </p>
-                <textarea
-                  rows={3}
-                  className="input-field resize-none mb-4"
-                  placeholder="Briefly describe what's happening…"
-                  value={emergencyText}
-                  onChange={(e) => setEmergencyText(e.target.value)}
-                />
-                {emergencyError && (
-                  <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mb-3">{emergencyError}</div>
-                )}
-                <div className="flex gap-3">
-                  <button onClick={() => setEmergencyOpen(false)} className="btn-secondary flex-1 justify-center py-3">Cancel</button>
-                  <button
-                    onClick={submitEmergency}
-                    disabled={emergencyBusy || !nearestAny}
-                    className="flex-1 justify-center py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold flex items-center gap-2 disabled:opacity-50"
-                  >
-                    {emergencyBusy ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</> : "Request Now"}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
       {confirmBookingOpen && bookingOpen && selectedDoctor && (
         <ConfirmDialog
           icon={CalendarCheck2}
@@ -1816,7 +1686,7 @@ function PatientDashboardInner() {
       )}
 
       {/* ── Empty state: nothing within the search radius ───────────── */}
-      {!panelOpen && !emergencyOpen && !pickingOnMap && doctors.length > 0
+      {!panelOpen && !pickingOnMap && doctors.length > 0
         && clinicMarkers.length === 0 && searchRadiusKm != null && !ignoreRadius && (
         <div className="absolute bottom-[calc(9rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-24 inset-x-0 z-20 flex justify-center px-4 pointer-events-none">
           <div className="glass-card rounded-2xl px-4 py-2.5 flex items-center gap-2 text-xs shadow border border-amber-200 pointer-events-auto max-w-full">
@@ -1830,7 +1700,7 @@ function PatientDashboardInner() {
       {/* ── Tap hint (shown when no panel is open) ──────────────────── */}
       {/* Sits clear above the "clinics nearby" badge — on phones the two
           floating chips used to collide at the bottom edge. */}
-      {!panelOpen && !emergencyOpen && !pickingOnMap && clinicMarkers.length > 0 && (
+      {!panelOpen && !pickingOnMap && clinicMarkers.length > 0 && (
         <div className="absolute bottom-[calc(9rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-24 inset-x-0 z-20 flex justify-center pointer-events-none">
           <div className="glass-card rounded-full px-4 py-2 flex items-center gap-2 text-xs text-slate-500 shadow">
             <ChevronDown className="w-3.5 h-3.5 animate-bounce" />

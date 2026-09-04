@@ -168,7 +168,6 @@ export async function PATCH(
                 dependentId: appointment.dependentId ?? undefined,
                 consentGiven: appointment.consentGiven,
                 consultType: appointment.consultType,
-                isEmergency: appointment.isEmergency,
                 amount: newAmount,
                 platformFee: newPlatformFee,
                 status: "PENDING_APPROVAL",

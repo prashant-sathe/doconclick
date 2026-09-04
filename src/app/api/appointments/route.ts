@@ -22,7 +22,6 @@ export async function POST(req: Request) {
       consultType,
       amount,
       scheduledAt,
-      isEmergency,
       followUpOfId,
       clinicId,
       patientLat,
@@ -49,9 +48,7 @@ export async function POST(req: Request) {
     }
     const normalizedRelation = dependent ? dependent.relation : "Self";
 
-    // Emergency requests are a deliberate one-tap flow — consent is implied by the
-    // act of requesting urgent help. Every other booking requires an explicit checkbox.
-    if (!isEmergency && !consentGiven) {
+    if (!consentGiven) {
       return NextResponse.json(
         { error: "Please agree to the consent statement to continue." },
         { status: 400 }
@@ -159,13 +156,12 @@ export async function POST(req: Request) {
         relation: normalizedRelation,
         dependentId: dependent?.id,
         allergies: allergies?.trim() ? allergies.trim() : null,
-        consentGiven: isEmergency ? true : Boolean(consentGiven),
+        consentGiven: Boolean(consentGiven),
         consultType,
         amount: Number(amount),
         platformFee,
         status: "PENDING_APPROVAL",
         paymentMethod: "ONLINE",
-        isEmergency: Boolean(isEmergency),
         followUpOfId: followUpOfId ?? undefined,
         clinicId: consultType === "CLINIC" && clinicId ? clinicId : undefined,
         ...(scheduledAt ? { scheduledAt: new Date(scheduledAt) } : {}),

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CreditCard } from "lucide-react";
 import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import { useDoctorProfile, patchDoctorProfile } from "@/lib/useDoctorProfile";
 
@@ -47,6 +48,8 @@ export default function BankDetailsPage() {
     <DoctorProfileSubShell
       title="Bank Details"
       description="Where DocOnClick sends your consultation payouts."
+      icon={<CreditCard className="w-5 h-5" />}
+      tint="bg-purple-50 text-purple-500"
       loading={loading}
       saving={saving}
       saved={saved}

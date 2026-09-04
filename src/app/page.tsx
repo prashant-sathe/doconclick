@@ -326,7 +326,7 @@ export default function Home() {
                 {[
                   { icon: Shield, title: "5-Step Doctor Verification", desc: "Every doctor's credentials, registration, and identity are verified before they go live." },
                   { icon: Award,  title: "Only Qualified Specialists",  desc: "We list only MBBS, MD, MS and DNB qualified professionals." },
-                  { icon: Clock,  title: "24/7 Availability",           desc: "Emergency? Our platform has doctors available around the clock." },
+                  { icon: Clock,  title: "24/7 Availability",           desc: "Doctors are available around the clock, so you can book whenever you need to." },
                   { icon: TrendingUp, title: "Real-time Monitoring",    desc: "Patient feedback is monitored continuously. Ratings below 4.0 are investigated." },
                 ].map(({ icon: Icon, title, desc }) => (
                   <div key={title} className="flex items-start gap-4">

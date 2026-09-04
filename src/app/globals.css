@@ -285,6 +285,28 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: hsl(220, 13%, 85%); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: hsl(220, 13%, 70%); }
+
+  /* Leaflet ships z-indexes up to 1000 (its controls) for panes that only
+     ever need to stack among themselves. Left at that scale, its own
+     GPU-composited tile/marker layers can paint above our fixed header/bottom
+     nav (z-30/z-40) on mobile WebViews, regardless of the map's overflow:hidden
+     wrapper — a well-known Leaflet-on-mobile compositing quirk. Capping the
+     whole scale to single digits keeps Leaflet's internal stacking order
+     (tiles < overlays < markers < tooltips < popups < controls) intact while
+     guaranteeing none of it can ever out-rank the app chrome again.
+     !important is needed here: leaflet.css is imported inside the map
+     component itself, so it can be injected into the page AFTER this
+     stylesheet — at equal selector specificity, whichever rule loads last
+     wins, and without !important that's not reliably us. */
+  .leaflet-pane          { z-index: 1 !important; }
+  .leaflet-tile-pane     { z-index: 1 !important; }
+  .leaflet-overlay-pane  { z-index: 2 !important; }
+  .leaflet-shadow-pane   { z-index: 3 !important; }
+  .leaflet-marker-pane   { z-index: 4 !important; }
+  .leaflet-tooltip-pane  { z-index: 5 !important; }
+  .leaflet-popup-pane    { z-index: 6 !important; }
+  .leaflet-control       { z-index: 7 !important; }
+  .leaflet-top, .leaflet-bottom { z-index: 8 !important; }
 }
 
 /* Micro-animations */

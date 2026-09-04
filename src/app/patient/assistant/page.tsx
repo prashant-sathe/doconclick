@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp,
   MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck,
-  Building2, Video, Home, Ticket, Clock,
+  Building2, Video, Home, Ticket, Clock, LifeBuoy,
 } from "lucide-react";
 import RatingStars from "@/components/patient/RatingStars";
 import { isDoctorAvailableNow } from "@/lib/availability";
@@ -339,16 +339,16 @@ function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: strin
   );
 }
 
-function WelcomeState({ onPick }: { onPick: (text: string) => void }) {
+function WelcomeState({ name, onPick }: { name: string; onPick: (text: string) => void }) {
   return (
     <div className="h-full flex flex-col items-center justify-center gap-6 px-6 py-10 text-center">
       <div className="w-16 h-16 rounded-[22px] gradient-primary flex items-center justify-center shadow-lg">
         <Sparkles className="w-7 h-7 text-white" />
       </div>
       <div>
-        <h1 className="gradient-text text-2xl font-extrabold tracking-tight">Hi, I&apos;m your Health Assistant</h1>
+        <h1 className="gradient-text text-2xl font-extrabold tracking-tight">Hi {name}, what&apos;s bothering you?</h1>
         <p className="text-slate-500 text-sm mt-2 max-w-sm mx-auto leading-relaxed">
-          Tell me what&apos;s bothering you, and I&apos;ll help point you to the right doctor.
+          Tell me what&apos;s going on, and I&apos;ll help point you to the right doctor.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
@@ -377,12 +377,25 @@ export default function HealthAssistantPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [openTicketCount, setOpenTicketCount] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const storageKey = user ? `doconclick:assistant-chat:${user.id}` : null;
 
   useEffect(() => {
     requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }));
   }, [items, loading]);
+
+  // Lets "My Tickets" carry a signal of its own — a patient who raises a
+  // ticket mid-conversation has no other way back to it without this.
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/patient/complaints")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((tickets: { status: string }[]) => {
+        setOpenTicketCount(tickets.filter((t) => t.status === "OPEN" || t.status === "IN_PROGRESS").length);
+      })
+      .catch(() => {});
+  }, [user]);
 
   useEffect(() => {
     if (!storageKey) return;
@@ -458,12 +471,25 @@ export default function HealthAssistantPage() {
             <div className="text-[11px] text-slate-400 font-medium">Powered by AI · Always available</div>
           </div>
         </div>
-        <button
-          onClick={() => setItems([])}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors flex-shrink-0"
-        >
-          <Plus className="w-3.5 h-3.5" /> <span className="hidden sm:inline">New chat</span>
-        </button>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <Link
+            href="/patient/support"
+            className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
+          >
+            <LifeBuoy className="w-3.5 h-3.5" /> <span className="hidden sm:inline">My Tickets</span>
+            {openTicketCount > 0 && (
+              <span className="min-w-[16px] h-4 px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">
+                {openTicketCount}
+              </span>
+            )}
+          </Link>
+          <button
+            onClick={() => setItems([])}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" /> <span className="hidden sm:inline">New chat</span>
+          </button>
+        </div>
       </header>
 
       <div className="flex-shrink-0 bg-blue-50 border-b border-blue-100 px-4 sm:px-7 py-2 flex items-center gap-2">
@@ -475,7 +501,7 @@ export default function HealthAssistantPage() {
 
       <div className="flex-1 overflow-y-auto">
         {entries.length === 0 ? (
-          <WelcomeState onPick={send} />
+          <WelcomeState name={user?.name?.split(" ")[0] ?? "there"} onPick={send} />
         ) : (
           <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-4">
             {entries.map((entry) => (

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Briefcase, Languages, FileText, Hash } from "lucide-react";
+import { Award, Briefcase, Languages, FileText, Hash } from "lucide-react";
 import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import { useDoctorProfile, patchDoctorProfile } from "@/lib/useDoctorProfile";
 import { useSpecialties } from "@/lib/useSpecialties";
@@ -60,6 +60,8 @@ export default function ProfessionalDetailsPage() {
     <DoctorProfileSubShell
       title="Professional Details"
       description="Shown on your public profile so patients know your background."
+      icon={<Award className="w-5 h-5" />}
+      tint="bg-teal-50 text-teal-600"
       loading={loading}
       saving={saving}
       saved={saved}

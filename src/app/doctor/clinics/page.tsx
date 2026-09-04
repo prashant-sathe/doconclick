@@ -146,8 +146,9 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
   );
 }
 
-function ClinicCard({ clinic, onChange, onSave, onDelete }: {
+function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
   clinic: ClinicForm;
+  index: number;
   onChange: (next: ClinicForm) => void;
   onSave: () => void;
   onDelete: () => void;
@@ -192,10 +193,18 @@ function ClinicCard({ clinic, onChange, onSave, onDelete }: {
   return (
     <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="font-bold text-slate-800 flex items-center gap-2">
-          <Building2 className="w-4 h-4 text-teal-500" /> {clinic.name || "New Clinic"}
-        </h3>
-        <button type="button" onClick={onDelete} className="text-red-500 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="w-7 h-7 rounded-full bg-teal-50 text-teal-600 text-xs font-extrabold flex items-center justify-center flex-shrink-0">
+            {index + 1}
+          </span>
+          <h3 className="font-bold text-slate-800 truncate">{clinic.name || "New Clinic"}</h3>
+          {canSave ? (
+            <span className="badge badge-success text-[10px] flex-shrink-0"><CheckCircle2 className="w-3 h-3" /> Ready</span>
+          ) : (
+            <span className="badge badge-warning text-[10px] flex-shrink-0">Incomplete</span>
+          )}
+        </div>
+        <button type="button" onClick={onDelete} title="Delete clinic" className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0">
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
@@ -393,11 +402,16 @@ export default function DoctorClinicsPage() {
       <DoctorMobileNav />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
-          <h1 className="text-lg sm:text-xl font-extrabold text-slate-900">Manage Your Clinics</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Add every location you practice at, with day-wise hours for each. Patients will see a marker for each clinic on the map, and can see where you&apos;re available right now.
-          </p>
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
+            <Building2 className="w-7 h-7 text-white" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-xl font-extrabold text-slate-900">Manage Your Clinics</h1>
+            <p className="text-sm text-slate-500 mt-0.5">
+              Add every location you practice at, with day-wise hours for each. Patients see a marker for each on the map.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -405,6 +419,7 @@ export default function DoctorClinicsPage() {
             <ClinicCard
               key={clinic.uid}
               clinic={clinic}
+              index={idx}
               onChange={(next) => updateAt(idx, next)}
               onSave={() => saveClinic(idx)}
               onDelete={() => requestDeleteClinic(idx)}
@@ -412,12 +427,16 @@ export default function DoctorClinicsPage() {
           ))}
         </div>
 
-        <button type="button" onClick={addClinic} className="btn-secondary w-full justify-center py-3 mt-6 gap-1.5">
+        <button
+          type="button"
+          onClick={addClinic}
+          className="w-full flex items-center justify-center gap-1.5 mt-6 py-3.5 rounded-2xl border-2 border-dashed border-slate-200 text-slate-500 text-sm font-semibold hover:border-teal-300 hover:text-teal-600 hover:bg-teal-50/50 transition-colors"
+        >
           <Plus className="w-4 h-4" /> Add Another Clinic
         </button>
 
         <div className="flex justify-end mt-6">
-          <Link href="/doctor/dashboard" className="btn-secondary gap-1.5 text-sm">
+          <Link href="/doctor/dashboard" className={clinics.some((c) => c.id) ? "btn-primary gap-1.5 text-sm" : "btn-secondary gap-1.5 text-sm"}>
             Continue to Dashboard <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

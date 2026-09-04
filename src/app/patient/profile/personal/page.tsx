@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Droplets, Ruler, Weight, AlertTriangle, Pill, Scissors } from "lucide-react";
+import { Droplets, Ruler, Weight, AlertTriangle, Pill, Scissors, HeartPulse } from "lucide-react";
 import ProfileSubShell from "@/components/patient/ProfileSubShell";
 import { usePatientProfile, patchPatientProfile } from "@/lib/usePatientProfile";
 import { CHRONIC_OPTIONS, BLOOD_GROUPS } from "@/lib/medicalOptions";
@@ -86,6 +86,8 @@ export default function PersonalSettingsPage() {
     <ProfileSubShell
       title="Personal & Medical Info"
       description="Shared with the doctor you book so they can treat you safely."
+      icon={<HeartPulse className="w-5 h-5" />}
+      tint="bg-red-50 text-red-500"
       loading={loading}
       saving={saving}
       saved={saved}

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Loader2, Copy, Check, Download, FileText, Lock } from "lucide-react";
+import { Loader2, Copy, Check, Download, FileText, Lock, QrCode } from "lucide-react";
 import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import { useAuth } from "@/components/AuthProvider";
 import { useDoctorProfile } from "@/lib/useDoctorProfile";
@@ -82,6 +82,8 @@ export default function BookingQRPage() {
     <DoctorProfileSubShell
       title="Booking QR Code"
       description="Patients who scan this land on your public profile and can book with you."
+      icon={<QrCode className="w-5 h-5" />}
+      tint="bg-teal-50 text-teal-600"
       loading={loading}
     >
       {!isVerified ? (

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { PhoneCall } from "lucide-react";
 import ProfileSubShell from "@/components/patient/ProfileSubShell";
 import { usePatientProfile, patchPatientProfile } from "@/lib/usePatientProfile";
 import { isValidMobile, normalizeMobile } from "@/lib/validation";
@@ -49,6 +50,8 @@ export default function EmergencyContactSettingsPage() {
     <ProfileSubShell
       title="Emergency Contact"
       description="Someone we can reach if you can't be contacted during a visit."
+      icon={<PhoneCall className="w-5 h-5" />}
+      tint="bg-emerald-50 text-emerald-600"
       loading={loading}
       saving={saving}
       saved={saved}

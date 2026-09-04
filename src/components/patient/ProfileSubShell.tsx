@@ -3,12 +3,15 @@ import Link from "next/link";
 import { ChevronLeft, Loader2, Check, Save } from "lucide-react";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
+import { cn } from "@/lib/utils";
 
 // Shared chrome for a single profile-settings screen: a "‹ Profile" back link,
 // a title, the section's card, and a Save button.
 export default function ProfileSubShell({
   title,
   description,
+  icon,
+  tint = "bg-blue-50 text-blue-600",
   loading,
   saving,
   saved,
@@ -19,6 +22,8 @@ export default function ProfileSubShell({
 }: {
   title: string;
   description?: string;
+  icon?: React.ReactNode;
+  tint?: string;
   loading?: boolean;
   saving?: boolean;
   saved?: boolean;
@@ -33,11 +38,18 @@ export default function ProfileSubShell({
       <PatientMobileNav />
 
       <div className="max-w-xl mx-auto py-6 px-4 sm:px-6">
-        <Link href="/patient/profile" className="btn-ghost gap-1 text-sm -ml-2 mb-2">
+        <Link href="/patient/profile" className="btn-ghost gap-1 text-sm -ml-2 mb-3">
           <ChevronLeft className="w-4 h-4" /> Profile
         </Link>
-        <h1 className="text-2xl font-extrabold text-slate-900">{title}</h1>
-        {description && <p className="text-sm text-slate-500 mt-1">{description}</p>}
+        <div className="flex items-center gap-3">
+          {icon && (
+            <span className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", tint)}>
+              {icon}
+            </span>
+          )}
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">{title}</h1>
+        </div>
+        {description && <p className="text-sm text-slate-500 mt-1.5">{description}</p>}
 
         {loading ? (
           <div className="flex justify-center py-20">

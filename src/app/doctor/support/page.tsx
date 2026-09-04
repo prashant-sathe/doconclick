@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { renderChatText } from "@/lib/chatMarkdown";
+import { formatDoctorName } from "@/lib/utils";
 
 // Loosely typed mirror of the OpenAI Responses API's input/output items —
 // the client only needs enough shape to render and to echo the array back
@@ -218,14 +219,14 @@ function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: strin
   return <TicketListCard tickets={entry.tickets} />;
 }
 
-function WelcomeState({ onPick }: { onPick: (text: string) => void }) {
+function WelcomeState({ name, onPick }: { name: string; onPick: (text: string) => void }) {
   return (
     <div className="h-full flex flex-col items-center justify-center gap-6 px-6 py-10 text-center">
       <div className="w-16 h-16 rounded-[22px] bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg">
         <LifeBuoy className="w-7 h-7 text-white" />
       </div>
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Hi, I&apos;m your Support Assistant</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Hi {name}, how can I help?</h1>
         <p className="text-slate-500 text-sm mt-2 max-w-sm mx-auto leading-relaxed">
           Ask about your schedule, earnings, account status, or raise an issue for the DocOnClick team.
         </p>
@@ -255,12 +256,25 @@ export default function DoctorSupportPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [openTicketCount, setOpenTicketCount] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const storageKey = user ? `doconclick:doctor-support-chat:${user.id}` : null;
 
   useEffect(() => {
     requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }));
   }, [items, loading]);
+
+  // Lets "My Tickets" carry a signal of its own, instead of being a dead link
+  // the doctor has to click through just to check whether anything's pending.
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/doctor/complaints")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((tickets: { status: string }[]) => {
+        setOpenTicketCount(tickets.filter((t) => t.status === "OPEN" || t.status === "IN_PROGRESS").length);
+      })
+      .catch(() => {});
+  }, [user]);
 
   useEffect(() => {
     if (!storageKey) return;
@@ -335,9 +349,14 @@ export default function DoctorSupportPage() {
         <div className="flex items-center gap-1 flex-shrink-0">
           <Link
             href="/doctor/support/tickets"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
+            className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
           >
             <Ticket className="w-3.5 h-3.5" /> <span className="hidden sm:inline">My Tickets</span>
+            {openTicketCount > 0 && (
+              <span className="min-w-[16px] h-4 px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">
+                {openTicketCount}
+              </span>
+            )}
           </Link>
           <button
             onClick={() => setItems([])}
@@ -348,16 +367,18 @@ export default function DoctorSupportPage() {
         </div>
       </header>
 
-      <div className="flex-shrink-0 bg-teal-50 border-b border-teal-100 px-4 sm:px-7 py-2 flex items-center gap-2">
-        <Info className="w-3.5 h-3.5 text-teal-600 flex-shrink-0" />
-        <span className="text-xs font-medium text-teal-700">
-          I can look up your schedule, earnings, and account status, and raise a ticket for the DocOnClick team.
-        </span>
-      </div>
+      {entries.length > 0 && (
+        <div className="flex-shrink-0 bg-teal-50 border-b border-teal-100 px-4 sm:px-7 py-2 flex items-center gap-2">
+          <Info className="w-3.5 h-3.5 text-teal-600 flex-shrink-0" />
+          <span className="text-xs font-medium text-teal-700">
+            I can look up your schedule, earnings, and account status, and raise a ticket for the DocOnClick team.
+          </span>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto">
         {entries.length === 0 ? (
-          <WelcomeState onPick={send} />
+          <WelcomeState name={formatDoctorName(user?.name ?? "Doctor")} onPick={send} />
         ) : (
           <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-4">
             {entries.map((entry) => (

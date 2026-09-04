@@ -37,6 +37,8 @@ export default function VerificationDocumentsPage() {
     <DoctorProfileSubShell
       title="Verification & Documents"
       description="Uploads save immediately. Your profile only shows to patients once our team verifies you."
+      icon={<Shield className="w-5 h-5" />}
+      tint="bg-amber-50 text-amber-500"
       loading={loading}
     >
       {isVerified ? (

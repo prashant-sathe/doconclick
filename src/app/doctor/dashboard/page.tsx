@@ -1,12 +1,14 @@
 "use client";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
   CalendarCheck, Clock, Video, Home, Building2, Stethoscope, Star,
-  Loader2, Siren, CheckCircle2, XCircle, Paperclip, IndianRupee,
+  Loader2, CheckCircle2, XCircle, Paperclip, IndianRupee,
   Navigation, Plus, Trash2, History, ThumbsUp, ThumbsDown, Inbox,
   Car, MapPinCheck, AlertTriangle, MessageCircle, Search, X, FileText,
+  MoreHorizontal,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
@@ -51,7 +53,6 @@ interface Appointment {
   paymentMethod: string;
   paymentStatus: string;
   paidAt: string | null;
-  isEmergency: boolean;
   travelStatus: string;
   scheduledAt: string;
   acceptedAt: string | null;
@@ -452,6 +453,21 @@ export default function DoctorDashboard() {
   const [completedExpanded, setCompletedExpanded] = useState(false);
   const [cancelledExpanded, setCancelledExpanded] = useState(false);
   const [announcementsDone, setAnnouncementsDone] = useState(false);
+  // The "⋯" menu is portalled to <body> (see render below) so it can't be
+  // clipped by the appointment card's overflow-hidden — it needs its own
+  // fixed-position coordinates rather than relying on CSS anchoring to a
+  // clipped ancestor.
+  const [openMenu, setOpenMenu] = useState<{ id: string; top: number; right: number } | null>(null);
+  useEffect(() => {
+    if (!openMenu) return;
+    const close = () => setOpenMenu(null);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [openMenu]);
   const PAGE_SIZE = 5;
 
   useEffect(() => {
@@ -640,9 +656,14 @@ export default function DoctorDashboard() {
   const upcoming = appointments.filter((a) => a.status === "SCHEDULED" && matchesSearch(a));
   const cancelled = appointments.filter((a) => a.status === "CANCELLED" && matchesSearch(a));
   const completed = completedAll.filter((a) => a.paymentStatus === "PAID").filter(matchesSearch);
-  const totalEarnings = completedAll
-    .filter((a) => a.paymentStatus === "PAID")
+
+  const isToday = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
+  const todayUpcoming = upcoming.filter((a) => isToday(a.scheduledAt));
+  const todayEarnings = completedAll
+    .filter((a) => a.paymentStatus === "PAID" && isToday(a.scheduledAt))
     .reduce((sum, a) => sum + (a.amount - a.platformFee), 0);
+  const nextAppt = [...upcoming].sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0];
+  const minutesTo = (iso: string) => Math.round((new Date(iso).getTime() - now) / 60000);
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -651,13 +672,13 @@ export default function DoctorDashboard() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg">
+        <div className="flex items-center gap-4 mb-5">
+          <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <Stethoscope className="w-7 h-7 text-white" />
           </div>
-          <div>
-            <h1 className="text-2xl font-extrabold text-slate-900">{formatDoctorName(doctor?.name ?? user.name)}</h1>
-            <p className="text-slate-500 text-sm">
+          <div className="min-w-0">
+            <h1 className="text-xl font-extrabold text-slate-900 truncate">{formatDoctorName(doctor?.name ?? user.name)}</h1>
+            <p className="text-slate-500 text-sm truncate">
               {profile?.specialty ?? "Specialty pending"} · {profile?.qualification ?? "—"} ·{" "}
               <span className="text-amber-500 font-semibold inline-flex items-center gap-0.5">
                 <Star className="w-3.5 h-3.5 fill-current" /> {(profile?.avgRating ?? 0).toFixed(1)}
@@ -669,18 +690,44 @@ export default function DoctorDashboard() {
         <AnnouncementPopup onAllSeen={() => setAnnouncementsDone(true)} />
         {announcementsDone && <EnableNotificationsPrompt />}
 
-        {/* Stat Strip */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          {[
-            { label: "Total Consultations", value: String(completedAll.length), color: "text-blue-600", bg: "bg-blue-50" },
-            { label: "Total Earnings", value: `₹${totalEarnings.toLocaleString("en-IN")}`, color: "text-emerald-600", bg: "bg-emerald-50" },
-            { label: "Avg. Rating", value: `${(profile?.avgRating ?? 0).toFixed(1)} / 5`, color: "text-amber-600", bg: "bg-amber-50" },
-          ].map(({ label, value, color, bg }) => (
-            <div key={label} className={`${bg} rounded-2xl p-5`}>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{label}</p>
-              <p className={`text-2xl font-extrabold ${color}`}>{value}</p>
+        {/* Today at a glance — the day's shape in one card instead of a flat stat grid */}
+        <div className="gradient-hero rounded-2xl p-5 mb-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-2.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+              Today · {new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}
+            </span>
+            <span className="text-[11px] font-bold bg-white/15 rounded-full px-2.5 py-1 flex-shrink-0">
+              {todayUpcoming.length} visit{todayUpcoming.length === 1 ? "" : "s"} today
+            </span>
+          </div>
+          {nextAppt ? (
+            <>
+              <p className="text-[15px] font-bold leading-snug">
+                Next: {patientLabel(nextAppt)} · {new Date(nextAppt.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}
+              </p>
+              <p className="text-[12.5px] text-white/75 mt-0.5">
+                {nextAppt.consultType === "HOME" ? "Home visit" : nextAppt.consultType === "VIDEO" ? "Video consultation" : "Clinic visit"}
+                {minutesTo(nextAppt.scheduledAt) > 0 && ` · in ${minutesTo(nextAppt.scheduledAt)} min`}
+              </p>
+            </>
+          ) : (
+            <p className="text-[15px] font-bold">No more visits scheduled today</p>
+          )}
+          <div className="h-px bg-white/15 my-3.5" />
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Earnings Today</p>
+              <p className="text-[15px] font-extrabold mt-0.5">₹{todayEarnings.toLocaleString("en-IN")}</p>
             </div>
-          ))}
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Total Consults</p>
+              <p className="text-[15px] font-extrabold mt-0.5">{completedAll.length}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Rating</p>
+              <p className="text-[15px] font-extrabold mt-0.5">{(profile?.avgRating ?? 0).toFixed(1)} / 5</p>
+            </div>
+          </div>
         </div>
 
         {/* Search */}
@@ -721,18 +768,17 @@ export default function DoctorDashboard() {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
                 const patientLoc = a.patient.patientProfile;
                 return (
-                  <div key={a.id} className="px-6 py-4 flex items-center justify-between gap-3">
-                    <div className="flex items-start gap-4 min-w-0">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${a.isEmergency ? "bg-red-50" : "bg-amber-50"}`}>
-                        <Icon className={`w-5 h-5 ${a.isEmergency ? "text-red-500" : "text-amber-600"}`} />
+                  <div key={a.id} className="px-4 sm:px-6 py-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-50">
+                        <Icon className="w-5 h-5 text-amber-600" />
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
                           {patientLabel(a)}
                           {a.relation !== "Self" && (
                             <span className="badge badge-gray text-[10px]">{a.relation} of {a.patient.name}</span>
                           )}
-                          {a.isEmergency && <span className="badge badge-danger"><Siren className="w-3 h-3" /> Emergency</span>}
                         </div>
                         <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
                           <Clock className="w-3 h-3" />
@@ -759,12 +805,12 @@ export default function DoctorDashboard() {
                         )}
                       </div>
                     </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      <button onClick={() => setRejectTarget(a)} disabled={respondingId === a.id} className="btn-secondary py-1.5 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
-                        <ThumbsDown className="w-3.5 h-3.5" /> Reject
+                    <div className="flex gap-2.5 mt-3">
+                      <button onClick={() => setRejectTarget(a)} disabled={respondingId === a.id} className="btn-secondary flex-1 justify-center text-red-500 border-red-200 hover:bg-red-50">
+                        <ThumbsDown className="w-4 h-4" /> Reject
                       </button>
-                      <button onClick={() => setAcceptTarget(a)} disabled={respondingId === a.id} className="btn-primary py-1.5 px-3 text-xs">
-                        {respondingId === a.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ThumbsUp className="w-3.5 h-3.5" />} Accept
+                      <button onClick={() => setAcceptTarget(a)} disabled={respondingId === a.id} className="btn-primary flex-[1.4] justify-center">
+                        {respondingId === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <ThumbsUp className="w-4 h-4" />} Accept
                       </button>
                     </div>
                   </div>
@@ -791,111 +837,151 @@ export default function DoctorDashboard() {
               (upcomingExpanded ? upcoming : upcoming.slice(0, PAGE_SIZE)).map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
                 const patientLoc = a.patient.patientProfile;
+                // One primary action per visit instead of a row of small
+                // buttons — a home visit needs the journey moved along first,
+                // otherwise it's whatever unlocks the consult itself.
+                const readyToComplete = a.consultType !== "HOME" || a.travelStatus === "ARRIVED";
+                const paymentBlocked = a.paymentMethod === "ONLINE" && a.paymentStatus !== "PAID";
+                const unlockSec = a.consultType === "VIDEO" ? videoUnlockRemainingSec(a, now) : 0;
                 return (
-                  <div key={a.id} className="px-4 sm:px-6 py-4 hover:bg-slate-50/70 transition-colors">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-start gap-4 min-w-0">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${a.isEmergency ? "bg-red-50" : "bg-teal-50"}`}>
-                          <Icon className={`w-5 h-5 ${a.isEmergency ? "text-red-500" : "text-teal-600"}`} />
+                  <div key={a.id} className="px-3 sm:px-6 py-4 hover:bg-slate-50/70 transition-colors">
+                    <div className="flex gap-3">
+                      <div className="w-11 flex-shrink-0 pt-0.5 text-right">
+                        <div className="text-[13px] font-bold text-slate-700 leading-tight">
+                          {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true }).replace(/\s?[AP]M$/i, "")}
                         </div>
-                        <div className="min-w-0">
-                          <div className="font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
-                            <Link href={historyHref(a)} className="hover:underline hover:text-teal-600">
-                              {patientLabel(a)}
-                            </Link>
-                            {a.relation !== "Self" && (
-                              <span className="badge badge-gray text-[10px]">{a.relation} of {a.patient.name}</span>
-                            )}
-                            {a.isEmergency && (
-                              <span className="badge badge-danger"><Siren className="w-3 h-3" /> Emergency</span>
-                            )}
-                          </div>
-                          <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
-                            <Clock className="w-3 h-3" />
-                            {new Date(a.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} · {a.consultType}
-                          </div>
-                          <div className="text-sm text-slate-600 mt-0.5">{a.symptoms}</div>
-                        {a.allergies && (
-                          <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
-                            <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}
-                          </div>
-                        )}
-                          <div className={`text-xs mt-0.5 flex items-center gap-1 ${a.paymentMethod === "ONLINE" && a.paymentStatus !== "PAID" ? "text-amber-600 font-semibold" : "text-slate-400"}`}>
-                            <IndianRupee className="w-3 h-3" /> {a.amount} · {
-                              a.paymentMethod === "ONLINE"
-                                ? (a.paymentStatus === "PAID" ? "Paid Online" : "Payment Pending")
-                                : "Cash on visit"
-                            }
-                          </div>
-                          {a.consultType === "HOME" && patientLoc?.lat != null && patientLoc?.lng != null && (
-                            <a
-                              href={navigateUrl(patientLoc.lat, patientLoc.lng)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs text-blue-600 font-semibold mt-1 hover:underline"
-                            >
-                              <Navigation className="w-3 h-3" /> Navigate to patient
-                            </a>
-                          )}
-                          {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
-                            <div className="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold mt-1 ml-3">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Sharing live location with patient
-                            </div>
-                          )}
-                          {a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
-                            <div className="inline-flex items-center gap-1 text-xs text-slate-500 font-semibold mt-1 ml-3">
-                              <MapPinCheck className="w-3 h-3" /> Marked arrived
-                            </div>
-                          )}
+                        <div className="text-[10px] font-semibold text-slate-400 leading-tight">
+                          {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true }).match(/[AP]M$/i)?.[0]}
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-2 sm:flex-shrink-0">
-                        <Link href={historyHref(a)} className="btn-secondary py-1.5 px-3 text-xs" title="Patient history">
-                          <History className="w-3.5 h-3.5" />
-                        </Link>
-                        <Link href={`/doctor/chat/${a.id}`} className="relative btn-secondary py-1.5 px-3 text-xs" title="Chat with patient">
-                          <MessageCircle className="w-3.5 h-3.5" />
-                          {a.unreadMessageCount > 0 && (
-                            <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
-                              {a.unreadMessageCount > 9 ? "9+" : a.unreadMessageCount}
-                            </span>
-                          )}
-                        </Link>
-                        {a.consultType === "VIDEO" && a.paymentStatus === "PAID" && (
-                          videoUnlockRemainingSec(a, now) > 0 ? (
-                            <span className="btn-secondary py-1.5 px-3 text-xs opacity-60 cursor-not-allowed">
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Unlocking in {videoUnlockRemainingSec(a, now)}s
-                            </span>
-                          ) : (
-                            <Link href={`/doctor/video/${a.id}`} className="btn-secondary py-1.5 px-3 text-xs" title="Join video call">
-                              <Video className="w-3.5 h-3.5" />
-                            </Link>
-                          )
-                        )}
-                        {a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (
-                          <button onClick={() => startJourney(a.id)} disabled={startingJourneyId === a.id} className="btn-secondary py-1.5 px-3 text-xs text-blue-600 border-blue-200 hover:bg-blue-50">
-                            {startingJourneyId === a.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Car className="w-3.5 h-3.5" />} Start Journey
-                          </button>
-                        )}
-                        {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
-                          <button onClick={() => markArrived(a.id)} className="btn-secondary py-1.5 px-3 text-xs text-emerald-600 border-emerald-200 hover:bg-emerald-50">
-                            <MapPinCheck className="w-3.5 h-3.5" /> Arrived
-                          </button>
-                        )}
-                        <button onClick={() => setCancelTarget(a)} className="btn-secondary py-1.5 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
-                          <XCircle className="w-3.5 h-3.5" /> Cancel
-                        </button>
-                        {(a.consultType !== "HOME" || a.travelStatus === "ARRIVED") && (
-                          a.paymentMethod === "ONLINE" && a.paymentStatus !== "PAID" ? (
-                            <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-semibold px-1" title="Waiting for the patient to pay before this can be marked complete">
-                              <Clock className="w-3.5 h-3.5" /> Awaiting payment
-                            </span>
-                          ) : (
-                            <button onClick={() => setCompletingId(completingId === a.id ? null : a.id)} className="btn-primary py-1.5 px-3 text-xs">
-                              <FileText className="w-3.5 h-3.5" /> Start Prescription
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-teal-50">
+                            <Icon className="w-4.5 h-4.5 text-teal-600" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
+                              {patientLabel(a)}
+                              {a.relation !== "Self" && (
+                                <span className="badge badge-gray text-[10px]">{a.relation} of {a.patient.name}</span>
+                              )}
+                            </div>
+                            <div className="text-xs text-slate-400 mt-0.5">{a.consultType === "HOME" ? "Home visit" : a.consultType === "VIDEO" ? "Video consultation" : "Clinic visit"}</div>
+                            <div className="text-sm text-slate-600 mt-0.5">{a.symptoms}</div>
+                            {a.allergies && (
+                              <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
+                                <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}
+                              </div>
+                            )}
+                            <div className={`text-xs mt-1 flex items-center gap-1 ${paymentBlocked ? "text-amber-600 font-semibold" : "text-slate-400"}`}>
+                              <IndianRupee className="w-3 h-3" /> {a.amount} · {
+                                a.paymentMethod === "ONLINE"
+                                  ? (a.paymentStatus === "PAID" ? "Paid Online" : "Payment Pending")
+                                  : "Cash on visit"
+                              }
+                            </div>
+                            {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
+                              <div className="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold mt-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Sharing live location with patient
+                              </div>
+                            )}
+                            {a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
+                              <div className="inline-flex items-center gap-1 text-xs text-slate-500 font-semibold mt-1">
+                                <MapPinCheck className="w-3 h-3" /> Marked arrived
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-3">
+                          {a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (
+                            <button onClick={() => startJourney(a.id)} disabled={startingJourneyId === a.id} className="btn-secondary flex-1 h-11 justify-center text-blue-600 border-blue-200 hover:bg-blue-50">
+                              {startingJourneyId === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Car className="w-4 h-4" />} Start Journey
                             </button>
-                          )
-                        )}
+                          )}
+                          {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
+                            <button onClick={() => markArrived(a.id)} className="btn-secondary flex-1 h-11 justify-center text-emerald-600 border-emerald-200 hover:bg-emerald-50">
+                              <MapPinCheck className="w-4 h-4" /> Mark Arrived
+                            </button>
+                          )}
+                          {a.consultType === "VIDEO" && a.paymentStatus === "PAID" && (
+                            unlockSec > 0 ? (
+                              <span className="flex-1 h-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm font-semibold flex items-center justify-center gap-1.5 opacity-70">
+                                <Loader2 className="w-4 h-4 animate-spin" /> Unlocking in {unlockSec}s
+                              </span>
+                            ) : (
+                              <Link href={`/doctor/video/${a.id}`} className="btn-primary flex-1 h-11 justify-center">
+                                <Video className="w-4 h-4" /> Join Video Call
+                              </Link>
+                            )
+                          )}
+                          {readyToComplete && (
+                            paymentBlocked ? (
+                              <span className="flex-1 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm font-semibold flex items-center justify-center gap-1.5" title="Waiting for the patient to pay before this can be marked complete">
+                                <Clock className="w-4 h-4" /> Awaiting Payment
+                              </span>
+                            ) : (
+                              <button onClick={() => setCompletingId(completingId === a.id ? null : a.id)} className="btn-primary flex-1 h-11 justify-center">
+                                <FileText className="w-4 h-4" /> Start Prescription
+                              </button>
+                            )
+                          )}
+
+                          <Link href={`/doctor/chat/${a.id}`} className="relative w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center flex-shrink-0 hover:bg-slate-50 transition-colors" title="Chat with patient">
+                            <MessageCircle className="w-4 h-4 text-slate-500" />
+                            {a.unreadMessageCount > 0 && (
+                              <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
+                                {a.unreadMessageCount > 9 ? "9+" : a.unreadMessageCount}
+                              </span>
+                            )}
+                          </Link>
+
+                          <div className="relative flex-shrink-0">
+                            <button
+                              onClick={(e) => {
+                                if (openMenu?.id === a.id) { setOpenMenu(null); return; }
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                setOpenMenu({ id: a.id, top: rect.bottom + 8, right: window.innerWidth - rect.right });
+                              }}
+                              className="w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors"
+                              title="More actions"
+                            >
+                              <MoreHorizontal className="w-4 h-4 text-slate-500" />
+                            </button>
+                            {openMenu?.id === a.id && createPortal(
+                              <>
+                                <div className="fixed inset-0 z-30" onClick={() => setOpenMenu(null)} />
+                                <div
+                                  className="fixed w-52 bg-white rounded-xl border border-slate-100 shadow-lg z-40 overflow-hidden py-1"
+                                  style={{ top: openMenu.top, right: openMenu.right }}
+                                >
+                                  <Link href={historyHref(a)} onClick={() => setOpenMenu(null)} className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                                    <History className="w-4 h-4 text-slate-400" /> Patient history
+                                  </Link>
+                                  {a.consultType === "HOME" && patientLoc?.lat != null && patientLoc?.lng != null && (
+                                    <a
+                                      href={navigateUrl(patientLoc.lat, patientLoc.lng)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={() => setOpenMenu(null)}
+                                      className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                                    >
+                                      <Navigation className="w-4 h-4 text-slate-400" /> Navigate to patient
+                                    </a>
+                                  )}
+                                  <button
+                                    onClick={() => { setOpenMenu(null); setCancelTarget(a); }}
+                                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 text-left"
+                                  >
+                                    <XCircle className="w-4 h-4" /> Cancel appointment
+                                  </button>
+                                </div>
+                              </>,
+                              document.body
+                            )}
+                          </div>
+                        </div>
+
                       </div>
                     </div>
                     {completingId === a.id && (

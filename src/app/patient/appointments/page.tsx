@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Loader2, CalendarClock, Stethoscope, Home, Building2, Video,
-  FileText, Star, X, Wallet, CreditCard, Siren, RotateCcw, Clock,
+  FileText, Star, X, Wallet, CreditCard, RotateCcw, Clock,
   Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin,
   MessageCircle, Navigation, UserCheck,
 } from "lucide-react";
@@ -47,7 +47,6 @@ interface Appointment {
   paymentMethod: string;
   paymentStatus: string;
   paidAt: string | null;
-  isEmergency: boolean;
   travelStatus: string;
   unreadMessageCount: number;
   attachments: Attachment[];
@@ -205,9 +204,6 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
           <div className="min-w-0">
             <div className="font-bold text-slate-900 flex items-center gap-2 flex-wrap">
               {formatDoctorName(a.doctor.name)}
-              {a.isEmergency && (
-                <span className="badge badge-danger"><Siren className="w-3 h-3" /> Emergency</span>
-              )}
             </div>
             <div className="text-xs text-slate-500 mt-0.5">{a.doctor.doctorProfile?.specialty ?? ""}</div>
             <div className="text-xs text-slate-400 mt-0.5">
@@ -509,9 +505,14 @@ export default function PatientAppointments() {
       <PatientHeader />
       <PatientMobileNav />
       <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
-        <div className="mb-8">
-          <h1 className="text-2xl font-extrabold text-slate-900">My Appointments</h1>
-          <p className="text-slate-500 text-sm">Track requests, upcoming visits, and past consultations.</p>
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-14 h-14 rounded-2xl bg-blue-500 flex items-center justify-center shadow-lg flex-shrink-0">
+            <CalendarClock className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">My Appointments</h1>
+            <p className="text-slate-500 text-sm">Track requests, upcoming visits, and past consultations.</p>
+          </div>
         </div>
 
         {loading ? (

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Compass } from "lucide-react";
 import ProfileSubShell from "@/components/patient/ProfileSubShell";
 import { usePatientProfile, patchPatientProfile } from "@/lib/usePatientProfile";
 import { SEARCH_RADIUS_MIN_KM, SEARCH_RADIUS_MAX_KM } from "@/lib/geo";
@@ -48,6 +48,8 @@ export default function SearchRangeSettingsPage() {
     <ProfileSubShell
       title="Doctor Search Range"
       description="The map shows only clinics within this distance. Search, the Assistant and your saved list still keep doctors who offer video, wherever they are."
+      icon={<Compass className="w-5 h-5" />}
+      tint="bg-blue-50 text-blue-500"
       loading={loading}
       saving={saving}
       saved={saved}

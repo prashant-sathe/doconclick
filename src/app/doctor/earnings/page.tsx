@@ -133,18 +133,27 @@ export default function DoctorEarnings() {
           <p className="text-slate-500 text-sm">Your consultation income, net of platform commission.</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-          {[
-            { label: "Total Earnings", value: `₹${totalEarnings.toLocaleString("en-IN")}`, icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50" },
-            { label: "This Month", value: `₹${thisMonthEarnings.toLocaleString("en-IN")}`, icon: TrendingUp, color: "text-blue-600", bg: "bg-blue-50" },
-            { label: "Online (Payout Pending)", value: `₹${onlinePending.toLocaleString("en-IN")}`, icon: CreditCard, color: "text-purple-600", bg: "bg-purple-50" },
-          ].map(({ label, value, icon: Icon, color, bg }) => (
-            <div key={label} className={`${bg} rounded-2xl p-4`}>
-              <Icon className={`w-4 h-4 ${color} mb-2`} />
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">{label}</p>
-              <p className={`text-lg font-extrabold ${color}`}>{value}</p>
+        {/* Headline number gets the hero treatment; the rest stays secondary */}
+        <div className="gradient-hero rounded-2xl p-5 mb-4 text-white shadow-lg">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-white/70 mb-1 flex items-center gap-1.5">
+            <IndianRupee className="w-3.5 h-3.5" /> Total Earnings
+          </p>
+          <p className="text-3xl font-extrabold">₹{totalEarnings.toLocaleString("en-IN")}</p>
+          <div className="h-px bg-white/15 my-4" />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65 flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" /> This Month
+              </p>
+              <p className="text-[16px] font-extrabold mt-0.5">₹{thisMonthEarnings.toLocaleString("en-IN")}</p>
             </div>
-          ))}
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65 flex items-center gap-1">
+                <CreditCard className="w-3 h-3" /> Payout Pending
+              </p>
+              <p className="text-[16px] font-extrabold mt-0.5">₹{onlinePending.toLocaleString("en-IN")}</p>
+            </div>
+          </div>
         </div>
 
         {platformFeeDue > 0 && (
@@ -210,7 +219,7 @@ export default function DoctorEarnings() {
           {visibleCount < recentAll.length && (
             <button
               onClick={() => setVisibleCount((v) => v + 10)}
-              className="w-full py-3 border-t border-slate-100 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+              className="w-full py-3 border-t border-slate-100 text-xs font-semibold text-teal-600 hover:bg-teal-50 transition-colors"
             >
               Load {Math.min(10, recentAll.length - visibleCount)} more
             </button>

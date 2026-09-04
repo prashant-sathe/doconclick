@@ -86,6 +86,8 @@ export default function AddressSettingsPage() {
     <ProfileSubShell
       title="Location & Address"
       description="Used to find doctors near you and for home visits."
+      icon={<MapPin className="w-5 h-5" />}
+      tint="bg-blue-50 text-blue-500"
       loading={loading}
       saving={saving}
       saved={saved}

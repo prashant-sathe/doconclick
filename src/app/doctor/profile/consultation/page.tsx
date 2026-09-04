@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Home, Video, MapPin } from "lucide-react";
+import { Building2, Home, Video, MapPin, IndianRupee } from "lucide-react";
 import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import { useDoctorProfile, patchDoctorProfile } from "@/lib/useDoctorProfile";
 import { cn } from "@/lib/utils";
@@ -60,9 +60,20 @@ export default function ConsultationSettingsPage() {
   };
 
   const toggleRow = (Icon: React.ElementType, label: string, k: "offersClinic" | "offersHomeVisit" | "offersVideo") => (
+    // A real checkbox drives the switch (sr-only + peer) rather than a bare
+    // <button>, so the whole row stays tappable via the label's native
+    // click-forwards-to-input behavior — a <button> with its own onClick
+    // only responds inside its own small hit box, not the row around it.
     <label className="flex items-center justify-between p-4 rounded-xl border border-slate-200 cursor-pointer">
       <span className="flex items-center gap-2 text-sm font-semibold text-slate-800"><Icon className="w-4 h-4 text-slate-400" /> {label}</span>
-      <input type="checkbox" checked={form[k]} onChange={(e) => set({ [k]: e.target.checked } as Partial<typeof form>)} className="w-4 h-4 accent-teal-500" />
+      <input
+        type="checkbox"
+        role="switch"
+        checked={form[k]}
+        onChange={(e) => set({ [k]: e.target.checked } as Partial<typeof form>)}
+        className="sr-only peer"
+      />
+      <span className="w-10 h-6 rounded-full bg-slate-200 peer-checked:bg-teal-500 relative flex-shrink-0 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-[18px]" />
     </label>
   );
 
@@ -70,6 +81,8 @@ export default function ConsultationSettingsPage() {
     <DoctorProfileSubShell
       title="Consultation & Fees"
       description="What you offer, what you charge, and how far you travel for home visits."
+      icon={<IndianRupee className="w-5 h-5" />}
+      tint="bg-emerald-50 text-emerald-600"
       loading={loading}
       saving={saving}
       saved={saved}

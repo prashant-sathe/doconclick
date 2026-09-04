@@ -86,9 +86,14 @@ export default function SavedDoctorsPage() {
       <PatientHeader />
       <PatientMobileNav />
       <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-extrabold text-slate-900">Saved Doctors</h1>
-          <p className="text-slate-500 text-sm">Doctors you&apos;ve bookmarked for a quick re-booking later.</p>
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-14 h-14 rounded-2xl bg-blue-500 flex items-center justify-center shadow-lg flex-shrink-0">
+            <Bookmark className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">Saved Doctors</h1>
+            <p className="text-slate-500 text-sm">Doctors you&apos;ve bookmarked for a quick re-booking later.</p>
+          </div>
         </div>
 
         {pinnedLabel && (
@@ -150,13 +155,13 @@ export default function SavedDoctorsPage() {
                 </div>
                 <div className="flex flex-col gap-2 flex-shrink-0">
                   {profile?.status === "APPROVED" ? (
-                    <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary py-2 px-3 text-xs whitespace-nowrap">
+                    <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary py-2.5 px-4 text-xs whitespace-nowrap justify-center">
                       Book Again
                     </Link>
                   ) : (
                     <span
                       title="This doctor is currently unavailable for booking"
-                      className="btn-secondary py-2 px-3 text-xs whitespace-nowrap opacity-50 cursor-not-allowed"
+                      className="btn-secondary py-2.5 px-4 text-xs whitespace-nowrap opacity-50 cursor-not-allowed justify-center"
                     >
                       Unavailable
                     </span>
@@ -164,7 +169,7 @@ export default function SavedDoctorsPage() {
                   <button
                     onClick={() => remove(doctor.id)}
                     disabled={removingId === doctor.id}
-                    className="btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50"
+                    className="btn-secondary py-2.5 px-4 text-xs text-red-500 border-red-200 hover:bg-red-50 justify-center"
                   >
                     <BookmarkX className="w-3.5 h-3.5" /> Remove
                   </button>
