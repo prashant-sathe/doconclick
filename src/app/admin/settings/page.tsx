@@ -1,5 +1,6 @@
 "use client";
-import { Settings, Info } from "lucide-react";
+import Link from "next/link";
+import { Settings, Info, ShieldCheck, ChevronRight } from "lucide-react";
 import NotificationSettings from "@/components/NotificationSettings";
 import SplashSettings from "@/components/SplashSettings";
 
@@ -26,6 +27,20 @@ export default function AdminSettings() {
             </div>
           </div>
         </div>
+
+        <Link
+          href="/admin/settings/admins"
+          className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex items-center gap-4 hover:border-slate-200 transition-colors"
+        >
+          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="font-bold text-slate-800">Admin Users</h2>
+            <p className="text-sm text-slate-500 mt-0.5">Create and manage accounts with admin panel access.</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
+        </Link>
 
         <NotificationSettings />
 

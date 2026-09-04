@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Loader2, Award, IndianRupee, Clock, Building2, Shield, CreditCard, QrCode,
   Bell, LifeBuoy, ChevronRight, Check, Camera, LogOut, User, CheckCircle2,
-  ShieldCheck, AlertTriangle,
+  ShieldCheck, AlertTriangle, Lock,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
@@ -15,6 +15,7 @@ import { useDoctorProfile } from "@/lib/useDoctorProfile";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import ImageCropModal from "@/components/ImageCropModal";
+import EditableName from "@/components/EditableName";
 
 function daysUntil(target: Date): number {
   return Math.max(0, Math.ceil((target.getTime() - Date.now()) / 86400000));
@@ -98,7 +99,7 @@ function Status({ done }: { done: boolean }) {
 }
 
 export default function DoctorProfilePage() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading, logout, refresh } = useAuth();
   const router = useRouter();
   const { profile, clinicCount, loading } = useDoctorProfile();
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
@@ -152,7 +153,7 @@ export default function DoctorProfilePage() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-4 flex items-center gap-4">
           <AvatarEditor url={photoUrl} onChange={(u) => setPhotoUrl(u || null)} />
           <div className="min-w-0 flex-1">
-            <h1 className="text-lg font-extrabold text-slate-900 truncate">{formatDoctorName(user.name)}</h1>
+            <EditableName name={user.name} displayName={formatDoctorName(user.name)} onSaved={refresh} />
             <p className="text-sm text-slate-500 truncate">{p.specialty ?? "Specialty not set"}</p>
             <div className="mt-2 flex items-center gap-2">
               <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
@@ -233,6 +234,8 @@ export default function DoctorProfilePage() {
         <Group label="Account">
           <Row href="/doctor/profile/notifications" tint="bg-amber-50 text-amber-500" icon={<Bell className="w-4 h-4" />}
             title="Notifications" />
+          <Row href="/doctor/profile/security" tint="bg-indigo-50 text-indigo-500" icon={<Lock className="w-4 h-4" />}
+            title="Change Password" />
           <Row href="/doctor/support/tickets" tint="bg-indigo-50 text-indigo-500" icon={<LifeBuoy className="w-4 h-4" />}
             title="My Support Tickets" />
         </Group>

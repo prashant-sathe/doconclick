@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Loader2, MapPin, HeartPulse, PhoneCall, Compass, Bell, Wallet as WalletIcon,
-  LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2,
+  LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2, Lock,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import ImageCropModal from "@/components/ImageCropModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import EditableName from "@/components/EditableName";
 
 function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -151,7 +152,7 @@ function StatusPill({ done, total }: { done: number; total: number }) {
 }
 
 export default function PatientProfilePage() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading, logout, refresh } = useAuth();
   const router = useRouter();
   const { profile, loading, setProfile } = usePatientProfile();
 
@@ -196,7 +197,7 @@ export default function PatientProfilePage() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6 flex items-center gap-4">
           <AvatarEditor url={p.photoUrl ?? ""} onChange={(url) => setProfile((prev) => ({ ...(prev ?? {}), photoUrl: url }))} />
           <div className="min-w-0 flex-1">
-            <h1 className="text-lg font-extrabold text-slate-900 truncate">{user.name}</h1>
+            <EditableName name={user.name} onSaved={refresh} />
             <p className="text-sm text-slate-500">{user.mobile}</p>
             <div className="mt-2 flex items-center gap-2">
               <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
@@ -232,6 +233,8 @@ export default function PatientProfilePage() {
         <Group label="Account">
           <Row href="/patient/wallet" tint="bg-emerald-50 text-emerald-600" icon={<WalletIcon className="w-4 h-4" />}
             title="Wallet" />
+          <Row href="/patient/profile/security" tint="bg-indigo-50 text-indigo-500" icon={<Lock className="w-4 h-4" />}
+            title="Change Password" />
           <Row href="/patient/support" tint="bg-indigo-50 text-indigo-500" icon={<LifeBuoy className="w-4 h-4" />}
             title="Help & Support" />
         </Group>
