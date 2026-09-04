@@ -1695,8 +1695,10 @@ function PatientDashboardInner() {
       )}
 
       {/* ── Tap hint (shown when no panel is open) ──────────────────── */}
+      {/* Sits clear above the "clinics nearby" badge — on phones the two
+          floating chips used to collide at the bottom edge. */}
       {!panelOpen && !emergencyOpen && doctors.length > 0 && (
-        <div className="absolute bottom-24 inset-x-0 z-20 flex justify-center pointer-events-none">
+        <div className="absolute bottom-[calc(9rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-24 inset-x-0 z-20 flex justify-center pointer-events-none">
           <div className="glass-card rounded-full px-4 py-2 flex items-center gap-2 text-xs text-slate-500 shadow">
             <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
             Tap a doctor pin to see details
