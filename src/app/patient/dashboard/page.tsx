@@ -10,7 +10,7 @@ import {
   ChevronDown, X, Loader2, CheckCircle, LogOut, Languages,
   Navigation, AlertCircle, IndianRupee, CalendarClock, Siren,
   CalendarCheck2, AlertTriangle, ShieldCheck, Users, Search,
-  Bookmark, BookmarkCheck, Sparkles, Compass, RefreshCw,
+  Bookmark, BookmarkCheck, Sparkles, Compass, RefreshCw, Crosshair,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
@@ -27,6 +27,7 @@ import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import DependentPicker from "@/components/patient/DependentPicker";
+import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 
@@ -304,10 +305,39 @@ function PatientDashboardInner() {
     try {
       const pos = await getCurrentPositionCompat({ timeout: 8000 });
       setUserPos([pos.coords.latitude, pos.coords.longitude]);
+      setPosError(false);
     } catch {
       /* keep current position */
     }
   }, []);
+
+  // Manual location entry — a fallback for when the browser can't get GPS
+  // (permission denied, or an on-screen overlay blocks the prompt: Android's
+  // "This site can't ask for your permission").
+  const [locationPickerOpen, setLocationPickerOpen] = useState(false);
+  const [locationQuery, setLocationQuery] = useState("");
+  const [locatingGps, setLocatingGps] = useState(false);
+
+  const setManualLocation = (lat: number, lng: number) => {
+    setUserPos([lat, lng]);
+    setPosError(false);
+    setLocationPickerOpen(false);
+    setLocationQuery("");
+  };
+
+  const retryGps = async () => {
+    setLocatingGps(true);
+    try {
+      const pos = await getCurrentPositionCompat({ timeout: 8000 });
+      setUserPos([pos.coords.latitude, pos.coords.longitude]);
+      setPosError(false);
+      setLocationPickerOpen(false);
+    } catch {
+      setPosError(true);
+    } finally {
+      setLocatingGps(false);
+    }
+  };
 
   // ── Fetch doctors ──────────────────────────────────────────────────────
   const loadDoctors = useCallback(async () => {
@@ -850,16 +880,19 @@ function PatientDashboardInner() {
           className="flex items-start justify-between p-3 sm:p-4 gap-2 sm:gap-3"
           style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
         >
-          {/* Logo / title */}
-          <div className="glass-card rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 pointer-events-auto shadow-lg min-w-0">
+          {/* Logo / title — tap the location line to change it */}
+          <button
+            onClick={() => setLocationPickerOpen(true)}
+            className="glass-card rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 pointer-events-auto shadow-lg min-w-0 text-left"
+          >
             <img src="/logo-icon.png" alt="DocOnClick" className="w-8 h-8 sm:w-9 sm:h-9 object-contain flex-shrink-0" />
             <div className="min-w-0 hidden xs:block sm:block">
               <p className="text-sm font-bold text-slate-900 leading-none">DocOnClick</p>
               <p className="text-xs text-slate-500 mt-0.5 truncate">
-                {posError ? "📍 Default" : "📍 Your location"}
+                {posError ? "📍 Set your location" : "📍 Your location · Change"}
               </p>
             </div>
-          </div>
+          </button>
 
           {/* Right: profile + appointments + user + logout */}
           <div className="glass-card rounded-2xl px-2.5 sm:px-4 py-2.5 sm:py-3 flex items-center gap-1.5 sm:gap-3 pointer-events-auto shadow-lg flex-shrink-0">
@@ -933,9 +966,20 @@ function PatientDashboardInner() {
           </div>
         </div>
 
-        {/* Nearest doctor badge + emergency button, same row so they never collide */}
+        {/* Nearest doctor badge (or the "set location" prompt) + emergency
+            button, same row so they never collide */}
         <div className="flex items-center gap-2 px-3 sm:px-4 mt-2.5">
-          {nearest?.doctorProfile && (
+          {posError ? (
+            <button
+              onClick={() => setLocationPickerOpen(true)}
+              className="glass-card rounded-2xl px-3 py-2.5 flex items-center gap-2 pointer-events-auto shadow-lg border border-amber-200 min-w-0 flex-1 sm:flex-initial"
+            >
+              <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+              <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
+                Showing Pune — <span className="text-blue-600">Set your location</span>
+              </span>
+            </button>
+          ) : nearest?.doctorProfile && (
             <button
               onClick={() => {
                 setSelectedDoctor(nearest);
@@ -1708,12 +1752,34 @@ function PatientDashboardInner() {
         </div>
       )}
 
-      {/* ── Location error banner ───────────────────────────────────── */}
-      {posError && (
-        <div className="absolute top-44 inset-x-0 z-20 flex justify-center pointer-events-none">
-          <div className="glass-card rounded-xl px-4 py-2 flex items-center gap-2 text-xs text-amber-700 border border-amber-200">
-            <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-            Location access denied — showing default area (Pune)
+      {/* ── Manual location picker ──────────────────────────────────── */}
+      {locationPickerOpen && (
+        <div className="absolute inset-0 z-50 flex items-start justify-center p-4 pt-24 bg-black/30" onClick={() => setLocationPickerOpen(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-extrabold text-slate-900">Set your location</h3>
+              <button onClick={() => setLocationPickerOpen(false)} className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-400 mb-4">Search an area, or let the browser use your GPS.</p>
+
+            <AddressAutocomplete
+              value={locationQuery}
+              onChange={setLocationQuery}
+              onSelect={(s) => setManualLocation(s.lat, s.lon)}
+              placeholder="Search city, area or society…"
+            />
+
+            <button
+              onClick={retryGps}
+              disabled={locatingGps}
+              className="btn-secondary w-full justify-center py-2.5 mt-3 gap-1.5 text-sm disabled:opacity-60"
+            >
+              {locatingGps
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Locating…</>
+                : <><Crosshair className="w-4 h-4" /> Use my current location</>}
+            </button>
           </div>
         </div>
       )}
