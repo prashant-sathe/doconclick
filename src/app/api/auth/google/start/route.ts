@@ -6,6 +6,7 @@ import {
   encodeState,
   newNonce,
   externalOrigin,
+  oauthCanonicalOrigin,
   type OAuthRole,
   type OAuthIntent,
 } from "@/lib/googleOAuth";
@@ -19,9 +20,17 @@ export async function GET(req: Request) {
   const next = url.searchParams.get("next") ?? undefined;
   const intent: OAuthIntent = url.searchParams.get("intent") === "reset" ? "reset" : "login";
 
+  // The whole flow — state cookie, redirect_uri, callback — must live on one
+  // origin Google recognises. If the user landed here on a different host
+  // (e.g. www. vs apex), bounce to the canonical one first, keeping the query.
+  const canonicalOrigin = oauthCanonicalOrigin(req, url);
+  if (canonicalOrigin !== externalOrigin(req, url)) {
+    return NextResponse.redirect(`${canonicalOrigin}/api/auth/google/start${url.search}`);
+  }
+
   const nonce = newNonce();
   const state = encodeState({ nonce, role, next, intent });
-  const redirectUri = `${externalOrigin(req, url)}/api/auth/google/callback`;
+  const redirectUri = `${canonicalOrigin}/api/auth/google/callback`;
 
   const googleUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   googleUrl.searchParams.set("client_id", process.env.GOOGLE_CLIENT_ID ?? "");

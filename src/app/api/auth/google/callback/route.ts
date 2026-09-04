@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { signToken, COOKIE_SECURE } from "@/lib/auth";
-import { STATE_COOKIE_NAME, decodeState, externalOrigin } from "@/lib/googleOAuth";
+import { STATE_COOKIE_NAME, decodeState, oauthCanonicalOrigin } from "@/lib/googleOAuth";
 import { resolveGoogleUser } from "@/lib/googleAuth";
 
 const COOKIE_NAME = "doconclick_token";
@@ -22,7 +22,9 @@ function failureRedirect(origin: string, reason: string) {
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const origin = externalOrigin(req, url);
+  // Must be the exact origin /start used for `redirect_uri`, or the token
+  // exchange fails with redirect_uri_mismatch.
+  const origin = oauthCanonicalOrigin(req, url);
   const code = url.searchParams.get("code");
   const rawState = url.searchParams.get("state");
 
