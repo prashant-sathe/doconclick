@@ -11,6 +11,7 @@ import {
   Navigation, AlertCircle, IndianRupee, CalendarClock,
   CalendarCheck2, AlertTriangle, ShieldCheck, Users, Search,
   Bookmark, BookmarkCheck, Sparkles, Compass, RefreshCw, Crosshair,
+  List,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
@@ -211,6 +212,75 @@ function nextOpeningLocalInput(next: { daysAhead: number; fromTime: string }) {
   return local.toISOString().slice(0, 16);
 }
 
+// ── Doctor card for the list view ───────────────────────────────────────────
+function DoctorListCard({
+  doctor,
+  distanceKm,
+  color,
+  isOpen,
+  onClick,
+}: {
+  doctor: Doctor;
+  distanceKm: number | null;
+  color: string;
+  isOpen: boolean;
+  onClick: () => void;
+}) {
+  const profile = doctor.doctorProfile;
+  if (!profile) return null;
+  const bareName = doctor.name.replace(/^dr\.?\s*/i, "").trim();
+  const initial = (bareName[0] ?? doctor.name.trim()[0] ?? "?").toUpperCase();
+
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-blue-200 hover:shadow-md transition-all text-left"
+    >
+      <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100">
+        {profile.photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={profile.photoUrl} alt={doctor.name} className="w-full h-full object-cover" />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center text-white font-extrabold text-lg"
+            style={{ background: `linear-gradient(135deg, ${color}, ${color}99)` }}
+          >
+            {initial}
+          </div>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <p className="font-bold text-slate-900 text-sm truncate">{formatDoctorName(doctor.name)}</p>
+          {profile.isVerified && <VerifiedBadge />}
+        </div>
+        <p className="text-xs text-slate-500 truncate">
+          {profile.specialty}{profile.experience ? ` · ${profile.experience} yrs` : ""}
+        </p>
+        <div className="flex items-center gap-2 mt-1">
+          <RatingStars avgRating={profile.avgRating} totalReviews={profile.totalReviews} size="sm" />
+          {distanceKm != null && (
+            <span className="text-[11px] text-slate-400">· {distanceKm.toFixed(1)} km</span>
+          )}
+        </div>
+      </div>
+      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+        <span
+          className={cn(
+            "text-[10px] font-bold px-2 py-0.5 rounded-full",
+            isOpen ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-400"
+          )}
+        >
+          {isOpen ? "Open" : "Closed"}
+        </span>
+        <span className="text-xs font-bold text-slate-700 flex items-center">
+          <IndianRupee className="w-3 h-3" />{profile.consultFee}
+        </span>
+      </div>
+    </button>
+  );
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 // PAGE COMPONENT
 // ══════════════════════════════════════════════════════════════════════════
@@ -234,6 +304,7 @@ function PatientDashboardInner() {
   const [savedDoctorIds, setSavedDoctorIds] = useState<Set<string>>(new Set());
   const [savingBookmark, setSavingBookmark] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const [bookingOpen, setBookingOpen] = useState(false);
   const [consultType, setConsultType] = useState("HOME");
   const [symptoms, setSymptoms] = useState("");
@@ -423,6 +494,24 @@ function PatientDashboardInner() {
       });
     }
     setSavingBookmark(false);
+  };
+
+  // Opens the doctor detail panel — same sequence used by a map pin click,
+  // shared here so the list view's cards land in the identical state.
+  const openDoctorPanel = (doc: Doctor, clinicId: string | null) => {
+    setSelectedDoctor(doc);
+    setSelectedClinicId(clinicId);
+    setPanelOpen(true);
+    setBookingOpen(false);
+    setConsultType(defaultConsultType(doc));
+    setSymptoms("");
+    setRelation("Self");
+    setDependentId(null);
+    setConsentGiven(false);
+    setBooked(null);
+    setBookingError("");
+    setConfirmBookingOpen(false);
+    setScheduleMode("NOW");
   };
 
   // Re-checks who's currently within their set hours every minute, so a
@@ -846,6 +935,186 @@ function PatientDashboardInner() {
   // ── Derived loading flag ───────────────────────────────────────────────
   const isLoading = authLoading || !userPos;
 
+  // The identity/actions row and the search/filter card — shared between the
+  // map's floating glass header and the list view's solid, in-flow header,
+  // so the two stay visually in sync instead of drifting apart.
+  const headerRow = (
+    <div
+      className="flex items-start justify-between p-3 sm:p-4 gap-2 sm:gap-3"
+      style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
+    >
+      {/* Logo / title — tap the location line to change it */}
+      <button
+        onClick={() => setLocationPickerOpen(true)}
+        className="glass-card rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 pointer-events-auto shadow-lg min-w-0 text-left"
+      >
+        <div className="min-w-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="DocOnClick" className="h-6 sm:h-7 w-auto object-contain" />
+          <p className={cn("text-xs mt-0.5 truncate", customLabel ? "text-blue-600 font-semibold" : "text-slate-500")}>
+            {customLabel ? `📍 ${customLabel}` : posError ? "📍 Set your location" : "📍 Your location · Change"}
+          </p>
+        </div>
+      </button>
+
+      {/* Right: quick actions + profile */}
+      <div className="glass-card rounded-2xl px-2.5 sm:px-4 py-2.5 sm:py-3 flex items-center gap-1.5 sm:gap-3 pointer-events-auto shadow-lg flex-shrink-0">
+        {profilePercent != null && profilePercent < 100 && (
+          <button
+            onClick={() => router.push("/patient/profile")}
+            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors"
+            title="Complete your profile"
+          >
+            Profile {profilePercent}%
+          </button>
+        )}
+        <button
+          onClick={() => router.push("/patient/assistant")}
+          className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl gradient-primary text-white text-xs font-semibold hover:opacity-90 transition-opacity"
+          title="Health Assistant"
+        >
+          <Sparkles className="w-4 h-4" /> Ask AI
+        </button>
+        <button
+          onClick={() => router.push("/patient/appointments")}
+          className="hidden lg:flex w-8 h-8 rounded-xl bg-blue-50 items-center justify-center text-blue-500 hover:bg-blue-100 transition-colors"
+          title="My Appointments"
+        >
+          <CalendarCheck2 className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => router.push("/patient/profile")}
+          className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors flex-shrink-0"
+          title="Profile"
+        >
+          <UserCircle className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+
+  const searchRow = (
+    <div className="px-3 sm:px-4 pb-3 sm:pb-4 pointer-events-auto">
+      <div className="glass-card rounded-2xl p-2.5 max-w-full">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="relative flex-1 min-w-0">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search doctor or specialty…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-8 pr-8 py-2 rounded-xl border border-slate-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-0.5 bg-white/80 border border-slate-200 rounded-xl p-1 flex-shrink-0">
+            <button
+              onClick={() => setViewMode("map")}
+              title="Map view"
+              className={cn(
+                "w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
+                viewMode === "map" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-slate-600"
+              )}
+            >
+              <MapPin className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("list")}
+              title="List view"
+              className={cn(
+                "w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
+                viewMode === "list" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-slate-600"
+              )}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+          <button
+            onClick={refreshMap}
+            disabled={refreshing}
+            className="w-9 h-9 rounded-xl bg-white/80 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 transition-colors disabled:opacity-60 flex-shrink-0"
+            title="Refresh doctors & location"
+          >
+            <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
+          </button>
+        </div>
+        <SpecialtyFilter value={specialtyFilter} onChange={setSpecialtyFilter} />
+        {searchRadiusKm != null && (
+          <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
+            <Compass className="w-3 h-3 flex-shrink-0" />
+            {ignoreRadius ? (
+              <>Showing all clinics.{" "}
+                <button type="button" onClick={() => setIgnoreRadius(false)} className="font-semibold text-blue-600 hover:underline">Limit to {searchRadiusKm} km</button>
+              </>
+            ) : (
+              <>Showing clinics within {searchRadiusKm} km.{" "}
+                <button type="button" onClick={() => router.push("/patient/profile")} className="font-semibold text-blue-600 hover:underline">Change</button>
+              </>
+            )}
+          </p>
+        )}
+
+        {/* Where you're searching from — folded into the same card
+            instead of its own floating pill below. */}
+        {customLabel ? (
+          <button
+            onClick={switchToMyLocation}
+            className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
+          >
+            <MapPin className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+            <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
+              {customLabel} <span className="text-blue-600">· Use my location</span>
+            </span>
+          </button>
+        ) : posError ? (
+          <button
+            onClick={() => setLocationPickerOpen(true)}
+            className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
+          >
+            <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+            <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
+              Showing Pune — <span className="text-blue-600">Set your location</span>
+            </span>
+          </button>
+        ) : nearest?.doctorProfile && (
+          <button
+            onClick={() => {
+              setSelectedDoctor(nearest);
+              setSelectedClinicId((findOpenClinic(nearest.clinics) ?? nearest.clinics[0])?.id ?? null);
+              setPanelOpen(true);
+              setBookingOpen(false);
+              setConsultType(defaultConsultType(nearest));
+            }}
+            className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
+          >
+            <div
+              className="w-2 h-2 rounded-full animate-pulse flex-shrink-0"
+              style={{ backgroundColor: colorFor(nearest.doctorProfile.specialty) }}
+            />
+            <span className="text-xs font-semibold text-slate-700 truncate min-w-0 flex-1">
+              Nearest: <span className="text-blue-600">{formatDoctorName(nearest.name)}</span>
+              {nearest.distance != null && (
+                <span className="text-slate-400 font-normal ml-1">
+                  · {nearest.distance.toFixed(1)} km
+                </span>
+              )}
+            </span>
+            <Navigation className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-slate-900">
       {/* ── Map container (always mounted so Leaflet can find it) ──────── */}
@@ -866,166 +1135,48 @@ function PatientDashboardInner() {
       {!isLoading && <AnnouncementPopup onAllSeen={() => setAnnouncementsDone(true)} />}
       {!isLoading && announcementsDone && <EnableNotificationsPrompt />}
 
-      {/* ── Top bar ────────────────────────────────────────────────── */}
-      <div className={cn("absolute top-0 inset-x-0 z-20 pointer-events-none", pickingOnMap && "hidden")}>
-        <div
-          className="flex items-start justify-between p-3 sm:p-4 gap-2 sm:gap-3"
-          style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
-        >
-          {/* Logo / title — tap the location line to change it */}
-          <button
-            onClick={() => setLocationPickerOpen(true)}
-            className="glass-card rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 pointer-events-auto shadow-lg min-w-0 text-left"
-          >
-            <div className="min-w-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt="DocOnClick" className="h-6 sm:h-7 w-auto object-contain" />
-              <p className={cn("text-xs mt-0.5 truncate", customLabel ? "text-blue-600 font-semibold" : "text-slate-500")}>
-                {customLabel ? `📍 ${customLabel}` : posError ? "📍 Set your location" : "📍 Your location · Change"}
-              </p>
+      {/* ── Top bar / list view ────────────────────────────────────── */}
+      {viewMode === "list" ? (
+        <div className="absolute inset-0 z-10 flex flex-col bg-slate-50">
+          <div className="flex-shrink-0 bg-white shadow-sm border-b border-slate-100">
+            {headerRow}
+            {searchRow}
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-3 sm:p-4 pb-28 lg:pb-16 max-w-2xl mx-auto flex flex-col gap-2.5">
+              {sorted.length === 0 ? (
+                <div className="text-center text-slate-400 text-sm py-12">
+                  No doctors found nearby.
+                </div>
+              ) : (
+                sorted.map((doc) => {
+                  const openClinic = findOpenClinic(doc.clinics) ?? doc.clinics[0] ?? null;
+                  const clinicId = openClinic?.id ?? null;
+                  const isOpen = openClinic ? isClinicOpenNow(openClinic.slots, new Date(now)) : doc.clinics.length === 0;
+                  return (
+                    <DoctorListCard
+                      key={doc.id}
+                      doctor={doc}
+                      distanceKm={doc.distance ?? null}
+                      color={colorFor(doc.doctorProfile?.specialty ?? "")}
+                      isOpen={isOpen}
+                      onClick={() => openDoctorPanel(doc, clinicId)}
+                    />
+                  );
+                })
+              )}
             </div>
-          </button>
-
-          {/* Right: quick actions + profile */}
-          <div className="glass-card rounded-2xl px-2.5 sm:px-4 py-2.5 sm:py-3 flex items-center gap-1.5 sm:gap-3 pointer-events-auto shadow-lg flex-shrink-0">
-            {profilePercent != null && profilePercent < 100 && (
-              <button
-                onClick={() => router.push("/patient/profile")}
-                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors"
-                title="Complete your profile"
-              >
-                Profile {profilePercent}%
-              </button>
-            )}
-            <button
-              onClick={() => router.push("/patient/assistant")}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl gradient-primary text-white text-xs font-semibold hover:opacity-90 transition-opacity"
-              title="Health Assistant"
-            >
-              <Sparkles className="w-4 h-4" /> Ask AI
-            </button>
-            <button
-              onClick={() => router.push("/patient/appointments")}
-              className="hidden lg:flex w-8 h-8 rounded-xl bg-blue-50 items-center justify-center text-blue-500 hover:bg-blue-100 transition-colors"
-              title="My Appointments"
-            >
-              <CalendarCheck2 className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => router.push("/patient/profile")}
-              className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors flex-shrink-0"
-              title="Profile"
-            >
-              <UserCircle className="w-4 h-4" />
-            </button>
           </div>
         </div>
-
-        {/* Search, filters, refresh and where-you're-searching info — one
-            card instead of three separate floating rows, so glancing at the
-            top of the screen reads as "identity" then "search", not five
-            competing pills. */}
-        <div className="px-3 sm:px-4 pointer-events-auto">
-          <div className="glass-card rounded-2xl p-2.5 max-w-full">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="relative flex-1 min-w-0">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search doctor or specialty…"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-8 pr-8 py-2 rounded-xl border border-slate-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-                {search && (
-                  <button
-                    type="button"
-                    onClick={() => setSearch("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-              <button
-                onClick={refreshMap}
-                disabled={refreshing}
-                className="w-9 h-9 rounded-xl bg-white/80 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 transition-colors disabled:opacity-60 flex-shrink-0"
-                title="Refresh doctors & location"
-              >
-                <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
-              </button>
-            </div>
-            <SpecialtyFilter value={specialtyFilter} onChange={setSpecialtyFilter} />
-            {searchRadiusKm != null && (
-              <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
-                <Compass className="w-3 h-3 flex-shrink-0" />
-                {ignoreRadius ? (
-                  <>Showing all clinics.{" "}
-                    <button type="button" onClick={() => setIgnoreRadius(false)} className="font-semibold text-blue-600 hover:underline">Limit to {searchRadiusKm} km</button>
-                  </>
-                ) : (
-                  <>Showing clinics within {searchRadiusKm} km.{" "}
-                    <button type="button" onClick={() => router.push("/patient/profile")} className="font-semibold text-blue-600 hover:underline">Change</button>
-                  </>
-                )}
-              </p>
-            )}
-
-            {/* Where you're searching from — folded into the same card
-                instead of its own floating pill below. */}
-            {customLabel ? (
-              <button
-                onClick={switchToMyLocation}
-                className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
-              >
-                <MapPin className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
-                <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
-                  {customLabel} <span className="text-blue-600">· Use my location</span>
-                </span>
-              </button>
-            ) : posError ? (
-              <button
-                onClick={() => setLocationPickerOpen(true)}
-                className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
-              >
-                <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-                <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
-                  Showing Pune — <span className="text-blue-600">Set your location</span>
-                </span>
-              </button>
-            ) : nearest?.doctorProfile && (
-              <button
-                onClick={() => {
-                  setSelectedDoctor(nearest);
-                  setSelectedClinicId((findOpenClinic(nearest.clinics) ?? nearest.clinics[0])?.id ?? null);
-                  setPanelOpen(true);
-                  setBookingOpen(false);
-                  setConsultType(defaultConsultType(nearest));
-                }}
-                className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
-              >
-                <div
-                  className="w-2 h-2 rounded-full animate-pulse flex-shrink-0"
-                  style={{ backgroundColor: colorFor(nearest.doctorProfile.specialty) }}
-                />
-                <span className="text-xs font-semibold text-slate-700 truncate min-w-0 flex-1">
-                  Nearest: <span className="text-blue-600">{formatDoctorName(nearest.name)}</span>
-                  {nearest.distance != null && (
-                    <span className="text-slate-400 font-normal ml-1">
-                      · {nearest.distance.toFixed(1)} km
-                    </span>
-                  )}
-                </span>
-                <Navigation className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
-              </button>
-            )}
-          </div>
+      ) : (
+        <div className={cn("absolute top-0 inset-x-0 z-20 pointer-events-none", pickingOnMap && "hidden")}>
+          {headerRow}
+          {searchRow}
         </div>
-      </div>
+      )}
 
       {/* ── Legend ─────────────────────────────────────────────────── */}
-      <div className={cn("hidden lg:block absolute bottom-6 left-4 z-20 pointer-events-none", pickingOnMap && "lg:hidden")}>
+      <div className={cn("hidden lg:block absolute bottom-6 left-4 z-20 pointer-events-none", (pickingOnMap || viewMode === "list") && "lg:hidden")}>
         <div className="glass-card rounded-2xl p-3 flex flex-col gap-1.5 max-w-[170px]">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Specialties</p>
           {specialties.slice(0, 5).map(({ name, color }) => (
@@ -1039,7 +1190,7 @@ function PatientDashboardInner() {
       </div>
 
       {/* ── Doctor count badge ──────────────────────────────────────── */}
-      <div className={cn("absolute bottom-[calc(5rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-6 right-4 z-20 pointer-events-none", pickingOnMap && "hidden")}>
+      <div className={cn("absolute bottom-[calc(5rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-6 right-4 z-20 pointer-events-none", (pickingOnMap || viewMode === "list") && "hidden")}>
         <div className="glass-card rounded-2xl px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 pointer-events-auto">
           <Stethoscope className="w-4 h-4 text-blue-500" />
           <span className="text-xs sm:text-sm font-semibold text-slate-700">
