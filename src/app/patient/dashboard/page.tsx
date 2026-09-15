@@ -1137,7 +1137,7 @@ function PatientDashboardInner() {
 
       {/* ── Top bar / list view ────────────────────────────────────── */}
       {viewMode === "list" ? (
-        <div className="absolute inset-0 z-10 flex flex-col bg-slate-50">
+        <div className={cn("absolute inset-0 z-10 flex flex-col bg-slate-50", pickingOnMap && "hidden")}>
           <div className="flex-shrink-0 bg-white shadow-sm border-b border-slate-100">
             {headerRow}
             {searchRow}
@@ -1884,7 +1884,7 @@ function PatientDashboardInner() {
             />
 
             <button
-              onClick={() => { setLocationPickerOpen(false); setPickingOnMap(true); }}
+              onClick={() => { setLocationPickerOpen(false); setPickingOnMap(true); setViewMode("map"); }}
               className="btn-secondary w-full justify-center py-2.5 mt-3 gap-1.5 text-sm"
             >
               <MapPin className="w-4 h-4" /> Pick an exact spot on the map
