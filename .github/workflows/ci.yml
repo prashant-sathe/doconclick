@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Schema-only — doesn't need a live database, just emits the typed
+      # client that tsc/next build both import from (@/generated/prisma).
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      # No DATABASE_URL/Firebase/Cashfree secrets needed here — nothing in
+      # this app touches those at build time (sitemap.ts, the one route that
+      # queries the DB, is `export const dynamic = "force-dynamic"`, i.e.
+      # rendered per-request, not at build).
+      - name: Build
+        run: npm run build
