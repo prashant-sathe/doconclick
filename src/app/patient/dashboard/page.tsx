@@ -25,6 +25,15 @@ import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
+import DoctorFilters from "@/components/patient/DoctorFilters";
+import {
+  type DoctorFilterState,
+  DEFAULT_DOCTOR_FILTERS,
+  matchesDoctorFilters,
+  sortDoctors,
+  readStoredDoctorFilters,
+  writeStoredDoctorFilters,
+} from "@/lib/doctorFilters";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
@@ -567,11 +576,25 @@ function PatientDashboardInner() {
   const [ignoreRadius, setIgnoreRadius] = useState(false);
   const effectiveRadiusKm = ignoreRadius ? null : searchRadiusKm;
 
+  const [doctorFilterState, setDoctorFilterState] = useState<DoctorFilterState>(DEFAULT_DOCTOR_FILTERS);
+  useEffect(() => {
+    const stored = readStoredDoctorFilters();
+    if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDoctorFilterState(stored);
+    }
+  }, []);
+  const applyDoctorFilters = (next: DoctorFilterState) => {
+    setDoctorFilterState(next);
+    writeStoredDoctorFilters(next);
+  };
+
   const mapDoctors = useMemo(() => {
     const q = search.trim().toLowerCase();
     return doctorsWithDist.filter((d) => {
       const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
       const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
+      const matchesFilters = !d.doctorProfile || matchesDoctorFilters(d.doctorProfile, doctorFilterState);
       // The map is a proximity tool: a doctor shows only if they have at least
       // one clinic pin *within the search range*. The "video is location-
       // independent" exception deliberately does NOT apply to map pins — a far
@@ -580,14 +603,24 @@ function PatientDashboardInner() {
       const hasClinicInRange = d.clinics.some((c) =>
         withinSearchRadius(clinicDistance(c), effectiveRadiusKm, false),
       );
-      return matchesSpecialty && matchesSearch && hasClinicInRange;
+      return matchesSpecialty && matchesSearch && matchesFilters && hasClinicInRange;
     });
-  }, [doctorsWithDist, specialtyFilter, search, effectiveRadiusKm, clinicDistance]);
+  }, [doctorsWithDist, specialtyFilter, search, doctorFilterState, effectiveRadiusKm, clinicDistance]);
 
+  // Always distance-ordered — drives the "Nearest" badge and the pulsing map
+  // pin, which need the geographically nearest doctor regardless of whatever
+  // sort order the patient picked for the list view below.
   const sorted = useMemo(() => [...mapDoctors].sort(
     (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
   ), [mapDoctors]);
   const nearest = sorted[0];
+
+  // The list view's own display order — respects the patient's chosen sort
+  // (nearest/rating/experience/fee) independent of `sorted` above.
+  const displayList = useMemo(
+    () => sortDoctors(mapDoctors, doctorFilterState.sortBy),
+    [mapDoctors, doctorFilterState.sortBy]
+  );
 
   // One marker per clinic, not per doctor — a doctor with several locations
   // shows up as several pins.
@@ -767,7 +800,7 @@ function PatientDashboardInner() {
     if (!leafletMapRef.current) return;
     placeClinicMarkers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doctors, specialtyFilter, search, now, colorFor]);
+  }, [doctors, specialtyFilter, search, doctorFilterState, effectiveRadiusKm, now, colorFor]);
 
   const selectedClinic = selectedDoctor?.clinics.find((c) => c.id === selectedClinicId) ?? null;
 
@@ -1054,7 +1087,12 @@ function PatientDashboardInner() {
             <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
           </button>
         </div>
-        <SpecialtyFilter value={specialtyFilter} onChange={setSpecialtyFilter} />
+        <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <SpecialtyFilter value={specialtyFilter} onChange={setSpecialtyFilter} />
+          </div>
+          <DoctorFilters value={doctorFilterState} onChange={applyDoctorFilters} doctors={doctors} />
+        </div>
         {searchRadiusKm != null && (
           <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
             <Compass className="w-3 h-3 flex-shrink-0" />
@@ -1151,12 +1189,12 @@ function PatientDashboardInner() {
           </div>
           <PullToRefresh selfScrolls onRefresh={refreshMap} className="flex-1 overflow-y-auto">
             <div className="p-3 sm:p-4 pb-28 lg:pb-16 max-w-2xl mx-auto flex flex-col gap-2.5">
-              {sorted.length === 0 ? (
+              {displayList.length === 0 ? (
                 <div className="text-center text-slate-400 text-sm py-12">
                   No doctors found nearby.
                 </div>
               ) : (
-                sorted.map((doc) => {
+                displayList.map((doc) => {
                   const openClinic = findOpenClinic(doc.clinics) ?? doc.clinics[0] ?? null;
                   const clinicId = openClinic?.id ?? null;
                   const isOpen = openClinic ? isClinicOpenNow(openClinic.slots, new Date(now)) : doc.clinics.length === 0;

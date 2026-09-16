@@ -20,6 +20,15 @@ import { readPatientLocation } from "@/lib/patientLocation";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
+import DoctorFilters from "@/components/patient/DoctorFilters";
+import {
+  type DoctorFilterState,
+  DEFAULT_DOCTOR_FILTERS,
+  matchesDoctorFilters,
+  sortDoctors,
+  readStoredDoctorFilters,
+  writeStoredDoctorFilters,
+} from "@/lib/doctorFilters";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import DependentPicker from "@/components/patient/DependentPicker";
@@ -131,6 +140,18 @@ function PatientBookInner() {
 
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [specialtyFilter, setSpecialtyFilter] = useState("");
+  const [doctorFilterState, setDoctorFilterState] = useState<DoctorFilterState>(DEFAULT_DOCTOR_FILTERS);
+  useEffect(() => {
+    const stored = readStoredDoctorFilters();
+    if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDoctorFilterState(stored);
+    }
+  }, []);
+  const applyDoctorFilters = (next: DoctorFilterState) => {
+    setDoctorFilterState(next);
+    writeStoredDoctorFilters(next);
+  };
   const [search, setSearch] = useState("");
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
   // Patient's "doctor search range" preference (km); null = no limit.
@@ -207,16 +228,22 @@ function PatientBookInner() {
     return userPos && lat != null && lng != null ? haversine(userPos[0], userPos[1], lat, lng) : null;
   };
 
-  const visibleDoctors = doctors.filter((d) => {
-    const q = search.trim().toLowerCase();
-    const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
-    const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
-    const inRange =
-      radiusOverride ||
-      d.id === preselectDoctorId ||
-      withinSearchRadius(doctorDistance(d), searchRadiusKm, d.doctorProfile?.offersVideo ?? false);
-    return matchesSpecialty && matchesSearch && inRange;
-  });
+  const visibleDoctors = sortDoctors(
+    doctors
+      .filter((d) => {
+        const q = search.trim().toLowerCase();
+        const matchesSpecialty = !specialtyFilter || d.doctorProfile?.specialty === specialtyFilter;
+        const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.doctorProfile?.specialty ?? "").toLowerCase().includes(q);
+        const matchesFilters = !d.doctorProfile || matchesDoctorFilters(d.doctorProfile, doctorFilterState);
+        const inRange =
+          radiusOverride ||
+          d.id === preselectDoctorId ||
+          withinSearchRadius(doctorDistance(d), searchRadiusKm, d.doctorProfile?.offersVideo ?? false);
+        return matchesSpecialty && matchesSearch && matchesFilters && inRange;
+      })
+      .map((d) => ({ ...d, distance: doctorDistance(d) ?? undefined })),
+    doctorFilterState.sortBy
+  );
 
   const selectedDoctor = doctors.find((d) => d.id === form.doctorId);
   const selectedOutOfRange =
@@ -453,7 +480,12 @@ function PatientBookInner() {
                   </button>
                 )}
               </div>
-              <SpecialtyFilter value={specialtyFilter} onChange={(s) => { setSpecialtyFilter(s); set("doctorId", ""); }} />
+              <div className="flex items-center gap-2">
+                <div className="flex-1 min-w-0">
+                  <SpecialtyFilter value={specialtyFilter} onChange={(s) => { setSpecialtyFilter(s); set("doctorId", ""); }} />
+                </div>
+                <DoctorFilters value={doctorFilterState} onChange={applyDoctorFilters} doctors={doctors} />
+              </div>
             </div>
 
             {/* Consult Type */}
