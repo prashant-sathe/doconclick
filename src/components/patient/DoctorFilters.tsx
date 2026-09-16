@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { SlidersHorizontal, X, Languages, GraduationCap, IndianRupee, ArrowUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -68,10 +69,10 @@ export default function DoctorFilters({
         )}
       </button>
 
-      {open && (
+      {open && createPortal(
         <div className="fixed inset-0 bg-black/40 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setOpen(false)}>
           <div
-            className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm max-h-[85vh] overflow-y-auto p-5"
+            className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm max-h-[85dvh] overflow-y-auto p-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -188,7 +189,8 @@ export default function DoctorFilters({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
