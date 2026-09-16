@@ -71,6 +71,7 @@ export const ModelName = {
   Complaint: 'Complaint',
   Clinic: 'Clinic',
   ClinicSlot: 'ClinicSlot',
+  ClinicLeave: 'ClinicLeave',
   Specialty: 'Specialty',
   Announcement: 'Announcement',
   AnnouncementRecipient: 'AnnouncementRecipient',
@@ -439,6 +440,17 @@ export const ClinicSlotScalarFieldEnum = {
 } as const
 
 export type ClinicSlotScalarFieldEnum = (typeof ClinicSlotScalarFieldEnum)[keyof typeof ClinicSlotScalarFieldEnum]
+
+
+export const ClinicLeaveScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  date: 'date',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ClinicLeaveScalarFieldEnum = (typeof ClinicLeaveScalarFieldEnum)[keyof typeof ClinicLeaveScalarFieldEnum]
 
 
 export const SpecialtyScalarFieldEnum = {

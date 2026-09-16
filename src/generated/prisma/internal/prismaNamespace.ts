@@ -417,6 +417,7 @@ export const ModelName = {
   Complaint: 'Complaint',
   Clinic: 'Clinic',
   ClinicSlot: 'ClinicSlot',
+  ClinicLeave: 'ClinicLeave',
   Specialty: 'Specialty',
   Announcement: 'Announcement',
   AnnouncementRecipient: 'AnnouncementRecipient',
@@ -439,7 +440,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption"
+    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1923,6 +1924,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ClinicLeave: {
+      payload: Prisma.$ClinicLeavePayload<ExtArgs>
+      fields: Prisma.ClinicLeaveFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ClinicLeaveFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ClinicLeaveFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload>
+        }
+        findFirst: {
+          args: Prisma.ClinicLeaveFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ClinicLeaveFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload>
+        }
+        findMany: {
+          args: Prisma.ClinicLeaveFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload>[]
+        }
+        create: {
+          args: Prisma.ClinicLeaveCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload>
+        }
+        createMany: {
+          args: Prisma.ClinicLeaveCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ClinicLeaveCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload>[]
+        }
+        delete: {
+          args: Prisma.ClinicLeaveDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload>
+        }
+        update: {
+          args: Prisma.ClinicLeaveUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload>
+        }
+        deleteMany: {
+          args: Prisma.ClinicLeaveDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ClinicLeaveUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ClinicLeaveUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload>[]
+        }
+        upsert: {
+          args: Prisma.ClinicLeaveUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClinicLeavePayload>
+        }
+        aggregate: {
+          args: Prisma.ClinicLeaveAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateClinicLeave>
+        }
+        groupBy: {
+          args: Prisma.ClinicLeaveGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClinicLeaveGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ClinicLeaveCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClinicLeaveCountAggregateOutputType> | number
+        }
+      }
+    }
     Specialty: {
       payload: Prisma.$SpecialtyPayload<ExtArgs>
       fields: Prisma.SpecialtyFieldRefs
@@ -2825,6 +2900,17 @@ export const ClinicSlotScalarFieldEnum = {
 export type ClinicSlotScalarFieldEnum = (typeof ClinicSlotScalarFieldEnum)[keyof typeof ClinicSlotScalarFieldEnum]
 
 
+export const ClinicLeaveScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  date: 'date',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ClinicLeaveScalarFieldEnum = (typeof ClinicLeaveScalarFieldEnum)[keyof typeof ClinicLeaveScalarFieldEnum]
+
+
 export const SpecialtyScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -3223,6 +3309,7 @@ export type GlobalOmitConfig = {
   complaint?: Prisma.ComplaintOmit
   clinic?: Prisma.ClinicOmit
   clinicSlot?: Prisma.ClinicSlotOmit
+  clinicLeave?: Prisma.ClinicLeaveOmit
   specialty?: Prisma.SpecialtyOmit
   announcement?: Prisma.AnnouncementOmit
   announcementRecipient?: Prisma.AnnouncementRecipientOmit

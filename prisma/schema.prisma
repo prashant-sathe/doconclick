@@ -384,6 +384,7 @@ model Clinic {
   createdAt DateTime @default(now())
 
   slots        ClinicSlot[]
+  leaves       ClinicLeave[]
   appointments Appointment[]
 }
 
@@ -394,6 +395,21 @@ model ClinicSlot {
   dayOfWeek String // Mon, Tue, Wed, Thu, Fri, Sat, Sun
   fromTime  String // "HH:MM", 24h
   toTime    String // "HH:MM", 24h
+}
+
+// A single calendar date this clinic is closed despite its normal weekly
+// ClinicSlot hours — a doctor's day off, holiday, vacation day, etc. Plain
+// "YYYY-MM-DD" string (not DateTime) to match how every other date in
+// src/lib/clinicAvailability.ts is handled — a calendar date, not an instant.
+model ClinicLeave {
+  id        String   @id @default(cuid())
+  clinicId  String
+  clinic    Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  date      String   // "YYYY-MM-DD"
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@unique([clinicId, date])
 }
 
 model Specialty {

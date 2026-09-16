@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Loader2, MapPin, Building2, Clock, Plus, Trash2, Save, CheckCircle2,
-  Navigation, Image as ImageIcon, UploadCloud, ArrowRight,
+  Navigation, Image as ImageIcon, UploadCloud, ArrowRight, CalendarOff,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -141,6 +141,113 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
           onCancel={() => setPendingFile(null)}
           onConfirm={(blob) => { setPendingFile(null); upload(blob); }}
         />
+      )}
+    </div>
+  );
+}
+
+interface ClinicLeave {
+  id: string;
+  date: string; // "YYYY-MM-DD"
+  reason: string | null;
+}
+
+function formatLeaveDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-IN", {
+    timeZone: "UTC", day: "numeric", month: "short", year: "numeric",
+  });
+}
+
+// Per-clinic leave/holiday dates — closes booking on specific calendar dates
+// despite the clinic's normal weekly hours. Persisted immediately on
+// add/remove (unlike the rest of the clinic form) since there's nothing to
+// "save" together with it — each date is its own row server-side.
+function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
+  const [leaves, setLeaves] = useState<ClinicLeave[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [date, setDate] = useState("");
+  const [reason, setReason] = useState("");
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState("");
+  const [removingId, setRemovingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/doctors/me/clinics/${clinicId}/leaves`)
+      .then((r) => (r.ok ? r.json() : { leaves: [] }))
+      .then((data: { leaves: ClinicLeave[] }) => { if (!cancelled) setLeaves(data.leaves ?? []); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [clinicId]);
+
+  const addLeave = async () => {
+    if (!date) return;
+    setAdding(true);
+    setError("");
+    const res = await fetch(`/api/doctors/me/clinics/${clinicId}/leaves`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ date, reason: reason.trim() || undefined }),
+    });
+    setAdding(false);
+    if (res.ok) {
+      const created: ClinicLeave = await res.json();
+      setLeaves((cur) => [...cur, created].sort((a, b) => a.date.localeCompare(b.date)));
+      setDate("");
+      setReason("");
+    } else {
+      const err = await res.json().catch(() => ({}));
+      setError(err.error ?? "Could not add that date.");
+    }
+  };
+
+  const removeLeave = async (leaveId: string) => {
+    setRemovingId(leaveId);
+    const res = await fetch(`/api/doctors/me/clinics/${clinicId}/leaves/${leaveId}`, { method: "DELETE" });
+    setRemovingId(null);
+    if (res.ok) setLeaves((cur) => cur.filter((l) => l.id !== leaveId));
+  };
+
+  const todayIso = new Date().toISOString().slice(0, 10);
+
+  return (
+    <div>
+      <label className="input-label flex items-center gap-1.5"><CalendarOff className="w-3.5 h-3.5" /> Leave / Holiday Dates <span className="text-slate-400 font-normal normal-case">(optional)</span></label>
+      <p className="text-xs text-slate-400 mt-1 mb-2">Mark specific dates you&apos;ll be closed — patients won&apos;t be able to book this clinic on those days, even within your normal hours.</p>
+
+      {loading ? (
+        <Loader2 className="w-4 h-4 animate-spin text-slate-300" />
+      ) : (
+        <>
+          {leaves.length > 0 && (
+            <ul className="space-y-1.5 mb-3">
+              {leaves.map((l) => (
+                <li key={l.id} className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-sm">
+                  <span className="text-slate-700 font-semibold">
+                    {formatLeaveDate(l.date)}
+                    {l.reason && <span className="text-slate-400 font-normal"> — {l.reason}</span>}
+                  </span>
+                  <button type="button" onClick={() => removeLeave(l.id)} disabled={removingId === l.id}
+                    className="text-red-400 hover:text-red-600 p-1 rounded-lg hover:bg-red-50 flex-shrink-0 disabled:opacity-60">
+                    {removingId === l.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="flex items-center gap-2">
+            <input type="date" className="input-field flex-1" min={todayIso} value={date}
+              onChange={(e) => setDate(e.target.value)} />
+            <input type="text" className="input-field flex-1" placeholder="Reason (optional)" value={reason}
+              onChange={(e) => setReason(e.target.value)} />
+            <button type="button" onClick={addLeave} disabled={!date || adding}
+              className="btn-secondary flex-shrink-0 px-3 text-xs gap-1 disabled:opacity-60">
+              {adding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />} Add
+            </button>
+          </div>
+          {error && <p className="text-xs text-red-600 mt-1.5">{error}</p>}
+        </>
       )}
     </div>
   );
@@ -294,6 +401,8 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
           <Plus className="w-3.5 h-3.5" /> Add another time range
         </button>
       </div>
+
+      {clinic.id && <ClinicLeaveManager clinicId={clinic.id} />}
 
       {clinic.error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">{clinic.error}</p>}
 

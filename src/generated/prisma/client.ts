@@ -142,6 +142,11 @@ export type Clinic = Prisma.ClinicModel
  */
 export type ClinicSlot = Prisma.ClinicSlotModel
 /**
+ * Model ClinicLeave
+ * 
+ */
+export type ClinicLeave = Prisma.ClinicLeaveModel
+/**
  * Model Specialty
  * 
  */

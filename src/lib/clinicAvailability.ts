@@ -23,11 +23,22 @@ function nowInIst(now: Date): { weekday: string; minutes: number } {
   return { weekday, minutes: hour * 60 + minute };
 }
 
+// Today's calendar date in IST as "YYYY-MM-DD" — the reference date/weekday
+// this whole file's slot math is anchored to (see the "Slot-time math
+// assumes IST" note elsewhere in this codebase).
+export function todayIsoDateIst(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(now);
+}
+
 // Whether a clinic is currently within one of its day-wise slots, evaluated in
 // IST regardless of the visitor's timezone. A clinic with no slots at all
 // (hours never configured) fails open — consistent with isDoctorAvailableNow
 // in src/lib/availability.ts — so it's never wrongly hidden/dimmed by default.
-export function isClinicOpenNow(slots: ClinicSlotLike[], now: Date = new Date()): boolean {
+// `leaves` are specific "YYYY-MM-DD" dates the clinic is closed regardless of
+// its normal weekly hours (a doctor's day off) — checked first since a leave
+// day overrides everything else.
+export function isClinicOpenNow(slots: ClinicSlotLike[], now: Date = new Date(), leaves: string[] = []): boolean {
+  if (leaves.includes(todayIsoDateIst(now))) return false;
   if (slots.length === 0) return true;
 
   const { weekday, minutes: nowMin } = nowInIst(now);
@@ -44,15 +55,22 @@ export function isClinicOpenNow(slots: ClinicSlotLike[], now: Date = new Date())
 // Returns the first currently-open clinic (by sortOrder) among a doctor's
 // clinics, or null if none are open right now — used to suggest an
 // alternative location when the clinic a patient tapped is closed.
-export function findOpenClinic<T extends { sortOrder: number; slots: ClinicSlotLike[] }>(
+export function findOpenClinic<T extends { sortOrder: number; slots: ClinicSlotLike[]; leaves?: string[] }>(
   clinics: T[],
   now: Date = new Date()
 ): T | null {
   const sorted = [...clinics].sort((a, b) => a.sortOrder - b.sortOrder);
-  return sorted.find((clinic) => isClinicOpenNow(clinic.slots, now)) ?? null;
+  return sorted.find((clinic) => isClinicOpenNow(clinic.slots, now, clinic.leaves ?? [])) ?? null;
 }
 
 const DAY_ORDER = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function addDaysIso(dateIso: string, days: number): string {
+  const [y, m, d] = dateIso.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  dt.setUTCDate(dt.getUTCDate() + days);
+  return dt.toISOString().slice(0, 10);
+}
 
 export interface NextOpening<T> {
   clinic: T;
@@ -64,21 +82,26 @@ export interface NextOpening<T> {
 // Scans up to 7 days ahead (from `now`, in IST) across a doctor's clinics for
 // the earliest upcoming opening — used to tell a patient when/where a doctor
 // who's closed everywhere right now will next be available. Returns null if
-// none of the clinics have any slots configured (nothing to suggest).
-export function findNextOpening<T extends { slots: ClinicSlotLike[] }>(
+// none of the clinics have any slots configured (nothing to suggest). A
+// clinic on leave for a given date is skipped for that date entirely, same
+// as isClinicOpenNow.
+export function findNextOpening<T extends { slots: ClinicSlotLike[]; leaves?: string[] }>(
   clinics: T[],
   now: Date = new Date()
 ): NextOpening<T> | null {
   const { weekday, minutes: nowMin } = nowInIst(now);
   const todayIdx = DAY_ORDER.indexOf(weekday);
   if (todayIdx === -1) return null;
+  const todayIso = todayIsoDateIst(now);
 
   for (let daysAhead = 0; daysAhead < 7; daysAhead++) {
     const dayOfWeek = DAY_ORDER[(todayIdx + daysAhead) % 7];
+    const dateIso = addDaysIso(todayIso, daysAhead);
     let best: NextOpening<T> | null = null;
     let bestMin = Infinity;
 
     for (const clinic of clinics) {
+      if (clinic.leaves?.includes(dateIso)) continue;
       for (const slot of clinic.slots) {
         if (slot.dayOfWeek !== dayOfWeek) continue;
         const fromMin = toMinutes(slot.fromTime);
@@ -128,13 +151,6 @@ export function formatClinicHours(slots: ClinicSlotLike[]): ClinicDayHours[] {
     }));
 }
 
-// Today's calendar date in IST as "YYYY-MM-DD" — the reference date/weekday
-// this whole file's slot math is anchored to (see the "Slot-time math
-// assumes IST" note elsewhere in this codebase).
-export function todayIsoDateIst(now: Date = new Date()): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(now);
-}
-
 export interface TimeSlot {
   time: string; // "HH:MM", 24h — the slot's start time
   label: string; // "2:00 PM"
@@ -153,8 +169,10 @@ const SLOT_INTERVAL_MINUTES = 10;
 export function generateSlotsForDate(
   slots: ClinicSlotLike[],
   date: string,
-  now: Date = new Date()
+  now: Date = new Date(),
+  leaves: string[] = []
 ): TimeSlot[] {
+  if (leaves.includes(date)) return [];
   const match = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return [];
   const [, yStr, mStr, dStr] = match;

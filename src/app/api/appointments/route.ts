@@ -112,12 +112,12 @@ export async function POST(req: Request) {
 
     if (consultType === "CLINIC") {
       if (clinicId) {
-        const clinic = await prisma.clinic.findUnique({ where: { id: clinicId }, include: { slots: true } });
+        const clinic = await prisma.clinic.findUnique({ where: { id: clinicId }, include: { slots: true, leaves: true } });
         if (!clinic || clinic.doctorId !== doctorId || !clinic.isActive) {
           return NextResponse.json({ error: "Please select a valid clinic location." }, { status: 400 });
         }
         const effectiveTime = scheduledAt ? new Date(scheduledAt) : new Date();
-        if (!isClinicOpenNow(clinic.slots, effectiveTime)) {
+        if (!isClinicOpenNow(clinic.slots, effectiveTime, clinic.leaves.map((l) => l.date))) {
           return NextResponse.json(
             { error: "The doctor is not available at this clinic at the selected time. Please choose a different clinic or time." },
             { status: 400 }

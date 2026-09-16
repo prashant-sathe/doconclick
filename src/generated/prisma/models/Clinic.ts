@@ -266,6 +266,7 @@ export type ClinicWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Clinic"> | Date | string
   doctor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   slots?: Prisma.ClinicSlotListRelationFilter
+  leaves?: Prisma.ClinicLeaveListRelationFilter
   appointments?: Prisma.AppointmentListRelationFilter
 }
 
@@ -282,6 +283,7 @@ export type ClinicOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   doctor?: Prisma.UserOrderByWithRelationInput
   slots?: Prisma.ClinicSlotOrderByRelationAggregateInput
+  leaves?: Prisma.ClinicLeaveOrderByRelationAggregateInput
   appointments?: Prisma.AppointmentOrderByRelationAggregateInput
 }
 
@@ -301,6 +303,7 @@ export type ClinicWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Clinic"> | Date | string
   doctor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   slots?: Prisma.ClinicSlotListRelationFilter
+  leaves?: Prisma.ClinicLeaveListRelationFilter
   appointments?: Prisma.AppointmentListRelationFilter
 }, "id">
 
@@ -350,6 +353,7 @@ export type ClinicCreateInput = {
   createdAt?: Date | string
   doctor: Prisma.UserCreateNestedOneWithoutClinicsInput
   slots?: Prisma.ClinicSlotCreateNestedManyWithoutClinicInput
+  leaves?: Prisma.ClinicLeaveCreateNestedManyWithoutClinicInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutClinicInput
 }
 
@@ -365,6 +369,7 @@ export type ClinicUncheckedCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   slots?: Prisma.ClinicSlotUncheckedCreateNestedManyWithoutClinicInput
+  leaves?: Prisma.ClinicLeaveUncheckedCreateNestedManyWithoutClinicInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutClinicInput
 }
 
@@ -380,6 +385,7 @@ export type ClinicUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctor?: Prisma.UserUpdateOneRequiredWithoutClinicsNestedInput
   slots?: Prisma.ClinicSlotUpdateManyWithoutClinicNestedInput
+  leaves?: Prisma.ClinicLeaveUpdateManyWithoutClinicNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutClinicNestedInput
 }
 
@@ -395,6 +401,7 @@ export type ClinicUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slots?: Prisma.ClinicSlotUncheckedUpdateManyWithoutClinicNestedInput
+  leaves?: Prisma.ClinicLeaveUncheckedUpdateManyWithoutClinicNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutClinicNestedInput
 }
 
@@ -579,6 +586,20 @@ export type ClinicUpdateOneRequiredWithoutSlotsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ClinicUpdateToOneWithWhereWithoutSlotsInput, Prisma.ClinicUpdateWithoutSlotsInput>, Prisma.ClinicUncheckedUpdateWithoutSlotsInput>
 }
 
+export type ClinicCreateNestedOneWithoutLeavesInput = {
+  create?: Prisma.XOR<Prisma.ClinicCreateWithoutLeavesInput, Prisma.ClinicUncheckedCreateWithoutLeavesInput>
+  connectOrCreate?: Prisma.ClinicCreateOrConnectWithoutLeavesInput
+  connect?: Prisma.ClinicWhereUniqueInput
+}
+
+export type ClinicUpdateOneRequiredWithoutLeavesNestedInput = {
+  create?: Prisma.XOR<Prisma.ClinicCreateWithoutLeavesInput, Prisma.ClinicUncheckedCreateWithoutLeavesInput>
+  connectOrCreate?: Prisma.ClinicCreateOrConnectWithoutLeavesInput
+  upsert?: Prisma.ClinicUpsertWithoutLeavesInput
+  connect?: Prisma.ClinicWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClinicUpdateToOneWithWhereWithoutLeavesInput, Prisma.ClinicUpdateWithoutLeavesInput>, Prisma.ClinicUncheckedUpdateWithoutLeavesInput>
+}
+
 export type ClinicCreateWithoutDoctorInput = {
   id?: string
   name: string
@@ -590,6 +611,7 @@ export type ClinicCreateWithoutDoctorInput = {
   isActive?: boolean
   createdAt?: Date | string
   slots?: Prisma.ClinicSlotCreateNestedManyWithoutClinicInput
+  leaves?: Prisma.ClinicLeaveCreateNestedManyWithoutClinicInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutClinicInput
 }
 
@@ -604,6 +626,7 @@ export type ClinicUncheckedCreateWithoutDoctorInput = {
   isActive?: boolean
   createdAt?: Date | string
   slots?: Prisma.ClinicSlotUncheckedCreateNestedManyWithoutClinicInput
+  leaves?: Prisma.ClinicLeaveUncheckedCreateNestedManyWithoutClinicInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutClinicInput
 }
 
@@ -661,6 +684,7 @@ export type ClinicCreateWithoutAppointmentsInput = {
   createdAt?: Date | string
   doctor: Prisma.UserCreateNestedOneWithoutClinicsInput
   slots?: Prisma.ClinicSlotCreateNestedManyWithoutClinicInput
+  leaves?: Prisma.ClinicLeaveCreateNestedManyWithoutClinicInput
 }
 
 export type ClinicUncheckedCreateWithoutAppointmentsInput = {
@@ -675,6 +699,7 @@ export type ClinicUncheckedCreateWithoutAppointmentsInput = {
   isActive?: boolean
   createdAt?: Date | string
   slots?: Prisma.ClinicSlotUncheckedCreateNestedManyWithoutClinicInput
+  leaves?: Prisma.ClinicLeaveUncheckedCreateNestedManyWithoutClinicInput
 }
 
 export type ClinicCreateOrConnectWithoutAppointmentsInput = {
@@ -705,6 +730,7 @@ export type ClinicUpdateWithoutAppointmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctor?: Prisma.UserUpdateOneRequiredWithoutClinicsNestedInput
   slots?: Prisma.ClinicSlotUpdateManyWithoutClinicNestedInput
+  leaves?: Prisma.ClinicLeaveUpdateManyWithoutClinicNestedInput
 }
 
 export type ClinicUncheckedUpdateWithoutAppointmentsInput = {
@@ -719,6 +745,7 @@ export type ClinicUncheckedUpdateWithoutAppointmentsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slots?: Prisma.ClinicSlotUncheckedUpdateManyWithoutClinicNestedInput
+  leaves?: Prisma.ClinicLeaveUncheckedUpdateManyWithoutClinicNestedInput
 }
 
 export type ClinicCreateWithoutSlotsInput = {
@@ -732,6 +759,7 @@ export type ClinicCreateWithoutSlotsInput = {
   isActive?: boolean
   createdAt?: Date | string
   doctor: Prisma.UserCreateNestedOneWithoutClinicsInput
+  leaves?: Prisma.ClinicLeaveCreateNestedManyWithoutClinicInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutClinicInput
 }
 
@@ -746,6 +774,7 @@ export type ClinicUncheckedCreateWithoutSlotsInput = {
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
+  leaves?: Prisma.ClinicLeaveUncheckedCreateNestedManyWithoutClinicInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutClinicInput
 }
 
@@ -776,6 +805,7 @@ export type ClinicUpdateWithoutSlotsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctor?: Prisma.UserUpdateOneRequiredWithoutClinicsNestedInput
+  leaves?: Prisma.ClinicLeaveUpdateManyWithoutClinicNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutClinicNestedInput
 }
 
@@ -790,6 +820,83 @@ export type ClinicUncheckedUpdateWithoutSlotsInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  leaves?: Prisma.ClinicLeaveUncheckedUpdateManyWithoutClinicNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutClinicNestedInput
+}
+
+export type ClinicCreateWithoutLeavesInput = {
+  id?: string
+  name: string
+  address: string
+  photoUrl?: string | null
+  lat: number
+  lng: number
+  sortOrder?: number
+  isActive?: boolean
+  createdAt?: Date | string
+  doctor: Prisma.UserCreateNestedOneWithoutClinicsInput
+  slots?: Prisma.ClinicSlotCreateNestedManyWithoutClinicInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutClinicInput
+}
+
+export type ClinicUncheckedCreateWithoutLeavesInput = {
+  id?: string
+  doctorId: string
+  name: string
+  address: string
+  photoUrl?: string | null
+  lat: number
+  lng: number
+  sortOrder?: number
+  isActive?: boolean
+  createdAt?: Date | string
+  slots?: Prisma.ClinicSlotUncheckedCreateNestedManyWithoutClinicInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutClinicInput
+}
+
+export type ClinicCreateOrConnectWithoutLeavesInput = {
+  where: Prisma.ClinicWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClinicCreateWithoutLeavesInput, Prisma.ClinicUncheckedCreateWithoutLeavesInput>
+}
+
+export type ClinicUpsertWithoutLeavesInput = {
+  update: Prisma.XOR<Prisma.ClinicUpdateWithoutLeavesInput, Prisma.ClinicUncheckedUpdateWithoutLeavesInput>
+  create: Prisma.XOR<Prisma.ClinicCreateWithoutLeavesInput, Prisma.ClinicUncheckedCreateWithoutLeavesInput>
+  where?: Prisma.ClinicWhereInput
+}
+
+export type ClinicUpdateToOneWithWhereWithoutLeavesInput = {
+  where?: Prisma.ClinicWhereInput
+  data: Prisma.XOR<Prisma.ClinicUpdateWithoutLeavesInput, Prisma.ClinicUncheckedUpdateWithoutLeavesInput>
+}
+
+export type ClinicUpdateWithoutLeavesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lat?: Prisma.FloatFieldUpdateOperationsInput | number
+  lng?: Prisma.FloatFieldUpdateOperationsInput | number
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  doctor?: Prisma.UserUpdateOneRequiredWithoutClinicsNestedInput
+  slots?: Prisma.ClinicSlotUpdateManyWithoutClinicNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutClinicNestedInput
+}
+
+export type ClinicUncheckedUpdateWithoutLeavesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  doctorId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lat?: Prisma.FloatFieldUpdateOperationsInput | number
+  lng?: Prisma.FloatFieldUpdateOperationsInput | number
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  slots?: Prisma.ClinicSlotUncheckedUpdateManyWithoutClinicNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutClinicNestedInput
 }
 
@@ -816,6 +923,7 @@ export type ClinicUpdateWithoutDoctorInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slots?: Prisma.ClinicSlotUpdateManyWithoutClinicNestedInput
+  leaves?: Prisma.ClinicLeaveUpdateManyWithoutClinicNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutClinicNestedInput
 }
 
@@ -830,6 +938,7 @@ export type ClinicUncheckedUpdateWithoutDoctorInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slots?: Prisma.ClinicSlotUncheckedUpdateManyWithoutClinicNestedInput
+  leaves?: Prisma.ClinicLeaveUncheckedUpdateManyWithoutClinicNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutClinicNestedInput
 }
 
@@ -852,11 +961,13 @@ export type ClinicUncheckedUpdateManyWithoutDoctorInput = {
 
 export type ClinicCountOutputType = {
   slots: number
+  leaves: number
   appointments: number
 }
 
 export type ClinicCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   slots?: boolean | ClinicCountOutputTypeCountSlotsArgs
+  leaves?: boolean | ClinicCountOutputTypeCountLeavesArgs
   appointments?: boolean | ClinicCountOutputTypeCountAppointmentsArgs
 }
 
@@ -880,6 +991,13 @@ export type ClinicCountOutputTypeCountSlotsArgs<ExtArgs extends runtime.Types.Ex
 /**
  * ClinicCountOutputType without action
  */
+export type ClinicCountOutputTypeCountLeavesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClinicLeaveWhereInput
+}
+
+/**
+ * ClinicCountOutputType without action
+ */
 export type ClinicCountOutputTypeCountAppointmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AppointmentWhereInput
 }
@@ -898,6 +1016,7 @@ export type ClinicSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   createdAt?: boolean
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   slots?: boolean | Prisma.Clinic$slotsArgs<ExtArgs>
+  leaves?: boolean | Prisma.Clinic$leavesArgs<ExtArgs>
   appointments?: boolean | Prisma.Clinic$appointmentsArgs<ExtArgs>
   _count?: boolean | Prisma.ClinicCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clinic"]>
@@ -947,6 +1066,7 @@ export type ClinicOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type ClinicInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   slots?: boolean | Prisma.Clinic$slotsArgs<ExtArgs>
+  leaves?: boolean | Prisma.Clinic$leavesArgs<ExtArgs>
   appointments?: boolean | Prisma.Clinic$appointmentsArgs<ExtArgs>
   _count?: boolean | Prisma.ClinicCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -962,6 +1082,7 @@ export type $ClinicPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   objects: {
     doctor: Prisma.$UserPayload<ExtArgs>
     slots: Prisma.$ClinicSlotPayload<ExtArgs>[]
+    leaves: Prisma.$ClinicLeavePayload<ExtArgs>[]
     appointments: Prisma.$AppointmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1371,6 +1492,7 @@ export interface Prisma__ClinicClient<T, Null = never, ExtArgs extends runtime.T
   readonly [Symbol.toStringTag]: "PrismaPromise"
   doctor<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   slots<T extends Prisma.Clinic$slotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clinic$slotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClinicSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  leaves<T extends Prisma.Clinic$leavesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clinic$leavesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClinicLeavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   appointments<T extends Prisma.Clinic$appointmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clinic$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1833,6 +1955,30 @@ export type Clinic$slotsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.ClinicSlotScalarFieldEnum | Prisma.ClinicSlotScalarFieldEnum[]
+}
+
+/**
+ * Clinic.leaves
+ */
+export type Clinic$leavesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClinicLeave
+   */
+  select?: Prisma.ClinicLeaveSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClinicLeave
+   */
+  omit?: Prisma.ClinicLeaveOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClinicLeaveInclude<ExtArgs> | null
+  where?: Prisma.ClinicLeaveWhereInput
+  orderBy?: Prisma.ClinicLeaveOrderByWithRelationInput | Prisma.ClinicLeaveOrderByWithRelationInput[]
+  cursor?: Prisma.ClinicLeaveWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClinicLeaveScalarFieldEnum | Prisma.ClinicLeaveScalarFieldEnum[]
 }
 
 /**

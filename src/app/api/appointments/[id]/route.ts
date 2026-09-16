@@ -298,9 +298,9 @@ export async function PATCH(
       if (appointment.consultType === "CLINIC" && appointment.clinicId) {
         const clinic = await prisma.clinic.findUnique({
           where: { id: appointment.clinicId },
-          select: { slots: true },
+          select: { slots: true, leaves: true },
         });
-        if (clinic && !isClinicOpenNow(clinic.slots, when)) {
+        if (clinic && !isClinicOpenNow(clinic.slots, when, clinic.leaves.map((l) => l.date))) {
           return NextResponse.json(
             { error: "The clinic isn't open at that time. Please choose a time within its hours." },
             { status: 400 }

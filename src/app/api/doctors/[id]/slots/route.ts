@@ -27,13 +27,13 @@ export async function GET(
 
   const clinic = await prisma.clinic.findUnique({
     where: { id: clinicId },
-    include: { slots: true },
+    include: { slots: true, leaves: true },
   });
   if (!clinic || clinic.doctorId !== doctorId || !clinic.isActive) {
     return NextResponse.json({ error: "Clinic not found" }, { status: 404 });
   }
 
-  const candidates = generateSlotsForDate(clinic.slots, date);
+  const candidates = generateSlotsForDate(clinic.slots, date, new Date(), clinic.leaves.map((l) => l.date));
   if (candidates.length === 0) {
     return NextResponse.json({ slots: [] });
   }
