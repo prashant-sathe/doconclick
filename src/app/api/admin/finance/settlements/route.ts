@@ -71,9 +71,16 @@ export async function GET() {
   });
   const infoById = new Map(doctors.map((d) => [d.id, d]));
 
+  const openRequests = await prisma.payoutRequest.findMany({
+    where: { doctorId: { in: doctorIds }, status: "PENDING" },
+    orderBy: { createdAt: "asc" },
+  });
+  const requestByDoctor = new Map(openRequests.map((r) => [r.doctorId, r]));
+
   const queue = doctorIds.map((doctorId) => {
     const t = byDoctor.get(doctorId)!;
     const info = infoById.get(doctorId);
+    const request = requestByDoctor.get(doctorId);
     return {
       doctorId,
       doctorName: info?.name ?? "Unknown",
@@ -84,10 +91,16 @@ export async function GET() {
       cashFeeOwed: t.cashFeeOwed,
       onlinePayoutOwed: t.onlinePayoutOwed,
       netAmount: t.onlinePayoutOwed - t.cashFeeOwed,
+      payoutRequestedAt: request?.createdAt ?? null,
     };
   });
 
-  queue.sort((a, b) => b.netAmount - a.netAmount);
+  // Doctors who've actively asked to be paid float to the top, ahead of the
+  // usual highest-amount-first sort.
+  queue.sort((a, b) => {
+    if (!!a.payoutRequestedAt !== !!b.payoutRequestedAt) return a.payoutRequestedAt ? -1 : 1;
+    return b.netAmount - a.netAmount;
+  });
   return NextResponse.json(queue);
 }
 
@@ -134,6 +147,10 @@ export async function POST(req: Request) {
     await tx.appointment.updateMany({
       where: { id: { in: pending.map((p) => p.id) } },
       data: { settlementId: created.id },
+    });
+    await tx.payoutRequest.updateMany({
+      where: { doctorId, status: "PENDING" },
+      data: { status: "FULFILLED", resolvedAt: new Date(), settlementId: created.id },
     });
     return created;
   });

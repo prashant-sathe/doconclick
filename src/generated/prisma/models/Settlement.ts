@@ -275,6 +275,7 @@ export type SettlementWhereInput = {
   doctor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   settledByAdmin?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   appointments?: Prisma.AppointmentListRelationFilter
+  payoutRequests?: Prisma.PayoutRequestListRelationFilter
 }
 
 export type SettlementOrderByWithRelationInput = {
@@ -291,6 +292,7 @@ export type SettlementOrderByWithRelationInput = {
   doctor?: Prisma.UserOrderByWithRelationInput
   settledByAdmin?: Prisma.UserOrderByWithRelationInput
   appointments?: Prisma.AppointmentOrderByRelationAggregateInput
+  payoutRequests?: Prisma.PayoutRequestOrderByRelationAggregateInput
 }
 
 export type SettlementWhereUniqueInput = Prisma.AtLeast<{
@@ -310,6 +312,7 @@ export type SettlementWhereUniqueInput = Prisma.AtLeast<{
   doctor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   settledByAdmin?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   appointments?: Prisma.AppointmentListRelationFilter
+  payoutRequests?: Prisma.PayoutRequestListRelationFilter
 }, "id">
 
 export type SettlementOrderByWithAggregationInput = {
@@ -358,6 +361,7 @@ export type SettlementCreateInput = {
   doctor: Prisma.UserCreateNestedOneWithoutSettlementsInput
   settledByAdmin?: Prisma.UserCreateNestedOneWithoutSettlementsAdminedInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutSettlementInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateInput = {
@@ -372,6 +376,7 @@ export type SettlementUncheckedCreateInput = {
   settledByAdminId?: string | null
   createdAt?: Date | string
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutSettlementInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUpdateInput = {
@@ -386,6 +391,7 @@ export type SettlementUpdateInput = {
   doctor?: Prisma.UserUpdateOneRequiredWithoutSettlementsNestedInput
   settledByAdmin?: Prisma.UserUpdateOneWithoutSettlementsAdminedNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutSettlementNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateInput = {
@@ -400,6 +406,7 @@ export type SettlementUncheckedUpdateInput = {
   settledByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutSettlementNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementCreateManyInput = {
@@ -609,6 +616,22 @@ export type SettlementUpdateOneWithoutAppointmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SettlementUpdateToOneWithWhereWithoutAppointmentsInput, Prisma.SettlementUpdateWithoutAppointmentsInput>, Prisma.SettlementUncheckedUpdateWithoutAppointmentsInput>
 }
 
+export type SettlementCreateNestedOneWithoutPayoutRequestsInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutPayoutRequestsInput, Prisma.SettlementUncheckedCreateWithoutPayoutRequestsInput>
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutPayoutRequestsInput
+  connect?: Prisma.SettlementWhereUniqueInput
+}
+
+export type SettlementUpdateOneWithoutPayoutRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutPayoutRequestsInput, Prisma.SettlementUncheckedCreateWithoutPayoutRequestsInput>
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutPayoutRequestsInput
+  upsert?: Prisma.SettlementUpsertWithoutPayoutRequestsInput
+  disconnect?: Prisma.SettlementWhereInput | boolean
+  delete?: Prisma.SettlementWhereInput | boolean
+  connect?: Prisma.SettlementWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SettlementUpdateToOneWithWhereWithoutPayoutRequestsInput, Prisma.SettlementUpdateWithoutPayoutRequestsInput>, Prisma.SettlementUncheckedUpdateWithoutPayoutRequestsInput>
+}
+
 export type SettlementCreateWithoutDoctorInput = {
   id?: string
   cashCount?: number
@@ -620,6 +643,7 @@ export type SettlementCreateWithoutDoctorInput = {
   createdAt?: Date | string
   settledByAdmin?: Prisma.UserCreateNestedOneWithoutSettlementsAdminedInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutSettlementInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutDoctorInput = {
@@ -633,6 +657,7 @@ export type SettlementUncheckedCreateWithoutDoctorInput = {
   settledByAdminId?: string | null
   createdAt?: Date | string
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutSettlementInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutDoctorInput = {
@@ -656,6 +681,7 @@ export type SettlementCreateWithoutSettledByAdminInput = {
   createdAt?: Date | string
   doctor: Prisma.UserCreateNestedOneWithoutSettlementsInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutSettlementInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutSettledByAdminInput = {
@@ -669,6 +695,7 @@ export type SettlementUncheckedCreateWithoutSettledByAdminInput = {
   note?: string | null
   createdAt?: Date | string
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutSettlementInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutSettledByAdminInput = {
@@ -740,6 +767,7 @@ export type SettlementCreateWithoutAppointmentsInput = {
   createdAt?: Date | string
   doctor: Prisma.UserCreateNestedOneWithoutSettlementsInput
   settledByAdmin?: Prisma.UserCreateNestedOneWithoutSettlementsAdminedInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutAppointmentsInput = {
@@ -753,6 +781,7 @@ export type SettlementUncheckedCreateWithoutAppointmentsInput = {
   note?: string | null
   settledByAdminId?: string | null
   createdAt?: Date | string
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutAppointmentsInput = {
@@ -782,6 +811,7 @@ export type SettlementUpdateWithoutAppointmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctor?: Prisma.UserUpdateOneRequiredWithoutSettlementsNestedInput
   settledByAdmin?: Prisma.UserUpdateOneWithoutSettlementsAdminedNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutAppointmentsInput = {
@@ -795,6 +825,79 @@ export type SettlementUncheckedUpdateWithoutAppointmentsInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settledByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutSettlementNestedInput
+}
+
+export type SettlementCreateWithoutPayoutRequestsInput = {
+  id?: string
+  cashCount?: number
+  onlineCount?: number
+  cashFeeOwed?: number
+  onlinePayoutOwed?: number
+  netAmount: number
+  note?: string | null
+  createdAt?: Date | string
+  doctor: Prisma.UserCreateNestedOneWithoutSettlementsInput
+  settledByAdmin?: Prisma.UserCreateNestedOneWithoutSettlementsAdminedInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutSettlementInput
+}
+
+export type SettlementUncheckedCreateWithoutPayoutRequestsInput = {
+  id?: string
+  doctorId: string
+  cashCount?: number
+  onlineCount?: number
+  cashFeeOwed?: number
+  onlinePayoutOwed?: number
+  netAmount: number
+  note?: string | null
+  settledByAdminId?: string | null
+  createdAt?: Date | string
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutSettlementInput
+}
+
+export type SettlementCreateOrConnectWithoutPayoutRequestsInput = {
+  where: Prisma.SettlementWhereUniqueInput
+  create: Prisma.XOR<Prisma.SettlementCreateWithoutPayoutRequestsInput, Prisma.SettlementUncheckedCreateWithoutPayoutRequestsInput>
+}
+
+export type SettlementUpsertWithoutPayoutRequestsInput = {
+  update: Prisma.XOR<Prisma.SettlementUpdateWithoutPayoutRequestsInput, Prisma.SettlementUncheckedUpdateWithoutPayoutRequestsInput>
+  create: Prisma.XOR<Prisma.SettlementCreateWithoutPayoutRequestsInput, Prisma.SettlementUncheckedCreateWithoutPayoutRequestsInput>
+  where?: Prisma.SettlementWhereInput
+}
+
+export type SettlementUpdateToOneWithWhereWithoutPayoutRequestsInput = {
+  where?: Prisma.SettlementWhereInput
+  data: Prisma.XOR<Prisma.SettlementUpdateWithoutPayoutRequestsInput, Prisma.SettlementUncheckedUpdateWithoutPayoutRequestsInput>
+}
+
+export type SettlementUpdateWithoutPayoutRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cashCount?: Prisma.IntFieldUpdateOperationsInput | number
+  onlineCount?: Prisma.IntFieldUpdateOperationsInput | number
+  cashFeeOwed?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePayoutOwed?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  doctor?: Prisma.UserUpdateOneRequiredWithoutSettlementsNestedInput
+  settledByAdmin?: Prisma.UserUpdateOneWithoutSettlementsAdminedNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutSettlementNestedInput
+}
+
+export type SettlementUncheckedUpdateWithoutPayoutRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  doctorId?: Prisma.StringFieldUpdateOperationsInput | string
+  cashCount?: Prisma.IntFieldUpdateOperationsInput | number
+  onlineCount?: Prisma.IntFieldUpdateOperationsInput | number
+  cashFeeOwed?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePayoutOwed?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settledByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementCreateManyDoctorInput = {
@@ -832,6 +935,7 @@ export type SettlementUpdateWithoutDoctorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settledByAdmin?: Prisma.UserUpdateOneWithoutSettlementsAdminedNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutSettlementNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutDoctorInput = {
@@ -845,6 +949,7 @@ export type SettlementUncheckedUpdateWithoutDoctorInput = {
   settledByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutSettlementNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateManyWithoutDoctorInput = {
@@ -870,6 +975,7 @@ export type SettlementUpdateWithoutSettledByAdminInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctor?: Prisma.UserUpdateOneRequiredWithoutSettlementsNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutSettlementNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutSettledByAdminInput = {
@@ -883,6 +989,7 @@ export type SettlementUncheckedUpdateWithoutSettledByAdminInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutSettlementNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateManyWithoutSettledByAdminInput = {
@@ -904,10 +1011,12 @@ export type SettlementUncheckedUpdateManyWithoutSettledByAdminInput = {
 
 export type SettlementCountOutputType = {
   appointments: number
+  payoutRequests: number
 }
 
 export type SettlementCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   appointments?: boolean | SettlementCountOutputTypeCountAppointmentsArgs
+  payoutRequests?: boolean | SettlementCountOutputTypeCountPayoutRequestsArgs
 }
 
 /**
@@ -927,6 +1036,13 @@ export type SettlementCountOutputTypeCountAppointmentsArgs<ExtArgs extends runti
   where?: Prisma.AppointmentWhereInput
 }
 
+/**
+ * SettlementCountOutputType without action
+ */
+export type SettlementCountOutputTypeCountPayoutRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PayoutRequestWhereInput
+}
+
 
 export type SettlementSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -942,6 +1058,7 @@ export type SettlementSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   settledByAdmin?: boolean | Prisma.Settlement$settledByAdminArgs<ExtArgs>
   appointments?: boolean | Prisma.Settlement$appointmentsArgs<ExtArgs>
+  payoutRequests?: boolean | Prisma.Settlement$payoutRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.SettlementCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settlement"]>
 
@@ -993,6 +1110,7 @@ export type SettlementInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   settledByAdmin?: boolean | Prisma.Settlement$settledByAdminArgs<ExtArgs>
   appointments?: boolean | Prisma.Settlement$appointmentsArgs<ExtArgs>
+  payoutRequests?: boolean | Prisma.Settlement$payoutRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.SettlementCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SettlementIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1010,6 +1128,7 @@ export type $SettlementPayload<ExtArgs extends runtime.Types.Extensions.Internal
     doctor: Prisma.$UserPayload<ExtArgs>
     settledByAdmin: Prisma.$UserPayload<ExtArgs> | null
     appointments: Prisma.$AppointmentPayload<ExtArgs>[]
+    payoutRequests: Prisma.$PayoutRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1419,6 +1538,7 @@ export interface Prisma__SettlementClient<T, Null = never, ExtArgs extends runti
   doctor<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   settledByAdmin<T extends Prisma.Settlement$settledByAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Settlement$settledByAdminArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   appointments<T extends Prisma.Settlement$appointmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Settlement$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  payoutRequests<T extends Prisma.Settlement$payoutRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Settlement$payoutRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1899,6 +2019,30 @@ export type Settlement$appointmentsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.AppointmentScalarFieldEnum | Prisma.AppointmentScalarFieldEnum[]
+}
+
+/**
+ * Settlement.payoutRequests
+ */
+export type Settlement$payoutRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PayoutRequest
+   */
+  select?: Prisma.PayoutRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PayoutRequest
+   */
+  omit?: Prisma.PayoutRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PayoutRequestInclude<ExtArgs> | null
+  where?: Prisma.PayoutRequestWhereInput
+  orderBy?: Prisma.PayoutRequestOrderByWithRelationInput | Prisma.PayoutRequestOrderByWithRelationInput[]
+  cursor?: Prisma.PayoutRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PayoutRequestScalarFieldEnum | Prisma.PayoutRequestScalarFieldEnum[]
 }
 
 /**

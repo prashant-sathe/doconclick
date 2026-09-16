@@ -408,6 +408,7 @@ export const ModelName = {
   Wallet: 'Wallet',
   WalletTransaction: 'WalletTransaction',
   Settlement: 'Settlement',
+  PayoutRequest: 'PayoutRequest',
   DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
   PrescriptionMedicine: 'PrescriptionMedicine',
@@ -440,7 +441,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption"
+    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1255,6 +1256,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SettlementCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SettlementCountAggregateOutputType> | number
+        }
+      }
+    }
+    PayoutRequest: {
+      payload: Prisma.$PayoutRequestPayload<ExtArgs>
+      fields: Prisma.PayoutRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PayoutRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PayoutRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.PayoutRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PayoutRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+        }
+        findMany: {
+          args: Prisma.PayoutRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload>[]
+        }
+        create: {
+          args: Prisma.PayoutRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+        }
+        createMany: {
+          args: Prisma.PayoutRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PayoutRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.PayoutRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+        }
+        update: {
+          args: Prisma.PayoutRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.PayoutRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PayoutRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PayoutRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.PayoutRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.PayoutRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePayoutRequest>
+        }
+        groupBy: {
+          args: Prisma.PayoutRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PayoutRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PayoutRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PayoutRequestCountAggregateOutputType> | number
         }
       }
     }
@@ -2785,6 +2860,20 @@ export const SettlementScalarFieldEnum = {
 export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
 
 
+export const PayoutRequestScalarFieldEnum = {
+  id: 'id',
+  doctorId: 'doctorId',
+  amount: 'amount',
+  status: 'status',
+  note: 'note',
+  createdAt: 'createdAt',
+  resolvedAt: 'resolvedAt',
+  settlementId: 'settlementId'
+} as const
+
+export type PayoutRequestScalarFieldEnum = (typeof PayoutRequestScalarFieldEnum)[keyof typeof PayoutRequestScalarFieldEnum]
+
+
 export const DoctorPaymentLogScalarFieldEnum = {
   id: 'id',
   doctorId: 'doctorId',
@@ -3300,6 +3389,7 @@ export type GlobalOmitConfig = {
   wallet?: Prisma.WalletOmit
   walletTransaction?: Prisma.WalletTransactionOmit
   settlement?: Prisma.SettlementOmit
+  payoutRequest?: Prisma.PayoutRequestOmit
   doctorPaymentLog?: Prisma.DoctorPaymentLogOmit
   message?: Prisma.MessageOmit
   prescriptionMedicine?: Prisma.PrescriptionMedicineOmit

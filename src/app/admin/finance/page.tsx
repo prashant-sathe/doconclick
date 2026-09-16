@@ -22,6 +22,7 @@ interface PendingSettlement {
   cashFeeOwed: number;
   onlinePayoutOwed: number;
   netAmount: number;
+  payoutRequestedAt: string | null;
 }
 interface SettlementRecord {
   id: string;
@@ -113,7 +114,14 @@ export default function AdminFinance() {
         if (!row) return null;
         return (
           <div className="leading-tight py-1">
-            <div className="font-semibold text-slate-800">{formatDoctorName(row.doctorName)}</div>
+            <div className="font-semibold text-slate-800 flex items-center gap-1.5">
+              {formatDoctorName(row.doctorName)}
+              {row.payoutRequestedAt && (
+                <span className="badge badge-warning text-[10px]" title={`Requested ${new Date(row.payoutRequestedAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}`}>
+                  Requested
+                </span>
+              )}
+            </div>
             {row.bankDetails ? (
               <div className="text-[11px] text-slate-400">{row.bankDetails}</div>
             ) : (

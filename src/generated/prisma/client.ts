@@ -97,6 +97,11 @@ export type WalletTransaction = Prisma.WalletTransactionModel
  */
 export type Settlement = Prisma.SettlementModel
 /**
+ * Model PayoutRequest
+ * 
+ */
+export type PayoutRequest = Prisma.PayoutRequestModel
+/**
  * Model DoctorPaymentLog
  * 
  */

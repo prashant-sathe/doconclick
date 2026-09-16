@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, IndianRupee, TrendingUp, CreditCard, AlertCircle } from "lucide-react";
+import { Loader2, IndianRupee, TrendingUp, CreditCard, AlertCircle, Send, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
@@ -36,6 +36,13 @@ interface SettlementRecord {
   createdAt: string;
 }
 
+interface PayoutRequestRecord {
+  id: string;
+  amount: number;
+  status: string;
+  createdAt: string;
+}
+
 function startOfWeek(d: Date) {
   const day = d.getDay();
   const diff = (day === 0 ? -6 : 1) - day; // Monday as start
@@ -50,8 +57,11 @@ export default function DoctorEarnings() {
   const { user, loading: authLoading } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [settlements, setSettlements] = useState<SettlementRecord[]>([]);
+  const [payoutRequests, setPayoutRequests] = useState<PayoutRequestRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(10);
+  const [requestingPayout, setRequestingPayout] = useState(false);
+  const [payoutError, setPayoutError] = useState("");
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/earnings");
@@ -68,9 +78,11 @@ export default function DoctorEarnings() {
         return Promise.all([
           fetch("/api/appointments/me").then((r) => (r.ok ? r.json() : [])),
           fetch("/api/doctor/settlements").then((r) => (r.ok ? r.json() : [])),
-        ]).then(([appts, settled]) => {
+          fetch("/api/doctor/payout-requests").then((r) => (r.ok ? r.json() : [])),
+        ]).then(([appts, settled, requests]) => {
           setAppointments(appts);
           setSettlements(settled);
+          setPayoutRequests(requests);
           setLoading(false);
         });
       })
@@ -103,6 +115,20 @@ export default function DoctorEarnings() {
   const unsettled = completed.filter((a) => !a.settlementId);
   const onlinePending = unsettled.filter((a) => a.paymentMethod === "ONLINE").reduce((sum, a) => sum + net(a), 0);
   const platformFeeDue = unsettled.filter((a) => a.paymentMethod === "CASH").reduce((sum, a) => sum + a.platformFee, 0);
+  const openPayoutRequest = payoutRequests.find((r) => r.status === "PENDING") ?? null;
+
+  const requestPayout = async () => {
+    setRequestingPayout(true);
+    setPayoutError("");
+    const res = await fetch("/api/doctor/payout-requests", { method: "POST" });
+    setRequestingPayout(false);
+    if (res.ok) {
+      const created: PayoutRequestRecord = await res.json();
+      setPayoutRequests((cur) => [created, ...cur]);
+    } else {
+      setPayoutError((await res.json().catch(() => ({}))).error ?? "Could not send the payout request.");
+    }
+  };
 
   // Last 7 days bar breakdown
   const weekStart = startOfWeek(now);
@@ -155,6 +181,29 @@ export default function DoctorEarnings() {
             </div>
           </div>
         </div>
+
+        {/* Payout request — settling is still an admin action, this just
+            flags to them that this doctor is actively asking, instead of
+            waiting for the admin to notice on their own settle queue. */}
+        {openPayoutRequest ? (
+          <div className="flex items-center gap-3 bg-teal-50 border border-teal-100 rounded-2xl p-4 mb-6">
+            <CheckCircle2 className="w-5 h-5 text-teal-600 flex-shrink-0" />
+            <p className="text-sm text-teal-800">
+              <span className="font-bold">Payout of ₹{openPayoutRequest.amount.toLocaleString("en-IN")} requested</span> on{" "}
+              {new Date(openPayoutRequest.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} — awaiting admin review.
+            </p>
+          </div>
+        ) : onlinePending > 0 && (
+          <div className="flex items-center justify-between gap-3 bg-white border border-slate-100 rounded-2xl p-4 mb-6 shadow-sm">
+            <p className="text-sm text-slate-600">
+              ₹{onlinePending.toLocaleString("en-IN")} is waiting to be settled to you.
+            </p>
+            <button onClick={requestPayout} disabled={requestingPayout} className="btn-primary py-1.5 px-3 text-xs gap-1.5 flex-shrink-0">
+              {requestingPayout ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />} Request Payout
+            </button>
+          </div>
+        )}
+        {payoutError && <p className="text-xs text-red-600 mb-6 -mt-4">{payoutError}</p>}
 
         {platformFeeDue > 0 && (
           <div className="flex items-center gap-3 bg-red-50 border border-red-100 rounded-2xl p-4 mb-6">

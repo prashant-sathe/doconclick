@@ -33,6 +33,7 @@ model User {
   messagesSent   Message[]       @relation("SentMessages")
   settlements       Settlement[] @relation("DoctorSettlements")
   settlementsAdmined Settlement[] @relation("AdminSettlements")
+  payoutRequests    PayoutRequest[] @relation("DoctorPayoutRequests")
   paymentLogs       DoctorPaymentLog[] @relation("DoctorPaymentLogs")
   savedDoctors      SavedDoctor[] @relation("PatientSavedDoctors")
   savedByPatients   SavedDoctor[] @relation("DoctorSavedBy")
@@ -291,6 +292,26 @@ model Settlement {
   settledByAdmin   User?    @relation("AdminSettlements", fields: [settledByAdminId], references: [id])
   createdAt        DateTime @default(now())
   appointments     Appointment[]
+  payoutRequests   PayoutRequest[]
+}
+
+// A doctor's own request to be paid out — settlement is still an admin
+// action (POST /api/admin/finance/settlements), this just lets a doctor flag
+// "please settle me" instead of waiting for the admin to notice on their own.
+// `amount` is a snapshot of what was owed at request time (purely
+// informational — the actual settlement always recomputes live totals,
+// which may have moved on by the time it's fulfilled).
+model PayoutRequest {
+  id           String      @id @default(cuid())
+  doctorId     String
+  doctor       User        @relation("DoctorPayoutRequests", fields: [doctorId], references: [id], onDelete: Cascade)
+  amount       Float
+  status       String      @default("PENDING") // PENDING, FULFILLED, DISMISSED
+  note         String?
+  createdAt    DateTime    @default(now())
+  resolvedAt   DateTime?
+  settlementId String?
+  settlement   Settlement? @relation(fields: [settlementId], references: [id], onDelete: SetNull)
 }
 
 model DoctorPaymentLog {
