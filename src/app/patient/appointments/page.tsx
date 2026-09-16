@@ -344,9 +344,10 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       )}
 
       <div className="flex gap-2 flex-wrap">
-        {a.status === "PENDING_APPROVAL" && (
+        {(a.status === "PENDING_APPROVAL"
+          || (a.status === "SCHEDULED" && !(a.consultType === "HOME" && a.travelStatus === "ARRIVED"))) && (
           <button onClick={() => onCancel(a)} className="btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
-            Cancel Request
+            {a.status === "SCHEDULED" ? "Cancel Appointment" : "Cancel Request"}
           </button>
         )}
         {needsPayment && (
@@ -437,6 +438,7 @@ export default function PatientAppointments() {
   const [pastExpanded, setPastExpanded] = useState(false);
   const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState("");
   const PAGE_SIZE = 5;
 
   const unreadTotalRef = useRef<number | null>(null);
@@ -478,17 +480,28 @@ export default function PatientAppointments() {
     return () => clearInterval(tick);
   }, []);
 
+  const openCancelDialog = (a: Appointment) => {
+    setCancelError("");
+    setCancelTarget(a);
+  };
+
   const confirmCancel = async () => {
     if (!cancelTarget) return;
     setCancelling(true);
-    await fetch(`/api/appointments/${cancelTarget.id}`, {
+    setCancelError("");
+    const res = await fetch(`/api/appointments/${cancelTarget.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "CANCELLED" }),
     });
     setCancelling(false);
-    setCancelTarget(null);
-    load();
+    if (res.ok) {
+      setCancelTarget(null);
+      load();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setCancelError(data.error ?? "Couldn't cancel this appointment. Please try again.");
+    }
   };
 
   if (authLoading || !user || user.role !== "PATIENT") {
@@ -535,7 +548,7 @@ export default function PatientAppointments() {
                 </h2>
                 <div className="space-y-3">
                   {(pendingExpanded ? pending : pending.slice(0, PAGE_SIZE)).map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={setCancelTarget} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReview={setReviewFor} />
                   ))}
                 </div>
                 {!pendingExpanded && pending.length > PAGE_SIZE && (
@@ -557,7 +570,7 @@ export default function PatientAppointments() {
               ) : (
                 <div className="space-y-3">
                   {(upcomingExpanded ? upcoming : upcoming.slice(0, PAGE_SIZE)).map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={setCancelTarget} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReview={setReviewFor} />
                   ))}
                 </div>
               )}
@@ -577,7 +590,7 @@ export default function PatientAppointments() {
               ) : (
                 <div className="space-y-3">
                   {(pastExpanded ? past : past.slice(0, PAGE_SIZE)).map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={setCancelTarget} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReview={setReviewFor} />
                   ))}
                 </div>
               )}
@@ -599,27 +612,43 @@ export default function PatientAppointments() {
         />
       )}
 
-      {cancelTarget && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
-            <div className="flex items-center gap-2 mb-3">
-              <ThumbsDown className="w-5 h-5 text-red-600" />
-              <h3 className="font-bold text-slate-800">Cancel this request?</h3>
-            </div>
-            <p className="text-sm text-slate-500 mb-5">
-              Your request to {formatDoctorName(cancelTarget.doctor.name)} on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
-            </p>
-            <div className="flex gap-3">
-              <button onClick={() => setCancelTarget(null)} className="btn-secondary flex-1">
-                Keep Request
-              </button>
-              <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                {cancelling ? "Cancelling…" : "Cancel Request"}
-              </button>
+      {cancelTarget && (() => {
+        const willRefund = cancelTarget.status === "SCHEDULED" && cancelTarget.paymentStatus === "PAID";
+        const refundAmount = Math.max(0, cancelTarget.amount - cancelTarget.discountAmount);
+        return (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+              <div className="flex items-center gap-2 mb-3">
+                <ThumbsDown className="w-5 h-5 text-red-600" />
+                <h3 className="font-bold text-slate-800">
+                  {cancelTarget.status === "SCHEDULED" ? "Cancel this appointment?" : "Cancel this request?"}
+                </h3>
+              </div>
+              <p className="text-sm text-slate-500 mb-2">
+                Your {cancelTarget.status === "SCHEDULED" ? "appointment" : "request"} with {formatDoctorName(cancelTarget.doctor.name)} on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
+              </p>
+              {willRefund && (
+                <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-2">
+                  ₹{refundAmount} will be credited back to your wallet.
+                </p>
+              )}
+              {cancelError && (
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-2">
+                  {cancelError}
+                </p>
+              )}
+              <div className="flex gap-3 mt-3">
+                <button onClick={() => { setCancelTarget(null); setCancelError(""); }} className="btn-secondary flex-1">
+                  Keep {cancelTarget.status === "SCHEDULED" ? "Appointment" : "Request"}
+                </button>
+                <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                  {cancelling ? "Cancelling…" : "Cancel"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

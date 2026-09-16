@@ -235,19 +235,62 @@ export async function PATCH(
     if (appointment.patientId !== authUser.id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
-    if (status !== "CANCELLED" || appointment.status !== "PENDING_APPROVAL") {
+    if (status !== "CANCELLED" || !["PENDING_APPROVAL", "SCHEDULED"].includes(appointment.status)) {
       return NextResponse.json(
         { error: "This appointment can no longer be cancelled." },
         { status: 400 }
       );
     }
-    const updated = await prisma.appointment.update({
-      where: { id },
-      data: { status: "CANCELLED" },
+    // Once the doctor has actually arrived for a home visit, cancelling
+    // in-app would strand them mid-trip — the patient needs to sort that
+    // out with the doctor directly instead.
+    if (appointment.consultType === "HOME" && appointment.travelStatus === "ARRIVED") {
+      return NextResponse.json(
+        { error: "The doctor has already arrived — please contact them directly to cancel." },
+        { status: 400 }
+      );
+    }
+
+    // Same wasPaid/refund-or-release-coupon split as the doctor-cancel branch
+    // above, minus the reassignment attempt — the patient is choosing to
+    // leave, not being left stranded, so there's no substitute doctor to find.
+    const wasPaid = appointment.paymentStatus === "PAID";
+    const refundAmount = netPayable(appointment);
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const cancelled = await tx.appointment.update({
+        where: { id },
+        data: { status: "CANCELLED" },
+      });
+
+      if (wasPaid) {
+        const wallet = await getOrCreateWallet(tx, appointment.patientId);
+        const updatedWallet = await tx.wallet.update({
+          where: { id: wallet.id },
+          data: { balance: { increment: refundAmount } },
+        });
+        await tx.walletTransaction.create({
+          data: {
+            walletId: wallet.id,
+            type: "CANCELLATION_REFUND",
+            amount: refundAmount,
+            balanceAfter: updatedWallet.balance,
+            status: "SUCCESS",
+            note: `Refund for appointment ${appointment.id}, cancelled by the patient`,
+          },
+        });
+      } else {
+        await releaseCouponRedemption(tx, { appointmentId: id });
+      }
+
+      return cancelled;
     });
+
     void sendPushToUser(appointment.doctorId, {
       title: "Appointment cancelled",
-      body: `${authUser.name} cancelled their appointment request.`,
+      body: wasPaid
+        ? `${authUser.name} cancelled their appointment. ₹${refundAmount} was refunded to their wallet.`
+        : `${authUser.name} cancelled their appointment request.`,
       url: "/doctor/dashboard",
     });
     return NextResponse.json(updated);
