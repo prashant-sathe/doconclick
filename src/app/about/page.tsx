@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Image from "next/image";
 import { Heart, Shield, Target, Users, Award, Stethoscope, TrendingUp, Globe } from "lucide-react";
 
 export const metadata = {
@@ -95,10 +96,11 @@ export default function AboutPage() {
             <h2 className="text-4xl font-extrabold text-slate-900 mb-4">Meet Our <span className="gradient-text">Founder</span></h2>
           </div>
           <div className="max-w-sm mx-auto stat-card card-hover text-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="/team/founder-kalpesh-kalyani.jpg"
               alt="Dr. Kalpesh Sandeep Kalyani"
+              width={510}
+              height={510}
               className="w-32 h-32 rounded-2xl object-cover mx-auto mb-5 shadow"
             />
             <h3 className="text-lg font-bold text-slate-900">Dr. Kalpesh Sandeep Kalyani</h3>

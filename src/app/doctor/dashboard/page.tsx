@@ -23,6 +23,8 @@ import { cn, formatDoctorName } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
+import { useResync } from "@/hooks/useResync";
+import PullToRefresh from "@/components/PullToRefresh";
 
 interface DoctorProfile {
   specialty: string;
@@ -504,6 +506,11 @@ export default function DoctorDashboard() {
       .catch(() => setLoadingAppts(false));
   }, []);
 
+  // The 5s poll below keeps this fresh while the tab/app stays open, but
+  // mobile WebViews commonly suspend timers while backgrounded — force an
+  // immediate refetch on resume/reconnect instead of waiting for the next tick.
+  useResync(loadAppointments);
+
   // Ticks the video-call payment-unlock countdown independently of the 5s data poll.
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -670,7 +677,7 @@ export default function DoctorDashboard() {
       <DoctorHeader />
       <DoctorMobileNav />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+      <PullToRefresh onRefresh={loadAppointments} className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-5">
           <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
@@ -1066,7 +1073,7 @@ export default function DoctorDashboard() {
             )}
           </div>
         )}
-      </div>
+      </PullToRefresh>
 
       {/* Cancel confirmation */}
       {cancelTarget && (

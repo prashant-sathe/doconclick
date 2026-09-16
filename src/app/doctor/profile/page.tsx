@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Loader2, Award, IndianRupee, Clock, Building2, Shield, CreditCard, QrCode,
   Bell, LifeBuoy, ChevronRight, Check, Camera, LogOut, User, CheckCircle2,
@@ -44,8 +45,7 @@ function AvatarEditor({ url, onChange }: { url: string | null; onChange: (url: s
         className="relative w-16 h-16 rounded-full flex-shrink-0 overflow-hidden bg-slate-100 border border-slate-200"
       >
         {url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="Profile" className="w-full h-full object-cover" />
+          <Image src={url} alt="Profile" width={64} height={64} className="w-full h-full object-cover" />
         ) : (
           <User className="w-7 h-7 text-slate-300 absolute inset-0 m-auto" />
         )}

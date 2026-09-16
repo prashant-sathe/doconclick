@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowLeft, ImagePlus, Loader2, Plus, Trash2, AlertCircle, X,
   Send, Check, Users, Stethoscope, UserCircle,
@@ -217,8 +218,7 @@ export default function AnnouncementDetailPage() {
             <label className="input-label">Banner Image</label>
             {bannerImageUrl ? (
               <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={bannerImageUrl} alt="Banner" className="w-full h-full object-cover" />
+                <Image src={bannerImageUrl} alt="Banner" fill sizes="100vw" className="object-cover" />
                 {isDraft && (
                   <button
                     onClick={() => setBannerImageUrl(null)}

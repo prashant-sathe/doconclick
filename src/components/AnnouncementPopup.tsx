@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { X } from "lucide-react";
 
 type AnnouncementButton = { label: string; url: string };
@@ -89,8 +90,9 @@ export default function AnnouncementPopup({ onAllSeen }: { onAllSeen?: () => voi
           <X className="w-5 h-5" />
         </button>
         {current.bannerImageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={current.bannerImageUrl} alt={current.title} className="w-full h-64 object-cover" />
+          <div className="relative w-full h-64">
+            <Image src={current.bannerImageUrl} alt={current.title} fill sizes="32rem" className="object-cover" />
+          </div>
         )}
         <div className="p-8">
           <h3 className="text-2xl font-extrabold text-slate-900">{current.title}</h3>

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Stethoscope, Users, CalendarCheck,
@@ -38,8 +39,7 @@ function SidebarContents({ pathname, user, logout, onNavigate }: {
     <>
       <div className="px-6 py-5 border-b border-slate-200/70">
         <div className="flex items-center gap-2.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-icon.png" alt="DocOnClick" className="w-9 h-9 object-contain" />
+          <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-9 h-9 object-contain" />
           <div>
             <div className="font-bold text-slate-900 leading-tight">DocOnClick</div>
             <div className="text-xs text-slate-400 font-medium">Admin Panel</div>
@@ -116,8 +116,7 @@ export default function AdminSidebar() {
         >
           <Menu className="w-5 h-5" />
         </button>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo-icon.png" alt="DocOnClick" className="w-6 h-6 object-contain flex-shrink-0" />
+        <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-6 h-6 object-contain flex-shrink-0" />
         <span className="font-bold text-slate-900 text-sm truncate">Admin Panel</span>
       </header>
 

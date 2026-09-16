@@ -5,6 +5,7 @@ import markerIcon2xUrl from "leaflet/dist/images/marker-icon-2x.png";
 import markerShadowUrl from "leaflet/dist/images/marker-shadow.png";
 import { Suspense, useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import {
   MapPin, Home, Building2, Video, Stethoscope, Clock,
   ChevronDown, X, Loader2, UserCircle, Languages,
@@ -32,6 +33,8 @@ import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { readPatientLocation, writePatientLocation } from "@/lib/patientLocation";
 import { computeCompleteness } from "@/lib/profileCompleteness";
+import { useResync } from "@/hooks/useResync";
+import PullToRefresh from "@/components/PullToRefresh";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface DoctorProfile {
@@ -238,8 +241,7 @@ function DoctorListCard({
     >
       <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100">
         {profile.photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={profile.photoUrl} alt={doctor.name} className="w-full h-full object-cover" />
+          <Image src={profile.photoUrl} alt={doctor.name} width={56} height={56} className="w-full h-full object-cover" />
         ) : (
           <div
             className="w-full h-full flex items-center justify-center text-white font-extrabold text-lg"
@@ -833,6 +835,12 @@ function PatientDashboardInner() {
     setRefreshing(false);
   }, [refreshing, loadDoctors, loadSavedDoctors, loadProfile, acquireLocation]);
 
+  // Re-pull doctors/profile/location when the app comes back to the
+  // foreground or the device reconnects — this screen has no polling loop of
+  // its own, so without this a patient could sit on a stale doctor list
+  // indefinitely after switching away and back.
+  useResync(refreshMap);
+
   // ── Booking submit ─────────────────────────────────────────────────────
   // "Confirm ₹X" only opens the confirmation dialog; confirmAndBook fires the
   // actual request once the patient confirms.
@@ -949,8 +957,7 @@ function PatientDashboardInner() {
         className="glass-card rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 pointer-events-auto shadow-lg min-w-0 text-left"
       >
         <div className="min-w-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="DocOnClick" className="h-6 sm:h-7 w-auto object-contain" />
+          <Image src="/logo.png" alt="DocOnClick" width={431} height={102} className="h-6 sm:h-7 w-auto object-contain" />
           <p className={cn("text-xs mt-0.5 truncate", customLabel ? "text-blue-600 font-semibold" : "text-slate-500")}>
             {customLabel ? `📍 ${customLabel}` : posError ? "📍 Set your location" : "📍 Your location · Change"}
           </p>
@@ -1142,7 +1149,7 @@ function PatientDashboardInner() {
             {headerRow}
             {searchRow}
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <PullToRefresh selfScrolls onRefresh={refreshMap} className="flex-1 overflow-y-auto">
             <div className="p-3 sm:p-4 pb-28 lg:pb-16 max-w-2xl mx-auto flex flex-col gap-2.5">
               {sorted.length === 0 ? (
                 <div className="text-center text-slate-400 text-sm py-12">
@@ -1166,7 +1173,7 @@ function PatientDashboardInner() {
                 })
               )}
             </div>
-          </div>
+          </PullToRefresh>
         </div>
       ) : (
         <div className={cn("absolute top-0 inset-x-0 z-20 pointer-events-none", pickingOnMap && "hidden")}>
@@ -1515,12 +1522,13 @@ function PatientDashboardInner() {
                 <div className="pb-6">
                   {/* Clinic cover photo */}
                   {(selectedClinic ? selectedClinic.photoUrl : selectedDoctor.doctorProfile.clinicPhotoUrl) && (
-                    <div className="w-full h-32 sm:h-40 rounded-2xl overflow-hidden bg-slate-100 mb-4 -mt-1">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                    <div className="relative w-full h-32 sm:h-40 rounded-2xl overflow-hidden bg-slate-100 mb-4 -mt-1">
+                      <Image
                         src={(selectedClinic ? selectedClinic.photoUrl : selectedDoctor.doctorProfile.clinicPhotoUrl)!}
                         alt={(selectedClinic?.name ?? selectedDoctor.doctorProfile.clinicName) ? `${selectedClinic?.name ?? selectedDoctor.doctorProfile.clinicName} — clinic photo` : "Clinic photo"}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="100vw"
+                        className="object-cover"
                       />
                     </div>
                   )}
@@ -1528,10 +1536,11 @@ function PatientDashboardInner() {
                   <div className="flex items-start gap-4 mb-4 pr-10">
                     {/* Avatar */}
                     {selectedDoctor.doctorProfile.photoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={selectedDoctor.doctorProfile.photoUrl}
                         alt={selectedDoctor.name}
+                        width={64}
+                        height={64}
                         className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 shadow"
                       />
                     ) : (
@@ -1837,7 +1846,7 @@ function PatientDashboardInner() {
       )}
 
       {/* ── Empty state: nothing within the search radius ───────────── */}
-      {!panelOpen && !pickingOnMap && doctors.length > 0
+      {viewMode === "map" && !panelOpen && !pickingOnMap && doctors.length > 0
         && clinicMarkers.length === 0 && searchRadiusKm != null && !ignoreRadius && (
         <div className="absolute bottom-[calc(9rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-24 inset-x-0 z-20 flex justify-center px-4 pointer-events-none">
           <div className="glass-card rounded-2xl px-4 py-2.5 flex items-center gap-2 text-xs shadow border border-amber-200 pointer-events-auto max-w-full">
@@ -1851,7 +1860,7 @@ function PatientDashboardInner() {
       {/* ── Tap hint (shown when no panel is open) ──────────────────── */}
       {/* Sits clear above the "clinics nearby" badge — on phones the two
           floating chips used to collide at the bottom edge. */}
-      {!panelOpen && !pickingOnMap && clinicMarkers.length > 0 && (
+      {viewMode === "map" && !panelOpen && !pickingOnMap && clinicMarkers.length > 0 && (
         <div className="absolute bottom-[calc(9rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-24 inset-x-0 z-20 flex justify-center pointer-events-none">
           <div className="glass-card rounded-full px-4 py-2 flex items-center gap-2 text-xs text-slate-500 shadow">
             <ChevronDown className="w-3.5 h-3.5 animate-bounce" />

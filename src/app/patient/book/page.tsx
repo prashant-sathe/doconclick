@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   MapPin, Video, Home, Building2, Loader2,
   CalendarClock, Clock, IndianRupee,
@@ -692,10 +693,11 @@ function PatientBookInner() {
             {selectedDoctor?.doctorProfile ? (
               <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
                 {selectedDoctor.doctorProfile.photoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={selectedDoctor.doctorProfile.photoUrl}
                     alt={selectedDoctor.name}
+                    width={44}
+                    height={44}
                     className="w-11 h-11 rounded-xl object-cover flex-shrink-0"
                   />
                 ) : (

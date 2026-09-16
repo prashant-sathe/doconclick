@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, ArrowRight } from "lucide-react";
 
 const footerLinks = {
@@ -52,7 +53,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center mb-5">
-              <img src="/logo-dark.png" alt="DocOnClick" className="h-9 w-auto" />
+              <Image src="/logo-dark.png" alt="DocOnClick" width={431} height={102} className="h-9 w-auto" />
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">
               India's most trusted on-demand healthcare platform. Connecting patients with verified doctors for home visits, video consultations, and clinic appointments.

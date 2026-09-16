@@ -38,6 +38,14 @@
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- FCM (@capacitor-firebase/messaging) draws notifications with the
+             launcher icon by default, which Android renders as a plain white
+             blob in the status bar on 5+ (it strips color from the launcher
+             icon but the launcher icon isn't a proper silhouette). These
+             point it at a real status-bar-style icon + brand tint instead. -->
+        <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_notify" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/notificationColor" />
     </application>
 
     <!-- Permissions -->

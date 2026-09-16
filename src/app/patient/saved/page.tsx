@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Loader2, Bookmark, BookmarkX, Building2, Compass, ChevronDown } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
@@ -125,8 +126,7 @@ export default function SavedDoctorsPage() {
             return (
               <div key={id} className={cn("bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4", dimmed && "opacity-60")}>
                 {profile?.photoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={profile.photoUrl} alt={doctor.name} className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 shadow" />
+                  <Image src={profile.photoUrl} alt={doctor.name} width={56} height={56} className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 shadow" />
                 ) : (
                   <div
                     className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-lg font-extrabold shadow"

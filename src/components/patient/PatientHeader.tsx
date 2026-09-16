@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { CalendarCheck2, UserCircle, Bell, Bookmark, Sparkles, Wallet as WalletIcon } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
@@ -78,8 +79,7 @@ export default function PatientHeader() {
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <Link href="/patient/dashboard" className="flex items-center flex-shrink-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="DocOnClick" className="h-7 sm:h-8 w-auto object-contain" />
+          <Image src="/logo.png" alt="DocOnClick" width={431} height={102} className="h-7 sm:h-8 w-auto object-contain" />
         </Link>
 
         {/* Desktop nav — shown from lg up; below that the fixed bottom

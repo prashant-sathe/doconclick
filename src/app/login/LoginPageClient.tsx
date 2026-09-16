@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Phone, Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
@@ -67,7 +68,7 @@ function LoginForm() {
     <div className="w-full max-w-md mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <img src="/logo-icon.png" alt="DocOnClick" className="w-16 h-16 object-contain mx-auto mb-4" />
+        <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-16 h-16 object-contain mx-auto mb-4" loading="eager" />
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome back</h1>
         <p className="text-slate-500 mt-2 text-sm">Sign in to your DocOnClick account</p>
       </div>

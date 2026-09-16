@@ -3,4 +3,10 @@
     <!-- Matches the web app's .gradient-surface background so the native
          splash screen doesn't flash a mismatched color before hand-off. -->
     <color name="splashBackground">#F8FAFC</color>
+
+    <!-- Brand blue used to tint the white status-bar notification icon
+         (ic_stat_notify) — otherwise Android draws push notifications with
+         the launcher icon at full color, which shows as a white/blob-shaped
+         mask in the status bar on Android 5+. -->
+    <color name="notificationColor">#2563EB</color>
 </resources>

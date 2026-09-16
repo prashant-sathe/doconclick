@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback, useMemo } from "react";
+import Image from "next/image";
 import {
   Search, Users, Eye, X, Phone, Mail, MapPin, Calendar,
   Activity, Droplets, Ruler, Weight, AlertTriangle,
@@ -94,7 +95,7 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-white text-2xl font-extrabold border border-white/30 overflow-hidden">
               {prof?.photoUrl ? (
-                <img src={prof.photoUrl} alt={data?.name ?? "Patient"} className="w-full h-full object-cover" />
+                <Image src={prof.photoUrl} alt={data?.name ?? "Patient"} width={64} height={64} className="w-full h-full object-cover" />
               ) : (
                 data?.name?.charAt(0) ?? "P"
               )}

@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp,
   MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck,
@@ -178,10 +179,11 @@ function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
       <div className="flex gap-3">
         <div className="relative flex-shrink-0">
           {doctor.photoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={doctor.photoUrl}
               alt={doctor.name}
+              width={48}
+              height={48}
               className="w-12 h-12 rounded-2xl object-cover"
             />
           ) : (

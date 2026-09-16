@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Loader2, MapPin, Building2, Clock, Plus, Trash2, Save, CheckCircle2,
   Navigation, Image as ImageIcon, UploadCloud, ArrowRight,
@@ -110,8 +111,7 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
     <div>
       <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 mb-2">
         {url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="Clinic photo" className="w-full h-full object-cover" />
+          <Image src={url} alt="Clinic photo" fill sizes="100vw" className="object-cover" />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-1">
             <ImageIcon className="w-6 h-6" />

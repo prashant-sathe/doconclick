@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import {
   User, Camera, Loader2, Trash2, Lock, Eye, EyeOff, Check, AlertCircle, ShieldCheck,
 } from "lucide-react";
@@ -55,8 +56,7 @@ function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) 
         className="relative w-16 h-16 rounded-full block overflow-hidden bg-slate-100 border border-slate-200"
       >
         {url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="Profile" className="w-full h-full object-cover" />
+          <Image src={url} alt="Profile" width={64} height={64} className="w-full h-full object-cover" />
         ) : (
           <User className="w-7 h-7 text-slate-300 absolute inset-0 m-auto" />
         )}

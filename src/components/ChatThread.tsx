@@ -192,8 +192,14 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                         onClick={() => setLightboxUrl(downloadUrl(m.fileUrl!, m.fileName, "inline"))}
                         className="block mb-1.5 -mx-1 w-full"
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={downloadUrl(m.fileUrl, m.fileName, "inline")} alt={m.fileName ?? "Attachment"} className="max-w-full rounded-lg max-h-64 object-cover" />
+                        {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary aspect ratio per upload, next/image needs a fixed intrinsic size */}
+                        <img
+                          src={downloadUrl(m.fileUrl, m.fileName, "inline")}
+                          alt={m.fileName ?? "Attachment"}
+                          className="max-w-full rounded-lg max-h-64 object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
                       </button>
                     ) : (
                       <a

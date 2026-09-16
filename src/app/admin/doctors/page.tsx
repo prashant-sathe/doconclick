@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback, useMemo } from "react";
+import Image from "next/image";
 import {
   CheckCircle, XCircle, PauseCircle, Search, RefreshCw, Stethoscope,
   Eye, X, Phone, Mail, Award, Hash, Briefcase, DollarSign,
@@ -207,7 +208,7 @@ function DoctorDrawer({
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-white text-2xl font-extrabold border border-white/30 overflow-hidden">
               {p?.photoUrl ? (
-                <img src={p.photoUrl} alt={data?.name ?? "Doctor"} className="w-full h-full object-cover" />
+                <Image src={p.photoUrl} alt={data?.name ?? "Doctor"} width={64} height={64} className="w-full h-full object-cover" />
               ) : (
                 data?.name?.charAt(0) ?? "D"
               )}

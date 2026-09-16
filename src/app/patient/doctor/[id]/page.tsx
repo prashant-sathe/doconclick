@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import {
   Loader2, Building2, Video, Home, Clock, Languages, UserX, Bookmark, BookmarkCheck, Compass, X,
@@ -74,7 +75,7 @@ function Header() {
     <header className="safe-top sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-2">
-          <img src="/logo-icon.png" alt="DocOnClick" className="w-8 h-8 object-contain" />
+          <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-8 h-8 object-contain" />
           <span className="font-extrabold text-slate-900">DocOnClick</span>
         </Link>
         <Link href={user ? "/patient/dashboard" : "/login"} className="btn-secondary py-2 px-3.5 text-sm">
@@ -218,12 +219,13 @@ export default function DoctorProfilePage() {
         )}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           {(doctor.clinics.length > 0 ? doctor.clinics[0].photoUrl : profile.clinicPhotoUrl) && (
-            <div className="w-full h-40 sm:h-48 bg-slate-100">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="relative w-full h-40 sm:h-48 bg-slate-100">
+              <Image
                 src={(doctor.clinics.length > 0 ? doctor.clinics[0].photoUrl : profile.clinicPhotoUrl)!}
                 alt={(doctor.clinics[0]?.name ?? profile.clinicName) ? `${doctor.clinics[0]?.name ?? profile.clinicName} — clinic photo` : "Clinic photo"}
-                className="w-full h-full object-cover"
+                fill
+                sizes="100vw"
+                className="object-cover"
               />
             </div>
           )}
@@ -247,10 +249,11 @@ export default function DoctorProfilePage() {
               </button>
             )}
             {profile.photoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={profile.photoUrl}
                 alt={doctor.name}
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 shadow"
               />
             ) : (

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard } from "lucide-react";
@@ -30,7 +31,7 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between gap-6">
         {/* Logo */}
         <Link href="/" className="flex items-center flex-shrink-0">
-          <img src="/logo.png" alt="DocOnClick" className="h-9 w-auto" />
+          <Image src="/logo.png" alt="DocOnClick" width={431} height={102} className="h-9 w-auto" />
         </Link>
 
         {/* Desktop nav */}

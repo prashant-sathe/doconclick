@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ImagePlus, Loader2, Plus, Trash2, AlertCircle, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 type ButtonRow = { label: string; url: string };
 
@@ -106,8 +107,7 @@ export default function NewAnnouncement() {
             <label className="input-label">Banner Image (optional)</label>
             {bannerImageUrl ? (
               <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={bannerImageUrl} alt="Banner" className="w-full h-full object-cover" />
+                <Image src={bannerImageUrl} alt="Banner" fill sizes="100vw" className="object-cover" />
                 <button
                   onClick={() => setBannerImageUrl(null)}
                   className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1"
@@ -197,8 +197,9 @@ export default function NewAnnouncement() {
           <div className="bg-slate-100 rounded-2xl p-6 flex items-center justify-center min-h-[20rem]">
             <div className="bg-white rounded-2xl shadow-2xl max-w-xs w-full overflow-hidden">
               {bannerImageUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={bannerImageUrl} alt="Banner" className="w-full h-32 object-cover" />
+                <div className="relative w-full h-32">
+                  <Image src={bannerImageUrl} alt="Banner" fill sizes="24rem" className="object-cover" />
+                </div>
               )}
               <div className="p-5">
                 <h3 className="text-base font-extrabold text-slate-900">{title || "Announcement title"}</h3>

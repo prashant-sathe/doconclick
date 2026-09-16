@@ -17,6 +17,8 @@ import { downloadOrShareUrl } from "@/lib/nativeDownload";
 import { isNative } from "@/lib/platform";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
+import { useResync } from "@/hooks/useResync";
+import PullToRefresh from "@/components/PullToRefresh";
 
 interface Medicine {
   id: string;
@@ -451,6 +453,11 @@ export default function PatientAppointments() {
       .catch(() => setLoading(false));
   }, []);
 
+  // The 5s poll below keeps this fresh while the tab/app stays open, but
+  // mobile WebViews commonly suspend timers while backgrounded — force an
+  // immediate refetch on resume/reconnect instead of waiting for the next tick.
+  useResync(load);
+
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/patient/appointments");
     if (!authLoading && user && user.role !== "PATIENT") router.push("/login");
@@ -504,7 +511,7 @@ export default function PatientAppointments() {
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
       <PatientHeader />
       <PatientMobileNav />
-      <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
+      <PullToRefresh onRefresh={load} className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
         <div className="flex items-center gap-4 mb-8">
           <div className="w-14 h-14 rounded-2xl bg-blue-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <CalendarClock className="w-7 h-7 text-white" />
@@ -582,7 +589,7 @@ export default function PatientAppointments() {
             </section>
           </div>
         )}
-      </div>
+      </PullToRefresh>
 
       {reviewFor && (
         <ReviewModal

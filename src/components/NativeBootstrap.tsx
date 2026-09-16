@@ -88,6 +88,15 @@ export function NativeBootstrap() {
         App.getLaunchUrl().then((res) => routeFromUrl(res?.url)).catch(() => {});
         const urlOpenListener = await App.addListener("appUrlOpen", ({ url }) => routeFromUrl(url));
         cleanups.push(() => urlOpenListener.remove());
+
+        // Coming back from the background can leave a screen showing minutes
+        // (or hours) -old data with no polling loop to catch it — broadcast a
+        // DOM event so any page can opt in via useResync() without importing
+        // Capacitor itself.
+        const resumeListener = await App.addListener("appStateChange", ({ isActive }) => {
+          if (isActive) window.dispatchEvent(new Event("app:resume"));
+        });
+        cleanups.push(() => resumeListener.remove());
       } catch {
         /* ignore */
       }

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import { Loader2, UploadCloud, Lock, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ImageCropModal from "@/components/ImageCropModal";
@@ -72,8 +73,8 @@ export default function DocSlot({
     <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-4">
       <div className="flex items-center gap-3 min-w-0">
         {(type === "photo" || type === "signature") && url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt={type === "photo" ? "Profile photo" : "Signature"}
+          <Image src={url} alt={type === "photo" ? "Profile photo" : "Signature"}
+            width={type === "photo" ? 36 : 56} height={36}
             className={cn("flex-shrink-0 border border-slate-200 object-contain bg-white", type === "photo" ? "w-9 h-9 rounded-full object-cover" : "w-14 h-9 rounded-lg p-1")} />
         ) : (
           <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0", url ? "bg-emerald-50" : "bg-slate-100")}>
