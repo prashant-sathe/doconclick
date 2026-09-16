@@ -46,6 +46,7 @@ model User {
   impersonationsReceived ImpersonationLog[]      @relation("ImpersonationsReceived")
   couponsCreated         Coupon[]               @relation("CouponsCreatedByAdmin")
   couponRedemptions      CouponRedemption[]
+  documents              PatientDocument[]      @relation("PatientDocuments")
 }
 
 model PushToken {
@@ -120,6 +121,22 @@ model PatientDependent {
   emergencyContactPhone String?
   createdAt        DateTime @default(now())
   appointments     Appointment[]
+}
+
+// A patient's general health-records vault — lab reports, scans, discharge
+// summaries, vaccination cards etc. kept outside of any one appointment
+// (which already has its own PrescriptionAttachment list for visit-specific
+// files). Lives on User directly, like Appointment.patientId, rather than
+// PatientProfile, since a record shouldn't depend on that row existing.
+model PatientDocument {
+  id        String   @id @default(cuid())
+  patientId String
+  patient   User     @relation("PatientDocuments", fields: [patientId], references: [id], onDelete: Cascade)
+  title     String
+  category  String   @default("Other") // Lab Report, Prescription, Scan/X-ray, Vaccination, Discharge Summary, Other
+  fileUrl   String
+  fileName  String?
+  createdAt DateTime @default(now())
 }
 
 model DoctorProfile {

@@ -56,6 +56,7 @@ export const ModelName = {
   SavedDoctor: 'SavedDoctor',
   PatientProfile: 'PatientProfile',
   PatientDependent: 'PatientDependent',
+  PatientDocument: 'PatientDocument',
   DoctorProfile: 'DoctorProfile',
   Appointment: 'Appointment',
   Wallet: 'Wallet',
@@ -180,6 +181,19 @@ export const PatientDependentScalarFieldEnum = {
 } as const
 
 export type PatientDependentScalarFieldEnum = (typeof PatientDependentScalarFieldEnum)[keyof typeof PatientDependentScalarFieldEnum]
+
+
+export const PatientDocumentScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  title: 'title',
+  category: 'category',
+  fileUrl: 'fileUrl',
+  fileName: 'fileName',
+  createdAt: 'createdAt'
+} as const
+
+export type PatientDocumentScalarFieldEnum = (typeof PatientDocumentScalarFieldEnum)[keyof typeof PatientDocumentScalarFieldEnum]
 
 
 export const DoctorProfileScalarFieldEnum = {
