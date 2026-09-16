@@ -8,6 +8,7 @@ import { getOrCreateWallet } from "@/lib/wallet";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 import { netPayable, releaseCouponRedemption } from "@/lib/coupons";
+import { isClinicOpenNow } from "@/lib/clinicAvailability";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
   SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
@@ -66,7 +67,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
   }
 
-  const { status, doctorNotes } = await req.json();
+  const { status, doctorNotes, scheduledAt } = await req.json();
 
   if (authUser.role === "DOCTOR") {
     if (appointment.doctorId !== authUser.id) {
@@ -209,6 +210,44 @@ export async function PATCH(
       return NextResponse.json(cancelled);
     }
 
+    // A rejection is normally free (PENDING_APPROVAL appointments are never
+    // paid — online payment only happens after acceptance). The one
+    // exception is a previously-accepted, already-paid appointment that a
+    // patient reopened to PENDING_APPROVAL via a reschedule request (see the
+    // PATIENT branch below) — if the doctor can't make the new time, the
+    // patient's money needs to come back.
+    if (status === "REJECTED" && appointment.paymentStatus === "PAID") {
+      const refundAmount = netPayable(appointment);
+      const updated = await prisma.$transaction(async (tx) => {
+        const rejected = await tx.appointment.update({
+          where: { id },
+          data: { status: "REJECTED", doctorNotes: doctorNotes ?? appointment.doctorNotes },
+        });
+        const wallet = await getOrCreateWallet(tx, appointment.patientId);
+        const updatedWallet = await tx.wallet.update({
+          where: { id: wallet.id },
+          data: { balance: { increment: refundAmount } },
+        });
+        await tx.walletTransaction.create({
+          data: {
+            walletId: wallet.id,
+            type: "CANCELLATION_REFUND",
+            amount: refundAmount,
+            balanceAfter: updatedWallet.balance,
+            status: "SUCCESS",
+            note: `Refund for appointment ${appointment.id}, declined by the doctor after a reschedule request`,
+          },
+        });
+        return rejected;
+      });
+      void sendPushToUser(appointment.patientId, {
+        title: "Request declined",
+        body: `${authUser.name} couldn't accommodate your new requested time. ₹${refundAmount} was refunded to your wallet.`,
+        url: "/patient/appointments",
+      });
+      return NextResponse.json(updated);
+    }
+
     const updated = await prisma.appointment.update({
       where: { id },
       data: {
@@ -235,6 +274,64 @@ export async function PATCH(
     if (appointment.patientId !== authUser.id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
+
+    if (scheduledAt) {
+      if (!["PENDING_APPROVAL", "SCHEDULED"].includes(appointment.status)) {
+        return NextResponse.json(
+          { error: "This appointment can no longer be rescheduled." },
+          { status: 400 }
+        );
+      }
+      // Once the doctor has actually set off (or arrived) for a home visit,
+      // they're already committed to right now — a reschedule at that point
+      // needs to go through them directly, not silently move their trip.
+      if (appointment.consultType === "HOME" && appointment.travelStatus !== "NOT_STARTED") {
+        return NextResponse.json(
+          { error: "The doctor is already on the way — please contact them directly to reschedule." },
+          { status: 400 }
+        );
+      }
+      const when = new Date(scheduledAt);
+      if (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()) {
+        return NextResponse.json({ error: "Please pick a time in the future." }, { status: 400 });
+      }
+      if (appointment.consultType === "CLINIC" && appointment.clinicId) {
+        const clinic = await prisma.clinic.findUnique({
+          where: { id: appointment.clinicId },
+          select: { slots: true },
+        });
+        if (clinic && !isClinicOpenNow(clinic.slots, when)) {
+          return NextResponse.json(
+            { error: "The clinic isn't open at that time. Please choose a time within its hours." },
+            { status: 400 }
+          );
+        }
+      }
+
+      // Already-accepted appointments go back to PENDING_APPROVAL — the
+      // doctor agreed to the original time, not this new one, so they need
+      // to re-confirm it (mirrors this app's existing all-bookings-need-
+      // acceptance rule). A still-pending request just gets its time updated
+      // in place; the doctor hasn't reviewed it yet either way.
+      const reopensForApproval = appointment.status === "SCHEDULED";
+      const updated = await prisma.appointment.update({
+        where: { id },
+        data: {
+          scheduledAt: when,
+          ...(reopensForApproval ? { status: "PENDING_APPROVAL", acceptedAt: null } : {}),
+        },
+      });
+
+      void sendPushToUser(appointment.doctorId, {
+        title: reopensForApproval ? "Reschedule requested" : "Requested time updated",
+        body: reopensForApproval
+          ? `${authUser.name} requested a new time for their appointment — please review and confirm.`
+          : `${authUser.name} updated their requested appointment time.`,
+        url: "/doctor/dashboard",
+      });
+      return NextResponse.json(updated);
+    }
+
     if (status !== "CANCELLED" || !["PENDING_APPROVAL", "SCHEDULED"].includes(appointment.status)) {
       return NextResponse.json(
         { error: "This appointment can no longer be cancelled." },

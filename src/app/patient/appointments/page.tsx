@@ -167,11 +167,28 @@ function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: s
   );
 }
 
-function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
+// A home visit the doctor has already set off for (or reached) is a
+// commitment happening right now — cancelling/rescheduling it in-app from
+// here on needs to go through the doctor directly instead.
+const homeVisitArrived = (a: Appointment) => a.consultType === "HOME" && a.travelStatus === "ARRIVED";
+const homeVisitInProgress = (a: Appointment) => a.consultType === "HOME" && a.travelStatus !== "NOT_STARTED";
+const canCancel = (a: Appointment) =>
+  (a.status === "PENDING_APPROVAL" || a.status === "SCHEDULED") && !homeVisitArrived(a);
+const canReschedule = (a: Appointment) =>
+  (a.status === "PENDING_APPROVAL" || a.status === "SCHEDULED") && !homeVisitInProgress(a);
+
+// Local datetime-local min value (now, floored to the minute)
+function nowLocalInput() {
+  const d = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+  return d.toISOString().slice(0, 16);
+}
+
+function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }: {
   a: Appointment;
   patientId: string;
   now: number;
   onCancel: (a: Appointment) => void;
+  onReschedule: (a: Appointment) => void;
   onReview: (id: string) => void;
 }) {
   const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
@@ -344,8 +361,12 @@ function AppointmentCard({ a, patientId, now, onCancel, onReview }: {
       )}
 
       <div className="flex gap-2 flex-wrap">
-        {(a.status === "PENDING_APPROVAL"
-          || (a.status === "SCHEDULED" && !(a.consultType === "HOME" && a.travelStatus === "ARRIVED"))) && (
+        {canReschedule(a) && (
+          <button onClick={() => onReschedule(a)} className="btn-secondary py-2 px-3 text-xs">
+            <CalendarClock className="w-3.5 h-3.5" /> Reschedule
+          </button>
+        )}
+        {canCancel(a) && (
           <button onClick={() => onCancel(a)} className="btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
             {a.status === "SCHEDULED" ? "Cancel Appointment" : "Cancel Request"}
           </button>
@@ -439,6 +460,10 @@ export default function PatientAppointments() {
   const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState("");
+  const [rescheduleTarget, setRescheduleTarget] = useState<Appointment | null>(null);
+  const [newScheduledAt, setNewScheduledAt] = useState("");
+  const [rescheduling, setRescheduling] = useState(false);
+  const [rescheduleError, setRescheduleError] = useState("");
   const PAGE_SIZE = 5;
 
   const unreadTotalRef = useRef<number | null>(null);
@@ -483,6 +508,31 @@ export default function PatientAppointments() {
   const openCancelDialog = (a: Appointment) => {
     setCancelError("");
     setCancelTarget(a);
+  };
+
+  const openRescheduleDialog = (a: Appointment) => {
+    setRescheduleError("");
+    setNewScheduledAt("");
+    setRescheduleTarget(a);
+  };
+
+  const confirmReschedule = async () => {
+    if (!rescheduleTarget || !newScheduledAt) return;
+    setRescheduling(true);
+    setRescheduleError("");
+    const res = await fetch(`/api/appointments/${rescheduleTarget.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scheduledAt: new Date(newScheduledAt).toISOString() }),
+    });
+    setRescheduling(false);
+    if (res.ok) {
+      setRescheduleTarget(null);
+      load();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setRescheduleError(data.error ?? "Couldn't reschedule this appointment. Please try again.");
+    }
   };
 
   const confirmCancel = async () => {
@@ -548,7 +598,7 @@ export default function PatientAppointments() {
                 </h2>
                 <div className="space-y-3">
                   {(pendingExpanded ? pending : pending.slice(0, PAGE_SIZE)).map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReschedule={openRescheduleDialog} onReview={setReviewFor} />
                   ))}
                 </div>
                 {!pendingExpanded && pending.length > PAGE_SIZE && (
@@ -570,7 +620,7 @@ export default function PatientAppointments() {
               ) : (
                 <div className="space-y-3">
                   {(upcomingExpanded ? upcoming : upcoming.slice(0, PAGE_SIZE)).map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReschedule={openRescheduleDialog} onReview={setReviewFor} />
                   ))}
                 </div>
               )}
@@ -590,7 +640,7 @@ export default function PatientAppointments() {
               ) : (
                 <div className="space-y-3">
                   {(pastExpanded ? past : past.slice(0, PAGE_SIZE)).map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReschedule={openRescheduleDialog} onReview={setReviewFor} />
                   ))}
                 </div>
               )}
@@ -649,6 +699,50 @@ export default function PatientAppointments() {
           </div>
         );
       })()}
+
+      {rescheduleTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-3">
+              <CalendarClock className="w-5 h-5 text-blue-600" />
+              <h3 className="font-bold text-slate-800">Reschedule appointment</h3>
+            </div>
+            <p className="text-sm text-slate-500 mb-3">
+              Pick a new time for your {rescheduleTarget.status === "SCHEDULED" ? "appointment" : "request"} with {formatDoctorName(rescheduleTarget.doctor.name)}.
+            </p>
+            {rescheduleTarget.status === "SCHEDULED" && (
+              <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">
+                {`This will need ${formatDoctorName(rescheduleTarget.doctor.name)} to reconfirm the new time before it's booked again.`}
+              </p>
+            )}
+            <input
+              type="datetime-local"
+              required
+              className="input-field mb-3"
+              min={nowLocalInput()}
+              value={newScheduledAt}
+              onChange={(e) => setNewScheduledAt(e.target.value)}
+            />
+            {rescheduleError && (
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-3">
+                {rescheduleError}
+              </p>
+            )}
+            <div className="flex gap-3">
+              <button onClick={() => setRescheduleTarget(null)} className="btn-secondary flex-1">
+                Cancel
+              </button>
+              <button
+                onClick={confirmReschedule}
+                disabled={rescheduling || !newScheduledAt}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {rescheduling ? "Saving…" : "Confirm New Time"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
