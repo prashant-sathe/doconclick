@@ -460,6 +460,8 @@ export default function DoctorDashboard() {
   const [rejectTarget, setRejectTarget] = useState<Appointment | null>(null);
   const [rejecting, setRejecting] = useState(false);
   const [acceptTarget, setAcceptTarget] = useState<Appointment | null>(null);
+  const [confirmingBulkAccept, setConfirmingBulkAccept] = useState(false);
+  const [bulkAccepting, setBulkAccepting] = useState(false);
   const [upcomingExpanded, setUpcomingExpanded] = useState(false);
   const [completedExpanded, setCompletedExpanded] = useState(false);
   const [cancelledExpanded, setCancelledExpanded] = useState(false);
@@ -570,6 +572,14 @@ export default function DoctorDashboard() {
     });
     setCancelling(false);
     setCancelTarget(null);
+    loadAppointments();
+  };
+
+  const confirmBulkAccept = async () => {
+    setBulkAccepting(true);
+    await fetch("/api/appointments/bulk-accept", { method: "POST" });
+    setBulkAccepting(false);
+    setConfirmingBulkAccept(false);
     loadAppointments();
   };
 
@@ -695,6 +705,14 @@ export default function DoctorDashboard() {
     .reduce((sum, a) => sum + (a.amount - a.platformFee), 0);
   const nextAppt = [...upcoming].sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0];
   const minutesTo = (iso: string) => Math.round((new Date(iso).getTime() - now) / 60000);
+  // "in 41576 min" is meaningless for anything beyond a same-day appointment —
+  // scale the unit up as the gap grows instead of always showing raw minutes.
+  const formatTimeUntil = (mins: number): string => {
+    if (mins < 60) return `${mins} min`;
+    if (mins < 24 * 60) return `${Math.round(mins / 60)} hr`;
+    const days = Math.round(mins / (24 * 60));
+    return `${days} day${days === 1 ? "" : "s"}`;
+  };
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -734,11 +752,13 @@ export default function DoctorDashboard() {
           {nextAppt ? (
             <>
               <p className="text-[15px] font-bold leading-snug">
-                Next: {patientLabel(nextAppt)} · {new Date(nextAppt.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}
+                Next: {patientLabel(nextAppt)} · {isToday(nextAppt.scheduledAt)
+                  ? new Date(nextAppt.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })
+                  : new Date(nextAppt.scheduledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
               </p>
               <p className="text-[12.5px] text-white/75 mt-0.5">
                 {nextAppt.consultType === "HOME" ? "Home visit" : nextAppt.consultType === "VIDEO" ? "Video consultation" : "Clinic visit"}
-                {minutesTo(nextAppt.scheduledAt) > 0 && ` · in ${minutesTo(nextAppt.scheduledAt)} min`}
+                {minutesTo(nextAppt.scheduledAt) > 0 && ` · in ${formatTimeUntil(minutesTo(nextAppt.scheduledAt))}`}
               </p>
             </>
           ) : (
@@ -784,10 +804,17 @@ export default function DoctorDashboard() {
 
         {/* Pending Requests */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
-          <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
-            <Inbox className="w-5 h-5 text-amber-500" />
-            <h2 className="font-bold text-slate-800">Pending Requests</h2>
-            {pending.length > 0 && <span className="badge badge-warning">{pending.length} new</span>}
+          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Inbox className="w-5 h-5 text-amber-500" />
+              <h2 className="font-bold text-slate-800">Pending Requests</h2>
+              {pending.length > 0 && <span className="badge badge-warning">{pending.length} new</span>}
+            </div>
+            {pending.length > 1 && (
+              <button onClick={() => setConfirmingBulkAccept(true)} className="btn-secondary py-1.5 px-3 text-xs gap-1">
+                <ThumbsUp className="w-3.5 h-3.5" /> Accept All ({pending.length})
+              </button>
+            )}
           </div>
           <div className="divide-y divide-slate-50">
             {loadingAppts ? (
@@ -1188,6 +1215,21 @@ export default function DoctorDashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Bulk accept confirmation */}
+      {confirmingBulkAccept && (
+        <ConfirmDialog
+          icon={ThumbsUp}
+          title={`Accept all ${pending.length} pending requests?`}
+          message="Every patient will be confirmed and notified immediately. If you need to back out of any of them later, cancelling may carry a late-cancellation penalty."
+          confirmLabel="Accept All"
+          busyLabel="Accepting…"
+          tone="success"
+          busy={bulkAccepting}
+          onCancel={() => setConfirmingBulkAccept(false)}
+          onConfirm={confirmBulkAccept}
+        />
       )}
 
       {/* Accept confirmation */}
