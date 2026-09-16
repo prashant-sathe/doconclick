@@ -217,6 +217,10 @@ model Appointment {
   clinicId      String?
   clinic        Clinic?   @relation(fields: [clinicId], references: [id], onDelete: SetNull)
   scheduledAt   DateTime  @default(now())
+  // Set once the "your appointment is coming up" push has gone out (see
+  // src/lib/appointmentReminders.ts), so the periodic sweep never reminds
+  // the same appointment twice.
+  reminderSentAt DateTime?
   createdAt     DateTime  @default(now())
   review        Review?
   medicines     PrescriptionMedicine[]
