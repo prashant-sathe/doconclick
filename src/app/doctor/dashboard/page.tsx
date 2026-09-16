@@ -8,7 +8,7 @@ import {
   Loader2, CheckCircle2, XCircle, Paperclip, IndianRupee,
   Navigation, Plus, Trash2, History, ThumbsUp, ThumbsDown, Inbox,
   Car, MapPinCheck, AlertTriangle, MessageCircle, Search, X, FileText,
-  MoreHorizontal, UserX,
+  MoreHorizontal, UserX, CalendarClock, ChevronDown,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
@@ -111,6 +111,75 @@ function videoUnlockRemainingSec(a: Appointment, now: number): number {
 }
 function historyHref(a: Appointment): string {
   return a.dependentId ? `/doctor/patients/${a.patientId}?dependentId=${a.dependentId}` : `/doctor/patients/${a.patientId}`;
+}
+
+// ── Today's Timeline ─────────────────────────────────────────────────────
+// No appointment has a stored duration (bookable slots are just points in
+// time, 10 min apart) — this is purely a visual block size for the calendar
+// layout below, not a real scheduling constraint.
+const TIMELINE_BLOCK_MINUTES = 30;
+const TIMELINE_HOUR_HEIGHT = 64;
+const TIMELINE_LABEL_WIDTH = 44;
+
+interface TimelineItem {
+  id: string;
+  appt: Appointment;
+  startMin: number;
+  endMin: number;
+}
+
+interface TimelinePlacement extends TimelineItem {
+  col: number;
+  cols: number;
+}
+
+// Standard calendar-style overlap layout: group appointments into clusters of
+// mutually-overlapping time ranges, then greedily assign each a column within
+// its own cluster (reusing a column once its previous occupant has ended) so
+// concurrent appointments split the width evenly instead of stacking on top
+// of each other.
+function layoutTimeline(items: TimelineItem[]): TimelinePlacement[] {
+  const sorted = [...items].sort((a, b) => a.startMin - b.startMin);
+  const clusters: TimelineItem[][] = [];
+  let current: TimelineItem[] = [];
+  let clusterEnd = -Infinity;
+  for (const item of sorted) {
+    if (current.length === 0 || item.startMin < clusterEnd) {
+      current.push(item);
+      clusterEnd = Math.max(clusterEnd, item.endMin);
+    } else {
+      clusters.push(current);
+      current = [item];
+      clusterEnd = item.endMin;
+    }
+  }
+  if (current.length) clusters.push(current);
+
+  const placed: TimelinePlacement[] = [];
+  for (const cluster of clusters) {
+    const columnEnds: number[] = [];
+    const colOf = new Map<string, number>();
+    for (const item of cluster) {
+      let col = columnEnds.findIndex((end) => end <= item.startMin);
+      if (col === -1) {
+        col = columnEnds.length;
+        columnEnds.push(item.endMin);
+      } else {
+        columnEnds[col] = item.endMin;
+      }
+      colOf.set(item.id, col);
+    }
+    const cols = columnEnds.length;
+    for (const item of cluster) {
+      placed.push({ ...item, col: colOf.get(item.id) ?? 0, cols });
+    }
+  }
+  return placed;
+}
+
+function timelineDotColor(status: string): string {
+  if (status === "PENDING_APPROVAL") return "bg-amber-400";
+  return "bg-teal-500";
 }
 const EMPTY_ROW: MedicineRow = { name: "", dosage: "", frequency: "", frequencyOther: "", duration: "", durationOther: "", instructions: "" };
 const EMPTY_TEST_ROW: TestRow = { name: "", instructions: "" };
@@ -462,6 +531,9 @@ export default function DoctorDashboard() {
   const [acceptTarget, setAcceptTarget] = useState<Appointment | null>(null);
   const [confirmingBulkAccept, setConfirmingBulkAccept] = useState(false);
   const [bulkAccepting, setBulkAccepting] = useState(false);
+  const [timelineOpen, setTimelineOpen] = useState(true);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [upcomingExpanded, setUpcomingExpanded] = useState(false);
   const [completedExpanded, setCompletedExpanded] = useState(false);
   const [cancelledExpanded, setCancelledExpanded] = useState(false);
@@ -700,6 +772,40 @@ export default function DoctorDashboard() {
 
   const isToday = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
   const todayUpcoming = upcoming.filter((a) => isToday(a.scheduledAt));
+  const todayPending = pending.filter((a) => isToday(a.scheduledAt));
+  const timelineItems: TimelineItem[] = [...todayUpcoming, ...todayPending].map((a) => {
+    const d = new Date(a.scheduledAt);
+    const startMin = d.getHours() * 60 + d.getMinutes();
+    return { id: a.id, appt: a, startMin, endMin: startMin + TIMELINE_BLOCK_MINUTES };
+  });
+  const timelinePlacements = layoutTimeline(timelineItems);
+  const nowDate = new Date(now);
+  const nowMin = nowDate.getHours() * 60 + nowDate.getMinutes();
+  const timelineRangeStartHour = timelineItems.length
+    ? Math.max(0, Math.min(nowMin, ...timelineItems.map((i) => i.startMin)) / 60 - 1)
+    : 0;
+  const timelineRangeEndHour = timelineItems.length
+    ? Math.min(24, Math.max(nowMin, ...timelineItems.map((i) => i.endMin)) / 60 + 1)
+    : 0;
+  const timelineStartHour = Math.floor(timelineRangeStartHour);
+  const timelineEndHour = Math.ceil(timelineRangeEndHour);
+  const timelineHours = Array.from({ length: Math.max(0, timelineEndHour - timelineStartHour) }, (_, i) => timelineStartHour + i);
+  const timelineTotalHeight = timelineHours.length * TIMELINE_HOUR_HEIGHT;
+  const minutesToTimelineTop = (min: number) => ((min - timelineStartHour * 60) / 60) * TIMELINE_HOUR_HEIGHT;
+
+  // Scrolls the matching card in Pending Requests / Upcoming Appointments
+  // into view and briefly highlights it — expanding the paginated Upcoming
+  // list first if the target is hidden behind "Load more".
+  const jumpToCard = (id: string) => {
+    const idx = upcoming.findIndex((a) => a.id === id);
+    if (idx >= PAGE_SIZE && !upcomingExpanded) setUpcomingExpanded(true);
+    window.setTimeout(() => {
+      cardRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setHighlightId(id);
+      window.setTimeout(() => setHighlightId((cur) => (cur === id ? null : cur)), 1600);
+    }, 80);
+  };
+
   const todayEarnings = completedAll
     .filter((a) => a.paymentStatus === "PAID" && isToday(a.scheduledAt))
     .reduce((sum, a) => sum + (a.amount - a.platformFee), 0);
@@ -781,6 +887,82 @@ export default function DoctorDashboard() {
           </div>
         </div>
 
+        {/* Today's Timeline — a calendar-style at-a-glance view of the day's
+            shape, complementing the flat sorted lists below rather than
+            replacing them: tapping a block jumps to the same appointment's
+            full card further down, where the real actions live. */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+          <button
+            type="button"
+            onClick={() => setTimelineOpen((o) => !o)}
+            className="w-full px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-2">
+              <CalendarClock className="w-5 h-5 text-indigo-500" />
+              <h2 className="font-bold text-slate-800">Today&apos;s Timeline</h2>
+            </div>
+            <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform", timelineOpen && "rotate-180")} />
+          </button>
+          {timelineOpen && (
+            <div className="p-4">
+              {timelineItems.length === 0 ? (
+                <p className="text-sm text-slate-400 text-center py-8">No appointments scheduled today.</p>
+              ) : (
+                <div className="overflow-y-auto" style={{ maxHeight: 420 }}>
+                  <div className="relative" style={{ height: timelineTotalHeight }}>
+                    {timelineHours.map((h) => (
+                      <div key={h} className="absolute left-0 right-0 flex items-start" style={{ top: (h - timelineStartHour) * TIMELINE_HOUR_HEIGHT }}>
+                        <span className="flex-shrink-0 text-[10px] font-semibold text-slate-400 -translate-y-1/2" style={{ width: TIMELINE_LABEL_WIDTH }}>
+                          {h === 0 ? "12 AM" : h < 12 ? `${h} AM` : h === 12 ? "12 PM" : `${h - 12} PM`}
+                        </span>
+                        <div className="flex-1 border-t border-slate-100" />
+                      </div>
+                    ))}
+                    {nowMin >= timelineStartHour * 60 && nowMin <= timelineEndHour * 60 && (
+                      <div className="absolute right-0 flex items-center gap-1 z-10" style={{ top: minutesToTimelineTop(nowMin), left: TIMELINE_LABEL_WIDTH }}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                        <div className="flex-1 h-px bg-red-400" />
+                      </div>
+                    )}
+                    {timelinePlacements.map(({ appt: a, startMin, col, cols }) => {
+                      const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
+                      const isPending = a.status === "PENDING_APPROVAL";
+                      return (
+                        <button
+                          key={a.id}
+                          type="button"
+                          onClick={() => jumpToCard(a.id)}
+                          className={cn(
+                            "absolute rounded-lg px-2 py-1 text-left overflow-hidden border transition-colors",
+                            isPending
+                              ? "bg-amber-50 border-amber-200 border-dashed hover:bg-amber-100"
+                              : "bg-teal-50 border-teal-200 hover:bg-teal-100"
+                          )}
+                          style={{
+                            top: minutesToTimelineTop(startMin),
+                            height: (TIMELINE_BLOCK_MINUTES / 60) * TIMELINE_HOUR_HEIGHT - 3,
+                            left: `calc(${TIMELINE_LABEL_WIDTH}px + (100% - ${TIMELINE_LABEL_WIDTH}px) * ${col} / ${cols})`,
+                            width: `calc((100% - ${TIMELINE_LABEL_WIDTH}px) / ${cols} - 4px)`,
+                          }}
+                        >
+                          <div className={cn("flex items-center gap-1 text-[11px] font-bold leading-tight", isPending ? "text-amber-700" : "text-teal-700")}>
+                            <span className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", timelineDotColor(a.status))} />
+                            <Icon className="w-3 h-3 flex-shrink-0" />
+                            <span className="truncate">{patientLabel(a)}</span>
+                          </div>
+                          <div className={cn("text-[10px] truncate", isPending ? "text-amber-600" : "text-teal-600")}>
+                            {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Search */}
         <div className="relative mb-6">
           <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -826,7 +1008,11 @@ export default function DoctorDashboard() {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
                 const patientLoc = a.patient.patientProfile;
                 return (
-                  <div key={a.id} className="px-4 sm:px-6 py-4">
+                  <div
+                    key={a.id}
+                    ref={(el) => { cardRefs.current[a.id] = el; }}
+                    className={cn("px-4 sm:px-6 py-4 transition-colors duration-700", highlightId === a.id && "bg-teal-50")}
+                  >
                     <div className="flex items-start gap-3">
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-50">
                         <Icon className="w-5 h-5 text-amber-600" />
@@ -902,7 +1088,11 @@ export default function DoctorDashboard() {
                 const paymentBlocked = a.paymentMethod === "ONLINE" && a.paymentStatus !== "PAID";
                 const unlockSec = a.consultType === "VIDEO" ? videoUnlockRemainingSec(a, now) : 0;
                 return (
-                  <div key={a.id} className="px-3 sm:px-6 py-4 hover:bg-slate-50/70 transition-colors">
+                  <div
+                    key={a.id}
+                    ref={(el) => { cardRefs.current[a.id] = el; }}
+                    className={cn("px-3 sm:px-6 py-4 hover:bg-slate-50/70 transition-colors duration-700", highlightId === a.id && "bg-teal-50")}
+                  >
                     <div className="flex gap-3">
                       <div className="w-11 flex-shrink-0 pt-0.5 text-right">
                         <div className="text-[13px] font-bold text-slate-700 leading-tight">
