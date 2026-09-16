@@ -5,7 +5,7 @@ import {
   Search, Users, Eye, X, Phone, Mail, MapPin, Calendar,
   Activity, Droplets, Ruler, Weight, AlertTriangle,
   Pill, Scissors, PhoneCall, DollarSign, CalendarCheck,
-  CheckCircle2, AlertCircle, MessageCircle, Clock, RefreshCw, Trash2, LogIn,
+  CheckCircle2, AlertCircle, MessageCircle, Clock, RefreshCw, Trash2, LogIn, UserX,
 } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
@@ -51,7 +51,7 @@ interface Complaint {
 interface PatientDetail extends Patient {
   asPatient: Appointment[];
   complaints: Complaint[];
-  stats: { totalSpent: number; completedCount: number; scheduledCount: number; cancelledCount: number };
+  stats: { totalSpent: number; completedCount: number; scheduledCount: number; cancelledCount: number; noShowCount: number };
 }
 
 const APPT_BADGE: Record<string, string> = {
@@ -128,11 +128,12 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
             <div className="p-6 space-y-6">
 
               {/* Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 {[
                   { label: "Completed",  value: s?.completedCount ?? 0,  icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
                   { label: "Scheduled",  value: s?.scheduledCount ?? 0,  icon: CalendarCheck, color: "text-blue-600",   bg: "bg-blue-50" },
                   { label: "Cancelled",  value: s?.cancelledCount ?? 0,  icon: AlertCircle,   color: "text-red-500",    bg: "bg-red-50" },
+                  { label: "No-Show",    value: s?.noShowCount ?? 0,     icon: UserX,         color: "text-amber-600",  bg: "bg-amber-50" },
                   { label: "Total Spent", value: `₹${(s?.totalSpent ?? 0).toLocaleString("en-IN")}`, icon: DollarSign, color: "text-purple-600", bg: "bg-purple-50" },
                 ].map(({ label, value, icon: Icon, color, bg }) => (
                   <div key={label} className={`${bg} rounded-xl p-3 text-center`}>

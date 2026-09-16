@@ -5,7 +5,7 @@ import {
   CheckCircle, XCircle, PauseCircle, Search, RefreshCw, Stethoscope,
   Eye, X, Phone, Mail, Award, Hash, Briefcase, DollarSign,
   Clock, MapPin, CreditCard, CalendarCheck, TrendingUp, AlertCircle,
-  CheckCircle2, User, BadgeCheck, Languages, FileText, Trash2, LogIn,
+  CheckCircle2, User, BadgeCheck, Languages, FileText, Trash2, LogIn, UserX,
 } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
@@ -67,7 +67,7 @@ interface Clinic {
 interface DoctorDetail extends Doctor {
   clinics: Clinic[];
   asDoctor: Appointment[];
-  stats: { totalEarnings: number; completedCount: number; scheduledCount: number; cancelledCount: number };
+  stats: { totalEarnings: number; completedCount: number; scheduledCount: number; cancelledCount: number; noShowCount: number };
 }
 
 // ── Status config ──────────────────────────────────────────────
@@ -267,11 +267,12 @@ function DoctorDrawer({
             <div className="p-6 space-y-6">
 
               {/* Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 {[
                   { label: "Completed",  value: s?.completedCount ?? 0,  icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
                   { label: "Scheduled",  value: s?.scheduledCount ?? 0,  icon: CalendarCheck, color: "text-blue-600",    bg: "bg-blue-50" },
                   { label: "Cancelled",  value: s?.cancelledCount ?? 0,  icon: AlertCircle,   color: "text-red-500",     bg: "bg-red-50" },
+                  { label: "No-Show",    value: s?.noShowCount ?? 0,     icon: UserX,         color: "text-amber-600",   bg: "bg-amber-50" },
                   { label: "Earnings",   value: `₹${(s?.totalEarnings ?? 0).toLocaleString("en-IN")}`, icon: TrendingUp, color: "text-purple-600", bg: "bg-purple-50" },
                 ].map(({ label, value, icon: Icon, color, bg }) => (
                   <div key={label} className={`${bg} rounded-xl p-3 text-center`}>

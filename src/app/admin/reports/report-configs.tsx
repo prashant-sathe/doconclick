@@ -173,7 +173,7 @@ export const REPORT_CONFIGS: ReportConfig[] = [
     dateFilter: true,
     statusFilter: {
       param: "status", label: "Status",
-      options: [{ value: "ALL", label: "All" }, { value: "COMPLETED", label: "Completed" }, { value: "SCHEDULED", label: "Scheduled" }, { value: "PENDING_APPROVAL", label: "Pending Approval" }, { value: "REJECTED", label: "Rejected" }, { value: "CANCELLED", label: "Cancelled" }, { value: "EXPIRED", label: "Expired" }],
+      options: [{ value: "ALL", label: "All" }, { value: "COMPLETED", label: "Completed" }, { value: "SCHEDULED", label: "Scheduled" }, { value: "PENDING_APPROVAL", label: "Pending Approval" }, { value: "REJECTED", label: "Rejected" }, { value: "CANCELLED", label: "Cancelled" }, { value: "EXPIRED", label: "Expired" }, { value: "NO_SHOW", label: "No-Show" }],
     },
     columns: [
       { key: "patientName", label: "Patient" },

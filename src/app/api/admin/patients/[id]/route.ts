@@ -41,11 +41,12 @@ export async function GET(
   const completedCount = user.asPatient.filter((a) => a.status === "COMPLETED").length;
   const scheduledCount = user.asPatient.filter((a) => a.status === "SCHEDULED").length;
   const cancelledCount = user.asPatient.filter((a) => a.status === "CANCELLED").length;
+  const noShowCount    = user.asPatient.filter((a) => a.status === "NO_SHOW").length;
 
   return NextResponse.json({
     ...user,
     password: undefined,
-    stats: { totalSpent, completedCount, scheduledCount, cancelledCount },
+    stats: { totalSpent, completedCount, scheduledCount, cancelledCount, noShowCount },
   });
 }
 

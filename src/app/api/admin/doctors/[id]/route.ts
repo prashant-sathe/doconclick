@@ -50,11 +50,14 @@ export async function GET(
   const completedCount  = user.asDoctor.filter((a) => a.status === "COMPLETED").length;
   const scheduledCount  = user.asDoctor.filter((a) => a.status === "SCHEDULED").length;
   const cancelledCount  = user.asDoctor.filter((a) => a.status === "CANCELLED").length;
+  // Kept separate from cancelledCount — a patient no-show isn't the doctor's
+  // doing and shouldn't be read as a cancellation on their record.
+  const noShowCount     = user.asDoctor.filter((a) => a.status === "NO_SHOW").length;
 
   return NextResponse.json({
     ...user,
     password: undefined,
-    stats: { totalEarnings, completedCount, scheduledCount, cancelledCount },
+    stats: { totalEarnings, completedCount, scheduledCount, cancelledCount, noShowCount },
   });
 }
 

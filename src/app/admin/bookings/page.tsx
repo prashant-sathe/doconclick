@@ -67,6 +67,7 @@ const STATUS_BADGE: Record<string, string> = {
   SCHEDULED: "badge badge-info",
   COMPLETED: "badge badge-success",
   CANCELLED: "badge badge-danger",
+  NO_SHOW: "badge badge-warning",
 };
 
 const TYPE_BADGE: Record<string, string> = {
@@ -75,7 +76,7 @@ const TYPE_BADGE: Record<string, string> = {
   CLINIC: "badge badge-gray",
 };
 
-const FILTERS = ["ALL", "SCHEDULED", "COMPLETED", "CANCELLED"];
+const FILTERS = ["ALL", "SCHEDULED", "COMPLETED", "CANCELLED", "NO_SHOW"];
 
 function downloadUrl(fileUrl: string, name: string) {
   return `/api/files/download?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(name)}`;

@@ -8,7 +8,7 @@ import {
   Loader2, CheckCircle2, XCircle, Paperclip, IndianRupee,
   Navigation, Plus, Trash2, History, ThumbsUp, ThumbsDown, Inbox,
   Car, MapPinCheck, AlertTriangle, MessageCircle, Search, X, FileText,
-  MoreHorizontal,
+  MoreHorizontal, UserX,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
@@ -94,6 +94,13 @@ const CANCEL_GRACE_PERIOD_MS = 10 * 60 * 1000;
 function isLateCancellation(a: Appointment): boolean {
   if (!a.acceptedAt) return false;
   return Date.now() - new Date(a.acceptedAt).getTime() > CANCEL_GRACE_PERIOD_MS;
+}
+// Mirrors the server-side guard in the PATCH route: only once the scheduled
+// time has passed, and only after actually arriving for a home visit.
+function canMarkNoShow(a: Appointment, now: number): boolean {
+  if (new Date(a.scheduledAt).getTime() > now) return false;
+  if (a.consultType === "HOME" && a.travelStatus !== "ARRIVED") return false;
+  return true;
 }
 // Seconds left before a paid video appointment's "Join Video Consultation" button
 // unlocks; 0 once VIDEO_UNLOCK_DELAY_SECONDS has passed since payment.
@@ -448,12 +455,15 @@ export default function DoctorDashboard() {
   const [respondError, setRespondError] = useState<{ id: string; message: string } | null>(null);
   const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [noShowTarget, setNoShowTarget] = useState<Appointment | null>(null);
+  const [markingNoShow, setMarkingNoShow] = useState(false);
   const [rejectTarget, setRejectTarget] = useState<Appointment | null>(null);
   const [rejecting, setRejecting] = useState(false);
   const [acceptTarget, setAcceptTarget] = useState<Appointment | null>(null);
   const [upcomingExpanded, setUpcomingExpanded] = useState(false);
   const [completedExpanded, setCompletedExpanded] = useState(false);
   const [cancelledExpanded, setCancelledExpanded] = useState(false);
+  const [noShowExpanded, setNoShowExpanded] = useState(false);
   const [announcementsDone, setAnnouncementsDone] = useState(false);
   // The "⋯" menu is portalled to <body> (see render below) so it can't be
   // clipped by the appointment card's overflow-hidden — it needs its own
@@ -563,6 +573,19 @@ export default function DoctorDashboard() {
     loadAppointments();
   };
 
+  const confirmNoShow = async () => {
+    if (!noShowTarget) return;
+    setMarkingNoShow(true);
+    await fetch(`/api/appointments/${noShowTarget.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "NO_SHOW" }),
+    });
+    setMarkingNoShow(false);
+    setNoShowTarget(null);
+    loadAppointments();
+  };
+
   // ── Live journey tracking for home visits ───────────────────────────────
   const watchIdRef = useRef<number | null>(null);
   const lastSentRef = useRef<number>(0);
@@ -662,6 +685,7 @@ export default function DoctorDashboard() {
   const pending = appointments.filter((a) => a.status === "PENDING_APPROVAL" && matchesSearch(a));
   const upcoming = appointments.filter((a) => a.status === "SCHEDULED" && matchesSearch(a));
   const cancelled = appointments.filter((a) => a.status === "CANCELLED" && matchesSearch(a));
+  const noShow = appointments.filter((a) => a.status === "NO_SHOW" && matchesSearch(a));
   const completed = completedAll.filter((a) => a.paymentStatus === "PAID").filter(matchesSearch);
 
   const isToday = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
@@ -976,6 +1000,14 @@ export default function DoctorDashboard() {
                                       <Navigation className="w-4 h-4 text-slate-400" /> Navigate to patient
                                     </a>
                                   )}
+                                  {canMarkNoShow(a, now) && (
+                                    <button
+                                      onClick={() => { setOpenMenu(null); setNoShowTarget(a); }}
+                                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-amber-600 hover:bg-amber-50 text-left"
+                                    >
+                                      <UserX className="w-4 h-4" /> Mark as no-show
+                                    </button>
+                                  )}
                                   <button
                                     onClick={() => { setOpenMenu(null); setCancelTarget(a); }}
                                     className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 text-left"
@@ -1073,6 +1105,37 @@ export default function DoctorDashboard() {
             )}
           </div>
         )}
+
+        {/* No-Show — kept separate from Cancelled since this wasn't the doctor's doing */}
+        {noShow.length > 0 && (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+              <UserX className="w-5 h-5 text-amber-500" />
+              <h2 className="font-bold text-slate-800">Patient No-Shows</h2>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {(noShowExpanded ? noShow : noShow.slice(0, PAGE_SIZE)).map((a) => (
+                <div key={a.id} className="px-6 py-3.5 flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-slate-500 text-sm">{patientLabel(a)}</span>
+                    {a.relation !== "Self" && (
+                      <span className="badge badge-gray text-[10px] ml-1.5">{a.relation} of {a.patient.name}</span>
+                    )}
+                    <div className="text-xs text-slate-400">
+                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
+                    </div>
+                  </div>
+                  <span className="badge badge-warning">No-Show</span>
+                </div>
+              ))}
+            </div>
+            {!noShowExpanded && noShow.length > PAGE_SIZE && (
+              <button onClick={() => setNoShowExpanded(true)} className="w-full py-3 text-xs font-semibold text-teal-600 hover:bg-teal-50 border-t border-slate-100 transition-colors">
+                Load {noShow.length - PAGE_SIZE} more
+              </button>
+            )}
+          </div>
+        )}
       </PullToRefresh>
 
       {/* Cancel confirmation */}
@@ -1098,6 +1161,29 @@ export default function DoctorDashboard() {
               </button>
               <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
                 {cancelling ? "Cancelling…" : "Cancel Appointment"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* No-show confirmation */}
+      {noShowTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-3">
+              <UserX className="w-5 h-5 text-amber-600" />
+              <h3 className="font-bold text-slate-800">Mark as no-show?</h3>
+            </div>
+            <p className="text-sm text-slate-500 mb-5">
+              This means {patientLabel(noShowTarget)} didn&apos;t show up for their appointment on {new Date(noShowTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}. Unlike cancelling, this won&apos;t count against your cancellation record and no refund is issued — this cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setNoShowTarget(null)} className="btn-secondary flex-1">
+                Go Back
+              </button>
+              <button onClick={confirmNoShow} disabled={markingNoShow} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                {markingNoShow ? "Marking…" : "Mark No-Show"}
               </button>
             </div>
           </div>

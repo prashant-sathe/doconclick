@@ -195,7 +195,7 @@ model Appointment {
   dependent     PatientDependent? @relation(fields: [dependentId], references: [id])
   consentGiven  Boolean   @default(false)
   consultType   String    @default("CLINIC") // CLINIC, HOME, VIDEO
-  status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED
+  status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED, NO_SHOW
   acceptedAt    DateTime? // set when the doctor accepts (PENDING_APPROVAL → SCHEDULED); used for the late-cancellation warning
   paymentMethod String    @default("CASH") // ONLINE, CASH
   paymentStatus String    @default("PENDING") // PENDING, PAID

@@ -74,6 +74,7 @@ const STATUS_LABEL: Record<string, string> = {
   CANCELLED: "Cancelled",
   REJECTED: "Declined",
   EXPIRED: "Expired",
+  NO_SHOW: "No-show",
 };
 
 const STATUS_BADGE: Record<string, string> = {
@@ -83,6 +84,7 @@ const STATUS_BADGE: Record<string, string> = {
   CANCELLED: "badge badge-gray",
   REJECTED: "badge badge-danger",
   EXPIRED: "badge badge-gray",
+  NO_SHOW: "badge badge-warning",
 };
 
 function DoctorPatientHistoryInner() {

@@ -76,6 +76,7 @@ const STATUS_BADGE: Record<string, string> = {
   CANCELLED: "badge badge-gray",
   REJECTED: "badge badge-danger",
   EXPIRED: "badge badge-gray",
+  NO_SHOW: "badge badge-warning",
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -85,6 +86,7 @@ const STATUS_LABEL: Record<string, string> = {
   CANCELLED: "Cancelled",
   REJECTED: "Declined",
   EXPIRED: "Doctor was busy",
+  NO_SHOW: "Missed (no-show)",
 };
 
 const REQUEST_TIMEOUT_MS = 30 * 60 * 1000;

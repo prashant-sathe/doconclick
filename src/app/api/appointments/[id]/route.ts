@@ -15,12 +15,13 @@ const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: stri
   REJECTED: { title: "Request declined", body: (d) => `${d} was unable to accept your request.`, url: "/patient/appointments" },
   COMPLETED: { title: "Consultation completed", body: (d) => `Your visit with ${d} is complete.`, url: "/patient/appointments" },
   CANCELLED: { title: "Appointment cancelled", body: (d) => `Your appointment with ${d} was cancelled.`, url: "/patient/appointments" },
+  NO_SHOW: { title: "Marked as a no-show", body: (d) => `You were marked as a no-show for your appointment with ${d}.`, url: "/patient/appointments" },
 };
 
 // Valid status transitions a doctor may make, keyed by the appointment's current status
 const DOCTOR_TRANSITIONS: Record<string, string[]> = {
   PENDING_APPROVAL: ["SCHEDULED", "REJECTED"],
-  SCHEDULED: ["COMPLETED", "CANCELLED"],
+  SCHEDULED: ["COMPLETED", "CANCELLED", "NO_SHOW"],
 };
 
 // GET: A single appointment, visible only to its own patient or doctor
@@ -96,6 +97,28 @@ export async function PATCH(
         { error: "The patient hasn't completed payment yet. You can mark this consultation complete once payment is received." },
         { status: 400 }
       );
+    }
+
+    // A no-show is the patient's fault, not the doctor's — unlike CANCELLED
+    // (below) it never refunds the patient or reassigns the slot, and it
+    // falls through to the generic status-update path at the end of this
+    // handler. Guarded the same way as COMPLETED: a home visit needs the
+    // doctor to have actually arrived, and it can't be backdated to a time
+    // that hasn't happened yet (both guard against a doctor pre-emptively
+    // no-showing a patient to dodge a booking).
+    if (status === "NO_SHOW") {
+      if (appointment.consultType === "HOME" && appointment.travelStatus !== "ARRIVED") {
+        return NextResponse.json(
+          { error: "Mark your journey as arrived before marking this a no-show." },
+          { status: 400 }
+        );
+      }
+      if (appointment.scheduledAt.getTime() > Date.now()) {
+        return NextResponse.json(
+          { error: "You can only mark a no-show once the scheduled time has passed." },
+          { status: 400 }
+        );
+      }
     }
 
     // A doctor cancelling an already-accepted (SCHEDULED) appointment leaves

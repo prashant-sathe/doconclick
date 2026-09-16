@@ -21,7 +21,7 @@ export async function GET(req: Request) {
       select: { paymentMethod: true, paymentStatus: true, amount: true },
     }),
     prisma.appointment.findMany({
-      where: { ...where, paymentStatus: "PENDING", amount: { gt: 0 }, status: { notIn: ["REJECTED", "CANCELLED", "EXPIRED"] } },
+      where: { ...where, paymentStatus: "PENDING", amount: { gt: 0 }, status: { notIn: ["REJECTED", "CANCELLED", "EXPIRED", "NO_SHOW"] } },
       select: {
         id: true, amount: true, paymentMethod: true, status: true, scheduledAt: true,
         patient: { select: { name: true, mobile: true } },
