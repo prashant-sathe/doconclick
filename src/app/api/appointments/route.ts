@@ -123,6 +123,26 @@ export async function POST(req: Request) {
             { status: 400 }
           );
         }
+        // A scheduled (not "now") clinic slot is a specific promise to be
+        // there at that exact minute — two patients can't both hold it.
+        // "Now" bookings are exempt: there's no discrete slot to collide on.
+        if (scheduledAt) {
+          const clash = await prisma.appointment.findFirst({
+            where: {
+              doctorId,
+              clinicId,
+              status: { in: ["PENDING_APPROVAL", "SCHEDULED"] },
+              scheduledAt: effectiveTime,
+            },
+            select: { id: true },
+          });
+          if (clash) {
+            return NextResponse.json(
+              { error: "That time was just taken by another patient. Please pick a different slot." },
+              { status: 409 }
+            );
+          }
+        }
       } else {
         // A doctor with clinics must have one picked and validated above —
         // only doctors with no clinics at all skip this (legacy fallback).

@@ -38,6 +38,7 @@ import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import DependentPicker from "@/components/patient/DependentPicker";
+import TimeSlotPicker from "@/components/patient/TimeSlotPicker";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { readPatientLocation, writePatientLocation } from "@/lib/patientLocation";
@@ -1481,13 +1482,24 @@ function PatientDashboardInner() {
                     </button>
                   </div>
                   {scheduleMode === "LATER" && (
-                    <input
-                      type="datetime-local"
-                      className="input-field mb-4"
-                      min={nowLocalInput()}
-                      value={scheduledAt}
-                      onChange={(e) => setScheduledAt(e.target.value)}
-                    />
+                    consultType === "CLINIC" && selectedClinicId ? (
+                      <div className="mb-4">
+                        <TimeSlotPicker
+                          doctorId={selectedDoctor.id}
+                          clinicId={selectedClinicId}
+                          value={scheduledAt}
+                          onChange={setScheduledAt}
+                        />
+                      </div>
+                    ) : (
+                      <input
+                        type="datetime-local"
+                        className="input-field mb-4"
+                        min={nowLocalInput()}
+                        value={scheduledAt}
+                        onChange={(e) => setScheduledAt(e.target.value)}
+                      />
+                    )
                   )}
 
                   {/* Who is this for */}

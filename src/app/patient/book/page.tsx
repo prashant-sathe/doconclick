@@ -32,6 +32,7 @@ import {
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import DependentPicker from "@/components/patient/DependentPicker";
+import TimeSlotPicker from "@/components/patient/TimeSlotPicker";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface ClinicSlot {
@@ -655,8 +656,19 @@ function PatientBookInner() {
                 </button>
               </div>
               {scheduleMode === "LATER" && (
-                <input type="datetime-local" required className="input-field mt-3" min={nowLocalInput()}
-                  value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
+                form.consultType === "CLINIC" && form.clinicId ? (
+                  <div className="mt-3">
+                    <TimeSlotPicker
+                      doctorId={form.doctorId}
+                      clinicId={form.clinicId}
+                      value={scheduledAt}
+                      onChange={setScheduledAt}
+                    />
+                  </div>
+                ) : (
+                  <input type="datetime-local" required className="input-field mt-3" min={nowLocalInput()}
+                    value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
+                )
               )}
             </div>
 

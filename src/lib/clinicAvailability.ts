@@ -128,6 +128,55 @@ export function formatClinicHours(slots: ClinicSlotLike[]): ClinicDayHours[] {
     }));
 }
 
+// Today's calendar date in IST as "YYYY-MM-DD" — the reference date/weekday
+// this whole file's slot math is anchored to (see the "Slot-time math
+// assumes IST" note elsewhere in this codebase).
+export function todayIsoDateIst(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(now);
+}
+
+export interface TimeSlot {
+  time: string; // "HH:MM", 24h — the slot's start time
+  label: string; // "2:00 PM"
+}
+
+const SLOT_INTERVAL_MINUTES = 10;
+
+// Discrete bookable start times for one clinic on one calendar date, derived
+// by dividing its day-of-week open-hour ranges into fixed intervals. `date`
+// is a plain "YYYY-MM-DD" (e.g. from a patient's date picker) — its weekday
+// is computed independent of any timezone (a calendar date has one weekday
+// no matter where it's evaluated), and only that day's ranges are used.
+// Already-past slots are dropped when `date` is today (IST). Overnight
+// ranges (toTime <= fromTime, e.g. "20:00"–"02:00") are skipped rather than
+// wrapped — a rare enough case that it's not worth the extra complexity here.
+export function generateSlotsForDate(
+  slots: ClinicSlotLike[],
+  date: string,
+  now: Date = new Date()
+): TimeSlot[] {
+  const match = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return [];
+  const [, yStr, mStr, dStr] = match;
+  const weekday = DAY_ORDER[new Date(Date.UTC(Number(yStr), Number(mStr) - 1, Number(dStr))).getUTCDay()];
+  const isToday = date === todayIsoDateIst(now);
+  const nowMin = isToday ? nowInIst(now).minutes : -1;
+
+  const result: TimeSlot[] = [];
+  for (const slot of slots) {
+    if (slot.dayOfWeek !== weekday) continue;
+    const fromMin = toMinutes(slot.fromTime);
+    const toMin = toMinutes(slot.toTime);
+    if (fromMin == null || toMin == null || toMin <= fromMin) continue;
+    for (let t = fromMin; t + SLOT_INTERVAL_MINUTES <= toMin; t += SLOT_INTERVAL_MINUTES) {
+      if (isToday && t <= nowMin) continue;
+      const time = `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
+      result.push({ time, label: formatSlotTime(time) });
+    }
+  }
+  return result;
+}
+
 // "14:05" → "2:05 PM"
 export function formatSlotTime(hhmm: string): string {
   const min = toMinutes(hhmm);
