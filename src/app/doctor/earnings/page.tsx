@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Loader2, IndianRupee, TrendingUp, CreditCard, AlertCircle, Send, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
@@ -154,9 +155,19 @@ export default function DoctorEarnings() {
       <DoctorMobileNav />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-extrabold text-slate-900">Earnings</h1>
           <p className="text-slate-500 text-sm">Your consultation income, net of platform commission.</p>
+        </div>
+
+        {/* Tab switcher — this page has the ledger/payout detail, Analytics has the trends. */}
+        <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 mb-6 w-fit">
+          <span className="px-4 py-1.5 rounded-lg text-sm font-semibold bg-white text-teal-600 shadow-sm">
+            Earnings
+          </span>
+          <Link href="/doctor/analytics" className="px-4 py-1.5 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">
+            Analytics
+          </Link>
         </div>
 
         {/* Headline number gets the hero treatment; the rest stays secondary */}
