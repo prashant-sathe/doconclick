@@ -16,7 +16,7 @@ model User {
   mobile    String   @unique
   email     String?  @unique
   password  String   @default("")
-  role      String   @default("PATIENT") // PATIENT, DOCTOR, ADMIN
+  role      String   @default("PATIENT") // PATIENT, DOCTOR, ADMIN, STAFF
   photoUrl  String?  // admin's own profile photo — patients/doctors use their profile-table column instead
   termsAcceptedAt DateTime? // set when the patient/doctor accepts the Terms of Service + Privacy Policy gate
   deletedAt DateTime?
@@ -48,6 +48,8 @@ model User {
   couponsCreated         Coupon[]               @relation("CouponsCreatedByAdmin")
   couponRedemptions      CouponRedemption[]
   documents              PatientDocument[]      @relation("PatientDocuments")
+  staffAccount           StaffProfile?           @relation("StaffAccount")
+  staffMembers           StaffProfile[]          @relation("DoctorStaff")
 }
 
 model PushToken {
@@ -180,6 +182,19 @@ model DoctorProfile {
   cashfreePaymentId     String?
   trialEndsAt           DateTime?
   subscriptionPaidUntil DateTime?
+}
+
+// A receptionist/front-desk account created by a doctor, scoped to that one
+// doctor's appointment queue only (accept/reject/cancel/no-show) — no
+// earnings, payouts, or profile access. See src/lib/staffGuard.ts.
+model StaffProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation("StaffAccount", fields: [userId], references: [id], onDelete: Cascade)
+  doctorId  String
+  doctor    User     @relation("DoctorStaff", fields: [doctorId], references: [id], onDelete: Cascade)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
 
 model Appointment {

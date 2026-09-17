@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
 import { safeNum } from "@/lib/adminAuth";
+import { resolveDoctorScope } from "@/lib/staffGuard";
 
 // GET: The logged-in user's own appointments (as patient or as doctor)
 export async function GET() {
@@ -39,9 +40,12 @@ export async function GET() {
     );
   }
 
-  if (authUser.role === "DOCTOR") {
+  if (authUser.role === "DOCTOR" || authUser.role === "STAFF") {
+    const scope = await resolveDoctorScope(authUser);
+    if (scope.denied) return scope.denied;
+
     const appointments = await prisma.appointment.findMany({
-      where: { doctorId: authUser.id },
+      where: { doctorId: scope.doctorId },
       orderBy: [{ createdAt: "desc" }],
       include: {
         patient: {

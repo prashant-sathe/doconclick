@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUser, type JWTPayload } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { resolveDoctorScope } from "@/lib/staffGuard";
 
 // Chat is open only while a booking is accepted and still upcoming
 // (SCHEDULED). It closes for everyone once the visit is COMPLETED (and was
@@ -23,9 +24,20 @@ function isOwnAttachmentUrl(url: string): boolean {
   }
 }
 
-export async function loadAndAuthorize(id: string, userId: string) {
+// `authUser` rather than a bare userId — a STAFF caller's own id never
+// matches appointment.doctorId directly, so it needs their assigned
+// doctor's id resolved via resolveDoctorScope instead.
+export async function loadAndAuthorize(id: string, authUser: JWTPayload) {
   const appointment = await prisma.appointment.findUnique({ where: { id } });
-  if (!appointment || (appointment.patientId !== userId && appointment.doctorId !== userId)) {
+  if (!appointment) {
+    return { error: NextResponse.json({ error: "Appointment not found" }, { status: 404 }) };
+  }
+  let authorized = appointment.patientId === authUser.id || appointment.doctorId === authUser.id;
+  if (!authorized && authUser.role === "STAFF") {
+    const scope = await resolveDoctorScope(authUser);
+    authorized = !scope.denied && appointment.doctorId === scope.doctorId;
+  }
+  if (!authorized) {
     return { error: NextResponse.json({ error: "Appointment not found" }, { status: 404 }) };
   }
   if (!CHAT_ENABLED_STATUSES.includes(appointment.status)) {
@@ -48,7 +60,7 @@ export async function GET(
   }
 
   const { id } = await params;
-  const { error } = await loadAndAuthorize(id, authUser.id);
+  const { error } = await loadAndAuthorize(id, authUser);
   if (error) return error;
 
   const messages = await prisma.message.findMany({
@@ -75,7 +87,7 @@ export async function POST(
   }
 
   const { id } = await params;
-  const { error, appointment } = await loadAndAuthorize(id, authUser.id);
+  const { error, appointment } = await loadAndAuthorize(id, authUser);
   if (error) return error;
 
   const { text, fileUrl, fileName, fileType } = await req.json();

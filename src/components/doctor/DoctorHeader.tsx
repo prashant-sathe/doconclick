@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { LayoutDashboard, IndianRupee, UserCircle, Building2, Bell, Clock, Sparkles } from "lucide-react";
+import { LayoutDashboard, IndianRupee, UserCircle, Building2, Bell, Clock, Sparkles, LogOut } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
@@ -18,15 +18,24 @@ const NAV = [
   { href: "/doctor/profile", label: "Profile", icon: UserCircle },
 ];
 
+// Staff accounts only ever see the queue — no earnings/profile/clinic-edit
+// access, so they get a single nav item and a direct logout instead of
+// routing through the doctor-only Profile page.
+const STAFF_NAV = [
+  { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
+];
+
 function patientLabelFor(r: { patientName: string | null; relation: string; patient: { name: string } }): string {
   return r.relation !== "Self" && r.patientName ? r.patientName : r.patient.name;
 }
 
 export default function DoctorHeader() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [bellOpen, setBellOpen] = useState(false);
+  const isStaff = user?.role === "STAFF";
+  const nav = isStaff ? STAFF_NAV : NAV;
   const { pendingRequests, hasUnseen: requestsUnseen, activeToast, dismissToast, markSeen } = useDoctorNotifications(user?.id);
   const { announcements, hasUnseen: announcementsUnseen, markSeen: markAnnouncementsSeen } = useAnnouncementNotifications(user?.id);
   const hasUnseen = requestsUnseen || announcementsUnseen;
@@ -52,7 +61,7 @@ export default function DoctorHeader() {
             DoctorMobileNav handles navigation (tablet portrait can't fit
             the full row without overflowing the header off-screen). */}
         <nav className="hidden lg:flex items-center gap-1">
-          {NAV.map(({ href, label, icon: Icon }) => (
+          {nav.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
@@ -80,8 +89,18 @@ export default function DoctorHeader() {
 
         <div className="flex items-center gap-3 flex-shrink-0">
           <span className="text-sm text-slate-500 hidden xl:inline">
-            Hi, <strong className="text-slate-800">{user && formatDoctorName(user.name)}</strong>
+            Hi, <strong className="text-slate-800">{user && (isStaff ? user.name : formatDoctorName(user.name))}</strong>
           </span>
+
+          {isStaff && (
+            <button
+              onClick={logout}
+              title="Sign out"
+              className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          )}
 
           <div className="relative">
             <button

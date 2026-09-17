@@ -28,11 +28,11 @@ export default function DoctorChatPage() {
 
   useEffect(() => {
     if (!authLoading && !user) router.push(`/login?next=/doctor/chat/${params.id}`);
-    if (!authLoading && user && user.role !== "DOCTOR") router.push("/login");
+    if (!authLoading && user && user.role !== "DOCTOR" && user.role !== "STAFF") router.push("/login");
   }, [authLoading, user, router, params.id]);
 
   useEffect(() => {
-    if (!user || user.role !== "DOCTOR") return;
+    if (!user || (user.role !== "DOCTOR" && user.role !== "STAFF")) return;
     fetch(`/api/appointments/${params.id}`).then(async (r) => {
       if (!r.ok) { setError((await r.json().catch(() => ({}))).error ?? "Could not load this appointment."); return; }
       setAppt(await r.json());

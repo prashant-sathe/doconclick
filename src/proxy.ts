@@ -6,7 +6,7 @@ const COOKIE_NAME = "doconclick_token";
 // Routes that require authentication, mapped to allowed roles
 const PROTECTED: { pattern: RegExp; roles: string[] }[] = [
   { pattern: /^\/admin(\/|$)/, roles: ["ADMIN"] },
-  { pattern: /^\/doctor\/dashboard(\/|$)/, roles: ["DOCTOR"] },
+  { pattern: /^\/doctor\/dashboard(\/|$)/, roles: ["DOCTOR", "STAFF"] },
   { pattern: /^\/patient\/dashboard(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/patient\/book(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/patient\/assistant(\/|$)/, roles: ["PATIENT"] },
@@ -19,6 +19,7 @@ const ROLE_HOME: Record<string, string> = {
   ADMIN:   "/admin",
   DOCTOR:  "/doctor/dashboard",
   PATIENT: "/patient/dashboard",
+  STAFF:   "/doctor/dashboard",
 };
 
 // Next.js 16 requires export name "proxy" (renamed from "middleware")

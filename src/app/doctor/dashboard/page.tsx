@@ -515,7 +515,10 @@ function navigateUrl(lat: number, lng: number) {
 export default function DoctorDashboard() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const isStaff = user?.role === "STAFF";
   const [doctor, setDoctor] = useState<DoctorMe | null>(null);
+  const [staffActive, setStaffActive] = useState<boolean | null>(null);
+  const [staffDoctorName, setStaffDoctorName] = useState<string | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [search, setSearch] = useState("");
   const [loadingAppts, setLoadingAppts] = useState(true);
@@ -558,7 +561,7 @@ export default function DoctorDashboard() {
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/dashboard");
-    if (!authLoading && user && user.role !== "DOCTOR") router.push("/login");
+    if (!authLoading && user && user.role !== "DOCTOR" && user.role !== "STAFF") router.push("/login");
   }, [authLoading, user, router]);
 
   useEffect(() => {
@@ -574,6 +577,27 @@ export default function DoctorDashboard() {
         }
       })
       .catch(() => setDoctor(null));
+  }, [user, router]);
+
+  // Staff has no doctorProfile of their own — check their assignment is
+  // still active instead of the registration/subscription gates above. A
+  // revoked account is signed out directly (skipping the confirm-dialog
+  // `logout()` used for the header's user-initiated Sign Out button).
+  useEffect(() => {
+    if (!user || user.role !== "STAFF") return;
+    fetch("/api/doctor/staff/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then(async (d: { active: boolean; doctorName: string } | null) => {
+        if (!d || !d.active) {
+          setStaffActive(false);
+          await fetch("/api/auth/logout", { method: "POST" });
+          router.push("/login");
+          return;
+        }
+        setStaffActive(true);
+        setStaffDoctorName(d.doctorName);
+      })
+      .catch(() => setStaffActive(false));
   }, [user, router]);
 
   const unreadTotalRef = useRef<number | null>(null);
@@ -605,7 +629,7 @@ export default function DoctorDashboard() {
   // Poll so a pending request that times out (no response within 30 min)
   // disappears from the queue without the doctor needing to refresh.
   useEffect(() => {
-    if (user?.role !== "DOCTOR") return;
+    if (user?.role !== "DOCTOR" && user?.role !== "STAFF") return;
     loadAppointments();
     const interval = setInterval(loadAppointments, 5000);
     return () => clearInterval(interval);
@@ -748,10 +772,16 @@ export default function DoctorDashboard() {
     };
   }, []);
 
+  if (authLoading || !user || (user.role !== "DOCTOR" && user.role !== "STAFF")) {
+    return (
+      <div className="min-h-screen gradient-surface flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+      </div>
+    );
+  }
   if (
-    authLoading || !user || user.role !== "DOCTOR" ||
-    !doctor?.doctorProfile?.registrationFeePaid ||
-    !hasActiveDoctorSubscription(doctor.doctorProfile)
+    (isStaff && staffActive !== true) ||
+    (!isStaff && (!doctor?.doctorProfile?.registrationFeePaid || !hasActiveDoctorSubscription(doctor.doctorProfile)))
   ) {
     return (
       <div className="min-h-screen gradient-surface flex items-center justify-center">
@@ -832,13 +862,19 @@ export default function DoctorDashboard() {
             <Stethoscope className="w-7 h-7 text-white" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-xl font-extrabold text-slate-900 truncate">{formatDoctorName(doctor?.name ?? user.name)}</h1>
-            <p className="text-slate-500 text-sm truncate">
-              {profile?.specialty ?? "Specialty pending"} · {profile?.qualification ?? "—"} ·{" "}
-              <span className="text-amber-500 font-semibold inline-flex items-center gap-0.5">
-                <Star className="w-3.5 h-3.5 fill-current" /> {(profile?.avgRating ?? 0).toFixed(1)}
-              </span>
-            </p>
+            <h1 className="text-xl font-extrabold text-slate-900 truncate">
+              {isStaff ? user.name : formatDoctorName(doctor?.name ?? user.name)}
+            </h1>
+            {isStaff ? (
+              <p className="text-slate-500 text-sm truncate">Front desk · {staffDoctorName ?? "—"}</p>
+            ) : (
+              <p className="text-slate-500 text-sm truncate">
+                {profile?.specialty ?? "Specialty pending"} · {profile?.qualification ?? "—"} ·{" "}
+                <span className="text-amber-500 font-semibold inline-flex items-center gap-0.5">
+                  <Star className="w-3.5 h-3.5 fill-current" /> {(profile?.avgRating ?? 0).toFixed(1)}
+                </span>
+              </p>
+            )}
           </div>
         </div>
 
@@ -871,19 +907,23 @@ export default function DoctorDashboard() {
             <p className="text-[15px] font-bold">No more appointments scheduled today</p>
           )}
           <div className="h-px bg-white/15 my-3.5" />
-          <div className="grid grid-cols-3 gap-2">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Earnings Today</p>
-              <p className="text-[15px] font-extrabold mt-0.5">₹{todayEarnings.toLocaleString("en-IN")}</p>
-            </div>
+          <div className={cn("grid gap-2", isStaff ? "grid-cols-1" : "grid-cols-3")}>
+            {!isStaff && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Earnings Today</p>
+                <p className="text-[15px] font-extrabold mt-0.5">₹{todayEarnings.toLocaleString("en-IN")}</p>
+              </div>
+            )}
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Total Consultations</p>
               <p className="text-[15px] font-extrabold mt-0.5">{completedAll.length}</p>
             </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Rating</p>
-              <p className="text-[15px] font-extrabold mt-0.5">{(profile?.avgRating ?? 0).toFixed(1)} / 5</p>
-            </div>
+            {!isStaff && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Rating</p>
+                <p className="text-[15px] font-extrabold mt-0.5">{(profile?.avgRating ?? 0).toFixed(1)} / 5</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1163,7 +1203,7 @@ export default function DoctorDashboard() {
                               </Link>
                             )
                           )}
-                          {readyToComplete && (
+                          {readyToComplete && !isStaff && (
                             paymentBlocked ? (
                               <span className="flex-1 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm font-semibold flex items-center justify-center gap-1.5" title="Waiting for the patient to pay before this can be marked complete">
                                 <Clock className="w-4 h-4" /> Awaiting Payment
@@ -1203,9 +1243,11 @@ export default function DoctorDashboard() {
                                   className="fixed w-52 bg-white rounded-xl border border-slate-100 shadow-lg z-40 overflow-hidden py-1"
                                   style={{ top: openMenu.top, right: openMenu.right }}
                                 >
-                                  <Link href={historyHref(a)} onClick={() => setOpenMenu(null)} className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                                    <History className="w-4 h-4 text-slate-400" /> Patient history
-                                  </Link>
+                                  {!isStaff && (
+                                    <Link href={historyHref(a)} onClick={() => setOpenMenu(null)} className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                                      <History className="w-4 h-4 text-slate-400" /> Patient history
+                                    </Link>
+                                  )}
                                   {a.consultType === "HOME" && patientLoc?.lat != null && patientLoc?.lng != null && (
                                     <a
                                       href={navigateUrl(patientLoc.lat, patientLoc.lng)}
@@ -1240,7 +1282,7 @@ export default function DoctorDashboard() {
 
                       </div>
                     </div>
-                    {completingId === a.id && (
+                    {!isStaff && completingId === a.id && (
                       <CompleteVisitForm
                         appt={a}
                         onCancel={() => setCompletingId(null)}
@@ -1270,9 +1312,13 @@ export default function DoctorDashboard() {
               {(completedExpanded ? completed : completed.slice(0, PAGE_SIZE)).map((a) => (
                 <div key={a.id} className="px-6 py-3.5 flex items-center justify-between">
                   <div>
-                    <Link href={historyHref(a)} className="font-semibold text-slate-800 text-sm hover:underline hover:text-teal-600">
-                      {patientLabel(a)}
-                    </Link>
+                    {isStaff ? (
+                      <span className="font-semibold text-slate-800 text-sm">{patientLabel(a)}</span>
+                    ) : (
+                      <Link href={historyHref(a)} className="font-semibold text-slate-800 text-sm hover:underline hover:text-teal-600">
+                        {patientLabel(a)}
+                      </Link>
+                    )}
                     {a.relation !== "Self" && (
                       <span className="badge badge-gray text-[10px] ml-1.5">{a.relation} of {a.patient.name}</span>
                     )}
@@ -1280,7 +1326,7 @@ export default function DoctorDashboard() {
                       {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
                     </div>
                   </div>
-                  <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>
+                  {!isStaff && <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>}
                 </div>
               ))}
             </div>

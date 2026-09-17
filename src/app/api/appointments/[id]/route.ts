@@ -6,7 +6,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { findReassignmentDoctor } from "@/lib/doctorMatching";
 import { getOrCreateWallet } from "@/lib/wallet";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
-import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { resolveDoctorScope } from "@/lib/staffGuard";
 import { netPayable, releaseCouponRedemption } from "@/lib/coupons";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
 
@@ -43,7 +43,15 @@ export async function GET(
       patient: { select: { name: true } },
     },
   });
-  if (!appointment || (appointment.patientId !== authUser.id && appointment.doctorId !== authUser.id)) {
+  if (!appointment) {
+    return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
+  }
+  let authorized = appointment.patientId === authUser.id || appointment.doctorId === authUser.id;
+  if (!authorized && authUser.role === "STAFF") {
+    const scope = await resolveDoctorScope(authUser);
+    authorized = !scope.denied && appointment.doctorId === scope.doctorId;
+  }
+  if (!authorized) {
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
   }
 
@@ -70,12 +78,20 @@ export async function PATCH(
 
   const { status, doctorNotes, scheduledAt } = await req.json();
 
-  if (authUser.role === "DOCTOR") {
-    if (appointment.doctorId !== authUser.id) {
+  if (authUser.role === "DOCTOR" || authUser.role === "STAFF") {
+    const scope = await resolveDoctorScope(authUser);
+    if (scope.denied) return scope.denied;
+    if (appointment.doctorId !== scope.doctorId) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
-    const suspendedResponse = await requireActiveDoctor(authUser);
-    if (suspendedResponse) return suspendedResponse;
+    // Visit completion is clinical documentation (prescriptions etc.) —
+    // staff can manage the queue but not close out a consultation.
+    if (authUser.role === "STAFF" && status === "COMPLETED") {
+      return NextResponse.json({ error: "Only the doctor can mark a visit complete." }, { status: 403 });
+    }
+    const actingDoctorName = authUser.role === "DOCTOR"
+      ? authUser.name
+      : (await prisma.user.findUnique({ where: { id: scope.doctorId }, select: { name: true } }))?.name ?? "Your doctor";
     if (appointment.status === "EXPIRED") {
       return NextResponse.json(
         { error: "This request timed out and the patient has already been notified — it can no longer be accepted." },
@@ -216,16 +232,16 @@ export async function PATCH(
         void sendPushToUser(appointment.patientId, {
           title: "Your appointment was reassigned",
           body: wasPaid
-            ? `${authUser.name} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and credited ₹${refundAmount} back to your wallet — pay again once they accept.`
-            : `${authUser.name} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and sent them your request.`,
+            ? `${actingDoctorName} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and credited ₹${refundAmount} back to your wallet — pay again once they accept.`
+            : `${actingDoctorName} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and sent them your request.`,
           url: "/patient/appointments",
         });
       } else {
         void sendPushToUser(appointment.patientId, {
           title: "Appointment cancelled",
           body: wasPaid
-            ? `${authUser.name} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — ₹${refundAmount} has been credited to your wallet. Please book again.`
-            : `${authUser.name} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — please book again.`,
+            ? `${actingDoctorName} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — ₹${refundAmount} has been credited to your wallet. Please book again.`
+            : `${actingDoctorName} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — please book again.`,
           url: "/patient/appointments",
         });
       }
@@ -265,7 +281,7 @@ export async function PATCH(
       });
       void sendPushToUser(appointment.patientId, {
         title: "Request declined",
-        body: `${authUser.name} couldn't accommodate your new requested time. ₹${refundAmount} was refunded to your wallet.`,
+        body: `${actingDoctorName} couldn't accommodate your new requested time. ₹${refundAmount} was refunded to your wallet.`,
         url: "/patient/appointments",
       });
       return NextResponse.json(updated);
@@ -286,7 +302,7 @@ export async function PATCH(
     if (copy) {
       void sendPushToUser(appointment.patientId, {
         title: copy.title,
-        body: copy.body(authUser.name),
+        body: copy.body(actingDoctorName),
         url: copy.url,
       });
     }

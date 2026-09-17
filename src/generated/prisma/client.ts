@@ -77,6 +77,11 @@ export type PatientDocument = Prisma.PatientDocumentModel
  */
 export type DoctorProfile = Prisma.DoctorProfileModel
 /**
+ * Model StaffProfile
+ * 
+ */
+export type StaffProfile = Prisma.StaffProfileModel
+/**
  * Model Appointment
  * 
  */

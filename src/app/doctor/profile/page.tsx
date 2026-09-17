@@ -6,7 +6,7 @@ import Image from "next/image";
 import {
   Loader2, Award, IndianRupee, Clock, Building2, Shield, CreditCard, QrCode,
   Bell, LifeBuoy, ChevronRight, Check, Camera, LogOut, User, CheckCircle2,
-  ShieldCheck, AlertTriangle, Lock, FileCheck,
+  ShieldCheck, AlertTriangle, Lock, FileCheck, Users,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
@@ -236,6 +236,8 @@ export default function DoctorProfilePage() {
             title="Notifications" />
           <Row href="/doctor/profile/security" tint="bg-indigo-50 text-indigo-500" icon={<Lock className="w-4 h-4" />}
             title="Change Password" />
+          <Row href="/doctor/profile/staff" tint="bg-cyan-50 text-cyan-600" icon={<Users className="w-4 h-4" />}
+            title="Staff Access" />
           <Row href="/doctor/support/tickets" tint="bg-indigo-50 text-indigo-500" icon={<LifeBuoy className="w-4 h-4" />}
             title="My Support Tickets" />
           <Row href="/doctor/profile/terms" tint="bg-slate-100 text-slate-500" icon={<FileCheck className="w-4 h-4" />}

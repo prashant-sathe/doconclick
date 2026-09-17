@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, IndianRupee, Building2, UserCircle, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { computeDoctorCompleteness } from "@/lib/doctorProfileCompleteness";
+import { useAuth } from "@/components/AuthProvider";
 
 const TABS = [
   { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -14,11 +15,20 @@ const TABS = [
   { href: "/doctor/profile", label: "Profile", icon: UserCircle },
 ];
 
+// Staff only manages the queue — no earnings/clinics-edit/support-AI/profile.
+const STAFF_TABS = [
+  { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
+];
+
 export default function DoctorMobileNav() {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const isStaff = user?.role === "STAFF";
+  const tabs = isStaff ? STAFF_TABS : TABS;
   const [profileIncomplete, setProfileIncomplete] = useState(false);
 
   useEffect(() => {
+    if (isStaff) return;
     fetch("/api/doctors/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
@@ -28,13 +38,13 @@ export default function DoctorMobileNav() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [isStaff]);
 
   return (
     <nav
       className="safe-bottom lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-xl border-t border-slate-200 flex items-stretch"
     >
-      {TABS.map(({ href, label, icon: Icon }) => {
+      {tabs.map(({ href, label, icon: Icon }) => {
         const active = pathname === href;
         return (
           <Link
