@@ -4,12 +4,7 @@ import { useRouter } from "next/navigation";
 import { Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
-
-const ROLE_HOME: Record<string, string> = {
-  ADMIN: "/admin",
-  DOCTOR: "/doctor/dashboard",
-  PATIENT: "/patient/dashboard",
-};
+import { ROLE_HOME } from "@/lib/roleHome";
 
 export default function ResetPassword() {
   const router = useRouter();

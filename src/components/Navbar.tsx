@@ -6,18 +6,13 @@ import { useState } from "react";
 import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard } from "lucide-react";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
+import { ROLE_HOME } from "@/lib/roleHome";
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact" },
 ];
-
-const ROLE_HOME: Record<string, string> = {
-  ADMIN: "/admin",
-  DOCTOR: "/doctor/dashboard",
-  PATIENT: "/patient/dashboard",
-};
 
 export default function Navbar() {
   const pathname = usePathname();

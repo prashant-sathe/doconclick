@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
+import { ROLE_HOME } from "@/lib/roleHome";
 
 const COOKIE_NAME = "doconclick_token";
 
@@ -13,14 +14,6 @@ const PROTECTED: { pattern: RegExp; roles: string[] }[] = [
   { pattern: /^\/patient\/payment(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/patient\/wallet(\/|$)/, roles: ["PATIENT"] },
 ];
-
-// Redirect destinations after login by role
-const ROLE_HOME: Record<string, string> = {
-  ADMIN:   "/admin",
-  DOCTOR:  "/doctor/dashboard",
-  PATIENT: "/patient/dashboard",
-  STAFF:   "/doctor/dashboard",
-};
 
 // Next.js 16 requires export name "proxy" (renamed from "middleware")
 export function proxy(request: NextRequest) {

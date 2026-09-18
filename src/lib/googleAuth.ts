@@ -2,12 +2,7 @@ import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import type { JWTPayload } from "@/lib/auth";
 import type { OAuthRole, OAuthIntent } from "@/lib/googleOAuth";
-
-const ROLE_HOME: Record<string, string> = {
-  ADMIN: "/admin",
-  DOCTOR: "/doctor/dashboard",
-  PATIENT: "/patient/dashboard",
-};
+import { ROLE_HOME } from "@/lib/roleHome";
 
 /**
  * Shared "a Google identity signed in — find or create the account and decide

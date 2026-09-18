@@ -4,12 +4,7 @@ import { useRouter } from "next/navigation";
 import { Phone, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { isValidMobile, normalizeMobile } from "@/lib/validation";
-
-const ROLE_HOME: Record<string, string> = {
-  ADMIN: "/admin",
-  DOCTOR: "/doctor/dashboard",
-  PATIENT: "/patient/dashboard",
-};
+import { ROLE_HOME } from "@/lib/roleHome";
 
 export default function CompleteProfile() {
   const router = useRouter();

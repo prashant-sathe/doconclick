@@ -8,12 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { isNative } from "@/lib/platform";
 import { isValidMobile, normalizeMobile } from "@/lib/validation";
-
-const ROLE_HOME: Record<string, string> = {
-  ADMIN:   "/admin",
-  DOCTOR:  "/doctor/dashboard",
-  PATIENT: "/patient/dashboard",
-};
+import { ROLE_HOME } from "@/lib/roleHome";
 
 const ERROR_MESSAGES: Record<string, string> = {
   google_failed: "Something went wrong verifying your Google account. Please try again.",
