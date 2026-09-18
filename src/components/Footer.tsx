@@ -111,9 +111,9 @@ export default function Footer() {
         <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
           <p>© 2025 DocOnClick. All rights reserved. Built with ❤️ in India.</p>
           <div className="flex gap-5">
-            <a href="#" className="hover:text-slate-300 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-slate-300 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-slate-300 transition-colors">Disclaimer</a>
+            <Link href="/privacy-policy#privacy-policy" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
+            <Link href="/privacy-policy#terms-of-service" className="hover:text-slate-300 transition-colors">Terms of Service</Link>
+            <Link href="/data-deletion" className="hover:text-slate-300 transition-colors">Delete My Data</Link>
           </div>
         </div>
       </div>

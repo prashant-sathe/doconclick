@@ -5,7 +5,7 @@
       "namespace": "android_app",
       "package_name": "com.doconclick.app",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_RELEASE_SIGNING_SHA256",
+        "71:62:A7:88:80:BF:C7:03:58:A9:F8:BA:49:C6:B6:CD:46:22:F8:D0:57:29:45:82:1C:8B:6C:6B:B4:E3:25:C2",
         "REPLACE_WITH_PLAY_APP_SIGNING_SHA256"
       ]
     }
