@@ -5,6 +5,7 @@ import { commissionPercentForConsultType } from "@/lib/platformFee";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
 import { haversine } from "@/lib/geo";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { missingProfileFields } from "@/lib/bookingProfile";
 
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
@@ -57,9 +58,23 @@ export async function POST(req: Request) {
 
     // The session cookie can outlive the underlying user (e.g. a dev database
     // reseed) — verify it still resolves before writing anything.
-    const patient = await prisma.user.findUnique({ where: { id: authUser.id } });
+    const patient = await prisma.user.findUnique({
+      where: { id: authUser.id },
+      include: { patientProfile: { select: { age: true, gender: true } } },
+    });
     if (!patient) {
       return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
+    }
+
+    // Quick signup skips name/age/gender — they're collected by the booking
+    // page's profile sheet, and enforced here so no appointment is ever
+    // created without them.
+    const missing = missingProfileFields(patient.name, patient.patientProfile, { forDependent: !!dependent });
+    if (missing.length > 0) {
+      return NextResponse.json(
+        { error: "Please complete your profile to book.", code: "PROFILE_INCOMPLETE", missing },
+        { status: 409 }
+      );
     }
 
     const doctor = await prisma.user.findUnique({

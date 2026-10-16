@@ -7,12 +7,14 @@ import { usePatientProfile, patchPatientProfile } from "@/lib/usePatientProfile"
 import { CHRONIC_OPTIONS, BLOOD_GROUPS } from "@/lib/medicalOptions";
 import { computeBMI, bmiCategoryClasses } from "@/lib/bmi";
 import { cn } from "@/lib/utils";
+import { GENDERS } from "@/lib/bookingProfile";
 
 export default function PersonalSettingsPage() {
   const router = useRouter();
   const { profile, loading } = usePatientProfile();
 
   const [form, setForm] = useState({
+    age: "", gender: "",
     bloodGroup: "", height: "", weight: "", allergies: "",
     chronicDiseases: [] as string[], otherChronicText: "",
     medications: "", surgeries: "",
@@ -29,6 +31,9 @@ export default function PersonalSettingsPage() {
     const custom = loaded.find((x) => !known.has(x));
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm({
+      // age 0 / gender "" = not filled yet (quick signup).
+      age: typeof profile.age === "number" && profile.age > 0 ? String(profile.age) : "",
+      gender: typeof profile.gender === "string" ? profile.gender : "",
       bloodGroup: profile.bloodGroup ?? "",
       height: profile.height != null ? String(profile.height) : "",
       weight: profile.weight != null ? String(profile.weight) : "",
@@ -64,6 +69,9 @@ export default function PersonalSettingsPage() {
       .join(",");
     try {
       await patchPatientProfile({
+        // Required to book, so they can be changed but never cleared.
+        ...(form.age ? { age: Number(form.age) } : {}),
+        ...(form.gender ? { gender: form.gender } : {}),
         bloodGroup: form.bloodGroup || null,
         height: form.height || null,
         weight: form.weight || null,
@@ -95,6 +103,20 @@ export default function PersonalSettingsPage() {
       error={error}
       onSave={save}
     >
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="input-label">Age (years)</label>
+          <input type="number" inputMode="numeric" min={1} max={120} className="input-field" placeholder="30" value={form.age} onChange={(e) => set({ age: e.target.value })} />
+        </div>
+        <div>
+          <label className="input-label">Gender</label>
+          <select className="input-field" value={form.gender} onChange={(e) => set({ gender: e.target.value })}>
+            <option value="">Select…</option>
+            {GENDERS.map((g) => <option key={g}>{g}</option>)}
+          </select>
+        </div>
+      </div>
+
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className="input-label"><Droplets className="inline w-3.5 h-3.5 mr-1" />Blood Group</label>

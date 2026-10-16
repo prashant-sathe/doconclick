@@ -11,6 +11,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 import { usePatientProfile } from "@/lib/usePatientProfile";
+import { missingProfileFields } from "@/lib/bookingProfile";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import ImageCropModal from "@/components/ImageCropModal";
@@ -186,6 +187,9 @@ export default function PatientProfilePage() {
   const medicalDone = ["Blood Group", "Height & Weight", "Allergies", "Chronic Conditions"].filter(done).length;
   const addressDone = ["Location", "Home Address"].filter(done).length;
   const emergencyDone = done("Emergency Contact");
+  // Quick signup leaves these blank; they're asked for at the first booking
+  // anyway, but nudge here so it isn't a surprise.
+  const bookingMissing = missingProfileFields(user.name, { age: p.age as number | null, gender: p.gender as string | null });
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -197,7 +201,7 @@ export default function PatientProfilePage() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6 flex items-center gap-4">
           <AvatarEditor url={p.photoUrl ?? ""} onChange={(url) => setProfile((prev) => ({ ...(prev ?? {}), photoUrl: url }))} />
           <div className="min-w-0 flex-1">
-            <EditableName name={user.name} onSaved={refresh} />
+            <EditableName name={user.name} displayName={user.name || "Add your name"} onSaved={refresh} />
             <p className="text-sm text-slate-500">{user.mobile}</p>
             <div className="mt-2 flex items-center gap-2">
               <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
@@ -212,6 +216,19 @@ export default function PatientProfilePage() {
             </div>
           </div>
         </div>
+
+        {bookingMissing.length > 0 && (
+          <Link href="/patient/profile/personal" className="mb-5 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3.5">
+            <span className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-100 text-amber-600"><User className="w-4 h-4" /></span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-semibold text-amber-900">Complete your profile</span>
+              <span className="block text-xs text-amber-700">
+                Add your {bookingMissing.join(", ")} — needed to book a doctor.
+              </span>
+            </span>
+            <ChevronRight className="w-4 h-4 text-amber-400 flex-shrink-0" />
+          </Link>
+        )}
 
         <Group label="Your Information">
           <Row href="/patient/profile/personal" tint="bg-red-50 text-red-500" icon={<HeartPulse className="w-4 h-4" />}

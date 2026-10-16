@@ -34,6 +34,7 @@ import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import DependentPicker from "@/components/patient/DependentPicker";
 import TimeSlotPicker from "@/components/patient/TimeSlotPicker";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { useBookingProfileGate } from "@/components/patient/CompleteProfileSheet";
 
 interface ClinicSlot {
   dayOfWeek: string;
@@ -166,6 +167,7 @@ function PatientBookInner() {
   const [scheduledAt, setScheduledAt] = useState("");
   const [consentGiven, setConsentGiven] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const profileGate = useBookingProfileGate();
   const [loading, setLoading] = useState(false);
   const [booked, setBooked] = useState(false);
   const [fee, setFee] = useState(0);
@@ -313,7 +315,9 @@ function PatientBookInner() {
       return;
     }
     setError("");
-    setConfirmOpen(true);
+    // First booking after quick signup: collect name/DOB/gender, then go on
+    // to the confirmation dialog.
+    profileGate.run(!!dependentId, () => setConfirmOpen(true));
   };
 
   const confirmAndBook = async () => {
@@ -343,6 +347,7 @@ function PatientBookInner() {
     setLoading(false);
     setConfirmOpen(false);
     if (res.ok) { setFee(currentFee); setAppointmentId(data.id); setBooked(true); }
+    else if (data.code === "PROFILE_INCOMPLETE") profileGate.open(data.missing, () => setConfirmOpen(true));
     else setError(data.error ?? "Booking failed. Please try again.");
   };
 
@@ -798,6 +803,7 @@ function PatientBookInner() {
         )}
       </div>
 
+      {profileGate.sheet}
       {confirmOpen && selectedDoctor && (
         <ConfirmDialog
           icon={CalendarCheck2}

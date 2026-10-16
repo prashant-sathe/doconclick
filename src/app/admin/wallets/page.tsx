@@ -106,10 +106,10 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
           style={{ background: "linear-gradient(135deg, hsl(160,84%,32%) 0%, hsl(172,76%,40%) 100%)" }}>
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-white text-2xl font-extrabold border border-white/30">
-              {data?.user?.name?.charAt(0) ?? "P"}
+              {data?.user?.name?.charAt(0) || "P"}
             </div>
             <div>
-              <div className="text-xl font-extrabold text-white">{data?.user?.name ?? "Loading…"}</div>
+              <div className="text-xl font-extrabold text-white">{data ? (data.user?.name || "Name not added") : "Loading…"}</div>
               <div className="text-emerald-100 text-sm mt-0.5">{data?.user?.mobile ?? ""}</div>
               <div className="text-white text-2xl font-extrabold mt-2">
                 {data ? `₹${data.balance.toLocaleString("en-IN")}` : "—"}
@@ -255,7 +255,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
           title={`${direction === "CREDIT" ? "Credit" : "Debit"} ₹${amount}?`}
           message={
             <>
-              This will {direction === "CREDIT" ? "add" : "deduct"} ₹{amount} {direction === "CREDIT" ? "to" : "from"} {data?.user?.name ?? "this patient"}&apos;s wallet
+              This will {direction === "CREDIT" ? "add" : "deduct"} ₹{amount} {direction === "CREDIT" ? "to" : "from"} {data?.user?.name || "this patient"}&apos;s wallet
               {note ? <> with note “{note}”</> : ""} — visible to them immediately in their transaction history. This cannot be undone from here.
             </>
           }

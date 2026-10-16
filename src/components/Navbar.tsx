@@ -19,7 +19,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { user, loading, logout } = useAuth();
   const dashboardHref = user ? ROLE_HOME[user.role] ?? "/" : "/";
-  const displayName = user ? (user.role === "DOCTOR" ? formatDoctorName(user.name) : user.name) : "";
+  const displayName = user ? (user.role === "DOCTOR" ? formatDoctorName(user.name) : user.name || user.mobile) : "";
 
   return (
     <nav className="safe-top fixed top-0 inset-x-0 z-50 border-b border-white/20 bg-white/90 backdrop-blur-xl">

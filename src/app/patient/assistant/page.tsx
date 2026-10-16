@@ -503,7 +503,7 @@ export default function HealthAssistantPage() {
 
       <div className="flex-1 overflow-y-auto">
         {entries.length === 0 ? (
-          <WelcomeState name={user?.name?.split(" ")[0] ?? "there"} onPick={send} />
+          <WelcomeState name={user?.name?.split(" ")[0] || "there"} onPick={send} />
         ) : (
           <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-4">
             {entries.map((entry) => (

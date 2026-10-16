@@ -103,7 +103,7 @@ export default function PatientHeader() {
 
         <div className="flex items-center gap-3 flex-shrink-0">
           <span className="text-sm text-slate-500 hidden xl:inline">
-            Hi, <strong className="text-slate-800">{user?.name}</strong>
+            Hi, <strong className="text-slate-800">{user?.name || "there"}</strong>
           </span>
 
           <Link

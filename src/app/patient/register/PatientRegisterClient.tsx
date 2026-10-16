@@ -1,47 +1,31 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AuthPageShell from "@/components/AuthPageShell";
-import {
-  Heart, User, Phone, Calendar, Lock, Eye, EyeOff,
-  Loader2, CheckCircle, ArrowRight,
-} from "lucide-react";
+import { Heart, Phone, Lock, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
-import { isValidMobile, isValidEmail, normalizeMobile, nameError, PASSWORD_MIN_LENGTH } from "@/lib/validation";
+import { useAuth } from "@/components/AuthProvider";
+import { isValidMobile, normalizeMobile, PASSWORD_MIN_LENGTH } from "@/lib/validation";
 
 export default function PatientRegisterClient() {
+  const router = useRouter();
+  const { refresh } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [showPw, setShowPw] = useState(false);
 
-  const [form, setForm] = useState({
-    name: "", mobile: "", email: "", dob: "", age: "", gender: "",
-    password: "", confirmPassword: "",
-  });
+  const [form, setForm] = useState({ mobile: "", password: "", confirmPassword: "" });
 
-  const set = (k: string, v: string) => {
+  const set = (k: keyof typeof form, v: string) => {
     setError("");
-    if (k === "dob") {
-      const age = v ? String(new Date().getFullYear() - new Date(v).getFullYear()) : "";
-      setForm((f) => ({ ...f, dob: v, age }));
-    } else {
-      setForm((f) => ({ ...f, [k]: v }));
-    }
+    setForm((f) => ({ ...f, [k]: v }));
   };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!form.name || !form.mobile || !form.gender || !form.dob) {
-      setError("Please fill all required fields.");
-      return;
-    }
-    const nameErr = nameError(form.name);
-    if (nameErr) { setError(nameErr); return; }
     if (!isValidMobile(form.mobile)) { setError("Enter a valid 10-digit Indian mobile number."); return; }
-    if (form.email && !isValidEmail(form.email)) { setError("Enter a valid email address, or leave it blank."); return; }
-    if (new Date(form.dob) > new Date() || Number(form.age) > 120) { setError("Enter a valid date of birth."); return; }
     if (form.password.length < PASSWORD_MIN_LENGTH) {
       setError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`);
       return;
@@ -55,80 +39,41 @@ export default function PatientRegisterClient() {
     const res = await fetch("/api/patients/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: form.name.trim(), mobile: normalizeMobile(form.mobile), email: form.email.trim(),
-        age: form.age, gender: form.gender, password: form.password,
-      }),
+      body: JSON.stringify({ mobile: normalizeMobile(form.mobile), password: form.password }),
     });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) { setError(data.error ?? "Registration failed."); return; }
-    setSuccess(true);
-  };
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { setLoading(false); setError(data.error ?? "Registration failed."); return; }
 
-  if (success) return (
-    <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
-      <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md w-full text-center">
-        <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
-          <CheckCircle className="w-10 h-10 text-emerald-500" />
-        </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Welcome to DocOnClick!</h2>
-        <p className="text-slate-500 mb-8">Your account is ready. Sign in to finish setting up your health profile and book your first consultation.</p>
-        <Link href="/login" className="btn-primary w-full justify-center py-3.5 text-base">Sign In Now</Link>
-        <p className="text-xs text-slate-400 mt-3">Or <Link href="/" className="text-blue-500 underline">return home</Link></p>
-      </div>
-    </div>
-  );
+    // The register route already signed us in — go straight to the app.
+    await refresh();
+    router.push("/patient/dashboard");
+    router.refresh();
+  };
 
   return (
     <AuthPageShell backHref="/login">
-      <div className="max-w-lg mx-auto">
+      <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Heart className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Patient Registration</h1>
-          <p className="text-slate-500 mt-2">Just the basics for now — you can complete your health profile after signing in.</p>
+          <h1 className="text-3xl font-extrabold text-slate-900">Create your account</h1>
+          <p className="text-slate-500 mt-2">Takes a few seconds. We&apos;ll ask for a few details when you book your first consultation.</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
           <form onSubmit={submit} className="space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="input-label"><User className="inline w-3.5 h-3.5 mr-1" />Full Name *</label>
-                <input required className="input-field" placeholder="John Doe" value={form.name} onChange={(e) => set("name", e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label"><Phone className="inline w-3.5 h-3.5 mr-1" />Mobile Number *</label>
-                <input required type="tel" inputMode="numeric" maxLength={10} className="input-field" placeholder="9800000000" value={form.mobile} onChange={(e) => set("mobile", e.target.value.replace(/\D/g, "").slice(0, 10))} />
-              </div>
-              <div>
-                <label className="input-label">Email (optional)</label>
-                <input type="email" className="input-field" placeholder="you@email.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label"><Calendar className="inline w-3.5 h-3.5 mr-1" />Date of Birth *</label>
-                <input required type="date" max={new Date().toISOString().slice(0, 10)} className="input-field" value={form.dob} onChange={(e) => set("dob", e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label">Gender *</label>
-                <select required className="input-field" value={form.gender} onChange={(e) => set("gender", e.target.value)}>
-                  <option value="">Select…</option>
-                  <option>Male</option><option>Female</option><option>Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="input-label">Age</label>
-                <input readOnly className="input-field bg-slate-50 text-slate-500" placeholder="Auto-filled" value={form.age} />
-              </div>
+            <div>
+              <label className="input-label"><Phone className="inline w-3.5 h-3.5 mr-1" />Mobile Number</label>
+              <input required type="tel" inputMode="numeric" autoComplete="tel" maxLength={10} className="input-field" placeholder="9800000000" value={form.mobile} onChange={(e) => set("mobile", e.target.value.replace(/\D/g, "").slice(0, 10))} />
             </div>
 
             <div>
               <label className="input-label"><Lock className="inline w-3.5 h-3.5 mr-1" />Password</label>
               <div className="relative">
                 <input required type={showPw ? "text" : "password"} autoComplete="new-password" className="input-field pr-10"
-                  placeholder="Min. 6 characters" value={form.password} onChange={(e) => set("password", e.target.value)} />
+                  placeholder={`Min. ${PASSWORD_MIN_LENGTH} characters`} value={form.password} onChange={(e) => set("password", e.target.value)} />
                 <button type="button" onClick={() => setShowPw((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>

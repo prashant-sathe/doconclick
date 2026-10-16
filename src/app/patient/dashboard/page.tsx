@@ -41,6 +41,8 @@ import DependentPicker from "@/components/patient/DependentPicker";
 import TimeSlotPicker from "@/components/patient/TimeSlotPicker";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { useBookingProfileGate } from "@/components/patient/CompleteProfileSheet";
+import { missingProfileFields } from "@/lib/bookingProfile";
 import { readPatientLocation, writePatientLocation } from "@/lib/patientLocation";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 import { useResync } from "@/hooks/useResync";
@@ -328,6 +330,7 @@ function PatientDashboardInner() {
   const [scheduledAt, setScheduledAt] = useState("");
   const [booking, setBooking] = useState(false);
   const [confirmBookingOpen, setConfirmBookingOpen] = useState(false);
+  const profileGate = useBookingProfileGate();
   const [booked, setBooked] = useState<{ id: string; fee: number } | null>(null);
   const [bookingError, setBookingError] = useState("");
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -849,6 +852,13 @@ function PatientDashboardInner() {
       setProfilePercent(percent);
       setSearchRadiusKm(d.patientProfile?.searchRadiusKm ?? null);
       if (d.patientProfile?.allergies) setAllergies(d.patientProfile.allergies);
+      // Fresh quick-signup accounts go straight to the doctor map — their
+      // name/age/gender are asked for by the booking sheet instead. Use up
+      // this session's prompt too, or the reload after that sheet saves
+      // would bounce the patient here mid-booking.
+      if (missingProfileFields(d.name, d.patientProfile).length > 0) {
+        sessionStorage.setItem("profilePromptSeen", "1");
+      }
       if (percent < 100 && !sessionStorage.getItem("profilePromptSeen")) {
         sessionStorage.setItem("profilePromptSeen", "1");
         router.replace("/patient/profile");
@@ -893,7 +903,9 @@ function PatientDashboardInner() {
       return;
     }
     setBookingError("");
-    setConfirmBookingOpen(true);
+    // First booking after quick signup: collect name/DOB/gender, then go on
+    // to the confirmation dialog.
+    profileGate.run(!!dependentId, () => setConfirmBookingOpen(true));
   };
 
   const confirmAndBook = async () => {
@@ -927,6 +939,7 @@ function PatientDashboardInner() {
     setBooking(false);
     setConfirmBookingOpen(false);
     if (res.ok) setBooked({ id: data.id, fee });
+    else if (data.code === "PROFILE_INCOMPLETE") profileGate.open(data.missing, () => setConfirmBookingOpen(true));
     else setBookingError(data.error ?? "Booking failed. Please try again.");
   };
 
@@ -1851,6 +1864,7 @@ function PatientDashboardInner() {
         </>
       )}
 
+      {profileGate.sheet}
       {confirmBookingOpen && bookingOpen && selectedDoctor && (
         <ConfirmDialog
           icon={CalendarCheck2}

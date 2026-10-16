@@ -71,3 +71,23 @@ export function validateRegistration(body: {
 
   return { data: { name, mobile, email: rawEmail || null, password } };
 }
+
+/**
+ * Validates the quick patient signup: just { mobile, password }. Name, age
+ * and gender are collected later, at the first booking.
+ */
+export function validateQuickRegistration(body: { mobile?: unknown; password?: unknown }):
+  | { error: string }
+  | { data: { mobile: string; password: string } } {
+  const mobile = normalizeMobile(String(body.mobile ?? ""));
+  if (!MOBILE_REGEX.test(mobile)) {
+    return { error: "Enter a valid 10-digit Indian mobile number." };
+  }
+
+  const password = String(body.password ?? "");
+  if (password.length < PASSWORD_MIN_LENGTH) {
+    return { error: `Password must be at least ${PASSWORD_MIN_LENGTH} characters.` };
+  }
+
+  return { data: { mobile, password } };
+}

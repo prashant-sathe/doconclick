@@ -95,15 +95,15 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-white text-2xl font-extrabold border border-white/30 overflow-hidden">
               {prof?.photoUrl ? (
-                <Image src={prof.photoUrl} alt={data?.name ?? "Patient"} width={64} height={64} className="w-full h-full object-cover" />
+                <Image src={prof.photoUrl} alt={data?.name || "Patient"} width={64} height={64} className="w-full h-full object-cover" />
               ) : (
-                data?.name?.charAt(0) ?? "P"
+                data?.name?.charAt(0) || "P"
               )}
             </div>
             <div>
-              <div className="text-xl font-extrabold text-white">{data?.name ?? "Loading…"}</div>
+              <div className="text-xl font-extrabold text-white">{data ? (data.name || "Name not added") : "Loading…"}</div>
               <div className="text-blue-100 text-sm mt-0.5">
-                {prof ? `${prof.age} yrs · ${prof.gender}` : "Patient"}
+                {prof && prof.age > 0 && prof.gender ? `${prof.age} yrs · ${prof.gender}` : "Patient"}
               </div>
               {prof?.location && (
                 <div className="text-blue-200 text-xs mt-1 flex items-center gap-1">
@@ -155,8 +155,8 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
               {/* Basic Profile */}
               {prof && (
                 <Section title="Patient Profile" icon={Activity}>
-                  <Row icon={Calendar} label="Age"    value={`${prof.age} years`} />
-                  <Row icon={Users}    label="Gender" value={prof.gender} />
+                  <Row icon={Calendar} label="Age"    value={prof.age > 0 ? `${prof.age} years` : "Not added"} />
+                  <Row icon={Users}    label="Gender" value={prof.gender || "Not added"} />
                 </Section>
               )}
 
@@ -306,7 +306,7 @@ export default function AdminPatients() {
       flex: 1.2,
       cellRenderer: (p: ICellRendererParams<Patient>) => (
         <div className="leading-tight py-1">
-          <div className="font-semibold text-slate-900">{p.data?.name}</div>
+          <div className="font-semibold text-slate-900">{p.data?.name || <span className="text-slate-400 font-normal italic">Name not added</span>}</div>
           <div className="text-xs text-slate-400">{p.data?.email ?? "No email"}</div>
         </div>
       ),
@@ -451,7 +451,7 @@ export default function AdminPatients() {
           title="Delete this account?"
           message={
             <>
-              {deleteTarget.name} ({deleteTarget.mobile}) will be permanently blocked from logging in, and their mobile number will be freed for a new registration.
+              {deleteTarget.name || "This patient"} ({deleteTarget.mobile}) will be permanently blocked from logging in, and their mobile number will be freed for a new registration.
               Their past appointment history is kept for the doctors who treated them. This cannot be undone.
             </>
           }
@@ -468,7 +468,7 @@ export default function AdminPatients() {
       {impersonateTarget && (
         <ConfirmDialog
           icon={LogIn}
-          title={`Log in as ${impersonateTarget.name}?`}
+          title={`Log in as ${impersonateTarget.name || impersonateTarget.mobile}?`}
           message="You'll be switched into their account and see the app exactly as they do. Use “Exit impersonation” in the banner to return to your admin session."
           confirmLabel="Log In"
           busyLabel="Logging in…"

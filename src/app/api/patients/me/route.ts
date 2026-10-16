@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { normalizeSearchRadiusKm } from "@/lib/geo";
+import { isValidAge, isValidGender } from "@/lib/bookingProfile";
 
 const EDITABLE_FIELDS = [
   "location",
@@ -68,6 +69,21 @@ export async function PATCH(req: Request) {
     } else {
       data[key] = value === "" || value == null ? null : String(value);
     }
+  }
+
+  // age/gender are required to book (see src/lib/bookingProfile.ts) — once
+  // set they can be changed but not cleared.
+  if ("age" in body) {
+    if (!isValidAge(body.age)) {
+      return NextResponse.json({ error: "Enter a valid date of birth." }, { status: 400 });
+    }
+    data.age = Number(body.age);
+  }
+  if ("gender" in body) {
+    if (!isValidGender(body.gender)) {
+      return NextResponse.json({ error: "Select a gender." }, { status: 400 });
+    }
+    data.gender = String(body.gender);
   }
 
   if ("homeAddress" in body && !String(body.homeAddress ?? "").trim()) {
