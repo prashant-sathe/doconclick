@@ -12,6 +12,7 @@ interface AppointmentSummary {
   discountAmount: number;
   couponCode: string | null;
   paymentStatus: string;
+  status: string;
   providerType?: string; // "NURSE" for nurse bookings
   serviceName?: string | null;
   // Nurse package: one payment covers every accepted, unpaid visit.
@@ -158,6 +159,22 @@ function PaymentContent() {
             : "This appointment has already been paid for."}
         </p>
         <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">My Appointments</Link>
+      </div>
+    );
+  }
+
+  // Only an accepted appointment can be paid for — the pay routes reject
+  // anything else, so don't offer buttons that can only fail.
+  if (appt.status !== "SCHEDULED") {
+    const pendingApproval = appt.status === "PENDING_APPROVAL";
+    return (
+      <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-md w-full text-center">
+        <p className="text-slate-500">
+          {pendingApproval
+            ? `Payment opens once the ${appt.providerType === "NURSE" ? "nurse" : "doctor"} accepts your appointment.`
+            : "This appointment is no longer active, so there's nothing to pay."}
+        </p>
+        <Link href="/patient/appointments" className="btn-secondary w-full justify-center mt-5">My Appointments</Link>
       </div>
     );
   }

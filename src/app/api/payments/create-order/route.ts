@@ -28,6 +28,12 @@ export async function POST(req: Request) {
   if (appointment.paymentStatus === "PAID") {
     return NextResponse.json({ error: "This appointment has already been paid for" }, { status: 400 });
   }
+  // Only an accepted, still-live appointment can be charged. A package's
+  // other visits are filtered to SCHEDULED below; if one is cancelled after
+  // the order is created, the webhook credits its share to the wallet.
+  if (appointment.status !== "SCHEDULED") {
+    return NextResponse.json({ error: "This appointment is no longer active, so it can't be paid for." }, { status: 400 });
+  }
 
   // A nurse package is one checkout for every accepted, unpaid visit.
   const covered = appointment.packageId

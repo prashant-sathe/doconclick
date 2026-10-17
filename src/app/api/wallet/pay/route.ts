@@ -29,6 +29,11 @@ export async function POST(req: Request) {
   if (appointment.paymentStatus === "PAID") {
     return NextResponse.json({ error: "This appointment has already been paid for" }, { status: 400 });
   }
+  // Only an accepted, still-live appointment can be charged — never one that
+  // was cancelled, rejected, expired or completed while the page sat open.
+  if (appointment.status !== "SCHEDULED") {
+    return NextResponse.json({ error: "This appointment is no longer active, so it can't be paid for." }, { status: 400 });
+  }
 
   // A nurse package is paid in one go: every accepted, unpaid visit in it.
   const targetIds = appointment.packageId
@@ -48,6 +53,9 @@ export async function POST(req: Request) {
     const result = await prisma.$transaction(async (tx) => {
       const fresh = await tx.appointment.findMany({ where: { id: { in: targetIds } } });
       if (fresh.length === 0 || fresh.some((a) => a.paymentStatus === "PAID")) throw new Error("ALREADY_PAID");
+      // Re-checked inside the transaction: a visit cancelled between the read
+      // above and now must not be charged.
+      if (fresh.some((a) => a.status !== "SCHEDULED")) throw new Error("NOT_SCHEDULED");
 
       // What the patient actually pays — the fee less any coupon discount
       // the platform is absorbing (summed across a package's visits).
@@ -112,6 +120,9 @@ export async function POST(req: Request) {
   } catch (err) {
     if (err instanceof Error && err.message === "INSUFFICIENT_BALANCE") {
       return NextResponse.json({ error: "Insufficient wallet balance" }, { status: 400 });
+    }
+    if (err instanceof Error && err.message === "NOT_SCHEDULED") {
+      return NextResponse.json({ error: "This appointment is no longer active, so it can't be paid for." }, { status: 400 });
     }
     if (err instanceof Error && err.message === "ALREADY_PAID") {
       return NextResponse.json({ error: "This appointment has already been paid for" }, { status: 400 });
