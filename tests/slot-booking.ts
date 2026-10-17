@@ -39,7 +39,7 @@ async function main() {
   };
   const doc1 = await mkDoctor(1);
   const doc2 = await mkDoctor(2);
-  const patients = [];
+  const patients: { id: string; name: string; role: string; mobile: string }[] = [];
   for (let i = 0; i < 8; i++) {
     const p = await prisma.user.create({
       data: { name: `Slot Test Patient ${i}`, mobile: `6${i}${stamp}`, role: "PATIENT", patientProfile: { create: { age: 30, gender: "Other" } } },

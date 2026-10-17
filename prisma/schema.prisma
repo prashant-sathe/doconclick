@@ -478,6 +478,9 @@ model Settlement {
   onlinePayoutOwed Float    @default(0) // owed TO doctor BY platform
   netAmount        Float    // onlinePayoutOwed - cashFeeOwed
   note             String?
+  // Client-generated per "Settle" click (reused on retry / the negative-net
+  // acknowledgement), so a double-submit returns this settlement, not a second one.
+  idempotencyKey   String?  @unique
   settledByAdminId String?
   settledByAdmin   User?    @relation("AdminSettlements", fields: [settledByAdminId], references: [id])
   createdAt        DateTime @default(now())

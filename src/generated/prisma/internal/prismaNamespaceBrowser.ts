@@ -475,6 +475,7 @@ export const SettlementScalarFieldEnum = {
   onlinePayoutOwed: 'onlinePayoutOwed',
   netAmount: 'netAmount',
   note: 'note',
+  idempotencyKey: 'idempotencyKey',
   settledByAdminId: 'settledByAdminId',
   createdAt: 'createdAt'
 } as const

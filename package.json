@@ -13,7 +13,8 @@
     "test:cancel-race": "tsx tests/cancel-race.ts",
     "test:expire-refund": "tsx tests/expire-refund.ts",
     "test:reschedule": "tsx tests/reschedule-request.ts",
-    "test:slots": "tsx tests/slot-booking.ts"
+    "test:slots": "tsx tests/slot-booking.ts",
+    "test:settlements": "tsx tests/settlement-idempotency.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

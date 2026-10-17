@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { IndianRupee, TrendingUp, Save, Wallet } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
@@ -40,6 +40,13 @@ interface SettlementRecord {
   createdAt: string;
 }
 
+// crypto.randomUUID only exists on secure origins; an admin page served over
+// plain HTTP (e.g. straight to an EC2 IP) still has getRandomValues.
+function newIdempotencyKey(): string {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  return Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 export default function AdminFinance() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [clinicCommission, setClinicCommission] = useState("10");
@@ -53,6 +60,13 @@ export default function AdminFinance() {
   const [settlingId, setSettlingId] = useState<string | null>(null);
   const [confirmNegative, setConfirmNegative] = useState<PendingSettlement | null>(null);
   const [settleTarget, setSettleTarget] = useState<PendingSettlement | null>(null);
+  const [settleError, setSettleError] = useState("");
+  // One idempotency key per "settle this doctor" intent — reused for the
+  // negative-net acknowledgement and any retry (incl. after a lost response),
+  // so the API returns the same settlement instead of creating a second one.
+  const settleKeys = useRef<Record<string, string>>({});
+  // Synchronous guard: state updates land a render later, a double-click doesn't.
+  const settleInFlight = useRef(false);
   const [confirmSaveSettings, setConfirmSaveSettings] = useState(false);
 
   const loadSettlements = () => {
@@ -124,24 +138,39 @@ export default function AdminFinance() {
   };
 
   const settleDoctor = async (doctorId: string, acknowledgeNegative = false) => {
+    if (settleInFlight.current) return;
+    settleInFlight.current = true;
     setSettlingId(doctorId);
-    const res = await fetch("/api/admin/finance/settlements", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ doctorId, acknowledgeNegative }),
-    });
-    if (res.status === 409) {
-      const data = await res.json();
-      const row = pending.find((p) => p.doctorId === doctorId);
-      const doctorName = row?.doctorName ?? "This doctor";
-      const providerRole = row?.providerRole;
+    setSettleError("");
+    const idempotencyKey = (settleKeys.current[doctorId] ??= newIdempotencyKey());
+    try {
+      const res = await fetch("/api/admin/finance/settlements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ doctorId, acknowledgeNegative, idempotencyKey }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 409 && data.requiresAcknowledgement) {
+        const row = pending.find((p) => p.doctorId === doctorId);
+        const doctorName = row?.doctorName ?? "This doctor";
+        const providerRole = row?.providerRole;
+        setConfirmNegative({ doctorId, doctorName, providerRole, ...data });
+        return;
+      }
+      if (!res.ok) {
+        setSettleError(data.error ?? "Could not settle. Please try again.");
+        return;
+      }
+      delete settleKeys.current[doctorId];
+      setConfirmNegative(null);
+      loadSettlements();
+    } catch {
+      // Safe to retry: the same key returns the settlement if this one actually went through.
+      setSettleError("Network error — please try again.");
+    } finally {
+      settleInFlight.current = false;
       setSettlingId(null);
-      setConfirmNegative({ doctorId, doctorName, providerRole, ...data });
-      return;
     }
-    setSettlingId(null);
-    setConfirmNegative(null);
-    loadSettlements();
   };
 
   const pendingColumnDefs = useMemo<ColDef<PendingSettlement>[]>(() => [
@@ -212,7 +241,7 @@ export default function AdminFinance() {
       cellRenderer: (p: ICellRendererParams<PendingSettlement>) => (
         <button
           onClick={() => p.data && setSettleTarget(p.data)}
-          disabled={settlingId === p.data?.doctorId}
+          disabled={settlingId !== null}
           className="btn-primary text-xs py-1.5 px-3"
         >
           {settlingId === p.data?.doctorId ? "Settling…" : "Settle Now"}
@@ -380,6 +409,7 @@ export default function AdminFinance() {
       {/* Pending Settlements */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-8">
         <h2 className="font-bold text-slate-800 mb-1 text-lg">Pending Settlements</h2>
+        {settleError && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 my-3">{settleError}</p>}
         <p className="text-xs text-slate-400 mb-5">
           Cash fee owed = commission the doctor collected in cash and owes the platform. Online payout owed = money the platform holds and owes the doctor.
         </p>
@@ -432,16 +462,18 @@ export default function AdminFinance() {
             </p>
             <div className="flex gap-3">
               <button
-                onClick={() => setConfirmNegative(null)}
+                onClick={() => { delete settleKeys.current[confirmNegative.doctorId]; setConfirmNegative(null); }}
+                disabled={settlingId === confirmNegative.doctorId}
                 className="btn-secondary flex-1"
               >
                 Cancel
               </button>
               <button
                 onClick={() => settleDoctor(confirmNegative.doctorId, true)}
-                className="btn-primary flex-1"
+                disabled={settlingId === confirmNegative.doctorId}
+                className="btn-primary flex-1 disabled:opacity-60"
               >
-                Confirm Settle
+                {settlingId === confirmNegative.doctorId ? "Settling…" : "Confirm Settle"}
               </button>
             </div>
           </div>
