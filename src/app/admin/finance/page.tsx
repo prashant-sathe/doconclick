@@ -47,6 +47,7 @@ export default function AdminFinance() {
   const [homeCommission, setHomeCommission] = useState("10");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [settingsError, setSettingsError] = useState("");
   const [pending, setPending] = useState<PendingSettlement[]>([]);
   const [history, setHistory] = useState<SettlementRecord[]>([]);
   const [settlingId, setSettlingId] = useState<string | null>(null);
@@ -72,20 +73,54 @@ export default function AdminFinance() {
     loadSettlements();
   }, []);
 
+  // A blank or out-of-range field must never be sent — the API would reject
+  // it, and before that it used to silently become 0%.
+  const parseCommissions = () => {
+    const values = [clinicCommission, videoCommission, homeCommission].map((v) => (v.trim() === "" ? NaN : Number(v)));
+    return values.every((v) => Number.isFinite(v) && v >= 0 && v <= 100) ? values : null;
+  };
+
+  const requestSaveSettings = () => {
+    setSaved(false);
+    if (!parseCommissions()) {
+      setSettingsError("Enter every commission as a number between 0 and 100.");
+      return;
+    }
+    setSettingsError("");
+    setConfirmSaveSettings(true);
+  };
+
   const saveSettings = async () => {
+    const values = parseCommissions();
+    if (!values) {
+      setSettingsError("Enter every commission as a number between 0 and 100.");
+      return;
+    }
+    const [clinic, video, home] = values;
     setSaving(true);
-    await fetch("/api/admin/settings", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        clinicCommissionPercent: parseFloat(clinicCommission),
-        videoCommissionPercent: parseFloat(videoCommission),
-        homeCommissionPercent: parseFloat(homeCommission),
-      }),
-    });
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setSaved(false);
+    setSettingsError("");
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clinicCommissionPercent: clinic,
+          videoCommissionPercent: video,
+          homeCommissionPercent: home,
+        }),
+      });
+      if (!res.ok) {
+        setSettingsError((await res.json().catch(() => ({}))).error ?? "Could not save commission settings.");
+        return;
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setSettingsError("Network error — commission settings were not saved.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const settleDoctor = async (doctorId: string, acknowledgeNegative = false) => {
@@ -332,13 +367,14 @@ export default function AdminFinance() {
           </div>
         </div>
         <button
-          onClick={() => setConfirmSaveSettings(true)}
+          onClick={requestSaveSettings}
           disabled={saving}
           className="btn-primary gap-2"
         >
           <Save className="w-4 h-4" />
           {saving ? "Saving…" : saved ? "✓ Saved!" : "Save Settings"}
         </button>
+        {settingsError && <p className="text-sm text-red-600 mt-3">{settingsError}</p>}
       </div>
 
       {/* Pending Settlements */}

@@ -21,20 +21,37 @@ export default function NurseSettings() {
 
   const save = async () => {
     if (!form) return;
-    setSaving(true); setSaved(false); setError("");
-    const res = await fetch("/api/admin/settings", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nurseCommissionPercent: Number(form.commission),
-        nurseRegistrationFee: Number(form.regFee),
-        nurseSubscriptionFee: Number(form.subFee),
-      }),
-    });
-    setSaving(false);
-    if (!res.ok) { setError((await res.json().catch(() => ({}))).error ?? "Could not save."); return; }
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setSaved(false); setError("");
+    // Number("") is 0 — a blank field must be an error, not a free/0% setting.
+    const num = (v: string) => (v.trim() === "" ? NaN : Number(v));
+    const commission = num(form.commission);
+    const regFee = num(form.regFee);
+    const subFee = num(form.subFee);
+    if (!Number.isFinite(commission) || commission < 0 || commission > 100) {
+      setError("Commission must be a number between 0 and 100."); return;
+    }
+    if (![regFee, subFee].every((f) => Number.isFinite(f) && f >= 0 && f <= 100000)) {
+      setError("Fees must be between ₹0 and ₹1,00,000."); return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nurseCommissionPercent: commission,
+          nurseRegistrationFee: regFee,
+          nurseSubscriptionFee: subFee,
+        }),
+      });
+      if (!res.ok) { setError((await res.json().catch(() => ({}))).error ?? "Could not save."); return; }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setError("Network error — settings were not saved.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
