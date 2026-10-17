@@ -25,6 +25,10 @@ export function parseNurseServiceInput(body: Record<string, unknown>, requireNam
     data.suggestedPrice = Math.round(n);
   }
   if ("requiresPrescription" in body) data.requiresPrescription = Boolean(body.requiresPrescription);
+  if ("kind" in body) {
+    if (body.kind !== "VISIT" && body.kind !== "SHIFT") return { error: "Invalid service type." };
+    data.kind = body.kind;
+  }
   if ("isActive" in body) data.isActive = Boolean(body.isActive);
   if ("sortOrder" in body) {
     const n = Number(body.sortOrder);

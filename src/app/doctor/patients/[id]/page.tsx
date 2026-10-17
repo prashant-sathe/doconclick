@@ -3,11 +3,10 @@ import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
-  Loader2, ArrowLeft, User, Droplets, AlertTriangle, Pill,
-  Scissors, PhoneCall, CalendarClock, Star, Stethoscope, Paperclip, Users,
-  Home, Building2, Video,
+  Loader2, ArrowLeft, User, Droplets, AlertTriangle, Pill, Scissors, PhoneCall, CalendarClock, Star, Stethoscope, Paperclip, Users, Home, Building2, Video, Activity,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import VitalsCharts, { type VitalReadingRow } from "@/components/VitalsCharts";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import { computeBMI, bmiCategoryClasses } from "@/lib/bmi";
@@ -101,6 +100,15 @@ function DoctorPatientHistoryInner() {
     if (!authLoading && !user) router.push("/login?next=/doctor/dashboard");
     if (!authLoading && user && user.role !== "DOCTOR") router.push("/login");
   }, [authLoading, user, router]);
+
+  const [vitals, setVitals] = useState<VitalReadingRow[] | null>(null);
+  useEffect(() => {
+    if (!user?.id || user.role !== "DOCTOR") return;
+    fetch(`/api/vitals?patientId=${params.id}${dependentId ? `&dependentId=${dependentId}` : ""}&limit=120`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setVitals)
+      .catch(() => setVitals([]));
+  }, [user?.id, user?.role, params.id, dependentId]);
 
   useEffect(() => {
     if (!user || user.role !== "DOCTOR") return;
@@ -198,6 +206,15 @@ function DoctorPatientHistoryInner() {
                 </div>
               )}
             </div>
+
+            {vitals && vitals.length > 0 && (
+              <div className="mb-6">
+                <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Activity className="w-4 h-4" /> Vitals from nurse visits ({vitals.length})
+                </h2>
+                <VitalsCharts readings={vitals} />
+              </div>
+            )}
 
             <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
               <CalendarClock className="w-4 h-4" /> Visit History with You ({data.appointments.length})

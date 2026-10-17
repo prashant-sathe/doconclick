@@ -18,12 +18,12 @@ import { RELATIONS } from "@/lib/relations";
 import { readPatientLocation } from "@/lib/patientLocation";
 import { getCurrentPositionCompat } from "@/lib/platform";
 import { isDoctorAvailableNow, formatAvailability } from "@/lib/availability";
-import { buildVisitSchedule, intervalLabel, PACKAGE_VISIT_OPTIONS, PACKAGE_INTERVAL_OPTIONS } from "@/lib/nursePackage";
+import { buildVisitSchedule, intervalLabel, isShift, shiftLabel, PACKAGE_VISIT_OPTIONS, PACKAGE_INTERVAL_OPTIONS, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
 import { patchPatientProfile } from "@/lib/usePatientProfile";
 import { prepareUpload, tooBigMessage } from "@/lib/compressImage";
 import { cn, formatProviderName } from "@/lib/utils";
 
-type Service = { id: string; name: string; description: string | null; durationMinutes: number; suggestedPrice: number; requiresPrescription: boolean };
+type Service = { id: string; name: string; description: string | null; durationMinutes: number; suggestedPrice: number; requiresPrescription: boolean; kind?: string };
 type Nurse = {
   id: string; name: string; photoUrl: string | null; qualification: string | null; experience: number; gender: string | null;
   languages: string; bio: string | null; availability: string; isVerified: boolean; policeVerified: boolean;
@@ -154,7 +154,8 @@ function PatientNurseContent() {
   const pickNurse = (n: Nurse) => {
     setNurse(n); setError(""); setConsent(false); setPrescriptionDocId("");
     // Off-hours right now → "as soon as possible" isn't on offer; start on a picked time.
-    setWhen(canComeNow(n) ? "NOW" : "LATER");
+    // Shifts are planned care — always a picked start time.
+    setWhen(!isShift(service) && canComeNow(n) ? "NOW" : "LATER");
     if (service?.requiresPrescription) loadDocs();
     window.scrollTo({ top: 0 });
   };
@@ -197,9 +198,14 @@ function PatientNurseContent() {
 
   // Exact dates the package will use (same function the server books with).
   const visitStart = when === "LATER" && scheduledAt ? new Date(scheduledAt) : null;
-  const schedulePreview = nurse && visits > 1
-    ? buildVisitSchedule(visitStart ?? new Date(), visits, intervalDays, nurse.availability)
+  const shiftMode = isShift(service);
+  const schedulePreview = nurse && (visits > 1 || shiftMode)
+    ? buildVisitSchedule(visitStart ?? new Date(), visits, shiftMode ? 1 : intervalDays, shiftMode ? null : nurse.availability)
     : [];
+  const fmtShift = (d: Date) => {
+    const end = new Date(d.getTime() + (service?.durationMinutes ?? 0) * 60000);
+    return `${fmtDay(d)} → ${end.toLocaleString("en-IN", { weekday: "short", hour: "numeric", minute: "2-digit" })}`;
+  };
   const total = nurse ? nurse.price * visits : 0;
   const fmtDay = (d: Date) => d.toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
@@ -236,7 +242,9 @@ function PatientNurseContent() {
     if (relation !== "Self" && !dependentId) { setError("Please select or add the family member this visit is for."); return; }
     if (when === "LATER" && (!scheduledAt || new Date(scheduledAt).getTime() <= Date.now())) { setError("Please pick a time in the future."); return; }
     const visitAt = when === "LATER" && scheduledAt ? new Date(scheduledAt) : new Date();
-    if (!isDoctorAvailableNow(nurse.availability, visitAt)) {
+    if (isShift(service)) {
+      if (!scheduledAt || visitAt.getTime() < Date.now() + SHIFT_MIN_LEAD_MS) { setError("Pick when the shift should start — at least an hour from now."); return; }
+    } else if (!isDoctorAvailableNow(nurse.availability, visitAt)) {
       setError(`${formatProviderName(nurse.name, "NURSE")} works ${formatAvailability(nurse.availability)}. Please pick a time within those hours.`);
       return;
     }
@@ -335,13 +343,20 @@ function PatientNurseContent() {
                 {services === null ? (
                   <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-slate-300" /></div>
                 ) : (
+                  <div className="space-y-5">
+                  {[
+                    { title: "Home visits", items: services.filter((s) => !isShift(s)) },
+                    { title: "Shifts — nurse stays with the patient", items: services.filter((s) => isShift(s)) },
+                  ].filter((g) => g.items.length > 0).map((g) => (
+                  <div key={g.title}>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{g.title}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {services.map((s) => (
+                    {g.items.map((s) => (
                       <button key={s.id} onClick={() => pickService(s)} className="text-left bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:border-rose-300 hover:shadow transition-all">
                         <p className="font-bold text-slate-900">{s.name}</p>
                         {s.description && <p className="text-xs text-slate-500 mt-1">{s.description}</p>}
                         <p className="text-xs text-slate-400 mt-2 flex items-center gap-2">
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />~{s.durationMinutes} min</span>
+                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{isShift(s) ? shiftLabel(s.durationMinutes) : `~${s.durationMinutes} min`}</span>
                           {s.suggestedPrice > 0 && <span>from ~₹{s.suggestedPrice}</span>}
                         </p>
                         {s.requiresPrescription && (
@@ -349,6 +364,9 @@ function PatientNurseContent() {
                         )}
                       </button>
                     ))}
+                  </div>
+                  </div>
+                  ))}
                   </div>
                 )}
               </>
@@ -406,7 +424,9 @@ function PatientNurseContent() {
                             {n.totalReviews > 0 && <span className="flex items-center gap-0.5"><Star className="w-3 h-3 fill-amber-400 text-amber-400" />{n.avgRating.toFixed(1)} ({n.totalReviews})</span>}
                             {n.distanceKm != null && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{n.distanceKm} km</span>}
                             {n.policeVerified && <span className="flex items-center gap-0.5 text-emerald-600 font-semibold"><ShieldCheck className="w-3 h-3" />Police verified</span>}
-                            {!isDoctorAvailableNow(n.availability)
+                            {shiftMode
+                              ? <span className="flex items-center gap-0.5 text-emerald-600 font-semibold"><Clock className="w-3 h-3" />Takes shifts</span>
+                              : !isDoctorAvailableNow(n.availability)
                               ? <span className="flex items-center gap-0.5 text-slate-400"><Clock className="w-3 h-3" />{formatAvailability(n.availability)}</span>
                               : n.busyNow
                                 ? <span className="flex items-center gap-0.5 text-amber-600 font-semibold"><Clock className="w-3 h-3" />On a visit now — book for later</span>
@@ -457,13 +477,13 @@ function PatientNurseContent() {
 
                   <div>
                     <label className="input-label"><CalendarClock className="inline w-3.5 h-3.5 mr-1" />When?</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {(["NOW", "LATER"] as const).map((w) => {
+                    <div className={cn("grid gap-2", shiftMode ? "grid-cols-1" : "grid-cols-2")}>
+                      {(shiftMode ? (["LATER"] as const) : (["NOW", "LATER"] as const)).map((w) => {
                         const off = w === "NOW" && !canComeNow(nurse);
                         return (
                           <button key={w} type="button" disabled={off} onClick={() => { setWhen(w); setError(""); }}
                             className={cn("py-2.5 rounded-xl border text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed", when === w ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
-                            {w === "NOW" ? "As soon as possible" : "Pick a time"}
+                            {w === "NOW" ? "As soon as possible" : shiftMode ? "Shift starts at" : "Pick a time"}
                           </button>
                         );
                       })}
@@ -471,16 +491,20 @@ function PatientNurseContent() {
                     {when === "LATER" && (
                       <input type="datetime-local" className="input-field mt-2" min={localInputValue(new Date())} value={scheduledAt} onChange={(e) => { setScheduledAt(e.target.value); setError(""); }} />
                     )}
+                    {shiftMode ? (
+                      <p className="text-[11px] text-slate-400 mt-1">{shiftLabel(service.durationMinutes)} — book at least an hour ahead so the nurse can plan.</p>
+                    ) : (
                     <p className="text-[11px] text-slate-400 mt-1">
                       Works {formatAvailability(nurse.availability)}
                       {!isDoctorAvailableNow(nurse.availability)
                         ? " — not working right now, so pick a time"
                         : nurse.busyNow ? " — on another visit right now, so pick a later time" : ""}
                     </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="input-label">How many visits?</label>
+                    <label className="input-label">{shiftMode ? "How many shifts? (back-to-back days)" : "How many visits?"}</label>
                     <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
                       {PACKAGE_VISIT_OPTIONS.map((n) => (
                         <button key={n} type="button" onClick={() => { setVisits(n); setError(""); }}
@@ -489,9 +513,9 @@ function PatientNurseContent() {
                         </button>
                       ))}
                     </div>
-                    {visits > 1 && (
+                    {(visits > 1 || shiftMode) && (
                       <>
-                        <div className="grid grid-cols-3 gap-2 mt-2">
+                        <div className={cn("grid grid-cols-3 gap-2 mt-2", shiftMode && "hidden")}>
                           {PACKAGE_INTERVAL_OPTIONS.map((n) => (
                             <button key={n} type="button" onClick={() => { setIntervalDays(n); setError(""); }}
                               className={cn("py-2 rounded-xl border text-xs font-semibold", intervalDays === n ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
@@ -500,11 +524,19 @@ function PatientNurseContent() {
                           ))}
                         </div>
                         <div className="mt-2 rounded-xl bg-slate-50 border border-slate-100 p-3">
-                          <p className="text-xs font-semibold text-slate-700 mb-1.5">Your {visits} visits{when === "NOW" ? " (first one as soon as possible)" : ""}</p>
-                          <ol className="text-xs text-slate-600 space-y-0.5 list-decimal list-inside">
-                            {schedulePreview.map((d, i) => <li key={i}>{i === 0 && when === "NOW" ? "As soon as possible" : fmtDay(d)}</li>)}
-                          </ol>
-                          <p className="text-[11px] text-slate-400 mt-1.5">Days {formatProviderName(nurse.name, "NURSE")} doesn&apos;t work are skipped. Pay once for all visits after she accepts.</p>
+                          <p className="text-xs font-semibold text-slate-700 mb-1.5">
+                            {shiftMode ? `Your ${visits} shift${visits === 1 ? "" : "s"}` : `Your ${visits} visits${when === "NOW" ? " (first one as soon as possible)" : ""}`}
+                          </p>
+                          {shiftMode && !scheduledAt ? (
+                            <p className="text-xs text-slate-400">Pick a start time to see the shifts.</p>
+                          ) : (
+                            <ol className="text-xs text-slate-600 space-y-0.5 list-decimal list-inside">
+                              {schedulePreview.map((d, i) => <li key={i}>{shiftMode ? fmtShift(d) : i === 0 && when === "NOW" ? "As soon as possible" : fmtDay(d)}</li>)}
+                            </ol>
+                          )}
+                          <p className="text-[11px] text-slate-400 mt-1.5">
+                            {shiftMode ? "Back-to-back days, same start time." : `Days ${formatProviderName(nurse.name, "NURSE")} doesn't work are skipped.`} Pay once for all after she accepts.
+                          </p>
                         </div>
                       </>
                     )}
@@ -561,7 +593,7 @@ function PatientNurseContent() {
                   {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-start gap-2"><AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />{error}</div>}
 
                   <button type="submit" disabled={booking} className="btn-primary w-full justify-center py-3.5 text-base">
-                    {visits > 1 ? `Request ${visits} visits (₹${total})` : `Request visit (₹${nurse.price})`}
+                    {shiftMode ? `Request ${visits} shift${visits === 1 ? "" : "s"} (₹${total})` : visits > 1 ? `Request ${visits} visits (₹${total})` : `Request visit (₹${nurse.price})`}
                   </button>
                   <p className="text-[11px] text-slate-400 text-center">You pay online after the nurse accepts.</p>
                 </div>
@@ -576,13 +608,13 @@ function PatientNurseContent() {
         <ConfirmDialog
           icon={CalendarCheck2}
           tone="primary"
-          title="Confirm this visit?"
+          title={shiftMode ? "Confirm this shift booking?" : "Confirm this visit?"}
           message={
             <div className="space-y-1.5">
               <div className="flex justify-between gap-3"><span>Nurse</span><span className="font-semibold text-slate-800 text-right">{formatProviderName(nurse.name, "NURSE")}</span></div>
               <div className="flex justify-between gap-3"><span>Service</span><span className="font-semibold text-slate-800 text-right">{service.name}</span></div>
-              {visits > 1 && (
-                <div className="flex justify-between gap-3"><span>Visits</span><span className="font-semibold text-slate-800 text-right">{visits} · {intervalLabel(intervalDays)} · ₹{nurse.price} each</span></div>
+              {(visits > 1 || shiftMode) && (
+                <div className="flex justify-between gap-3"><span>{shiftMode ? "Shifts" : "Visits"}</span><span className="font-semibold text-slate-800 text-right">{shiftMode ? `${visits} × ${shiftLabel(service.durationMinutes)}` : `${visits} · ${intervalLabel(intervalDays)}`} · ₹{nurse.price} each</span></div>
               )}
               <div className="flex justify-between gap-3"><span>{visits > 1 ? "First visit" : "When"}</span><span className="font-semibold text-slate-800 text-right">{when === "LATER" && scheduledAt ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "As soon as possible"}</span></div>
               <div className="flex justify-between gap-3"><span>Payment</span><span className="font-semibold text-slate-800 text-right">Online, after the nurse accepts</span></div>

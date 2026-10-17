@@ -87,6 +87,11 @@ export type NurseProfile = Prisma.NurseProfileModel
  */
 export type NurseService = Prisma.NurseServiceModel
 /**
+ * Model VitalReading
+ * 
+ */
+export type VitalReading = Prisma.VitalReadingModel
+/**
  * Model NursePackage
  * 
  */

@@ -6,6 +6,8 @@ import { getOpenAIClient, ASSISTANT_MODEL } from "@/lib/openai";
 import { ensureSpecialtiesSeeded } from "@/lib/specialties";
 import { haversine, withinSearchRadius } from "@/lib/geo";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
+import { ensureNurseServices } from "@/lib/nurseServices";
+import { searchNurses } from "@/lib/nurseSearch";
 
 type InputItem = OpenAI.Responses.ResponseInputItem;
 type FunctionCall = OpenAI.Responses.ResponseFunctionToolCall;
@@ -28,7 +30,7 @@ function checkRateLimit(patientId: string): boolean {
   return true;
 }
 
-const SYSTEM_PROMPT = `You are the DocOnClick Health Assistant — you help patients in India figure out which type of doctor to see, then point them to real doctors on the platform. You also help with account/app issues (booking problems, payment disputes, complaints) by raising a support ticket. You are not a doctor.
+const SYSTEM_PROMPT = `You are the DocOnClick Health Assistant — you help patients in India figure out which type of doctor to see, then point them to real doctors on the platform. You can also point them to registered nurses who come home for nursing care. You also help with account/app issues (booking problems, payment disputes, complaints) by raising a support ticket. You are not a doctor.
 
 Rules:
 - Never diagnose a condition, and never recommend medicines, dosages, or treatment. Your only job is triage: understand the symptoms well enough to recommend a medical specialty.
@@ -39,7 +41,11 @@ Rules:
 - Ask short, focused questions, one or two at a time. Whenever a question has a small set of likely answers, also call suggest_quick_replies with those options so the app can show tappable chips.
 - Once you have enough information, call find_doctors with the specialty you've settled on, and briefly explain your reasoning in the same turn. find_doctors already respects the patient's chosen search range — if it returns no doctors and a range is set, say so and suggest widening the range in their profile (Profile → Doctor Search Range).
 - You never book appointments yourself. Once you've shown doctors, the patient books through the app's normal booking screen — just recommend, don't try to complete a booking in the conversation.
-- For app/account problems that aren't medical — a payment that didn't go through, a booking bug, a billing dispute, a complaint about a doctor's conduct, or anything else needing a human to step in — call create_support_ticket so the DocOnClick team can follow up, and tell the patient you've done so. Never raise a ticket for a medical question; that's what specialty recommendations are for. If the patient asks about a ticket they raised before, call list_my_support_tickets.`;
+- For app/account problems that aren't medical — a payment that didn't go through, a booking bug, a billing dispute, a complaint about a doctor's conduct, or anything else needing a human to step in — call create_support_ticket so the DocOnClick team can follow up, and tell the patient you've done so. Never raise a ticket for a medical question; that's what specialty recommendations are for. If the patient asks about a ticket they raised before, call list_my_support_tickets.
+- Nurses (home nursing care): when the patient needs care or a procedure done at home rather than a diagnosis — giving a doctor-prescribed injection or IV drip, wound dressing, catheter care, removing stitches, BP/sugar checks, nebulization, post-operative or elderly care, mother & newborn care, or someone to stay with a patient for a 12-hour / 24-hour shift — call list_nurse_services, pick the matching service, and call find_nurses with its exact name. Say briefly why a nurse fits.
+- A nurse can only give medicines a doctor has already prescribed. If the service needs a prescription (requiresPrescription) and the patient has none, tell them to see a doctor first and recommend one (find_doctors) instead of nurses. If get_my_appointments shows a doctorRecommendedNurseCare item, mention it — their doctor's prescription is already attached when they book that nurse.
+- New or worsening symptoms (fever, pain, breathlessness, a wound looking infected…) need a doctor, not a nurse — triage to a doctor as usual. Nurses never replace a doctor's diagnosis.
+- As with doctors, you never book nurses yourself; the patient taps a nurse card to book. Repeated care (e.g. an injection daily for 5 days) is booked in one go: on the booking screen they choose the number of visits (up to 14) and how often, and pay once — tell them that instead of suggesting separate bookings. Shifts (12h / 24h) can likewise be booked for several days back-to-back.`;
 
 const TOOLS: OpenAI.Responses.Tool[] = [
   {
@@ -114,6 +120,27 @@ const TOOLS: OpenAI.Responses.Tool[] = [
         description: { type: "string", description: "Full detail of the issue, written from the conversation so far." },
       },
       required: ["subject", "description"],
+      additionalProperties: false,
+    },
+  },
+  {
+    type: "function",
+    name: "list_nurse_services",
+    description: "List the home nursing services nurses on the platform offer (visit procedures and 12h/24h shifts), with whether each needs a doctor's prescription.",
+    strict: true,
+    parameters: { type: "object", properties: {}, required: [], additionalProperties: false },
+  },
+  {
+    type: "function",
+    name: "find_nurses",
+    description: "Find registered nurses near the patient who offer one nursing service, nearest first. Returns { service, nurses, needsLocation, hasDoctorReferral }. If needsLocation is true, ask the patient to add their home address in their profile (Profile → Location & Address). hasDoctorReferral means a doctor on the platform already recommended this service for them.",
+    strict: true,
+    parameters: {
+      type: "object",
+      properties: {
+        serviceName: { type: "string", description: "Exact service name as returned by list_nurse_services." },
+      },
+      required: ["serviceName"],
       additionalProperties: false,
     },
   },
@@ -222,6 +249,46 @@ async function findDoctors(
   };
 }
 
+async function listNurseServices() {
+  await ensureNurseServices();
+  const services = await prisma.nurseService.findMany({
+    where: { isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    select: { name: true, kind: true, description: true, requiresPrescription: true, durationMinutes: true, suggestedPrice: true },
+  });
+  return services.map((s) => ({
+    name: s.name,
+    type: s.kind === "SHIFT" ? `shift (${Math.round(s.durationMinutes / 60)} hours)` : "visit",
+    description: s.description,
+    requiresPrescription: s.requiresPrescription,
+    typicalPrice: s.suggestedPrice,
+  }));
+}
+
+async function findNurses(patientId: string, args: { serviceName: string }, origin: Origin) {
+  const service = await prisma.nurseService.findFirst({
+    where: { name: { equals: args.serviceName, mode: "insensitive" }, isActive: true },
+  });
+  if (!service) return { error: `No nursing service called "${args.serviceName}". Call list_nurse_services for the exact names.` };
+  const [result, referral] = await Promise.all([
+    searchNurses({ patientId, serviceId: service.id, lat: origin?.lat ?? null, lng: origin?.lng ?? null }),
+    prisma.nurseReferral.findFirst({
+      where: { serviceId: service.id, appointment: { patientId }, bookings: { none: {} } },
+      select: { id: true },
+    }),
+  ]);
+  return {
+    service: { id: service.id, name: service.name, kind: service.kind, requiresPrescription: service.requiresPrescription },
+    needsLocation: result.needsLocation,
+    hasDoctorReferral: !!referral,
+    nurses: result.nurses.slice(0, 5).map((n) => ({
+      id: n.id, name: n.name, photoUrl: n.photoUrl, price: n.price, distanceKm: n.distanceKm,
+      avgRating: n.avgRating, totalReviews: n.totalReviews, experience: n.experience, qualification: n.qualification,
+      gender: n.gender, policeVerified: n.policeVerified, availability: n.availability, busyNow: n.busyNow,
+    })),
+  };
+}
+
 async function getMyProfile(patientId: string) {
   const profile = await prisma.patientProfile.findUnique({
     where: { userId: patientId },
@@ -264,9 +331,28 @@ async function getMyAppointments(patientId: string) {
     }),
   ]);
 
+  // Nurse care a doctor recommended that the patient hasn't booked yet.
+  const referrals = await prisma.nurseReferral.findMany({
+    where: { appointment: { patientId }, bookings: { none: {} } },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+    select: {
+      visits: true, intervalDays: true, instructions: true,
+      service: { select: { name: true } },
+      appointment: { select: { doctor: { select: { name: true } } } },
+    },
+  });
+
   return {
     upcoming: upcoming.map(apptLabel),
     recentCompleted: recentCompleted.map(apptLabel),
+    doctorRecommendedNurseCare: referrals.map((r) => ({
+      service: r.service.name,
+      visits: r.visits,
+      everyDays: r.intervalDays,
+      instructions: r.instructions,
+      doctorName: r.appointment.doctor.name,
+    })),
   };
 }
 
@@ -315,6 +401,10 @@ async function executeTool(call: FunctionCall, patientId: string, origin: Origin
       });
     case "list_my_support_tickets":
       return listMySupportTickets(patientId);
+    case "list_nurse_services":
+      return listNurseServices();
+    case "find_nurses":
+      return findNurses(patientId, { serviceName: String(args.serviceName ?? "") }, origin);
     default:
       return { error: `Unknown tool: ${call.name}` };
   }

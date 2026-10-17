@@ -406,6 +406,7 @@ export const ModelName = {
   DoctorProfile: 'DoctorProfile',
   NurseProfile: 'NurseProfile',
   NurseService: 'NurseService',
+  VitalReading: 'VitalReading',
   NursePackage: 'NursePackage',
   NurseReferral: 'NurseReferral',
   NurseServiceOffering: 'NurseServiceOffering',
@@ -448,7 +449,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption"
+    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1115,6 +1116,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.NurseServiceCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.NurseServiceCountAggregateOutputType> | number
+        }
+      }
+    }
+    VitalReading: {
+      payload: Prisma.$VitalReadingPayload<ExtArgs>
+      fields: Prisma.VitalReadingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VitalReadingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VitalReadingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload>
+        }
+        findFirst: {
+          args: Prisma.VitalReadingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VitalReadingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload>
+        }
+        findMany: {
+          args: Prisma.VitalReadingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload>[]
+        }
+        create: {
+          args: Prisma.VitalReadingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload>
+        }
+        createMany: {
+          args: Prisma.VitalReadingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VitalReadingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload>[]
+        }
+        delete: {
+          args: Prisma.VitalReadingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload>
+        }
+        update: {
+          args: Prisma.VitalReadingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload>
+        }
+        deleteMany: {
+          args: Prisma.VitalReadingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VitalReadingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VitalReadingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload>[]
+        }
+        upsert: {
+          args: Prisma.VitalReadingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VitalReadingPayload>
+        }
+        aggregate: {
+          args: Prisma.VitalReadingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVitalReading>
+        }
+        groupBy: {
+          args: Prisma.VitalReadingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VitalReadingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VitalReadingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VitalReadingCountAggregateOutputType> | number
         }
       }
     }
@@ -3337,6 +3412,7 @@ export type NurseProfileScalarFieldEnum = (typeof NurseProfileScalarFieldEnum)[k
 export const NurseServiceScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  kind: 'kind',
   description: 'description',
   durationMinutes: 'durationMinutes',
   suggestedPrice: 'suggestedPrice',
@@ -3347,6 +3423,28 @@ export const NurseServiceScalarFieldEnum = {
 } as const
 
 export type NurseServiceScalarFieldEnum = (typeof NurseServiceScalarFieldEnum)[keyof typeof NurseServiceScalarFieldEnum]
+
+
+export const VitalReadingScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  dependentId: 'dependentId',
+  appointmentId: 'appointmentId',
+  recordedById: 'recordedById',
+  recordedAt: 'recordedAt',
+  systolic: 'systolic',
+  diastolic: 'diastolic',
+  pulse: 'pulse',
+  spo2: 'spo2',
+  temperatureC: 'temperatureC',
+  sugarMgDl: 'sugarMgDl',
+  sugarType: 'sugarType',
+  notes: 'notes',
+  alertLevel: 'alertLevel',
+  alerts: 'alerts'
+} as const
+
+export type VitalReadingScalarFieldEnum = (typeof VitalReadingScalarFieldEnum)[keyof typeof VitalReadingScalarFieldEnum]
 
 
 export const NursePackageScalarFieldEnum = {
@@ -3704,6 +3802,7 @@ export const PlatformSettingsScalarFieldEnum = {
   nurseCommissionPercent: 'nurseCommissionPercent',
   nurseRegistrationFee: 'nurseRegistrationFee',
   nurseSubscriptionFee: 'nurseSubscriptionFee',
+  nurseShiftServicesSeeded: 'nurseShiftServicesSeeded',
   splashImageUrl: 'splashImageUrl',
   splashFit: 'splashFit',
   splashBgColor: 'splashBgColor',
@@ -4036,6 +4135,7 @@ export type GlobalOmitConfig = {
   doctorProfile?: Prisma.DoctorProfileOmit
   nurseProfile?: Prisma.NurseProfileOmit
   nurseService?: Prisma.NurseServiceOmit
+  vitalReading?: Prisma.VitalReadingOmit
   nursePackage?: Prisma.NursePackageOmit
   nurseReferral?: Prisma.NurseReferralOmit
   nurseServiceOffering?: Prisma.NurseServiceOfferingOmit

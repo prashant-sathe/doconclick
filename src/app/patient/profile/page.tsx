@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Loader2, MapPin, HeartPulse, PhoneCall, Compass, Bell, Wallet as WalletIcon,
-  LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2, Lock, FileCheck, FolderHeart,
+  LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2, Lock, FileCheck, FolderHeart, Activity,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -241,6 +241,8 @@ export default function PatientProfilePage() {
             title="Emergency Contact" trailing={<StatusPill done={emergencyDone ? 1 : 0} total={1} />} />
           <Row href="/patient/profile/documents" tint="bg-rose-50 text-rose-600" icon={<FolderHeart className="w-4 h-4" />}
             title="Health Documents" />
+          <Row href="/patient/profile/vitals" tint="bg-rose-50 text-rose-500" icon={<Activity className="w-4 h-4" />}
+            title="Vitals (BP, sugar, SpO2…)" />
         </Group>
 
         <Group label="Preferences">

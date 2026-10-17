@@ -17,7 +17,7 @@ import { prepareUpload, tooBigMessage } from "@/lib/compressImage";
 import { parseAvailabilityString } from "@/lib/availability";
 import { cn } from "@/lib/utils";
 
-type Service = { id: string; name: string; description: string | null; suggestedPrice: number; requiresPrescription: boolean; durationMinutes: number };
+type Service = { id: string; name: string; description: string | null; suggestedPrice: number; requiresPrescription: boolean; durationMinutes: number; kind?: string };
 type Offering = { serviceId: string; price: number; service: Service };
 type NurseProfile = {
   status: string; isVerified: boolean;
@@ -459,7 +459,7 @@ function NurseProfileContent() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-800">{s.name}</p>
                     <p className="text-xs text-slate-400">
-                      ~{s.durationMinutes} min{s.requiresPrescription ? " · needs doctor's prescription" : ""}
+                      {s.kind === "SHIFT" ? `${Math.round(s.durationMinutes / 60)}-hour shift — you stay with the patient` : `~${s.durationMinutes} min`}{s.requiresPrescription ? " · needs doctor's prescription" : ""}
                     </p>
                   </div>
                   {on && (

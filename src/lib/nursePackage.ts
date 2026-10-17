@@ -38,3 +38,15 @@ export function buildVisitSchedule(
 export function intervalLabel(intervalDays: number): string {
   return intervalDays === 1 ? "every day" : `every ${intervalDays} days`;
 }
+
+// Shift services (12h / 24h): the nurse stays for the whole duration.
+export const SHIFT_MIN_LEAD_MS = 60 * 60 * 1000; // book at least an hour ahead
+
+export function isShift(service: { kind?: string | null } | null | undefined): boolean {
+  return service?.kind === "SHIFT";
+}
+
+export function shiftLabel(durationMinutes: number): string {
+  const h = Math.round(durationMinutes / 60);
+  return `${h}-hour shift`;
+}

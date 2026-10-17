@@ -4,14 +4,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp,
-  MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck,
-  Building2, Video, Home, Ticket, Clock, LifeBuoy,
+  ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp, MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck, Building2, Video, Home, Ticket, Clock, LifeBuoy, HeartPulse,
 } from "lucide-react";
 import RatingStars from "@/components/patient/RatingStars";
-import { isDoctorAvailableNow } from "@/lib/availability";
+import { isDoctorAvailableNow, formatAvailability } from "@/lib/availability";
 import { useAuth } from "@/components/AuthProvider";
-import { formatDoctorName } from "@/lib/utils";
+import { formatDoctorName, formatProviderName } from "@/lib/utils";
 import { renderChatText } from "@/lib/chatMarkdown";
 import { readPatientLocation } from "@/lib/patientLocation";
 
@@ -44,6 +42,22 @@ interface AssistantDoctor {
   offersVideo: boolean;
 }
 
+interface AssistantNurse {
+  id: string;
+  name: string;
+  photoUrl: string | null;
+  price: number;
+  distanceKm: number | null;
+  avgRating: number;
+  totalReviews: number;
+  experience: number;
+  qualification: string | null;
+  gender: string | null;
+  policeVerified: boolean;
+  availability: string;
+  busyNow?: boolean;
+}
+
 interface SupportTicket {
   id: string;
   subject: string;
@@ -57,6 +71,7 @@ type DisplayEntry =
   | { kind: "assistant"; text: string; key: string }
   | { kind: "chips"; options: string[]; active: boolean; key: string }
   | { kind: "doctors"; doctors: AssistantDoctor[]; key: string }
+  | { kind: "nurses"; nurses: AssistantNurse[]; service: { id: string; name: string; kind: string; requiresPrescription: boolean }; hasDoctorReferral: boolean; key: string }
   | { kind: "ticket-created"; ticket: SupportTicket; key: string }
   | { kind: "ticket-list"; tickets: SupportTicket[]; key: string };
 
@@ -99,6 +114,15 @@ function buildDisplayEntries(items: ConversationItem[]): DisplayEntry[] {
           if (doctors.length) entries.push({ kind: "doctors", doctors, key: `d-${idx}` });
         } catch {
           // malformed tool output — skip rendering doctor cards for this turn
+        }
+      } else if (call?.name === "find_nurses") {
+        try {
+          const parsed = JSON.parse(item.output ?? "{}");
+          if (parsed?.service && Array.isArray(parsed.nurses) && parsed.nurses.length) {
+            entries.push({ kind: "nurses", nurses: parsed.nurses, service: parsed.service, hasDoctorReferral: !!parsed.hasDoctorReferral, key: `n-${idx}` });
+          }
+        } catch {
+          // malformed tool output — skip rendering nurse cards for this turn
         }
       } else if (call?.name === "create_support_ticket") {
         try {
@@ -158,6 +182,57 @@ function TypingIndicator() {
         <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:-0.3s]" />
         <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:-0.15s]" />
         <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" />
+      </div>
+    </div>
+  );
+}
+
+// A nurse suggestion: books straight into /patient/nurse with this nurse +
+// service pre-selected (the same page the patient would reach by hand).
+function NurseCard({ nurse, service, hasDoctorReferral }: {
+  nurse: AssistantNurse;
+  service: { id: string; name: string; kind: string; requiresPrescription: boolean };
+  hasDoctorReferral: boolean;
+}) {
+  const shift = service.kind === "SHIFT";
+  const available = !shift && isDoctorAvailableNow(nurse.availability) && !nurse.busyNow;
+  return (
+    <div className="bg-white border border-rose-100 rounded-2xl p-4 shadow-sm">
+      <div className="flex gap-3">
+        <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+          {nurse.photoUrl
+            ? <Image src={nurse.photoUrl} alt={nurse.name} width={48} height={48} className="w-12 h-12 object-cover" />
+            : <HeartPulse className="w-6 h-6 text-rose-400" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-bold text-slate-900 truncate">{formatProviderName(nurse.name, "NURSE")}</span>
+            <span className="text-sm font-bold text-slate-900 flex-shrink-0">₹{nurse.price}</span>
+          </div>
+          <span className="badge badge-danger mt-1.5">{service.name}</span>
+          <p className="text-[11px] text-slate-500 mt-1">{[nurse.qualification, nurse.experience ? `${nurse.experience} yrs exp` : null, nurse.gender].filter(Boolean).join(" · ")}</p>
+          {nurse.totalReviews > 0 && <div className="mt-1"><RatingStars avgRating={nurse.avgRating} totalReviews={nurse.totalReviews} /></div>}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[11px]">
+            {nurse.distanceKm != null && <span className="flex items-center gap-1 text-slate-500"><MapPin className="w-3 h-3" /> {nurse.distanceKm} km away</span>}
+            {nurse.policeVerified && <span className="font-semibold text-emerald-600">Police verified</span>}
+            {!shift && (
+              <span className={`flex items-center gap-1 font-semibold ${available ? "text-emerald-600" : "text-amber-600"}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${available ? "bg-emerald-500" : "bg-amber-500"}`} />
+                {available ? "Available now" : nurse.busyNow ? "On a visit now" : formatAvailability(nurse.availability)}
+              </span>
+            )}
+          </div>
+          {service.requiresPrescription && (
+            <p className={`text-[11px] mt-1.5 font-semibold ${hasDoctorReferral ? "text-emerald-700" : "text-amber-700"}`}>
+              {hasDoctorReferral ? "Your doctor's prescription will be attached" : "Needs a doctor's prescription"}
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="flex gap-2 mt-3">
+        <Link href={`/patient/nurse?serviceId=${service.id}&nurseId=${nurse.id}`} className="btn-primary flex-1 justify-center py-2 text-xs">
+          Book this nurse
+        </Link>
       </div>
     </div>
   );
@@ -332,6 +407,13 @@ function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: strin
   }
   if (entry.kind === "ticket-created") return <TicketCreatedCard ticket={entry.ticket} />;
   if (entry.kind === "ticket-list") return <TicketListCard tickets={entry.tickets} />;
+  if (entry.kind === "nurses") {
+    return (
+      <div className="ml-9 flex flex-col gap-3">
+        {entry.nurses.map((n) => <NurseCard key={n.id} nurse={n} service={entry.service} hasDoctorReferral={entry.hasDoctorReferral} />)}
+      </div>
+    );
+  }
   return (
     <div className="ml-9 flex flex-col gap-3">
       {entry.doctors.map((d) => (
@@ -497,7 +579,7 @@ export default function HealthAssistantPage() {
       <div className="flex-shrink-0 bg-blue-50 border-b border-blue-100 px-4 sm:px-7 py-2 flex items-center gap-2">
         <Info className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
         <span className="text-xs font-medium text-blue-700">
-          This assistant helps you find the right doctor. It does not provide diagnosis or emergency care — for urgent symptoms, call 112 or go to the nearest hospital.
+          This assistant helps you find the right doctor or home nurse. It does not provide diagnosis or emergency care — for urgent symptoms, call 112 or go to the nearest hospital.
         </span>
       </div>
 

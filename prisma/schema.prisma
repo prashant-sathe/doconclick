@@ -50,6 +50,8 @@ model User {
   couponRedemptions      CouponRedemption[]
   documents              PatientDocument[]      @relation("PatientDocuments")
   nursePaymentLogs       NursePaymentLog[]      @relation("NursePaymentLogs")
+  vitals                 VitalReading[]         @relation("PatientVitals")
+  vitalsRecorded         VitalReading[]         @relation("VitalsRecordedBy")
   staffAccount           StaffProfile?           @relation("StaffAccount")
   staffMembers           StaffProfile[]          @relation("DoctorStaff")
 }
@@ -126,6 +128,7 @@ model PatientDependent {
   emergencyContactPhone String?
   createdAt        DateTime @default(now())
   appointments     Appointment[]
+  vitals           VitalReading[]
 }
 
 // A patient's general health-records vault — lab reports, scans, discharge
@@ -232,6 +235,10 @@ model NurseProfile {
 model NurseService {
   id                   String   @id @default(cuid())
   name                 String   @unique
+  // VISIT = a procedure/visit (minutes); SHIFT = the nurse stays for
+  // durationMinutes (12h / 24h attendant care). Shifts skip the nurse's
+  // daily working hours but still block her calendar for their full length.
+  kind                 String   @default("VISIT") // VISIT, SHIFT
   description          String?
   durationMinutes      Int      @default(30)
   suggestedPrice       Float    @default(0)
@@ -242,6 +249,33 @@ model NurseService {
   offerings            NurseServiceOffering[]
   appointments         Appointment[]
   referrals            NurseReferral[]
+}
+
+// Vitals a nurse records during a visit (BP, pulse, SpO2, temperature, sugar).
+// The subject is the account holder, or one of their family members.
+model VitalReading {
+  id            String    @id @default(cuid())
+  patientId     String
+  patient       User      @relation("PatientVitals", fields: [patientId], references: [id], onDelete: Cascade)
+  dependentId   String?
+  dependent     PatientDependent? @relation(fields: [dependentId], references: [id], onDelete: Cascade)
+  appointmentId String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  recordedById  String
+  recordedBy    User      @relation("VitalsRecordedBy", fields: [recordedById], references: [id])
+  recordedAt    DateTime  @default(now())
+  systolic      Int?
+  diastolic     Int?
+  pulse         Int?
+  spo2          Int?
+  temperatureC  Float?
+  sugarMgDl     Int?
+  sugarType     String?   // FASTING, RANDOM, POST_MEAL
+  notes         String?
+  alertLevel    String    @default("NORMAL") // NORMAL, WARNING, CRITICAL
+  alerts        String?   // readable summary of what was out of range
+
+  @@index([patientId, dependentId, recordedAt])
 }
 
 model NursePackage {
@@ -343,6 +377,7 @@ model Appointment {
   nurseReferral     NurseReferral? @relation("ReferralBookings", fields: [nurseReferralId], references: [id], onDelete: SetNull)
   // On a doctor's consultation: the nurse care the doctor recommended.
   referralGiven     NurseReferral? @relation("ReferralSource")
+  vitals            VitalReading[]
   status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED, NO_SHOW
   acceptedAt    DateTime? // set when the doctor accepts (PENDING_APPROVAL → SCHEDULED); used for the late-cancellation warning
   paymentMethod String    @default("CASH") // ONLINE, CASH
@@ -638,6 +673,9 @@ model PlatformSettings {
   nurseCommissionPercent  Float    @default(10)
   nurseRegistrationFee    Float    @default(0)
   nurseSubscriptionFee    Float    @default(0)
+  // One-time: the starter 12h/24h shift services were added to an existing
+  // catalogue (so an admin deleting them later doesn't bring them back).
+  nurseShiftServicesSeeded Boolean @default(false)
   // Mobile app splash: admin uploads an image that the native shell shows over
   // the WebView while it boots (the real native splash is baked into the app
   // binary and can't change without a store update — this is the dynamic layer

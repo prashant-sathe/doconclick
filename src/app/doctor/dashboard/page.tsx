@@ -27,6 +27,7 @@ import { useResync } from "@/hooks/useResync";
 import PullToRefresh from "@/components/PullToRefresh";
 import { compressImage } from "@/lib/compressImage";
 import { PACKAGE_VISIT_OPTIONS, PACKAGE_INTERVAL_OPTIONS, intervalLabel } from "@/lib/nursePackage";
+import { vitalsSummary, type VitalsInput } from "@/lib/vitals";
 
 interface DoctorProfile {
   specialty: string;
@@ -45,6 +46,9 @@ interface DoctorMe {
 interface Appointment {
   id: string;
   patientId: string;
+  // Latest vitals a nurse recorded for this patient in the last 30 days.
+  latestVitals?: (VitalsInput & { recordedAt: string; alertLevel: string; alerts: string | null }) | null;
+  recentVitalsCount?: number;
   status: string;
   consultType: string;
   symptoms: string;
@@ -113,6 +117,29 @@ function videoUnlockRemainingSec(a: Appointment, now: number): number {
 }
 function historyHref(a: Appointment): string {
   return a.dependentId ? `/doctor/patients/${a.patientId}?dependentId=${a.dependentId}` : `/doctor/patients/${a.patientId}`;
+}
+
+// What nurses recorded since the doctor last saw this patient — one tap to
+// the full trend on the patient's history page.
+function VitalsChip({ a }: { a: Appointment }) {
+  const v = a.latestVitals;
+  if (!v) return null;
+  const critical = v.alertLevel === "CRITICAL";
+  const warn = v.alertLevel === "WARNING";
+  const when = new Date(v.recordedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  return (
+    <Link
+      href={historyHref(a)}
+      className={cn(
+        "mt-1.5 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-semibold border",
+        critical ? "bg-red-50 border-red-200 text-red-700" : warn ? "bg-amber-50 border-amber-200 text-amber-800" : "bg-slate-50 border-slate-200 text-slate-600"
+      )}
+    >
+      {critical || warn ? <AlertTriangle className="w-3 h-3" /> : <HeartPulse className="w-3 h-3 text-rose-500" />}
+      Nurse vitals {when}: {vitalsSummary(v)}
+      {(a.recentVitalsCount ?? 0) > 1 && <span className="font-normal opacity-80">· {a.recentVitalsCount} readings</span>}
+    </Link>
+  );
 }
 
 // ── Today's Timeline ─────────────────────────────────────────────────────
@@ -1120,6 +1147,7 @@ export default function DoctorDashboard() {
                           {new Date(a.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} · {a.consultType}
                         </div>
                         <div className="text-sm text-slate-600 mt-0.5">{a.symptoms}</div>
+                        <VitalsChip a={a} />
                         {a.allergies && (
                           <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}
@@ -1207,6 +1235,7 @@ export default function DoctorDashboard() {
                             </div>
                             <div className="text-xs text-slate-400 mt-0.5">{a.consultType === "HOME" ? "Home visit" : a.consultType === "VIDEO" ? "Video consultation" : "Clinic visit"}</div>
                             <div className="text-sm text-slate-600 mt-0.5">{a.symptoms}</div>
+                            <VitalsChip a={a} />
                             {a.allergies && (
                               <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
                                 <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}

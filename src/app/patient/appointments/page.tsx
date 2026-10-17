@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Loader2, CalendarClock, Stethoscope, Home, Building2, Video, FileText, Star, X, Wallet, CreditCard, RotateCcw, Clock, Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin, MessageCircle, Navigation, UserCheck, HeartPulse, CheckCircle2,
+  Loader2, CalendarClock, Stethoscope, Home, Building2, Video, FileText, Star, X, Wallet, CreditCard, RotateCcw, Clock, Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin, MessageCircle, Navigation, UserCheck, HeartPulse, CheckCircle2, Activity, AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName, formatProviderName } from "@/lib/utils";
@@ -16,6 +16,7 @@ import { playMessageChime } from "@/lib/playNotificationSound";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { useResync } from "@/hooks/useResync";
 import { intervalLabel } from "@/lib/nursePackage";
+import { vitalsSummary, type VitalsInput } from "@/lib/vitals";
 import PullToRefresh from "@/components/PullToRefresh";
 
 interface Medicine {
@@ -57,6 +58,8 @@ interface Appointment {
   serviceName?: string | null;
   nurseServiceId?: string | null;
   visitOtp?: string | null;
+  nurseService?: { kind: string; durationMinutes: number } | null;
+  vitals?: (VitalsInput & { id: string; recordedAt: string; alertLevel: string })[];
   visitStartedAt?: string | null;
   visitStartNote?: string | null;
   packageIndex?: number | null;
@@ -257,6 +260,11 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
         </div>
       </div>
 
+      {a.nurseService?.kind === "SHIFT" && (
+        <p className="text-xs font-semibold text-violet-700 mb-1">
+          {Math.round(a.nurseService.durationMinutes / 60)}-hour shift · ends {new Date(new Date(a.scheduledAt).getTime() + a.nurseService.durationMinutes * 60000).toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
+        </p>
+      )}
       {a.packageIndex && a.package && (
         <p className="text-xs font-semibold text-rose-600 mb-1">Visit {a.packageIndex} of {a.package.visits} · {intervalLabel(a.package.intervalDays)}</p>
       )}
@@ -271,6 +279,18 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
           </div>
           <span className="text-2xl font-extrabold tracking-[0.3em] text-rose-700 flex-shrink-0">{a.visitOtp}</span>
         </div>
+      )}
+      {a.providerType === "NURSE" && a.vitals && a.vitals.length > 0 && (
+        <Link href="/patient/profile/vitals" className={cn(
+          "rounded-xl border px-4 py-2.5 mb-3 text-xs flex items-center justify-between gap-2",
+          a.vitals[0].alertLevel === "CRITICAL" ? "border-red-200 bg-red-50 text-red-800" : a.vitals[0].alertLevel === "WARNING" ? "border-amber-200 bg-amber-50 text-amber-900" : "border-slate-200 bg-slate-50 text-slate-700"
+        )}>
+          <span className="flex items-center gap-1.5 min-w-0">
+            {a.vitals[0].alertLevel === "NORMAL" ? <Activity className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" /> : <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />}
+            <span className="truncate">Vitals: {vitalsSummary(a.vitals[0])}</span>
+          </span>
+          <span className="font-semibold flex-shrink-0">See trend →</span>
+        </Link>
       )}
       {a.providerType === "NURSE" && a.visitStartedAt && a.visitStartNote && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 mb-3 text-xs text-amber-800">

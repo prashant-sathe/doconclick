@@ -15,11 +15,30 @@ const DEFAULT_NURSE_SERVICES = [
   { name: "Mother & Baby Care", description: "Post-delivery care for mother and newborn.", durationMinutes: 60, suggestedPrice: 800, requiresPrescription: false },
 ];
 
+// Long-hours care: the nurse stays for the whole shift.
+const DEFAULT_SHIFT_SERVICES = [
+  { name: "12-hour Day Shift", description: "Nurse stays with the patient for 12 hours in the day — care, medicines on time, hygiene, vitals.", durationMinutes: 720, suggestedPrice: 1500 },
+  { name: "12-hour Night Shift", description: "Nurse stays overnight for 12 hours — night care, turning, medicines, and help if anything changes.", durationMinutes: 720, suggestedPrice: 1800 },
+  { name: "24-hour Live-in Care", description: "Round-the-clock nursing care for 24 hours — for bedridden, post-operative or elderly patients.", durationMinutes: 1440, suggestedPrice: 3000 },
+];
+
 export async function ensureNurseServices() {
   const count = await prisma.nurseService.count();
-  if (count > 0) return;
-  await prisma.nurseService.createMany({
-    data: DEFAULT_NURSE_SERVICES.map((s, i) => ({ ...s, sortOrder: i })),
-    skipDuplicates: true,
-  });
+  if (count === 0) {
+    await prisma.nurseService.createMany({
+      data: DEFAULT_NURSE_SERVICES.map((s, i) => ({ ...s, sortOrder: i })),
+      skipDuplicates: true,
+    });
+  }
+  // Shift services arrived after the first catalogue — add them once to an
+  // existing catalogue, then never again (so an admin deleting one sticks).
+  const settings = (await prisma.platformSettings.findFirst()) ?? (await prisma.platformSettings.create({ data: {} }));
+  if (!settings.nurseShiftServicesSeeded) {
+    const last = await prisma.nurseService.findFirst({ orderBy: { sortOrder: "desc" }, select: { sortOrder: true } });
+    await prisma.nurseService.createMany({
+      data: DEFAULT_SHIFT_SERVICES.map((s, i) => ({ ...s, kind: "SHIFT", requiresPrescription: false, sortOrder: (last?.sortOrder ?? 0) + 1 + i })),
+      skipDuplicates: true,
+    });
+    await prisma.platformSettings.update({ where: { id: settings.id }, data: { nurseShiftServicesSeeded: true } });
+  }
 }

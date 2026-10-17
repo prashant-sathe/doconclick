@@ -60,6 +60,7 @@ export const ModelName = {
   DoctorProfile: 'DoctorProfile',
   NurseProfile: 'NurseProfile',
   NurseService: 'NurseService',
+  VitalReading: 'VitalReading',
   NursePackage: 'NursePackage',
   NurseReferral: 'NurseReferral',
   NurseServiceOffering: 'NurseServiceOffering',
@@ -287,6 +288,7 @@ export type NurseProfileScalarFieldEnum = (typeof NurseProfileScalarFieldEnum)[k
 export const NurseServiceScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  kind: 'kind',
   description: 'description',
   durationMinutes: 'durationMinutes',
   suggestedPrice: 'suggestedPrice',
@@ -297,6 +299,28 @@ export const NurseServiceScalarFieldEnum = {
 } as const
 
 export type NurseServiceScalarFieldEnum = (typeof NurseServiceScalarFieldEnum)[keyof typeof NurseServiceScalarFieldEnum]
+
+
+export const VitalReadingScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  dependentId: 'dependentId',
+  appointmentId: 'appointmentId',
+  recordedById: 'recordedById',
+  recordedAt: 'recordedAt',
+  systolic: 'systolic',
+  diastolic: 'diastolic',
+  pulse: 'pulse',
+  spo2: 'spo2',
+  temperatureC: 'temperatureC',
+  sugarMgDl: 'sugarMgDl',
+  sugarType: 'sugarType',
+  notes: 'notes',
+  alertLevel: 'alertLevel',
+  alerts: 'alerts'
+} as const
+
+export type VitalReadingScalarFieldEnum = (typeof VitalReadingScalarFieldEnum)[keyof typeof VitalReadingScalarFieldEnum]
 
 
 export const NursePackageScalarFieldEnum = {
@@ -654,6 +678,7 @@ export const PlatformSettingsScalarFieldEnum = {
   nurseCommissionPercent: 'nurseCommissionPercent',
   nurseRegistrationFee: 'nurseRegistrationFee',
   nurseSubscriptionFee: 'nurseSubscriptionFee',
+  nurseShiftServicesSeeded: 'nurseShiftServicesSeeded',
   splashImageUrl: 'splashImageUrl',
   splashFit: 'splashFit',
   splashBgColor: 'splashBgColor',

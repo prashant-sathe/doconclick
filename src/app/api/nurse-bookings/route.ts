@@ -6,7 +6,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
 import { isNurseBookable } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
-import { buildVisitSchedule, intervalLabel, PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS } from "@/lib/nursePackage";
+import { buildVisitSchedule, intervalLabel, isShift, shiftLabel, PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
 
 // POST: patient books a nurse home visit (or a multi-visit package) for one service. Stored as a
 // regular Appointment (providerType NURSE, doctorId = the nurse) so payment,
@@ -88,10 +88,19 @@ export async function POST(req: Request) {
     }
   }
 
+  // A shift (12h / 24h) is planned care: it needs a start time, at least an
+  // hour ahead, and runs on consecutive days. It isn't bound by the nurse's
+  // daily visiting hours (she chose to offer shifts) — but it does block her
+  // calendar for the whole shift, so the clash check below still applies.
+  const shift = isShift(offering.service);
+  if (shift && (!scheduledAt || new Date(scheduledAt).getTime() < Date.now() + SHIFT_MIN_LEAD_MS)) {
+    return NextResponse.json({ error: "Pick the shift's start time — at least an hour from now." }, { status: 400 });
+  }
+
   // Package: 1 visit (default) up to 14, every 1–3 days. The dates skip the
   // nurse's days off — same function the booking form previews with.
   const visitsWanted = body.visits === undefined ? 1 : Number(body.visits);
-  const intervalDays = body.intervalDays === undefined ? 1 : Number(body.intervalDays);
+  const intervalDays = shift ? 1 : body.intervalDays === undefined ? 1 : Number(body.intervalDays);
   if (!Number.isInteger(visitsWanted) || visitsWanted < 1 || visitsWanted > PACKAGE_MAX_VISITS) {
     return NextResponse.json({ error: `Choose between 1 and ${PACKAGE_MAX_VISITS} visits.` }, { status: 400 });
   }
@@ -102,7 +111,7 @@ export async function POST(req: Request) {
     scheduledAt ? new Date(scheduledAt) : new Date(),
     visitsWanted,
     intervalDays,
-    nurse.nurseProfile.availability,
+    shift ? null : nurse.nurseProfile.availability,
   );
   for (let i = 0; i < schedule.length; i++) {
     const problem = await nurseSlotProblem({
@@ -111,6 +120,7 @@ export async function POST(req: Request) {
       when: schedule[i],
       durationMinutes: offering.service.durationMinutes,
       viewer: "patient",
+      checkHours: !shift,
     });
     if (problem) {
       const prefix = schedule.length > 1
@@ -217,9 +227,11 @@ export async function POST(req: Request) {
   const who = dependent ? dependent.name : patient.name;
   void sendPushToUser(nurse.id, {
     title: created.pkg ? "New visit package request" : "New visit request",
-    body: created.pkg
-      ? `${who} requested ${offering.service.name} — ${schedule.length} visits, ${intervalLabel(intervalDays)}.`
-      : `${who} requested ${offering.service.name}.`,
+    body: shift
+      ? `${who} requested ${schedule.length > 1 ? `${schedule.length} × ` : "a "}${shiftLabel(offering.service.durationMinutes)} (${offering.service.name}).`
+      : created.pkg
+        ? `${who} requested ${offering.service.name} — ${schedule.length} visits, ${intervalLabel(intervalDays)}.`
+        : `${who} requested ${offering.service.name}.`,
     url: "/nurse/dashboard",
   });
 

@@ -27,6 +27,8 @@ export async function GET() {
         attachments: true,
         reassignedTo: { select: { id: true, doctor: { select: { name: true } } } },
         package: { select: { visits: true, intervalDays: true } },
+        nurseService: { select: { kind: true, durationMinutes: true } },
+        vitals: { orderBy: { recordedAt: "desc" }, take: 1 },
         referralGiven: {
           select: {
             id: true, visits: true, intervalDays: true, instructions: true,
@@ -67,12 +69,35 @@ export async function GET() {
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });
+    // Vitals nurses recorded for these patients in the last 30 days — so at
+    // the next consultation the doctor sees what happened in between.
+    const active = appointments.filter((a) => ["PENDING_APPROVAL", "SCHEDULED", "COMPLETED"].includes(a.status));
+    const recentVitals = active.length
+      ? await prisma.vitalReading.findMany({
+          where: {
+            patientId: { in: [...new Set(active.map((a) => a.patientId))] },
+            recordedAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+          },
+          orderBy: { recordedAt: "desc" },
+          select: {
+            patientId: true, dependentId: true, recordedAt: true, alertLevel: true, alerts: true,
+            systolic: true, diastolic: true, pulse: true, spo2: true, temperatureC: true, sugarMgDl: true, sugarType: true,
+          },
+        })
+      : [];
+    const latestFor = (patientId: string, dependentId: string | null) =>
+      recentVitals.find((v) => v.patientId === patientId && v.dependentId === dependentId) ?? null;
+    const countFor = (patientId: string, dependentId: string | null) =>
+      recentVitals.filter((v) => v.patientId === patientId && v.dependentId === dependentId).length;
+
     return NextResponse.json(
       appointments.map(({ _count, ...a }) => ({
         ...a,
         amount: safeNum(a.amount),
         platformFee: safeNum(a.platformFee),
         unreadMessageCount: _count.messages,
+        latestVitals: latestFor(a.patientId, a.dependentId),
+        recentVitalsCount: countFor(a.patientId, a.dependentId),
       }))
     );
   }
@@ -98,6 +123,8 @@ export async function GET() {
         prescriptionDoc: { select: { title: true, fileUrl: true, fileName: true } },
         review: { select: { rating: true, comment: true } },
         package: { select: { visits: true, intervalDays: true } },
+        nurseService: { select: { kind: true, durationMinutes: true } },
+        vitals: { orderBy: { recordedAt: "desc" } },
         nurseReferral: {
           select: {
             instructions: true, visits: true, intervalDays: true,

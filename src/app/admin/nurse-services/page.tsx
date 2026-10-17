@@ -12,11 +12,12 @@ interface ServiceRow {
   suggestedPrice: number;
   requiresPrescription: boolean;
   isActive: boolean;
+  kind: string;
   _count: { offerings: number; appointments: number };
 }
 
-type FormState = { name: string; description: string; durationMinutes: string; suggestedPrice: string; requiresPrescription: boolean };
-const EMPTY: FormState = { name: "", description: "", durationMinutes: "30", suggestedPrice: "", requiresPrescription: false };
+type FormState = { name: string; description: string; durationMinutes: string; suggestedPrice: string; requiresPrescription: boolean; shift: boolean };
+const EMPTY: FormState = { name: "", description: "", durationMinutes: "30", suggestedPrice: "", requiresPrescription: false, shift: false };
 
 function ServiceForm({ value, onChange }: { value: FormState; onChange: (v: FormState) => void }) {
   return (
@@ -41,6 +42,11 @@ function ServiceForm({ value, onChange }: { value: FormState; onChange: (v: Form
         <input type="checkbox" className="w-4 h-4 accent-rose-500" checked={value.requiresPrescription} onChange={(e) => onChange({ ...value, requiresPrescription: e.target.checked })} />
         Needs a doctor&apos;s prescription (injections, IV, catheter…)
       </label>
+      <label className="sm:col-span-2 flex items-center gap-2 text-sm text-slate-700">
+        <input type="checkbox" className="w-4 h-4 accent-rose-500" checked={value.shift}
+          onChange={(e) => onChange({ ...value, shift: e.target.checked, durationMinutes: e.target.checked && Number(value.durationMinutes) < 240 ? "720" : value.durationMinutes })} />
+        Shift — the nurse stays for the whole duration (e.g. 12-hour night shift, 24-hour care)
+      </label>
     </div>
   );
 }
@@ -51,6 +57,7 @@ const toBody = (f: FormState) => ({
   durationMinutes: Number(f.durationMinutes),
   suggestedPrice: Number(f.suggestedPrice || 0),
   requiresPrescription: f.requiresPrescription,
+  kind: f.shift ? "SHIFT" : "VISIT",
 });
 
 export default function AdminNurseServices() {
@@ -150,6 +157,7 @@ export default function AdminNurseServices() {
                     <p className="font-bold text-slate-900 flex items-center gap-2 flex-wrap">
                       {s.name}
                       {!s.isActive && <span className="badge badge-gray text-[10px]">Hidden</span>}
+                      {s.kind === "SHIFT" && <span className="badge badge-purple text-[10px]">Shift · {Math.round(s.durationMinutes / 60)} h</span>}
                       {s.requiresPrescription && <span className="badge badge-warning text-[10px] inline-flex items-center gap-1"><FileText className="w-3 h-3" />Prescription</span>}
                     </p>
                     {s.description && <p className="text-sm text-slate-500 mt-0.5">{s.description}</p>}
@@ -162,7 +170,7 @@ export default function AdminNurseServices() {
                       title="Edit"
                       onClick={() => {
                         setEditId(s.id);
-                        setEditForm({ name: s.name, description: s.description ?? "", durationMinutes: String(s.durationMinutes), suggestedPrice: String(s.suggestedPrice), requiresPrescription: s.requiresPrescription });
+                        setEditForm({ name: s.name, description: s.description ?? "", durationMinutes: String(s.durationMinutes), suggestedPrice: String(s.suggestedPrice), requiresPrescription: s.requiresPrescription, shift: s.kind === "SHIFT" });
                       }}
                       className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50"
                     ><Pencil className="w-4 h-4" /></button>

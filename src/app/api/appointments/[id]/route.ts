@@ -438,7 +438,7 @@ export async function PATCH(
         const [nurseProfile, svc] = await Promise.all([
           prisma.nurseProfile.findUnique({ where: { userId: appointment.doctorId }, select: { availability: true } }),
           appointment.nurseServiceId
-            ? prisma.nurseService.findUnique({ where: { id: appointment.nurseServiceId }, select: { durationMinutes: true } })
+            ? prisma.nurseService.findUnique({ where: { id: appointment.nurseServiceId }, select: { durationMinutes: true, kind: true } })
             : null,
         ]);
         const problem = await nurseSlotProblem({
@@ -448,6 +448,8 @@ export async function PATCH(
           durationMinutes: svc?.durationMinutes,
           excludeAppointmentId: appointment.id,
           viewer: "patient",
+          // Shifts aren't bound by her daily visiting hours (see nurse-bookings).
+          checkHours: svc?.kind !== "SHIFT",
         });
         if (problem) return NextResponse.json({ error: problem }, { status: 409 });
       }

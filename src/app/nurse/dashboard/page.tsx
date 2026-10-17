@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Loader2, Clock, MapPin, Navigation, Phone, MessageCircle, FileText, CheckCircle2, XCircle,
-  Car, Flag, AlertTriangle, IndianRupee, User as UserIcon, CalendarClock, Star, KeyRound, Layers, Stethoscope,
+  Car, Flag, AlertTriangle, IndianRupee, User as UserIcon, CalendarClock, Star, KeyRound, Layers, Stethoscope, Activity,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { NurseHeader, NurseMobileNav } from "@/components/nurse/NurseNav";
@@ -13,9 +13,16 @@ import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
 import { cn } from "@/lib/utils";
 import { intervalLabel } from "@/lib/nursePackage";
+import { SUGAR_TYPES, fToC, cToF, vitalsSummary, type VitalsInput } from "@/lib/vitals";
+
+type VitalRow = VitalsInput & { id: string; recordedAt: string; alertLevel: string; alerts: string | null };
 
 type Visit = {
   id: string;
+  patientId: string;
+  dependentId: string | null;
+  vitals: VitalRow[];
+  nurseService: { kind: string; durationMinutes: number } | null;
   status: string;
   serviceName: string | null;
   symptoms: string;
@@ -79,6 +86,119 @@ function directionsUrl(v: Visit) {
   if (p?.lat != null && p?.lng != null) return `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
   if (p?.homeAddress) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.homeAddress)}`;
   return null;
+}
+
+// Vitals at the visit. Temperature is entered in °F (what home thermometers
+// in India show) and stored in °C. A critical reading shows what to do right
+// away; the server has already pushed it to the patient (and the referring
+// doctor, if any).
+function RecordVitalsBox({ visit, onSaved }: { visit: Visit; onSaved: () => void }) {
+  const [open, setOpen] = useState(visit.vitals.length === 0);
+  const [f, setF] = useState({ systolic: "", diastolic: "", pulse: "", spo2: "", tempF: "", sugar: "", sugarType: "RANDOM", notes: "" });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<{ level: string; alerts: { level: string; message: string }[]; doctorAlerted: boolean } | null>(null);
+  const [previous, setPrevious] = useState<VitalRow | null | undefined>(undefined);
+
+  useEffect(() => {
+    const qs = new URLSearchParams({ patientId: visit.patientId, limit: "5", ...(visit.dependentId ? { dependentId: visit.dependentId } : {}) });
+    fetch(`/api/vitals?${qs}`).then((r) => (r.ok ? r.json() : [])).then((rows: (VitalRow & { appointmentId: string | null })[]) => {
+      setPrevious(rows.find((r) => r.appointmentId !== visit.id) ?? null);
+    }).catch(() => setPrevious(null));
+  }, [visit.patientId, visit.dependentId, visit.id]);
+
+  const set = (k: keyof typeof f, val: string) => { setF((x) => ({ ...x, [k]: val })); setError(""); };
+  const save = async () => {
+    setBusy(true); setError("");
+    const res = await fetch(`/api/appointments/${visit.id}/vitals`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systolic: f.systolic, diastolic: f.diastolic, pulse: f.pulse, spo2: f.spo2,
+        temperatureC: f.tempF ? fToC(Number(f.tempF)) : "",
+        sugarMgDl: f.sugar, sugarType: f.sugarType, notes: f.notes,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setBusy(false);
+    if (!res.ok) { setError(data.error ?? "Could not save vitals."); return; }
+    setResult({ level: data.level, alerts: data.alerts ?? [], doctorAlerted: !!data.doctorAlerted });
+    setF({ systolic: "", diastolic: "", pulse: "", spo2: "", tempF: "", sugar: "", sugarType: "RANDOM", notes: "" });
+    setOpen(false);
+    onSaved();
+  };
+  const field = (k: keyof typeof f, label: string, ph: string, w = "") => (
+    <label className={cn("block", w)}>
+      <span className="text-[11px] text-slate-500">{label}</span>
+      <input inputMode="decimal" className="input-field py-1.5 text-sm" placeholder={ph} value={f[k]} onChange={(e) => set(k, e.target.value.replace(/[^\d.]/g, ""))} />
+    </label>
+  );
+
+  return (
+    <div className="rounded-xl border border-slate-200 p-3 mb-2">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5"><Activity className="w-4 h-4 text-rose-500" />Vitals</p>
+        {!open && <button type="button" onClick={() => { setOpen(true); setResult(null); }} className="text-xs font-semibold text-blue-600">+ Record</button>}
+      </div>
+      {previous && (
+        <p className="text-[11px] text-slate-500 mt-1">Previous ({new Date(previous.recordedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}): {vitalsSummary(previous)}</p>
+      )}
+      {visit.vitals.map((r) => (
+        <p key={r.id} className={cn("text-xs mt-1", r.alertLevel === "CRITICAL" ? "text-red-700 font-semibold" : r.alertLevel === "WARNING" ? "text-amber-800" : "text-slate-600")}>
+          {r.alertLevel !== "NORMAL" && <AlertTriangle className="w-3 h-3 inline mr-1" />}
+          {new Date(r.recordedAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}: {vitalsSummary(r)}
+        </p>
+      ))}
+      {result?.level === "CRITICAL" && (
+        <div className="mt-2 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-800">
+          <p className="font-bold flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" />Critical reading</p>
+          {result.alerts.filter((a) => a.level === "CRITICAL").map((a, i) => <p key={i}>• {a.message}</p>)}
+          <p className="mt-1">Recheck once. If it stays like this, contact the patient&apos;s doctor now. Chest pain, breathing difficulty, fainting or confusion → call <strong>108</strong> immediately.</p>
+          <p className="mt-1 font-semibold">{result.doctorAlerted ? "The referring doctor and the patient have been alerted." : "The patient's family has been alerted."}</p>
+        </div>
+      )}
+      {result?.level === "WARNING" && (
+        <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-900">
+          <p className="font-semibold">Out of normal range</p>
+          {result.alerts.map((a, i) => <p key={i}>• {a.message}</p>)}
+          <p className="mt-0.5">Mention it in your visit notes.</p>
+        </div>
+      )}
+      {open && (
+        <div className="mt-2 space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            {field("systolic", "BP upper", "120")}
+            {field("diastolic", "BP lower", "80")}
+            {field("pulse", "Pulse /min", "76")}
+            {field("spo2", "SpO2 %", "98")}
+            {field("tempF", "Temp °F", "98.6")}
+            {field("sugar", "Sugar mg/dL", "110")}
+          </div>
+          {f.sugar && (
+            <div className="flex gap-1.5">
+              {SUGAR_TYPES.map((t) => (
+                <button key={t.id} type="button" onClick={() => set("sugarType", t.id)}
+                  className={cn("flex-1 py-1.5 rounded-lg border text-[11px] font-semibold", f.sugarType === t.id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          )}
+          {f.tempF && Number(f.tempF) > 0 && Number(f.tempF) < 50 && (
+            <p className="text-[11px] text-amber-700">That looks like °C — enter °F (e.g. 98.6). {f.tempF}°C = {cToF(Number(f.tempF))}°F</p>
+          )}
+          <input className="input-field py-1.5 text-sm" placeholder="Notes (optional)" value={f.notes} onChange={(e) => set("notes", e.target.value)} />
+          {error && <p className="text-xs text-red-600">{error}</p>}
+          <div className="flex gap-2">
+            {visit.vitals.length > 0 && <button type="button" onClick={() => setOpen(false)} className="btn-secondary flex-1 justify-center py-2 text-xs">Cancel</button>}
+            <button type="button" disabled={busy} onClick={save} className="btn-primary flex-1 justify-center py-2 text-xs">
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save vitals"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // At the door: the patient reads out the 4-digit code from their app. If
@@ -327,6 +447,12 @@ export default function NurseDashboardPage() {
                   <div className="mt-3 space-y-1.5 text-sm text-slate-600">
                     <p className="flex items-center gap-1.5"><CalendarClock className="w-4 h-4 text-slate-400" />
                       {new Date(v.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                      {v.nurseService?.kind === "SHIFT" && (
+                        <span className="font-semibold text-slate-700">
+                          → {new Date(new Date(v.scheduledAt).getTime() + v.nurseService.durationMinutes * 60000).toLocaleString("en-IN", { weekday: "short", hour: "numeric", minute: "2-digit" })}
+                          {" "}({Math.round(v.nurseService.durationMinutes / 60)}-hour shift)
+                        </span>
+                      )}
                     </p>
                     {p?.homeAddress && (
                       <p className="flex items-start gap-1.5"><MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
@@ -409,6 +535,9 @@ export default function NurseDashboardPage() {
                         )}
                         {v.travelStatus === "ARRIVED" && !v.visitStartedAt && (
                           <StartVisitBox visitId={v.id} onStarted={load} />
+                        )}
+                        {v.travelStatus === "ARRIVED" && v.visitStartedAt && (
+                          <RecordVitalsBox visit={v} onSaved={load} />
                         )}
                         {v.travelStatus === "ARRIVED" && v.visitStartedAt && (
                           <button

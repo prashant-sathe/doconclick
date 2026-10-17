@@ -77,7 +77,13 @@ export async function nurseSlotProblem(params: {
   });
   if (!clash) return null;
 
+  // Long bookings (shifts) read wrongly as a start time alone — "busy at
+  // 8 PM" doesn't explain why 8 AM next day is taken. Show the span.
+  const clashMin = clash.nurseService?.durationMinutes ?? DEFAULT_VISIT_MIN;
+  const span = clashMin >= 180
+    ? `from ${fmt(clash.scheduledAt)} to ${fmt(new Date(clash.scheduledAt.getTime() + clashMin * 60000))}`
+    : `around ${fmt(clash.scheduledAt)}`;
   return viewer === "patient"
-    ? `This nurse already has a visit around ${fmt(clash.scheduledAt)}. Please pick another time or another nurse.`
-    : `You already have a confirmed visit (${clash.serviceName ?? "visit"}) at ${fmt(clash.scheduledAt)} — it overlaps this one.`;
+    ? `This nurse is already booked ${span}. Please pick another time or another nurse.`
+    : `You already have a confirmed ${clash.serviceName ?? "visit"} ${span} — it overlaps this one.`;
 }

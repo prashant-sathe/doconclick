@@ -41,6 +41,7 @@ export type NurseServiceSumAggregateOutputType = {
 export type NurseServiceMinAggregateOutputType = {
   id: string | null
   name: string | null
+  kind: string | null
   description: string | null
   durationMinutes: number | null
   suggestedPrice: number | null
@@ -53,6 +54,7 @@ export type NurseServiceMinAggregateOutputType = {
 export type NurseServiceMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  kind: string | null
   description: string | null
   durationMinutes: number | null
   suggestedPrice: number | null
@@ -65,6 +67,7 @@ export type NurseServiceMaxAggregateOutputType = {
 export type NurseServiceCountAggregateOutputType = {
   id: number
   name: number
+  kind: number
   description: number
   durationMinutes: number
   suggestedPrice: number
@@ -91,6 +94,7 @@ export type NurseServiceSumAggregateInputType = {
 export type NurseServiceMinAggregateInputType = {
   id?: true
   name?: true
+  kind?: true
   description?: true
   durationMinutes?: true
   suggestedPrice?: true
@@ -103,6 +107,7 @@ export type NurseServiceMinAggregateInputType = {
 export type NurseServiceMaxAggregateInputType = {
   id?: true
   name?: true
+  kind?: true
   description?: true
   durationMinutes?: true
   suggestedPrice?: true
@@ -115,6 +120,7 @@ export type NurseServiceMaxAggregateInputType = {
 export type NurseServiceCountAggregateInputType = {
   id?: true
   name?: true
+  kind?: true
   description?: true
   durationMinutes?: true
   suggestedPrice?: true
@@ -214,6 +220,7 @@ export type NurseServiceGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type NurseServiceGroupByOutputType = {
   id: string
   name: string
+  kind: string
   description: string | null
   durationMinutes: number
   suggestedPrice: number
@@ -249,6 +256,7 @@ export type NurseServiceWhereInput = {
   NOT?: Prisma.NurseServiceWhereInput | Prisma.NurseServiceWhereInput[]
   id?: Prisma.StringFilter<"NurseService"> | string
   name?: Prisma.StringFilter<"NurseService"> | string
+  kind?: Prisma.StringFilter<"NurseService"> | string
   description?: Prisma.StringNullableFilter<"NurseService"> | string | null
   durationMinutes?: Prisma.IntFilter<"NurseService"> | number
   suggestedPrice?: Prisma.FloatFilter<"NurseService"> | number
@@ -264,6 +272,7 @@ export type NurseServiceWhereInput = {
 export type NurseServiceOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
   suggestedPrice?: Prisma.SortOrder
@@ -282,6 +291,7 @@ export type NurseServiceWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.NurseServiceWhereInput | Prisma.NurseServiceWhereInput[]
   OR?: Prisma.NurseServiceWhereInput[]
   NOT?: Prisma.NurseServiceWhereInput | Prisma.NurseServiceWhereInput[]
+  kind?: Prisma.StringFilter<"NurseService"> | string
   description?: Prisma.StringNullableFilter<"NurseService"> | string | null
   durationMinutes?: Prisma.IntFilter<"NurseService"> | number
   suggestedPrice?: Prisma.FloatFilter<"NurseService"> | number
@@ -297,6 +307,7 @@ export type NurseServiceWhereUniqueInput = Prisma.AtLeast<{
 export type NurseServiceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
   suggestedPrice?: Prisma.SortOrder
@@ -317,6 +328,7 @@ export type NurseServiceScalarWhereWithAggregatesInput = {
   NOT?: Prisma.NurseServiceScalarWhereWithAggregatesInput | Prisma.NurseServiceScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"NurseService"> | string
   name?: Prisma.StringWithAggregatesFilter<"NurseService"> | string
+  kind?: Prisma.StringWithAggregatesFilter<"NurseService"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"NurseService"> | string | null
   durationMinutes?: Prisma.IntWithAggregatesFilter<"NurseService"> | number
   suggestedPrice?: Prisma.FloatWithAggregatesFilter<"NurseService"> | number
@@ -329,6 +341,7 @@ export type NurseServiceScalarWhereWithAggregatesInput = {
 export type NurseServiceCreateInput = {
   id?: string
   name: string
+  kind?: string
   description?: string | null
   durationMinutes?: number
   suggestedPrice?: number
@@ -344,6 +357,7 @@ export type NurseServiceCreateInput = {
 export type NurseServiceUncheckedCreateInput = {
   id?: string
   name: string
+  kind?: string
   description?: string | null
   durationMinutes?: number
   suggestedPrice?: number
@@ -359,6 +373,7 @@ export type NurseServiceUncheckedCreateInput = {
 export type NurseServiceUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -374,6 +389,7 @@ export type NurseServiceUpdateInput = {
 export type NurseServiceUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -389,6 +405,7 @@ export type NurseServiceUncheckedUpdateInput = {
 export type NurseServiceCreateManyInput = {
   id?: string
   name: string
+  kind?: string
   description?: string | null
   durationMinutes?: number
   suggestedPrice?: number
@@ -401,6 +418,7 @@ export type NurseServiceCreateManyInput = {
 export type NurseServiceUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -413,6 +431,7 @@ export type NurseServiceUpdateManyMutationInput = {
 export type NurseServiceUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -425,6 +444,7 @@ export type NurseServiceUncheckedUpdateManyInput = {
 export type NurseServiceCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
   description?: Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
   suggestedPrice?: Prisma.SortOrder
@@ -443,6 +463,7 @@ export type NurseServiceAvgOrderByAggregateInput = {
 export type NurseServiceMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
   description?: Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
   suggestedPrice?: Prisma.SortOrder
@@ -455,6 +476,7 @@ export type NurseServiceMaxOrderByAggregateInput = {
 export type NurseServiceMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
   description?: Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
   suggestedPrice?: Prisma.SortOrder
@@ -527,6 +549,7 @@ export type NurseServiceUpdateOneWithoutAppointmentsNestedInput = {
 export type NurseServiceCreateWithoutReferralsInput = {
   id?: string
   name: string
+  kind?: string
   description?: string | null
   durationMinutes?: number
   suggestedPrice?: number
@@ -541,6 +564,7 @@ export type NurseServiceCreateWithoutReferralsInput = {
 export type NurseServiceUncheckedCreateWithoutReferralsInput = {
   id?: string
   name: string
+  kind?: string
   description?: string | null
   durationMinutes?: number
   suggestedPrice?: number
@@ -571,6 +595,7 @@ export type NurseServiceUpdateToOneWithWhereWithoutReferralsInput = {
 export type NurseServiceUpdateWithoutReferralsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -585,6 +610,7 @@ export type NurseServiceUpdateWithoutReferralsInput = {
 export type NurseServiceUncheckedUpdateWithoutReferralsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -599,6 +625,7 @@ export type NurseServiceUncheckedUpdateWithoutReferralsInput = {
 export type NurseServiceCreateWithoutOfferingsInput = {
   id?: string
   name: string
+  kind?: string
   description?: string | null
   durationMinutes?: number
   suggestedPrice?: number
@@ -613,6 +640,7 @@ export type NurseServiceCreateWithoutOfferingsInput = {
 export type NurseServiceUncheckedCreateWithoutOfferingsInput = {
   id?: string
   name: string
+  kind?: string
   description?: string | null
   durationMinutes?: number
   suggestedPrice?: number
@@ -643,6 +671,7 @@ export type NurseServiceUpdateToOneWithWhereWithoutOfferingsInput = {
 export type NurseServiceUpdateWithoutOfferingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -657,6 +686,7 @@ export type NurseServiceUpdateWithoutOfferingsInput = {
 export type NurseServiceUncheckedUpdateWithoutOfferingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -671,6 +701,7 @@ export type NurseServiceUncheckedUpdateWithoutOfferingsInput = {
 export type NurseServiceCreateWithoutAppointmentsInput = {
   id?: string
   name: string
+  kind?: string
   description?: string | null
   durationMinutes?: number
   suggestedPrice?: number
@@ -685,6 +716,7 @@ export type NurseServiceCreateWithoutAppointmentsInput = {
 export type NurseServiceUncheckedCreateWithoutAppointmentsInput = {
   id?: string
   name: string
+  kind?: string
   description?: string | null
   durationMinutes?: number
   suggestedPrice?: number
@@ -715,6 +747,7 @@ export type NurseServiceUpdateToOneWithWhereWithoutAppointmentsInput = {
 export type NurseServiceUpdateWithoutAppointmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -729,6 +762,7 @@ export type NurseServiceUpdateWithoutAppointmentsInput = {
 export type NurseServiceUncheckedUpdateWithoutAppointmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -792,6 +826,7 @@ export type NurseServiceCountOutputTypeCountReferralsArgs<ExtArgs extends runtim
 export type NurseServiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  kind?: boolean
   description?: boolean
   durationMinutes?: boolean
   suggestedPrice?: boolean
@@ -808,6 +843,7 @@ export type NurseServiceSelect<ExtArgs extends runtime.Types.Extensions.Internal
 export type NurseServiceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  kind?: boolean
   description?: boolean
   durationMinutes?: boolean
   suggestedPrice?: boolean
@@ -820,6 +856,7 @@ export type NurseServiceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
 export type NurseServiceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  kind?: boolean
   description?: boolean
   durationMinutes?: boolean
   suggestedPrice?: boolean
@@ -832,6 +869,7 @@ export type NurseServiceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type NurseServiceSelectScalar = {
   id?: boolean
   name?: boolean
+  kind?: boolean
   description?: boolean
   durationMinutes?: boolean
   suggestedPrice?: boolean
@@ -841,7 +879,7 @@ export type NurseServiceSelectScalar = {
   createdAt?: boolean
 }
 
-export type NurseServiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "durationMinutes" | "suggestedPrice" | "requiresPrescription" | "isActive" | "sortOrder" | "createdAt", ExtArgs["result"]["nurseService"]>
+export type NurseServiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "kind" | "description" | "durationMinutes" | "suggestedPrice" | "requiresPrescription" | "isActive" | "sortOrder" | "createdAt", ExtArgs["result"]["nurseService"]>
 export type NurseServiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   offerings?: boolean | Prisma.NurseService$offeringsArgs<ExtArgs>
   appointments?: boolean | Prisma.NurseService$appointmentsArgs<ExtArgs>
@@ -861,6 +899,7 @@ export type $NurseServicePayload<ExtArgs extends runtime.Types.Extensions.Intern
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    kind: string
     description: string | null
     durationMinutes: number
     suggestedPrice: number
@@ -1296,6 +1335,7 @@ export interface Prisma__NurseServiceClient<T, Null = never, ExtArgs extends run
 export interface NurseServiceFieldRefs {
   readonly id: Prisma.FieldRef<"NurseService", 'String'>
   readonly name: Prisma.FieldRef<"NurseService", 'String'>
+  readonly kind: Prisma.FieldRef<"NurseService", 'String'>
   readonly description: Prisma.FieldRef<"NurseService", 'String'>
   readonly durationMinutes: Prisma.FieldRef<"NurseService", 'Int'>
   readonly suggestedPrice: Prisma.FieldRef<"NurseService", 'Float'>
