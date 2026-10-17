@@ -12,11 +12,12 @@ import {
 } from "@/lib/googleOAuth";
 
 // GET: Kick off Google's OAuth consent flow for either role.
-// ?role=PATIENT|DOCTOR (defaults to PATIENT), optional ?next=/some/path,
+// ?role=PATIENT|DOCTOR|NURSE (defaults to PATIENT), optional ?next=/some/path,
 // optional ?intent=reset (defaults to "login") for the forgot-password flow.
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const role: OAuthRole = url.searchParams.get("role") === "DOCTOR" ? "DOCTOR" : "PATIENT";
+  const roleParam = url.searchParams.get("role");
+  const role: OAuthRole = roleParam === "DOCTOR" || roleParam === "NURSE" ? roleParam : "PATIENT";
   const next = url.searchParams.get("next") ?? undefined;
   const intent: OAuthIntent = url.searchParams.get("intent") === "reset" ? "reset" : "login";
 

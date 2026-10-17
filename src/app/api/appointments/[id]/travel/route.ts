@@ -2,16 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
-import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { requireActiveProvider } from "@/lib/providerGuard";
 
 const VALID_STATUSES = ["ON_THE_WAY", "ARRIVED"];
 
-const TRAVEL_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string }> = {
-  ON_THE_WAY: { title: "Your doctor is on the way!", body: (d) => `${d} has started the journey to you.` },
-  ARRIVED: { title: "Your doctor has arrived!", body: (d) => `${d} is here for your visit.` },
+const TRAVEL_PUSH_COPY: Record<string, { title: (provider: string) => string; body: (name: string) => string }> = {
+  ON_THE_WAY: { title: (p) => `Your ${p} is on the way!`, body: (d) => `${d} has started the journey to you.` },
+  ARRIVED: { title: (p) => `Your ${p} has arrived!`, body: (d) => `${d} is here for your visit.` },
 };
 
-// PATCH: Doctor starts/updates/ends a home-visit journey.
+// PATCH: Doctor or nurse starts/updates/ends a home-visit journey.
 // Called once to start (ON_THE_WAY + initial position), then repeatedly while
 // travelling to push updated coordinates, then once more with ARRIVED.
 export async function PATCH(
@@ -19,10 +19,10 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
+  if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "NURSE")) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
-  const suspendedResponse = await requireActiveDoctor(authUser);
+  const suspendedResponse = await requireActiveProvider(authUser);
   if (suspendedResponse) return suspendedResponse;
 
   const { id } = await params;
@@ -55,7 +55,7 @@ export async function PATCH(
     const copy = TRAVEL_PUSH_COPY[travelStatus];
     if (copy) {
       void sendPushToUser(appointment.patientId, {
-        title: copy.title,
+        title: copy.title(appointment.providerType === "NURSE" ? "nurse" : "doctor"),
         body: copy.body(authUser.name),
         url: `/patient/track/${id}`,
       });

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, type JWTPayload } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
-import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { requireActiveProvider } from "@/lib/providerGuard";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 
 // Chat is open only while a booking is accepted and still upcoming
@@ -44,7 +44,7 @@ export async function loadAndAuthorize(id: string, authUser: JWTPayload) {
     const message =
       appointment.status === "COMPLETED"
         ? "This chat has closed now that the visit is complete."
-        : "Chat opens once the doctor accepts this appointment.";
+        : `Chat opens once the ${appointment.providerType === "NURSE" ? "nurse" : "doctor"} accepts this appointment.`;
     return { error: NextResponse.json({ error: message }, { status: 403 }) };
   }
   return { appointment };
@@ -81,8 +81,8 @@ export async function POST(
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  if (authUser.role === "DOCTOR") {
-    const suspendedResponse = await requireActiveDoctor(authUser);
+  if (authUser.role === "DOCTOR" || authUser.role === "NURSE") {
+    const suspendedResponse = await requireActiveProvider(authUser);
     if (suspendedResponse) return suspendedResponse;
   }
 
@@ -119,7 +119,9 @@ export async function POST(
   void sendPushToUser(recipientId, {
     title: `New message from ${authUser.name}`,
     body: message.text ? message.text.slice(0, 120) : "Sent a file",
-    url: recipientIsDoctor ? `/doctor/chat/${id}` : `/patient/chat/${id}`,
+    url: recipientIsDoctor
+      ? `/${appointment!.providerType === "NURSE" ? "nurse" : "doctor"}/chat/${id}`
+      : `/patient/chat/${id}`,
   });
 
   return NextResponse.json(message);

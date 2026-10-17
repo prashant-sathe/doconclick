@@ -7,10 +7,11 @@ import { useAuth } from "@/components/AuthProvider";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import ChatThread from "@/components/ChatThread";
-import { formatDoctorName } from "@/lib/utils";
+import { formatProviderName } from "@/lib/utils";
 
 interface ChatAppointment {
   status: string;
+  providerType?: string; // "NURSE" for nurse bookings
   doctor: { name: string; doctorProfile: { specialty: string } | null };
 }
 
@@ -59,7 +60,7 @@ export default function PatientChatPage() {
               <Stethoscope className="w-5 h-5 text-blue-600" />
             </div>
             <div className="min-w-0">
-              <p className="font-bold text-slate-900 truncate">{appt ? formatDoctorName(appt.doctor.name) : "…"}</p>
+              <p className="font-bold text-slate-900 truncate">{appt ? formatProviderName(appt.doctor.name, appt.providerType) : "…"}</p>
               <p className="text-xs text-slate-500">{appt?.doctor.doctorProfile?.specialty}</p>
             </div>
           </div>
@@ -74,7 +75,7 @@ export default function PatientChatPage() {
               <p className="text-sm text-slate-500">
                 {chatClosed
                   ? "This chat has closed now that your consultation is complete."
-                  : `Chat opens once ${formatDoctorName(appt.doctor.name)} accepts this request.`}
+                  : `Chat opens once ${formatProviderName(appt.doctor.name, appt.providerType)} accepts this request.`}
               </p>
             </div>
           ) : (

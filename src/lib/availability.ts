@@ -123,3 +123,30 @@ export function isDoctorAvailableNow(availability: string | null | undefined, no
   if (fromMin <= toMin) return nowMin >= fromMin && nowMin < toMin;
   return nowMin >= fromMin || nowMin < toMin; // overnight window, e.g. 8PM–2AM
 }
+
+const WEEK_ORDER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function to12h(hhmm: string): string {
+  const [h, m] = hhmm.split(":").map(Number);
+  const suffix = h >= 12 ? "PM" : "AM";
+  const hour = h % 12 || 12;
+  return m ? `${hour}:${String(m).padStart(2, "0")} ${suffix}` : `${hour} ${suffix}`;
+}
+
+// Human-friendly version of an availability string for patients:
+// "Mon, Tue, Wed, Thu, Fri, Sat 08:00–20:00" → "Mon–Sat, 8 AM–8 PM".
+// Falls back to the raw text when it can't be parsed.
+export function formatAvailability(availability: string | null | undefined): string {
+  const rows = parseAvailabilityString(availability);
+  if (rows.length === 0) return availability ?? "";
+  const idx = WEEK_ORDER.map((d) => rows.some((r) => r.dayOfWeek === d));
+  const runs: string[] = [];
+  for (let i = 0; i < 7; i++) {
+    if (!idx[i]) continue;
+    let j = i;
+    while (j + 1 < 7 && idx[j + 1]) j++;
+    runs.push(j - i >= 2 ? `${WEEK_ORDER[i]}–${WEEK_ORDER[j]}` : WEEK_ORDER.slice(i, j + 1).join(", "));
+    i = j;
+  }
+  return `${runs.join(", ")}, ${to12h(rows[0].fromTime)}–${to12h(rows[0].toTime)}`;
+}

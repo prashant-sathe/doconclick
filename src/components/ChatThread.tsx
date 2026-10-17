@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { downloadOrShareUrl } from "@/lib/nativeDownload";
 import { isNative } from "@/lib/platform";
+import { compressImage } from "@/lib/compressImage";
 
 interface ChatMessage {
   id: string;
@@ -120,9 +121,9 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
         reader.onerror = () => reject(reader.error ?? new Error("Could not read the file"));
         reader.readAsArrayBuffer(file);
       });
-      const blob = new Blob([bytes], { type: resolveMime(file) });
+      const blob = await compressImage(new File([bytes], file.name, { type: resolveMime(file) }));
       const form = new FormData();
-      form.append("file", blob, file.name);
+      form.append("file", blob, blob.name);
 
       const uploadRes = await fetch(`/api/appointments/${appointmentId}/messages/upload`, {
         method: "POST",

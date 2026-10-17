@@ -21,7 +21,7 @@ export async function expireStalePendingRequests() {
       createdAt: { lt: cutoff },
       scheduledAt: { lt: now },
     },
-    select: { id: true, patientId: true, doctor: { select: { name: true } } },
+    select: { id: true, patientId: true, providerType: true, doctor: { select: { name: true } } },
   });
   if (stale.length === 0) return;
 
@@ -41,7 +41,7 @@ export async function expireStalePendingRequests() {
 
   for (const a of stale) {
     void sendPushToUser(a.patientId, {
-      title: "No response from doctor",
+      title: `No response from ${a.providerType === "NURSE" ? "nurse" : "doctor"}`,
       body: `${a.doctor.name} didn't respond in time.`,
       url: "/patient/appointments",
     });

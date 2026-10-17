@@ -21,7 +21,7 @@ export async function GET(req: Request) {
     },
     orderBy: { createdAt: "desc" },
     include: {
-      doctor: { select: { name: true } },
+      doctor: { select: { name: true, role: true } },
       settledByAdmin: { select: { name: true } },
     },
   });

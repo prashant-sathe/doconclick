@@ -163,6 +163,12 @@ function LoginForm() {
               Join the network →
             </Link>
           </p>
+          <p>
+            Are you a registered nurse?{" "}
+            <Link href="/nurse/register" className="text-rose-600 font-semibold hover:underline">
+              Join as a nurse →
+            </Link>
+          </p>
         </div>
       </div>
 

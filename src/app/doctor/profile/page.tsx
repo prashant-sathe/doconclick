@@ -17,6 +17,7 @@ import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import ImageCropModal from "@/components/ImageCropModal";
 import EditableName from "@/components/EditableName";
+import { prepareBlobUpload } from "@/lib/compressImage";
 
 function daysUntil(target: Date): number {
   return Math.max(0, Math.ceil((target.getTime() - Date.now()) / 86400000));
@@ -31,7 +32,8 @@ function AvatarEditor({ url, onChange }: { url: string | null; onChange: (url: s
     setBusy(true);
     const fd = new FormData();
     fd.append("type", "photo");
-    fd.append("file", blob, "photo.jpg");
+    // The crop output is full-resolution — shrink it so a phone photo stays under 5 MB.
+    fd.append("file", await prepareBlobUpload(blob, "photo.jpg"), "photo.jpg");
     const res = await fetch("/api/doctors/me/documents", { method: "POST", body: fd });
     setBusy(false);
     if (res.ok) onChange((await res.json()).photoUrl);

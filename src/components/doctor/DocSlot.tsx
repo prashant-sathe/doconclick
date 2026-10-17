@@ -5,6 +5,7 @@ import { Loader2, UploadCloud, Lock, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ImageCropModal from "@/components/ImageCropModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { prepareBlobUpload, tooBigMessage } from "@/lib/compressImage";
 
 const FIELD_FOR: Record<string, string> = {
   photo: "photoUrl",
@@ -38,9 +39,13 @@ export default function DocSlot({
   const upload = async (fileOrBlob: File | Blob) => {
     setBusy(true);
     setError("");
+    const file = await prepareBlobUpload(fileOrBlob, `${type}.jpg`).catch(() => null);
+    if (!file) { setBusy(false); setError("Couldn't read that file — please pick it again."); return; }
+    const tooBig = tooBigMessage(file);
+    if (tooBig) { setBusy(false); setError(tooBig); return; }
     const form = new FormData();
     form.append("type", type);
-    form.append("file", fileOrBlob, `${type}.jpg`);
+    form.append("file", file, file.name);
     const res = await fetch("/api/doctors/me/documents", { method: "POST", body: form });
     setBusy(false);
     if (res.ok) {

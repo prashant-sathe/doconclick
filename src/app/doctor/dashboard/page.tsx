@@ -25,6 +25,7 @@ import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
 import { useResync } from "@/hooks/useResync";
 import PullToRefresh from "@/components/PullToRefresh";
+import { compressImage } from "@/lib/compressImage";
 
 interface DoctorProfile {
   specialty: string;
@@ -305,7 +306,8 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
           reader.onerror = () => reject(reader.error ?? new Error("Could not read the file"));
           reader.readAsArrayBuffer(f);
         });
-        form.append("file", new Blob([bytes], { type: f.type || "application/octet-stream" }), f.name);
+        const prepared = await compressImage(new File([bytes], f.name, { type: f.type || "application/octet-stream" }));
+        form.append("file", prepared, prepared.name);
       }
       const res = await fetch(`/api/appointments/${appt.id}/prescription`, { method: "POST", body: form });
       if (!res.ok) {

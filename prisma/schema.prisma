@@ -25,6 +25,7 @@ model User {
 
   patientProfile PatientProfile?
   doctorProfile  DoctorProfile?
+  nurseProfile   NurseProfile?
   asPatient      Appointment[]   @relation("PatientAppointments")
   asDoctor       Appointment[]   @relation("DoctorAppointments")
   complaints     Complaint[]
@@ -48,6 +49,7 @@ model User {
   couponsCreated         Coupon[]               @relation("CouponsCreatedByAdmin")
   couponRedemptions      CouponRedemption[]
   documents              PatientDocument[]      @relation("PatientDocuments")
+  nursePaymentLogs       NursePaymentLog[]      @relation("NursePaymentLogs")
   staffAccount           StaffProfile?           @relation("StaffAccount")
   staffMembers           StaffProfile[]          @relation("DoctorStaff")
 }
@@ -140,6 +142,8 @@ model PatientDocument {
   fileUrl   String
   fileName  String?
   createdAt DateTime @default(now())
+  // Nurse bookings that attached this as the doctor's prescription.
+  nurseBookings Appointment[] @relation("NurseBookingPrescription")
 }
 
 model DoctorProfile {
@@ -187,6 +191,80 @@ model DoctorProfile {
 // A receptionist/front-desk account created by a doctor, scoped to that one
 // doctor's appointment queue only (accept/reject/cancel/no-show) — no
 // earnings, payouts, or profile access. See src/lib/staffGuard.ts.
+model NurseProfile {
+  id               String  @id @default(cuid())
+  userId           String  @unique
+  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photoUrl         String?
+  qualification    String? // ANM, GNM, B.Sc Nursing, M.Sc Nursing
+  councilRegNo     String? @unique // Nursing Council registration number
+  councilState     String?
+  experience       Int     @default(0)
+  gender           String? // Male, Female, Other — patients can filter for a female nurse
+  languages        String  @default("Marathi, Hindi, English")
+  bio              String?
+  radius           Int     @default(10) // km the nurse will travel for a home visit
+  lat              Float?
+  lng              Float?
+  address          String?
+  availability     String  @default("Mon-Sat, 8AM-8PM")
+  isVerified       Boolean @default(false)
+  avgRating        Float   @default(0)
+  totalReviews     Int     @default(0)
+  bankDetails      String?
+  status           String  @default("PENDING") // PENDING, APPROVED, REJECTED, SUSPENDED
+  councilCertUrl   String?
+  degreeCertUrl    String?
+  kycDocUrl        String?
+  policeVerifUrl   String?
+  registrationFeePaid   Boolean   @default(false)
+  subscriptionPaidUntil DateTime?
+  cashfreeOrderId       String?
+  cashfreePaymentId     String?
+  // Admin can change the nurse fees at any time, so the webhook checks the
+  // payment against the amount this order was actually created for.
+  pendingOrderAmount    Float?
+  createdAt        DateTime @default(now())
+  services         NurseServiceOffering[]
+}
+
+// Admin-managed catalogue of nurse services (like Specialty for doctors).
+model NurseService {
+  id                   String   @id @default(cuid())
+  name                 String   @unique
+  description          String?
+  durationMinutes      Int      @default(30)
+  suggestedPrice       Float    @default(0)
+  requiresPrescription Boolean  @default(false) // injections/IV need a doctor's prescription
+  isActive             Boolean  @default(true)
+  sortOrder            Int      @default(0)
+  createdAt            DateTime @default(now())
+  offerings            NurseServiceOffering[]
+  appointments         Appointment[]
+}
+
+// Which services a nurse offers, at the nurse's own price.
+model NurseServiceOffering {
+  id             String       @id @default(cuid())
+  nurseProfileId String
+  nurseProfile   NurseProfile @relation(fields: [nurseProfileId], references: [id], onDelete: Cascade)
+  serviceId      String
+  service        NurseService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  price          Float
+
+  @@unique([nurseProfileId, serviceId])
+}
+
+model NursePaymentLog {
+  id                String   @id @default(cuid())
+  nurseId           String
+  nurse             User     @relation("NursePaymentLogs", fields: [nurseId], references: [id])
+  type              String   // REGISTRATION, SUBSCRIPTION
+  amount            Float
+  cashfreePaymentId String?
+  createdAt         DateTime @default(now())
+}
+
 model StaffProfile {
   id        String   @id @default(cuid())
   userId    String   @unique
@@ -211,6 +289,15 @@ model Appointment {
   dependent     PatientDependent? @relation(fields: [dependentId], references: [id])
   consentGiven  Boolean   @default(false)
   consultType   String    @default("CLINIC") // CLINIC, HOME, VIDEO
+  // Who the booking is with. Nurse bookings reuse this whole table (and the
+  // payment/wallet/settlement/review machinery keyed on doctorId) — doctorId
+  // then holds the nurse's user id. Nurse visits are always consultType HOME.
+  providerType  String    @default("DOCTOR") // DOCTOR, NURSE
+  nurseServiceId String?
+  nurseService   NurseService? @relation(fields: [nurseServiceId], references: [id], onDelete: SetNull)
+  serviceName    String?   // denormalised so it survives the service being renamed/removed
+  prescriptionDocId String?
+  prescriptionDoc   PatientDocument? @relation("NurseBookingPrescription", fields: [prescriptionDocId], references: [id], onDelete: SetNull)
   status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED, NO_SHOW
   acceptedAt    DateTime? // set when the doctor accepts (PENDING_APPROVAL → SCHEDULED); used for the late-cancellation warning
   paymentMethod String    @default("CASH") // ONLINE, CASH
@@ -501,6 +588,11 @@ model PlatformSettings {
   clinicCommissionPercent Float    @default(10)
   videoCommissionPercent  Float    @default(10)
   homeCommissionPercent   Float    @default(10)
+  // Nurses — all admin-set. A fee of 0 means "free": no payment step at
+  // registration / no monthly subscription gate.
+  nurseCommissionPercent  Float    @default(10)
+  nurseRegistrationFee    Float    @default(0)
+  nurseSubscriptionFee    Float    @default(0)
   // Mobile app splash: admin uploads an image that the native shell shows over
   // the WebView while it boots (the real native splash is baked into the app
   // binary and can't change without a store update — this is the dynamic layer

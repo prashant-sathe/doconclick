@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 
-// GET: the current patient's own support tickets
+// Shared by patients and nurses (nurses have no separate support channel).
+// GET: the current user's own support tickets
 export async function GET() {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "PATIENT") {
+  if (!authUser || (authUser.role !== "PATIENT" && authUser.role !== "NURSE")) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
@@ -21,7 +22,7 @@ export async function GET() {
 // POST: raise a new support ticket
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "PATIENT") {
+  if (!authUser || (authUser.role !== "PATIENT" && authUser.role !== "NURSE")) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 

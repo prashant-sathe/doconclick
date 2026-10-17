@@ -7,6 +7,7 @@ import ProfileSubShell from "@/components/patient/ProfileSubShell";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { downloadOrShareUrl } from "@/lib/nativeDownload";
 import { isNative } from "@/lib/platform";
+import { prepareUpload, tooBigMessage } from "@/lib/compressImage";
 
 interface PatientDocument {
   id: string;
@@ -163,10 +164,14 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
     if (!file) { setError("Please choose a file."); return; }
     setBusy(true);
     setError("");
+    const prepared = await prepareUpload(file).catch(() => null);
+    if (!prepared) { setBusy(false); setError("Couldn't read that file — please pick it again."); return; }
+    const tooBig = tooBigMessage(prepared);
+    if (tooBig) { setBusy(false); setError(tooBig); return; }
     const fd = new FormData();
     fd.append("title", title.trim());
     fd.append("category", category);
-    fd.append("file", file);
+    fd.append("file", prepared, prepared.name);
     const res = await fetch("/api/patients/me/documents", { method: "POST", body: fd });
     setBusy(false);
     if (res.ok) {

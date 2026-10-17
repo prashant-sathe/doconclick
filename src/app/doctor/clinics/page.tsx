@@ -16,6 +16,7 @@ import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import LocationPickerMap from "@/components/LocationPickerMap";
 import ImageCropModal from "@/components/ImageCropModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { prepareBlobUpload } from "@/lib/compressImage";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -90,8 +91,10 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
   const upload = async (fileOrBlob: File | Blob) => {
     setBusy(true);
     setError("");
+    const file = await prepareBlobUpload(fileOrBlob, "clinic-photo.jpg").catch(() => null);
+    if (!file) { setBusy(false); setError("Couldn't read that file — please pick it again."); return; }
     const form = new FormData();
-    form.append("file", fileOrBlob, "clinic-photo.jpg");
+    form.append("file", file, "clinic-photo.jpg");
     const res = await fetch("/api/doctors/me/clinics/photo", { method: "POST", body: form });
     setBusy(false);
     if (res.ok) {

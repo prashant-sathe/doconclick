@@ -22,7 +22,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ userId:
     orderBy: { createdAt: "desc" },
     include: {
       admin: { select: { name: true } },
-      appointment: { select: { id: true, doctor: { select: { name: true } } } },
+      appointment: { select: { id: true, providerType: true, doctor: { select: { name: true } } } },
     },
   });
 

@@ -77,8 +77,10 @@ export async function POST(req: Request) {
     });
     void sendPushToUser(appointment.doctorId, {
       title: "Payment received",
-      body: `Payment received for your consultation with ${authUser.name}.`,
-      url: "/doctor/dashboard",
+      body: appointment.providerType === "NURSE"
+        ? `${authUser.name} paid for the ${appointment.serviceName ?? "home"} visit — you can complete it once you're done.`
+        : `Payment received for your consultation with ${authUser.name}.`,
+      url: appointment.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
     });
 
     return NextResponse.json({ appointment: result.updatedAppt, walletBalance: result.wallet.balance });

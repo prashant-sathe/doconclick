@@ -67,7 +67,7 @@ export async function GET() {
   const doctorIds = [...byDoctor.keys()];
   const doctors = await prisma.user.findMany({
     where: { id: { in: doctorIds } },
-    select: { id: true, name: true, mobile: true, doctorProfile: { select: { bankDetails: true } } },
+    select: { id: true, name: true, mobile: true, role: true, doctorProfile: { select: { bankDetails: true } }, nurseProfile: { select: { bankDetails: true } } },
   });
   const infoById = new Map(doctors.map((d) => [d.id, d]));
 
@@ -85,7 +85,8 @@ export async function GET() {
       doctorId,
       doctorName: info?.name ?? "Unknown",
       doctorMobile: info?.mobile ?? null,
-      bankDetails: info?.doctorProfile?.bankDetails ?? null,
+      providerRole: info?.role ?? "DOCTOR",
+      bankDetails: info?.doctorProfile?.bankDetails ?? info?.nurseProfile?.bankDetails ?? null,
       cashCount: t.cashCount,
       onlineCount: t.onlineCount,
       cashFeeOwed: t.cashFeeOwed,

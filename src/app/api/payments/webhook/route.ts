@@ -4,6 +4,7 @@ import { verifyCashfreeWebhookSignature, DOCTOR_REGISTRATION_FEE, DOCTOR_SUBSCRI
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { WALLET_TOPUP_ORDER_PREFIX } from "@/lib/wallet";
 import { netPayable, confirmCouponRedemption, releaseCouponRedemption } from "@/lib/coupons";
+import { NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX } from "@/lib/nurseConstants";
 
 interface CashfreeWebhookPayload {
   type: "PAYMENT_SUCCESS_WEBHOOK" | "PAYMENT_FAILED_WEBHOOK" | string;
@@ -190,6 +191,52 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  if (orderId.startsWith(NURSE_REGISTRATION_ORDER_PREFIX) || orderId.startsWith(NURSE_SUBSCRIPTION_ORDER_PREFIX)) {
+    const isRegistration = orderId.startsWith(NURSE_REGISTRATION_ORDER_PREFIX);
+    const profile = await prisma.nurseProfile.findFirst({ where: { cashfreeOrderId: orderId } });
+    if (!profile) {
+      console.error("Cashfree webhook: no nurse profile found for order", orderId);
+      return NextResponse.json({ ok: true });
+    }
+    // Already applied (Cashfree retries) — the payment id is set on success.
+    if (profile.cashfreePaymentId === payload.data.payment.cf_payment_id) {
+      return NextResponse.json({ ok: true });
+    }
+    if (profile.pendingOrderAmount == null || payload.data.order.order_amount !== profile.pendingOrderAmount) {
+      console.error(
+        "Cashfree webhook amount mismatch for nurse fee", profile.id,
+        "expected", profile.pendingOrderAmount, "got", payload.data.order.order_amount
+      );
+      return NextResponse.json({ ok: true });
+    }
+    const now = Date.now();
+    const currentPaidUntil = profile.subscriptionPaidUntil ? new Date(profile.subscriptionPaidUntil).getTime() : 0;
+    const paidUntil = new Date(Math.max(now, currentPaidUntil));
+    paidUntil.setMonth(paidUntil.getMonth() + 1);
+    await prisma.$transaction([
+      prisma.nurseProfile.update({
+        where: { id: profile.id },
+        data: {
+          ...(isRegistration ? { registrationFeePaid: true } : { subscriptionPaidUntil: paidUntil }),
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+          pendingOrderAmount: null,
+        },
+      }),
+      prisma.nursePaymentLog.create({
+        data: {
+          nurseId: profile.userId,
+          type: isRegistration ? "REGISTRATION" : "SUBSCRIPTION",
+          amount: payload.data.order.order_amount,
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+        },
+      }),
+    ]);
+    void sendPushToUser(profile.userId, isRegistration
+      ? { title: "Registration fee received", body: "Your application is now under review.", url: "/nurse/profile" }
+      : { title: "Subscription renewed", body: "Your subscription is active.", url: "/nurse/dashboard" });
+    return NextResponse.json({ ok: true });
+  }
+
   if (orderId.startsWith(WALLET_TOPUP_ORDER_PREFIX)) {
     const txn = await prisma.walletTransaction.findFirst({
       where: { cashfreeOrderId: orderId },
@@ -265,8 +312,10 @@ export async function POST(req: Request) {
 
   void sendPushToUser(appointment.doctorId, {
     title: "Payment received",
-    body: `Payment received for your consultation with ${appointment.patient.name}.`,
-    url: "/doctor/dashboard",
+    body: appointment.providerType === "NURSE"
+      ? `${appointment.patient.name} paid for the ${appointment.serviceName ?? "home"} visit — you can complete it once you're done.`
+      : `Payment received for your consultation with ${appointment.patient.name}.`,
+    url: appointment.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
   });
 
   return NextResponse.json({ ok: true });

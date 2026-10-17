@@ -29,6 +29,13 @@ export function formatDoctorName(name: string) {
   return `Dr. ${name.replace(/^dr\.?\s*/i, "").trim()}`;
 }
 
+// Nurse bookings share the Appointment table (doctorId = the nurse), so any
+// screen that lists appointments must not prefix a nurse with "Dr.".
+export function formatProviderName(name: string, providerType?: string | null) {
+  if (providerType === "NURSE") return `Nurse ${name.replace(/^(nurse|sister)\.?\s*/i, "").trim()}`;
+  return formatDoctorName(name);
+}
+
 // Turns a display name into a URL/path-safe slug for use in storage keys.
 // Non-Latin names (e.g. Devanagari) collapse to "" — callers should combine
 // this with a unique id so the resulting path is still unique.

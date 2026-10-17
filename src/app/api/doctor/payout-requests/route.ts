@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { requireActiveProvider } from "@/lib/providerGuard";
 import { safeNum } from "@/lib/adminAuth";
 
 const PENDING_APPOINTMENT_WHERE = { status: "COMPLETED", paymentStatus: "PAID", settlementId: null } as const;
 
+// Shared by doctors and nurses (their earnings are the same Appointment rows).
 // GET: the current doctor's own payout requests, newest first
 export async function GET() {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
+  if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "NURSE")) {
     return NextResponse.json({ error: "Not authorized" }, { status: 401 });
   }
 
@@ -26,10 +27,10 @@ export async function GET() {
 // there's nothing currently owed to request against.
 export async function POST() {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
+  if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "NURSE")) {
     return NextResponse.json({ error: "Not authorized" }, { status: 401 });
   }
-  const suspendedResponse = await requireActiveDoctor(authUser);
+  const suspendedResponse = await requireActiveProvider(authUser);
   if (suspendedResponse) return suspendedResponse;
 
   const existing = await prisma.payoutRequest.findFirst({

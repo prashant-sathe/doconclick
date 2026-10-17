@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, CalendarCheck, Eye, X, FileText, Pill, FlaskConical, Phone, Download } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
-import { cn, formatDoctorName } from "@/lib/utils";
+import { cn, formatProviderName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
 import type { PrescriptionData } from "@/components/patient/PrescriptionDocument";
@@ -11,6 +11,7 @@ import type { PrescriptionData } from "@/components/patient/PrescriptionDocument
 interface Appointment {
   id: string;
   patient: { name: string };
+  providerType?: string;
   doctor: { name: string };
   symptoms: string;
   patientName: string | null;
@@ -133,7 +134,7 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
               {data && (data.relation !== "Self" && data.patientName ? data.patientName : data.patient.name)}
             </div>
             <div className="text-blue-100 text-sm mt-0.5">
-              {data ? `with ${formatDoctorName(data.doctor.name)}` : "Loading…"}
+              {data ? `with ${formatProviderName(data.doctor.name, data.providerType)}` : "Loading…"}
             </div>
           </div>
           <button onClick={onClose}
@@ -166,7 +167,7 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
               </Section>
 
               <Section title="Doctor" icon={Phone}>
-                <Row label="Name" value={formatDoctorName(data.doctor.name)} />
+                <Row label="Name" value={formatProviderName(data.doctor.name, data.providerType)} />
                 <Row label="Specialty" value={data.doctor.doctorProfile?.specialty ?? "—"} />
                 <Row label="Mobile" value={data.doctor.mobile} />
               </Section>
@@ -322,7 +323,7 @@ export default function AdminBookings() {
       field: "doctor.name",
       minWidth: 170,
       flex: 1.2,
-      valueFormatter: (p: ValueFormatterParams<Appointment>) => formatDoctorName(p.value ?? ""),
+      valueFormatter: (p: ValueFormatterParams<Appointment>) => formatProviderName(p.value ?? "", p.data?.providerType),
     },
     {
       headerName: "Type",

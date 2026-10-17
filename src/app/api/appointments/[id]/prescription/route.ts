@@ -36,6 +36,9 @@ export async function GET(
   if (!appointment) {
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
   }
+  if (appointment.providerType === "NURSE") {
+    return NextResponse.json({ error: "Nurse visits don't have a prescription." }, { status: 404 });
+  }
   if (authUser.id !== appointment.patientId) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }

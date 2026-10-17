@@ -6,4 +6,5 @@ export const ROLE_HOME: Record<string, string> = {
   DOCTOR: "/doctor/dashboard",
   PATIENT: "/patient/dashboard",
   STAFF: "/doctor/dashboard",
+  NURSE: "/nurse/dashboard",
 };

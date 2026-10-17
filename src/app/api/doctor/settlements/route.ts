@@ -5,7 +5,7 @@ import { getAuthUser } from "@/lib/auth";
 // GET: the current doctor's own past settlements, newest first
 export async function GET() {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
+  if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "NURSE")) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
 

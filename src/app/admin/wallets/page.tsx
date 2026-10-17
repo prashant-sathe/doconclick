@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
-import { formatDoctorName } from "@/lib/utils";
+import { formatProviderName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
@@ -27,7 +27,7 @@ interface WalletTxn {
   note: string | null;
   createdAt: string;
   admin: { name: string } | null;
-  appointment: { id: string; doctor: { name: string } } | null;
+  appointment: { id: string; providerType?: string; doctor: { name: string } } | null;
 }
 
 interface WalletDetail {
@@ -222,7 +222,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
                               <div className="text-xs text-slate-400 truncate">
                                 {new Date(t.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
                                 {t.status !== "SUCCESS" && ` · ${t.status}`}
-                                {t.appointment && ` · Dr. ${formatDoctorName(t.appointment.doctor.name)}`}
+                                {t.appointment && ` · ${formatProviderName(t.appointment.doctor.name, t.appointment.providerType)}`}
                                 {t.admin && ` · by ${t.admin.name}`}
                                 {t.note && ` · ${t.note}`}
                               </div>

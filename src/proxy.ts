@@ -13,6 +13,8 @@ const PROTECTED: { pattern: RegExp; roles: string[] }[] = [
   { pattern: /^\/patient\/assistant(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/patient\/payment(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/patient\/wallet(\/|$)/, roles: ["PATIENT"] },
+  { pattern: /^\/patient\/nurse(\/|$)/, roles: ["PATIENT"] },
+  { pattern: /^\/nurse(\/|$)/, roles: ["NURSE"] },
 ];
 
 // Next.js 16 requires export name "proxy" (renamed from "middleware")
@@ -29,7 +31,8 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/favicon") ||
     pathname === "/" ||
     pathname === "/patient/register" ||
-    pathname === "/doctor/register"
+    pathname === "/doctor/register" ||
+    pathname === "/nurse/register"
   ) {
     return NextResponse.next();
   }

@@ -36,6 +36,7 @@ export async function sendDueAppointmentReminders() {
       patientId: true,
       doctorId: true,
       patientName: true,
+      providerType: true,
       doctor: { select: { name: true } },
       patient: { select: { name: true } },
     },
@@ -59,7 +60,7 @@ export async function sendDueAppointmentReminders() {
     void sendPushToUser(a.doctorId, {
       title: "Upcoming appointment",
       body: `You have an appointment with ${a.patientName ?? a.patient.name} in about an hour.`,
-      url: "/doctor/dashboard",
+      url: a.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
     });
   }
 }

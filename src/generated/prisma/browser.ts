@@ -53,6 +53,26 @@ export type PatientDocument = Prisma.PatientDocumentModel
  */
 export type DoctorProfile = Prisma.DoctorProfileModel
 /**
+ * Model NurseProfile
+ * 
+ */
+export type NurseProfile = Prisma.NurseProfileModel
+/**
+ * Model NurseService
+ * 
+ */
+export type NurseService = Prisma.NurseServiceModel
+/**
+ * Model NurseServiceOffering
+ * 
+ */
+export type NurseServiceOffering = Prisma.NurseServiceOfferingModel
+/**
+ * Model NursePaymentLog
+ * 
+ */
+export type NursePaymentLog = Prisma.NursePaymentLogModel
+/**
  * Model StaffProfile
  * 
  */

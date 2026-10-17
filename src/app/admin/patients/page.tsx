@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
-import { cn, formatDoctorName } from "@/lib/utils";
+import { cn, formatProviderName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
@@ -38,6 +38,7 @@ interface Appointment {
   symptoms: string;
   amount: number;
   scheduledAt: string;
+  providerType?: string;
   doctor: { name: string; mobile: string; doctorProfile: { specialty: string } | null };
 }
 
@@ -170,7 +171,7 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
                       <div key={a.id} className="flex items-center justify-between px-4 py-3 gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-semibold text-slate-800">
-                            {formatDoctorName(a.doctor.name)}
+                            {formatProviderName(a.doctor.name, a.providerType)}
                             {a.doctor.doctorProfile?.specialty && (
                               <span className="text-slate-400 font-normal"> · {a.doctor.doctorProfile.specialty}</span>
                             )}

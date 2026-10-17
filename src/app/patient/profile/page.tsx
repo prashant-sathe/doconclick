@@ -17,6 +17,7 @@ import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import ImageCropModal from "@/components/ImageCropModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import EditableName from "@/components/EditableName";
+import { prepareBlobUpload } from "@/lib/compressImage";
 
 function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -38,7 +39,8 @@ function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) 
   const upload = async (blob: Blob) => {
     setBusy(true);
     const fd = new FormData();
-    fd.append("file", blob, "photo.jpg");
+    // The crop output is full-resolution — shrink it so a phone photo stays under 5 MB.
+    fd.append("file", await prepareBlobUpload(blob, "photo.jpg"), "photo.jpg");
     const res = await fetch("/api/patients/me/photo", { method: "POST", body: fd });
     setBusy(false);
     if (res.ok) onChange((await res.json()).photoUrl);

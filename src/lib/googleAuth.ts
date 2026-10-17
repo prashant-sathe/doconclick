@@ -37,7 +37,9 @@ export async function resolveGoogleUser(params: {
         role,
         ...(role === "DOCTOR"
           ? { doctorProfile: { create: { status: "PENDING" } } }
-          : { patientProfile: { create: { age: 0, gender: "" } } }),
+          : role === "NURSE"
+            ? { nurseProfile: { create: { status: "PENDING" } } }
+            : { patientProfile: { create: { age: 0, gender: "" } } }),
       },
     });
   }

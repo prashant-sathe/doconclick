@@ -3,7 +3,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CreditCard, Loader2, ShieldCheck, CheckCircle, Wallet, TicketPercent, X } from "lucide-react";
-import { formatDoctorName } from "@/lib/utils";
+import { formatProviderName } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface AppointmentSummary {
@@ -12,6 +12,7 @@ interface AppointmentSummary {
   discountAmount: number;
   couponCode: string | null;
   paymentStatus: string;
+  providerType?: string; // "NURSE" for nurse bookings
   doctor: { name: string };
 }
 
@@ -153,7 +154,7 @@ function PaymentContent() {
     <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-md w-full">
       <div className="bg-slate-50 rounded-xl p-4 mb-4">
         <div className="flex justify-between text-sm">
-          <span className="text-slate-500">Consultation with {formatDoctorName(appt.doctor.name)}</span>
+          <span className="text-slate-500">{appt.providerType === "NURSE" ? "Nurse visit" : "Consultation"} with {formatProviderName(appt.doctor.name, appt.providerType)}</span>
           <span className="text-slate-700">₹{appt.amount}</span>
         </div>
         {appt.discountAmount > 0 && (
@@ -251,7 +252,7 @@ function PaymentContent() {
         <ConfirmDialog
           icon={Wallet}
           title={`Pay ₹${netPayable} from your wallet?`}
-          message={`This deducts ₹${netPayable} from your wallet balance right now to confirm your consultation with ${formatDoctorName(appt.doctor.name)}.`}
+          message={`This deducts ₹${netPayable} from your wallet balance right now to confirm your consultation with ${formatProviderName(appt.doctor.name, appt.providerType)}.`}
           confirmLabel="Pay Now"
           busyLabel="Paying…"
           tone="primary"

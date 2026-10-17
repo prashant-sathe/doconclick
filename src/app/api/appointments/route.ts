@@ -21,7 +21,6 @@ export async function POST(req: Request) {
       allergies,
       consentGiven,
       consultType,
-      amount,
       scheduledAt,
       followUpOfId,
       clinicId,
@@ -31,6 +30,9 @@ export async function POST(req: Request) {
 
     if (!doctorId || !symptoms || !consultType) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+    if (!["CLINIC", "HOME", "VIDEO"].includes(consultType)) {
+      return NextResponse.json({ error: "Invalid consultation type" }, { status: 400 });
     }
 
     // Booking for someone other than yourself always goes through a saved
@@ -180,7 +182,14 @@ export async function POST(req: Request) {
 
     const settings = await prisma.platformSettings.findFirst();
     const commission = commissionPercentForConsultType(settings, consultType);
-    const platformFee = (Number(amount) * commission) / 100;
+    // The fee is always the doctor's own price for this consult type — never
+    // whatever the client sent (a hand-crafted request could otherwise book
+    // a consultation for ₹1).
+    const amount =
+      consultType === "HOME" ? doctor.doctorProfile.homeVisitFee
+        : consultType === "VIDEO" ? doctor.doctorProfile.videoFee
+          : doctor.doctorProfile.consultFee;
+    const platformFee = (amount * commission) / 100;
 
     const appointment = await prisma.appointment.create({
       data: {
@@ -193,7 +202,7 @@ export async function POST(req: Request) {
         allergies: allergies?.trim() ? allergies.trim() : null,
         consentGiven: Boolean(consentGiven),
         consultType,
-        amount: Number(amount),
+        amount,
         platformFee,
         status: "PENDING_APPROVAL",
         paymentMethod: "ONLINE",

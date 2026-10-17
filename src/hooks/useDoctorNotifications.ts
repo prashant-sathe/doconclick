@@ -10,6 +10,7 @@ export interface PendingRequest {
   relation: string;
   createdAt: string;
   patient: { name: string };
+  serviceName?: string | null; // nurse bookings
 }
 
 const POLL_MS = 5000;

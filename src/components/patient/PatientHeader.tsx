@@ -3,9 +3,9 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { CalendarCheck2, UserCircle, Bell, Bookmark, Sparkles, Wallet as WalletIcon } from "lucide-react";
+import { CalendarCheck2, UserCircle, Bell, Bookmark, Sparkles, HeartPulse, Wallet as WalletIcon } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { cn, formatDoctorName } from "@/lib/utils";
+import { cn, formatProviderName } from "@/lib/utils";
 import { usePatientNotifications } from "@/hooks/usePatientNotifications";
 import { useWalletNotifications } from "@/hooks/useWalletNotifications";
 import { useAnnouncementNotifications } from "@/hooks/useAnnouncementNotifications";
@@ -22,6 +22,7 @@ const WALLET_EVENT_LABEL: Record<string, string> = {
 
 const NAV = [
   { href: "/patient/dashboard", label: "Find a Doctor" },
+  { href: "/patient/nurse", label: "Book a Nurse", icon: HeartPulse },
   { href: "/patient/assistant", label: "Ask AI", icon: Sparkles },
   { href: "/patient/appointments", label: "Appointments", icon: CalendarCheck2 },
   { href: "/patient/saved", label: "Saved", icon: Bookmark },
@@ -145,7 +146,7 @@ export default function PatientHeader() {
                         >
                           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[a.event] ?? "bg-slate-300"}`} />
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-slate-800 truncate">{formatDoctorName(a.doctor.name)}</p>
+                            <p className="text-sm font-semibold text-slate-800 truncate">{formatProviderName(a.doctor.name, a.providerType)}</p>
                             <p className="text-xs text-slate-400 mt-0.5">{STATUS_LABEL[a.event] ?? a.event} · {a.consultType}</p>
                           </div>
                         </button>

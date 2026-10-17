@@ -39,6 +39,23 @@ export async function PATCH(req: Request) {
     data[key] = value;
   }
 
+  if (body.nurseCommissionPercent !== undefined) {
+    const value = Number(body.nurseCommissionPercent);
+    if (Number.isNaN(value) || value < 0 || value > 100) {
+      return NextResponse.json({ error: "Commission percentages must be between 0 and 100." }, { status: 400 });
+    }
+    data.nurseCommissionPercent = value;
+  }
+  // ₹0 = free (no payment step / no subscription gate for nurses).
+  for (const key of ["nurseRegistrationFee", "nurseSubscriptionFee"] as const) {
+    if (body[key] === undefined) continue;
+    const value = Number(body[key]);
+    if (!Number.isFinite(value) || value < 0 || value > 100000) {
+      return NextResponse.json({ error: "Nurse fees must be between ₹0 and ₹1,00,000." }, { status: 400 });
+    }
+    data[key] = Math.round(value);
+  }
+
   if (body.splashImageUrl !== undefined) {
     data.splashImageUrl = body.splashImageUrl ? String(body.splashImageUrl).trim() : null;
   }

@@ -58,6 +58,10 @@ export const ModelName = {
   PatientDependent: 'PatientDependent',
   PatientDocument: 'PatientDocument',
   DoctorProfile: 'DoctorProfile',
+  NurseProfile: 'NurseProfile',
+  NurseService: 'NurseService',
+  NurseServiceOffering: 'NurseServiceOffering',
+  NursePaymentLog: 'NursePaymentLog',
   StaffProfile: 'StaffProfile',
   Appointment: 'Appointment',
   Wallet: 'Wallet',
@@ -242,6 +246,79 @@ export const DoctorProfileScalarFieldEnum = {
 export type DoctorProfileScalarFieldEnum = (typeof DoctorProfileScalarFieldEnum)[keyof typeof DoctorProfileScalarFieldEnum]
 
 
+export const NurseProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  photoUrl: 'photoUrl',
+  qualification: 'qualification',
+  councilRegNo: 'councilRegNo',
+  councilState: 'councilState',
+  experience: 'experience',
+  gender: 'gender',
+  languages: 'languages',
+  bio: 'bio',
+  radius: 'radius',
+  lat: 'lat',
+  lng: 'lng',
+  address: 'address',
+  availability: 'availability',
+  isVerified: 'isVerified',
+  avgRating: 'avgRating',
+  totalReviews: 'totalReviews',
+  bankDetails: 'bankDetails',
+  status: 'status',
+  councilCertUrl: 'councilCertUrl',
+  degreeCertUrl: 'degreeCertUrl',
+  kycDocUrl: 'kycDocUrl',
+  policeVerifUrl: 'policeVerifUrl',
+  registrationFeePaid: 'registrationFeePaid',
+  subscriptionPaidUntil: 'subscriptionPaidUntil',
+  cashfreeOrderId: 'cashfreeOrderId',
+  cashfreePaymentId: 'cashfreePaymentId',
+  pendingOrderAmount: 'pendingOrderAmount',
+  createdAt: 'createdAt'
+} as const
+
+export type NurseProfileScalarFieldEnum = (typeof NurseProfileScalarFieldEnum)[keyof typeof NurseProfileScalarFieldEnum]
+
+
+export const NurseServiceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  durationMinutes: 'durationMinutes',
+  suggestedPrice: 'suggestedPrice',
+  requiresPrescription: 'requiresPrescription',
+  isActive: 'isActive',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt'
+} as const
+
+export type NurseServiceScalarFieldEnum = (typeof NurseServiceScalarFieldEnum)[keyof typeof NurseServiceScalarFieldEnum]
+
+
+export const NurseServiceOfferingScalarFieldEnum = {
+  id: 'id',
+  nurseProfileId: 'nurseProfileId',
+  serviceId: 'serviceId',
+  price: 'price'
+} as const
+
+export type NurseServiceOfferingScalarFieldEnum = (typeof NurseServiceOfferingScalarFieldEnum)[keyof typeof NurseServiceOfferingScalarFieldEnum]
+
+
+export const NursePaymentLogScalarFieldEnum = {
+  id: 'id',
+  nurseId: 'nurseId',
+  type: 'type',
+  amount: 'amount',
+  cashfreePaymentId: 'cashfreePaymentId',
+  createdAt: 'createdAt'
+} as const
+
+export type NursePaymentLogScalarFieldEnum = (typeof NursePaymentLogScalarFieldEnum)[keyof typeof NursePaymentLogScalarFieldEnum]
+
+
 export const StaffProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -264,6 +341,10 @@ export const AppointmentScalarFieldEnum = {
   dependentId: 'dependentId',
   consentGiven: 'consentGiven',
   consultType: 'consultType',
+  providerType: 'providerType',
+  nurseServiceId: 'nurseServiceId',
+  serviceName: 'serviceName',
+  prescriptionDocId: 'prescriptionDocId',
   status: 'status',
   acceptedAt: 'acceptedAt',
   paymentMethod: 'paymentMethod',
@@ -535,6 +616,9 @@ export const PlatformSettingsScalarFieldEnum = {
   clinicCommissionPercent: 'clinicCommissionPercent',
   videoCommissionPercent: 'videoCommissionPercent',
   homeCommissionPercent: 'homeCommissionPercent',
+  nurseCommissionPercent: 'nurseCommissionPercent',
+  nurseRegistrationFee: 'nurseRegistrationFee',
+  nurseSubscriptionFee: 'nurseSubscriptionFee',
   splashImageUrl: 'splashImageUrl',
   splashFit: 'splashFit',
   splashBgColor: 'splashBgColor',

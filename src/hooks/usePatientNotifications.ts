@@ -8,6 +8,7 @@ export interface AppointmentStatusEvent {
   travelStatus: string;
   consultType: string;
   scheduledAt: string;
+  providerType?: string; // "NURSE" for nurse bookings
   doctor: { name: string };
   event: string;
 }

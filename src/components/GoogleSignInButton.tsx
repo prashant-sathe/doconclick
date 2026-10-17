@@ -7,7 +7,7 @@ import { nativeGoogleSignIn } from "@/lib/nativeGoogleAuth";
 import { useAuth } from "@/components/AuthProvider";
 
 type Props = {
-  role?: "PATIENT" | "DOCTOR";
+  role?: "PATIENT" | "DOCTOR" | "NURSE";
   next?: string;
   intent?: "login" | "reset";
   label?: string;

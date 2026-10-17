@@ -24,7 +24,7 @@ const client = new OAuth2Client();
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const idToken = body?.idToken;
-  const role: OAuthRole = body?.role === "DOCTOR" ? "DOCTOR" : "PATIENT";
+  const role: OAuthRole = body?.role === "DOCTOR" || body?.role === "NURSE" ? body.role : "PATIENT";
   const intent: OAuthIntent = body?.intent === "reset" ? "reset" : "login";
   const next = typeof body?.next === "string" ? body.next : undefined;
 

@@ -7,6 +7,8 @@ import { findReassignmentDoctor } from "@/lib/doctorMatching";
 import { getOrCreateWallet } from "@/lib/wallet";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
 import { resolveDoctorScope } from "@/lib/staffGuard";
+import { resolveProviderScope } from "@/lib/providerGuard";
+import { nurseSlotProblem } from "@/lib/nurseSchedule";
 import { netPayable, releaseCouponRedemption } from "@/lib/coupons";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
 
@@ -78,8 +80,12 @@ export async function PATCH(
 
   const { status, doctorNotes, scheduledAt } = await req.json();
 
-  if (authUser.role === "DOCTOR" || authUser.role === "STAFF") {
-    const scope = await resolveDoctorScope(authUser);
+  // Nurse bookings share this table — "provider" below is the doctor or nurse.
+  const providerWord = appointment.providerType === "NURSE" ? "nurse" : "doctor";
+  const providerDashboard = appointment.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard";
+
+  if (authUser.role === "DOCTOR" || authUser.role === "STAFF" || authUser.role === "NURSE") {
+    const scope = await resolveProviderScope(authUser);
     if (scope.denied) return scope.denied;
     if (appointment.doctorId !== scope.doctorId) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
@@ -89,7 +95,7 @@ export async function PATCH(
     if (authUser.role === "STAFF" && status === "COMPLETED") {
       return NextResponse.json({ error: "Only the doctor can mark a visit complete." }, { status: 403 });
     }
-    const actingDoctorName = authUser.role === "DOCTOR"
+    const actingDoctorName = authUser.role === "DOCTOR" || authUser.role === "NURSE"
       ? authUser.name
       : (await prisma.user.findUnique({ where: { id: scope.doctorId }, select: { name: true } }))?.name ?? "Your doctor";
     if (appointment.status === "EXPIRED") {
@@ -101,6 +107,23 @@ export async function PATCH(
     const allowed = DOCTOR_TRANSITIONS[appointment.status] ?? [];
     if (!allowed.includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
+    // A nurse is one person on the road — don't let her confirm two
+    // overlapping home visits.
+    if (status === "SCHEDULED" && appointment.providerType === "NURSE") {
+      const svc = appointment.nurseServiceId
+        ? await prisma.nurseService.findUnique({ where: { id: appointment.nurseServiceId }, select: { durationMinutes: true } })
+        : null;
+      const problem = await nurseSlotProblem({
+        nurseId: appointment.doctorId,
+        availability: null,
+        when: new Date(Math.max(appointment.scheduledAt.getTime(), Date.now())),
+        durationMinutes: svc?.durationMinutes,
+        excludeAppointmentId: appointment.id,
+        viewer: "nurse",
+        checkHours: false,
+      });
+      if (problem) return NextResponse.json({ error: problem }, { status: 409 });
     }
     if (status === "COMPLETED" && appointment.consultType === "HOME" && appointment.travelStatus !== "ARRIVED") {
       return NextResponse.json(
@@ -240,8 +263,8 @@ export async function PATCH(
         void sendPushToUser(appointment.patientId, {
           title: "Appointment cancelled",
           body: wasPaid
-            ? `${actingDoctorName} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — ₹${refundAmount} has been credited to your wallet. Please book again.`
-            : `${actingDoctorName} had an emergency and couldn't continue with your appointment. We couldn't find another doctor nearby right now — please book again.`,
+            ? `${actingDoctorName} had an emergency and couldn't continue with your appointment. We couldn't find another ${providerWord} nearby right now — ₹${refundAmount} has been credited to your wallet. Please book again.`
+            : `${actingDoctorName} had an emergency and couldn't continue with your appointment. We couldn't find another ${providerWord} nearby right now — please book again.`,
           url: "/patient/appointments",
         });
       }
@@ -326,13 +349,30 @@ export async function PATCH(
       // needs to go through them directly, not silently move their trip.
       if (appointment.consultType === "HOME" && appointment.travelStatus !== "NOT_STARTED") {
         return NextResponse.json(
-          { error: "The doctor is already on the way — please contact them directly to reschedule." },
+          { error: `The ${providerWord} is already on the way — please contact them directly to reschedule.` },
           { status: 400 }
         );
       }
       const when = new Date(scheduledAt);
       if (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()) {
         return NextResponse.json({ error: "Please pick a time in the future." }, { status: 400 });
+      }
+      if (appointment.providerType === "NURSE") {
+        const [nurseProfile, svc] = await Promise.all([
+          prisma.nurseProfile.findUnique({ where: { userId: appointment.doctorId }, select: { availability: true } }),
+          appointment.nurseServiceId
+            ? prisma.nurseService.findUnique({ where: { id: appointment.nurseServiceId }, select: { durationMinutes: true } })
+            : null,
+        ]);
+        const problem = await nurseSlotProblem({
+          nurseId: appointment.doctorId,
+          availability: nurseProfile?.availability,
+          when,
+          durationMinutes: svc?.durationMinutes,
+          excludeAppointmentId: appointment.id,
+          viewer: "patient",
+        });
+        if (problem) return NextResponse.json({ error: problem }, { status: 409 });
       }
       if (appointment.consultType === "CLINIC" && appointment.clinicId) {
         const clinic = await prisma.clinic.findUnique({
@@ -366,7 +406,7 @@ export async function PATCH(
         body: reopensForApproval
           ? `${authUser.name} requested a new time for their appointment — please review and confirm.`
           : `${authUser.name} updated their requested appointment time.`,
-        url: "/doctor/dashboard",
+        url: providerDashboard,
       });
       return NextResponse.json(updated);
     }
@@ -382,7 +422,7 @@ export async function PATCH(
     // out with the doctor directly instead.
     if (appointment.consultType === "HOME" && appointment.travelStatus === "ARRIVED") {
       return NextResponse.json(
-        { error: "The doctor has already arrived — please contact them directly to cancel." },
+        { error: `The ${providerWord} has already arrived — please contact them directly to cancel.` },
         { status: 400 }
       );
     }
@@ -427,7 +467,7 @@ export async function PATCH(
       body: wasPaid
         ? `${authUser.name} cancelled their appointment. ₹${refundAmount} was refunded to their wallet.`
         : `${authUser.name} cancelled their appointment request.`,
-      url: "/doctor/dashboard",
+      url: providerDashboard,
     });
     return NextResponse.json(updated);
   }

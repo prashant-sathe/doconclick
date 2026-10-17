@@ -3,7 +3,10 @@ import { useEffect, useState, useMemo } from "react";
 import { IndianRupee, TrendingUp, Save, Wallet } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
-import { formatDoctorName } from "@/lib/utils";
+import { formatProviderName } from "@/lib/utils";
+
+// Nurses are settled here too (same Appointment/Settlement rows) — never "Dr." them.
+const providerName = (name: string, role?: string | null) => formatProviderName(name, role === "NURSE" ? "NURSE" : "DOCTOR");
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
@@ -15,6 +18,7 @@ interface Analytics {
 interface PendingSettlement {
   doctorId: string;
   doctorName: string;
+  providerRole?: string;
   doctorMobile: string | null;
   bankDetails: string | null;
   cashCount: number;
@@ -26,7 +30,7 @@ interface PendingSettlement {
 }
 interface SettlementRecord {
   id: string;
-  doctor: { name: string };
+  doctor: { name: string; role?: string };
   settledByAdmin: { name: string } | null;
   cashCount: number;
   onlineCount: number;
@@ -93,9 +97,11 @@ export default function AdminFinance() {
     });
     if (res.status === 409) {
       const data = await res.json();
-      const doctorName = pending.find((p) => p.doctorId === doctorId)?.doctorName ?? "This doctor";
+      const row = pending.find((p) => p.doctorId === doctorId);
+      const doctorName = row?.doctorName ?? "This doctor";
+      const providerRole = row?.providerRole;
       setSettlingId(null);
-      setConfirmNegative({ doctorId, doctorName, ...data });
+      setConfirmNegative({ doctorId, doctorName, providerRole, ...data });
       return;
     }
     setSettlingId(null);
@@ -115,7 +121,7 @@ export default function AdminFinance() {
         return (
           <div className="leading-tight py-1">
             <div className="font-semibold text-slate-800 flex items-center gap-1.5">
-              {formatDoctorName(row.doctorName)}
+              {providerName(row.doctorName, row.providerRole)}
               {row.payoutRequestedAt && (
                 <span className="badge badge-warning text-[10px]" title={`Requested ${new Date(row.payoutRequestedAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}`}>
                   Requested
@@ -186,7 +192,7 @@ export default function AdminFinance() {
       field: "doctor.name",
       minWidth: 180,
       flex: 1.2,
-      valueFormatter: (p: ValueFormatterParams<SettlementRecord>) => formatDoctorName(p.value ?? ""),
+      valueFormatter: (p: ValueFormatterParams<SettlementRecord>) => providerName(p.value ?? "", p.data?.doctor.role),
       cellClass: "font-semibold text-slate-800",
     },
     {
@@ -384,7 +390,7 @@ export default function AdminFinance() {
               <h3 className="font-bold text-slate-800">Doctor owes the platform</h3>
             </div>
             <p className="text-sm text-slate-500 mb-5">
-              {formatDoctorName(confirmNegative.doctorName)} owes the platform ₹{Math.abs(confirmNegative.netAmount).toLocaleString("en-IN")} net
+              {providerName(confirmNegative.doctorName, confirmNegative.providerRole)} owes the platform ₹{Math.abs(confirmNegative.netAmount).toLocaleString("en-IN")} net
               (₹{confirmNegative.cashFeeOwed.toLocaleString("en-IN")} cash fee vs ₹{confirmNegative.onlinePayoutOwed.toLocaleString("en-IN")} online payout).
               Settling will record this as a net amount owed by the doctor. Continue?
             </p>
@@ -410,7 +416,7 @@ export default function AdminFinance() {
       {settleTarget && (
         <ConfirmDialog
           icon={Wallet}
-          title={`Settle with ${formatDoctorName(settleTarget.doctorName)}?`}
+          title={`Settle with ${providerName(settleTarget.doctorName, settleTarget.providerRole)}?`}
           message={
             <>
               This clears their {settleTarget.cashCount} cash and {settleTarget.onlineCount} online due{settleTarget.cashCount + settleTarget.onlineCount === 1 ? "" : "s"} — net{" "}

@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/seo";
 export const STATE_COOKIE_NAME = "google_oauth_state";
 export const STATE_COOKIE_MAX_AGE = 5 * 60; // 5 minutes — just long enough for the OAuth round trip
 
-export type OAuthRole = "PATIENT" | "DOCTOR";
+export type OAuthRole = "PATIENT" | "DOCTOR" | "NURSE";
 export type OAuthIntent = "login" | "reset";
 
 export type OAuthState = {
@@ -56,7 +56,7 @@ export function decodeState(raw: string): OAuthState | null {
     if (
       parsed &&
       typeof parsed.nonce === "string" &&
-      (parsed.role === "PATIENT" || parsed.role === "DOCTOR")
+      (parsed.role === "PATIENT" || parsed.role === "DOCTOR" || parsed.role === "NURSE")
     ) {
       return { intent: "login", ...parsed } as OAuthState;
     }

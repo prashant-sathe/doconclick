@@ -146,7 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // account never gets blocked by (or silently accepts) that account's gate.
   const needsTerms =
     !!user && !suspended && !impersonatedBy &&
-    (user.role === "PATIENT" || user.role === "DOCTOR") && !user.termsAcceptedAt;
+    (user.role === "PATIENT" || user.role === "DOCTOR" || user.role === "NURSE") && !user.termsAcceptedAt;
 
   return (
     <AuthContext.Provider value={{ user, loading, impersonatedBy, logout, refresh, exitImpersonation }}>

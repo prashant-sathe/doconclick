@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Stethoscope, Users, CalendarCheck,
   DollarSign, MessageCircle, Settings, Tag,
   LogOut, ChevronRight, FileBarChart, Wallet, Megaphone, TicketPercent,
-  Menu, X,
+  Menu, X, HeartPulse, ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
@@ -16,6 +16,8 @@ const navItems = [
   { href: "/admin",            label: "Overview",    icon: LayoutDashboard },
   { href: "/admin/doctors",    label: "Doctors",     icon: Stethoscope },
   { href: "/admin/specialties", label: "Specialties", icon: Tag },
+  { href: "/admin/nurses",     label: "Nurses",      icon: HeartPulse },
+  { href: "/admin/nurse-services", label: "Nurse Services", icon: ClipboardList },
   { href: "/admin/patients",   label: "Patients",    icon: Users },
   { href: "/admin/bookings",   label: "Bookings",    icon: CalendarCheck },
   { href: "/admin/finance",    label: "Finance",     icon: DollarSign },

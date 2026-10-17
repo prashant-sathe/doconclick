@@ -23,7 +23,19 @@ export async function GET(req: Request) {
     select: {
       id: true,
       name: true,
-      doctorProfile: true,
+      // Public endpoint — never expose bank details, KYC/certificate files or
+      // payment ids (the doctor's own /api/doctors/me has those).
+      doctorProfile: {
+        omit: {
+          bankDetails: true,
+          kycDocUrl: true,
+          medRegCertUrl: true,
+          degreeCertUrl: true,
+          signatureUrl: true,
+          cashfreeOrderId: true,
+          cashfreePaymentId: true,
+        },
+      },
       clinics: { where: { isActive: true }, orderBy: { sortOrder: "asc" }, include: { slots: true } },
     },
   });

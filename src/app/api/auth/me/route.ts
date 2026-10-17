@@ -27,6 +27,19 @@ export async function GET() {
     }
   }
 
+  if (user.role === "NURSE") {
+    const profile = await prisma.nurseProfile.findUnique({
+      where: { userId: user.id },
+      select: { status: true },
+    });
+    if (profile?.status === "SUSPENDED") {
+      return NextResponse.json(
+        { ...user, suspended: true, suspendedMessage: SUSPENDED_MESSAGE },
+        { status: 403 }
+      );
+    }
+  }
+
   const cookieStore = await cookies();
   const impersonatorToken = cookieStore.get(IMPERSONATOR_COOKIE_NAME)?.value;
   const impersonator = impersonatorToken ? verifyToken(impersonatorToken) : null;

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
 import { loadAndAuthorize } from "../route";
-import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { requireActiveProvider } from "@/lib/providerGuard";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -24,8 +24,8 @@ export async function POST(
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  if (authUser.role === "DOCTOR") {
-    const suspendedResponse = await requireActiveDoctor(authUser);
+  if (authUser.role === "DOCTOR" || authUser.role === "NURSE") {
+    const suspendedResponse = await requireActiveProvider(authUser);
     if (suspendedResponse) return suspendedResponse;
   }
 

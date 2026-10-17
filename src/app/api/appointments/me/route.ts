@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
 import { safeNum } from "@/lib/adminAuth";
 import { resolveDoctorScope } from "@/lib/staffGuard";
+import { resolveProviderScope } from "@/lib/providerGuard";
 
 // GET: The logged-in user's own appointments (as patient or as doctor)
 export async function GET() {
@@ -55,6 +56,37 @@ export async function GET() {
             patientProfile: { select: { lat: true, lng: true, homeAddress: true } },
           },
         },
+        _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
+      },
+    });
+    return NextResponse.json(
+      appointments.map(({ _count, ...a }) => ({
+        ...a,
+        amount: safeNum(a.amount),
+        platformFee: safeNum(a.platformFee),
+        unreadMessageCount: _count.messages,
+      }))
+    );
+  }
+
+  if (authUser.role === "NURSE") {
+    const scope = await resolveProviderScope(authUser);
+    if (scope.denied) return scope.denied;
+
+    const appointments = await prisma.appointment.findMany({
+      where: { doctorId: authUser.id },
+      orderBy: [{ createdAt: "desc" }],
+      include: {
+        patient: {
+          select: {
+            name: true,
+            mobile: true,
+            patientProfile: { select: { lat: true, lng: true, homeAddress: true, landmark: true, pinCode: true, age: true, gender: true } },
+          },
+        },
+        dependent: { select: { age: true, gender: true } },
+        prescriptionDoc: { select: { title: true, fileUrl: true, fileName: true } },
+        review: { select: { rating: true, comment: true } },
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });

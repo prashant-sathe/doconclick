@@ -2,10 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  Heart, ArrowRight, Star, CheckCircle2,
-  Home as HomeIcon, Video, Building2, Shield, Clock, MapPin,
-  Stethoscope, Brain, Bone, Baby, Eye, Ear, Pill, Zap,
-  Users, CalendarCheck, Award, TrendingUp,
+  Heart, ArrowRight, Star, CheckCircle2, Home as HomeIcon, Video, Building2, Shield, Clock, MapPin, Stethoscope, Brain, Bone, Baby, Eye, Ear, Pill, Zap, Users, CalendarCheck, Award, TrendingUp, HeartPulse,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -367,10 +364,11 @@ export default function Home() {
               Join <span className="gradient-text">DocOnClick</span> Today
             </h2>
           </div>
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             {[
               { title: "For Patients", icon: Heart, color: "text-blue-500", bg: "bg-blue-50", desc: "Register in 2 minutes. Book your first consultation today.", cta: "Register as Patient", href: "/patient/register" },
               { title: "For Doctors", icon: Stethoscope, color: "text-teal-500", bg: "bg-teal-50", desc: "Join 1,200+ verified doctors. Grow your practice with DocOnClick.", cta: "Join as Doctor", href: "/doctor/register" },
+              { title: "For Nurses", icon: HeartPulse, color: "text-rose-500", bg: "bg-rose-50", desc: "Registered nurse? Get home-visit bookings near you — injections, dressing, IV, elderly care.", cta: "Join as Nurse", href: "/nurse/register" },
             ].map(({ title, icon: Icon, color, bg, desc, cta, href }) => (
               <div key={title} className="stat-card card-hover border border-slate-100 group">
                 <div className={`w-14 h-14 rounded-2xl ${bg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>

@@ -9,7 +9,7 @@ import Link from "next/link";
 import { ArrowLeft, Car, MapPinCheck, Clock, Navigation, Loader2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { estimateArrivalMinutes } from "@/lib/eta";
-import { formatDoctorName } from "@/lib/utils";
+import { formatProviderName } from "@/lib/utils";
 
 interface TrackedAppointment {
   id: string;
@@ -18,6 +18,7 @@ interface TrackedAppointment {
   travelStatus: string;
   doctorLat: number | null;
   doctorLng: number | null;
+  providerType?: string; // "NURSE" for nurse bookings
   doctor: { name: string; doctorProfile: { specialty: string } | null };
 }
 
@@ -148,7 +149,7 @@ export default function PatientTrackDoctor() {
       ) : appt.doctorLat == null ? (
         <div className="absolute inset-0 z-30 flex items-center justify-center p-6">
           <div className="glass-card rounded-2xl p-6 text-center text-slate-500 max-w-sm">
-            Waiting for {formatDoctorName(appt.doctor.name)} to start their journey…
+            Waiting for {formatProviderName(appt.doctor.name, appt.providerType)} to start their journey…
           </div>
         </div>
       ) : (
@@ -159,12 +160,12 @@ export default function PatientTrackDoctor() {
                 {appt.travelStatus === "ARRIVED" ? <MapPinCheck className="w-5 h-5 text-white" /> : <Car className="w-5 h-5 text-white" />}
               </div>
               <div className="min-w-0">
-                <p className="font-bold text-slate-900 truncate">{formatDoctorName(appt.doctor.name)}</p>
+                <p className="font-bold text-slate-900 truncate">{formatProviderName(appt.doctor.name, appt.providerType)}</p>
                 <p className="text-xs text-slate-500">{appt.doctor.doctorProfile?.specialty}</p>
               </div>
             </div>
             {appt.travelStatus === "ARRIVED" ? (
-              <p className="text-sm font-semibold text-emerald-600">Your doctor has arrived.</p>
+              <p className="text-sm font-semibold text-emerald-600">Your {appt.providerType === "NURSE" ? "nurse" : "doctor"} has arrived.</p>
             ) : (
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-1.5 text-slate-600">

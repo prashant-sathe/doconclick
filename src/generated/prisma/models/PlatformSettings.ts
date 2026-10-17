@@ -30,12 +30,18 @@ export type PlatformSettingsAvgAggregateOutputType = {
   clinicCommissionPercent: number | null
   videoCommissionPercent: number | null
   homeCommissionPercent: number | null
+  nurseCommissionPercent: number | null
+  nurseRegistrationFee: number | null
+  nurseSubscriptionFee: number | null
 }
 
 export type PlatformSettingsSumAggregateOutputType = {
   clinicCommissionPercent: number | null
   videoCommissionPercent: number | null
   homeCommissionPercent: number | null
+  nurseCommissionPercent: number | null
+  nurseRegistrationFee: number | null
+  nurseSubscriptionFee: number | null
 }
 
 export type PlatformSettingsMinAggregateOutputType = {
@@ -43,6 +49,9 @@ export type PlatformSettingsMinAggregateOutputType = {
   clinicCommissionPercent: number | null
   videoCommissionPercent: number | null
   homeCommissionPercent: number | null
+  nurseCommissionPercent: number | null
+  nurseRegistrationFee: number | null
+  nurseSubscriptionFee: number | null
   splashImageUrl: string | null
   splashFit: string | null
   splashBgColor: string | null
@@ -54,6 +63,9 @@ export type PlatformSettingsMaxAggregateOutputType = {
   clinicCommissionPercent: number | null
   videoCommissionPercent: number | null
   homeCommissionPercent: number | null
+  nurseCommissionPercent: number | null
+  nurseRegistrationFee: number | null
+  nurseSubscriptionFee: number | null
   splashImageUrl: string | null
   splashFit: string | null
   splashBgColor: string | null
@@ -65,6 +77,9 @@ export type PlatformSettingsCountAggregateOutputType = {
   clinicCommissionPercent: number
   videoCommissionPercent: number
   homeCommissionPercent: number
+  nurseCommissionPercent: number
+  nurseRegistrationFee: number
+  nurseSubscriptionFee: number
   splashImageUrl: number
   splashFit: number
   splashBgColor: number
@@ -77,12 +92,18 @@ export type PlatformSettingsAvgAggregateInputType = {
   clinicCommissionPercent?: true
   videoCommissionPercent?: true
   homeCommissionPercent?: true
+  nurseCommissionPercent?: true
+  nurseRegistrationFee?: true
+  nurseSubscriptionFee?: true
 }
 
 export type PlatformSettingsSumAggregateInputType = {
   clinicCommissionPercent?: true
   videoCommissionPercent?: true
   homeCommissionPercent?: true
+  nurseCommissionPercent?: true
+  nurseRegistrationFee?: true
+  nurseSubscriptionFee?: true
 }
 
 export type PlatformSettingsMinAggregateInputType = {
@@ -90,6 +111,9 @@ export type PlatformSettingsMinAggregateInputType = {
   clinicCommissionPercent?: true
   videoCommissionPercent?: true
   homeCommissionPercent?: true
+  nurseCommissionPercent?: true
+  nurseRegistrationFee?: true
+  nurseSubscriptionFee?: true
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
@@ -101,6 +125,9 @@ export type PlatformSettingsMaxAggregateInputType = {
   clinicCommissionPercent?: true
   videoCommissionPercent?: true
   homeCommissionPercent?: true
+  nurseCommissionPercent?: true
+  nurseRegistrationFee?: true
+  nurseSubscriptionFee?: true
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
@@ -112,6 +139,9 @@ export type PlatformSettingsCountAggregateInputType = {
   clinicCommissionPercent?: true
   videoCommissionPercent?: true
   homeCommissionPercent?: true
+  nurseCommissionPercent?: true
+  nurseRegistrationFee?: true
+  nurseSubscriptionFee?: true
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
@@ -210,6 +240,9 @@ export type PlatformSettingsGroupByOutputType = {
   clinicCommissionPercent: number
   videoCommissionPercent: number
   homeCommissionPercent: number
+  nurseCommissionPercent: number
+  nurseRegistrationFee: number
+  nurseSubscriptionFee: number
   splashImageUrl: string | null
   splashFit: string
   splashBgColor: string
@@ -244,6 +277,9 @@ export type PlatformSettingsWhereInput = {
   clinicCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   videoCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   homeCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  nurseCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  nurseRegistrationFee?: Prisma.FloatFilter<"PlatformSettings"> | number
+  nurseSubscriptionFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   splashImageUrl?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringFilter<"PlatformSettings"> | string
@@ -255,6 +291,9 @@ export type PlatformSettingsOrderByWithRelationInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  nurseCommissionPercent?: Prisma.SortOrder
+  nurseRegistrationFee?: Prisma.SortOrder
+  nurseSubscriptionFee?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -269,6 +308,9 @@ export type PlatformSettingsWhereUniqueInput = Prisma.AtLeast<{
   clinicCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   videoCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   homeCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  nurseCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
+  nurseRegistrationFee?: Prisma.FloatFilter<"PlatformSettings"> | number
+  nurseSubscriptionFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   splashImageUrl?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringFilter<"PlatformSettings"> | string
@@ -280,6 +322,9 @@ export type PlatformSettingsOrderByWithAggregationInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  nurseCommissionPercent?: Prisma.SortOrder
+  nurseRegistrationFee?: Prisma.SortOrder
+  nurseSubscriptionFee?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -299,6 +344,9 @@ export type PlatformSettingsScalarWhereWithAggregatesInput = {
   clinicCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   videoCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   homeCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  nurseCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  nurseRegistrationFee?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  nurseSubscriptionFee?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   splashImageUrl?: Prisma.StringNullableWithAggregatesFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
@@ -310,6 +358,9 @@ export type PlatformSettingsCreateInput = {
   clinicCommissionPercent?: number
   videoCommissionPercent?: number
   homeCommissionPercent?: number
+  nurseCommissionPercent?: number
+  nurseRegistrationFee?: number
+  nurseSubscriptionFee?: number
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
@@ -321,6 +372,9 @@ export type PlatformSettingsUncheckedCreateInput = {
   clinicCommissionPercent?: number
   videoCommissionPercent?: number
   homeCommissionPercent?: number
+  nurseCommissionPercent?: number
+  nurseRegistrationFee?: number
+  nurseSubscriptionFee?: number
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
@@ -332,6 +386,9 @@ export type PlatformSettingsUpdateInput = {
   clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -343,6 +400,9 @@ export type PlatformSettingsUncheckedUpdateInput = {
   clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -354,6 +414,9 @@ export type PlatformSettingsCreateManyInput = {
   clinicCommissionPercent?: number
   videoCommissionPercent?: number
   homeCommissionPercent?: number
+  nurseCommissionPercent?: number
+  nurseRegistrationFee?: number
+  nurseSubscriptionFee?: number
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
@@ -365,6 +428,9 @@ export type PlatformSettingsUpdateManyMutationInput = {
   clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -376,6 +442,9 @@ export type PlatformSettingsUncheckedUpdateManyInput = {
   clinicCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   videoCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -387,6 +456,9 @@ export type PlatformSettingsCountOrderByAggregateInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  nurseCommissionPercent?: Prisma.SortOrder
+  nurseRegistrationFee?: Prisma.SortOrder
+  nurseSubscriptionFee?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -397,6 +469,9 @@ export type PlatformSettingsAvgOrderByAggregateInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  nurseCommissionPercent?: Prisma.SortOrder
+  nurseRegistrationFee?: Prisma.SortOrder
+  nurseSubscriptionFee?: Prisma.SortOrder
 }
 
 export type PlatformSettingsMaxOrderByAggregateInput = {
@@ -404,6 +479,9 @@ export type PlatformSettingsMaxOrderByAggregateInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  nurseCommissionPercent?: Prisma.SortOrder
+  nurseRegistrationFee?: Prisma.SortOrder
+  nurseSubscriptionFee?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -415,6 +493,9 @@ export type PlatformSettingsMinOrderByAggregateInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  nurseCommissionPercent?: Prisma.SortOrder
+  nurseRegistrationFee?: Prisma.SortOrder
+  nurseSubscriptionFee?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -425,6 +506,9 @@ export type PlatformSettingsSumOrderByAggregateInput = {
   clinicCommissionPercent?: Prisma.SortOrder
   videoCommissionPercent?: Prisma.SortOrder
   homeCommissionPercent?: Prisma.SortOrder
+  nurseCommissionPercent?: Prisma.SortOrder
+  nurseRegistrationFee?: Prisma.SortOrder
+  nurseSubscriptionFee?: Prisma.SortOrder
 }
 
 
@@ -434,6 +518,9 @@ export type PlatformSettingsSelect<ExtArgs extends runtime.Types.Extensions.Inte
   clinicCommissionPercent?: boolean
   videoCommissionPercent?: boolean
   homeCommissionPercent?: boolean
+  nurseCommissionPercent?: boolean
+  nurseRegistrationFee?: boolean
+  nurseSubscriptionFee?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
@@ -445,6 +532,9 @@ export type PlatformSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   clinicCommissionPercent?: boolean
   videoCommissionPercent?: boolean
   homeCommissionPercent?: boolean
+  nurseCommissionPercent?: boolean
+  nurseRegistrationFee?: boolean
+  nurseSubscriptionFee?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
@@ -456,6 +546,9 @@ export type PlatformSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   clinicCommissionPercent?: boolean
   videoCommissionPercent?: boolean
   homeCommissionPercent?: boolean
+  nurseCommissionPercent?: boolean
+  nurseRegistrationFee?: boolean
+  nurseSubscriptionFee?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
@@ -467,13 +560,16 @@ export type PlatformSettingsSelectScalar = {
   clinicCommissionPercent?: boolean
   videoCommissionPercent?: boolean
   homeCommissionPercent?: boolean
+  nurseCommissionPercent?: boolean
+  nurseRegistrationFee?: boolean
+  nurseSubscriptionFee?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
   updatedAt?: boolean
 }
 
-export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "splashImageUrl" | "splashFit" | "splashBgColor" | "updatedAt", ExtArgs["result"]["platformSettings"]>
+export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "nurseSubscriptionFee" | "splashImageUrl" | "splashFit" | "splashBgColor" | "updatedAt", ExtArgs["result"]["platformSettings"]>
 
 export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlatformSettings"
@@ -483,6 +579,9 @@ export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.In
     clinicCommissionPercent: number
     videoCommissionPercent: number
     homeCommissionPercent: number
+    nurseCommissionPercent: number
+    nurseRegistrationFee: number
+    nurseSubscriptionFee: number
     splashImageUrl: string | null
     splashFit: string
     splashBgColor: string
@@ -914,6 +1013,9 @@ export interface PlatformSettingsFieldRefs {
   readonly clinicCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly videoCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly homeCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly nurseCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly nurseRegistrationFee: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly nurseSubscriptionFee: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly splashImageUrl: Prisma.FieldRef<"PlatformSettings", 'String'>
   readonly splashFit: Prisma.FieldRef<"PlatformSettings", 'String'>
   readonly splashBgColor: Prisma.FieldRef<"PlatformSettings", 'String'>

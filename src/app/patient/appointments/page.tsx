@@ -9,7 +9,7 @@ import {
   MessageCircle, Navigation, UserCheck,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { cn, formatDoctorName } from "@/lib/utils";
+import { cn, formatDoctorName, formatProviderName } from "@/lib/utils";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
@@ -55,6 +55,9 @@ interface Appointment {
   doctorNotes: string | null;
   scheduledAt: string;
   createdAt: string;
+  providerType?: string; // "NURSE" for nurse bookings
+  serviceName?: string | null;
+  nurseServiceId?: string | null;
   doctor: {
     name: string;
     doctorProfile: { specialty: string; clinicName: string | null; address: string | null; lat: number | null; lng: number | null } | null;
@@ -88,6 +91,15 @@ const STATUS_LABEL: Record<string, string> = {
   EXPIRED: "Doctor was busy",
   NO_SHOW: "Missed (no-show)",
 };
+
+// Nurse bookings share these cards — swap the provider word where it shows.
+function statusLabel(a: { status: string; providerType?: string }) {
+  if (a.providerType === "NURSE") {
+    if (a.status === "PENDING_APPROVAL") return "Waiting for nurse";
+    if (a.status === "EXPIRED") return "Nurse was busy";
+  }
+  return STATUS_LABEL[a.status] ?? a.status;
+}
 
 const REQUEST_TIMEOUT_MS = 30 * 60 * 1000;
 
@@ -224,9 +236,9 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
           </div>
           <div className="min-w-0">
             <div className="font-bold text-slate-900 flex items-center gap-2 flex-wrap">
-              {formatDoctorName(a.doctor.name)}
+              {formatProviderName(a.doctor.name, a.providerType)}
             </div>
-            <div className="text-xs text-slate-500 mt-0.5">{a.doctor.doctorProfile?.specialty ?? ""}</div>
+            <div className="text-xs text-slate-500 mt-0.5">{a.providerType === "NURSE" ? `Nurse visit · ${a.serviceName ?? ""}` : a.doctor.doctorProfile?.specialty ?? ""}</div>
             <div className="text-xs text-slate-400 mt-0.5">
               {new Date(a.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
             </div>
@@ -236,7 +248,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
           </div>
         </div>
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-          <span className={STATUS_BADGE[a.status] ?? "badge badge-gray"}>{STATUS_LABEL[a.status] ?? a.status}</span>
+          <span className={STATUS_BADGE[a.status] ?? "badge badge-gray"}>{statusLabel(a)}</span>
           <span className="text-sm font-bold text-slate-800">₹{a.amount}</span>
         </div>
       </div>
@@ -246,7 +258,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
       {a.status === "PENDING_APPROVAL" && a.reassignedFromId && a.reassignedFrom && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
           <UserCheck className="w-4 h-4 flex-shrink-0" />
-          {formatDoctorName(a.reassignedFrom.doctor.name)} had an emergency and couldn&apos;t continue with your appointment, so we&apos;ve assigned you to {formatDoctorName(a.doctor.name)} instead.
+          {formatDoctorName(a.reassignedFrom.doctor.name)} had an emergency and couldn&apos;t continue with your appointment, so we&apos;ve assigned you to {formatProviderName(a.doctor.name, a.providerType)} instead.
         </div>
       )}
       {a.status === "PENDING_APPROVAL" && (
@@ -254,8 +266,8 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
           <span className="flex items-center gap-2">
             <Clock className="w-4 h-4 flex-shrink-0" />
             {scheduledForLater
-              ? `Waiting for ${formatDoctorName(a.doctor.name)} to confirm your scheduled appointment.`
-              : `Waiting for ${formatDoctorName(a.doctor.name)} to accept this request.`}
+              ? `Waiting for ${formatProviderName(a.doctor.name, a.providerType)} to confirm your scheduled appointment.`
+              : `Waiting for ${formatProviderName(a.doctor.name, a.providerType)} to accept this request.`}
           </span>
           {!scheduledForLater && (
             <span className="text-xs font-mono font-semibold text-amber-700 flex-shrink-0">
@@ -267,17 +279,17 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
       {a.status === "CANCELLED" && a.reassignedTo && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
           <UserCheck className="w-4 h-4 flex-shrink-0" />
-          {formatDoctorName(a.doctor.name)} had an emergency and couldn&apos;t continue with this appointment, so we&apos;ve assigned you to {formatDoctorName(a.reassignedTo.doctor.name)} instead — check your pending requests.
+          {formatProviderName(a.doctor.name, a.providerType)} had an emergency and couldn&apos;t continue with this appointment, so we&apos;ve assigned you to {formatDoctorName(a.reassignedTo.doctor.name)} instead — check your pending requests.
         </div>
       )}
       {a.status === "REJECTED" && (
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
-          <ThumbsDown className="w-4 h-4 flex-shrink-0 text-slate-400" /> {formatDoctorName(a.doctor.name)} was unable to accept this request. No payment was taken.
+          <ThumbsDown className="w-4 h-4 flex-shrink-0 text-slate-400" /> {formatProviderName(a.doctor.name, a.providerType)} was unable to accept this request. No payment was taken.
         </div>
       )}
       {a.status === "EXPIRED" && (
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
-          <Clock className="w-4 h-4 flex-shrink-0 text-slate-400" /> {formatDoctorName(a.doctor.name)}{" "}didn&apos;t respond in time and may be too busy right now. No payment was taken — try booking again or choose another doctor.
+          <Clock className="w-4 h-4 flex-shrink-0 text-slate-400" /> {formatProviderName(a.doctor.name, a.providerType)}{" "}didn&apos;t respond in time and may be too busy right now. No payment was taken — try booking again or choose another doctor.
         </div>
       )}
       {a.consultType === "CLINIC" &&
@@ -292,7 +304,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
           <span className="flex items-center gap-2 min-w-0">
             <Building2 className="w-4 h-4 flex-shrink-0" />
             <span className="truncate">
-              {a.clinic?.name || a.doctor.doctorProfile?.clinicName || `${formatDoctorName(a.doctor.name)}'s clinic`}
+              {a.clinic?.name || a.doctor.doctorProfile?.clinicName || `${formatProviderName(a.doctor.name, a.providerType)}'s clinic`}
               {a.clinic?.address && <span className="text-teal-600"> — {a.clinic.address}</span>}
             </span>
           </span>
@@ -307,7 +319,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
           className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 mb-3 flex items-center justify-between gap-2 hover:bg-emerald-100 transition-colors"
         >
           <span className="flex items-center gap-2">
-            <Car className="w-4 h-4 flex-shrink-0" /> {formatDoctorName(a.doctor.name)} is on the way
+            <Car className="w-4 h-4 flex-shrink-0" /> {formatProviderName(a.doctor.name, a.providerType)} is on the way
           </span>
           <span className="font-semibold underline flex items-center gap-1">
             <MapPin className="w-3.5 h-3.5" /> Track Live
@@ -316,13 +328,13 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
       )}
       {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
-          <MapPinCheck className="w-4 h-4 flex-shrink-0" /> {formatDoctorName(a.doctor.name)} has arrived.
+          <MapPinCheck className="w-4 h-4 flex-shrink-0" /> {formatProviderName(a.doctor.name, a.providerType)} has arrived.
         </div>
       )}
       {needsPayment && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
           <span className="flex items-center gap-2">
-            <CardIcon className="w-4 h-4 flex-shrink-0" /> Payment pending — pay ₹{Math.max(0, a.amount - a.discountAmount)}{a.discountAmount > 0 ? ` (${a.couponCode} applied)` : ""} to confirm your consultation with {formatDoctorName(a.doctor.name)}.
+            <CardIcon className="w-4 h-4 flex-shrink-0" /> Payment pending — pay ₹{Math.max(0, a.amount - a.discountAmount)}{a.discountAmount > 0 ? ` (${a.couponCode} applied)` : ""} to confirm your consultation with {formatProviderName(a.doctor.name, a.providerType)}.
           </span>
         </div>
       )}
@@ -341,7 +353,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
 
       {a.doctorNotes && (
         <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-600 mb-3">
-          <span className="font-semibold text-slate-700">Doctor&apos;s notes: </span>{a.doctorNotes}
+          <span className="font-semibold text-slate-700">{a.providerType === "NURSE" ? "Nurse's notes" : "Doctor's notes"}: </span>{a.doctorNotes}
         </div>
       )}
 
@@ -423,7 +435,8 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
             </a>
           );
         })}
-        {a.status === "COMPLETED" && (a.medicines.length > 0 || !!a.doctorNotes) && (
+        {/* Nurses can't issue prescriptions — their visit notes are shown on the card instead. */}
+        {a.status === "COMPLETED" && a.providerType !== "NURSE" && (a.medicines.length > 0 || !!a.doctorNotes) && (
           <PrescriptionDownloadButton appointmentId={a.id} patientId={patientId} />
         )}
         {a.status === "COMPLETED" && !a.review && (
@@ -438,10 +451,14 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
         )}
         {a.status === "COMPLETED" && (
           <button
-            onClick={() => router.push(`/patient/book?doctorId=${a.doctorId}&followUpOf=${a.id}`)}
+            onClick={() => router.push(
+              a.providerType === "NURSE"
+                ? `/patient/nurse?nurseId=${a.doctorId}${a.nurseServiceId ? `&serviceId=${a.nurseServiceId}` : ""}`
+                : `/patient/book?doctorId=${a.doctorId}&followUpOf=${a.id}`
+            )}
             className="btn-secondary py-2 px-3 text-xs"
           >
-            <RotateCcw className="w-3.5 h-3.5" /> Book Follow-up
+            <RotateCcw className="w-3.5 h-3.5" /> {a.providerType === "NURSE" ? "Book Again" : "Book Follow-up"}
           </button>
         )}
       </div>
@@ -677,7 +694,7 @@ export default function PatientAppointments() {
                 </h3>
               </div>
               <p className="text-sm text-slate-500 mb-2">
-                Your {cancelTarget.status === "SCHEDULED" ? "appointment" : "request"} with {formatDoctorName(cancelTarget.doctor.name)} on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
+                Your {cancelTarget.status === "SCHEDULED" ? "appointment" : "request"} with {formatProviderName(cancelTarget.doctor.name, cancelTarget.providerType)} on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
               </p>
               {willRefund && (
                 <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-2">
@@ -710,11 +727,11 @@ export default function PatientAppointments() {
               <h3 className="font-bold text-slate-800">Reschedule appointment</h3>
             </div>
             <p className="text-sm text-slate-500 mb-3">
-              Pick a new time for your {rescheduleTarget.status === "SCHEDULED" ? "appointment" : "request"} with {formatDoctorName(rescheduleTarget.doctor.name)}.
+              Pick a new time for your {rescheduleTarget.status === "SCHEDULED" ? "appointment" : "request"} with {formatProviderName(rescheduleTarget.doctor.name, rescheduleTarget.providerType)}.
             </p>
             {rescheduleTarget.status === "SCHEDULED" && (
               <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">
-                {`This will need ${formatDoctorName(rescheduleTarget.doctor.name)} to reconfirm the new time before it's booked again.`}
+                {`This will need ${formatProviderName(rescheduleTarget.doctor.name, rescheduleTarget.providerType)} to reconfirm the new time before it's booked again.`}
               </p>
             )}
             <input

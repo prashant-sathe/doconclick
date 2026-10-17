@@ -7,9 +7,11 @@ import type { PendingRequest } from "@/hooks/useDoctorNotifications";
 
 const AUTO_DISMISS_MS = 6000;
 
-export default function NotificationToast({ request, onDismiss }: {
+// Also used by the nurse header (href "/nurse/dashboard").
+export default function NotificationToast({ request, onDismiss, href = "/doctor/dashboard" }: {
   request: PendingRequest;
   onDismiss: () => void;
+  href?: string;
 }) {
   const router = useRouter();
 
@@ -23,15 +25,15 @@ export default function NotificationToast({ request, onDismiss }: {
   return createPortal(
     <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 w-[calc(100%-2rem)] max-w-sm animate-fade-in-up">
       <button
-        onClick={() => { router.push("/doctor/dashboard"); onDismiss(); }}
+        onClick={() => { router.push(href); onDismiss(); }}
         className="w-full text-left bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 flex items-start gap-3 hover:border-teal-200 transition-colors"
       >
         <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center flex-shrink-0">
           <Bell className="w-4 h-4 text-teal-600" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-slate-900">New appointment request</p>
-          <p className="text-xs text-slate-500 mt-0.5">{patientLabel} · {request.consultType}</p>
+          <p className="text-sm font-bold text-slate-900">{request.serviceName ? "New visit request" : "New appointment request"}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{patientLabel} · {request.serviceName ?? request.consultType}</p>
           <p className="text-xs text-slate-400 mt-0.5 truncate">{request.symptoms}</p>
         </div>
         <span

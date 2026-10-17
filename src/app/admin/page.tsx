@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Users, Stethoscope, CalendarCheck, IndianRupee, AlertCircle, Clock, TrendingUp } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
-import { cn, formatDoctorName } from "@/lib/utils";
+import { cn, formatProviderName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 
@@ -18,6 +18,7 @@ interface Analytics {
   recentAppointments: {
     id: string;
     patient: { name: string };
+    providerType?: string;
     doctor: { name: string };
     symptoms: string;
     status: string;
@@ -90,7 +91,7 @@ export default function AdminOverview() {
       field: "doctor.name",
       minWidth: 160,
       flex: 1,
-      valueFormatter: (p: ValueFormatterParams<RecentAppointment>) => formatDoctorName(p.value ?? ""),
+      valueFormatter: (p: ValueFormatterParams<RecentAppointment>) => formatProviderName(p.value ?? "", p.data?.providerType),
     },
     { headerName: "Symptoms", field: "symptoms", minWidth: 180, flex: 1.4, cellClass: "truncate text-slate-600" },
     {

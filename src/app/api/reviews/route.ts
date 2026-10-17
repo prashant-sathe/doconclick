@@ -47,13 +47,13 @@ export async function POST(req: Request) {
       _count: { rating: true },
     });
 
-    await tx.doctorProfile.update({
-      where: { userId: appointment.doctorId },
-      data: {
-        avgRating: agg._avg.rating ?? ratingNum,
-        totalReviews: agg._count.rating,
-      },
-    });
+    // Nurse bookings share this table — keep the right profile's rating current.
+    const ratingData = { avgRating: agg._avg.rating ?? ratingNum, totalReviews: agg._count.rating };
+    if (appointment.providerType === "NURSE") {
+      await tx.nurseProfile.update({ where: { userId: appointment.doctorId }, data: ratingData });
+    } else {
+      await tx.doctorProfile.update({ where: { userId: appointment.doctorId }, data: ratingData });
+    }
 
     return created;
   });
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
   void sendPushToUser(appointment.doctorId, {
     title: "New review",
     body: `${authUser.name} left a ${ratingNum}★ review.`,
-    url: "/doctor/dashboard",
+    url: appointment.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
   });
 
   return NextResponse.json(review);
