@@ -6,7 +6,7 @@ import { isClinicOpenNow } from "@/lib/clinicAvailability";
 import { haversine } from "@/lib/geo";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
-import { clinicSlotTaken } from "@/lib/clinicSlots";
+import { doctorSlotProblem, snapToClinicGrid, isSlotIndexViolation } from "@/lib/doctorSlots";
 
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
@@ -90,11 +90,15 @@ export async function POST(req: Request) {
 
     // A scheduled booking can only be placed for a future moment — the client
     // restricts the picker, this guards a hand-crafted request.
+    // The moment this booking holds the doctor for (null = "book now"). Pickers
+    // only offer whole minutes; clinic times are snapped onto the slot grid below.
+    let bookAt: Date | null = null;
     if (scheduledAt) {
       const when = new Date(scheduledAt);
       if (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()) {
         return NextResponse.json({ error: "Please pick a time in the future." }, { status: 400 });
       }
+      bookAt = new Date(Math.floor(when.getTime() / 60_000) * 60_000);
     }
 
     if (consultType === "HOME" && !doctor.doctorProfile.offersHomeVisit) {
@@ -134,23 +138,19 @@ export async function POST(req: Request) {
         if (!clinic || clinic.doctorId !== doctorId || !clinic.isActive) {
           return NextResponse.json({ error: "Please select a valid clinic location." }, { status: 400 });
         }
-        const effectiveTime = scheduledAt ? new Date(scheduledAt) : new Date();
+        const effectiveTime = bookAt ?? new Date();
         if (!isClinicOpenNow(clinic.slots, effectiveTime, clinic.leaves.map((l) => l.date))) {
           return NextResponse.json(
             { error: "The doctor is not available at this clinic at the selected time. Please choose a different clinic or time." },
             { status: 400 }
           );
         }
-        // A scheduled (not "now") clinic slot is a specific promise to be
-        // there at that exact minute — two patients can't both hold it.
-        // "Now" bookings are exempt: there's no discrete slot to collide on.
-        if (scheduledAt) {
-          if (await clinicSlotTaken({ doctorId, clinicId, when: effectiveTime })) {
-            return NextResponse.json(
-              { error: "That time was just taken by another patient. Please pick a different slot." },
-              { status: 409 }
-            );
-          }
+        // A scheduled clinic visit must be one of the slots the slots API
+        // offers — never an arbitrary minute between two of them.
+        if (bookAt) {
+          const snapped = snapToClinicGrid(clinic, bookAt);
+          if (snapped.error !== null) return NextResponse.json({ error: snapped.error }, { status: 400 });
+          bookAt = snapped.when;
         }
       } else {
         // A doctor with clinics must have one picked and validated above —
@@ -163,6 +163,14 @@ export async function POST(req: Request) {
     }
     if (consultType === "VIDEO" && !doctor.doctorProfile.offersVideo) {
       return NextResponse.json({ error: "This doctor does not offer video consultations" }, { status: 400 });
+    }
+
+    // A scheduled booking holds the doctor for a slot across all their clinics
+    // and consult types. "Now" bookings are exempt: there's no discrete slot
+    // to collide on (see src/lib/doctorSlots.ts).
+    if (bookAt) {
+      const problem = await doctorSlotProblem({ doctorId, when: bookAt, against: "live", viewer: "patient" });
+      if (problem) return NextResponse.json({ error: problem }, { status: 409 });
     }
 
     if (followUpOfId) {
@@ -200,7 +208,7 @@ export async function POST(req: Request) {
         paymentMethod: "ONLINE",
         followUpOfId: followUpOfId ?? undefined,
         clinicId: consultType === "CLINIC" && clinicId ? clinicId : undefined,
-        ...(scheduledAt ? { scheduledAt: new Date(scheduledAt) } : {}),
+        ...(bookAt ? { scheduledAt: bookAt } : {}),
       },
       include: {
         patient: { select: { name: true } },
@@ -216,6 +224,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json(appointment);
   } catch (err) {
+    // Two patients raced for the same slot — the partial unique index let one through.
+    if (isSlotIndexViolation(err)) {
+      return NextResponse.json({ error: "That time was just taken by another patient. Please pick a different slot." }, { status: 409 });
+    }
     console.error(err);
     return NextResponse.json({ error: "Booking failed. Please try again." }, { status: 500 });
   }

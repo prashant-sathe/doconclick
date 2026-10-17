@@ -30,8 +30,9 @@ async function main() {
   try {
     // Accepted + paid ₹600 with a ₹100 coupon, then rescheduled to a time that has now passed unconfirmed.
     const paid = await prisma.appointment.create({ data: { ...base, status: "PENDING_APPROVAL", paymentStatus: "PAID", amount: 600, discountAmount: 100, scheduledAt: hourAgo } });
-    const unpaid = await prisma.appointment.create({ data: { ...base, status: "PENDING_APPROVAL", paymentStatus: "PENDING", amount: 500, scheduledAt: hourAgo } });
-    const live = await prisma.appointment.create({ data: { ...base, status: "SCHEDULED", paymentStatus: "PAID", amount: 500, scheduledAt: hourAgo } });
+    // Distinct start times: live bookings of one doctor can't share one (partial unique index).
+    const unpaid = await prisma.appointment.create({ data: { ...base, status: "PENDING_APPROVAL", paymentStatus: "PENDING", amount: 500, scheduledAt: new Date(hourAgo.getTime() + 60_000) } });
+    const live = await prisma.appointment.create({ data: { ...base, status: "SCHEDULED", paymentStatus: "PAID", amount: 500, scheduledAt: new Date(hourAgo.getTime() + 120_000) } });
 
     const statuses = await Promise.all(Array.from({ length: PARALLEL }, () =>
       fetch(`${BASE}/api/appointments/me`, { headers: { cookie } }).then((r) => r.status)));

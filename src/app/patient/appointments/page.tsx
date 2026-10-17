@@ -18,6 +18,7 @@ import { useResync } from "@/hooks/useResync";
 import { intervalLabel } from "@/lib/nursePackage";
 import { vitalsSummary, type VitalsInput } from "@/lib/vitals";
 import PullToRefresh from "@/components/PullToRefresh";
+import TimeSlotPicker from "@/components/patient/TimeSlotPicker";
 
 interface Medicine {
   id: string;
@@ -37,6 +38,7 @@ interface Attachment {
 interface Appointment {
   id: string;
   doctorId: string;
+  clinicId?: string | null;
   status: string;
   consultType: string;
   symptoms: string;
@@ -836,14 +838,26 @@ export default function PatientAppointments() {
                 {`${formatProviderName(rescheduleTarget.doctor.name, rescheduleTarget.providerType)} needs to confirm the new time. Until then your current booking (${new Date(rescheduleTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}) stays as it is${rescheduleTarget.requestedScheduledAt ? ", and this replaces your earlier request" : ""}.`}
               </p>
             )}
-            <input
-              type="datetime-local"
-              required
-              className="input-field mb-3"
-              min={nowLocalInput()}
-              value={newScheduledAt}
-              onChange={(e) => setNewScheduledAt(e.target.value)}
-            />
+            {rescheduleTarget.consultType === "CLINIC" && rescheduleTarget.clinicId ? (
+              // Same slot grid as booking — the API only accepts these times.
+              <div className="mb-3">
+                <TimeSlotPicker
+                  doctorId={rescheduleTarget.doctorId}
+                  clinicId={rescheduleTarget.clinicId}
+                  value={newScheduledAt}
+                  onChange={setNewScheduledAt}
+                />
+              </div>
+            ) : (
+              <input
+                type="datetime-local"
+                required
+                className="input-field mb-3"
+                min={nowLocalInput()}
+                value={newScheduledAt}
+                onChange={(e) => setNewScheduledAt(e.target.value)}
+              />
+            )}
             {rescheduleError && (
               <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-3">
                 {rescheduleError}

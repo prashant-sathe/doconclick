@@ -633,6 +633,7 @@ export default function DoctorDashboard() {
   const [acceptTarget, setAcceptTarget] = useState<Appointment | null>(null);
   const [confirmingBulkAccept, setConfirmingBulkAccept] = useState(false);
   const [bulkAccepting, setBulkAccepting] = useState(false);
+  const [bulkNotice, setBulkNotice] = useState("");
   const [timelineOpen, setTimelineOpen] = useState(true);
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -772,10 +773,23 @@ export default function DoctorDashboard() {
 
   const confirmBulkAccept = async () => {
     setBulkAccepting(true);
-    await fetch("/api/appointments/bulk-accept", { method: "POST" });
-    setBulkAccepting(false);
-    setConfirmingBulkAccept(false);
-    loadAppointments();
+    setBulkNotice("");
+    try {
+      const res = await fetch("/api/appointments/bulk-accept", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setBulkNotice(data.error ?? "Could not accept the requests.");
+      } else if (data.skipped?.length) {
+        // Requests that overlap a slot already confirmed stay pending for a manual decision.
+        setBulkNotice(`Accepted ${data.count}. ${data.skipped.length} left pending because ${data.skipped.length === 1 ? "it overlaps" : "they overlap"} a confirmed appointment.`);
+      }
+    } catch {
+      setBulkNotice("Network error — please try again.");
+    } finally {
+      setBulkAccepting(false);
+      setConfirmingBulkAccept(false);
+      loadAppointments();
+    }
   };
 
   const confirmNoShow = async () => {
@@ -1137,6 +1151,7 @@ export default function DoctorDashboard() {
               </button>
             )}
           </div>
+          {bulkNotice && <p className="px-6 py-2 text-xs font-semibold text-amber-700 bg-amber-50 border-b border-amber-100">{bulkNotice}</p>}
           <div className="divide-y divide-slate-50">
             {loadingAppts ? (
               <div className="p-6 space-y-3">{[...Array(2)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>

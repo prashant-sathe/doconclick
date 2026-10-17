@@ -156,7 +156,7 @@ export interface TimeSlot {
   label: string; // "2:00 PM"
 }
 
-const SLOT_INTERVAL_MINUTES = 10;
+export const SLOT_INTERVAL_MINUTES = 10;
 
 // Discrete bookable start times for one clinic on one calendar date, derived
 // by dividing its day-of-week open-hour ranges into fixed intervals. `date`

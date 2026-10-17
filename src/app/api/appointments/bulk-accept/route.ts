@@ -4,13 +4,14 @@ import { getAuthUser } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { doctorSlotProblem, isTimedBooking } from "@/lib/doctorSlots";
 
 // POST: Accept every one of the logged-in doctor's (or their staff's) still-
 // pending requests in one go — a busy morning shouldn't mean tapping "Accept"
 // one at a time. Mirrors the PENDING_APPROVAL → SCHEDULED transition in
-// /api/appointments/[id] (no extra guard applies to that transition there
-// either — home-visit distance etc. is checked at booking time, not
-// acceptance time), just applied to every pending request instead of one.
+// /api/appointments/[id], including its slot guard: requests are accepted in
+// time order, and a timed request that overlaps one already confirmed
+// (possibly earlier in this same batch) is left pending and reported back.
 export async function POST() {
   const authUser = await getAuthUser();
   if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "STAFF")) {
@@ -23,21 +24,34 @@ export async function POST() {
 
   const pending = await prisma.appointment.findMany({
     where: { doctorId: scope.doctorId, status: "PENDING_APPROVAL" },
-    select: { id: true, patientId: true },
+    select: { id: true, patientId: true, scheduledAt: true, createdAt: true },
+    orderBy: [{ scheduledAt: "asc" }, { createdAt: "asc" }],
   });
   if (pending.length === 0) {
-    return NextResponse.json({ count: 0 });
+    return NextResponse.json({ count: 0, skipped: [] });
   }
 
-  await prisma.appointment.updateMany({
-    where: { id: { in: pending.map((a) => a.id) } },
-    data: { status: "SCHEDULED", acceptedAt: new Date() },
-  });
+  const accepted: typeof pending = [];
+  const skipped: { id: string; reason: string }[] = [];
+  for (const a of pending) {
+    if (isTimedBooking(a)) {
+      const problem = await doctorSlotProblem({
+        doctorId: scope.doctorId, when: a.scheduledAt, excludeAppointmentId: a.id, against: "confirmed", viewer: "doctor",
+      });
+      if (problem) { skipped.push({ id: a.id, reason: problem }); continue; }
+    }
+    // Conditional — the doctor may be answering this one individually right now.
+    const { count } = await prisma.appointment.updateMany({
+      where: { id: a.id, status: "PENDING_APPROVAL" },
+      data: { status: "SCHEDULED", acceptedAt: new Date() },
+    });
+    if (count === 1) accepted.push(a);
+  }
 
   const doctorName = authUser.role === "DOCTOR"
     ? authUser.name
     : (await prisma.user.findUnique({ where: { id: scope.doctorId }, select: { name: true } }))?.name ?? "Your doctor";
-  for (const a of pending) {
+  for (const a of accepted) {
     void sendPushToUser(a.patientId, {
       title: "Appointment confirmed!",
       body: `${doctorName} accepted your request.`,
@@ -45,5 +59,5 @@ export async function POST() {
     });
   }
 
-  return NextResponse.json({ count: pending.length });
+  return NextResponse.json({ count: accepted.length, skipped });
 }

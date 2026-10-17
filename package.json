@@ -8,11 +8,12 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "tsx prisma/seed.ts",
-    "db:push": "prisma db push",
+    "db:push": "prisma db push && prisma db execute --file prisma/sql/partial-indexes.sql",
     "migrate:uploads-to-s3": "tsx prisma/migrate-uploads-to-s3.ts",
     "test:cancel-race": "tsx tests/cancel-race.ts",
     "test:expire-refund": "tsx tests/expire-refund.ts",
-    "test:reschedule": "tsx tests/reschedule-request.ts"
+    "test:reschedule": "tsx tests/reschedule-request.ts",
+    "test:slots": "tsx tests/slot-booking.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

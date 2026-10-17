@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { generateSlotsForDate } from "@/lib/clinicAvailability";
+import { generateSlotsForDate, SLOT_INTERVAL_MINUTES } from "@/lib/clinicAvailability";
+import { isTimedBooking } from "@/lib/doctorSlots";
 
 // GET /api/doctors/[id]/slots?clinicId=X&date=YYYY-MM-DD
 // Discrete bookable time slots for one of a doctor's clinics on one date —
@@ -38,33 +39,32 @@ export async function GET(
     return NextResponse.json({ slots: [] });
   }
 
-  // A slot is taken if there's a live (not rejected/cancelled/expired)
-  // appointment at that exact clinic + date + time already — or a patient's
-  // pending request to move their accepted appointment there.
-  const dayStart = new Date(`${date}T00:00:00+05:30`);
-  const dayEnd = new Date(`${date}T23:59:59.999+05:30`);
+  // A slot is taken if it overlaps any live timed booking of this doctor —
+  // at any of their clinics or consult types, or a patient's pending request
+  // to move there. Same rule the booking route enforces (src/lib/doctorSlots.ts).
+  const slotMs = SLOT_INTERVAL_MINUTES * 60_000;
+  const dayStart = new Date(new Date(`${date}T00:00:00+05:30`).getTime() - slotMs);
+  const dayEnd = new Date(new Date(`${date}T23:59:59.999+05:30`).getTime() + slotMs);
   const day = { gte: dayStart, lte: dayEnd };
   const booked = await prisma.appointment.findMany({
     where: {
       doctorId,
-      clinicId,
       OR: [
         { status: { in: ["PENDING_APPROVAL", "SCHEDULED"] }, scheduledAt: day },
         { status: "SCHEDULED", requestedScheduledAt: day },
       ],
     },
-    select: { scheduledAt: true, requestedScheduledAt: true },
+    select: { scheduledAt: true, createdAt: true, requestedScheduledAt: true },
   });
-  const istTime = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false,
-  });
-  const takenTimes = new Set(
-    booked
-      .flatMap((a) => [a.scheduledAt, a.requestedScheduledAt])
-      .filter((t): t is Date => !!t && t >= dayStart && t <= dayEnd)
-      .map((t) => istTime.format(t)) // "HH:MM"
-  );
+  const busyStarts = booked.flatMap((a) => [
+    ...(isTimedBooking(a) ? [a.scheduledAt.getTime()] : []),
+    ...(a.requestedScheduledAt ? [a.requestedScheduledAt.getTime()] : []),
+  ]);
+  const isTaken = (hhmm: string) => {
+    const start = new Date(`${date}T${hhmm}:00+05:30`).getTime();
+    return busyStarts.some((b) => Math.abs(b - start) < slotMs);
+  };
 
-  const slots = candidates.filter((s) => !takenTimes.has(s.time));
+  const slots = candidates.filter((s) => !isTaken(s.time));
   return NextResponse.json({ slots });
 }

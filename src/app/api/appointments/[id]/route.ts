@@ -12,8 +12,7 @@ import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
 import { netPayable, releaseCouponRedemption } from "@/lib/coupons";
-import { isClinicOpenNow } from "@/lib/clinicAvailability";
-import { clinicSlotTaken } from "@/lib/clinicSlots";
+import { doctorSlotProblem, snapToClinicGrid, isTimedBooking, isSlotIndexViolation } from "@/lib/doctorSlots";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
   SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
@@ -43,6 +42,8 @@ async function claimStatusChange(
   if (count === 0) throw new AppointmentAlreadyClosedError();
   return tx.appointment.findUniqueOrThrow({ where: { id } });
 }
+
+const SLOT_TAKEN_MESSAGE = "That time was just taken. Please pick a different slot.";
 
 const fmtIST = (d: Date) =>
   d.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
@@ -195,21 +196,27 @@ export async function PATCH(
           });
           if (problem) return NextResponse.json({ error: problem }, { status: 409 });
         }
-        if (
-          appointment.consultType === "CLINIC" && appointment.clinicId &&
-          await clinicSlotTaken({ doctorId: appointment.doctorId, clinicId: appointment.clinicId, when: requested, excludeAppointmentId: appointment.id })
-        ) {
-          return NextResponse.json({ error: "Another patient already has that time at this clinic." }, { status: 409 });
+        if (appointment.providerType !== "NURSE") {
+          const problem = await doctorSlotProblem({
+            doctorId: appointment.doctorId, when: requested, excludeAppointmentId: appointment.id, against: "confirmed", viewer: "doctor",
+          });
+          if (problem) return NextResponse.json({ error: problem }, { status: 409 });
         }
       }
       // Conditional on the exact request answered — the patient may have
       // changed or withdrawn it in the meantime.
-      const { count } = await prisma.appointment.updateMany({
-        where: { id, status: "SCHEDULED", requestedScheduledAt: requested },
-        data: reschedule === "ACCEPT"
-          ? { scheduledAt: requested, requestedScheduledAt: null, reminderSentAt: null }
-          : { requestedScheduledAt: null },
-      });
+      let count: number;
+      try {
+        ({ count } = await prisma.appointment.updateMany({
+          where: { id, status: "SCHEDULED", requestedScheduledAt: requested },
+          data: reschedule === "ACCEPT"
+            ? { scheduledAt: requested, requestedScheduledAt: null, reminderSentAt: null }
+            : { requestedScheduledAt: null },
+        }));
+      } catch (err) {
+        if (isSlotIndexViolation(err)) return NextResponse.json({ error: SLOT_TAKEN_MESSAGE }, { status: 409 });
+        throw err;
+      }
       if (count === 0) {
         return NextResponse.json({ error: "This request was already answered or changed. Please refresh." }, { status: 409 });
       }
@@ -342,7 +349,7 @@ export async function PATCH(
       // The patient only ever paid the coupon-discounted amount, so that's
       // what gets refunded to their wallet.
       const refundAmount = netPayable(appointment);
-      const candidate = doctorProfile
+      const match = doctorProfile
         ? await findReassignmentDoctor({
             excludeDoctorId: appointment.doctorId,
             specialty: doctorProfile.specialty,
@@ -350,6 +357,11 @@ export async function PATCH(
             patientId: appointment.patientId,
           })
         : null;
+      // The replacement inherits the slot, so they must actually be free then.
+      const candidate = match && isTimedBooking(appointment)
+        && await doctorSlotProblem({ doctorId: match.id, when: appointment.scheduledAt, against: "live", viewer: "doctor" })
+        ? null
+        : match;
 
       let newAmount = 0;
       let newPlatformFee = 0;
@@ -480,6 +492,16 @@ export async function PATCH(
       return NextResponse.json(withoutVisitCode(updated));
     }
 
+    // Accepting confirms the slot — it must not overlap one the doctor has
+    // already confirmed (another clinic, a video call…). Nurse accepts are
+    // checked above with their visit durations.
+    if (status === "SCHEDULED" && appointment.providerType !== "NURSE" && isTimedBooking(appointment)) {
+      const problem = await doctorSlotProblem({
+        doctorId: appointment.doctorId, when: appointment.scheduledAt, excludeAppointmentId: appointment.id, against: "confirmed", viewer: "doctor",
+      });
+      if (problem) return NextResponse.json({ error: problem }, { status: 409 });
+    }
+
     const updated = await prisma.appointment.update({
       where: { id },
       data: {
@@ -541,9 +563,22 @@ export async function PATCH(
           { status: 400 }
         );
       }
-      const when = new Date(scheduledAt);
-      if (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()) {
+      const picked = new Date(scheduledAt);
+      if (Number.isNaN(picked.getTime()) || picked.getTime() <= Date.now()) {
         return NextResponse.json({ error: "Please pick a time in the future." }, { status: 400 });
+      }
+      let when = new Date(Math.floor(picked.getTime() / 60_000) * 60_000);
+      if (appointment.consultType === "CLINIC" && appointment.clinicId) {
+        const clinic = await prisma.clinic.findUnique({
+          where: { id: appointment.clinicId },
+          select: { slots: true, leaves: true },
+        });
+        if (clinic) {
+          // Only the slots the slots API offers — same grid as a new booking.
+          const snapped = snapToClinicGrid(clinic, when);
+          if (snapped.error !== null) return NextResponse.json({ error: snapped.error }, { status: 400 });
+          when = snapped.when;
+        }
       }
       if (appointment.status === "SCHEDULED" && when.getTime() === appointment.scheduledAt.getTime()) {
         return NextResponse.json({ error: "That's already your appointment time." }, { status: 400 });
@@ -567,23 +602,11 @@ export async function PATCH(
         });
         if (problem) return NextResponse.json({ error: problem }, { status: 409 });
       }
-      if (appointment.consultType === "CLINIC" && appointment.clinicId) {
-        const clinic = await prisma.clinic.findUnique({
-          where: { id: appointment.clinicId },
-          select: { slots: true, leaves: true },
+      if (appointment.providerType !== "NURSE") {
+        const problem = await doctorSlotProblem({
+          doctorId: appointment.doctorId, when, excludeAppointmentId: appointment.id, against: "live", viewer: "patient",
         });
-        if (clinic && !isClinicOpenNow(clinic.slots, when, clinic.leaves.map((l) => l.date))) {
-          return NextResponse.json(
-            { error: "The clinic isn't open at that time. Please choose a time within its hours." },
-            { status: 400 }
-          );
-        }
-        if (await clinicSlotTaken({ doctorId: appointment.doctorId, clinicId: appointment.clinicId, when, excludeAppointmentId: appointment.id })) {
-          return NextResponse.json(
-            { error: "That time is already booked at this clinic. Please pick another slot." },
-            { status: 409 }
-          );
-        }
+        if (problem) return NextResponse.json({ error: problem }, { status: 409 });
       }
 
       // An accepted appointment keeps its original time — and its payment —
@@ -593,10 +616,16 @@ export async function PATCH(
       // provider hasn't reviewed it yet either way. Conditional on the status
       // read above, in case the provider is accepting/cancelling right now.
       const isRequest = appointment.status === "SCHEDULED";
-      const { count } = await prisma.appointment.updateMany({
-        where: { id, status: appointment.status },
-        data: isRequest ? { requestedScheduledAt: when } : { scheduledAt: when, reminderSentAt: null },
-      });
+      let count: number;
+      try {
+        ({ count } = await prisma.appointment.updateMany({
+          where: { id, status: appointment.status },
+          data: isRequest ? { requestedScheduledAt: when } : { scheduledAt: when, reminderSentAt: null },
+        }));
+      } catch (err) {
+        if (isSlotIndexViolation(err)) return NextResponse.json({ error: SLOT_TAKEN_MESSAGE }, { status: 409 });
+        throw err;
+      }
       if (count === 0) {
         return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
       }
