@@ -60,6 +60,8 @@ export const ModelName = {
   DoctorProfile: 'DoctorProfile',
   NurseProfile: 'NurseProfile',
   NurseService: 'NurseService',
+  NursePackage: 'NursePackage',
+  NurseReferral: 'NurseReferral',
   NurseServiceOffering: 'NurseServiceOffering',
   NursePaymentLog: 'NursePaymentLog',
   StaffProfile: 'StaffProfile',
@@ -297,6 +299,32 @@ export const NurseServiceScalarFieldEnum = {
 export type NurseServiceScalarFieldEnum = (typeof NurseServiceScalarFieldEnum)[keyof typeof NurseServiceScalarFieldEnum]
 
 
+export const NursePackageScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  nurseId: 'nurseId',
+  serviceId: 'serviceId',
+  visits: 'visits',
+  intervalDays: 'intervalDays',
+  createdAt: 'createdAt'
+} as const
+
+export type NursePackageScalarFieldEnum = (typeof NursePackageScalarFieldEnum)[keyof typeof NursePackageScalarFieldEnum]
+
+
+export const NurseReferralScalarFieldEnum = {
+  id: 'id',
+  appointmentId: 'appointmentId',
+  serviceId: 'serviceId',
+  visits: 'visits',
+  intervalDays: 'intervalDays',
+  instructions: 'instructions',
+  createdAt: 'createdAt'
+} as const
+
+export type NurseReferralScalarFieldEnum = (typeof NurseReferralScalarFieldEnum)[keyof typeof NurseReferralScalarFieldEnum]
+
+
 export const NurseServiceOfferingScalarFieldEnum = {
   id: 'id',
   nurseProfileId: 'nurseProfileId',
@@ -345,6 +373,13 @@ export const AppointmentScalarFieldEnum = {
   nurseServiceId: 'nurseServiceId',
   serviceName: 'serviceName',
   prescriptionDocId: 'prescriptionDocId',
+  visitOtp: 'visitOtp',
+  visitOtpAttempts: 'visitOtpAttempts',
+  visitStartedAt: 'visitStartedAt',
+  visitStartNote: 'visitStartNote',
+  packageId: 'packageId',
+  packageIndex: 'packageIndex',
+  nurseReferralId: 'nurseReferralId',
   status: 'status',
   acceptedAt: 'acceptedAt',
   paymentMethod: 'paymentMethod',

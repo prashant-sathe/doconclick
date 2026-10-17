@@ -26,6 +26,14 @@ export async function GET() {
         medicines: true,
         attachments: true,
         reassignedTo: { select: { id: true, doctor: { select: { name: true } } } },
+        package: { select: { visits: true, intervalDays: true } },
+        referralGiven: {
+          select: {
+            id: true, visits: true, intervalDays: true, instructions: true,
+            service: { select: { id: true, name: true } },
+            bookings: { where: { status: { in: ["PENDING_APPROVAL", "SCHEDULED", "COMPLETED"] } }, select: { id: true }, take: 1 },
+          },
+        },
         reassignedFrom: { select: { id: true, doctor: { select: { name: true } } } },
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
@@ -76,6 +84,8 @@ export async function GET() {
     const appointments = await prisma.appointment.findMany({
       where: { doctorId: authUser.id },
       orderBy: [{ createdAt: "desc" }],
+      // The door code is the patient's to share — never the nurse's to read.
+      omit: { visitOtp: true },
       include: {
         patient: {
           select: {
@@ -87,6 +97,19 @@ export async function GET() {
         dependent: { select: { age: true, gender: true } },
         prescriptionDoc: { select: { title: true, fileUrl: true, fileName: true } },
         review: { select: { rating: true, comment: true } },
+        package: { select: { visits: true, intervalDays: true } },
+        nurseReferral: {
+          select: {
+            instructions: true, visits: true, intervalDays: true,
+            appointment: {
+              select: {
+                scheduledAt: true, doctorNotes: true,
+                doctor: { select: { name: true } },
+                medicines: { select: { name: true, dosage: true, frequency: true, duration: true, instructions: true } },
+              },
+            },
+          },
+        },
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });

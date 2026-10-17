@@ -1,3 +1,4 @@
+import { randomInt } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
@@ -57,7 +58,36 @@ export async function GET(
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
   }
 
-  return NextResponse.json(appointment);
+  const isPatient = appointment.patientId === authUser.id;
+  // The visit-start code proves the nurse is actually at the patient's door —
+  // only the patient may ever see it.
+  const { visitOtp, ...rest } = appointment;
+  // A package is paid in one go — the payment page needs the whole bill.
+  let pkg = null;
+  if (isPatient && appointment.packageId) {
+    const sessions = await prisma.appointment.findMany({
+      where: { packageId: appointment.packageId },
+      select: { status: true, paymentStatus: true, amount: true, discountAmount: true },
+    });
+    const unpaid = sessions.filter((x) => x.status === "SCHEDULED" && x.paymentStatus !== "PAID");
+    pkg = {
+      visits: sessions.length,
+      unpaidCount: unpaid.length,
+      unpaidTotal: unpaid.reduce((sum, x) => sum + netPayable(x), 0),
+    };
+  }
+  return NextResponse.json({ ...rest, ...(isPatient ? { visitOtp } : {}), package: pkg });
+}
+
+// Provider-facing responses must never carry the patient's door code.
+function withoutVisitCode<T extends { visitOtp?: string | null }>(row: T): Omit<T, "visitOtp"> {
+  const { visitOtp: _code, ...rest } = row;
+  void _code;
+  return rest;
+}
+
+function newVisitCode() {
+  return String(randomInt(0, 10000)).padStart(4, "0");
 }
 
 // PATCH: Doctor accepts/rejects/completes/cancels their own appointment;
@@ -108,22 +138,69 @@ export async function PATCH(
     if (!allowed.includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
-    // A nurse is one person on the road — don't let her confirm two
-    // overlapping home visits.
-    if (status === "SCHEDULED" && appointment.providerType === "NURSE") {
-      const svc = appointment.nurseServiceId
-        ? await prisma.nurseService.findUnique({ where: { id: appointment.nurseServiceId }, select: { durationMinutes: true } })
-        : null;
-      const problem = await nurseSlotProblem({
-        nurseId: appointment.doctorId,
-        availability: null,
-        when: new Date(Math.max(appointment.scheduledAt.getTime(), Date.now())),
-        durationMinutes: svc?.durationMinutes,
-        excludeAppointmentId: appointment.id,
-        viewer: "nurse",
-        checkHours: false,
-      });
-      if (problem) return NextResponse.json({ error: problem }, { status: 409 });
+    // Nurse accept / decline. A package is answered as a whole (one request
+    // card for the nurse), so every still-pending visit in it moves together.
+    // Each accepted visit gets its own door code.
+    if (appointment.providerType === "NURSE" && (status === "SCHEDULED" || (status === "REJECTED" && appointment.paymentStatus !== "PAID"))) {
+      const group = appointment.packageId
+        ? await prisma.appointment.findMany({
+            where: { packageId: appointment.packageId, status: "PENDING_APPROVAL", paymentStatus: { not: "PAID" } },
+            orderBy: { scheduledAt: "asc" },
+          })
+        : [appointment];
+      if (!group.some((g) => g.id === appointment.id)) group.push(appointment);
+
+      if (status === "SCHEDULED") {
+        // A nurse is one person on the road — don't let her confirm two
+        // overlapping home visits.
+        const svc = appointment.nurseServiceId
+          ? await prisma.nurseService.findUnique({ where: { id: appointment.nurseServiceId }, select: { durationMinutes: true } })
+          : null;
+        for (const g of group) {
+          const problem = await nurseSlotProblem({
+            nurseId: appointment.doctorId,
+            availability: null,
+            when: new Date(Math.max(g.scheduledAt.getTime(), Date.now())),
+            durationMinutes: svc?.durationMinutes,
+            excludeAppointmentId: g.id,
+            viewer: "nurse",
+            checkHours: false,
+          });
+          if (problem) {
+            const which = group.length > 1 ? `Visit ${g.packageIndex ?? ""}: ` : "";
+            return NextResponse.json({ error: which + problem }, { status: 409 });
+          }
+        }
+      }
+
+      const now = new Date();
+      await prisma.$transaction(
+        group.map((g) => prisma.appointment.update({
+          where: { id: g.id },
+          data: status === "SCHEDULED"
+            ? { status, acceptedAt: now, visitOtp: newVisitCode(), visitOtpAttempts: 0 }
+            : { status, doctorNotes: doctorNotes ?? g.doctorNotes },
+        }))
+      );
+      const copy = PATIENT_PUSH_COPY[status];
+      if (copy) {
+        void sendPushToUser(appointment.patientId, {
+          title: copy.title,
+          body: group.length > 1
+            ? `${actingDoctorName} ${status === "SCHEDULED" ? "accepted" : "couldn't accept"} your ${group.length}-visit package.`
+            : copy.body(actingDoctorName),
+          url: copy.url,
+        });
+      }
+      const { visitOtp: _hidden, ...updated } = await prisma.appointment.findUniqueOrThrow({ where: { id } });
+      void _hidden;
+      return NextResponse.json({ ...updated, groupSize: group.length });
+    }
+    if (status === "COMPLETED" && appointment.providerType === "NURSE" && !appointment.visitStartedAt) {
+      return NextResponse.json(
+        { error: "Start the visit with the patient's 4-digit code before completing it." },
+        { status: 400 }
+      );
     }
     if (status === "COMPLETED" && appointment.consultType === "HOME" && appointment.travelStatus !== "ARRIVED") {
       return NextResponse.json(
@@ -269,7 +346,7 @@ export async function PATCH(
         });
       }
 
-      return NextResponse.json(cancelled);
+      return NextResponse.json(withoutVisitCode(cancelled));
     }
 
     // A rejection is normally free (PENDING_APPROVAL appointments are never
@@ -307,7 +384,7 @@ export async function PATCH(
         body: `${actingDoctorName} couldn't accommodate your new requested time. ₹${refundAmount} was refunded to your wallet.`,
         url: "/patient/appointments",
       });
-      return NextResponse.json(updated);
+      return NextResponse.json(withoutVisitCode(updated));
     }
 
     const updated = await prisma.appointment.update({
@@ -329,7 +406,7 @@ export async function PATCH(
         url: copy.url,
       });
     }
-    return NextResponse.json(updated);
+    return NextResponse.json(withoutVisitCode(updated));
   }
 
   if (authUser.role === "PATIENT") {

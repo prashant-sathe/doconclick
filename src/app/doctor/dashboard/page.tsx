@@ -8,7 +8,7 @@ import {
   Loader2, CheckCircle2, XCircle, Paperclip, IndianRupee,
   Navigation, Plus, Trash2, History, ThumbsUp, ThumbsDown, Inbox,
   Car, MapPinCheck, AlertTriangle, MessageCircle, Search, X, FileText,
-  MoreHorizontal, UserX, CalendarClock, ChevronDown,
+  MoreHorizontal, UserX, CalendarClock, ChevronDown, HeartPulse,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
@@ -26,6 +26,7 @@ import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib
 import { useResync } from "@/hooks/useResync";
 import PullToRefresh from "@/components/PullToRefresh";
 import { compressImage } from "@/lib/compressImage";
+import { PACKAGE_VISIT_OPTIONS, PACKAGE_INTERVAL_OPTIONS, intervalLabel } from "@/lib/nursePackage";
 
 interface DoctorProfile {
   specialty: string;
@@ -192,7 +193,10 @@ const EMPTY_TEST_ROW: TestRow = { name: "", instructions: "" };
 function draftKeyFor(appointmentId: string) {
   return `prescriptionDraft:${appointmentId}`;
 }
-function loadDraft(appointmentId: string): { medicines?: MedicineRow[]; tests?: TestRow[]; notes?: string; confirmed?: boolean } {
+type NurseCareDraft = { on: boolean; serviceId: string; visits: number; intervalDays: number; instructions: string };
+const EMPTY_NURSE_CARE: NurseCareDraft = { on: false, serviceId: "", visits: 1, intervalDays: 1, instructions: "" };
+
+function loadDraft(appointmentId: string): { medicines?: MedicineRow[]; tests?: TestRow[]; notes?: string; confirmed?: boolean; nurseCare?: NurseCareDraft } {
   try {
     const raw = localStorage.getItem(draftKeyFor(appointmentId));
     return raw ? JSON.parse(raw) : {};
@@ -222,6 +226,13 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
     return Array.isArray(draft) && draft.length > 0 ? draft : [{ ...EMPTY_TEST_ROW }];
   });
   const [confirmed, setConfirmed] = useState(() => loadDraft(appt.id).confirmed === true);
+  // Doctor -> nurse referral: "this patient needs nurse care at home".
+  const [nurseCare, setNurseCare] = useState<NurseCareDraft>(() => ({ ...EMPTY_NURSE_CARE, ...(loadDraft(appt.id).nurseCare ?? {}) }));
+  const [nurseServices, setNurseServices] = useState<{ id: string; name: string; requiresPrescription: boolean }[]>([]);
+  const [referralError, setReferralError] = useState("");
+  useEffect(() => {
+    fetch("/api/nurse-services").then((r) => (r.ok ? r.json() : [])).then(setNurseServices).catch(() => {});
+  }, []);
   const [busy, setBusy] = useState(false);
   const [confirmingComplete, setConfirmingComplete] = useState(false);
   const [confirmingCancel, setConfirmingCancel] = useState(false);
@@ -232,11 +243,11 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
   useEffect(() => {
     try {
-      localStorage.setItem(draftKey, JSON.stringify({ medicines, tests, notes, confirmed }));
+      localStorage.setItem(draftKey, JSON.stringify({ medicines, tests, notes, confirmed, nurseCare }));
     } catch {
       // ignore unavailable storage
     }
-  }, [draftKey, medicines, tests, notes, confirmed]);
+  }, [draftKey, medicines, tests, notes, confirmed, nurseCare]);
   const clearDraft = () => {
     try {
       localStorage.removeItem(draftKey);
@@ -271,9 +282,11 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
   const submit = async () => {
     if (!hasPrescriptionItems || !confirmed) return;
+    if (nurseCare.on && !nurseCare.serviceId) { setReferralError("Pick the nurse service the patient needs."); setConfirmingComplete(false); return; }
     setConfirmingComplete(false);
     setBusy(true);
     setFileError("");
+    setReferralError("");
 
     const validMedicines = medicines
       .filter((m) => m.name.trim())
@@ -313,6 +326,18 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       if (!res.ok) {
         setBusy(false);
         setFileError((await res.json().catch(() => ({}))).error ?? "Could not upload attachments.");
+        return;
+      }
+    }
+    if (nurseCare.on) {
+      const res = await fetch(`/api/appointments/${appt.id}/nurse-referral`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ serviceId: nurseCare.serviceId, visits: nurseCare.visits, intervalDays: nurseCare.intervalDays, instructions: nurseCare.instructions }),
+      });
+      if (!res.ok) {
+        setBusy(false);
+        setReferralError((await res.json().catch(() => ({}))).error ?? "Could not save the nurse referral.");
         return;
       }
     }
@@ -407,6 +432,30 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         <button type="button" onClick={addTestRow} className="mt-2 text-xs text-teal-600 font-semibold flex items-center gap-1 hover:underline">
           <Plus className="w-3.5 h-3.5" /> Add test
         </button>
+      </div>
+
+      <div className="rounded-xl border border-rose-100 bg-white p-3">
+        <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer">
+          <input type="checkbox" className="w-4 h-4 accent-rose-500" checked={nurseCare.on} onChange={(e) => { setNurseCare((c) => ({ ...c, on: e.target.checked })); setReferralError(""); }} />
+          <HeartPulse className="w-4 h-4 text-rose-500" /> Patient needs a nurse at home (optional)
+        </label>
+        <p className="text-[11px] text-slate-500 mt-1 ml-6">The patient gets a one-tap &ldquo;Book a nurse&rdquo; with this prescription attached &mdash; no upload needed.</p>
+        {nurseCare.on && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
+            <select className="input-field text-xs py-1.5 sm:col-span-3" value={nurseCare.serviceId} onChange={(e) => { setNurseCare((c) => ({ ...c, serviceId: e.target.value })); setReferralError(""); }}>
+              <option value="">Nurse service…</option>
+              {nurseServices.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+            <select className="input-field text-xs py-1.5" value={nurseCare.visits} onChange={(e) => setNurseCare((c) => ({ ...c, visits: Number(e.target.value) }))}>
+              {PACKAGE_VISIT_OPTIONS.map((n) => <option key={n} value={n}>{n} visit{n === 1 ? "" : "s"}</option>)}
+            </select>
+            <select className="input-field text-xs py-1.5" value={nurseCare.intervalDays} disabled={nurseCare.visits === 1} onChange={(e) => setNurseCare((c) => ({ ...c, intervalDays: Number(e.target.value) }))}>
+              {PACKAGE_INTERVAL_OPTIONS.map((n) => <option key={n} value={n}>{intervalLabel(n)}</option>)}
+            </select>
+            <input className="input-field text-xs py-1.5" placeholder="Instructions for the nurse" value={nurseCare.instructions} onChange={(e) => setNurseCare((c) => ({ ...c, instructions: e.target.value }))} />
+          </div>
+        )}
+        {referralError && <p className="text-xs text-red-500 mt-2">{referralError}</p>}
       </div>
 
       {hasPrescriptionItems && (

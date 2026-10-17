@@ -13,6 +13,9 @@ interface AppointmentSummary {
   couponCode: string | null;
   paymentStatus: string;
   providerType?: string; // "NURSE" for nurse bookings
+  serviceName?: string | null;
+  // Nurse package: one payment covers every accepted, unpaid visit.
+  package?: { visits: number; unpaidCount: number; unpaidTotal: number } | null;
   doctor: { name: string };
 }
 
@@ -27,6 +30,7 @@ function PaymentContent() {
   const [error, setError] = useState("");
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [confirmWalletPay, setConfirmWalletPay] = useState(false);
+  const [justPaid, setJustPaid] = useState<{ amount: number; visits: number } | null>(null);
   const [couponInput, setCouponInput] = useState("");
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
@@ -70,7 +74,10 @@ function PaymentContent() {
     // Browser navigates away to Cashfree's hosted checkout from here.
   };
 
-  const netPayable = appt ? Math.max(0, Math.round((appt.amount - appt.discountAmount) * 100) / 100) : 0;
+  const isPackage = !!appt?.package && appt.package.unpaidCount > 1;
+  const netPayable = !appt ? 0
+    : isPackage ? Math.round(appt.package!.unpaidTotal * 100) / 100
+      : Math.max(0, Math.round((appt.amount - appt.discountAmount) * 100) / 100);
 
   const applyCoupon = async () => {
     if (!apptId || !couponInput.trim()) return;
@@ -119,8 +126,9 @@ function PaymentContent() {
       setError(data.error ?? "Could not pay with wallet. Please try again.");
       return;
     }
-    // Direct, synchronous result — no external redirect, so just flip the
-    // component straight to the "Already Paid" branch below.
+    // Direct, synchronous result — no external redirect, so flip straight to
+    // the paid screen (worded as a success, since they just paid).
+    setJustPaid({ amount: netPayable, visits: data.visitsPaid ?? 1 });
     setAppt((a) => (a ? { ...a, paymentStatus: "PAID" } : a));
   };
 
@@ -143,8 +151,12 @@ function PaymentContent() {
         <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-emerald-500" />
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Already Paid</h2>
-        <p className="text-slate-500 mb-8">This appointment has already been paid for.</p>
+        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{justPaid ? "Payment successful" : "Already Paid"}</h2>
+        <p className="text-slate-500 mb-8">
+          {justPaid
+            ? `₹${justPaid.amount} paid from your wallet${justPaid.visits > 1 ? ` for all ${justPaid.visits} visits` : ""}.`
+            : "This appointment has already been paid for."}
+        </p>
         <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">My Appointments</Link>
       </div>
     );
@@ -155,8 +167,14 @@ function PaymentContent() {
       <div className="bg-slate-50 rounded-xl p-4 mb-4">
         <div className="flex justify-between text-sm">
           <span className="text-slate-500">{appt.providerType === "NURSE" ? "Nurse visit" : "Consultation"} with {formatProviderName(appt.doctor.name, appt.providerType)}</span>
-          <span className="text-slate-700">₹{appt.amount}</span>
+          <span className="text-slate-700">₹{appt.amount}{isPackage ? " / visit" : ""}</span>
         </div>
+        {isPackage && (
+          <div className="flex justify-between text-sm mt-1.5">
+            <span className="text-slate-500">{appt.serviceName ?? "Visits"} package</span>
+            <span className="text-slate-700">× {appt.package!.unpaidCount} visits</span>
+          </div>
+        )}
         {appt.discountAmount > 0 && (
           <div className="flex justify-between text-sm mt-1.5 text-emerald-600">
             <span>Coupon {appt.couponCode}</span>
@@ -169,8 +187,8 @@ function PaymentContent() {
         </div>
       </div>
 
-      {/* Coupon */}
-      <div className="mb-4">
+      {/* Coupon — single visits only (a coupon discounts one visit, which reads wrong on a package bill). */}
+      <div className={isPackage ? "hidden" : "mb-4"}>
         {appt.couponCode ? (
           <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 text-sm">
             <span className="flex items-center gap-2 font-semibold text-emerald-700">

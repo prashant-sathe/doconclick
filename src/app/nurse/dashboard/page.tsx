@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Loader2, Clock, MapPin, Navigation, Phone, MessageCircle, FileText, CheckCircle2, XCircle,
-  Car, Flag, AlertTriangle, IndianRupee, User as UserIcon, CalendarClock, Star,
+  Car, Flag, AlertTriangle, IndianRupee, User as UserIcon, CalendarClock, Star, KeyRound, Layers, Stethoscope,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { NurseHeader, NurseMobileNav } from "@/components/nurse/NurseNav";
@@ -12,6 +12,7 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
 import { cn } from "@/lib/utils";
+import { intervalLabel } from "@/lib/nursePackage";
 
 type Visit = {
   id: string;
@@ -37,6 +38,20 @@ type Visit = {
   dependent: { age: number | null; gender: string | null } | null;
   prescriptionDoc: { title: string; fileUrl: string; fileName: string | null } | null;
   review: { rating: number; comment: string | null } | null;
+  packageId: string | null;
+  packageIndex: number | null;
+  package: { visits: number; intervalDays: number } | null;
+  visitStartedAt: string | null;
+  visitStartNote: string | null;
+  nurseReferral: {
+    instructions: string | null;
+    appointment: {
+      scheduledAt: string;
+      doctorNotes: string | null;
+      doctor: { name: string };
+      medicines: { name: string; dosage: string; frequency: string; duration: string; instructions: string | null }[];
+    };
+  } | null;
 };
 
 const TABS = [
@@ -64,6 +79,68 @@ function directionsUrl(v: Visit) {
   if (p?.lat != null && p?.lng != null) return `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
   if (p?.homeAddress) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.homeAddress)}`;
   return null;
+}
+
+// At the door: the patient reads out the 4-digit code from their app. If
+// they truly can't, the nurse may start anyway — with a reason, which the
+// patient and the admin both see.
+function StartVisitBox({ visitId, onStarted }: { visitId: string; onStarted: () => void }) {
+  const [code, setCode] = useState("");
+  const [skipping, setSkipping] = useState(false);
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const send = async (payload: Record<string, string>) => {
+    setBusy(true); setError("");
+    const res = await fetch(`/api/appointments/${visitId}/start-visit`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+    setBusy(false);
+    if (!res.ok) {
+      setError(data.error ?? "Could not start the visit.");
+      if (data.code === "OTP_LOCKED") setSkipping(true);
+      return;
+    }
+    onStarted();
+  };
+
+  return (
+    <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-3">
+      {!skipping ? (
+        <>
+          <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5"><KeyRound className="w-4 h-4 text-rose-500" />Ask the patient for their visit code</p>
+          <div className="flex gap-2 mt-2">
+            <input
+              inputMode="numeric" maxLength={4} autoComplete="one-time-code" placeholder="4-digit code"
+              className="input-field text-center text-lg font-bold tracking-[0.4em] flex-1"
+              value={code} onChange={(e) => { setCode(e.target.value.replace(/\D/g, "").slice(0, 4)); setError(""); }}
+            />
+            <button disabled={busy || code.length !== 4} onClick={() => send({ code })} className="btn-primary px-4 text-sm disabled:opacity-50">
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Start visit"}
+            </button>
+          </div>
+          <button type="button" onClick={() => { setSkipping(true); setError(""); }} className="text-xs font-semibold text-slate-500 mt-2 underline">
+            Patient can&apos;t share the code?
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="text-sm font-semibold text-slate-800">Start without the code</p>
+          <p className="text-[11px] text-slate-500">Tell us why — the patient and DocOnClick will be notified.</p>
+          <textarea rows={2} className="input-field mt-2 text-sm" placeholder="e.g. Elderly patient alone at home, son not reachable on phone" value={reason} onChange={(e) => { setReason(e.target.value); setError(""); }} />
+          <div className="flex gap-2 mt-2">
+            <button type="button" onClick={() => { setSkipping(false); setError(""); }} className="btn-secondary flex-1 justify-center py-2 text-xs">Back</button>
+            <button disabled={busy || reason.trim().length < 10} onClick={() => send({ skipReason: reason })} className="btn-primary flex-1 justify-center py-2 text-xs disabled:opacity-50">
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Start without code"}
+            </button>
+          </div>
+        </>
+      )}
+      {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
+    </div>
+  );
 }
 
 export default function NurseDashboardPage() {
@@ -162,7 +239,12 @@ export default function NurseDashboardPage() {
     return <div className="min-h-screen gradient-surface flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-rose-500" /></div>;
   }
 
-  const requests = visits.filter((v) => v.status === "PENDING_APPROVAL");
+  // A package is one request: show its first pending visit, with the rest listed on the card.
+  const pendingAll = visits.filter((v) => v.status === "PENDING_APPROVAL");
+  const packageSessions = (pkgId: string) =>
+    visits.filter((x) => x.packageId === pkgId && x.status === "PENDING_APPROVAL")
+      .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
+  const requests = pendingAll.filter((v) => !v.packageId || packageSessions(v.packageId)[0]?.id === v.id);
   const upcoming = visits
     .filter((v) => v.status === "SCHEDULED")
     .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
@@ -233,7 +315,12 @@ export default function NurseDashboardPage() {
                   </div>
 
                   <div className="mt-3 rounded-xl bg-rose-50 px-3 py-2">
-                    <p className="text-sm font-semibold text-rose-700">{v.serviceName ?? "Nursing visit"}</p>
+                    <p className="text-sm font-semibold text-rose-700 flex items-center justify-between gap-2">
+                      <span>{v.serviceName ?? "Nursing visit"}</span>
+                      {v.package && v.packageIndex && v.status !== "PENDING_APPROVAL" && (
+                        <span className="text-[11px] font-bold text-rose-600 bg-white rounded-full px-2 py-0.5 flex-shrink-0">Visit {v.packageIndex} of {v.package.visits}</span>
+                      )}
+                    </p>
                     {v.symptoms && v.symptoms !== v.serviceName && <p className="text-xs text-rose-900/70 mt-0.5">{v.symptoms}</p>}
                   </div>
 
@@ -253,6 +340,34 @@ export default function NurseDashboardPage() {
                       </a>
                     )}
                   </div>
+
+                  {v.status === "PENDING_APPROVAL" && v.packageId && v.package && (() => {
+                    const sessions = packageSessions(v.packageId);
+                    return (
+                      <div className="mt-3 rounded-xl border border-rose-200 px-3 py-2.5">
+                        <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5"><Layers className="w-4 h-4 text-rose-500" />Package · {sessions.length} visits · {intervalLabel(v.package.intervalDays)}</p>
+                        <ol className="text-xs text-slate-600 mt-1 space-y-0.5 list-decimal list-inside">
+                          {sessions.map((x) => <li key={x.id}>{new Date(x.scheduledAt).toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</li>)}
+                        </ol>
+                        <p className="text-xs text-emerald-700 font-semibold mt-1.5">You get ₹{Math.round(earning * sessions.length * 100) / 100} for the package</p>
+                        <p className="text-[11px] text-slate-400">Accepting confirms every visit above.</p>
+                      </div>
+                    );
+                  })()}
+
+                  {v.nurseReferral && (
+                    <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-2.5 text-xs text-slate-700">
+                      <p className="font-semibold text-blue-800 flex items-center gap-1.5"><Stethoscope className="w-3.5 h-3.5" />Referred by Dr. {v.nurseReferral.appointment.doctor.name.replace(/^dr\.?\s*/i, "")} · {new Date(v.nurseReferral.appointment.scheduledAt).toLocaleDateString("en-IN")}</p>
+                      {v.nurseReferral.instructions && <p className="mt-1">Instructions: {v.nurseReferral.instructions}</p>}
+                      {v.nurseReferral.appointment.medicines.length > 0 && (
+                        <ul className="mt-1 space-y-0.5">
+                          {v.nurseReferral.appointment.medicines.map((m, i) => (
+                            <li key={i}>• <strong>{m.name}</strong> {[m.dosage, m.frequency, m.duration].filter(Boolean).join(" · ")}{m.instructions ? ` — ${m.instructions}` : ""}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
 
                   {v.status === "PENDING_APPROVAL" && (
                     <div className="flex gap-2 mt-4">
@@ -292,7 +407,10 @@ export default function NurseDashboardPage() {
                             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flag className="w-4 h-4" />} I&apos;ve arrived
                           </button>
                         )}
-                        {v.travelStatus === "ARRIVED" && (
+                        {v.travelStatus === "ARRIVED" && !v.visitStartedAt && (
+                          <StartVisitBox visitId={v.id} onStarted={load} />
+                        )}
+                        {v.travelStatus === "ARRIVED" && v.visitStartedAt && (
                           <button
                             disabled={busy || !paid}
                             onClick={() => { setVisitNotes(""); setCompleteTarget(v); }}

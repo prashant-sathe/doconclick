@@ -60,7 +60,10 @@ export async function PATCH(
         url: `/patient/track/${id}`,
       });
     }
-    return NextResponse.json(updated);
+    // Never hand the patient's door code back to the nurse.
+    const { visitOtp: _code, ...safe } = updated;
+    void _code;
+    return NextResponse.json(safe);
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });

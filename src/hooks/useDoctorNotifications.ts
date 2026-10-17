@@ -11,6 +11,7 @@ export interface PendingRequest {
   createdAt: string;
   patient: { name: string };
   serviceName?: string | null; // nurse bookings
+  packageId?: string | null;    // nurse multi-visit package
 }
 
 const POLL_MS = 5000;
@@ -43,7 +44,16 @@ export function useDoctorNotifications(doctorId: string | undefined) {
       const res = await fetch("/api/appointments/me").catch(() => null);
       if (!res?.ok) return;
       const all: Array<{ id: string; status: string; symptoms: string; consultType: string; patientName: string | null; relation: string; createdAt: string; patient: { name: string } }> = await res.json();
-      const requests = all.filter((a) => a.status === "PENDING_APPROVAL");
+      // A nurse package is one request however many visits it holds.
+      const seenPackages = new Set<string>();
+      const requests = all.filter((a) => {
+        if (a.status !== "PENDING_APPROVAL") return false;
+        const pkg = (a as { packageId?: string | null }).packageId;
+        if (!pkg) return true;
+        if (seenPackages.has(pkg)) return false;
+        seenPackages.add(pkg);
+        return true;
+      });
       setPendingRequests(requests);
       setHasUnseen(computeUnseen(requests));
 

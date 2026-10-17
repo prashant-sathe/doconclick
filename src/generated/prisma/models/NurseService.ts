@@ -258,6 +258,7 @@ export type NurseServiceWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"NurseService"> | Date | string
   offerings?: Prisma.NurseServiceOfferingListRelationFilter
   appointments?: Prisma.AppointmentListRelationFilter
+  referrals?: Prisma.NurseReferralListRelationFilter
 }
 
 export type NurseServiceOrderByWithRelationInput = {
@@ -272,6 +273,7 @@ export type NurseServiceOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   offerings?: Prisma.NurseServiceOfferingOrderByRelationAggregateInput
   appointments?: Prisma.AppointmentOrderByRelationAggregateInput
+  referrals?: Prisma.NurseReferralOrderByRelationAggregateInput
 }
 
 export type NurseServiceWhereUniqueInput = Prisma.AtLeast<{
@@ -289,6 +291,7 @@ export type NurseServiceWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"NurseService"> | Date | string
   offerings?: Prisma.NurseServiceOfferingListRelationFilter
   appointments?: Prisma.AppointmentListRelationFilter
+  referrals?: Prisma.NurseReferralListRelationFilter
 }, "id" | "name">
 
 export type NurseServiceOrderByWithAggregationInput = {
@@ -335,6 +338,7 @@ export type NurseServiceCreateInput = {
   createdAt?: Date | string
   offerings?: Prisma.NurseServiceOfferingCreateNestedManyWithoutServiceInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutNurseServiceInput
+  referrals?: Prisma.NurseReferralCreateNestedManyWithoutServiceInput
 }
 
 export type NurseServiceUncheckedCreateInput = {
@@ -349,6 +353,7 @@ export type NurseServiceUncheckedCreateInput = {
   createdAt?: Date | string
   offerings?: Prisma.NurseServiceOfferingUncheckedCreateNestedManyWithoutServiceInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutNurseServiceInput
+  referrals?: Prisma.NurseReferralUncheckedCreateNestedManyWithoutServiceInput
 }
 
 export type NurseServiceUpdateInput = {
@@ -363,6 +368,7 @@ export type NurseServiceUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offerings?: Prisma.NurseServiceOfferingUpdateManyWithoutServiceNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutNurseServiceNestedInput
+  referrals?: Prisma.NurseReferralUpdateManyWithoutServiceNestedInput
 }
 
 export type NurseServiceUncheckedUpdateInput = {
@@ -377,6 +383,7 @@ export type NurseServiceUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offerings?: Prisma.NurseServiceOfferingUncheckedUpdateManyWithoutServiceNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutNurseServiceNestedInput
+  referrals?: Prisma.NurseReferralUncheckedUpdateManyWithoutServiceNestedInput
 }
 
 export type NurseServiceCreateManyInput = {
@@ -473,6 +480,20 @@ export type NurseServiceNullableScalarRelationFilter = {
   isNot?: Prisma.NurseServiceWhereInput | null
 }
 
+export type NurseServiceCreateNestedOneWithoutReferralsInput = {
+  create?: Prisma.XOR<Prisma.NurseServiceCreateWithoutReferralsInput, Prisma.NurseServiceUncheckedCreateWithoutReferralsInput>
+  connectOrCreate?: Prisma.NurseServiceCreateOrConnectWithoutReferralsInput
+  connect?: Prisma.NurseServiceWhereUniqueInput
+}
+
+export type NurseServiceUpdateOneRequiredWithoutReferralsNestedInput = {
+  create?: Prisma.XOR<Prisma.NurseServiceCreateWithoutReferralsInput, Prisma.NurseServiceUncheckedCreateWithoutReferralsInput>
+  connectOrCreate?: Prisma.NurseServiceCreateOrConnectWithoutReferralsInput
+  upsert?: Prisma.NurseServiceUpsertWithoutReferralsInput
+  connect?: Prisma.NurseServiceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.NurseServiceUpdateToOneWithWhereWithoutReferralsInput, Prisma.NurseServiceUpdateWithoutReferralsInput>, Prisma.NurseServiceUncheckedUpdateWithoutReferralsInput>
+}
+
 export type NurseServiceCreateNestedOneWithoutOfferingsInput = {
   create?: Prisma.XOR<Prisma.NurseServiceCreateWithoutOfferingsInput, Prisma.NurseServiceUncheckedCreateWithoutOfferingsInput>
   connectOrCreate?: Prisma.NurseServiceCreateOrConnectWithoutOfferingsInput
@@ -503,6 +524,78 @@ export type NurseServiceUpdateOneWithoutAppointmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.NurseServiceUpdateToOneWithWhereWithoutAppointmentsInput, Prisma.NurseServiceUpdateWithoutAppointmentsInput>, Prisma.NurseServiceUncheckedUpdateWithoutAppointmentsInput>
 }
 
+export type NurseServiceCreateWithoutReferralsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  durationMinutes?: number
+  suggestedPrice?: number
+  requiresPrescription?: boolean
+  isActive?: boolean
+  sortOrder?: number
+  createdAt?: Date | string
+  offerings?: Prisma.NurseServiceOfferingCreateNestedManyWithoutServiceInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutNurseServiceInput
+}
+
+export type NurseServiceUncheckedCreateWithoutReferralsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  durationMinutes?: number
+  suggestedPrice?: number
+  requiresPrescription?: boolean
+  isActive?: boolean
+  sortOrder?: number
+  createdAt?: Date | string
+  offerings?: Prisma.NurseServiceOfferingUncheckedCreateNestedManyWithoutServiceInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutNurseServiceInput
+}
+
+export type NurseServiceCreateOrConnectWithoutReferralsInput = {
+  where: Prisma.NurseServiceWhereUniqueInput
+  create: Prisma.XOR<Prisma.NurseServiceCreateWithoutReferralsInput, Prisma.NurseServiceUncheckedCreateWithoutReferralsInput>
+}
+
+export type NurseServiceUpsertWithoutReferralsInput = {
+  update: Prisma.XOR<Prisma.NurseServiceUpdateWithoutReferralsInput, Prisma.NurseServiceUncheckedUpdateWithoutReferralsInput>
+  create: Prisma.XOR<Prisma.NurseServiceCreateWithoutReferralsInput, Prisma.NurseServiceUncheckedCreateWithoutReferralsInput>
+  where?: Prisma.NurseServiceWhereInput
+}
+
+export type NurseServiceUpdateToOneWithWhereWithoutReferralsInput = {
+  where?: Prisma.NurseServiceWhereInput
+  data: Prisma.XOR<Prisma.NurseServiceUpdateWithoutReferralsInput, Prisma.NurseServiceUncheckedUpdateWithoutReferralsInput>
+}
+
+export type NurseServiceUpdateWithoutReferralsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  requiresPrescription?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  offerings?: Prisma.NurseServiceOfferingUpdateManyWithoutServiceNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutNurseServiceNestedInput
+}
+
+export type NurseServiceUncheckedUpdateWithoutReferralsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  suggestedPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  requiresPrescription?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  offerings?: Prisma.NurseServiceOfferingUncheckedUpdateManyWithoutServiceNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutNurseServiceNestedInput
+}
+
 export type NurseServiceCreateWithoutOfferingsInput = {
   id?: string
   name: string
@@ -514,6 +607,7 @@ export type NurseServiceCreateWithoutOfferingsInput = {
   sortOrder?: number
   createdAt?: Date | string
   appointments?: Prisma.AppointmentCreateNestedManyWithoutNurseServiceInput
+  referrals?: Prisma.NurseReferralCreateNestedManyWithoutServiceInput
 }
 
 export type NurseServiceUncheckedCreateWithoutOfferingsInput = {
@@ -527,6 +621,7 @@ export type NurseServiceUncheckedCreateWithoutOfferingsInput = {
   sortOrder?: number
   createdAt?: Date | string
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutNurseServiceInput
+  referrals?: Prisma.NurseReferralUncheckedCreateNestedManyWithoutServiceInput
 }
 
 export type NurseServiceCreateOrConnectWithoutOfferingsInput = {
@@ -556,6 +651,7 @@ export type NurseServiceUpdateWithoutOfferingsInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointments?: Prisma.AppointmentUpdateManyWithoutNurseServiceNestedInput
+  referrals?: Prisma.NurseReferralUpdateManyWithoutServiceNestedInput
 }
 
 export type NurseServiceUncheckedUpdateWithoutOfferingsInput = {
@@ -569,6 +665,7 @@ export type NurseServiceUncheckedUpdateWithoutOfferingsInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutNurseServiceNestedInput
+  referrals?: Prisma.NurseReferralUncheckedUpdateManyWithoutServiceNestedInput
 }
 
 export type NurseServiceCreateWithoutAppointmentsInput = {
@@ -582,6 +679,7 @@ export type NurseServiceCreateWithoutAppointmentsInput = {
   sortOrder?: number
   createdAt?: Date | string
   offerings?: Prisma.NurseServiceOfferingCreateNestedManyWithoutServiceInput
+  referrals?: Prisma.NurseReferralCreateNestedManyWithoutServiceInput
 }
 
 export type NurseServiceUncheckedCreateWithoutAppointmentsInput = {
@@ -595,6 +693,7 @@ export type NurseServiceUncheckedCreateWithoutAppointmentsInput = {
   sortOrder?: number
   createdAt?: Date | string
   offerings?: Prisma.NurseServiceOfferingUncheckedCreateNestedManyWithoutServiceInput
+  referrals?: Prisma.NurseReferralUncheckedCreateNestedManyWithoutServiceInput
 }
 
 export type NurseServiceCreateOrConnectWithoutAppointmentsInput = {
@@ -624,6 +723,7 @@ export type NurseServiceUpdateWithoutAppointmentsInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offerings?: Prisma.NurseServiceOfferingUpdateManyWithoutServiceNestedInput
+  referrals?: Prisma.NurseReferralUpdateManyWithoutServiceNestedInput
 }
 
 export type NurseServiceUncheckedUpdateWithoutAppointmentsInput = {
@@ -637,6 +737,7 @@ export type NurseServiceUncheckedUpdateWithoutAppointmentsInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offerings?: Prisma.NurseServiceOfferingUncheckedUpdateManyWithoutServiceNestedInput
+  referrals?: Prisma.NurseReferralUncheckedUpdateManyWithoutServiceNestedInput
 }
 
 
@@ -647,11 +748,13 @@ export type NurseServiceUncheckedUpdateWithoutAppointmentsInput = {
 export type NurseServiceCountOutputType = {
   offerings: number
   appointments: number
+  referrals: number
 }
 
 export type NurseServiceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   offerings?: boolean | NurseServiceCountOutputTypeCountOfferingsArgs
   appointments?: boolean | NurseServiceCountOutputTypeCountAppointmentsArgs
+  referrals?: boolean | NurseServiceCountOutputTypeCountReferralsArgs
 }
 
 /**
@@ -678,6 +781,13 @@ export type NurseServiceCountOutputTypeCountAppointmentsArgs<ExtArgs extends run
   where?: Prisma.AppointmentWhereInput
 }
 
+/**
+ * NurseServiceCountOutputType without action
+ */
+export type NurseServiceCountOutputTypeCountReferralsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NurseReferralWhereInput
+}
+
 
 export type NurseServiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -691,6 +801,7 @@ export type NurseServiceSelect<ExtArgs extends runtime.Types.Extensions.Internal
   createdAt?: boolean
   offerings?: boolean | Prisma.NurseService$offeringsArgs<ExtArgs>
   appointments?: boolean | Prisma.NurseService$appointmentsArgs<ExtArgs>
+  referrals?: boolean | Prisma.NurseService$referralsArgs<ExtArgs>
   _count?: boolean | Prisma.NurseServiceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["nurseService"]>
 
@@ -734,6 +845,7 @@ export type NurseServiceOmit<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type NurseServiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   offerings?: boolean | Prisma.NurseService$offeringsArgs<ExtArgs>
   appointments?: boolean | Prisma.NurseService$appointmentsArgs<ExtArgs>
+  referrals?: boolean | Prisma.NurseService$referralsArgs<ExtArgs>
   _count?: boolean | Prisma.NurseServiceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type NurseServiceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -744,6 +856,7 @@ export type $NurseServicePayload<ExtArgs extends runtime.Types.Extensions.Intern
   objects: {
     offerings: Prisma.$NurseServiceOfferingPayload<ExtArgs>[]
     appointments: Prisma.$AppointmentPayload<ExtArgs>[]
+    referrals: Prisma.$NurseReferralPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1151,6 +1264,7 @@ export interface Prisma__NurseServiceClient<T, Null = never, ExtArgs extends run
   readonly [Symbol.toStringTag]: "PrismaPromise"
   offerings<T extends Prisma.NurseService$offeringsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NurseService$offeringsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NurseServiceOfferingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   appointments<T extends Prisma.NurseService$appointmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NurseService$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referrals<T extends Prisma.NurseService$referralsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NurseService$referralsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NurseReferralPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1627,6 +1741,30 @@ export type NurseService$appointmentsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.AppointmentScalarFieldEnum | Prisma.AppointmentScalarFieldEnum[]
+}
+
+/**
+ * NurseService.referrals
+ */
+export type NurseService$referralsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NurseReferral
+   */
+  select?: Prisma.NurseReferralSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the NurseReferral
+   */
+  omit?: Prisma.NurseReferralOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NurseReferralInclude<ExtArgs> | null
+  where?: Prisma.NurseReferralWhereInput
+  orderBy?: Prisma.NurseReferralOrderByWithRelationInput | Prisma.NurseReferralOrderByWithRelationInput[]
+  cursor?: Prisma.NurseReferralWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NurseReferralScalarFieldEnum | Prisma.NurseReferralScalarFieldEnum[]
 }
 
 /**

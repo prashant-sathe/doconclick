@@ -47,6 +47,10 @@ interface Attachment {
 
 interface AppointmentDetail extends Appointment {
   id: string;
+  serviceName?: string | null;
+  packageIndex?: number | null;
+  visitStartedAt?: string | null;
+  visitStartNote?: string | null;
   patientId: string;
   scheduledAt: string;
   doctor: {
@@ -168,7 +172,19 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
 
               <Section title="Doctor" icon={Phone}>
                 <Row label="Name" value={formatProviderName(data.doctor.name, data.providerType)} />
-                <Row label="Specialty" value={data.doctor.doctorProfile?.specialty ?? "—"} />
+                {data.providerType === "NURSE" ? (
+                  <>
+                    <Row label="Service" value={`${data.serviceName ?? "—"}${data.packageIndex ? ` (package visit ${data.packageIndex})` : ""}`} />
+                    <Row
+                      label="Visit start"
+                      value={!data.visitStartedAt ? "Not started"
+                        : data.visitStartNote ? `⚠ Started WITHOUT patient code — "${data.visitStartNote}"`
+                          : `Verified with patient code · ${new Date(data.visitStartedAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}`}
+                    />
+                  </>
+                ) : (
+                  <Row label="Specialty" value={data.doctor.doctorProfile?.specialty ?? "—"} />
+                )}
                 <Row label="Mobile" value={data.doctor.mobile} />
               </Section>
 

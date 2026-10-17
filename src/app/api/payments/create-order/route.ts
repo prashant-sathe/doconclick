@@ -29,13 +29,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "This appointment has already been paid for" }, { status: 400 });
   }
 
+  // A nurse package is one checkout for every accepted, unpaid visit.
+  const covered = appointment.packageId
+    ? await prisma.appointment.findMany({
+        where: { packageId: appointment.packageId, status: "SCHEDULED", paymentStatus: { not: "PAID" }, paymentMethod: "ONLINE" },
+      })
+    : [appointment];
+  if (covered.length === 0) {
+    return NextResponse.json({ error: "Wait for the nurse to accept your visits before paying." }, { status: 400 });
+  }
+  const orderAmount = Math.round(covered.reduce((sum, a) => sum + netPayable(a), 0) * 100) / 100;
+
   const orderId = `appt${appointment.id}_${Date.now()}`;
   const origin = externalOrigin(req, new URL(req.url));
 
   try {
     const { paymentSessionId } = await createCashfreeOrder({
       orderId,
-      amount: netPayable(appointment),
+      amount: orderAmount,
       customerId: authUser.id,
       customerName: authUser.name,
       customerPhone: authUser.mobile,
@@ -43,8 +54,8 @@ export async function POST(req: Request) {
       notifyUrl: `${origin}/api/payments/webhook`,
     });
 
-    await prisma.appointment.update({
-      where: { id: appointment.id },
+    await prisma.appointment.updateMany({
+      where: { id: { in: covered.map((a) => a.id) } },
       data: { cashfreeOrderId: orderId },
     });
 

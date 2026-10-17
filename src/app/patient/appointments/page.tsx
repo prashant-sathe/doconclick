@@ -3,10 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Loader2, CalendarClock, Stethoscope, Home, Building2, Video,
-  FileText, Star, X, Wallet, CreditCard, RotateCcw, Clock,
-  Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin,
-  MessageCircle, Navigation, UserCheck,
+  Loader2, CalendarClock, Stethoscope, Home, Building2, Video, FileText, Star, X, Wallet, CreditCard, RotateCcw, Clock, Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin, MessageCircle, Navigation, UserCheck, HeartPulse, CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName, formatProviderName } from "@/lib/utils";
@@ -18,6 +15,7 @@ import { isNative } from "@/lib/platform";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { useResync } from "@/hooks/useResync";
+import { intervalLabel } from "@/lib/nursePackage";
 import PullToRefresh from "@/components/PullToRefresh";
 
 interface Medicine {
@@ -58,6 +56,12 @@ interface Appointment {
   providerType?: string; // "NURSE" for nurse bookings
   serviceName?: string | null;
   nurseServiceId?: string | null;
+  visitOtp?: string | null;
+  visitStartedAt?: string | null;
+  visitStartNote?: string | null;
+  packageIndex?: number | null;
+  package?: { visits: number; intervalDays: number } | null;
+  referralGiven?: { id: string; visits: number; intervalDays: number; instructions: string | null; service: { id: string; name: string }; bookings: { id: string }[] } | null;
   doctor: {
     name: string;
     doctorProfile: { specialty: string; clinicName: string | null; address: string | null; lat: number | null; lng: number | null } | null;
@@ -253,7 +257,26 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
         </div>
       </div>
 
+      {a.packageIndex && a.package && (
+        <p className="text-xs font-semibold text-rose-600 mb-1">Visit {a.packageIndex} of {a.package.visits} · {intervalLabel(a.package.intervalDays)}</p>
+      )}
       <p className="text-sm text-slate-600 mb-3">{a.symptoms}</p>
+
+      {/* The nurse can only start the visit with this code — so it proves she's really at the door. */}
+      {a.providerType === "NURSE" && a.status === "SCHEDULED" && a.visitOtp && !a.visitStartedAt && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 mb-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-rose-700">Visit code</p>
+            <p className="text-[11px] text-rose-700/80">Tell this to the nurse when she arrives — only then can she start. Booked for someone at home? Share it with them, or tell her on the phone.</p>
+          </div>
+          <span className="text-2xl font-extrabold tracking-[0.3em] text-rose-700 flex-shrink-0">{a.visitOtp}</span>
+        </div>
+      )}
+      {a.providerType === "NURSE" && a.visitStartedAt && a.visitStartNote && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 mb-3 text-xs text-amber-800">
+          Started without your code: &ldquo;{a.visitStartNote}&rdquo;. If that wasn&apos;t you, contact Help &amp; Support.
+        </div>
+      )}
 
       {a.status === "PENDING_APPROVAL" && a.reassignedFromId && a.reassignedFrom && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
@@ -371,6 +394,23 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {a.status === "COMPLETED" && a.referralGiven && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50/60 px-4 py-3 mb-3">
+          <p className="text-sm font-semibold text-rose-800 flex items-center gap-1.5"><HeartPulse className="w-4 h-4" />{formatProviderName(a.doctor.name, a.providerType)} recommends nurse care at home</p>
+          <p className="text-xs text-rose-900/80 mt-0.5">
+            {a.referralGiven.service.name} — {a.referralGiven.visits} visit{a.referralGiven.visits === 1 ? "" : "s"}{a.referralGiven.visits > 1 ? `, ${intervalLabel(a.referralGiven.intervalDays)}` : ""}
+            {a.referralGiven.instructions ? ` · ${a.referralGiven.instructions}` : ""}
+          </p>
+          {a.referralGiven.bookings.length > 0 ? (
+            <p className="text-xs font-semibold text-emerald-700 mt-2 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />Nurse booked</p>
+          ) : (
+            <Link href={`/patient/nurse?serviceId=${a.referralGiven.service.id}&referralId=${a.referralGiven.id}`} className="btn-primary py-2 px-3 text-xs mt-2 inline-flex">
+              <HeartPulse className="w-3.5 h-3.5" /> Book a nurse
+            </Link>
+          )}
         </div>
       )}
 

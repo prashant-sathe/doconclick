@@ -18,6 +18,7 @@ import { RELATIONS } from "@/lib/relations";
 import { readPatientLocation } from "@/lib/patientLocation";
 import { getCurrentPositionCompat } from "@/lib/platform";
 import { isDoctorAvailableNow, formatAvailability } from "@/lib/availability";
+import { buildVisitSchedule, intervalLabel, PACKAGE_VISIT_OPTIONS, PACKAGE_INTERVAL_OPTIONS } from "@/lib/nursePackage";
 import { patchPatientProfile } from "@/lib/usePatientProfile";
 import { prepareUpload, tooBigMessage } from "@/lib/compressImage";
 import { cn, formatProviderName } from "@/lib/utils";
@@ -52,6 +53,9 @@ function PatientNurseContent() {
   const searchParams = useSearchParams();
   // "Book Again" from a completed visit: ?nurseId=…&serviceId=…
   const deepLink = useRef({ serviceId: searchParams.get("serviceId"), nurseId: searchParams.get("nurseId") });
+  // "Book a nurse" from a doctor's consultation: ?serviceId=…&referralId=…
+  const referralId = searchParams.get("referralId");
+  const [referral, setReferral] = useState<{ id: string; service: { id: string; name: string }; visits: number; intervalDays: number; instructions: string | null; doctorName: string } | null>(null);
   const [notice, setNotice] = useState("");
   const profileGate = useBookingProfileGate();
 
@@ -68,6 +72,8 @@ function PatientNurseContent() {
   const [when, setWhen] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
   const [notes, setNotes] = useState("");
+  const [visits, setVisits] = useState(1);
+  const [intervalDays, setIntervalDays] = useState(1);
   const [address, setAddress] = useState({ text: "", lat: null as number | null, lng: null as number | null, saved: "" });
   // Where to look for nurses. The nurse travels to the visit address, so the
   // saved home address wins over GPS; an explicitly chosen browse location
@@ -153,16 +159,30 @@ function PatientNurseContent() {
     window.scrollTo({ top: 0 });
   };
 
+  useEffect(() => {
+    if (!referralId || !user?.id) return;
+    fetch(`/api/nurse-referrals/${referralId}`).then((r) => (r.ok ? r.json() : null)).then((r) => {
+      if (!r) { setNotice("That referral wasn't found — you can still book a nurse below."); return; }
+      setReferral(r);
+      setVisits(r.visits);
+      setIntervalDays(r.intervalDays);
+      if (r.instructions) setNotes((n) => n || r.instructions);
+    });
+  }, [referralId, user?.id]);
+
   // Deep link step 1: once services and the search location are known, open the service.
   useEffect(() => {
     const id = deepLink.current.serviceId;
     if (!id || !services || searchLoc === null || service) return;
+    // From a doctor's referral: wait for its details (visits, prescription)
+    // so the form never shows a moment of "1 visit, upload a prescription".
+    if (referralId && !referral && !notice) return;
     deepLink.current.serviceId = null;
     const s = services.find((x) => x.id === id);
     if (s) pickService(s);
     else setNotice("That service isn't offered any more — please choose another.");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [services, searchLoc]);
+  }, [services, searchLoc, referral, notice]);
 
   // Deep link step 2: once that service's nurses are listed, open the same nurse.
   useEffect(() => {
@@ -174,6 +194,14 @@ function PatientNurseContent() {
     else if (!needsLocation) setNotice("That nurse isn't available for this service near you right now — here are other nurses.");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nurses]);
+
+  // Exact dates the package will use (same function the server books with).
+  const visitStart = when === "LATER" && scheduledAt ? new Date(scheduledAt) : null;
+  const schedulePreview = nurse && visits > 1
+    ? buildVisitSchedule(visitStart ?? new Date(), visits, intervalDays, nurse.availability)
+    : [];
+  const total = nurse ? nurse.price * visits : 0;
+  const fmtDay = (d: Date) => d.toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
   const shown = useMemo(() => {
     const list = (nurses ?? []).filter((n) => !femaleOnly || n.gender === "Female");
@@ -213,7 +241,7 @@ function PatientNurseContent() {
       return;
     }
     if (!address.text.trim()) { setError("Please add the address where the nurse should come."); return; }
-    if (service.requiresPrescription && !prescriptionDocId) { setError(`${service.name} needs a doctor's prescription. Please attach one.`); return; }
+    if (service.requiresPrescription && !prescriptionDocId && !(referral && referral.service.id === service.id)) { setError(`${service.name} needs a doctor's prescription. Please attach one.`); return; }
     if (!consent) { setError("Please agree to the consent statement to continue."); return; }
     setError("");
     profileGate.run(!!dependentId, () => setConfirmOpen(true));
@@ -241,6 +269,9 @@ function PatientNurseContent() {
           dependentId,
           consentGiven: consent,
           prescriptionDocId: prescriptionDocId || undefined,
+          visits,
+          intervalDays,
+          ...(referral && referral.service.id === service.id ? { nurseReferralId: referral.id } : {}),
           ...(when === "LATER" && scheduledAt ? { scheduledAt: new Date(scheduledAt).toISOString() } : {}),
           // The visit address's own coordinates; else wherever we searched from.
           ...(address.lat != null && address.lng != null
@@ -280,7 +311,7 @@ function PatientNurseContent() {
             </div>
             <h1 className="text-xl font-extrabold text-slate-900">Request sent!</h1>
             <p className="text-sm text-slate-500 mt-2">
-              {formatProviderName(nurse.name, "NURSE")} will confirm your {service.name} visit shortly. You&apos;ll pay once they accept.
+              {formatProviderName(nurse.name, "NURSE")} will confirm your {service.name} {visits > 1 ? `package (${visits} visits)` : "visit"} shortly. You&apos;ll pay once they accept.
             </p>
             <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3 mt-6">View my appointments</Link>
           </div>
@@ -449,6 +480,37 @@ function PatientNurseContent() {
                   </div>
 
                   <div>
+                    <label className="input-label">How many visits?</label>
+                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                      {PACKAGE_VISIT_OPTIONS.map((n) => (
+                        <button key={n} type="button" onClick={() => { setVisits(n); setError(""); }}
+                          className={cn("py-2 rounded-xl border text-sm font-semibold", visits === n ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                    {visits > 1 && (
+                      <>
+                        <div className="grid grid-cols-3 gap-2 mt-2">
+                          {PACKAGE_INTERVAL_OPTIONS.map((n) => (
+                            <button key={n} type="button" onClick={() => { setIntervalDays(n); setError(""); }}
+                              className={cn("py-2 rounded-xl border text-xs font-semibold", intervalDays === n ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                              {intervalLabel(n)}
+                            </button>
+                          ))}
+                        </div>
+                        <div className="mt-2 rounded-xl bg-slate-50 border border-slate-100 p-3">
+                          <p className="text-xs font-semibold text-slate-700 mb-1.5">Your {visits} visits{when === "NOW" ? " (first one as soon as possible)" : ""}</p>
+                          <ol className="text-xs text-slate-600 space-y-0.5 list-decimal list-inside">
+                            {schedulePreview.map((d, i) => <li key={i}>{i === 0 && when === "NOW" ? "As soon as possible" : fmtDay(d)}</li>)}
+                          </ol>
+                          <p className="text-[11px] text-slate-400 mt-1.5">Days {formatProviderName(nurse.name, "NURSE")} doesn&apos;t work are skipped. Pay once for all visits after she accepts.</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div>
                     <label className="input-label"><MapPin className="inline w-3.5 h-3.5 mr-1" />Visit address</label>
                     <AddressAutocomplete
                       multiline
@@ -460,7 +522,14 @@ function PatientNurseContent() {
                     <p className="text-[11px] text-slate-400 mt-1">Saved to your profile for next time.</p>
                   </div>
 
-                  {service.requiresPrescription && (
+                  {referral && referral.service.id === service.id && (
+                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                      <p className="text-sm font-semibold text-emerald-800 flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" />Prescription from {formatProviderName(referral.doctorName, "DOCTOR")} attached</p>
+                      <p className="text-xs text-emerald-700 mt-0.5">The nurse will see your doctor&apos;s prescription and instructions — nothing to upload.</p>
+                    </div>
+                  )}
+
+                  {service.requiresPrescription && !(referral && referral.service.id === service.id) && (
                     <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3">
                       <p className="text-sm font-semibold text-amber-800 flex items-center gap-1.5"><FileText className="w-4 h-4" />Doctor&apos;s prescription (required)</p>
                       <p className="text-xs text-amber-700 mt-0.5 mb-2">Nurses can only give {service.name.toLowerCase()} that a doctor has prescribed.</p>
@@ -492,7 +561,7 @@ function PatientNurseContent() {
                   {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-start gap-2"><AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />{error}</div>}
 
                   <button type="submit" disabled={booking} className="btn-primary w-full justify-center py-3.5 text-base">
-                    Request visit (₹{nurse.price})
+                    {visits > 1 ? `Request ${visits} visits (₹${total})` : `Request visit (₹${nurse.price})`}
                   </button>
                   <p className="text-[11px] text-slate-400 text-center">You pay online after the nurse accepts.</p>
                 </div>
@@ -512,11 +581,14 @@ function PatientNurseContent() {
             <div className="space-y-1.5">
               <div className="flex justify-between gap-3"><span>Nurse</span><span className="font-semibold text-slate-800 text-right">{formatProviderName(nurse.name, "NURSE")}</span></div>
               <div className="flex justify-between gap-3"><span>Service</span><span className="font-semibold text-slate-800 text-right">{service.name}</span></div>
-              <div className="flex justify-between gap-3"><span>When</span><span className="font-semibold text-slate-800 text-right">{when === "LATER" && scheduledAt ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "As soon as possible"}</span></div>
+              {visits > 1 && (
+                <div className="flex justify-between gap-3"><span>Visits</span><span className="font-semibold text-slate-800 text-right">{visits} · {intervalLabel(intervalDays)} · ₹{nurse.price} each</span></div>
+              )}
+              <div className="flex justify-between gap-3"><span>{visits > 1 ? "First visit" : "When"}</span><span className="font-semibold text-slate-800 text-right">{when === "LATER" && scheduledAt ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "As soon as possible"}</span></div>
               <div className="flex justify-between gap-3"><span>Payment</span><span className="font-semibold text-slate-800 text-right">Online, after the nurse accepts</span></div>
             </div>
           }
-          confirmLabel={`Confirm (₹${nurse.price})`}
+          confirmLabel={`Confirm (₹${total})`}
           busyLabel="Booking…"
           busy={booking}
           onCancel={() => setConfirmOpen(false)}

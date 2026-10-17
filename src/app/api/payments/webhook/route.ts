@@ -278,10 +278,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const appointment = await prisma.appointment.findFirst({
+  // One order can cover several appointments — a nurse package's visits all
+  // share the order id they were paid with.
+  const covered = await prisma.appointment.findMany({
     where: { cashfreeOrderId: orderId },
     include: { patient: { select: { name: true } } },
+    orderBy: { scheduledAt: "asc" },
   });
+  const appointment = covered[0];
   if (!appointment) {
     console.error("Cashfree webhook: no appointment found for order", orderId);
     return NextResponse.json({ ok: true }); // ack anyway — nothing to retry into
@@ -289,7 +293,7 @@ export async function POST(req: Request) {
 
   // The order was created for the coupon-discounted amount, so that's what to
   // reconcile against — not the doctor's full fee.
-  const expectedAmount = netPayable(appointment);
+  const expectedAmount = Math.round(covered.reduce((sum, a) => sum + netPayable(a), 0) * 100) / 100;
   if (payload.data.order.order_amount !== expectedAmount) {
     console.error(
       "Cashfree webhook amount mismatch for appointment", appointment.id,
@@ -299,21 +303,25 @@ export async function POST(req: Request) {
   }
 
   await prisma.$transaction(async (tx) => {
-    await tx.appointment.update({
-      where: { id: appointment.id },
-      data: {
-        paymentStatus: "PAID",
-        paidAt: new Date(),
-        cashfreePaymentId: payload.data.payment.cf_payment_id,
-      },
-    });
-    await confirmCouponRedemption(tx, { appointmentId: appointment.id });
+    for (const a of covered) {
+      await tx.appointment.update({
+        where: { id: a.id },
+        data: {
+          paymentStatus: "PAID",
+          paidAt: a.paidAt ?? new Date(),
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+        },
+      });
+      await confirmCouponRedemption(tx, { appointmentId: a.id });
+    }
   });
 
   void sendPushToUser(appointment.doctorId, {
     title: "Payment received",
     body: appointment.providerType === "NURSE"
-      ? `${appointment.patient.name} paid for the ${appointment.serviceName ?? "home"} visit — you can complete it once you're done.`
+      ? covered.length > 1
+        ? `${appointment.patient.name} paid for all ${covered.length} ${appointment.serviceName ?? "home"} visits.`
+        : `${appointment.patient.name} paid for the ${appointment.serviceName ?? "home"} visit — you can complete it once you're done.`
       : `Payment received for your consultation with ${appointment.patient.name}.`,
     url: appointment.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
   });

@@ -87,6 +87,16 @@ export type NurseProfile = Prisma.NurseProfileModel
  */
 export type NurseService = Prisma.NurseServiceModel
 /**
+ * Model NursePackage
+ * 
+ */
+export type NursePackage = Prisma.NursePackageModel
+/**
+ * Model NurseReferral
+ * 
+ */
+export type NurseReferral = Prisma.NurseReferralModel
+/**
  * Model NurseServiceOffering
  * 
  */

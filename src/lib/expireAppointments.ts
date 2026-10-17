@@ -21,18 +21,30 @@ export async function expireStalePendingRequests() {
       createdAt: { lt: cutoff },
       scheduledAt: { lt: now },
     },
-    select: { id: true, patientId: true, providerType: true, doctor: { select: { name: true } } },
+    select: { id: true, patientId: true, providerType: true, packageId: true, doctor: { select: { name: true } } },
   });
   if (stale.length === 0) return;
 
+  // A nurse package is answered as a whole — once its first visit times out
+  // unanswered, the rest of its still-pending visits go with it (otherwise
+  // they would sit "waiting" until each one's own date).
+  const packageIds = [...new Set(stale.map((a) => a.packageId).filter((x): x is string => !!x))];
+  const siblings = packageIds.length
+    ? await prisma.appointment.findMany({
+        where: { packageId: { in: packageIds }, status: "PENDING_APPROVAL", id: { notIn: stale.map((a) => a.id) } },
+        select: { id: true },
+      })
+    : [];
+  const expiredIds = [...stale.map((a) => a.id), ...siblings.map((a) => a.id)];
+
   await prisma.appointment.updateMany({
-    where: { id: { in: stale.map((a) => a.id) } },
+    where: { id: { in: expiredIds } },
     data: { status: "EXPIRED" },
   });
 
   // Free any coupon slots that were reserved but never paid for.
   const reserved = await prisma.couponRedemption.findMany({
-    where: { appointmentId: { in: stale.map((a) => a.id) }, status: "RESERVED" },
+    where: { appointmentId: { in: expiredIds }, status: "RESERVED" },
     select: { appointmentId: true },
   });
   for (const r of reserved) {

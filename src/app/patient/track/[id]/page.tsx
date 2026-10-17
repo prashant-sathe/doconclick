@@ -19,6 +19,9 @@ interface TrackedAppointment {
   doctorLat: number | null;
   doctorLng: number | null;
   providerType?: string; // "NURSE" for nurse bookings
+  serviceName?: string | null;
+  visitOtp?: string | null; // only ever sent to the patient
+  visitStartedAt?: string | null;
   doctor: { name: string; doctorProfile: { specialty: string } | null };
 }
 
@@ -161,7 +164,7 @@ export default function PatientTrackDoctor() {
               </div>
               <div className="min-w-0">
                 <p className="font-bold text-slate-900 truncate">{formatProviderName(appt.doctor.name, appt.providerType)}</p>
-                <p className="text-xs text-slate-500">{appt.doctor.doctorProfile?.specialty}</p>
+                <p className="text-xs text-slate-500">{appt.providerType === "NURSE" ? appt.serviceName : appt.doctor.doctorProfile?.specialty}</p>
               </div>
             </div>
             {appt.travelStatus === "ARRIVED" ? (
@@ -174,6 +177,12 @@ export default function PatientTrackDoctor() {
                 <span className="flex items-center gap-1.5 font-bold text-teal-600">
                   <Clock className="w-3.5 h-3.5" /> ~{eta} min
                 </span>
+              </div>
+            )}
+            {appt.providerType === "NURSE" && appt.visitOtp && !appt.visitStartedAt && (
+              <div className="mt-3 rounded-xl bg-rose-50 border border-rose-200 px-3 py-2 flex items-center justify-between gap-3">
+                <span className="text-xs text-rose-700">Tell the nurse this code at the door</span>
+                <span className="text-xl font-extrabold tracking-[0.3em] text-rose-700">{appt.visitOtp}</span>
               </div>
             )}
           </div>

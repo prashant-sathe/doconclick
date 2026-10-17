@@ -241,6 +241,32 @@ model NurseService {
   createdAt            DateTime @default(now())
   offerings            NurseServiceOffering[]
   appointments         Appointment[]
+  referrals            NurseReferral[]
+}
+
+model NursePackage {
+  id           String   @id @default(cuid())
+  patientId    String
+  nurseId      String
+  serviceId    String
+  visits       Int
+  intervalDays Int      @default(1)
+  createdAt    DateTime @default(now())
+  appointments Appointment[]
+}
+
+// "Nurse care needed" written by a doctor while completing a consultation.
+model NurseReferral {
+  id            String       @id @default(cuid())
+  appointmentId String       @unique
+  appointment   Appointment  @relation("ReferralSource", fields: [appointmentId], references: [id], onDelete: Cascade)
+  serviceId     String
+  service       NurseService @relation(fields: [serviceId], references: [id])
+  visits        Int          @default(1)
+  intervalDays  Int          @default(1)
+  instructions  String?
+  createdAt     DateTime     @default(now())
+  bookings      Appointment[] @relation("ReferralBookings")
 }
 
 // Which services a nurse offers, at the nurse's own price.
@@ -298,6 +324,25 @@ model Appointment {
   serviceName    String?   // denormalised so it survives the service being renamed/removed
   prescriptionDocId String?
   prescriptionDoc   PatientDocument? @relation("NurseBookingPrescription", fields: [prescriptionDocId], references: [id], onDelete: SetNull)
+  // Visit-start code (nurse visits): generated when the nurse accepts, shown
+  // only to the patient; the nurse must enter it at the door to start the
+  // visit. Starting without it needs a reason (visitStartNote) and is
+  // flagged for the admin.
+  visitOtp          String?
+  visitOtpAttempts  Int       @default(0)
+  visitStartedAt    DateTime?
+  visitStartNote    String?
+  // Multi-visit nurse package: every visit is its own appointment (own
+  // travel / start / completion / refund) grouped by packageId, paid once.
+  packageId         String?
+  package           NursePackage? @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  packageIndex      Int?      // 1-based visit number within the package
+  // Nurse booking made from a doctor's referral — the referral's
+  // prescription stands in for an uploaded one.
+  nurseReferralId   String?
+  nurseReferral     NurseReferral? @relation("ReferralBookings", fields: [nurseReferralId], references: [id], onDelete: SetNull)
+  // On a doctor's consultation: the nurse care the doctor recommended.
+  referralGiven     NurseReferral? @relation("ReferralSource")
   status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED, NO_SHOW
   acceptedAt    DateTime? // set when the doctor accepts (PENDING_APPROVAL → SCHEDULED); used for the late-cancellation warning
   paymentMethod String    @default("CASH") // ONLINE, CASH
