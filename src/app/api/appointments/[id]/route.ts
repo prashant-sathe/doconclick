@@ -5,7 +5,8 @@ import { getAuthUser } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { findReassignmentDoctor } from "@/lib/doctorMatching";
-import { getOrCreateWallet } from "@/lib/wallet";
+import { refundAppointmentToWallet } from "@/lib/wallet";
+import { Prisma } from "@/generated/prisma/client";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
@@ -20,6 +21,32 @@ const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: stri
   CANCELLED: { title: "Appointment cancelled", body: (d) => `Your appointment with ${d} was cancelled.`, url: "/patient/appointments" },
   NO_SHOW: { title: "Marked as a no-show", body: (d) => `You were marked as a no-show for your appointment with ${d}.`, url: "/patient/appointments" },
 };
+
+// Thrown inside a cancel/decline transaction when a concurrent request has
+// already moved the appointment on — rolls the whole transaction back.
+class AppointmentAlreadyClosedError extends Error {}
+const ALREADY_CLOSED_MESSAGE = "This appointment was already cancelled or updated. Please refresh.";
+
+// A conditional status change that only succeeds for one of several racing
+// requests; the losers abort before touching the wallet.
+async function claimStatusChange(
+  tx: Prisma.TransactionClient,
+  id: string,
+  fromStatuses: string[],
+  data: Prisma.AppointmentUpdateManyMutationInput
+) {
+  const { count } = await tx.appointment.updateMany({
+    where: { id, status: { in: fromStatuses } },
+    data,
+  });
+  if (count === 0) throw new AppointmentAlreadyClosedError();
+  return tx.appointment.findUniqueOrThrow({ where: { id } });
+}
+
+function isAlreadyClosed(err: unknown) {
+  return err instanceof AppointmentAlreadyClosedError
+    || (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002");
+}
 
 // Valid status transitions a doctor may make, keyed by the appointment's current status
 const DOCTOR_TRANSITIONS: Record<string, string[]> = {
@@ -247,7 +274,6 @@ export async function PATCH(
         where: { userId: appointment.doctorId },
         select: { specialty: true },
       });
-      const wasPaid = appointment.paymentStatus === "PAID";
       // The patient only ever paid the coupon-discounted amount, so that's
       // what gets refunded to their wallet.
       const refundAmount = netPayable(appointment);
@@ -269,59 +295,61 @@ export async function PATCH(
         newPlatformFee = (newAmount * commission) / 100;
       }
 
-      const { cancelled, reassigned } = await prisma.$transaction(async (tx) => {
-        const cancelled = await tx.appointment.update({
-          where: { id },
-          data: { status: "CANCELLED", doctorNotes: doctorNotes ?? appointment.doctorNotes },
-        });
-
-        if (wasPaid) {
-          const wallet = await getOrCreateWallet(tx, appointment.patientId);
-          const updatedWallet = await tx.wallet.update({
-            where: { id: wallet.id },
-            data: { balance: { increment: refundAmount } },
+      let result;
+      try {
+        result = await prisma.$transaction(async (tx) => {
+          const cancelled = await claimStatusChange(tx, id, ["PENDING_APPROVAL", "SCHEDULED"], {
+            status: "CANCELLED",
+            doctorNotes: doctorNotes ?? appointment.doctorNotes,
           });
-          await tx.walletTransaction.create({
-            data: {
-              walletId: wallet.id,
-              type: "REASSIGNMENT_CREDIT",
+          // Read under the row lock the claim above took, not from the earlier
+          // snapshot — a payment may have landed in between.
+          const wasPaid = cancelled.paymentStatus === "PAID";
+
+          if (wasPaid) {
+            await refundAppointmentToWallet(tx, {
+              patientId: appointment.patientId,
+              appointmentId: appointment.id,
               amount: refundAmount,
-              balanceAfter: updatedWallet.balance,
-              status: "SUCCESS",
+              type: "REASSIGNMENT_CREDIT",
               note: `Refund for appointment ${appointment.id}, cancelled by the doctor`,
-            },
-          });
-        } else {
-          // Unpaid: free the coupon slot the patient had reserved.
-          await releaseCouponRedemption(tx, { appointmentId: id });
-        }
+            });
+          } else {
+            // Unpaid: free the coupon slot the patient had reserved.
+            await releaseCouponRedemption(tx, { appointmentId: id });
+          }
 
-        const reassigned = candidate
-          ? await tx.appointment.create({
-              data: {
-                patientId: appointment.patientId,
-                doctorId: candidate.id,
-                symptoms: appointment.symptoms,
-                patientName: appointment.patientName,
-                relation: appointment.relation,
-                allergies: appointment.allergies,
-                dependentId: appointment.dependentId ?? undefined,
-                consentGiven: appointment.consentGiven,
-                consultType: appointment.consultType,
-                amount: newAmount,
-                platformFee: newPlatformFee,
-                status: "PENDING_APPROVAL",
-                paymentMethod: appointment.paymentMethod,
-                paymentStatus: "PENDING",
-                clinicId: candidate.clinicId ?? undefined,
-                scheduledAt: appointment.scheduledAt,
-                reassignedFromId: appointment.id,
-              },
-            })
-          : null;
+          const reassigned = candidate
+            ? await tx.appointment.create({
+                data: {
+                  patientId: appointment.patientId,
+                  doctorId: candidate.id,
+                  symptoms: appointment.symptoms,
+                  patientName: appointment.patientName,
+                  relation: appointment.relation,
+                  allergies: appointment.allergies,
+                  dependentId: appointment.dependentId ?? undefined,
+                  consentGiven: appointment.consentGiven,
+                  consultType: appointment.consultType,
+                  amount: newAmount,
+                  platformFee: newPlatformFee,
+                  status: "PENDING_APPROVAL",
+                  paymentMethod: appointment.paymentMethod,
+                  paymentStatus: "PENDING",
+                  clinicId: candidate.clinicId ?? undefined,
+                  scheduledAt: appointment.scheduledAt,
+                  reassignedFromId: appointment.id,
+                },
+              })
+            : null;
 
-        return { cancelled, reassigned };
-      });
+          return { cancelled, reassigned, wasPaid };
+        });
+      } catch (err) {
+        if (isAlreadyClosed(err)) return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
+        throw err;
+      }
+      const { cancelled, reassigned, wasPaid } = result;
 
       if (reassigned && candidate) {
         void sendPushToUser(candidate.id, {
@@ -357,28 +385,26 @@ export async function PATCH(
     // patient's money needs to come back.
     if (status === "REJECTED" && appointment.paymentStatus === "PAID") {
       const refundAmount = netPayable(appointment);
-      const updated = await prisma.$transaction(async (tx) => {
-        const rejected = await tx.appointment.update({
-          where: { id },
-          data: { status: "REJECTED", doctorNotes: doctorNotes ?? appointment.doctorNotes },
-        });
-        const wallet = await getOrCreateWallet(tx, appointment.patientId);
-        const updatedWallet = await tx.wallet.update({
-          where: { id: wallet.id },
-          data: { balance: { increment: refundAmount } },
-        });
-        await tx.walletTransaction.create({
-          data: {
-            walletId: wallet.id,
-            type: "CANCELLATION_REFUND",
+      let updated;
+      try {
+        updated = await prisma.$transaction(async (tx) => {
+          const rejected = await claimStatusChange(tx, id, ["PENDING_APPROVAL"], {
+            status: "REJECTED",
+            doctorNotes: doctorNotes ?? appointment.doctorNotes,
+          });
+          await refundAppointmentToWallet(tx, {
+            patientId: appointment.patientId,
+            appointmentId: appointment.id,
             amount: refundAmount,
-            balanceAfter: updatedWallet.balance,
-            status: "SUCCESS",
+            type: "CANCELLATION_REFUND",
             note: `Refund for appointment ${appointment.id}, declined by the doctor after a reschedule request`,
-          },
+          });
+          return rejected;
         });
-        return rejected;
-      });
+      } catch (err) {
+        if (isAlreadyClosed(err)) return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
+        throw err;
+      }
       void sendPushToUser(appointment.patientId, {
         title: "Request declined",
         body: `${actingDoctorName} couldn't accommodate your new requested time. ₹${refundAmount} was refunded to your wallet.`,
@@ -509,37 +535,33 @@ export async function PATCH(
     // Same wasPaid/refund-or-release-coupon split as the doctor-cancel branch
     // above, minus the reassignment attempt — the patient is choosing to
     // leave, not being left stranded, so there's no substitute doctor to find.
-    const wasPaid = appointment.paymentStatus === "PAID";
     const refundAmount = netPayable(appointment);
 
-    const updated = await prisma.$transaction(async (tx) => {
-      const cancelled = await tx.appointment.update({
-        where: { id },
-        data: { status: "CANCELLED" },
-      });
+    let result;
+    try {
+      result = await prisma.$transaction(async (tx) => {
+        const cancelled = await claimStatusChange(tx, id, ["PENDING_APPROVAL", "SCHEDULED"], { status: "CANCELLED" });
+        const wasPaid = cancelled.paymentStatus === "PAID";
 
-      if (wasPaid) {
-        const wallet = await getOrCreateWallet(tx, appointment.patientId);
-        const updatedWallet = await tx.wallet.update({
-          where: { id: wallet.id },
-          data: { balance: { increment: refundAmount } },
-        });
-        await tx.walletTransaction.create({
-          data: {
-            walletId: wallet.id,
-            type: "CANCELLATION_REFUND",
+        if (wasPaid) {
+          await refundAppointmentToWallet(tx, {
+            patientId: appointment.patientId,
+            appointmentId: appointment.id,
             amount: refundAmount,
-            balanceAfter: updatedWallet.balance,
-            status: "SUCCESS",
+            type: "CANCELLATION_REFUND",
             note: `Refund for appointment ${appointment.id}, cancelled by the patient`,
-          },
-        });
-      } else {
-        await releaseCouponRedemption(tx, { appointmentId: id });
-      }
+          });
+        } else {
+          await releaseCouponRedemption(tx, { appointmentId: id });
+        }
 
-      return cancelled;
-    });
+        return { cancelled, wasPaid };
+      });
+    } catch (err) {
+      if (isAlreadyClosed(err)) return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
+      throw err;
+    }
+    const { cancelled: updated, wasPaid } = result;
 
     void sendPushToUser(appointment.doctorId, {
       title: "Appointment cancelled",

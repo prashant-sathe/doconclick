@@ -44,6 +44,7 @@ export type WalletTransactionMinAggregateOutputType = {
   balanceAfter: number | null
   status: string | null
   appointmentId: string | null
+  refundOfAppointmentId: string | null
   cashfreeOrderId: string | null
   cashfreePaymentId: string | null
   adminId: string | null
@@ -59,6 +60,7 @@ export type WalletTransactionMaxAggregateOutputType = {
   balanceAfter: number | null
   status: string | null
   appointmentId: string | null
+  refundOfAppointmentId: string | null
   cashfreeOrderId: string | null
   cashfreePaymentId: string | null
   adminId: string | null
@@ -74,6 +76,7 @@ export type WalletTransactionCountAggregateOutputType = {
   balanceAfter: number
   status: number
   appointmentId: number
+  refundOfAppointmentId: number
   cashfreeOrderId: number
   cashfreePaymentId: number
   adminId: number
@@ -101,6 +104,7 @@ export type WalletTransactionMinAggregateInputType = {
   balanceAfter?: true
   status?: true
   appointmentId?: true
+  refundOfAppointmentId?: true
   cashfreeOrderId?: true
   cashfreePaymentId?: true
   adminId?: true
@@ -116,6 +120,7 @@ export type WalletTransactionMaxAggregateInputType = {
   balanceAfter?: true
   status?: true
   appointmentId?: true
+  refundOfAppointmentId?: true
   cashfreeOrderId?: true
   cashfreePaymentId?: true
   adminId?: true
@@ -131,6 +136,7 @@ export type WalletTransactionCountAggregateInputType = {
   balanceAfter?: true
   status?: true
   appointmentId?: true
+  refundOfAppointmentId?: true
   cashfreeOrderId?: true
   cashfreePaymentId?: true
   adminId?: true
@@ -233,6 +239,7 @@ export type WalletTransactionGroupByOutputType = {
   balanceAfter: number | null
   status: string
   appointmentId: string | null
+  refundOfAppointmentId: string | null
   cashfreeOrderId: string | null
   cashfreePaymentId: string | null
   adminId: string | null
@@ -271,6 +278,7 @@ export type WalletTransactionWhereInput = {
   balanceAfter?: Prisma.FloatNullableFilter<"WalletTransaction"> | number | null
   status?: Prisma.StringFilter<"WalletTransaction"> | string
   appointmentId?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
+  refundOfAppointmentId?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   cashfreeOrderId?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   cashfreePaymentId?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   adminId?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
@@ -289,6 +297,7 @@ export type WalletTransactionOrderByWithRelationInput = {
   balanceAfter?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   appointmentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  refundOfAppointmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   cashfreeOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   cashfreePaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   adminId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -302,6 +311,7 @@ export type WalletTransactionOrderByWithRelationInput = {
 export type WalletTransactionWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   appointmentId?: string
+  refundOfAppointmentId?: string
   AND?: Prisma.WalletTransactionWhereInput | Prisma.WalletTransactionWhereInput[]
   OR?: Prisma.WalletTransactionWhereInput[]
   NOT?: Prisma.WalletTransactionWhereInput | Prisma.WalletTransactionWhereInput[]
@@ -318,7 +328,7 @@ export type WalletTransactionWhereUniqueInput = Prisma.AtLeast<{
   wallet?: Prisma.XOR<Prisma.WalletScalarRelationFilter, Prisma.WalletWhereInput>
   appointment?: Prisma.XOR<Prisma.AppointmentNullableScalarRelationFilter, Prisma.AppointmentWhereInput> | null
   admin?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-}, "id" | "appointmentId">
+}, "id" | "appointmentId" | "refundOfAppointmentId">
 
 export type WalletTransactionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -328,6 +338,7 @@ export type WalletTransactionOrderByWithAggregationInput = {
   balanceAfter?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   appointmentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  refundOfAppointmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   cashfreeOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   cashfreePaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   adminId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -351,6 +362,7 @@ export type WalletTransactionScalarWhereWithAggregatesInput = {
   balanceAfter?: Prisma.FloatNullableWithAggregatesFilter<"WalletTransaction"> | number | null
   status?: Prisma.StringWithAggregatesFilter<"WalletTransaction"> | string
   appointmentId?: Prisma.StringNullableWithAggregatesFilter<"WalletTransaction"> | string | null
+  refundOfAppointmentId?: Prisma.StringNullableWithAggregatesFilter<"WalletTransaction"> | string | null
   cashfreeOrderId?: Prisma.StringNullableWithAggregatesFilter<"WalletTransaction"> | string | null
   cashfreePaymentId?: Prisma.StringNullableWithAggregatesFilter<"WalletTransaction"> | string | null
   adminId?: Prisma.StringNullableWithAggregatesFilter<"WalletTransaction"> | string | null
@@ -364,6 +376,7 @@ export type WalletTransactionCreateInput = {
   amount: number
   balanceAfter?: number | null
   status?: string
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   note?: string | null
@@ -381,6 +394,7 @@ export type WalletTransactionUncheckedCreateInput = {
   balanceAfter?: number | null
   status?: string
   appointmentId?: string | null
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   adminId?: string | null
@@ -394,6 +408,7 @@ export type WalletTransactionUpdateInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -411,6 +426,7 @@ export type WalletTransactionUncheckedUpdateInput = {
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -426,6 +442,7 @@ export type WalletTransactionCreateManyInput = {
   balanceAfter?: number | null
   status?: string
   appointmentId?: string | null
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   adminId?: string | null
@@ -439,6 +456,7 @@ export type WalletTransactionUpdateManyMutationInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -453,6 +471,7 @@ export type WalletTransactionUncheckedUpdateManyInput = {
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -483,6 +502,7 @@ export type WalletTransactionCountOrderByAggregateInput = {
   balanceAfter?: Prisma.SortOrder
   status?: Prisma.SortOrder
   appointmentId?: Prisma.SortOrder
+  refundOfAppointmentId?: Prisma.SortOrder
   cashfreeOrderId?: Prisma.SortOrder
   cashfreePaymentId?: Prisma.SortOrder
   adminId?: Prisma.SortOrder
@@ -503,6 +523,7 @@ export type WalletTransactionMaxOrderByAggregateInput = {
   balanceAfter?: Prisma.SortOrder
   status?: Prisma.SortOrder
   appointmentId?: Prisma.SortOrder
+  refundOfAppointmentId?: Prisma.SortOrder
   cashfreeOrderId?: Prisma.SortOrder
   cashfreePaymentId?: Prisma.SortOrder
   adminId?: Prisma.SortOrder
@@ -518,6 +539,7 @@ export type WalletTransactionMinOrderByAggregateInput = {
   balanceAfter?: Prisma.SortOrder
   status?: Prisma.SortOrder
   appointmentId?: Prisma.SortOrder
+  refundOfAppointmentId?: Prisma.SortOrder
   cashfreeOrderId?: Prisma.SortOrder
   cashfreePaymentId?: Prisma.SortOrder
   adminId?: Prisma.SortOrder
@@ -652,6 +674,7 @@ export type WalletTransactionCreateWithoutAdminInput = {
   amount: number
   balanceAfter?: number | null
   status?: string
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   note?: string | null
@@ -668,6 +691,7 @@ export type WalletTransactionUncheckedCreateWithoutAdminInput = {
   balanceAfter?: number | null
   status?: string
   appointmentId?: string | null
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   note?: string | null
@@ -711,6 +735,7 @@ export type WalletTransactionScalarWhereInput = {
   balanceAfter?: Prisma.FloatNullableFilter<"WalletTransaction"> | number | null
   status?: Prisma.StringFilter<"WalletTransaction"> | string
   appointmentId?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
+  refundOfAppointmentId?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   cashfreeOrderId?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   cashfreePaymentId?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   adminId?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
@@ -724,6 +749,7 @@ export type WalletTransactionCreateWithoutAppointmentInput = {
   amount: number
   balanceAfter?: number | null
   status?: string
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   note?: string | null
@@ -739,6 +765,7 @@ export type WalletTransactionUncheckedCreateWithoutAppointmentInput = {
   amount: number
   balanceAfter?: number | null
   status?: string
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   adminId?: string | null
@@ -768,6 +795,7 @@ export type WalletTransactionUpdateWithoutAppointmentInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -783,6 +811,7 @@ export type WalletTransactionUncheckedUpdateWithoutAppointmentInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -796,6 +825,7 @@ export type WalletTransactionCreateWithoutWalletInput = {
   amount: number
   balanceAfter?: number | null
   status?: string
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   note?: string | null
@@ -811,6 +841,7 @@ export type WalletTransactionUncheckedCreateWithoutWalletInput = {
   balanceAfter?: number | null
   status?: string
   appointmentId?: string | null
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   adminId?: string | null
@@ -852,6 +883,7 @@ export type WalletTransactionCreateManyAdminInput = {
   balanceAfter?: number | null
   status?: string
   appointmentId?: string | null
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   note?: string | null
@@ -864,6 +896,7 @@ export type WalletTransactionUpdateWithoutAdminInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -880,6 +913,7 @@ export type WalletTransactionUncheckedUpdateWithoutAdminInput = {
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -894,6 +928,7 @@ export type WalletTransactionUncheckedUpdateManyWithoutAdminInput = {
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -907,6 +942,7 @@ export type WalletTransactionCreateManyWalletInput = {
   balanceAfter?: number | null
   status?: string
   appointmentId?: string | null
+  refundOfAppointmentId?: string | null
   cashfreeOrderId?: string | null
   cashfreePaymentId?: string | null
   adminId?: string | null
@@ -920,6 +956,7 @@ export type WalletTransactionUpdateWithoutWalletInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -935,6 +972,7 @@ export type WalletTransactionUncheckedUpdateWithoutWalletInput = {
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -949,6 +987,7 @@ export type WalletTransactionUncheckedUpdateManyWithoutWalletInput = {
   balanceAfter?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundOfAppointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -966,6 +1005,7 @@ export type WalletTransactionSelect<ExtArgs extends runtime.Types.Extensions.Int
   balanceAfter?: boolean
   status?: boolean
   appointmentId?: boolean
+  refundOfAppointmentId?: boolean
   cashfreeOrderId?: boolean
   cashfreePaymentId?: boolean
   adminId?: boolean
@@ -984,6 +1024,7 @@ export type WalletTransactionSelectCreateManyAndReturn<ExtArgs extends runtime.T
   balanceAfter?: boolean
   status?: boolean
   appointmentId?: boolean
+  refundOfAppointmentId?: boolean
   cashfreeOrderId?: boolean
   cashfreePaymentId?: boolean
   adminId?: boolean
@@ -1002,6 +1043,7 @@ export type WalletTransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   balanceAfter?: boolean
   status?: boolean
   appointmentId?: boolean
+  refundOfAppointmentId?: boolean
   cashfreeOrderId?: boolean
   cashfreePaymentId?: boolean
   adminId?: boolean
@@ -1020,6 +1062,7 @@ export type WalletTransactionSelectScalar = {
   balanceAfter?: boolean
   status?: boolean
   appointmentId?: boolean
+  refundOfAppointmentId?: boolean
   cashfreeOrderId?: boolean
   cashfreePaymentId?: boolean
   adminId?: boolean
@@ -1027,7 +1070,7 @@ export type WalletTransactionSelectScalar = {
   createdAt?: boolean
 }
 
-export type WalletTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "walletId" | "type" | "amount" | "balanceAfter" | "status" | "appointmentId" | "cashfreeOrderId" | "cashfreePaymentId" | "adminId" | "note" | "createdAt", ExtArgs["result"]["walletTransaction"]>
+export type WalletTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "walletId" | "type" | "amount" | "balanceAfter" | "status" | "appointmentId" | "refundOfAppointmentId" | "cashfreeOrderId" | "cashfreePaymentId" | "adminId" | "note" | "createdAt", ExtArgs["result"]["walletTransaction"]>
 export type WalletTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   wallet?: boolean | Prisma.WalletDefaultArgs<ExtArgs>
   appointment?: boolean | Prisma.WalletTransaction$appointmentArgs<ExtArgs>
@@ -1059,6 +1102,7 @@ export type $WalletTransactionPayload<ExtArgs extends runtime.Types.Extensions.I
     balanceAfter: number | null
     status: string
     appointmentId: string | null
+    refundOfAppointmentId: string | null
     cashfreeOrderId: string | null
     cashfreePaymentId: string | null
     adminId: string | null
@@ -1497,6 +1541,7 @@ export interface WalletTransactionFieldRefs {
   readonly balanceAfter: Prisma.FieldRef<"WalletTransaction", 'Float'>
   readonly status: Prisma.FieldRef<"WalletTransaction", 'String'>
   readonly appointmentId: Prisma.FieldRef<"WalletTransaction", 'String'>
+  readonly refundOfAppointmentId: Prisma.FieldRef<"WalletTransaction", 'String'>
   readonly cashfreeOrderId: Prisma.FieldRef<"WalletTransaction", 'String'>
   readonly cashfreePaymentId: Prisma.FieldRef<"WalletTransaction", 'String'>
   readonly adminId: Prisma.FieldRef<"WalletTransaction", 'String'>

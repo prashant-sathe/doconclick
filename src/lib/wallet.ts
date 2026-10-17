@@ -16,3 +16,35 @@ export async function getOrCreateWallet(client: PrismaClientOrTx, userId: string
     update: {},
   });
 }
+
+// Credits a cancelled/declined appointment's payment back to the patient's
+// wallet. refundOfAppointmentId is unique, so a second refund for the same
+// appointment fails the surrounding transaction instead of paying out twice.
+export async function refundAppointmentToWallet(
+  tx: Prisma.TransactionClient,
+  { patientId, appointmentId, amount, type, note }: {
+    patientId: string;
+    appointmentId: string;
+    amount: number;
+    type: "CANCELLATION_REFUND" | "REASSIGNMENT_CREDIT";
+    note: string;
+  }
+) {
+  const wallet = await getOrCreateWallet(tx, patientId);
+  const updatedWallet = await tx.wallet.update({
+    where: { id: wallet.id },
+    data: { balance: { increment: amount } },
+  });
+  await tx.walletTransaction.create({
+    data: {
+      walletId: wallet.id,
+      type,
+      amount,
+      balanceAfter: updatedWallet.balance,
+      status: "SUCCESS",
+      refundOfAppointmentId: appointmentId,
+      note,
+    },
+  });
+  return updatedWallet;
+}

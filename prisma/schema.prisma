@@ -451,6 +451,9 @@ model WalletTransaction {
   balanceAfter      Float?       // wallet.balance immediately after this row settled; null until status = SUCCESS
   status            String       @default("SUCCESS") // PENDING, SUCCESS, FAILED — only TOPUP rows are ever created PENDING
   appointmentId     String?      @unique // set for BOOKING_PAYMENT rows
+  // Set on the CANCELLATION_REFUND / REASSIGNMENT_CREDIT row that refunds an
+  // appointment — unique, so concurrent cancels can never refund it twice.
+  refundOfAppointmentId String?  @unique
   appointment       Appointment? @relation(fields: [appointmentId], references: [id])
   cashfreeOrderId   String?      // set for TOPUP rows
   cashfreePaymentId String?

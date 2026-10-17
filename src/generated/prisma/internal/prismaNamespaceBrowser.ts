@@ -454,6 +454,7 @@ export const WalletTransactionScalarFieldEnum = {
   balanceAfter: 'balanceAfter',
   status: 'status',
   appointmentId: 'appointmentId',
+  refundOfAppointmentId: 'refundOfAppointmentId',
   cashfreeOrderId: 'cashfreeOrderId',
   cashfreePaymentId: 'cashfreePaymentId',
   adminId: 'adminId',
