@@ -76,7 +76,9 @@ export async function GET(
   });
 }
 
-// POST: Doctor uploads one or more prescription files (reports/scans) for their own appointment
+// POST: Doctor uploads one or more prescription files (reports/scans) for their own appointment.
+// Attach-only: closing the consultation (and its payment/arrival guards) is the
+// PATCH /api/appointments/[id] handler's job, never this route's.
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -92,6 +94,12 @@ export async function POST(
   const appointment = await prisma.appointment.findUnique({ where: { id } });
   if (!appointment || appointment.doctorId !== authUser.id) {
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
+  }
+  if (appointment.status !== "SCHEDULED" && appointment.status !== "COMPLETED") {
+    return NextResponse.json(
+      { error: "Files can only be attached to an accepted or completed consultation." },
+      { status: 400 }
+    );
   }
 
   const form = await req.formData();
@@ -124,14 +132,6 @@ export async function POST(
     data: saved.map((s) => ({ appointmentId: id, url: s.url, fileName: s.fileName })),
   });
 
-  const updated = await prisma.appointment.update({
-    where: { id },
-    data: {
-      status: appointment.status === "SCHEDULED" ? "COMPLETED" : appointment.status,
-      ...(appointment.paymentMethod === "CASH" ? { paymentStatus: "PAID" } : {}),
-    },
-    include: { attachments: true },
-  });
-
-  return NextResponse.json(updated);
+  const attachments = await prisma.prescriptionAttachment.findMany({ where: { appointmentId: id } });
+  return NextResponse.json({ attachments });
 }

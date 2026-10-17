@@ -257,6 +257,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   const [nurseCare, setNurseCare] = useState<NurseCareDraft>(() => ({ ...EMPTY_NURSE_CARE, ...(loadDraft(appt.id).nurseCare ?? {}) }));
   const [nurseServices, setNurseServices] = useState<{ id: string; name: string; requiresPrescription: boolean }[]>([]);
   const [referralError, setReferralError] = useState("");
+  const [submitError, setSubmitError] = useState("");
   useEffect(() => {
     fetch("/api/nurse-services").then((r) => (r.ok ? r.json() : [])).then(setNurseServices).catch(() => {});
   }, []);
@@ -314,69 +315,86 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
     setBusy(true);
     setFileError("");
     setReferralError("");
+    setSubmitError("");
+    const errorOf = async (res: Response, fallback: string) =>
+      ((await res.json().catch(() => ({}))) as { error?: string }).error ?? fallback;
 
-    const validMedicines = medicines
-      .filter((m) => m.name.trim())
-      .map((m) => ({
-        name: m.name,
-        dosage: m.dosage,
-        frequency: m.frequency === "Other" ? m.frequencyOther.trim() : m.frequency,
-        duration: m.duration === "Other" ? m.durationOther.trim() : m.duration,
-        instructions: m.instructions,
-      }));
-    const validTests = tests
-      .filter((t) => t.name.trim())
-      .map((t) => ({ name: t.name, instructions: t.instructions }));
-    if (validMedicines.length > 0 || validTests.length > 0) {
-      await fetch(`/api/appointments/${appt.id}/prescription-items`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ medicines: validMedicines, tests: validTests }),
-      });
-    }
-    if (files.length > 0) {
-      const form = new FormData();
-      // Re-read each picked File into memory before appending: on Android the
-      // WebView can't stream a content:// -backed File into a fetch() multipart
-      // body, which fails the whole request with "Failed to fetch".
-      for (const f of files) {
-        const bytes = await new Promise<ArrayBuffer>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as ArrayBuffer);
-          reader.onerror = () => reject(reader.error ?? new Error("Could not read the file"));
-          reader.readAsArrayBuffer(f);
+    try {
+      const validMedicines = medicines
+        .filter((m) => m.name.trim())
+        .map((m) => ({
+          name: m.name,
+          dosage: m.dosage,
+          frequency: m.frequency === "Other" ? m.frequencyOther.trim() : m.frequency,
+          duration: m.duration === "Other" ? m.durationOther.trim() : m.duration,
+          instructions: m.instructions,
+        }));
+      const validTests = tests
+        .filter((t) => t.name.trim())
+        .map((t) => ({ name: t.name, instructions: t.instructions }));
+      if (validMedicines.length > 0 || validTests.length > 0) {
+        const res = await fetch(`/api/appointments/${appt.id}/prescription-items`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ medicines: validMedicines, tests: validTests }),
         });
-        const prepared = await compressImage(new File([bytes], f.name, { type: f.type || "application/octet-stream" }));
-        form.append("file", prepared, prepared.name);
+        if (!res.ok) {
+          setSubmitError(await errorOf(res, "Could not save the prescription."));
+          return;
+        }
       }
-      const res = await fetch(`/api/appointments/${appt.id}/prescription`, { method: "POST", body: form });
-      if (!res.ok) {
-        setBusy(false);
-        setFileError((await res.json().catch(() => ({}))).error ?? "Could not upload attachments.");
-        return;
+      if (files.length > 0) {
+        const form = new FormData();
+        // Re-read each picked File into memory before appending: on Android the
+        // WebView can't stream a content:// -backed File into a fetch() multipart
+        // body, which fails the whole request with "Failed to fetch".
+        for (const f of files) {
+          const bytes = await new Promise<ArrayBuffer>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as ArrayBuffer);
+            reader.onerror = () => reject(reader.error ?? new Error("Could not read the file"));
+            reader.readAsArrayBuffer(f);
+          });
+          const prepared = await compressImage(new File([bytes], f.name, { type: f.type || "application/octet-stream" }));
+          form.append("file", prepared, prepared.name);
+        }
+        const res = await fetch(`/api/appointments/${appt.id}/prescription`, { method: "POST", body: form });
+        if (!res.ok) {
+          setFileError(await errorOf(res, "Could not upload attachments."));
+          return;
+        }
+        // Uploaded — drop them so a retry after a later failure doesn't attach duplicates.
+        setFiles([]);
       }
-    }
-    if (nurseCare.on) {
-      const res = await fetch(`/api/appointments/${appt.id}/nurse-referral`, {
-        method: "POST",
+      if (nurseCare.on) {
+        const res = await fetch(`/api/appointments/${appt.id}/nurse-referral`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ serviceId: nurseCare.serviceId, visits: nurseCare.visits, intervalDays: nurseCare.intervalDays, instructions: nurseCare.instructions }),
+        });
+        if (!res.ok) {
+          setReferralError(await errorOf(res, "Could not save the nurse referral."));
+          return;
+        }
+      }
+      // Prescription is saved first; only then is the appointment closed —
+      // and only this PATCH may close it (payment/arrival guards live there).
+      const res = await fetch(`/api/appointments/${appt.id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ serviceId: nurseCare.serviceId, visits: nurseCare.visits, intervalDays: nurseCare.intervalDays, instructions: nurseCare.instructions }),
+        body: JSON.stringify({ status: "COMPLETED", doctorNotes: notes }),
       });
       if (!res.ok) {
-        setBusy(false);
-        setReferralError((await res.json().catch(() => ({}))).error ?? "Could not save the nurse referral.");
+        setSubmitError(await errorOf(res, "Could not mark this consultation complete."));
         return;
       }
+      clearDraft();
+      onDone();
+    } catch {
+      setSubmitError("Network error — please check your connection and try again.");
+    } finally {
+      setBusy(false);
     }
-    // Prescription is saved first; only then is the appointment closed.
-    await fetch(`/api/appointments/${appt.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "COMPLETED", doctorNotes: notes }),
-    });
-    setBusy(false);
-    clearDraft();
-    onDone();
   };
 
   return (
@@ -520,6 +538,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         )}
         {fileError && <p className="text-xs text-red-500 mt-1">{fileError}</p>}
       </div>
+      {submitError && <p className="text-xs text-red-500">{submitError}</p>}
       <div className="flex gap-2">
         <button onClick={() => setConfirmingCancel(true)} className="btn-secondary py-1.5 px-3 text-xs flex-1 justify-center">Cancel</button>
         <button
