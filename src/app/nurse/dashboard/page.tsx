@@ -9,6 +9,7 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import { NurseHeader, NurseMobileNav } from "@/components/nurse/NurseNav";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import RescheduleRequestBox from "@/components/RescheduleRequestBox";
 import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ type Visit = {
   paymentStatus: string;
   travelStatus: string;
   scheduledAt: string;
+  requestedScheduledAt: string | null;
   createdAt: string;
   doctorNotes: string | null;
   unreadMessageCount: number;
@@ -508,6 +510,9 @@ export default function NurseDashboardPage() {
 
                   {v.status === "SCHEDULED" && (
                     <>
+                      {v.requestedScheduledAt && (
+                        <RescheduleRequestBox appointmentId={v.id} requestedAt={v.requestedScheduledAt} onDone={load} />
+                      )}
                       <div className={cn("mt-4 rounded-xl px-3 py-2 text-xs font-semibold flex items-center gap-1.5", paid ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")}>
                         <IndianRupee className="w-3.5 h-3.5" />
                         {paid ? "Patient has paid" : "Waiting for the patient's payment — you can complete the visit once it's paid"}

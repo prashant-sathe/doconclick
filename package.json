@@ -10,7 +10,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:push": "prisma db push",
     "migrate:uploads-to-s3": "tsx prisma/migrate-uploads-to-s3.ts",
-    "test:cancel-race": "tsx tests/cancel-race.ts"
+    "test:cancel-race": "tsx tests/cancel-race.ts",
+    "test:expire-refund": "tsx tests/expire-refund.ts",
+    "test:reschedule": "tsx tests/reschedule-request.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -13,6 +13,7 @@ import { resolveProviderScope } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
 import { netPayable, releaseCouponRedemption } from "@/lib/coupons";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
+import { clinicSlotTaken } from "@/lib/clinicSlots";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
   SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
@@ -42,6 +43,9 @@ async function claimStatusChange(
   if (count === 0) throw new AppointmentAlreadyClosedError();
   return tx.appointment.findUniqueOrThrow({ where: { id } });
 }
+
+const fmtIST = (d: Date) =>
+  d.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
 
 function isAlreadyClosed(err: unknown) {
   return err instanceof AppointmentAlreadyClosedError
@@ -135,7 +139,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
   }
 
-  const { status, doctorNotes, scheduledAt } = await req.json();
+  const { status, doctorNotes, scheduledAt, reschedule, withdrawReschedule } = await req.json();
 
   // Nurse bookings share this table — "provider" below is the doctor or nurse.
   const providerWord = appointment.providerType === "NURSE" ? "nurse" : "doctor";
@@ -155,6 +159,67 @@ export async function PATCH(
     const actingDoctorName = authUser.role === "DOCTOR" || authUser.role === "NURSE"
       ? authUser.name
       : (await prisma.user.findUnique({ where: { id: scope.doctorId }, select: { name: true } }))?.name ?? "Your doctor";
+    // The provider's answer to a patient's request to move an accepted
+    // appointment (see the PATIENT branch below). Until then the booking —
+    // and its payment — stand at the original time.
+    if (reschedule !== undefined) {
+      if (reschedule !== "ACCEPT" && reschedule !== "DECLINE") {
+        return NextResponse.json({ error: "Invalid reschedule response" }, { status: 400 });
+      }
+      const requested = appointment.requestedScheduledAt;
+      if (appointment.status !== "SCHEDULED" || !requested) {
+        return NextResponse.json({ error: "There's no pending reschedule request on this appointment." }, { status: 409 });
+      }
+      if (reschedule === "ACCEPT") {
+        if (requested.getTime() <= Date.now()) {
+          return NextResponse.json({ error: "The requested time has already passed." }, { status: 409 });
+        }
+        if (appointment.consultType === "HOME" && appointment.travelStatus !== "NOT_STARTED") {
+          return NextResponse.json(
+            { error: "You're already on the way for the original time — please talk to the patient before changing it." },
+            { status: 400 }
+          );
+        }
+        if (appointment.providerType === "NURSE") {
+          const svc = appointment.nurseServiceId
+            ? await prisma.nurseService.findUnique({ where: { id: appointment.nurseServiceId }, select: { durationMinutes: true } })
+            : null;
+          const problem = await nurseSlotProblem({
+            nurseId: appointment.doctorId,
+            availability: null,
+            when: requested,
+            durationMinutes: svc?.durationMinutes,
+            excludeAppointmentId: appointment.id,
+            viewer: "nurse",
+            checkHours: false,
+          });
+          if (problem) return NextResponse.json({ error: problem }, { status: 409 });
+        }
+        if (
+          appointment.consultType === "CLINIC" && appointment.clinicId &&
+          await clinicSlotTaken({ doctorId: appointment.doctorId, clinicId: appointment.clinicId, when: requested, excludeAppointmentId: appointment.id })
+        ) {
+          return NextResponse.json({ error: "Another patient already has that time at this clinic." }, { status: 409 });
+        }
+      }
+      // Conditional on the exact request answered — the patient may have
+      // changed or withdrawn it in the meantime.
+      const { count } = await prisma.appointment.updateMany({
+        where: { id, status: "SCHEDULED", requestedScheduledAt: requested },
+        data: reschedule === "ACCEPT"
+          ? { scheduledAt: requested, requestedScheduledAt: null, reminderSentAt: null }
+          : { requestedScheduledAt: null },
+      });
+      if (count === 0) {
+        return NextResponse.json({ error: "This request was already answered or changed. Please refresh." }, { status: 409 });
+      }
+      void sendPushToUser(appointment.patientId, reschedule === "ACCEPT"
+        ? { title: "New time confirmed", body: `${actingDoctorName} confirmed your new time: ${fmtIST(requested)}.`, url: "/patient/appointments" }
+        : { title: "New time not available", body: `${actingDoctorName} couldn't make the new time — your appointment stays on ${fmtIST(appointment.scheduledAt)}.`, url: "/patient/appointments" });
+      const updated = await prisma.appointment.findUniqueOrThrow({ where: { id } });
+      return NextResponse.json(withoutVisitCode(updated));
+    }
+
     if (appointment.status === "EXPIRED") {
       return NextResponse.json(
         { error: "This request timed out and the patient has already been notified — it can no longer be accepted." },
@@ -300,6 +365,7 @@ export async function PATCH(
         result = await prisma.$transaction(async (tx) => {
           const cancelled = await claimStatusChange(tx, id, ["PENDING_APPROVAL", "SCHEDULED"], {
             status: "CANCELLED",
+            requestedScheduledAt: null,
             doctorNotes: doctorNotes ?? appointment.doctorNotes,
           });
           // Read under the row lock the claim above took, not from the earlier
@@ -380,9 +446,10 @@ export async function PATCH(
     // A rejection is normally free (PENDING_APPROVAL appointments are never
     // paid — online payment only happens after acceptance). The one
     // exception is a previously-accepted, already-paid appointment that a
-    // patient reopened to PENDING_APPROVAL via a reschedule request (see the
-    // PATIENT branch below) — if the doctor can't make the new time, the
-    // patient's money needs to come back.
+    // patient reopened to PENDING_APPROVAL via a reschedule request — if the
+    // doctor can't make the new time, the patient's money needs to come back.
+    // (Reschedules no longer reopen accepted appointments — they're held as
+    // requestedScheduledAt — so this only covers rows from before that.)
     if (status === "REJECTED" && appointment.paymentStatus === "PAID") {
       const refundAmount = netPayable(appointment);
       let updated;
@@ -417,6 +484,8 @@ export async function PATCH(
       where: { id },
       data: {
         status,
+        // Completed / no-show / declined: any pending new-time request is moot.
+        requestedScheduledAt: null,
         doctorNotes: doctorNotes ?? appointment.doctorNotes,
         ...(status === "SCHEDULED" ? { acceptedAt: new Date() } : {}),
         ...(status === "COMPLETED" && appointment.paymentMethod === "CASH"
@@ -440,6 +509,22 @@ export async function PATCH(
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
+    if (withdrawReschedule) {
+      const { count } = await prisma.appointment.updateMany({
+        where: { id, status: "SCHEDULED", requestedScheduledAt: { not: null } },
+        data: { requestedScheduledAt: null },
+      });
+      if (count === 0) {
+        return NextResponse.json({ error: "There's no pending reschedule request to withdraw." }, { status: 409 });
+      }
+      void sendPushToUser(appointment.doctorId, {
+        title: "Reschedule request withdrawn",
+        body: `${authUser.name} kept their original time (${fmtIST(appointment.scheduledAt)}).`,
+        url: providerDashboard,
+      });
+      return NextResponse.json(await prisma.appointment.findUniqueOrThrow({ where: { id } }));
+    }
+
     if (scheduledAt) {
       if (!["PENDING_APPROVAL", "SCHEDULED"].includes(appointment.status)) {
         return NextResponse.json(
@@ -459,6 +544,9 @@ export async function PATCH(
       const when = new Date(scheduledAt);
       if (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()) {
         return NextResponse.json({ error: "Please pick a time in the future." }, { status: 400 });
+      }
+      if (appointment.status === "SCHEDULED" && when.getTime() === appointment.scheduledAt.getTime()) {
+        return NextResponse.json({ error: "That's already your appointment time." }, { status: 400 });
       }
       if (appointment.providerType === "NURSE") {
         const [nurseProfile, svc] = await Promise.all([
@@ -490,30 +578,37 @@ export async function PATCH(
             { status: 400 }
           );
         }
+        if (await clinicSlotTaken({ doctorId: appointment.doctorId, clinicId: appointment.clinicId, when, excludeAppointmentId: appointment.id })) {
+          return NextResponse.json(
+            { error: "That time is already booked at this clinic. Please pick another slot." },
+            { status: 409 }
+          );
+        }
       }
 
-      // Already-accepted appointments go back to PENDING_APPROVAL — the
-      // doctor agreed to the original time, not this new one, so they need
-      // to re-confirm it (mirrors this app's existing all-bookings-need-
-      // acceptance rule). A still-pending request just gets its time updated
-      // in place; the doctor hasn't reviewed it yet either way.
-      const reopensForApproval = appointment.status === "SCHEDULED";
-      const updated = await prisma.appointment.update({
-        where: { id },
-        data: {
-          scheduledAt: when,
-          ...(reopensForApproval ? { status: "PENDING_APPROVAL", acceptedAt: null } : {}),
-        },
+      // An accepted appointment keeps its original time — and its payment —
+      // until the provider accepts the new one (requestedScheduledAt); the
+      // patient never loses a confirmed booking because nobody answered. A
+      // still-pending request just gets its time updated in place; the
+      // provider hasn't reviewed it yet either way. Conditional on the status
+      // read above, in case the provider is accepting/cancelling right now.
+      const isRequest = appointment.status === "SCHEDULED";
+      const { count } = await prisma.appointment.updateMany({
+        where: { id, status: appointment.status },
+        data: isRequest ? { requestedScheduledAt: when } : { scheduledAt: when, reminderSentAt: null },
       });
+      if (count === 0) {
+        return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
+      }
 
       void sendPushToUser(appointment.doctorId, {
-        title: reopensForApproval ? "Reschedule requested" : "Requested time updated",
-        body: reopensForApproval
-          ? `${authUser.name} requested a new time for their appointment — please review and confirm.`
+        title: isRequest ? "Reschedule requested" : "Requested time updated",
+        body: isRequest
+          ? `${authUser.name} asked to move their appointment to ${fmtIST(when)} — accept the new time or keep the original.`
           : `${authUser.name} updated their requested appointment time.`,
         url: providerDashboard,
       });
-      return NextResponse.json(updated);
+      return NextResponse.json(await prisma.appointment.findUniqueOrThrow({ where: { id } }));
     }
 
     if (status !== "CANCELLED" || !["PENDING_APPROVAL", "SCHEDULED"].includes(appointment.status)) {
@@ -540,7 +635,7 @@ export async function PATCH(
     let result;
     try {
       result = await prisma.$transaction(async (tx) => {
-        const cancelled = await claimStatusChange(tx, id, ["PENDING_APPROVAL", "SCHEDULED"], { status: "CANCELLED" });
+        const cancelled = await claimStatusChange(tx, id, ["PENDING_APPROVAL", "SCHEDULED"], { status: "CANCELLED", requestedScheduledAt: null });
         const wasPaid = cancelled.paymentStatus === "PAID";
 
         if (wasPaid) {

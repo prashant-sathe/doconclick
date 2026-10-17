@@ -53,6 +53,7 @@ interface Appointment {
   attachments: Attachment[];
   doctorNotes: string | null;
   scheduledAt: string;
+  requestedScheduledAt?: string | null; // pending new time for an accepted appointment
   createdAt: string;
   providerType?: string; // "NURSE" for nurse bookings
   serviceName?: string | null;
@@ -204,12 +205,13 @@ function nowLocalInput() {
   return d.toISOString().slice(0, 16);
 }
 
-function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }: {
+function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdrawReschedule, onReview }: {
   a: Appointment;
   patientId: string;
   now: number;
   onCancel: (a: Appointment) => void;
   onReschedule: (a: Appointment) => void;
+  onWithdrawReschedule: (a: Appointment) => Promise<string | null>;
   onReview: (id: string) => void;
 }) {
   const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
@@ -221,6 +223,9 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
   const scheduledForLater =
     new Date(a.scheduledAt).getTime() > new Date(a.createdAt).getTime() + REQUEST_TIMEOUT_MS;
   const [downloadingAtt, setDownloadingAtt] = useState<string | null>(null);
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [withdrawError, setWithdrawError] = useState("");
+  const pendingNewTime = a.status === "SCHEDULED" && a.requestedScheduledAt ? a.requestedScheduledAt : null;
 
   // Web: the <a target="_blank"> opens the file as before. Native: <a> can't
   // open/download inside the WebView, so intercept and use the OS share sheet.
@@ -434,6 +439,28 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onReview }
         </div>
       )}
 
+      {pendingNewTime && (
+        <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
+          <p className="font-semibold flex items-center gap-1.5">
+            <CalendarClock className="w-3.5 h-3.5 flex-shrink-0" />
+            New time requested: {new Date(pendingNewTime).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+          </p>
+          <p className="mt-0.5">Waiting for {formatProviderName(a.doctor.name, a.providerType)} to confirm. Your current time stays booked until then.</p>
+          <button
+            disabled={withdrawing}
+            onClick={async () => {
+              setWithdrawing(true);
+              setWithdrawError((await onWithdrawReschedule(a)) ?? "");
+              setWithdrawing(false);
+            }}
+            className="mt-1.5 font-semibold underline disabled:opacity-50"
+          >
+            {withdrawing ? "Withdrawing…" : "Keep my current time"}
+          </button>
+          {withdrawError && <p className="text-red-600 mt-1">{withdrawError}</p>}
+        </div>
+      )}
+
       <div className="flex gap-2 flex-wrap">
         {canReschedule(a) && (
           <button onClick={() => onReschedule(a)} className="btn-secondary py-2 px-3 text-xs">
@@ -595,6 +622,21 @@ export default function PatientAppointments() {
     setRescheduleTarget(a);
   };
 
+  // Drops a pending new-time request; returns an error message, or null on success.
+  const withdrawReschedule = async (a: Appointment): Promise<string | null> => {
+    try {
+      const res = await fetch(`/api/appointments/${a.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ withdrawReschedule: true }),
+      });
+      load();
+      return res.ok ? null : (await res.json().catch(() => ({}))).error ?? "Couldn't withdraw the request.";
+    } catch {
+      return "Network error — please try again.";
+    }
+  };
+
   const confirmReschedule = async () => {
     if (!rescheduleTarget || !newScheduledAt) return;
     setRescheduling(true);
@@ -677,7 +719,7 @@ export default function PatientAppointments() {
                 </h2>
                 <div className="space-y-3">
                   {(pendingExpanded ? pending : pending.slice(0, PAGE_SIZE)).map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReschedule={openRescheduleDialog} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReschedule={openRescheduleDialog} onWithdrawReschedule={withdrawReschedule} onReview={setReviewFor} />
                   ))}
                 </div>
                 {!pendingExpanded && pending.length > PAGE_SIZE && (
@@ -699,7 +741,7 @@ export default function PatientAppointments() {
               ) : (
                 <div className="space-y-3">
                   {(upcomingExpanded ? upcoming : upcoming.slice(0, PAGE_SIZE)).map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReschedule={openRescheduleDialog} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReschedule={openRescheduleDialog} onWithdrawReschedule={withdrawReschedule} onReview={setReviewFor} />
                   ))}
                 </div>
               )}
@@ -719,7 +761,7 @@ export default function PatientAppointments() {
               ) : (
                 <div className="space-y-3">
                   {(pastExpanded ? past : past.slice(0, PAGE_SIZE)).map((a) => (
-                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReschedule={openRescheduleDialog} onReview={setReviewFor} />
+                    <AppointmentCard key={a.id} a={a} patientId={user.id} now={now} onCancel={openCancelDialog} onReschedule={openRescheduleDialog} onWithdrawReschedule={withdrawReschedule} onReview={setReviewFor} />
                   ))}
                 </div>
               )}
@@ -791,7 +833,7 @@ export default function PatientAppointments() {
             </p>
             {rescheduleTarget.status === "SCHEDULED" && (
               <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">
-                {`This will need ${formatProviderName(rescheduleTarget.doctor.name, rescheduleTarget.providerType)} to reconfirm the new time before it's booked again.`}
+                {`${formatProviderName(rescheduleTarget.doctor.name, rescheduleTarget.providerType)} needs to confirm the new time. Until then your current booking (${new Date(rescheduleTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}) stays as it is${rescheduleTarget.requestedScheduledAt ? ", and this replaces your earlier request" : ""}.`}
               </p>
             )}
             <input

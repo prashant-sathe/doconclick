@@ -21,6 +21,7 @@ import { FREQUENCY_OPTIONS, DURATION_OPTIONS, TEST_SUGGESTIONS } from "@/lib/med
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { cn, formatDoctorName } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import RescheduleRequestBox from "@/components/RescheduleRequestBox";
 import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
 import { useResync } from "@/hooks/useResync";
@@ -63,6 +64,7 @@ interface Appointment {
   paidAt: string | null;
   travelStatus: string;
   scheduledAt: string;
+  requestedScheduledAt: string | null;
   acceptedAt: string | null;
   unreadMessageCount: number;
   patient: {
@@ -1279,6 +1281,9 @@ export default function DoctorDashboard() {
                             )}
                           </div>
                         </div>
+                        {a.requestedScheduledAt && (
+                          <RescheduleRequestBox appointmentId={a.id} requestedAt={a.requestedScheduledAt} onDone={loadAppointments} />
+                        )}
 
                         <div className="flex items-center gap-2 mt-3">
                           {a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (

@@ -39,25 +39,30 @@ export async function GET(
   }
 
   // A slot is taken if there's a live (not rejected/cancelled/expired)
-  // appointment at that exact clinic + date + time already.
+  // appointment at that exact clinic + date + time already — or a patient's
+  // pending request to move their accepted appointment there.
   const dayStart = new Date(`${date}T00:00:00+05:30`);
   const dayEnd = new Date(`${date}T23:59:59.999+05:30`);
+  const day = { gte: dayStart, lte: dayEnd };
   const booked = await prisma.appointment.findMany({
     where: {
       doctorId,
       clinicId,
-      status: { in: ["PENDING_APPROVAL", "SCHEDULED"] },
-      scheduledAt: { gte: dayStart, lte: dayEnd },
+      OR: [
+        { status: { in: ["PENDING_APPROVAL", "SCHEDULED"] }, scheduledAt: day },
+        { status: "SCHEDULED", requestedScheduledAt: day },
+      ],
     },
-    select: { scheduledAt: true },
+    select: { scheduledAt: true, requestedScheduledAt: true },
+  });
+  const istTime = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false,
   });
   const takenTimes = new Set(
-    booked.map((a) => {
-      const ist = new Intl.DateTimeFormat("en-GB", {
-        timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false,
-      }).format(a.scheduledAt);
-      return ist; // "HH:MM"
-    })
+    booked
+      .flatMap((a) => [a.scheduledAt, a.requestedScheduledAt])
+      .filter((t): t is Date => !!t && t >= dayStart && t <= dayEnd)
+      .map((t) => istTime.format(t)) // "HH:MM"
   );
 
   const slots = candidates.filter((s) => !takenTimes.has(s.time));

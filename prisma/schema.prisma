@@ -417,6 +417,11 @@ model Appointment {
   clinicId      String?
   clinic        Clinic?   @relation(fields: [clinicId], references: [id], onDelete: SetNull)
   scheduledAt   DateTime  @default(now())
+  // Patient-requested new time for an accepted (SCHEDULED) appointment. The
+  // booking keeps its original scheduledAt — and its payment — until the
+  // provider accepts the new time (moves scheduledAt) or keeps the original
+  // (clears this). Lapses on its own once either time passes.
+  requestedScheduledAt DateTime?
   // Set once the "your appointment is coming up" push has gone out (see
   // src/lib/appointmentReminders.ts), so the periodic sweep never reminds
   // the same appointment twice.

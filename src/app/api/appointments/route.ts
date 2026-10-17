@@ -6,6 +6,7 @@ import { isClinicOpenNow } from "@/lib/clinicAvailability";
 import { haversine } from "@/lib/geo";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
+import { clinicSlotTaken } from "@/lib/clinicSlots";
 
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
@@ -144,16 +145,7 @@ export async function POST(req: Request) {
         // there at that exact minute — two patients can't both hold it.
         // "Now" bookings are exempt: there's no discrete slot to collide on.
         if (scheduledAt) {
-          const clash = await prisma.appointment.findFirst({
-            where: {
-              doctorId,
-              clinicId,
-              status: { in: ["PENDING_APPROVAL", "SCHEDULED"] },
-              scheduledAt: effectiveTime,
-            },
-            select: { id: true },
-          });
-          if (clash) {
+          if (await clinicSlotTaken({ doctorId, clinicId, when: effectiveTime })) {
             return NextResponse.json(
               { error: "That time was just taken by another patient. Please pick a different slot." },
               { status: 409 }
