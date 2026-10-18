@@ -30,6 +30,7 @@ export default function ConfirmDialog({
   cancelLabel = "Cancel",
   tone = "primary",
   busy = false,
+  confirmDisabled = false,
   onConfirm,
   onCancel,
 }: {
@@ -41,6 +42,8 @@ export default function ConfirmDialog({
   cancelLabel?: string;
   tone?: ConfirmTone;
   busy?: boolean;
+  // e.g. until a required reason has been typed into `message`
+  confirmDisabled?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -58,7 +61,7 @@ export default function ConfirmDialog({
           </button>
           <button
             onClick={onConfirm}
-            disabled={busy}
+            disabled={busy || confirmDisabled}
             className={cn(
               "flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed",
               TONE_BUTTON[tone]

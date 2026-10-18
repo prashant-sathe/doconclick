@@ -123,6 +123,22 @@ const STATUS_CONFIRM_CONFIG: Record<string, {
   },
 };
 
+// Required for a rejection — the API pushes it to the doctor.
+function RejectionReasonField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="mt-3">
+      <label className="input-label">Reason (sent to the doctor)</label>
+      <textarea
+        className="input-field min-h-[80px]"
+        maxLength={500}
+        placeholder="e.g. Registration certificate is unreadable, please re-upload a clear copy."
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  );
+}
+
 // ── Profile Drawer ─────────────────────────────────────────────
 function DoctorDrawer({
   doctorId,
@@ -138,6 +154,7 @@ function DoctorDrawer({
   const [updating, setUpdating] = useState(false);
   const [actionError, setActionError] = useState("");
   const [confirmStatus, setConfirmStatus] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
   const [confirmUnverify, setConfirmUnverify] = useState(false);
 
   useEffect(() => {
@@ -148,14 +165,14 @@ function DoctorDrawer({
       .then((d) => { setData(d); setLoading(false); });
   }, [doctorId]);
 
-  const changeStatus = async (status: string) => {
+  const changeStatus = async (status: string, rejectionReason?: string) => {
     if (!data) return;
     setActionError("");
     setUpdating(true);
     const patchRes = await fetch(`/api/admin/doctors/${doctorId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, rejectionReason }),
     });
     setUpdating(false);
     if (!patchRes.ok) {
@@ -413,15 +430,22 @@ function DoctorDrawer({
         <ConfirmDialog
           icon={STATUS_CONFIRM_CONFIG[confirmStatus].icon}
           title={STATUS_CONFIRM_CONFIG[confirmStatus].title(formatDoctorName(data.name))}
-          message={STATUS_CONFIRM_CONFIG[confirmStatus].message}
+          message={
+            <>
+              {STATUS_CONFIRM_CONFIG[confirmStatus].message}
+              {confirmStatus === "REJECTED" && <RejectionReasonField value={rejectReason} onChange={setRejectReason} />}
+            </>
+          }
           confirmLabel={STATUS_CONFIRM_CONFIG[confirmStatus].confirmLabel}
           busyLabel={STATUS_CONFIRM_CONFIG[confirmStatus].busyLabel}
           tone={STATUS_CONFIRM_CONFIG[confirmStatus].tone}
           busy={updating}
-          onCancel={() => setConfirmStatus(null)}
+          confirmDisabled={confirmStatus === "REJECTED" && !rejectReason.trim()}
+          onCancel={() => { setConfirmStatus(null); setRejectReason(""); }}
           onConfirm={async () => {
-            await changeStatus(confirmStatus);
+            await changeStatus(confirmStatus, confirmStatus === "REJECTED" ? rejectReason.trim() : undefined);
             setConfirmStatus(null);
+            setRejectReason("");
           }}
         />
       )}
@@ -483,6 +507,8 @@ export default function AdminDoctors() {
   const [viewId, setViewId]     = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Doctor | null>(null);
   const [statusTarget, setStatusTarget] = useState<{ doctor: Doctor; status: string } | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [statusError, setStatusError] = useState("");
   const [impersonateTarget, setImpersonateTarget] = useState<Doctor | null>(null);
   const [impersonateError, setImpersonateError] = useState("");
 
@@ -495,13 +521,15 @@ export default function AdminDoctors() {
 
   useEffect(() => { load(); }, [load]);
 
-  const updateStatus = async (doctorId: string, status: string) => {
+  const updateStatus = async (doctorId: string, status: string, rejectionReason?: string) => {
+    setStatusError("");
     setUpdating(doctorId);
-    await fetch(`/api/admin/doctors/${doctorId}`, {
+    const res = await fetch(`/api/admin/doctors/${doctorId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, rejectionReason }),
     });
+    if (!res.ok) setStatusError((await res.json().catch(() => ({}))).error ?? "Could not update status.");
     await load();
     setUpdating(null);
   };
@@ -700,6 +728,12 @@ export default function AdminDoctors() {
         </button>
       </div>
 
+      {statusError && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+          {statusError}
+        </div>
+      )}
+
       {impersonateError && (
         <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
           {impersonateError}
@@ -797,15 +831,22 @@ export default function AdminDoctors() {
         <ConfirmDialog
           icon={STATUS_CONFIRM_CONFIG[statusTarget.status].icon}
           title={STATUS_CONFIRM_CONFIG[statusTarget.status].title(formatDoctorName(statusTarget.doctor.name))}
-          message={STATUS_CONFIRM_CONFIG[statusTarget.status].message}
+          message={
+            <>
+              {STATUS_CONFIRM_CONFIG[statusTarget.status].message}
+              {statusTarget.status === "REJECTED" && <RejectionReasonField value={rejectReason} onChange={setRejectReason} />}
+            </>
+          }
           confirmLabel={STATUS_CONFIRM_CONFIG[statusTarget.status].confirmLabel}
           busyLabel={STATUS_CONFIRM_CONFIG[statusTarget.status].busyLabel}
           tone={STATUS_CONFIRM_CONFIG[statusTarget.status].tone}
           busy={updating === statusTarget.doctor.id}
-          onCancel={() => setStatusTarget(null)}
+          confirmDisabled={statusTarget.status === "REJECTED" && !rejectReason.trim()}
+          onCancel={() => { setStatusTarget(null); setRejectReason(""); }}
           onConfirm={async () => {
-            await updateStatus(statusTarget.doctor.id, statusTarget.status);
+            await updateStatus(statusTarget.doctor.id, statusTarget.status, statusTarget.status === "REJECTED" ? rejectReason.trim() : undefined);
             setStatusTarget(null);
+            setRejectReason("");
           }}
         />
       )}
