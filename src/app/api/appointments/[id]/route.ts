@@ -4,14 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
-import { findReassignmentDoctor } from "@/lib/doctorMatching";
 import { refundAppointmentToWallet } from "@/lib/wallet";
-import { commissionPercentForConsultType } from "@/lib/platformFee";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
 import { netPayable } from "@/lib/coupons";
 import { cancelAndRefund, claimStatusChange, isAlreadyClosed, ALREADY_CLOSED_MESSAGE } from "@/lib/appointmentCancel";
+import { cancelAndReassign } from "@/lib/reassignment";
 import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
 import { doctorSlotProblem, snapToClinicGrid, isTimedBooking, isSlotIndexViolation } from "@/lib/doctorSlots";
 
@@ -317,73 +316,17 @@ export async function PATCH(
     // can't carry over (the new appointment starts unpaid), so it's credited
     // to the patient's wallet instead of lost.
     if (status === "CANCELLED") {
-      const doctorProfile = await prisma.doctorProfile.findUnique({
-        where: { userId: appointment.doctorId },
-        select: { specialty: true },
-      });
-      const match = doctorProfile
-        ? await findReassignmentDoctor({
-            excludeDoctorId: appointment.doctorId,
-            specialty: doctorProfile.specialty,
-            consultType: appointment.consultType,
-            patientId: appointment.patientId,
-          })
-        : null;
-      // The replacement inherits the slot, so they must actually be free then.
-      const candidate = match && isTimedBooking(appointment)
-        && await doctorSlotProblem({ doctorId: match.id, when: appointment.scheduledAt, against: "live", viewer: "doctor" })
-        ? null
-        : match;
-
-      let newAmount = 0;
-      let newPlatformFee = 0;
-      if (candidate) {
-        const settings = await prisma.platformSettings.findFirst();
-        const commission = commissionPercentForConsultType(settings, appointment.consultType);
-        newAmount = candidate.fee;
-        newPlatformFee = (newAmount * commission) / 100;
-      }
-
       let result;
       try {
-        result = await prisma.$transaction(async (tx) => {
-          const { cancelled, wasPaid, refund } = await cancelAndRefund(tx, id, {
-            data: { doctorNotes: doctorNotes ?? appointment.doctorNotes },
-            refundType: "REASSIGNMENT_CREDIT",
-            note: `Refund for appointment ${appointment.id}, cancelled by the doctor`,
-          });
-
-          const reassigned = candidate
-            ? await tx.appointment.create({
-                data: {
-                  patientId: appointment.patientId,
-                  doctorId: candidate.id,
-                  symptoms: appointment.symptoms,
-                  patientName: appointment.patientName,
-                  relation: appointment.relation,
-                  allergies: appointment.allergies,
-                  dependentId: appointment.dependentId ?? undefined,
-                  consentGiven: appointment.consentGiven,
-                  consultType: appointment.consultType,
-                  amount: newAmount,
-                  platformFee: newPlatformFee,
-                  status: "PENDING_APPROVAL",
-                  paymentMethod: appointment.paymentMethod,
-                  paymentStatus: "PENDING",
-                  clinicId: candidate.clinicId ?? undefined,
-                  scheduledAt: appointment.scheduledAt,
-                  reassignedFromId: appointment.id,
-                },
-              })
-            : null;
-
-          return { cancelled, reassigned, wasPaid, refund };
+        result = await cancelAndReassign(appointment, {
+          data: { doctorNotes: doctorNotes ?? appointment.doctorNotes },
+          note: `Refund for appointment ${appointment.id}, cancelled by the doctor`,
         });
       } catch (err) {
         if (isAlreadyClosed(err)) return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
         throw err;
       }
-      const { cancelled, reassigned, wasPaid, refund: refundAmount } = result;
+      const { cancelled, reassigned, candidate, wasPaid, refund: refundAmount } = result;
 
       if (reassigned && candidate) {
         void sendPushToUser(candidate.id, {

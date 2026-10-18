@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, revokeSessions } from "@/lib/auth";
-import { deleteAccount, DeletionBlockedError } from "@/lib/userDeletion";
+import { deleteAccount, DeletionBlockedError, accountDeletionPreview } from "@/lib/userDeletion";
+import { accountImpact, impactConfirmationResponse, resolveProviderBookings, type BookingAction } from "@/lib/accountImpact";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { DOCTOR_REGISTRATION_FEE } from "@/lib/cashfree";
 
@@ -79,7 +80,7 @@ export async function PATCH(
   if (denied) return denied;
 
   const { id } = await params;
-  const { status, isVerified, rejectionReason } = await req.json().catch(() => ({}));
+  const { status, isVerified, rejectionReason, bookingAction, confirmBookingIds } = await req.json().catch(() => ({}));
 
   const target = await prisma.user.findFirst({
     where: { id, role: "DOCTOR", deletedAt: null },
@@ -146,9 +147,18 @@ export async function PATCH(
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }
 
+  // Taking an approved doctor off the platform (suspend, reject, back to
+  // pending) strands their upcoming bookings — the admin reviews those first
+  // and picks cancel + refund or reassign (see src/lib/accountImpact.ts).
+  const statusChanged = data.status !== undefined && data.status !== profile.status;
+  const leavingApproved = statusChanged && profile.status === "APPROVED";
+  if (leavingApproved) {
+    const confirm = impactConfirmationResponse(await accountImpact(id, "DOCTOR", "suspend"), "DOCTOR", { bookingAction, confirmBookingIds });
+    if (confirm) return confirm;
+  }
+
   // Conditional on the status read above, so two admins acting at once can't
   // both "change" it (and both push the doctor).
-  const statusChanged = data.status !== undefined && data.status !== profile.status;
   const { count } = await prisma.doctorProfile.updateMany({
     where: { userId: id, status: profile.status },
     data,
@@ -179,19 +189,44 @@ export async function PATCH(
     });
   }
 
-  return NextResponse.json(updated);
+  // Now hidden from new bookings, so handle the ones they had (re-read, in
+  // case one landed after the review).
+  const bookings = leavingApproved
+    ? await resolveProviderBookings(id, "DOCTOR", (bookingAction as BookingAction) ?? "CANCEL", "suspended")
+    : null;
+
+  return NextResponse.json({ ...updated, bookings });
 }
 
-// DELETE – cancel + refund the doctor's open bookings, then soft-delete and
-// anonymize their account (src/lib/userDeletion.ts), freeing their mobile/email for reuse
+// DELETE { bookingAction?, confirmBookingIds? } – soft-delete and anonymize
+// the doctor's account (src/lib/userDeletion.ts), freeing their mobile/email
+// for reuse. Upcoming bookings are reviewed first (409 ACCOUNT_HAS_IMPACT);
+// on confirm they're reassigned where possible (REASSIGN) and the rest
+// cancelled + refunded to the patients' wallets.
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
   const { id } = await params;
+  const { bookingAction, confirmBookingIds } = await req.json().catch(() => ({}));
+  if (!(await prisma.user.findFirst({ where: { id, role: "DOCTOR", deletedAt: null }, select: { id: true } }))) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  // Checked before anything moves, so a refusal never leaves bookings half-handled.
+  const { blocker } = await accountDeletionPreview(id, "DOCTOR");
+  if (blocker) return NextResponse.json({ error: blocker }, { status: 409 });
+  const confirm = impactConfirmationResponse(await accountImpact(id, "DOCTOR", "delete"), "DOCTOR", { bookingAction, confirmBookingIds });
+  if (confirm) return confirm;
+
+  // Reassign what can be first; deleteAccount then cancels + refunds the
+  // rest (and any open booking left from before now) as it deletes.
+  const reassignedBookings = bookingAction === "REASSIGN"
+    ? await resolveProviderBookings(id, "DOCTOR", "REASSIGN", "removed")
+    : null;
+
   let deleted;
   try {
     deleted = await deleteAccount(id, "DOCTOR");
@@ -201,6 +236,14 @@ export async function DELETE(
   }
   if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  return NextResponse.json({ ...deleted.user, password: undefined });
+  return NextResponse.json({
+    ...deleted.user,
+    password: undefined,
+    bookings: {
+      reassigned: reassignedBookings?.reassigned ?? 0,
+      cancelled: (reassignedBookings?.cancelled ?? 0) + deleted.cancelledBookings,
+      refundTotal: (reassignedBookings?.refundTotal ?? 0) + deleted.refundTotal,
+    },
+  });
 }
 

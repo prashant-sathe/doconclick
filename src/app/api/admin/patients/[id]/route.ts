@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { deleteAccount, DeletionBlockedError } from "@/lib/userDeletion";
+import { accountImpact, impactConfirmationResponse } from "@/lib/accountImpact";
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -52,16 +53,27 @@ export async function GET(
   });
 }
 
-// DELETE – cancel + refund the patient's open bookings, then soft-delete and
-// anonymize their account (src/lib/userDeletion.ts), freeing their mobile/email for reuse
+// DELETE { confirmBookingIds? } – soft-delete and anonymize the patient's
+// account (src/lib/userDeletion.ts), freeing their mobile/email for reuse.
+// Upcoming bookings and any wallet balance are reviewed first (409
+// ACCOUNT_HAS_IMPACT); on confirm the bookings are cancelled + refunded to
+// their wallet and the providers notified. Wallet money can't be used once
+// the account is gone — the admin sees the total to pay out manually.
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
   const { id } = await params;
+  const { confirmBookingIds } = await req.json().catch(() => ({}));
+  if (!(await prisma.user.findFirst({ where: { id, role: "PATIENT", deletedAt: null }, select: { id: true } }))) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  const confirm = impactConfirmationResponse(await accountImpact(id, "PATIENT", "delete"), "PATIENT", { confirmBookingIds });
+  if (confirm) return confirm;
+
   let deleted;
   try {
     deleted = await deleteAccount(id, "PATIENT");
@@ -71,5 +83,11 @@ export async function DELETE(
   }
   if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  return NextResponse.json({ ...deleted.user, password: undefined });
+  const wallet = await prisma.wallet.findUnique({ where: { userId: id }, select: { balance: true } });
+  return NextResponse.json({
+    ...deleted.user,
+    password: undefined,
+    bookings: { cancelled: deleted.cancelledBookings, refundTotal: deleted.refundTotal },
+    walletBalance: wallet?.balance ?? 0,
+  });
 }

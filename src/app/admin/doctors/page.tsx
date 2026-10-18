@@ -12,6 +12,7 @@ import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog, { type ConfirmTone } from "@/components/ConfirmDialog";
+import { useAccountImpact, impactResultText } from "@/components/admin/AccountImpactDialog";
 
 // ── Types ──────────────────────────────────────────────────────
 interface DoctorProfile {
@@ -156,6 +157,8 @@ function DoctorDrawer({
   const [confirmStatus, setConfirmStatus] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [confirmUnverify, setConfirmUnverify] = useState(false);
+  const [actionNotice, setActionNotice] = useState("");
+  const impact = useAccountImpact();
 
   useEffect(() => {
     setLoading(true);
@@ -165,21 +168,24 @@ function DoctorDrawer({
       .then((d) => { setData(d); setLoading(false); });
   }, [doctorId]);
 
+  // Taking an approved doctor off the platform goes through the impact step
+  // (their upcoming bookings) when they have any — see useAccountImpact.
   const changeStatus = async (status: string, rejectionReason?: string) => {
     if (!data) return;
     setActionError("");
+    setActionNotice("");
     setUpdating(true);
-    const patchRes = await fetch(`/api/admin/doctors/${doctorId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, rejectionReason }),
-    });
+    const body = await impact.run(
+      (extra) => fetch(`/api/admin/doctors/${doctorId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, rejectionReason, ...extra }),
+      }),
+      { title: `Open bookings with ${formatDoctorName(data.name)}`, actionLabel: STATUS_CONFIRM_CONFIG[status]?.confirmLabel ?? "Confirm" },
+    );
     setUpdating(false);
-    if (!patchRes.ok) {
-      const body = await patchRes.json().catch(() => ({}));
-      setActionError(body.error ?? "Could not update status.");
-      return;
-    }
+    if (!body) return;
+    setActionNotice(impactResultText(body.bookings as never));
     onStatusChange();
     // Refresh detail
     const res = await fetch(`/api/admin/doctors/${doctorId}`);
@@ -264,8 +270,11 @@ function DoctorDrawer({
                   </button>
                 </div>
               )}
-              {actionError && (
-                <p className="text-xs text-red-100 bg-red-500/30 rounded-lg px-2.5 py-1 mt-2">{actionError}</p>
+              {(actionError || impact.error) && (
+                <p className="text-xs text-red-100 bg-red-500/30 rounded-lg px-2.5 py-1 mt-2">{actionError || impact.error}</p>
+              )}
+              {actionNotice && (
+                <p className="text-xs text-emerald-50 bg-emerald-500/30 rounded-lg px-2.5 py-1 mt-2">{actionNotice}</p>
               )}
             </div>
           </div>
@@ -450,6 +459,8 @@ function DoctorDrawer({
         />
       )}
 
+      {impact.dialog}
+
       {confirmUnverify && data && (
         <ConfirmDialog
           icon={BadgeCheck}
@@ -509,6 +520,8 @@ export default function AdminDoctors() {
   const [statusTarget, setStatusTarget] = useState<{ doctor: Doctor; status: string } | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [statusError, setStatusError] = useState("");
+  const [statusNotice, setStatusNotice] = useState("");
+  const impact = useAccountImpact();
   const [impersonateTarget, setImpersonateTarget] = useState<Doctor | null>(null);
   const [impersonateError, setImpersonateError] = useState("");
 
@@ -521,24 +534,39 @@ export default function AdminDoctors() {
 
   useEffect(() => { load(); }, [load]);
 
-  const updateStatus = async (doctorId: string, status: string, rejectionReason?: string) => {
+  const updateStatus = async (doctor: Doctor, status: string, rejectionReason?: string) => {
     setStatusError("");
-    setUpdating(doctorId);
-    const res = await fetch(`/api/admin/doctors/${doctorId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, rejectionReason }),
-    });
-    if (!res.ok) setStatusError((await res.json().catch(() => ({}))).error ?? "Could not update status.");
+    setStatusNotice("");
+    setUpdating(doctor.id);
+    const body = await impact.run(
+      (extra) => fetch(`/api/admin/doctors/${doctor.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, rejectionReason, ...extra }),
+      }),
+      { title: `Open bookings with ${formatDoctorName(doctor.name)}`, actionLabel: STATUS_CONFIRM_CONFIG[status]?.confirmLabel ?? "Confirm" },
+    );
+    if (body) setStatusNotice(impactResultText(body.bookings as never));
     await load();
     setUpdating(null);
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    setUpdating(deleteTarget.id);
-    await fetch(`/api/admin/doctors/${deleteTarget.id}`, { method: "DELETE" });
+    const target = deleteTarget;
+    setStatusError("");
+    setStatusNotice("");
+    setUpdating(target.id);
     setDeleteTarget(null);
+    const body = await impact.run(
+      (extra) => fetch(`/api/admin/doctors/${target.id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(extra),
+      }),
+      { title: `Open bookings with ${formatDoctorName(target.name)}`, actionLabel: "Delete Account" },
+    );
+    if (body) setStatusNotice(impactResultText(body.bookings as never));
     await load();
     setUpdating(null);
   };
@@ -728,9 +756,14 @@ export default function AdminDoctors() {
         </button>
       </div>
 
-      {statusError && (
+      {(statusError || impact.error) && (
         <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
-          {statusError}
+          {statusError || impact.error}
+        </div>
+      )}
+      {statusNotice && (
+        <div className="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-xl px-4 py-3">
+          {statusNotice}
         </div>
       )}
 
@@ -844,12 +877,14 @@ export default function AdminDoctors() {
           confirmDisabled={statusTarget.status === "REJECTED" && !rejectReason.trim()}
           onCancel={() => { setStatusTarget(null); setRejectReason(""); }}
           onConfirm={async () => {
-            await updateStatus(statusTarget.doctor.id, statusTarget.status, statusTarget.status === "REJECTED" ? rejectReason.trim() : undefined);
+            await updateStatus(statusTarget.doctor, statusTarget.status, statusTarget.status === "REJECTED" ? rejectReason.trim() : undefined);
             setStatusTarget(null);
             setRejectReason("");
           }}
         />
       )}
+
+      {impact.dialog}
 
       {/* Impersonate confirmation */}
       {impersonateTarget && (

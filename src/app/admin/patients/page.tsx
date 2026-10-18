@@ -12,6 +12,7 @@ import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-
 import { cn, formatProviderName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { useAccountImpact } from "@/components/admin/AccountImpactDialog";
 
 // ── Types ──────────────────────────────────────────────────────
 interface PatientProfile {
@@ -261,6 +262,8 @@ export default function AdminPatients() {
   const [impersonatingId, setImpersonatingId] = useState<string | null>(null);
   const [impersonateError, setImpersonateError] = useState("");
   const [impersonateTarget, setImpersonateTarget] = useState<Patient | null>(null);
+  const [deleteNotice, setDeleteNotice] = useState("");
+  const impact = useAccountImpact();
 
   const load = useCallback(() => {
     setLoading(true);
@@ -271,12 +274,31 @@ export default function AdminPatients() {
 
   useEffect(() => { load(); }, [load]);
 
+  // A patient with upcoming bookings or wallet money goes through the impact
+  // step first (see useAccountImpact) — the admin sees what will be cancelled
+  // and what's left in the wallet to pay out by hand.
   const confirmDelete = async () => {
     if (!deleteTarget) return;
+    const target = deleteTarget;
+    setDeleteNotice("");
     setDeleting(true);
-    await fetch(`/api/admin/patients/${deleteTarget.id}`, { method: "DELETE" });
     setDeleteTarget(null);
+    const body = await impact.run(
+      (extra) => fetch(`/api/admin/patients/${target.id}`, {
+        method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify(extra),
+      }),
+      { title: `Before deleting ${target.name || "this patient"}`, actionLabel: "Delete Account" },
+    );
     setDeleting(false);
+    if (body) {
+      const bookings = body.bookings as { cancelled: number; refundTotal: number } | undefined;
+      const wallet = Number(body.walletBalance ?? 0);
+      setDeleteNotice(
+        `${target.name || "Patient"} deleted.`
+          + (bookings?.cancelled ? ` ${bookings.cancelled} booking${bookings.cancelled === 1 ? "" : "s"} cancelled and the providers notified.` : "")
+          + (wallet > 0 ? ` ₹${wallet} is left in their wallet — pay it out manually.` : "")
+      );
+    }
     await load();
   };
 
@@ -403,6 +425,16 @@ export default function AdminPatients() {
           {impersonateError}
         </div>
       )}
+      {impact.error && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+          {impact.error}
+        </div>
+      )}
+      {deleteNotice && (
+        <div className="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-xl px-4 py-3">
+          {deleteNotice}
+        </div>
+      )}
 
       {/* Search */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6">
@@ -464,6 +496,8 @@ export default function AdminPatients() {
           onConfirm={confirmDelete}
         />
       )}
+
+      {impact.dialog}
 
       {/* Impersonate confirmation */}
       {impersonateTarget && (

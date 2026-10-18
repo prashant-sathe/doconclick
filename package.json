@@ -22,7 +22,8 @@
     "test:doctor-bookable": "tsx tests/doctor-bookable.ts",
     "test:admin-doctor-status": "tsx tests/admin-doctor-status.ts",
     "test:clinic-leave": "tsx tests/clinic-leave.ts",
-    "test:clinic-close": "tsx tests/clinic-close.ts"
+    "test:clinic-close": "tsx tests/clinic-close.ts",
+    "test:account-impact": "tsx tests/account-impact.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

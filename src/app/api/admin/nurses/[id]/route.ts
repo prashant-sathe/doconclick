@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
 import { revokeSessions } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { deleteAccount, DeletionBlockedError, accountDeletionPreview } from "@/lib/userDeletion";
+import { accountImpact, impactConfirmationResponse, resolveProviderBookings } from "@/lib/accountImpact";
 
 const STATUS_PUSH_COPY: Record<string, { title: string; body: string }> = {
   APPROVED: { title: "Application approved", body: "Your nurse application has been approved — patients can now book you." },
@@ -38,14 +40,18 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   });
 }
 
-// PATCH { status?, isVerified? } — approve / reject / suspend / verify.
+// PATCH { status?, isVerified?, bookingAction?, confirmBookingIds? } —
+// approve / reject / suspend / verify. Taking an approved nurse off the
+// platform needs her upcoming bookings reviewed first (409
+// ACCOUNT_HAS_IMPACT); on confirm they're cancelled + refunded and each
+// patient notified (src/lib/accountImpact.ts).
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { denied } = await requireAdmin();
   if (denied) return denied;
   const { id } = await params;
-  const { status, isVerified } = await req.json().catch(() => ({}));
+  const { status, isVerified, bookingAction, confirmBookingIds } = await req.json().catch(() => ({}));
 
-  const profile = await prisma.nurseProfile.findUnique({ where: { userId: id } });
+  const profile = await prisma.nurseProfile.findFirst({ where: { userId: id, user: { role: "NURSE", deletedAt: null } } });
   if (!profile) return NextResponse.json({ error: "Nurse not found" }, { status: 404 });
 
   const data: { status?: string; isVerified?: boolean } = {};
@@ -71,12 +77,59 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (isVerified !== undefined) data.isVerified = Boolean(isVerified);
   if (Object.keys(data).length === 0) return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
 
-  const updated = await prisma.nurseProfile.update({ where: { userId: id }, data });
+  const statusChanged = data.status !== undefined && data.status !== profile.status;
+  const leavingApproved = statusChanged && profile.status === "APPROVED";
+  if (leavingApproved) {
+    const confirm = impactConfirmationResponse(await accountImpact(id, "NURSE", "suspend"), "NURSE", { bookingAction, confirmBookingIds });
+    if (confirm) return confirm;
+  }
+
+  // Conditional on the status read above, so two admins acting at once can't
+  // both change it (and both push her, or both sweep her bookings).
+  const { count } = await prisma.nurseProfile.updateMany({ where: { userId: id, status: profile.status }, data });
+  if (count === 0) {
+    return NextResponse.json({ error: "This nurse was just updated by someone else. Please refresh." }, { status: 409 });
+  }
+  const updated = await prisma.nurseProfile.findUniqueOrThrow({ where: { userId: id } });
   // Sign them out everywhere; they can log back in, and then see the
   // suspended notice instead of a session that keeps working as before.
-  if (data.status === "SUSPENDED") await revokeSessions(id);
-  if (data.status && data.status !== profile.status && STATUS_PUSH_COPY[data.status]) {
+  if (statusChanged && data.status === "SUSPENDED") await revokeSessions(id);
+  if (statusChanged && data.status && STATUS_PUSH_COPY[data.status]) {
     void sendPushToUser(id, { ...STATUS_PUSH_COPY[data.status], url: "/nurse/dashboard" });
   }
-  return NextResponse.json(updated);
+  const bookings = leavingApproved ? await resolveProviderBookings(id, "NURSE", "CANCEL", "suspended") : null;
+  return NextResponse.json({ ...updated, bookings });
+}
+
+// DELETE { confirmBookingIds? } – soft-delete and anonymize the nurse's
+// account (src/lib/userDeletion.ts). Upcoming bookings are reviewed first
+// (409 ACCOUNT_HAS_IMPACT); on confirm they're cancelled + refunded to the
+// patients' wallets and each patient notified.
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { denied } = await requireAdmin();
+  if (denied) return denied;
+  const { id } = await params;
+  const { bookingAction, confirmBookingIds } = await req.json().catch(() => ({}));
+
+  if (!(await prisma.user.findFirst({ where: { id, role: "NURSE", deletedAt: null }, select: { id: true } }))) {
+    return NextResponse.json({ error: "Nurse not found" }, { status: 404 });
+  }
+  const { blocker } = await accountDeletionPreview(id, "NURSE");
+  if (blocker) return NextResponse.json({ error: blocker }, { status: 409 });
+  const confirm = impactConfirmationResponse(await accountImpact(id, "NURSE", "delete"), "NURSE", { bookingAction, confirmBookingIds });
+  if (confirm) return confirm;
+
+  let deleted;
+  try {
+    deleted = await deleteAccount(id, "NURSE");
+  } catch (err) {
+    if (err instanceof DeletionBlockedError) return NextResponse.json({ error: err.message }, { status: 409 });
+    throw err;
+  }
+  if (!deleted) return NextResponse.json({ error: "Nurse not found" }, { status: 404 });
+  return NextResponse.json({
+    ...deleted.user,
+    password: undefined,
+    bookings: { cancelled: deleted.cancelledBookings, reassigned: 0, refundTotal: deleted.refundTotal },
+  });
 }

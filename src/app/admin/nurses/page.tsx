@@ -2,11 +2,12 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   HeartPulse, Loader2, Search, CheckCircle2, XCircle, Ban, RotateCcw, BadgeCheck, LogIn, FileText,
-  Circle, MapPin, Phone, Mail, X, AlertCircle,
+  Circle, MapPin, Phone, Mail, X, AlertCircle, Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { nurseChecklist } from "@/lib/nurseChecklist";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { useAccountImpact, impactResultText } from "@/components/admin/AccountImpactDialog";
 
 interface NurseRow {
   id: string;
@@ -44,22 +45,33 @@ export default function AdminNurses() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // status is SUSPENDED / REJECTED, or DELETE for removing the account.
   const [confirm, setConfirm] = useState<{ nurse: NurseRow; status: string } | null>(null);
+  const [notice, setNotice] = useState("");
+  const impact = useAccountImpact();
 
   const load = useCallback(() => {
     fetch("/api/admin/nurses").then((r) => r.json()).then(setNurses);
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const update = async (id: string, body: Record<string, unknown>) => {
-    setBusy(true); setError("");
-    const res = await fetch(`/api/admin/nurses/${id}`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
-    });
+  // Suspending/rejecting an approved nurse, or deleting one, goes through the
+  // impact step (her upcoming bookings) when she has any — see useAccountImpact.
+  const send = async (nurse: NurseRow, method: "PATCH" | "DELETE", body: Record<string, unknown>) => {
+    setBusy(true); setError(""); setNotice("");
+    const result = await impact.run(
+      (extra) => fetch(`/api/admin/nurses/${nurse.id}`, {
+        method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, ...extra }),
+      }),
+      { title: `Open bookings with ${nurse.name}`, actionLabel: method === "DELETE" ? "Delete account" : body.status === "SUSPENDED" ? "Suspend" : "Confirm" },
+    );
     setBusy(false);
-    if (!res.ok) { setError((await res.json().catch(() => ({}))).error ?? "Could not update."); return; }
+    if (!result) return false;
+    setNotice(impactResultText(result.bookings as never));
     load();
+    return true;
   };
+  const update = (nurse: NurseRow, body: Record<string, unknown>) => send(nurse, "PATCH", body);
 
   const impersonate = async (id: string) => {
     setBusy(true); setError("");
@@ -83,6 +95,9 @@ export default function AdminNurses() {
         <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2"><HeartPulse className="w-6 h-6 text-rose-500" />Nurses</h1>
         <p className="text-slate-500 text-sm mt-1">Review registrations, documents and services. Only approved nurses can be booked.</p>
       </div>
+      {notice && !open && (
+        <div className="mb-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">{notice}</div>
+      )}
 
       <div className="flex flex-wrap items-center gap-2 mb-4">
         {FILTERS.map((f) => {
@@ -140,10 +155,11 @@ export default function AdminNurses() {
             </div>
 
             <div className="p-6 space-y-6">
-              {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4 flex-shrink-0" />{error}</div>}
+              {(error || impact.error) && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4 flex-shrink-0" />{error || impact.error}</div>}
+              {notice && <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">{notice}</div>}
               <div className="flex flex-wrap gap-2">
                 {op.status !== "APPROVED" && (
-                  <button disabled={busy} onClick={() => update(open.id, { status: "APPROVED" })} className="btn-primary py-2 px-4 text-sm"><CheckCircle2 className="w-4 h-4" /> Approve</button>
+                  <button disabled={busy} onClick={() => update(open, { status: "APPROVED" })} className="btn-primary py-2 px-4 text-sm"><CheckCircle2 className="w-4 h-4" /> Approve</button>
                 )}
                 {op.status === "PENDING" && (
                   <button disabled={busy} onClick={() => setConfirm({ nurse: open, status: "REJECTED" })} className="btn-secondary py-2 px-4 text-sm"><XCircle className="w-4 h-4" /> Reject</button>
@@ -152,12 +168,13 @@ export default function AdminNurses() {
                   <button disabled={busy} onClick={() => setConfirm({ nurse: open, status: "SUSPENDED" })} className="btn-secondary py-2 px-4 text-sm text-red-600"><Ban className="w-4 h-4" /> Suspend</button>
                 )}
                 {(op.status === "REJECTED" || op.status === "SUSPENDED") && (
-                  <button disabled={busy} onClick={() => update(open.id, { status: "PENDING" })} className="btn-secondary py-2 px-4 text-sm"><RotateCcw className="w-4 h-4" /> Back to review</button>
+                  <button disabled={busy} onClick={() => update(open, { status: "PENDING" })} className="btn-secondary py-2 px-4 text-sm"><RotateCcw className="w-4 h-4" /> Back to review</button>
                 )}
-                <button disabled={busy} onClick={() => update(open.id, { isVerified: !op.isVerified })} className="btn-secondary py-2 px-4 text-sm">
+                <button disabled={busy} onClick={() => update(open, { isVerified: !op.isVerified })} className="btn-secondary py-2 px-4 text-sm">
                   <BadgeCheck className="w-4 h-4" /> {op.isVerified ? "Remove verified badge" : "Mark credentials verified"}
                 </button>
                 <button disabled={busy} onClick={() => impersonate(open.id)} className="btn-secondary py-2 px-4 text-sm"><LogIn className="w-4 h-4" /> Log in as</button>
+                <button disabled={busy} onClick={() => setConfirm({ nurse: open, status: "DELETE" })} className="btn-secondary py-2 px-4 text-sm text-red-600"><Trash2 className="w-4 h-4" /> Delete</button>
               </div>
 
               <section>
@@ -223,16 +240,25 @@ export default function AdminNurses() {
 
       {confirm && (
         <ConfirmDialog
-          icon={confirm.status === "SUSPENDED" ? Ban : XCircle}
+          icon={confirm.status === "DELETE" ? Trash2 : confirm.status === "SUSPENDED" ? Ban : XCircle}
           tone="danger"
-          title={confirm.status === "SUSPENDED" ? `Suspend ${confirm.nurse.name}?` : `Reject ${confirm.nurse.name}?`}
-          message={confirm.status === "SUSPENDED" ? "They'll be hidden from patients and locked out of their dashboard." : "They'll be told their application wasn't approved."}
-          confirmLabel={confirm.status === "SUSPENDED" ? "Suspend" : "Reject"}
+          title={confirm.status === "DELETE" ? `Delete ${confirm.nurse.name}'s account?` : confirm.status === "SUSPENDED" ? `Suspend ${confirm.nurse.name}?` : `Reject ${confirm.nurse.name}?`}
+          message={confirm.status === "DELETE"
+            ? "She'll be permanently blocked from logging in and her mobile number freed for a new registration. Past visits and earnings history are kept. This cannot be undone."
+            : confirm.status === "SUSPENDED" ? "They'll be hidden from patients and locked out of their dashboard." : "They'll be told their application wasn't approved."}
+          confirmLabel={confirm.status === "DELETE" ? "Delete account" : confirm.status === "SUSPENDED" ? "Suspend" : "Reject"}
           busy={busy}
           onCancel={() => setConfirm(null)}
-          onConfirm={async () => { await update(confirm.nurse.id, { status: confirm.status }); setConfirm(null); }}
+          onConfirm={async () => {
+            const { nurse, status } = confirm;
+            setConfirm(null);
+            const done = status === "DELETE" ? await send(nurse, "DELETE", {}) : await update(nurse, { status });
+            if (done && status === "DELETE") setOpenId(null);
+          }}
         />
       )}
+
+      {impact.dialog}
     </div>
   );
 }
