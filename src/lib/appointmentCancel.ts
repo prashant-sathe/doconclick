@@ -114,3 +114,39 @@ export function isTransientConflict(err: unknown) {
   return err instanceof Prisma.PrismaClientKnownRequestError
     && (err.code === "P2034" || /\b(40P01|40001)\b/.test(err.message));
 }
+
+// ── Confirm-before-cancel (clinic leave, clinic delete/deactivate) ──
+// The first request returns the live bookings it would cancel; the doctor
+// confirms by sending back exactly those ids. Any booking not in that list —
+// one made after the doctor looked — means asking again, never cancelling
+// something unseen.
+
+type AffectedRow = {
+  id: string;
+  patientName: string | null;
+  patient: { name: string };
+  scheduledAt: Date;
+  status: string;
+  paymentStatus: string;
+  amount: number;
+  discountAmount: number;
+};
+
+export function needsBookingConfirmation(affected: { id: string }[], confirmBookingIds: unknown) {
+  const confirmed = new Set(Array.isArray(confirmBookingIds) ? confirmBookingIds : []);
+  return affected.some((a) => !confirmed.has(a.id));
+}
+
+// What the confirmation dialog lists for each booking.
+export function affectedBookingSummary(a: AffectedRow) {
+  return {
+    id: a.id,
+    patientName: a.patientName ?? a.patient.name,
+    scheduledAt: a.scheduledAt,
+    status: a.status,
+    paid: a.paymentStatus === "PAID",
+    refund: a.paymentStatus === "PAID" ? netPayable(a) : 0,
+  };
+}
+
+export const BOOKINGS_CHANGED_MESSAGE = "A booking just changed. Please review the latest list and confirm again.";

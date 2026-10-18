@@ -48,6 +48,7 @@ export type ClinicMinAggregateOutputType = {
   lng: number | null
   sortOrder: number | null
   isActive: boolean | null
+  deletedAt: Date | null
   createdAt: Date | null
 }
 
@@ -61,6 +62,7 @@ export type ClinicMaxAggregateOutputType = {
   lng: number | null
   sortOrder: number | null
   isActive: boolean | null
+  deletedAt: Date | null
   createdAt: Date | null
 }
 
@@ -74,6 +76,7 @@ export type ClinicCountAggregateOutputType = {
   lng: number
   sortOrder: number
   isActive: number
+  deletedAt: number
   createdAt: number
   _all: number
 }
@@ -101,6 +104,7 @@ export type ClinicMinAggregateInputType = {
   lng?: true
   sortOrder?: true
   isActive?: true
+  deletedAt?: true
   createdAt?: true
 }
 
@@ -114,6 +118,7 @@ export type ClinicMaxAggregateInputType = {
   lng?: true
   sortOrder?: true
   isActive?: true
+  deletedAt?: true
   createdAt?: true
 }
 
@@ -127,6 +132,7 @@ export type ClinicCountAggregateInputType = {
   lng?: true
   sortOrder?: true
   isActive?: true
+  deletedAt?: true
   createdAt?: true
   _all?: true
 }
@@ -227,6 +233,7 @@ export type ClinicGroupByOutputType = {
   lng: number
   sortOrder: number
   isActive: boolean
+  deletedAt: Date | null
   createdAt: Date
   _count: ClinicCountAggregateOutputType | null
   _avg: ClinicAvgAggregateOutputType | null
@@ -263,6 +270,7 @@ export type ClinicWhereInput = {
   lng?: Prisma.FloatFilter<"Clinic"> | number
   sortOrder?: Prisma.IntFilter<"Clinic"> | number
   isActive?: Prisma.BoolFilter<"Clinic"> | boolean
+  deletedAt?: Prisma.DateTimeNullableFilter<"Clinic"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Clinic"> | Date | string
   doctor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   slots?: Prisma.ClinicSlotListRelationFilter
@@ -280,6 +288,7 @@ export type ClinicOrderByWithRelationInput = {
   lng?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   doctor?: Prisma.UserOrderByWithRelationInput
   slots?: Prisma.ClinicSlotOrderByRelationAggregateInput
@@ -300,6 +309,7 @@ export type ClinicWhereUniqueInput = Prisma.AtLeast<{
   lng?: Prisma.FloatFilter<"Clinic"> | number
   sortOrder?: Prisma.IntFilter<"Clinic"> | number
   isActive?: Prisma.BoolFilter<"Clinic"> | boolean
+  deletedAt?: Prisma.DateTimeNullableFilter<"Clinic"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Clinic"> | Date | string
   doctor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   slots?: Prisma.ClinicSlotListRelationFilter
@@ -317,6 +327,7 @@ export type ClinicOrderByWithAggregationInput = {
   lng?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ClinicCountOrderByAggregateInput
   _avg?: Prisma.ClinicAvgOrderByAggregateInput
@@ -338,6 +349,7 @@ export type ClinicScalarWhereWithAggregatesInput = {
   lng?: Prisma.FloatWithAggregatesFilter<"Clinic"> | number
   sortOrder?: Prisma.IntWithAggregatesFilter<"Clinic"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"Clinic"> | boolean
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Clinic"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Clinic"> | Date | string
 }
 
@@ -350,6 +362,7 @@ export type ClinicCreateInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   doctor: Prisma.UserCreateNestedOneWithoutClinicsInput
   slots?: Prisma.ClinicSlotCreateNestedManyWithoutClinicInput
@@ -367,6 +380,7 @@ export type ClinicUncheckedCreateInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   slots?: Prisma.ClinicSlotUncheckedCreateNestedManyWithoutClinicInput
   leaves?: Prisma.ClinicLeaveUncheckedCreateNestedManyWithoutClinicInput
@@ -382,6 +396,7 @@ export type ClinicUpdateInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctor?: Prisma.UserUpdateOneRequiredWithoutClinicsNestedInput
   slots?: Prisma.ClinicSlotUpdateManyWithoutClinicNestedInput
@@ -399,6 +414,7 @@ export type ClinicUncheckedUpdateInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slots?: Prisma.ClinicSlotUncheckedUpdateManyWithoutClinicNestedInput
   leaves?: Prisma.ClinicLeaveUncheckedUpdateManyWithoutClinicNestedInput
@@ -415,6 +431,7 @@ export type ClinicCreateManyInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -427,6 +444,7 @@ export type ClinicUpdateManyMutationInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -440,6 +458,7 @@ export type ClinicUncheckedUpdateManyInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -468,6 +487,7 @@ export type ClinicCountOrderByAggregateInput = {
   lng?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -487,6 +507,7 @@ export type ClinicMaxOrderByAggregateInput = {
   lng?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -500,6 +521,7 @@ export type ClinicMinOrderByAggregateInput = {
   lng?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -609,6 +631,7 @@ export type ClinicCreateWithoutDoctorInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   slots?: Prisma.ClinicSlotCreateNestedManyWithoutClinicInput
   leaves?: Prisma.ClinicLeaveCreateNestedManyWithoutClinicInput
@@ -624,6 +647,7 @@ export type ClinicUncheckedCreateWithoutDoctorInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   slots?: Prisma.ClinicSlotUncheckedCreateNestedManyWithoutClinicInput
   leaves?: Prisma.ClinicLeaveUncheckedCreateNestedManyWithoutClinicInput
@@ -669,6 +693,7 @@ export type ClinicScalarWhereInput = {
   lng?: Prisma.FloatFilter<"Clinic"> | number
   sortOrder?: Prisma.IntFilter<"Clinic"> | number
   isActive?: Prisma.BoolFilter<"Clinic"> | boolean
+  deletedAt?: Prisma.DateTimeNullableFilter<"Clinic"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Clinic"> | Date | string
 }
 
@@ -681,6 +706,7 @@ export type ClinicCreateWithoutAppointmentsInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   doctor: Prisma.UserCreateNestedOneWithoutClinicsInput
   slots?: Prisma.ClinicSlotCreateNestedManyWithoutClinicInput
@@ -697,6 +723,7 @@ export type ClinicUncheckedCreateWithoutAppointmentsInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   slots?: Prisma.ClinicSlotUncheckedCreateNestedManyWithoutClinicInput
   leaves?: Prisma.ClinicLeaveUncheckedCreateNestedManyWithoutClinicInput
@@ -727,6 +754,7 @@ export type ClinicUpdateWithoutAppointmentsInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctor?: Prisma.UserUpdateOneRequiredWithoutClinicsNestedInput
   slots?: Prisma.ClinicSlotUpdateManyWithoutClinicNestedInput
@@ -743,6 +771,7 @@ export type ClinicUncheckedUpdateWithoutAppointmentsInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slots?: Prisma.ClinicSlotUncheckedUpdateManyWithoutClinicNestedInput
   leaves?: Prisma.ClinicLeaveUncheckedUpdateManyWithoutClinicNestedInput
@@ -757,6 +786,7 @@ export type ClinicCreateWithoutSlotsInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   doctor: Prisma.UserCreateNestedOneWithoutClinicsInput
   leaves?: Prisma.ClinicLeaveCreateNestedManyWithoutClinicInput
@@ -773,6 +803,7 @@ export type ClinicUncheckedCreateWithoutSlotsInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   leaves?: Prisma.ClinicLeaveUncheckedCreateNestedManyWithoutClinicInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutClinicInput
@@ -803,6 +834,7 @@ export type ClinicUpdateWithoutSlotsInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctor?: Prisma.UserUpdateOneRequiredWithoutClinicsNestedInput
   leaves?: Prisma.ClinicLeaveUpdateManyWithoutClinicNestedInput
@@ -819,6 +851,7 @@ export type ClinicUncheckedUpdateWithoutSlotsInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaves?: Prisma.ClinicLeaveUncheckedUpdateManyWithoutClinicNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutClinicNestedInput
@@ -833,6 +866,7 @@ export type ClinicCreateWithoutLeavesInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   doctor: Prisma.UserCreateNestedOneWithoutClinicsInput
   slots?: Prisma.ClinicSlotCreateNestedManyWithoutClinicInput
@@ -849,6 +883,7 @@ export type ClinicUncheckedCreateWithoutLeavesInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   slots?: Prisma.ClinicSlotUncheckedCreateNestedManyWithoutClinicInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutClinicInput
@@ -879,6 +914,7 @@ export type ClinicUpdateWithoutLeavesInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctor?: Prisma.UserUpdateOneRequiredWithoutClinicsNestedInput
   slots?: Prisma.ClinicSlotUpdateManyWithoutClinicNestedInput
@@ -895,6 +931,7 @@ export type ClinicUncheckedUpdateWithoutLeavesInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slots?: Prisma.ClinicSlotUncheckedUpdateManyWithoutClinicNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutClinicNestedInput
@@ -909,6 +946,7 @@ export type ClinicCreateManyDoctorInput = {
   lng: number
   sortOrder?: number
   isActive?: boolean
+  deletedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -921,6 +959,7 @@ export type ClinicUpdateWithoutDoctorInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slots?: Prisma.ClinicSlotUpdateManyWithoutClinicNestedInput
   leaves?: Prisma.ClinicLeaveUpdateManyWithoutClinicNestedInput
@@ -936,6 +975,7 @@ export type ClinicUncheckedUpdateWithoutDoctorInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slots?: Prisma.ClinicSlotUncheckedUpdateManyWithoutClinicNestedInput
   leaves?: Prisma.ClinicLeaveUncheckedUpdateManyWithoutClinicNestedInput
@@ -951,6 +991,7 @@ export type ClinicUncheckedUpdateManyWithoutDoctorInput = {
   lng?: Prisma.FloatFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1013,6 +1054,7 @@ export type ClinicSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   lng?: boolean
   sortOrder?: boolean
   isActive?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   slots?: boolean | Prisma.Clinic$slotsArgs<ExtArgs>
@@ -1031,6 +1073,7 @@ export type ClinicSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   lng?: boolean
   sortOrder?: boolean
   isActive?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clinic"]>
@@ -1045,6 +1088,7 @@ export type ClinicSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   lng?: boolean
   sortOrder?: boolean
   isActive?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clinic"]>
@@ -1059,10 +1103,11 @@ export type ClinicSelectScalar = {
   lng?: boolean
   sortOrder?: boolean
   isActive?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
 }
 
-export type ClinicOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "doctorId" | "name" | "address" | "photoUrl" | "lat" | "lng" | "sortOrder" | "isActive" | "createdAt", ExtArgs["result"]["clinic"]>
+export type ClinicOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "doctorId" | "name" | "address" | "photoUrl" | "lat" | "lng" | "sortOrder" | "isActive" | "deletedAt" | "createdAt", ExtArgs["result"]["clinic"]>
 export type ClinicInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   slots?: boolean | Prisma.Clinic$slotsArgs<ExtArgs>
@@ -1095,6 +1140,7 @@ export type $ClinicPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     lng: number
     sortOrder: number
     isActive: boolean
+    deletedAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["clinic"]>
   composites: {}
@@ -1532,6 +1578,7 @@ export interface ClinicFieldRefs {
   readonly lng: Prisma.FieldRef<"Clinic", 'Float'>
   readonly sortOrder: Prisma.FieldRef<"Clinic", 'Int'>
   readonly isActive: Prisma.FieldRef<"Clinic", 'Boolean'>
+  readonly deletedAt: Prisma.FieldRef<"Clinic", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Clinic", 'DateTime'>
 }
     

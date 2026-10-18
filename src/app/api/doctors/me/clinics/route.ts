@@ -30,7 +30,7 @@ export async function GET() {
   if (suspendedResponse) return suspendedResponse;
 
   const clinics = await prisma.clinic.findMany({
-    where: { doctorId: authUser.id },
+    where: { doctorId: authUser.id, deletedAt: null },
     orderBy: { sortOrder: "asc" },
     include: { slots: true },
   });

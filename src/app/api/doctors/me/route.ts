@@ -23,7 +23,7 @@ export async function GET() {
       createdAt: true,
       updatedAt: true,
       doctorProfile: true,
-      clinics: { select: { id: true } },
+      clinics: { where: { deletedAt: null }, select: { id: true } },
     },
   });
 

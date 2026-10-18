@@ -3871,6 +3871,7 @@ export const ClinicScalarFieldEnum = {
   lng: 'lng',
   sortOrder: 'sortOrder',
   isActive: 'isActive',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt'
 } as const
 

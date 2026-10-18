@@ -17,7 +17,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     where: { id: leaveId },
     include: { clinic: true },
   });
-  if (!leave || leave.clinicId !== id || leave.clinic.doctorId !== authUser.id) {
+  if (!leave || leave.clinicId !== id || leave.clinic.doctorId !== authUser.id || leave.clinic.deletedAt) {
     return NextResponse.json({ error: "Leave date not found" }, { status: 404 });
   }
 

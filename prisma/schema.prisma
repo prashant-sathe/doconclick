@@ -604,6 +604,10 @@ model Clinic {
   lng       Float
   sortOrder Int      @default(0)
   isActive  Boolean  @default(true)
+  // Soft delete: set together with isActive = false, so every patient-facing
+  // query (they all filter isActive) hides it, while past appointments keep
+  // their clinic name/address. Only the doctor's own lists filter on this.
+  deletedAt DateTime?
   createdAt DateTime @default(now())
 
   slots        ClinicSlot[]

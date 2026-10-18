@@ -166,6 +166,38 @@ interface AffectedBooking {
   refund: number;
 }
 
+// The bookings a leave day or a clinic removal would cancel, for the confirm dialogs.
+function AffectedBookingList({ bookings, showDate = false }: { bookings: AffectedBooking[]; showDate?: boolean }) {
+  const refundTotal = bookings.reduce((sum, b) => sum + b.refund, 0);
+  return (
+    <>
+      <ul className="mt-3 max-h-48 overflow-y-auto space-y-1.5">
+        {bookings.map((b) => (
+          <li key={b.id} className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
+            <span className="font-semibold text-slate-700 truncate">{b.patientName}</span>
+            <span className="text-slate-500 flex-shrink-0">
+              {new Date(b.scheduledAt).toLocaleString("en-IN", {
+                timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit",
+                ...(showDate ? { day: "numeric", month: "short" } : {}),
+              })}
+              {b.paid ? ` · ₹${b.refund} refund` : " · unpaid"}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {refundTotal > 0 && (
+        <p className="mt-3 text-xs">₹{refundTotal} in total goes back to the patients&apos; wallets.</p>
+      )}
+    </>
+  );
+}
+
+// "3 bookings cancelled and the patients notified. ₹900 refunded…"
+function cancelledNotice(cancelledBookings: number, refundTotal: number) {
+  return `${cancelledBookings} booking${cancelledBookings === 1 ? "" : "s"} cancelled and the patients notified.`
+    + (refundTotal > 0 ? ` ₹${refundTotal} refunded to their wallets.` : "");
+}
+
 function formatLeaveDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-IN", {
@@ -216,12 +248,7 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
       setDate("");
       setReason("");
       setAffected(null);
-      if (cancelledBookings > 0) {
-        setNotice(
-          `${cancelledBookings} booking${cancelledBookings === 1 ? "" : "s"} cancelled and the patients notified.`
-            + (refundTotal > 0 ? ` ₹${refundTotal} refunded to their wallets.` : "")
-        );
-      }
+      if (cancelledBookings > 0) setNotice(cancelledNotice(cancelledBookings, refundTotal));
     } else if (res.status === 409 && body.code === "LEAVE_HAS_BOOKINGS") {
       setAffected(body.bookings);
     } else {
@@ -243,7 +270,6 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
     const [y, m, d] = todayIso.split("-").map(Number);
     return new Date(Date.UTC(y, m - 1, d + 365)).toISOString().slice(0, 10);
   })();
-  const refundTotal = affected?.reduce((sum, b) => sum + b.refund, 0) ?? 0;
 
   return (
     <div>
@@ -293,20 +319,7 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
           message={
             <>
               <p>These patients are booked at this clinic that day. Adding the leave cancels their appointments and notifies them.</p>
-              <ul className="mt-3 max-h-48 overflow-y-auto space-y-1.5">
-                {affected.map((b) => (
-                  <li key={b.id} className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
-                    <span className="font-semibold text-slate-700 truncate">{b.patientName}</span>
-                    <span className="text-slate-500 flex-shrink-0">
-                      {new Date(b.scheduledAt).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit" })}
-                      {b.paid ? ` · ₹${b.refund} refund` : " · unpaid"}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              {refundTotal > 0 && (
-                <p className="mt-3 text-xs">₹{refundTotal} in total goes back to the patients&apos; wallets.</p>
-              )}
+              <AffectedBookingList bookings={affected} />
             </>
           }
           confirmLabel="Cancel bookings & add leave"
@@ -489,6 +502,10 @@ export default function DoctorClinicsPage() {
   const [loading, setLoading] = useState(true);
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
+  // Set when the API says the clinic being deleted still has open bookings.
+  const [deleteBookings, setDeleteBookings] = useState<AffectedBooking[] | null>(null);
+  const [deleteError, setDeleteError] = useState("");
+  const [pageNotice, setPageNotice] = useState("");
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/clinics");
@@ -524,10 +541,37 @@ export default function DoctorClinicsPage() {
 
   const addClinic = () => setClinics((cur) => [...cur, newClinic()]);
 
-  const deleteClinic = async (idx: number) => {
+  // Returns true once the card is gone. A clinic with open bookings comes
+  // back 409 CLINIC_HAS_BOOKINGS first; the dialog then lists them and the
+  // second call (with their ids) cancels + refunds them and deletes it.
+  const deleteClinic = async (idx: number, confirmBookingIds?: string[]) => {
     const clinic = clinics[idx];
-    if (clinic.id) await fetch(`/api/doctors/me/clinics/${clinic.id}`, { method: "DELETE" });
+    setDeleteError("");
+    if (clinic.id) {
+      const res = await fetch(`/api/doctors/me/clinics/${clinic.id}`, {
+        method: "DELETE", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmBookingIds }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (res.status === 409 && body.code === "CLINIC_HAS_BOOKINGS") {
+        setDeleteBookings(body.bookings);
+        return false;
+      }
+      if (!res.ok) {
+        setDeleteBookings(null);
+        setDeleteError(body.error ?? "Could not delete this clinic.");
+        return false;
+      }
+      setPageNotice(body.cancelledBookings > 0 ? cancelledNotice(body.cancelledBookings, body.refundTotal) : "");
+    }
     setClinics((cur) => cur.filter((_, i) => i !== idx));
+    return true;
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteIdx(null);
+    setDeleteBookings(null);
+    setDeleteError("");
   };
 
   // A brand-new, never-saved card (no `id` yet) is just an empty draft — no
@@ -591,6 +635,10 @@ export default function DoctorClinicsPage() {
           </div>
         </div>
 
+        {pageNotice && (
+          <p className="mb-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">{pageNotice}</p>
+        )}
+
         <div className="space-y-6">
           {clinics.map((clinic, idx) => (
             <ClinicCard
@@ -622,18 +670,32 @@ export default function DoctorClinicsPage() {
       {deleteIdx !== null && (
         <ConfirmDialog
           icon={Trash2}
-          title={`Delete ${clinics[deleteIdx].name || "this clinic"}?`}
-          message="Patients will no longer see this location on the map or be able to book here. Its address, hours, and photo will be permanently removed — you'll need to re-enter everything if you add it back."
-          confirmLabel="Delete Clinic"
+          title={deleteBookings
+            ? `Cancel ${deleteBookings.length} booking${deleteBookings.length === 1 ? "" : "s"} and delete ${clinics[deleteIdx].name || "this clinic"}?`
+            : `Delete ${clinics[deleteIdx].name || "this clinic"}?`}
+          message={
+            <>
+              {deleteBookings ? (
+                <>
+                  <p>These patients have upcoming bookings here. Deleting the clinic cancels their appointments and notifies them.</p>
+                  <AffectedBookingList bookings={deleteBookings} showDate />
+                </>
+              ) : (
+                <p>Patients will no longer see this location on the map or be able to book here. Past appointments keep their clinic details, but you&apos;ll need to re-enter the address, hours and photo if you add it back.</p>
+              )}
+              {deleteError && <p className="mt-3 text-xs text-red-600">{deleteError}</p>}
+            </>
+          }
+          confirmLabel={deleteBookings ? "Cancel bookings & delete" : "Delete Clinic"}
           busyLabel="Deleting…"
           tone="danger"
           busy={deleting}
-          onCancel={() => setDeleteIdx(null)}
+          onCancel={closeDeleteDialog}
           onConfirm={async () => {
             setDeleting(true);
-            await deleteClinic(deleteIdx);
+            const gone = await deleteClinic(deleteIdx, deleteBookings?.map((b) => b.id));
             setDeleting(false);
-            setDeleteIdx(null);
+            if (gone) closeDeleteDialog();
           }}
         />
       )}

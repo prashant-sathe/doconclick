@@ -3,14 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 import { todayIsoDateIst } from "@/lib/clinicAvailability";
-import { netPayable } from "@/lib/coupons";
-import { cancelManyAndRefund, isAlreadyClosed, isTransientConflict, LIVE_STATUSES } from "@/lib/appointmentCancel";
+import {
+  cancelManyAndRefund, isAlreadyClosed, isTransientConflict, LIVE_STATUSES,
+  needsBookingConfirmation, affectedBookingSummary, BOOKINGS_CHANGED_MESSAGE,
+} from "@/lib/appointmentCancel";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { formatDoctorName } from "@/lib/utils";
 
 async function loadOwnedClinic(doctorId: string, id: string) {
   const clinic = await prisma.clinic.findUnique({ where: { id } });
-  if (!clinic || clinic.doctorId !== doctorId) return null;
+  if (!clinic || clinic.doctorId !== doctorId || clinic.deletedAt) return null;
   return clinic;
 }
 
@@ -38,7 +40,6 @@ const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_DAYS_AHEAD = 365;
 const MAX_REASON_LENGTH = 200;
-const BOOKINGS_CHANGED_MESSAGE = "A booking on that day just changed. Tap Add again to review the latest list.";
 
 // "YYYY-MM-DD" → that calendar day's bounds in IST, or null for anything
 // that isn't a real date (2026-02-31, 2026-13-01, …).
@@ -101,20 +102,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     orderBy: { scheduledAt: "asc" },
     include: { patient: { select: { name: true } } },
   });
-  const confirmed = new Set(Array.isArray(confirmBookingIds) ? confirmBookingIds : []);
-  if (affected.some((a) => !confirmed.has(a.id))) {
+  if (needsBookingConfirmation(affected, confirmBookingIds)) {
     return NextResponse.json(
       {
         error: "Some patients are booked at this clinic that day. Confirm to cancel and refund them.",
         code: "LEAVE_HAS_BOOKINGS",
-        bookings: affected.map((a) => ({
-          id: a.id,
-          patientName: a.patientName ?? a.patient.name,
-          scheduledAt: a.scheduledAt,
-          status: a.status,
-          paid: a.paymentStatus === "PAID",
-          refund: a.paymentStatus === "PAID" ? netPayable(a) : 0,
-        })),
+        bookings: affected.map(affectedBookingSummary),
       },
       { status: 409 }
     );

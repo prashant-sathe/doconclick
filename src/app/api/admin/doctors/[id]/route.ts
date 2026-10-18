@@ -37,7 +37,7 @@ export async function GET(
     where: { id, role: "DOCTOR", deletedAt: null },
     include: {
       doctorProfile: true,
-      clinics: { orderBy: { sortOrder: "asc" } },
+      clinics: { where: { deletedAt: null }, orderBy: { sortOrder: "asc" } },
       asDoctor: {
         orderBy: { createdAt: "desc" },
         take: 10,

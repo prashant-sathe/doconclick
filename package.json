@@ -21,7 +21,8 @@
     "test:account-deletion": "tsx tests/account-deletion.ts",
     "test:doctor-bookable": "tsx tests/doctor-bookable.ts",
     "test:admin-doctor-status": "tsx tests/admin-doctor-status.ts",
-    "test:clinic-leave": "tsx tests/clinic-leave.ts"
+    "test:clinic-leave": "tsx tests/clinic-leave.ts",
+    "test:clinic-close": "tsx tests/clinic-close.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

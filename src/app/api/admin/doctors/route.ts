@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     omit: { password: true },
     include: {
       doctorProfile: true,
-      clinics: { select: { id: true } },
+      clinics: { where: { deletedAt: null }, select: { id: true } },
     },
     orderBy: { createdAt: "desc" },
   });
