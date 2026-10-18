@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
+import { paidInRange, effectivePaidAt } from "@/lib/paidAt";
 
 // GET: platform-wide revenue — consultations + doctor registration/subscription fees —
 // as a total summary plus a day-by-day breakdown.
@@ -14,8 +15,10 @@ export async function GET(req: Request) {
 
   const [appointments, paymentLogs] = await Promise.all([
     prisma.appointment.findMany({
-      where: { status: "COMPLETED", paymentStatus: "PAID", ...(dateFilter ? { paidAt: dateFilter } : {}) },
-      select: { amount: true, platformFee: true, paidAt: true },
+      // Rows without paidAt (older ones) are dated by their visit instead of
+      // silently dropping out of every date range.
+      where: { status: "COMPLETED", paymentStatus: "PAID", ...(dateFilter ? paidInRange(dateFilter) : {}) },
+      select: { amount: true, platformFee: true, paidAt: true, scheduledAt: true },
     }),
     prisma.doctorPaymentLog.findMany({
       where: dateFilter ? { createdAt: dateFilter } : undefined,
@@ -40,8 +43,7 @@ export async function GET(req: Request) {
     return e;
   };
   for (const a of appointments) {
-    if (!a.paidAt) continue;
-    const e = entry(dayKey(a.paidAt));
+    const e = entry(dayKey(effectivePaidAt(a)));
     e.consultRevenue += safeNum(a.amount);
     e.platformCommission += safeNum(a.platformFee);
   }

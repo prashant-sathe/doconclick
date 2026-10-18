@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
+import { paidInRange } from "@/lib/paidAt";
 
 // GET: per-doctor activity + earnings summary.
 export async function GET(req: Request) {
@@ -15,7 +16,9 @@ export async function GET(req: Request) {
   // corrupt (NaN) amount would otherwise poison the whole SQL-level SUM() for
   // that doctor, zeroing out every other completed appointment they have.
   const appointments = await prisma.appointment.findMany({
-    where: { status: "COMPLETED", paymentStatus: "PAID", ...(dateFilter ? { paidAt: dateFilter } : {}) },
+    // Rows without paidAt (older ones) are dated by their visit instead of
+    // silently dropping out of every date range.
+    where: { status: "COMPLETED", paymentStatus: "PAID", ...(dateFilter ? paidInRange(dateFilter) : {}) },
     select: { doctorId: true, amount: true, platformFee: true },
   });
   const byDoctor = new Map<string, { count: number; amount: number; platformFee: number }>();

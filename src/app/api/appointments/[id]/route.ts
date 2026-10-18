@@ -409,8 +409,9 @@ export async function PATCH(
         requestedScheduledAt: null,
         doctorNotes: doctorNotes ?? appointment.doctorNotes,
         ...(status === "SCHEDULED" ? { acceptedAt: new Date() } : {}),
+        // Cash is collected at the visit, so completing it is when it was paid.
         ...(status === "COMPLETED" && appointment.paymentMethod === "CASH"
-          ? { paymentStatus: "PAID" }
+          ? { paymentStatus: "PAID", paidAt: appointment.paidAt ?? new Date() }
           : {}),
       },
     });

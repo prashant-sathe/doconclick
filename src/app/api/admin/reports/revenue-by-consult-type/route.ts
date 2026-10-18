@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
+import { paidInRange } from "@/lib/paidAt";
 
 // GET: revenue split by CLINIC / HOME / VIDEO consult type.
 export async function GET(req: Request) {
@@ -15,7 +16,9 @@ export async function GET(req: Request) {
   // corrupt (NaN) amount would otherwise poison the whole SQL-level SUM() for
   // its group, zeroing out every other appointment in that consult type.
   const appointments = await prisma.appointment.findMany({
-    where: { status: "COMPLETED", paymentStatus: "PAID", ...(dateFilter ? { paidAt: dateFilter } : {}) },
+    // Rows without paidAt (older ones) are dated by their visit instead of
+    // silently dropping out of every date range.
+    where: { status: "COMPLETED", paymentStatus: "PAID", ...(dateFilter ? paidInRange(dateFilter) : {}) },
     select: { consultType: true, amount: true, platformFee: true },
   });
 

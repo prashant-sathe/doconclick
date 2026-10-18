@@ -10,6 +10,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:push": "prisma db push && prisma db execute --file prisma/sql/partial-indexes.sql",
     "migrate:uploads-to-s3": "tsx prisma/migrate-uploads-to-s3.ts",
+    "backfill:paid-at": "tsx prisma/backfill-paid-at.ts",
     "test:cancel-race": "tsx tests/cancel-race.ts",
     "test:expire-refund": "tsx tests/expire-refund.ts",
     "test:reschedule": "tsx tests/reschedule-request.ts",
@@ -26,7 +27,8 @@
     "test:account-impact": "tsx tests/account-impact.ts",
     "test:visit-address": "tsx tests/visit-address.ts",
     "test:doctor-profile-lock": "tsx tests/doctor-profile-lock.ts",
-    "test:admin-stats": "tsx tests/admin-stats.ts"
+    "test:admin-stats": "tsx tests/admin-stats.ts",
+    "test:paid-at": "tsx tests/paid-at.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
