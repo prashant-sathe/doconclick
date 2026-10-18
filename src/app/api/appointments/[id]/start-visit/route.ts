@@ -4,8 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { requireActiveNurse } from "@/lib/providerGuard";
 import { sendPushToUser, sendPushToAdmins } from "@/lib/firebaseAdmin";
+import { createRateLimiter } from "@/lib/rateLimit";
 
 const MAX_ATTEMPTS = 5;
+
+// Per-nurse cap on code submissions across all of the nurse's visits, so the
+// per-visit limit can't be sidestepped by spreading guesses over visits.
+const checkCodeRateLimit = createRateLimiter(10, 10 * 60 * 1000);
 
 // POST { code } — the nurse, at the door, enters the 4-digit code shown in
 // the patient's app; that's what starts the visit (and proves she was there).
@@ -60,33 +65,51 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json(updated);
   }
 
-  if (appt.visitOtpAttempts >= MAX_ATTEMPTS) {
+  // Checked before an attempt is claimed, so a throttled request doesn't
+  // burn one of the visit's five tries.
+  if (!checkCodeRateLimit(authUser.id)) {
+    return NextResponse.json(
+      { error: "Too many code attempts. Please wait a few minutes and try again.", code: "RATE_LIMITED" },
+      { status: 429 }
+    );
+  }
+
+  // Claim an attempt atomically *before* comparing. A read-then-increment
+  // let parallel requests all pass the `< MAX_ATTEMPTS` check on the same
+  // stale count and guess far more than five codes.
+  const claimed = await prisma.appointment.updateMany({
+    where: { id, visitOtpAttempts: { lt: MAX_ATTEMPTS } },
+    data: { visitOtpAttempts: { increment: 1 } },
+  });
+  if (claimed.count === 0) {
     return NextResponse.json(
       { error: "Too many wrong codes. Ask the patient to check the code in their app, or start without the code and tell us why.", code: "OTP_LOCKED" },
       { status: 429 }
     );
   }
+
   const code = String(body.code ?? "").replace(/\D/g, "");
   const expected = appt.visitOtp ?? "";
   const match = code.length === 4 && expected.length === 4 && timingSafeEqual(Buffer.from(code), Buffer.from(expected));
   if (!match) {
-    const after = await prisma.appointment.update({
-      where: { id },
-      data: { visitOtpAttempts: { increment: 1 } },
-      select: { visitOtpAttempts: true },
-    });
-    const left = MAX_ATTEMPTS - after.visitOtpAttempts;
+    const after = await prisma.appointment.findUnique({ where: { id }, select: { visitOtpAttempts: true } });
+    const left = Math.max(0, MAX_ATTEMPTS - (after?.visitOtpAttempts ?? MAX_ATTEMPTS));
     return NextResponse.json(
       { error: left > 0 ? `That code doesn't match. ${left} attempt${left === 1 ? "" : "s"} left.` : "Too many wrong codes. Start without the code and tell us why.", code: left > 0 ? "OTP_WRONG" : "OTP_LOCKED" },
       { status: 400 }
     );
   }
 
-  const updated = await prisma.appointment.update({
-    where: { id },
-    data: { visitStartedAt: new Date() },
-    omit: { visitOtp: true },
+  // Guarded on visitStartedAt so two simultaneous correct codes can't both
+  // start the visit (and double-notify the patient).
+  const started = await prisma.appointment.updateMany({
+    where: { id, visitStartedAt: null },
+    data: { visitStartedAt: new Date(), visitOtpAttempts: 0 },
   });
+  if (started.count === 0) {
+    return NextResponse.json({ error: "This visit has already started." }, { status: 400 });
+  }
+  const updated = await prisma.appointment.findUnique({ where: { id }, omit: { visitOtp: true } });
   void sendPushToUser(appt.patientId, {
     title: "Your nurse visit has started",
     body: `${authUser.name} verified your code and started the visit.`,
