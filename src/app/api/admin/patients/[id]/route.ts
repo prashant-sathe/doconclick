@@ -20,8 +20,10 @@ export async function GET(
 
   const { id } = await params;
 
-  const user = await prisma.user.findUnique({
-    where: { id },
+  // Live patients only — this route must not expose or act on admins,
+  // doctors, or deleted accounts.
+  const user = await prisma.user.findFirst({
+    where: { id, role: "PATIENT", deletedAt: null },
     include: {
       patientProfile: true,
       asPatient: {
@@ -59,7 +61,7 @@ export async function DELETE(
   if (denied) return denied;
 
   const { id } = await params;
-  const deleted = await softDeleteUser(id);
+  const deleted = await softDeleteUser(id, "PATIENT");
   if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   return NextResponse.json({ ...deleted, password: undefined });

@@ -28,6 +28,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Can't remove the last remaining admin." }, { status: 400 });
   }
 
-  const deleted = await softDeleteUser(id);
+  const deleted = await softDeleteUser(id, "ADMIN");
+  if (!deleted) return NextResponse.json({ error: "Admin not found." }, { status: 404 });
   return NextResponse.json({ ...deleted, password: undefined });
 }

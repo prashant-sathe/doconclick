@@ -28,8 +28,10 @@ export async function GET(
 
   const { id } = await params;
 
-  const user = await prisma.user.findUnique({
-    where: { id },
+  // Live doctors only — this route must not expose or act on admins,
+  // patients, or deleted accounts.
+  const user = await prisma.user.findFirst({
+    where: { id, role: "DOCTOR", deletedAt: null },
     include: {
       doctorProfile: true,
       clinics: { orderBy: { sortOrder: "asc" } },
@@ -71,6 +73,9 @@ export async function PATCH(
 
   const { id } = await params;
   const { status, isVerified } = await req.json();
+
+  const target = await prisma.user.findFirst({ where: { id, role: "DOCTOR", deletedAt: null }, select: { id: true } });
+  if (!target) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const data: { status?: string; isVerified?: boolean } = {};
 
@@ -133,7 +138,7 @@ export async function DELETE(
   if (denied) return denied;
 
   const { id } = await params;
-  const deleted = await softDeleteUser(id);
+  const deleted = await softDeleteUser(id, "DOCTOR");
   if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   return NextResponse.json({ ...deleted, password: undefined });
