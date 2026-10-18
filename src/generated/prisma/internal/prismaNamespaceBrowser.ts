@@ -65,6 +65,7 @@ export const ModelName = {
   NurseReferral: 'NurseReferral',
   NurseServiceOffering: 'NurseServiceOffering',
   NursePaymentLog: 'NursePaymentLog',
+  DoctorChangeRequest: 'DoctorChangeRequest',
   StaffProfile: 'StaffProfile',
   Appointment: 'Appointment',
   Wallet: 'Wallet',
@@ -233,6 +234,7 @@ export const DoctorProfileScalarFieldEnum = {
   avgRating: 'avgRating',
   totalReviews: 'totalReviews',
   bankDetails: 'bankDetails',
+  bankDetailsUpdatedAt: 'bankDetailsUpdatedAt',
   status: 'status',
   registrationFeePaid: 'registrationFeePaid',
   registrationFeeStatus: 'registrationFeeStatus',
@@ -372,6 +374,21 @@ export const NursePaymentLogScalarFieldEnum = {
 } as const
 
 export type NursePaymentLogScalarFieldEnum = (typeof NursePaymentLogScalarFieldEnum)[keyof typeof NursePaymentLogScalarFieldEnum]
+
+
+export const DoctorChangeRequestScalarFieldEnum = {
+  id: 'id',
+  doctorId: 'doctorId',
+  changes: 'changes',
+  status: 'status',
+  reviewNote: 'reviewNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  resolvedAt: 'resolvedAt',
+  resolvedById: 'resolvedById'
+} as const
+
+export type DoctorChangeRequestScalarFieldEnum = (typeof DoctorChangeRequestScalarFieldEnum)[keyof typeof DoctorChangeRequestScalarFieldEnum]
 
 
 export const StaffProfileScalarFieldEnum = {
@@ -772,6 +789,13 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const NullableJsonNullValueInput = {

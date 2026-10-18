@@ -74,6 +74,7 @@ export type DoctorProfileMinAggregateOutputType = {
   avgRating: number | null
   totalReviews: number | null
   bankDetails: string | null
+  bankDetailsUpdatedAt: Date | null
   status: string | null
   registrationFeePaid: boolean | null
   registrationFeeStatus: string | null
@@ -114,6 +115,7 @@ export type DoctorProfileMaxAggregateOutputType = {
   avgRating: number | null
   totalReviews: number | null
   bankDetails: string | null
+  bankDetailsUpdatedAt: Date | null
   status: string | null
   registrationFeePaid: boolean | null
   registrationFeeStatus: string | null
@@ -154,6 +156,7 @@ export type DoctorProfileCountAggregateOutputType = {
   avgRating: number
   totalReviews: number
   bankDetails: number
+  bankDetailsUpdatedAt: number
   status: number
   registrationFeePaid: number
   registrationFeeStatus: number
@@ -220,6 +223,7 @@ export type DoctorProfileMinAggregateInputType = {
   avgRating?: true
   totalReviews?: true
   bankDetails?: true
+  bankDetailsUpdatedAt?: true
   status?: true
   registrationFeePaid?: true
   registrationFeeStatus?: true
@@ -260,6 +264,7 @@ export type DoctorProfileMaxAggregateInputType = {
   avgRating?: true
   totalReviews?: true
   bankDetails?: true
+  bankDetailsUpdatedAt?: true
   status?: true
   registrationFeePaid?: true
   registrationFeeStatus?: true
@@ -300,6 +305,7 @@ export type DoctorProfileCountAggregateInputType = {
   avgRating?: true
   totalReviews?: true
   bankDetails?: true
+  bankDetailsUpdatedAt?: true
   status?: true
   registrationFeePaid?: true
   registrationFeeStatus?: true
@@ -427,6 +433,7 @@ export type DoctorProfileGroupByOutputType = {
   avgRating: number
   totalReviews: number
   bankDetails: string | null
+  bankDetailsUpdatedAt: Date | null
   status: string
   registrationFeePaid: boolean
   registrationFeeStatus: string
@@ -490,6 +497,7 @@ export type DoctorProfileWhereInput = {
   avgRating?: Prisma.FloatFilter<"DoctorProfile"> | number
   totalReviews?: Prisma.IntFilter<"DoctorProfile"> | number
   bankDetails?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  bankDetailsUpdatedAt?: Prisma.DateTimeNullableFilter<"DoctorProfile"> | Date | string | null
   status?: Prisma.StringFilter<"DoctorProfile"> | string
   registrationFeePaid?: Prisma.BoolFilter<"DoctorProfile"> | boolean
   registrationFeeStatus?: Prisma.StringFilter<"DoctorProfile"> | string
@@ -531,6 +539,7 @@ export type DoctorProfileOrderByWithRelationInput = {
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
   bankDetails?: Prisma.SortOrderInput | Prisma.SortOrder
+  bankDetailsUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   registrationFeePaid?: Prisma.SortOrder
   registrationFeeStatus?: Prisma.SortOrder
@@ -575,6 +584,7 @@ export type DoctorProfileWhereUniqueInput = Prisma.AtLeast<{
   avgRating?: Prisma.FloatFilter<"DoctorProfile"> | number
   totalReviews?: Prisma.IntFilter<"DoctorProfile"> | number
   bankDetails?: Prisma.StringNullableFilter<"DoctorProfile"> | string | null
+  bankDetailsUpdatedAt?: Prisma.DateTimeNullableFilter<"DoctorProfile"> | Date | string | null
   status?: Prisma.StringFilter<"DoctorProfile"> | string
   registrationFeePaid?: Prisma.BoolFilter<"DoctorProfile"> | boolean
   registrationFeeStatus?: Prisma.StringFilter<"DoctorProfile"> | string
@@ -616,6 +626,7 @@ export type DoctorProfileOrderByWithAggregationInput = {
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
   bankDetails?: Prisma.SortOrderInput | Prisma.SortOrder
+  bankDetailsUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   registrationFeePaid?: Prisma.SortOrder
   registrationFeeStatus?: Prisma.SortOrder
@@ -664,6 +675,7 @@ export type DoctorProfileScalarWhereWithAggregatesInput = {
   avgRating?: Prisma.FloatWithAggregatesFilter<"DoctorProfile"> | number
   totalReviews?: Prisma.IntWithAggregatesFilter<"DoctorProfile"> | number
   bankDetails?: Prisma.StringNullableWithAggregatesFilter<"DoctorProfile"> | string | null
+  bankDetailsUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"DoctorProfile"> | Date | string | null
   status?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
   registrationFeePaid?: Prisma.BoolWithAggregatesFilter<"DoctorProfile"> | boolean
   registrationFeeStatus?: Prisma.StringWithAggregatesFilter<"DoctorProfile"> | string
@@ -703,6 +715,7 @@ export type DoctorProfileCreateInput = {
   avgRating?: number
   totalReviews?: number
   bankDetails?: string | null
+  bankDetailsUpdatedAt?: Date | string | null
   status?: string
   registrationFeePaid?: boolean
   registrationFeeStatus?: string
@@ -744,6 +757,7 @@ export type DoctorProfileUncheckedCreateInput = {
   avgRating?: number
   totalReviews?: number
   bankDetails?: string | null
+  bankDetailsUpdatedAt?: Date | string | null
   status?: string
   registrationFeePaid?: boolean
   registrationFeeStatus?: string
@@ -783,6 +797,7 @@ export type DoctorProfileUpdateInput = {
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankDetailsUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -824,6 +839,7 @@ export type DoctorProfileUncheckedUpdateInput = {
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankDetailsUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -864,6 +880,7 @@ export type DoctorProfileCreateManyInput = {
   avgRating?: number
   totalReviews?: number
   bankDetails?: string | null
+  bankDetailsUpdatedAt?: Date | string | null
   status?: string
   registrationFeePaid?: boolean
   registrationFeeStatus?: string
@@ -903,6 +920,7 @@ export type DoctorProfileUpdateManyMutationInput = {
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankDetailsUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -943,6 +961,7 @@ export type DoctorProfileUncheckedUpdateManyInput = {
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankDetailsUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -988,6 +1007,7 @@ export type DoctorProfileCountOrderByAggregateInput = {
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
   bankDetails?: Prisma.SortOrder
+  bankDetailsUpdatedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   registrationFeePaid?: Prisma.SortOrder
   registrationFeeStatus?: Prisma.SortOrder
@@ -1040,6 +1060,7 @@ export type DoctorProfileMaxOrderByAggregateInput = {
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
   bankDetails?: Prisma.SortOrder
+  bankDetailsUpdatedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   registrationFeePaid?: Prisma.SortOrder
   registrationFeeStatus?: Prisma.SortOrder
@@ -1080,6 +1101,7 @@ export type DoctorProfileMinOrderByAggregateInput = {
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
   bankDetails?: Prisma.SortOrder
+  bankDetailsUpdatedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   registrationFeePaid?: Prisma.SortOrder
   registrationFeeStatus?: Prisma.SortOrder
@@ -1175,6 +1197,7 @@ export type DoctorProfileCreateWithoutUserInput = {
   avgRating?: number
   totalReviews?: number
   bankDetails?: string | null
+  bankDetailsUpdatedAt?: Date | string | null
   status?: string
   registrationFeePaid?: boolean
   registrationFeeStatus?: string
@@ -1214,6 +1237,7 @@ export type DoctorProfileUncheckedCreateWithoutUserInput = {
   avgRating?: number
   totalReviews?: number
   bankDetails?: string | null
+  bankDetailsUpdatedAt?: Date | string | null
   status?: string
   registrationFeePaid?: boolean
   registrationFeeStatus?: string
@@ -1269,6 +1293,7 @@ export type DoctorProfileUpdateWithoutUserInput = {
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankDetailsUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1308,6 +1333,7 @@ export type DoctorProfileUncheckedUpdateWithoutUserInput = {
   avgRating?: Prisma.FloatFieldUpdateOperationsInput | number
   totalReviews?: Prisma.IntFieldUpdateOperationsInput | number
   bankDetails?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankDetailsUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   registrationFeePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   registrationFeeStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1350,6 +1376,7 @@ export type DoctorProfileSelect<ExtArgs extends runtime.Types.Extensions.Interna
   avgRating?: boolean
   totalReviews?: boolean
   bankDetails?: boolean
+  bankDetailsUpdatedAt?: boolean
   status?: boolean
   registrationFeePaid?: boolean
   registrationFeeStatus?: boolean
@@ -1391,6 +1418,7 @@ export type DoctorProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   avgRating?: boolean
   totalReviews?: boolean
   bankDetails?: boolean
+  bankDetailsUpdatedAt?: boolean
   status?: boolean
   registrationFeePaid?: boolean
   registrationFeeStatus?: boolean
@@ -1432,6 +1460,7 @@ export type DoctorProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   avgRating?: boolean
   totalReviews?: boolean
   bankDetails?: boolean
+  bankDetailsUpdatedAt?: boolean
   status?: boolean
   registrationFeePaid?: boolean
   registrationFeeStatus?: boolean
@@ -1473,6 +1502,7 @@ export type DoctorProfileSelectScalar = {
   avgRating?: boolean
   totalReviews?: boolean
   bankDetails?: boolean
+  bankDetailsUpdatedAt?: boolean
   status?: boolean
   registrationFeePaid?: boolean
   registrationFeeStatus?: boolean
@@ -1489,7 +1519,7 @@ export type DoctorProfileSelectScalar = {
   subscriptionPaidUntil?: boolean
 }
 
-export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "videoFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "bio" | "offersHomeVisit" | "offersClinic" | "offersVideo" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "signatureUrl" | "address" | "clinicName" | "clinicPhotoUrl" | "cashfreeOrderId" | "cashfreePaymentId" | "trialEndsAt" | "subscriptionPaidUntil", ExtArgs["result"]["doctorProfile"]>
+export type DoctorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "medRegNo" | "specialty" | "experience" | "consultFee" | "videoFee" | "homeVisitFee" | "availability" | "radius" | "lat" | "lng" | "languages" | "bio" | "offersHomeVisit" | "offersClinic" | "offersVideo" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "bankDetailsUpdatedAt" | "status" | "registrationFeePaid" | "registrationFeeStatus" | "medRegCertUrl" | "degreeCertUrl" | "kycDocUrl" | "signatureUrl" | "address" | "clinicName" | "clinicPhotoUrl" | "cashfreeOrderId" | "cashfreePaymentId" | "trialEndsAt" | "subscriptionPaidUntil", ExtArgs["result"]["doctorProfile"]>
 export type DoctorProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -1529,6 +1559,7 @@ export type $DoctorProfilePayload<ExtArgs extends runtime.Types.Extensions.Inter
     avgRating: number
     totalReviews: number
     bankDetails: string | null
+    bankDetailsUpdatedAt: Date | null
     status: string
     registrationFeePaid: boolean
     registrationFeeStatus: string
@@ -1990,6 +2021,7 @@ export interface DoctorProfileFieldRefs {
   readonly avgRating: Prisma.FieldRef<"DoctorProfile", 'Float'>
   readonly totalReviews: Prisma.FieldRef<"DoctorProfile", 'Int'>
   readonly bankDetails: Prisma.FieldRef<"DoctorProfile", 'String'>
+  readonly bankDetailsUpdatedAt: Prisma.FieldRef<"DoctorProfile", 'DateTime'>
   readonly status: Prisma.FieldRef<"DoctorProfile", 'String'>
   readonly registrationFeePaid: Prisma.FieldRef<"DoctorProfile", 'Boolean'>
   readonly registrationFeeStatus: Prisma.FieldRef<"DoctorProfile", 'String'>

@@ -5,7 +5,7 @@ import {
   CheckCircle, XCircle, PauseCircle, Search, RefreshCw, Stethoscope,
   Eye, X, Phone, Mail, Award, Hash, Briefcase, DollarSign,
   Clock, MapPin, CreditCard, CalendarCheck, TrendingUp, AlertCircle,
-  CheckCircle2, User, BadgeCheck, Languages, FileText, Trash2, LogIn, UserX,
+  CheckCircle2, User, BadgeCheck, Languages, FileText, Trash2, LogIn, UserX, AlertTriangle,
 } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
@@ -29,6 +29,7 @@ interface DoctorProfile {
   availability: string;
   radius: number;
   bankDetails: string | null;
+  bankDetailsUpdatedAt: string | null;
   status: string;
   isVerified: boolean;
   medRegCertUrl: string | null;
@@ -46,7 +47,17 @@ interface Doctor {
   createdAt: string;
   doctorProfile: DoctorProfile | null;
   clinics: { id: string }[];
+  changeRequests?: { id: string }[];
 }
+
+// A verified doctor's pending change to fields their verification vouched for.
+interface ChangeRequest {
+  id: string;
+  changes: Partial<Record<"medRegNo" | "qualification" | "specialty", { from: string | null; to: string | null }>>;
+  createdAt: string;
+}
+
+const CHANGE_LABELS = { medRegNo: "Reg. Number", qualification: "Qualification", specialty: "Specialty" } as const;
 
 interface Appointment {
   id: string;
@@ -68,6 +79,7 @@ interface Clinic {
 interface DoctorDetail extends Doctor {
   clinics: Clinic[];
   asDoctor: Appointment[];
+  pendingChangeRequest: ChangeRequest | null;
   stats: { totalEarnings: number; completedCount: number; scheduledCount: number; cancelledCount: number; noShowCount: number };
 }
 
@@ -159,6 +171,32 @@ function DoctorDrawer({
   const [confirmUnverify, setConfirmUnverify] = useState(false);
   const [actionNotice, setActionNotice] = useState("");
   const impact = useAccountImpact();
+  const [reviewing, setReviewing] = useState<"APPROVE" | "REJECT" | null>(null);
+  const [openedAt] = useState(() => Date.now()); // for "bank changed recently"
+  const [reviewNote, setReviewNote] = useState("");
+
+  // Approve applies the requested values; reject sends the note to the doctor.
+  const reviewChange = async (action: "APPROVE" | "REJECT") => {
+    setActionError("");
+    setActionNotice("");
+    setUpdating(true);
+    const res = await fetch(`/api/admin/doctors/${doctorId}/change-request`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, note: reviewNote.trim() || undefined }),
+    });
+    setUpdating(false);
+    if (!res.ok) {
+      setActionError((await res.json().catch(() => ({}))).error ?? "Could not review the change.");
+      return;
+    }
+    setReviewing(null);
+    setReviewNote("");
+    setActionNotice(action === "APPROVE" ? "Change approved — the profile now shows the new details." : "Change rejected — the doctor has been told why.");
+    onStatusChange();
+    const r = await fetch(`/api/admin/doctors/${doctorId}`);
+    setData(await r.json());
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -322,6 +360,52 @@ function DoctorDrawer({
                 <Row icon={Award} label="Joined"  value={data?.createdAt ? new Date(data.createdAt).toLocaleDateString("en-IN", { dateStyle: "long" }) : "—"} />
               </Section>
 
+              {/* Pending re-verification */}
+              {data?.pendingChangeRequest && (
+                <Section title="Pending Profile Change" icon={AlertTriangle}>
+                  <div className="px-4 py-3 space-y-3">
+                    <p className="text-xs text-slate-500">
+                      Requested {new Date(data.pendingChangeRequest.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}.
+                      The profile keeps the current values until you approve. Check the registration certificate before approving a new number.
+                    </p>
+                    {(Object.keys(data.pendingChangeRequest.changes) as (keyof typeof CHANGE_LABELS)[]).map((f) => {
+                      const c = data.pendingChangeRequest!.changes[f]!;
+                      return (
+                        <div key={f} className="text-sm">
+                          <span className="text-slate-500">{CHANGE_LABELS[f]}: </span>
+                          <span className="line-through text-slate-400">{c.from ?? "—"}</span>
+                          <span className="text-slate-400"> → </span>
+                          <span className="font-semibold text-slate-800">{c.to ?? "—"}</span>
+                        </div>
+                      );
+                    })}
+                    {reviewing === "REJECT" && (
+                      <textarea className="input-field min-h-[70px] text-sm" maxLength={500} placeholder="Reason (sent to the doctor)"
+                        value={reviewNote} onChange={(e) => setReviewNote(e.target.value)} />
+                    )}
+                    <div className="flex gap-2">
+                      {reviewing === "REJECT" ? (
+                        <>
+                          <button onClick={() => { setReviewing(null); setReviewNote(""); }} disabled={updating} className="btn-secondary flex-1 justify-center py-2 text-sm">Back</button>
+                          <button onClick={() => reviewChange("REJECT")} disabled={updating || !reviewNote.trim()} className="btn-danger flex-1 justify-center py-2 text-sm">
+                            <XCircle className="w-4 h-4" /> Send rejection
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => reviewChange("APPROVE")} disabled={updating} className="btn-primary flex-1 justify-center py-2 text-sm">
+                            <CheckCircle className="w-4 h-4" /> Approve change
+                          </button>
+                          <button onClick={() => setReviewing("REJECT")} disabled={updating} className="btn-secondary flex-1 justify-center py-2 text-sm text-red-600">
+                            <XCircle className="w-4 h-4" /> Reject
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </Section>
+              )}
+
               {/* Professional */}
               <Section title="Professional Details" icon={Stethoscope}>
                 <Row icon={Award}      label="Qualification"    value={p?.qualification ?? "—"} />
@@ -361,6 +445,16 @@ function DoctorDrawer({
                 <div className="bg-slate-50 rounded-xl p-3 text-sm text-slate-700 font-mono">
                   {p?.bankDetails ?? "Not provided"}
                 </div>
+                {p?.bankDetailsUpdatedAt && (() => {
+                  const at = new Date(p.bankDetailsUpdatedAt);
+                  // A payout account changed this recently is worth a second look before paying out.
+                  const recent = openedAt - at.getTime() < 7 * 24 * 60 * 60 * 1000;
+                  return (
+                    <p className={cn("text-xs mt-2", recent ? "text-amber-600 font-semibold" : "text-slate-400")}>
+                      Changed {at.toLocaleDateString("en-IN", { dateStyle: "medium" })}{recent ? " — recently changed, verify before paying out" : ""}
+                    </p>
+                  );
+                })()}
               </Section>
 
               {/* Verification Documents */}
@@ -619,6 +713,11 @@ export default function AdminDoctors() {
               {d.doctorProfile?.registrationFeePaid && (
                 <span className="badge badge-success" title="Registration fee paid">
                   <CreditCard className="w-3 h-3" /> Paid
+                </span>
+              )}
+              {(d.changeRequests?.length ?? 0) > 0 && (
+                <span className="badge badge-warning" title="Wants to change verified details — review in the profile">
+                  <AlertTriangle className="w-3 h-3" /> Change request
                 </span>
               )}
             </div>

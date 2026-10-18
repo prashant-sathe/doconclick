@@ -39,6 +39,7 @@ export async function GET(
     include: {
       doctorProfile: true,
       clinics: { where: { deletedAt: null }, orderBy: { sortOrder: "asc" } },
+      changeRequests: { where: { status: "PENDING" }, take: 1 },
       asDoctor: {
         orderBy: { createdAt: "desc" },
         take: 10,
@@ -60,8 +61,11 @@ export async function GET(
   // doing and shouldn't be read as a cancellation on their record.
   const noShowCount     = user.asDoctor.filter((a) => a.status === "NO_SHOW").length;
 
+  const { changeRequests, ...rest } = user;
   return NextResponse.json({
-    ...user,
+    ...rest,
+    // A verified doctor's pending registration/qualification/specialty change.
+    pendingChangeRequest: changeRequests[0] ?? null,
     password: undefined,
     stats: { totalEarnings, completedCount, scheduledCount, cancelledCount, noShowCount },
   });

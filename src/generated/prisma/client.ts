@@ -112,6 +112,11 @@ export type NurseServiceOffering = Prisma.NurseServiceOfferingModel
  */
 export type NursePaymentLog = Prisma.NursePaymentLogModel
 /**
+ * Model DoctorChangeRequest
+ * 
+ */
+export type DoctorChangeRequest = Prisma.DoctorChangeRequestModel
+/**
  * Model StaffProfile
  * 
  */

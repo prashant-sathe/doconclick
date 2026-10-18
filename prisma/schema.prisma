@@ -58,6 +58,8 @@ model User {
   vitalsRecorded         VitalReading[]         @relation("VitalsRecordedBy")
   staffAccount           StaffProfile?           @relation("StaffAccount")
   staffMembers           StaffProfile[]          @relation("DoctorStaff")
+  changeRequests         DoctorChangeRequest[]   @relation("DoctorChangeRequests")
+  changeRequestsResolved DoctorChangeRequest[]   @relation("ChangeRequestsResolvedBy")
 }
 
 model PushToken {
@@ -178,6 +180,8 @@ model DoctorProfile {
   avgRating     Float   @default(0)
   totalReviews  Int     @default(0)
   bankDetails   String?
+  // Set on every bank-details change — admins see a recent change before paying out.
+  bankDetailsUpdatedAt DateTime?
   status        String  @default("PENDING") // PENDING, APPROVED, REJECTED, SUSPENDED
 
   registrationFeePaid   Boolean @default(false)
@@ -327,6 +331,26 @@ model NursePaymentLog {
   amount            Float
   cashfreePaymentId String?
   createdAt         DateTime @default(now())
+}
+
+// A verified doctor's request to change a field the verification vouched
+// for (medRegNo, qualification, specialty). The live profile keeps the old
+// values until an admin approves; at most one PENDING per doctor — a new
+// edit is merged into it. `changes` is { field: { from, to } }.
+model DoctorChangeRequest {
+  id           String    @id @default(cuid())
+  doctorId     String
+  doctor       User      @relation("DoctorChangeRequests", fields: [doctorId], references: [id], onDelete: Cascade)
+  changes      Json
+  status       String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  reviewNote   String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  resolvedAt   DateTime?
+  resolvedById String?
+  resolvedBy   User?     @relation("ChangeRequestsResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([doctorId, status])
 }
 
 model StaffProfile {

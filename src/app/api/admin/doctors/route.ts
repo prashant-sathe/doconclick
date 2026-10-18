@@ -16,6 +16,7 @@ export async function GET(req: Request) {
     include: {
       doctorProfile: true,
       clinics: { where: { deletedAt: null }, select: { id: true } },
+      changeRequests: { where: { status: "PENDING" }, select: { id: true }, take: 1 },
     },
     orderBy: { createdAt: "desc" },
   });

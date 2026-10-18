@@ -411,6 +411,7 @@ export const ModelName = {
   NurseReferral: 'NurseReferral',
   NurseServiceOffering: 'NurseServiceOffering',
   NursePaymentLog: 'NursePaymentLog',
+  DoctorChangeRequest: 'DoctorChangeRequest',
   StaffProfile: 'StaffProfile',
   Appointment: 'Appointment',
   Wallet: 'Wallet',
@@ -451,7 +452,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
+    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1488,6 +1489,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.NursePaymentLogCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.NursePaymentLogCountAggregateOutputType> | number
+        }
+      }
+    }
+    DoctorChangeRequest: {
+      payload: Prisma.$DoctorChangeRequestPayload<ExtArgs>
+      fields: Prisma.DoctorChangeRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DoctorChangeRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DoctorChangeRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.DoctorChangeRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DoctorChangeRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload>
+        }
+        findMany: {
+          args: Prisma.DoctorChangeRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload>[]
+        }
+        create: {
+          args: Prisma.DoctorChangeRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload>
+        }
+        createMany: {
+          args: Prisma.DoctorChangeRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DoctorChangeRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.DoctorChangeRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload>
+        }
+        update: {
+          args: Prisma.DoctorChangeRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.DoctorChangeRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DoctorChangeRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DoctorChangeRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.DoctorChangeRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorChangeRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.DoctorChangeRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDoctorChangeRequest>
+        }
+        groupBy: {
+          args: Prisma.DoctorChangeRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DoctorChangeRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DoctorChangeRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DoctorChangeRequestCountAggregateOutputType> | number
         }
       }
     }
@@ -3505,6 +3580,7 @@ export const DoctorProfileScalarFieldEnum = {
   avgRating: 'avgRating',
   totalReviews: 'totalReviews',
   bankDetails: 'bankDetails',
+  bankDetailsUpdatedAt: 'bankDetailsUpdatedAt',
   status: 'status',
   registrationFeePaid: 'registrationFeePaid',
   registrationFeeStatus: 'registrationFeeStatus',
@@ -3644,6 +3720,21 @@ export const NursePaymentLogScalarFieldEnum = {
 } as const
 
 export type NursePaymentLogScalarFieldEnum = (typeof NursePaymentLogScalarFieldEnum)[keyof typeof NursePaymentLogScalarFieldEnum]
+
+
+export const DoctorChangeRequestScalarFieldEnum = {
+  id: 'id',
+  doctorId: 'doctorId',
+  changes: 'changes',
+  status: 'status',
+  reviewNote: 'reviewNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  resolvedAt: 'resolvedAt',
+  resolvedById: 'resolvedById'
+} as const
+
+export type DoctorChangeRequestScalarFieldEnum = (typeof DoctorChangeRequestScalarFieldEnum)[keyof typeof DoctorChangeRequestScalarFieldEnum]
 
 
 export const StaffProfileScalarFieldEnum = {
@@ -4046,6 +4137,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const NullableJsonNullValueInput = {
   DbNull: DbNull,
   JsonNull: JsonNull
@@ -4326,6 +4424,7 @@ export type GlobalOmitConfig = {
   nurseReferral?: Prisma.NurseReferralOmit
   nurseServiceOffering?: Prisma.NurseServiceOfferingOmit
   nursePaymentLog?: Prisma.NursePaymentLogOmit
+  doctorChangeRequest?: Prisma.DoctorChangeRequestOmit
   staffProfile?: Prisma.StaffProfileOmit
   appointment?: Prisma.AppointmentOmit
   wallet?: Prisma.WalletOmit

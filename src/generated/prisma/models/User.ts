@@ -304,6 +304,8 @@ export type UserWhereInput = {
   vitalsRecorded?: Prisma.VitalReadingListRelationFilter
   staffAccount?: Prisma.XOR<Prisma.StaffProfileNullableScalarRelationFilter, Prisma.StaffProfileWhereInput> | null
   staffMembers?: Prisma.StaffProfileListRelationFilter
+  changeRequests?: Prisma.DoctorChangeRequestListRelationFilter
+  changeRequestsResolved?: Prisma.DoctorChangeRequestListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -351,6 +353,8 @@ export type UserOrderByWithRelationInput = {
   vitalsRecorded?: Prisma.VitalReadingOrderByRelationAggregateInput
   staffAccount?: Prisma.StaffProfileOrderByWithRelationInput
   staffMembers?: Prisma.StaffProfileOrderByRelationAggregateInput
+  changeRequests?: Prisma.DoctorChangeRequestOrderByRelationAggregateInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -401,6 +405,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   vitalsRecorded?: Prisma.VitalReadingListRelationFilter
   staffAccount?: Prisma.XOR<Prisma.StaffProfileNullableScalarRelationFilter, Prisma.StaffProfileWhereInput> | null
   staffMembers?: Prisma.StaffProfileListRelationFilter
+  changeRequests?: Prisma.DoctorChangeRequestListRelationFilter
+  changeRequestsResolved?: Prisma.DoctorChangeRequestListRelationFilter
 }, "id" | "mobile" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -486,6 +492,8 @@ export type UserCreateInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -533,6 +541,8 @@ export type UserUncheckedCreateInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUpdateInput = {
@@ -580,6 +590,8 @@ export type UserUpdateInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -627,6 +639,8 @@ export type UserUncheckedUpdateInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -899,6 +913,36 @@ export type UserUpdateOneRequiredWithoutNursePaymentLogsNestedInput = {
   upsert?: Prisma.UserUpsertWithoutNursePaymentLogsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNursePaymentLogsInput, Prisma.UserUpdateWithoutNursePaymentLogsInput>, Prisma.UserUncheckedUpdateWithoutNursePaymentLogsInput>
+}
+
+export type UserCreateNestedOneWithoutChangeRequestsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChangeRequestsInput, Prisma.UserUncheckedCreateWithoutChangeRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChangeRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutChangeRequestsResolvedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChangeRequestsResolvedInput, Prisma.UserUncheckedCreateWithoutChangeRequestsResolvedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChangeRequestsResolvedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutChangeRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChangeRequestsInput, Prisma.UserUncheckedCreateWithoutChangeRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChangeRequestsInput
+  upsert?: Prisma.UserUpsertWithoutChangeRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChangeRequestsInput, Prisma.UserUpdateWithoutChangeRequestsInput>, Prisma.UserUncheckedUpdateWithoutChangeRequestsInput>
+}
+
+export type UserUpdateOneWithoutChangeRequestsResolvedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChangeRequestsResolvedInput, Prisma.UserUncheckedCreateWithoutChangeRequestsResolvedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChangeRequestsResolvedInput
+  upsert?: Prisma.UserUpsertWithoutChangeRequestsResolvedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChangeRequestsResolvedInput, Prisma.UserUpdateWithoutChangeRequestsResolvedInput>, Prisma.UserUncheckedUpdateWithoutChangeRequestsResolvedInput>
 }
 
 export type UserCreateNestedOneWithoutStaffAccountInput = {
@@ -1259,6 +1303,8 @@ export type UserCreateWithoutPushTokensInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutPushTokensInput = {
@@ -1305,6 +1351,8 @@ export type UserUncheckedCreateWithoutPushTokensInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutPushTokensInput = {
@@ -1367,6 +1415,8 @@ export type UserUpdateWithoutPushTokensInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPushTokensInput = {
@@ -1413,6 +1463,8 @@ export type UserUncheckedUpdateWithoutPushTokensInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutSavedDoctorsInput = {
@@ -1459,6 +1511,8 @@ export type UserCreateWithoutSavedDoctorsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutSavedDoctorsInput = {
@@ -1505,6 +1559,8 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutSavedDoctorsInput = {
@@ -1556,6 +1612,8 @@ export type UserCreateWithoutSavedByPatientsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutSavedByPatientsInput = {
@@ -1602,6 +1660,8 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutSavedByPatientsInput = {
@@ -1664,6 +1724,8 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
@@ -1710,6 +1772,8 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUpsertWithoutSavedByPatientsInput = {
@@ -1767,6 +1831,8 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
@@ -1813,6 +1879,8 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutPatientProfileInput = {
@@ -1859,6 +1927,8 @@ export type UserCreateWithoutPatientProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutPatientProfileInput = {
@@ -1905,6 +1975,8 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutPatientProfileInput = {
@@ -1967,6 +2039,8 @@ export type UserUpdateWithoutPatientProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPatientProfileInput = {
@@ -2013,6 +2087,8 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutDocumentsInput = {
@@ -2059,6 +2135,8 @@ export type UserCreateWithoutDocumentsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutDocumentsInput = {
@@ -2105,6 +2183,8 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutDocumentsInput = {
@@ -2167,6 +2247,8 @@ export type UserUpdateWithoutDocumentsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDocumentsInput = {
@@ -2213,6 +2295,8 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutDoctorProfileInput = {
@@ -2259,6 +2343,8 @@ export type UserCreateWithoutDoctorProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutDoctorProfileInput = {
@@ -2305,6 +2391,8 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutDoctorProfileInput = {
@@ -2367,6 +2455,8 @@ export type UserUpdateWithoutDoctorProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDoctorProfileInput = {
@@ -2413,6 +2503,8 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutNurseProfileInput = {
@@ -2459,6 +2551,8 @@ export type UserCreateWithoutNurseProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutNurseProfileInput = {
@@ -2505,6 +2599,8 @@ export type UserUncheckedCreateWithoutNurseProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutNurseProfileInput = {
@@ -2567,6 +2663,8 @@ export type UserUpdateWithoutNurseProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNurseProfileInput = {
@@ -2613,6 +2711,8 @@ export type UserUncheckedUpdateWithoutNurseProfileInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutVitalsInput = {
@@ -2659,6 +2759,8 @@ export type UserCreateWithoutVitalsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutVitalsInput = {
@@ -2705,6 +2807,8 @@ export type UserUncheckedCreateWithoutVitalsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutVitalsInput = {
@@ -2756,6 +2860,8 @@ export type UserCreateWithoutVitalsRecordedInput = {
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutVitalsRecordedInput = {
@@ -2802,6 +2908,8 @@ export type UserUncheckedCreateWithoutVitalsRecordedInput = {
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutVitalsRecordedInput = {
@@ -2864,6 +2972,8 @@ export type UserUpdateWithoutVitalsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVitalsInput = {
@@ -2910,6 +3020,8 @@ export type UserUncheckedUpdateWithoutVitalsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUpsertWithoutVitalsRecordedInput = {
@@ -2967,6 +3079,8 @@ export type UserUpdateWithoutVitalsRecordedInput = {
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
@@ -3013,6 +3127,8 @@ export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutNursePaymentLogsInput = {
@@ -3059,6 +3175,8 @@ export type UserCreateWithoutNursePaymentLogsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
@@ -3105,6 +3223,8 @@ export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutNursePaymentLogsInput = {
@@ -3167,6 +3287,8 @@ export type UserUpdateWithoutNursePaymentLogsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
@@ -3213,6 +3335,424 @@ export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
+}
+
+export type UserCreateWithoutChangeRequestsInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
+}
+
+export type UserUncheckedCreateWithoutChangeRequestsInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
+}
+
+export type UserCreateOrConnectWithoutChangeRequestsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutChangeRequestsInput, Prisma.UserUncheckedCreateWithoutChangeRequestsInput>
+}
+
+export type UserCreateWithoutChangeRequestsResolvedInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+}
+
+export type UserUncheckedCreateWithoutChangeRequestsResolvedInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+}
+
+export type UserCreateOrConnectWithoutChangeRequestsResolvedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutChangeRequestsResolvedInput, Prisma.UserUncheckedCreateWithoutChangeRequestsResolvedInput>
+}
+
+export type UserUpsertWithoutChangeRequestsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutChangeRequestsInput, Prisma.UserUncheckedUpdateWithoutChangeRequestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutChangeRequestsInput, Prisma.UserUncheckedCreateWithoutChangeRequestsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutChangeRequestsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutChangeRequestsInput, Prisma.UserUncheckedUpdateWithoutChangeRequestsInput>
+}
+
+export type UserUpdateWithoutChangeRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutChangeRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
+}
+
+export type UserUpsertWithoutChangeRequestsResolvedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutChangeRequestsResolvedInput, Prisma.UserUncheckedUpdateWithoutChangeRequestsResolvedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutChangeRequestsResolvedInput, Prisma.UserUncheckedCreateWithoutChangeRequestsResolvedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutChangeRequestsResolvedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutChangeRequestsResolvedInput, Prisma.UserUncheckedUpdateWithoutChangeRequestsResolvedInput>
+}
+
+export type UserUpdateWithoutChangeRequestsResolvedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutChangeRequestsResolvedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
 }
 
 export type UserCreateWithoutStaffAccountInput = {
@@ -3259,6 +3799,8 @@ export type UserCreateWithoutStaffAccountInput = {
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutStaffAccountInput = {
@@ -3305,6 +3847,8 @@ export type UserUncheckedCreateWithoutStaffAccountInput = {
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutStaffAccountInput = {
@@ -3356,6 +3900,8 @@ export type UserCreateWithoutStaffMembersInput = {
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutStaffMembersInput = {
@@ -3402,6 +3948,8 @@ export type UserUncheckedCreateWithoutStaffMembersInput = {
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutStaffMembersInput = {
@@ -3464,6 +4012,8 @@ export type UserUpdateWithoutStaffAccountInput = {
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStaffAccountInput = {
@@ -3510,6 +4060,8 @@ export type UserUncheckedUpdateWithoutStaffAccountInput = {
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUpsertWithoutStaffMembersInput = {
@@ -3567,6 +4119,8 @@ export type UserUpdateWithoutStaffMembersInput = {
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStaffMembersInput = {
@@ -3613,6 +4167,8 @@ export type UserUncheckedUpdateWithoutStaffMembersInput = {
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutAsPatientInput = {
@@ -3659,6 +4215,8 @@ export type UserCreateWithoutAsPatientInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutAsPatientInput = {
@@ -3705,6 +4263,8 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutAsPatientInput = {
@@ -3756,6 +4316,8 @@ export type UserCreateWithoutAsDoctorInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutAsDoctorInput = {
@@ -3802,6 +4364,8 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutAsDoctorInput = {
@@ -3864,6 +4428,8 @@ export type UserUpdateWithoutAsPatientInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsPatientInput = {
@@ -3910,6 +4476,8 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUpsertWithoutAsDoctorInput = {
@@ -3967,6 +4535,8 @@ export type UserUpdateWithoutAsDoctorInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsDoctorInput = {
@@ -4013,6 +4583,8 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutWalletInput = {
@@ -4059,6 +4631,8 @@ export type UserCreateWithoutWalletInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutWalletInput = {
@@ -4105,6 +4679,8 @@ export type UserUncheckedCreateWithoutWalletInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutWalletInput = {
@@ -4167,6 +4743,8 @@ export type UserUpdateWithoutWalletInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletInput = {
@@ -4213,6 +4791,8 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutWalletTransactionsAdjustedInput = {
@@ -4259,6 +4839,8 @@ export type UserCreateWithoutWalletTransactionsAdjustedInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
@@ -4305,6 +4887,8 @@ export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutWalletTransactionsAdjustedInput = {
@@ -4367,6 +4951,8 @@ export type UserUpdateWithoutWalletTransactionsAdjustedInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
@@ -4413,6 +4999,8 @@ export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutSettlementsInput = {
@@ -4459,6 +5047,8 @@ export type UserCreateWithoutSettlementsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsInput = {
@@ -4505,6 +5095,8 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsInput = {
@@ -4556,6 +5148,8 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
@@ -4602,6 +5196,8 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsAdminedInput = {
@@ -4664,6 +5260,8 @@ export type UserUpdateWithoutSettlementsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsInput = {
@@ -4710,6 +5308,8 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUpsertWithoutSettlementsAdminedInput = {
@@ -4767,6 +5367,8 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
@@ -4813,6 +5415,8 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutPayoutRequestsInput = {
@@ -4859,6 +5463,8 @@ export type UserCreateWithoutPayoutRequestsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutPayoutRequestsInput = {
@@ -4905,6 +5511,8 @@ export type UserUncheckedCreateWithoutPayoutRequestsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutPayoutRequestsInput = {
@@ -4967,6 +5575,8 @@ export type UserUpdateWithoutPayoutRequestsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
@@ -5013,6 +5623,8 @@ export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutPaymentLogsInput = {
@@ -5059,6 +5671,8 @@ export type UserCreateWithoutPaymentLogsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutPaymentLogsInput = {
@@ -5105,6 +5719,8 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutPaymentLogsInput = {
@@ -5167,6 +5783,8 @@ export type UserUpdateWithoutPaymentLogsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentLogsInput = {
@@ -5213,6 +5831,8 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -5259,6 +5879,8 @@ export type UserCreateWithoutMessagesSentInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -5305,6 +5927,8 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -5367,6 +5991,8 @@ export type UserUpdateWithoutMessagesSentInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -5413,6 +6039,8 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutReviewsGivenInput = {
@@ -5459,6 +6087,8 @@ export type UserCreateWithoutReviewsGivenInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutReviewsGivenInput = {
@@ -5505,6 +6135,8 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutReviewsGivenInput = {
@@ -5556,6 +6188,8 @@ export type UserCreateWithoutReviewsReceivedInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutReviewsReceivedInput = {
@@ -5602,6 +6236,8 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutReviewsReceivedInput = {
@@ -5664,6 +6300,8 @@ export type UserUpdateWithoutReviewsGivenInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsGivenInput = {
@@ -5710,6 +6348,8 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUpsertWithoutReviewsReceivedInput = {
@@ -5767,6 +6407,8 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
@@ -5813,6 +6455,8 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutComplaintsInput = {
@@ -5859,6 +6503,8 @@ export type UserCreateWithoutComplaintsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsInput = {
@@ -5905,6 +6551,8 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsInput = {
@@ -5967,6 +6615,8 @@ export type UserUpdateWithoutComplaintsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsInput = {
@@ -6013,6 +6663,8 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutClinicsInput = {
@@ -6059,6 +6711,8 @@ export type UserCreateWithoutClinicsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutClinicsInput = {
@@ -6105,6 +6759,8 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutClinicsInput = {
@@ -6167,6 +6823,8 @@ export type UserUpdateWithoutClinicsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClinicsInput = {
@@ -6213,6 +6871,8 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutAnnouncementsCreatedInput = {
@@ -6259,6 +6919,8 @@ export type UserCreateWithoutAnnouncementsCreatedInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
@@ -6305,6 +6967,8 @@ export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementsCreatedInput = {
@@ -6367,6 +7031,8 @@ export type UserUpdateWithoutAnnouncementsCreatedInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
@@ -6413,6 +7079,8 @@ export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutAnnouncementRecipientsInput = {
@@ -6459,6 +7127,8 @@ export type UserCreateWithoutAnnouncementRecipientsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
@@ -6505,6 +7175,8 @@ export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementRecipientsInput = {
@@ -6567,6 +7239,8 @@ export type UserUpdateWithoutAnnouncementRecipientsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
@@ -6613,6 +7287,8 @@ export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutImpersonationsStartedInput = {
@@ -6659,6 +7335,8 @@ export type UserCreateWithoutImpersonationsStartedInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
@@ -6705,6 +7383,8 @@ export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutImpersonationsStartedInput = {
@@ -6756,6 +7436,8 @@ export type UserCreateWithoutImpersonationsReceivedInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
@@ -6802,6 +7484,8 @@ export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutImpersonationsReceivedInput = {
@@ -6864,6 +7548,8 @@ export type UserUpdateWithoutImpersonationsStartedInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
@@ -6910,6 +7596,8 @@ export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUpsertWithoutImpersonationsReceivedInput = {
@@ -6967,6 +7655,8 @@ export type UserUpdateWithoutImpersonationsReceivedInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
@@ -7013,6 +7703,8 @@ export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutCouponsCreatedInput = {
@@ -7059,6 +7751,8 @@ export type UserCreateWithoutCouponsCreatedInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutCouponsCreatedInput = {
@@ -7105,6 +7799,8 @@ export type UserUncheckedCreateWithoutCouponsCreatedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutCouponsCreatedInput = {
@@ -7167,6 +7863,8 @@ export type UserUpdateWithoutCouponsCreatedInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
@@ -7213,6 +7911,8 @@ export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutCouponRedemptionsInput = {
@@ -7259,6 +7959,8 @@ export type UserCreateWithoutCouponRedemptionsInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
@@ -7305,6 +8007,8 @@ export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutCouponRedemptionsInput = {
@@ -7367,6 +8071,8 @@ export type UserUpdateWithoutCouponRedemptionsInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
@@ -7413,6 +8119,8 @@ export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserCreateWithoutPaymentOrdersInput = {
@@ -7459,6 +8167,8 @@ export type UserCreateWithoutPaymentOrdersInput = {
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserUncheckedCreateWithoutPaymentOrdersInput = {
@@ -7505,6 +8215,8 @@ export type UserUncheckedCreateWithoutPaymentOrdersInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type UserCreateOrConnectWithoutPaymentOrdersInput = {
@@ -7567,6 +8279,8 @@ export type UserUpdateWithoutPaymentOrdersInput = {
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
@@ -7613,6 +8327,8 @@ export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 
@@ -7648,6 +8364,8 @@ export type UserCountOutputType = {
   vitals: number
   vitalsRecorded: number
   staffMembers: number
+  changeRequests: number
+  changeRequestsResolved: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -7678,6 +8396,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   vitals?: boolean | UserCountOutputTypeCountVitalsArgs
   vitalsRecorded?: boolean | UserCountOutputTypeCountVitalsRecordedArgs
   staffMembers?: boolean | UserCountOutputTypeCountStaffMembersArgs
+  changeRequests?: boolean | UserCountOutputTypeCountChangeRequestsArgs
+  changeRequestsResolved?: boolean | UserCountOutputTypeCountChangeRequestsResolvedArgs
 }
 
 /**
@@ -7879,6 +8599,20 @@ export type UserCountOutputTypeCountStaffMembersArgs<ExtArgs extends runtime.Typ
   where?: Prisma.StaffProfileWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountChangeRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DoctorChangeRequestWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountChangeRequestsResolvedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DoctorChangeRequestWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -7925,6 +8659,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   vitalsRecorded?: boolean | Prisma.User$vitalsRecordedArgs<ExtArgs>
   staffAccount?: boolean | Prisma.User$staffAccountArgs<ExtArgs>
   staffMembers?: boolean | Prisma.User$staffMembersArgs<ExtArgs>
+  changeRequests?: boolean | Prisma.User$changeRequestsArgs<ExtArgs>
+  changeRequestsResolved?: boolean | Prisma.User$changeRequestsResolvedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -8007,6 +8743,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   vitalsRecorded?: boolean | Prisma.User$vitalsRecordedArgs<ExtArgs>
   staffAccount?: boolean | Prisma.User$staffAccountArgs<ExtArgs>
   staffMembers?: boolean | Prisma.User$staffMembersArgs<ExtArgs>
+  changeRequests?: boolean | Prisma.User$changeRequestsArgs<ExtArgs>
+  changeRequestsResolved?: boolean | Prisma.User$changeRequestsResolvedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -8047,6 +8785,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     vitalsRecorded: Prisma.$VitalReadingPayload<ExtArgs>[]
     staffAccount: Prisma.$StaffProfilePayload<ExtArgs> | null
     staffMembers: Prisma.$StaffProfilePayload<ExtArgs>[]
+    changeRequests: Prisma.$DoctorChangeRequestPayload<ExtArgs>[]
+    changeRequestsResolved: Prisma.$DoctorChangeRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -8487,6 +9227,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   vitalsRecorded<T extends Prisma.User$vitalsRecordedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vitalsRecordedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VitalReadingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   staffAccount<T extends Prisma.User$staffAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$staffAccountArgs<ExtArgs>>): Prisma.Prisma__StaffProfileClient<runtime.Types.Result.GetResult<Prisma.$StaffProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   staffMembers<T extends Prisma.User$staffMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$staffMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StaffProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  changeRequests<T extends Prisma.User$changeRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$changeRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DoctorChangeRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  changeRequestsResolved<T extends Prisma.User$changeRequestsResolvedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$changeRequestsResolvedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DoctorChangeRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9661,6 +10403,54 @@ export type User$staffMembersArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.StaffProfileScalarFieldEnum | Prisma.StaffProfileScalarFieldEnum[]
+}
+
+/**
+ * User.changeRequests
+ */
+export type User$changeRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DoctorChangeRequest
+   */
+  select?: Prisma.DoctorChangeRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DoctorChangeRequest
+   */
+  omit?: Prisma.DoctorChangeRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DoctorChangeRequestInclude<ExtArgs> | null
+  where?: Prisma.DoctorChangeRequestWhereInput
+  orderBy?: Prisma.DoctorChangeRequestOrderByWithRelationInput | Prisma.DoctorChangeRequestOrderByWithRelationInput[]
+  cursor?: Prisma.DoctorChangeRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DoctorChangeRequestScalarFieldEnum | Prisma.DoctorChangeRequestScalarFieldEnum[]
+}
+
+/**
+ * User.changeRequestsResolved
+ */
+export type User$changeRequestsResolvedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DoctorChangeRequest
+   */
+  select?: Prisma.DoctorChangeRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DoctorChangeRequest
+   */
+  omit?: Prisma.DoctorChangeRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DoctorChangeRequestInclude<ExtArgs> | null
+  where?: Prisma.DoctorChangeRequestWhereInput
+  orderBy?: Prisma.DoctorChangeRequestOrderByWithRelationInput | Prisma.DoctorChangeRequestOrderByWithRelationInput[]
+  cursor?: Prisma.DoctorChangeRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DoctorChangeRequestScalarFieldEnum | Prisma.DoctorChangeRequestScalarFieldEnum[]
 }
 
 /**
