@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { bookableDoctorWhere } from "@/lib/doctorBookable";
 import { haversine } from "@/lib/geo";
 import { findOpenClinic } from "@/lib/clinicAvailability";
 
@@ -52,17 +53,7 @@ export async function findReassignmentDoctor(params: {
   }
 
   const doctors = await prisma.user.findMany({
-    where: {
-      role: "DOCTOR",
-      deletedAt: null,
-      id: { not: excludeDoctorId },
-      doctorProfile: {
-        status: "APPROVED",
-        isVerified: true,
-        specialty,
-        OR: [{ trialEndsAt: { gt: now } }, { subscriptionPaidUntil: { gt: now } }],
-      },
-    },
+    where: { ...bookableDoctorWhere({ specialty }), id: { not: excludeDoctorId } },
     include: {
       doctorProfile: true,
       clinics: { where: { isActive: true }, orderBy: { sortOrder: "asc" }, include: { slots: true } },

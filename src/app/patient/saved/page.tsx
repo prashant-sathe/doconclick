@@ -17,6 +17,7 @@ interface SavedDoctorEntry {
   id: string;
   distanceKm: number | null;
   inRange: boolean;
+  bookable: boolean;
   doctor: {
     id: string;
     name: string;
@@ -154,7 +155,7 @@ export default function SavedDoctorsPage() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 flex-shrink-0">
-                  {profile?.status === "APPROVED" ? (
+                  {entry.bookable ? (
                     <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary py-2.5 px-4 text-xs whitespace-nowrap justify-center">
                       Book Again
                     </Link>

@@ -5,6 +5,7 @@ import { expireStalePendingRequests } from "@/lib/expireAppointments";
 import { safeNum } from "@/lib/adminAuth";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
+import { isDoctorBookable } from "@/lib/doctorBookable";
 
 // GET: The logged-in user's own appointments (as patient or as doctor)
 export async function GET() {
@@ -20,7 +21,19 @@ export async function GET() {
       where: { patientId: authUser.id },
       orderBy: { scheduledAt: "desc" },
       include: {
-        doctor: { select: { name: true, doctorProfile: { select: { specialty: true, photoUrl: true, clinicName: true, address: true, lat: true, lng: true } } } },
+        doctor: {
+          select: {
+            name: true,
+            role: true,
+            deletedAt: true,
+            doctorProfile: {
+              select: {
+                specialty: true, photoUrl: true, clinicName: true, address: true, lat: true, lng: true,
+                status: true, isVerified: true, trialEndsAt: true, subscriptionPaidUntil: true,
+              },
+            },
+          },
+        },
         clinic: { select: { name: true, address: true, lat: true, lng: true } },
         review: true,
         medicines: true,
@@ -41,8 +54,18 @@ export async function GET() {
       },
     });
     return NextResponse.json(
-      appointments.map(({ _count, ...a }) => ({
+      appointments.map(({ _count, doctor: { role, deletedAt, doctorProfile, ...doctor }, ...a }) => ({
         ...a,
+        // The bookable-rule fields are only read here, never sent to the client.
+        doctor: {
+          ...doctor,
+          doctorProfile: doctorProfile && {
+            specialty: doctorProfile.specialty, photoUrl: doctorProfile.photoUrl, clinicName: doctorProfile.clinicName,
+            address: doctorProfile.address, lat: doctorProfile.lat, lng: doctorProfile.lng,
+          },
+        },
+        // Whether "Book Follow-up" can go through (doctors only).
+        doctorBookable: isDoctorBookable({ role, deletedAt, doctorProfile }),
         amount: safeNum(a.amount),
         platformFee: safeNum(a.platformFee),
         discountAmount: safeNum(a.discountAmount),

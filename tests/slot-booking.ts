@@ -31,7 +31,7 @@ async function main() {
     const u = await prisma.user.create({
       data: {
         name: `Slot Test Doctor ${n}`, mobile: `7${n}${stamp}`, role: "DOCTOR",
-        doctorProfile: { create: { status: "APPROVED", offersClinic: true, offersVideo: true, consultFee: 300, videoFee: 200 } },
+        doctorProfile: { create: { status: "APPROVED", isVerified: true, trialEndsAt: new Date(Date.now() + 30 * 86_400_000), offersClinic: true, offersVideo: true, consultFee: 300, videoFee: 200 } },
       },
     });
     ids.push(u.id);

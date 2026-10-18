@@ -6,6 +6,7 @@ import { isClinicOpenNow } from "@/lib/clinicAvailability";
 import { haversine } from "@/lib/geo";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
+import { isDoctorBookable, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
 import { doctorSlotProblem, snapToClinicGrid, isSlotIndexViolation } from "@/lib/doctorSlots";
 
 export async function POST(req: Request) {
@@ -84,8 +85,11 @@ export async function POST(req: Request) {
       where: { id: doctorId },
       include: { doctorProfile: true },
     });
-    if (!doctor?.doctorProfile || doctor.role !== "DOCTOR" || doctor.deletedAt || doctor.doctorProfile.status !== "APPROVED") {
-      return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
+    // Same rule as the listing — a doctor hidden from search (unverified,
+    // lapsed trial/plan, deleted) can't be booked by a direct request either.
+    // Covers follow-ups too, which come through here with followUpOfId.
+    if (!isDoctorBookable(doctor) || !doctor?.doctorProfile) {
+      return NextResponse.json({ error: UNBOOKABLE_MESSAGE }, { status: 404 });
     }
 
     // A scheduled booking can only be placed for a future moment — the client

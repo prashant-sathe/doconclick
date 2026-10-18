@@ -12,6 +12,7 @@ import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
 import { netPayable, releaseCouponRedemption } from "@/lib/coupons";
+import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
 import { doctorSlotProblem, snapToClinicGrid, isTimedBooking, isSlotIndexViolation } from "@/lib/doctorSlots";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
@@ -562,6 +563,17 @@ export async function PATCH(
           { error: `The ${providerWord} is already on the way — please contact them directly to reschedule.` },
           { status: 400 }
         );
+      }
+      // Moving to a new time is a fresh booking of the doctor's slot, so it
+      // needs a doctor patients can book right now (cancelling never does).
+      if (appointment.providerType !== "NURSE") {
+        const doctor = await prisma.user.findUnique({ where: { id: appointment.doctorId }, select: DOCTOR_BOOKABLE_SELECT });
+        if (!isDoctorBookable(doctor)) {
+          return NextResponse.json(
+            { error: `${UNBOOKABLE_MESSAGE} You can keep your current time or cancel this appointment.` },
+            { status: 409 }
+          );
+        }
       }
       const picked = new Date(scheduledAt);
       if (Number.isNaN(picked.getTime()) || picked.getTime() <= Date.now()) {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type OpenAI from "openai";
 import { prisma } from "@/lib/prisma";
+import { bookableDoctorWhere } from "@/lib/doctorBookable";
 import { getAuthUser } from "@/lib/auth";
 import { getOpenAIClient, ASSISTANT_MODEL } from "@/lib/openai";
 import { ensureSpecialtiesSeeded } from "@/lib/specialties";
@@ -190,16 +191,7 @@ async function findDoctors(
 
   const now = new Date();
   const doctors = await prisma.user.findMany({
-    where: {
-      role: "DOCTOR",
-      deletedAt: null,
-      doctorProfile: {
-        status: "APPROVED",
-        isVerified: true,
-        specialty: args.specialty,
-        OR: [{ trialEndsAt: { gt: now } }, { subscriptionPaidUntil: { gt: now } }],
-      },
-    },
+    where: bookableDoctorWhere({ specialty: args.specialty }),
     include: { doctorProfile: true, clinics: { where: { isActive: true }, include: { slots: true } } },
     take: 20,
   });

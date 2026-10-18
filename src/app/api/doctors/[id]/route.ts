@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { bookableDoctorWhere } from "@/lib/doctorBookable";
 
 // GET: A single doctor's public profile (unauthenticated — used by QR/profile links)
 export async function GET(
@@ -7,19 +8,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const now = new Date();
 
   const doctor = await prisma.user.findFirst({
-    where: {
-      id,
-      role: "DOCTOR",
-      deletedAt: null,
-      doctorProfile: {
-        status: "APPROVED",
-        isVerified: true,
-        OR: [{ trialEndsAt: { gt: now } }, { subscriptionPaidUntil: { gt: now } }],
-      },
-    },
+    where: { id, ...bookableDoctorWhere() },
     select: {
       id: true,
       name: true,

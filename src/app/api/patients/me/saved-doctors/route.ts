@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { haversine, withinSearchRadius } from "@/lib/geo";
+import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
 
 // GET: the current patient's bookmarked doctors, each tagged with distance
 // and whether it falls inside the patient's chosen search range.
@@ -38,8 +39,13 @@ export async function GET(req: Request) {
         select: {
           id: true,
           name: true,
+          role: true,
+          deletedAt: true,
           doctorProfile: {
             select: {
+              isVerified: true,
+              trialEndsAt: true,
+              subscriptionPaidUntil: true,
               specialty: true,
               photoUrl: true,
               clinicName: true,
@@ -79,6 +85,9 @@ export async function GET(req: Request) {
       createdAt: s.createdAt,
       distanceKm,
       inRange,
+      // A saved doctor stays bookmarked even once they stop taking bookings;
+      // the client shows them as unavailable instead of offering Book.
+      bookable: isDoctorBookable(s.doctor),
       doctor: {
         id: s.doctor.id,
         name: s.doctor.name,
@@ -104,7 +113,7 @@ export async function GET(req: Request) {
   return NextResponse.json({ searchRadiusKm: radiusKm, saved: entries });
 }
 
-// POST: bookmark a doctor for later booking
+// POST: bookmark a doctor for later booking — only one patients can book now
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
@@ -116,9 +125,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "doctorId is required" }, { status: 400 });
   }
 
-  const doctor = await prisma.user.findUnique({ where: { id: doctorId } });
-  if (!doctor || doctor.role !== "DOCTOR") {
-    return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
+  const doctor = await prisma.user.findUnique({ where: { id: doctorId }, select: DOCTOR_BOOKABLE_SELECT });
+  if (!isDoctorBookable(doctor)) {
+    return NextResponse.json({ error: UNBOOKABLE_MESSAGE }, { status: 404 });
   }
 
   try {

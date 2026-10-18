@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { bookableDoctorWhere } from "@/lib/doctorBookable";
 import { SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -13,20 +14,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/doctor/register`, changeFrequency: "monthly", priority: 0.7 },
   ];
 
-  const now = new Date();
   const doctors = await prisma.user.findMany({
-    where: {
-      role: "DOCTOR",
-      deletedAt: null,
-      doctorProfile: {
-        status: "APPROVED",
-        isVerified: true,
-        OR: [
-          { trialEndsAt: { gt: now } },
-          { subscriptionPaidUntil: { gt: now } },
-        ],
-      },
-    },
+    where: bookableDoctorWhere(),
     select: { id: true, updatedAt: true },
   });
 

@@ -25,7 +25,13 @@ const at = (hhmm: string) => new Date(`${day}T${hhmm}:00+05:30`);
 
 async function main() {
   const stamp = String(Date.now()).slice(-9);
-  const doctor = await prisma.user.create({ data: { name: "Resched Test Doctor", mobile: "7" + stamp, role: "DOCTOR" } });
+  // Bookable (src/lib/doctorBookable.ts), or every reschedule is refused.
+  const doctor = await prisma.user.create({
+    data: {
+      name: "Resched Test Doctor", mobile: "7" + stamp, role: "DOCTOR",
+      doctorProfile: { create: { status: "APPROVED", isVerified: true, trialEndsAt: new Date(Date.now() + 30 * 86_400_000) } },
+    },
+  });
   const patient = await prisma.user.create({ data: { name: "Resched Test Patient", mobile: "6" + stamp, role: "PATIENT" } });
   const other = await prisma.user.create({ data: { name: "Resched Test Other", mobile: "5" + stamp, role: "PATIENT" } });
   const cookie = (u: typeof doctor) => `doconclick_token=${jwt.sign({ id: u.id, name: u.name, role: u.role, mobile: u.mobile }, SECRET)}`;

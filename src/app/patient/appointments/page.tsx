@@ -38,6 +38,7 @@ interface Attachment {
 interface Appointment {
   id: string;
   doctorId: string;
+  doctorBookable?: boolean;
   clinicId?: string | null;
   status: string;
   consultType: string;
@@ -538,7 +539,14 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> You rated {a.review.rating}/5
           </span>
         )}
-        {a.status === "COMPLETED" && (
+        {a.status === "COMPLETED" && a.providerType !== "NURSE" && a.doctorBookable === false ? (
+          <span
+            title="This doctor isn't taking bookings right now"
+            className="btn-secondary py-2 px-3 text-xs opacity-50 cursor-not-allowed"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> Follow-up unavailable
+          </span>
+        ) : a.status === "COMPLETED" && (
           <button
             onClick={() => router.push(
               a.providerType === "NURSE"
