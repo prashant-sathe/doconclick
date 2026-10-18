@@ -25,7 +25,8 @@
     "test:clinic-close": "tsx tests/clinic-close.ts",
     "test:account-impact": "tsx tests/account-impact.ts",
     "test:visit-address": "tsx tests/visit-address.ts",
-    "test:doctor-profile-lock": "tsx tests/doctor-profile-lock.ts"
+    "test:doctor-profile-lock": "tsx tests/doctor-profile-lock.ts",
+    "test:admin-stats": "tsx tests/admin-stats.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

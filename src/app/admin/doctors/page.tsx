@@ -80,7 +80,13 @@ interface DoctorDetail extends Doctor {
   clinics: Clinic[];
   asDoctor: Appointment[];
   pendingChangeRequest: ChangeRequest | null;
-  stats: { totalEarnings: number; completedCount: number; scheduledCount: number; cancelledCount: number; noShowCount: number };
+  // Over all of the doctor's appointments; earnings are from completed visits,
+  // net of the platform's commission (what settlements pay out).
+  stats: {
+    totalEarnings: number; grossEarnings: number; platformFees: number; totalCount: number;
+    completedCount: number; scheduledCount: number; pendingCount: number; cancelledCount: number;
+    rejectedCount: number; expiredCount: number; noShowCount: number;
+  };
 }
 
 // ── Status config ──────────────────────────────────────────────
@@ -337,7 +343,7 @@ function DoctorDrawer({
                   { label: "Scheduled",  value: s?.scheduledCount ?? 0,  icon: CalendarCheck, color: "text-blue-600",    bg: "bg-blue-50" },
                   { label: "Cancelled",  value: s?.cancelledCount ?? 0,  icon: AlertCircle,   color: "text-red-500",     bg: "bg-red-50" },
                   { label: "No-Show",    value: s?.noShowCount ?? 0,     icon: UserX,         color: "text-amber-600",   bg: "bg-amber-50" },
-                  { label: "Earnings",   value: `₹${(s?.totalEarnings ?? 0).toLocaleString("en-IN")}`, icon: TrendingUp, color: "text-purple-600", bg: "bg-purple-50" },
+                  { label: "Net Earnings", value: `₹${(s?.totalEarnings ?? 0).toLocaleString("en-IN")}`, icon: TrendingUp, color: "text-purple-600", bg: "bg-purple-50" },
                 ].map(({ label, value, icon: Icon, color, bg }) => (
                   <div key={label} className={`${bg} rounded-xl p-3 text-center`}>
                     <Icon className={`w-5 h-5 ${color} mx-auto mb-1`} />
@@ -346,6 +352,13 @@ function DoctorDrawer({
                   </div>
                 ))}
               </div>
+              {s && (
+                <p className="text-xs text-slate-500 -mt-3">
+                  Net earnings = ₹{s.grossEarnings.toLocaleString("en-IN")} billed on {s.completedCount} completed visit{s.completedCount === 1 ? "" : "s"}
+                  {" "}− ₹{s.platformFees.toLocaleString("en-IN")} platform commission. {s.totalCount} appointment{s.totalCount === 1 ? "" : "s"} in total
+                  {s.pendingCount > 0 ? `, ${s.pendingCount} awaiting a response` : ""}.
+                </p>
+              )}
 
               {p?.bio && (
                 <Section title="About" icon={FileText}>

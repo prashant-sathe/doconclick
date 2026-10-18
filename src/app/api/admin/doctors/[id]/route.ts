@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, revokeSessions } from "@/lib/auth";
+import { safeNum } from "@/lib/adminAuth";
 import { deleteAccount, DeletionBlockedError, accountDeletionPreview } from "@/lib/userDeletion";
 import { accountImpact, impactConfirmationResponse, resolveProviderBookings, type BookingAction } from "@/lib/accountImpact";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
@@ -20,6 +21,40 @@ async function requireAdmin() {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
   return null;
+}
+
+// Appointment counts by status and earnings over all of a doctor's
+// appointments. Earnings are from COMPLETED visits and net of the platform's
+// commission (amount − platformFee) — the same share settlements pay out; a
+// coupon discount is the platform's cost, not the doctor's.
+async function providerStats(doctorId: string) {
+  const [groups, completed] = await Promise.all([
+    prisma.appointment.groupBy({ by: ["status"], where: { doctorId }, _count: true }),
+    // Legacy rows with NaN amounts would turn the whole SUM into NaN — leave
+    // them out of the money (they're still counted above).
+    prisma.appointment.aggregate({
+      where: { doctorId, status: "COMPLETED", amount: { not: NaN }, platformFee: { not: NaN } },
+      _sum: { amount: true, platformFee: true },
+    }),
+  ]);
+  const count = (status: string) => groups.find((x) => x.status === status)?._count ?? 0;
+  const grossEarnings = safeNum(completed._sum.amount);
+  const platformFees = safeNum(completed._sum.platformFee);
+  return {
+    totalEarnings: Math.round((grossEarnings - platformFees) * 100) / 100,
+    grossEarnings,
+    platformFees,
+    totalCount: groups.reduce((sum, x) => sum + x._count, 0),
+    completedCount: count("COMPLETED"),
+    scheduledCount: count("SCHEDULED"),
+    pendingCount: count("PENDING_APPROVAL"),
+    cancelledCount: count("CANCELLED"),
+    rejectedCount: count("REJECTED"),
+    expiredCount: count("EXPIRED"),
+    // Kept separate from cancelledCount — a patient no-show isn't the doctor's
+    // doing and shouldn't be read as a cancellation on their record.
+    noShowCount: count("NO_SHOW"),
+  };
 }
 
 // GET – full doctor profile for admin view
@@ -50,16 +85,8 @@ export async function GET(
 
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const totalEarnings = user.asDoctor
-    .filter((a) => a.status === "COMPLETED")
-    .reduce((sum, a) => sum + (a.amount ?? 0), 0);
-
-  const completedCount  = user.asDoctor.filter((a) => a.status === "COMPLETED").length;
-  const scheduledCount  = user.asDoctor.filter((a) => a.status === "SCHEDULED").length;
-  const cancelledCount  = user.asDoctor.filter((a) => a.status === "CANCELLED").length;
-  // Kept separate from cancelledCount — a patient no-show isn't the doctor's
-  // doing and shouldn't be read as a cancellation on their record.
-  const noShowCount     = user.asDoctor.filter((a) => a.status === "NO_SHOW").length;
+  // Over every appointment, not just the 10 shown — one groupBy by status.
+  const stats = await providerStats(id);
 
   const { changeRequests, ...rest } = user;
   return NextResponse.json({
@@ -67,7 +94,7 @@ export async function GET(
     // A verified doctor's pending registration/qualification/specialty change.
     pendingChangeRequest: changeRequests[0] ?? null,
     password: undefined,
-    stats: { totalEarnings, completedCount, scheduledCount, cancelledCount, noShowCount },
+    stats,
   });
 }
 

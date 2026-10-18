@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { safeNum } from "@/lib/adminAuth";
 import { deleteAccount, DeletionBlockedError } from "@/lib/userDeletion";
 import { accountImpact, impactConfirmationResponse } from "@/lib/accountImpact";
 
@@ -40,16 +41,34 @@ export async function GET(
 
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const totalSpent     = user.asPatient.filter((a) => a.status === "COMPLETED").reduce((s, a) => s + (a.amount ?? 0), 0);
-  const completedCount = user.asPatient.filter((a) => a.status === "COMPLETED").length;
-  const scheduledCount = user.asPatient.filter((a) => a.status === "SCHEDULED").length;
-  const cancelledCount = user.asPatient.filter((a) => a.status === "CANCELLED").length;
-  const noShowCount    = user.asPatient.filter((a) => a.status === "NO_SHOW").length;
+  // Over every appointment, not just the 10 shown. Spend is what the patient
+  // actually paid for completed visits — the fee minus any coupon discount.
+  const [groups, completed] = await Promise.all([
+    prisma.appointment.groupBy({ by: ["status"], where: { patientId: id }, _count: true }),
+    // Legacy rows with NaN amounts would turn the whole SUM into NaN — leave
+    // them out of the money (they're still counted above).
+    prisma.appointment.aggregate({
+      where: { patientId: id, status: "COMPLETED", amount: { not: NaN }, discountAmount: { not: NaN } },
+      _sum: { amount: true, discountAmount: true },
+    }),
+  ]);
+  const count = (status: string) => groups.find((x) => x.status === status)?._count ?? 0;
+  const completedFees = safeNum(completed._sum.amount);
+  const completedDiscounts = safeNum(completed._sum.discountAmount);
 
   return NextResponse.json({
     ...user,
     password: undefined,
-    stats: { totalSpent, completedCount, scheduledCount, cancelledCount, noShowCount },
+    stats: {
+      totalSpent: Math.round((completedFees - completedDiscounts) * 100) / 100,
+      couponSavings: completedDiscounts,
+      totalCount: groups.reduce((sum, x) => sum + x._count, 0),
+      completedCount: count("COMPLETED"),
+      scheduledCount: count("SCHEDULED"),
+      pendingCount: count("PENDING_APPROVAL"),
+      cancelledCount: count("CANCELLED"),
+      noShowCount: count("NO_SHOW"),
+    },
   });
 }
 

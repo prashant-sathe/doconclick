@@ -53,7 +53,12 @@ interface Complaint {
 interface PatientDetail extends Patient {
   asPatient: Appointment[];
   complaints: Complaint[];
-  stats: { totalSpent: number; completedCount: number; scheduledCount: number; cancelledCount: number; noShowCount: number };
+  // Over all of the patient's appointments; spend is what they paid for
+  // completed visits (fee minus coupon discount).
+  stats: {
+    totalSpent: number; couponSavings: number; totalCount: number;
+    completedCount: number; scheduledCount: number; pendingCount: number; cancelledCount: number; noShowCount: number;
+  };
 }
 
 const APPT_BADGE: Record<string, string> = {
@@ -145,6 +150,13 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
                   </div>
                 ))}
               </div>
+              {s && (
+                <p className="text-xs text-slate-500 -mt-3">
+                  Paid for {s.completedCount} completed visit{s.completedCount === 1 ? "" : "s"}
+                  {s.couponSavings > 0 ? ` after ₹${s.couponSavings.toLocaleString("en-IN")} in coupon discounts` : ""}.
+                  {" "}{s.totalCount} appointment{s.totalCount === 1 ? "" : "s"} in total{s.pendingCount > 0 ? `, ${s.pendingCount} awaiting a response` : ""}.
+                </p>
+              )}
 
               {/* Contact */}
               <Section title="Contact Information" icon={Phone}>
