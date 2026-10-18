@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
 import { createCashfreeOrder } from "@/lib/cashfree";
-import { netPayable } from "@/lib/coupons";
+import { APPOINTMENT_ORDER_PREFIX, recordPaymentOrder } from "@/lib/paymentOrders";
 
 // POST: Creates a real Cashfree order for an appointment's online payment
 // and returns a payment_session_id for the client to redirect into checkout.
@@ -44,15 +44,20 @@ export async function POST(req: Request) {
   if (covered.length === 0) {
     return NextResponse.json({ error: "Wait for the nurse to accept your visits before paying." }, { status: 400 });
   }
-  const orderAmount = Math.round(covered.reduce((sum, a) => sum + netPayable(a), 0) * 100) / 100;
 
-  const orderId = `appt${appointment.id}_${Date.now()}`;
+  const orderId = `${APPOINTMENT_ORDER_PREFIX}${appointment.id}_${Date.now()}`;
   const origin = externalOrigin(req, new URL(req.url));
+
+  // Recorded before checkout opens, with each visit's share, so the webhook
+  // can settle *this* order even if the patient retries and creates another
+  // (previously the retry overwrote Appointment.cashfreeOrderId and an
+  // earlier order's payment was lost).
+  const record = await recordPaymentOrder({ orderId, patientId: authUser.id, appointments: covered });
 
   try {
     const { paymentSessionId } = await createCashfreeOrder({
       orderId,
-      amount: orderAmount,
+      amount: record.amount,
       customerId: authUser.id,
       customerName: authUser.name,
       customerPhone: authUser.mobile,
@@ -60,13 +65,10 @@ export async function POST(req: Request) {
       notifyUrl: `${origin}/api/payments/webhook`,
     });
 
-    await prisma.appointment.updateMany({
-      where: { id: { in: covered.map((a) => a.id) } },
-      data: { cashfreeOrderId: orderId },
-    });
-
     return NextResponse.json({ paymentSessionId });
   } catch (err) {
+    // No gateway order exists, so nothing can ever be paid against this one.
+    await prisma.paymentOrder.delete({ where: { id: record.id } }).catch(() => {});
     console.error("Failed to create Cashfree order for appointment", appointment.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }

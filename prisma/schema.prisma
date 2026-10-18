@@ -51,6 +51,7 @@ model User {
   impersonationsReceived ImpersonationLog[]      @relation("ImpersonationsReceived")
   couponsCreated         Coupon[]               @relation("CouponsCreatedByAdmin")
   couponRedemptions      CouponRedemption[]
+  paymentOrders          PaymentOrder[]         @relation("PatientPaymentOrders")
   documents              PatientDocument[]      @relation("PatientDocuments")
   nursePaymentLogs       NursePaymentLog[]      @relation("NursePaymentLogs")
   vitals                 VitalReading[]         @relation("PatientVitals")
@@ -436,6 +437,7 @@ model Appointment {
   attachments   PrescriptionAttachment[]
   messages      Message[]
   walletTransaction WalletTransaction?
+  paymentOrderItems PaymentOrderItem[]
   couponRedemption  CouponRedemption?
 }
 
@@ -454,7 +456,7 @@ model WalletTransaction {
   id                String       @id @default(cuid())
   walletId          String
   wallet            Wallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
-  type              String       // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT, REASSIGNMENT_CREDIT, CANCELLATION_REFUND
+  type              String       // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT, REASSIGNMENT_CREDIT, CANCELLATION_REFUND, PAYMENT_CREDIT
   amount            Float        // always positive; direction implied by `type`
   balanceAfter      Float?       // wallet.balance immediately after this row settled; null until status = SUCCESS
   status            String       @default("SUCCESS") // PENDING, SUCCESS, FAILED — only TOPUP rows are ever created PENDING
@@ -462,6 +464,10 @@ model WalletTransaction {
   // Set on the CANCELLATION_REFUND / REASSIGNMENT_CREDIT row that refunds an
   // appointment — unique, so concurrent cancels can never refund it twice.
   refundOfAppointmentId String?  @unique
+  // Set on the PAYMENT_CREDIT row for a gateway payment that couldn't (fully)
+  // be applied — unique, so a webhook retry or a racing verify-order can
+  // never credit the same payment twice.
+  creditOfPaymentId String?      @unique
   appointment       Appointment? @relation(fields: [appointmentId], references: [id])
   cashfreeOrderId   String?      // set for TOPUP rows
   cashfreePaymentId String?
@@ -750,4 +756,37 @@ model CouponRedemption {
   status        String   @default("RESERVED") // RESERVED, CONFIRMED
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+// One Cashfree checkout for one or more appointments (a nurse package's
+// visits share one order). Kept per order instead of overwriting
+// Appointment.cashfreeOrderId, so a payment that lands on an older order — or
+// a second payment for something already paid — can still be traced and
+// credited to the patient's wallet. Settled by src/lib/paymentOrders.ts.
+model PaymentOrder {
+  id          String   @id @default(cuid())
+  orderId     String   @unique // Cashfree order_id
+  patientId   String
+  patient     User     @relation("PatientPaymentOrders", fields: [patientId], references: [id])
+  amount      Float    // order_amount sent to Cashfree
+  status      String   @default("CREATED") // CREATED, PAID, PARTIAL (some items credited), CREDITED (all to wallet)
+  cfPaymentId String?  // the payment that settled it
+  settledAt   DateTime?
+  createdAt   DateTime @default(now())
+  items       PaymentOrderItem[]
+
+  @@index([patientId])
+}
+
+model PaymentOrderItem {
+  id             String       @id @default(cuid())
+  paymentOrderId String
+  paymentOrder   PaymentOrder @relation(fields: [paymentOrderId], references: [id], onDelete: Cascade)
+  appointmentId  String
+  appointment    Appointment  @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  amount         Float        // this appointment's share when the order was created
+  outcome        String?      // APPLIED (marked PAID) or CREDITED (sent to wallet); null until settled
+
+  @@unique([paymentOrderId, appointmentId])
+  @@index([appointmentId])
 }

@@ -297,6 +297,7 @@ export type UserWhereInput = {
   impersonationsReceived?: Prisma.ImpersonationLogListRelationFilter
   couponsCreated?: Prisma.CouponListRelationFilter
   couponRedemptions?: Prisma.CouponRedemptionListRelationFilter
+  paymentOrders?: Prisma.PaymentOrderListRelationFilter
   documents?: Prisma.PatientDocumentListRelationFilter
   nursePaymentLogs?: Prisma.NursePaymentLogListRelationFilter
   vitals?: Prisma.VitalReadingListRelationFilter
@@ -343,6 +344,7 @@ export type UserOrderByWithRelationInput = {
   impersonationsReceived?: Prisma.ImpersonationLogOrderByRelationAggregateInput
   couponsCreated?: Prisma.CouponOrderByRelationAggregateInput
   couponRedemptions?: Prisma.CouponRedemptionOrderByRelationAggregateInput
+  paymentOrders?: Prisma.PaymentOrderOrderByRelationAggregateInput
   documents?: Prisma.PatientDocumentOrderByRelationAggregateInput
   nursePaymentLogs?: Prisma.NursePaymentLogOrderByRelationAggregateInput
   vitals?: Prisma.VitalReadingOrderByRelationAggregateInput
@@ -392,6 +394,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   impersonationsReceived?: Prisma.ImpersonationLogListRelationFilter
   couponsCreated?: Prisma.CouponListRelationFilter
   couponRedemptions?: Prisma.CouponRedemptionListRelationFilter
+  paymentOrders?: Prisma.PaymentOrderListRelationFilter
   documents?: Prisma.PatientDocumentListRelationFilter
   nursePaymentLogs?: Prisma.NursePaymentLogListRelationFilter
   vitals?: Prisma.VitalReadingListRelationFilter
@@ -476,6 +479,7 @@ export type UserCreateInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -522,6 +526,7 @@ export type UserUncheckedCreateInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -568,6 +573,7 @@ export type UserUpdateInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -614,6 +620,7 @@ export type UserUncheckedUpdateInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -1194,6 +1201,20 @@ export type UserUpdateOneRequiredWithoutCouponRedemptionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCouponRedemptionsInput, Prisma.UserUpdateWithoutCouponRedemptionsInput>, Prisma.UserUncheckedUpdateWithoutCouponRedemptionsInput>
 }
 
+export type UserCreateNestedOneWithoutPaymentOrdersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPaymentOrdersInput, Prisma.UserUncheckedCreateWithoutPaymentOrdersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPaymentOrdersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPaymentOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPaymentOrdersInput, Prisma.UserUncheckedCreateWithoutPaymentOrdersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPaymentOrdersInput
+  upsert?: Prisma.UserUpsertWithoutPaymentOrdersInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPaymentOrdersInput, Prisma.UserUpdateWithoutPaymentOrdersInput>, Prisma.UserUncheckedUpdateWithoutPaymentOrdersInput>
+}
+
 export type UserCreateWithoutPushTokensInput = {
   id?: string
   name: string
@@ -1231,6 +1252,7 @@ export type UserCreateWithoutPushTokensInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -1276,6 +1298,7 @@ export type UserUncheckedCreateWithoutPushTokensInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -1337,6 +1360,7 @@ export type UserUpdateWithoutPushTokensInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -1382,6 +1406,7 @@ export type UserUncheckedUpdateWithoutPushTokensInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -1427,6 +1452,7 @@ export type UserCreateWithoutSavedDoctorsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -1472,6 +1498,7 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -1522,6 +1549,7 @@ export type UserCreateWithoutSavedByPatientsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -1567,6 +1595,7 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -1628,6 +1657,7 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -1673,6 +1703,7 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -1729,6 +1760,7 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -1774,6 +1806,7 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -1819,6 +1852,7 @@ export type UserCreateWithoutPatientProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -1864,6 +1898,7 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -1925,6 +1960,7 @@ export type UserUpdateWithoutPatientProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -1970,6 +2006,7 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -2016,6 +2053,7 @@ export type UserCreateWithoutDocumentsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
@@ -2061,6 +2099,7 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
@@ -2122,6 +2161,7 @@ export type UserUpdateWithoutDocumentsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
@@ -2167,6 +2207,7 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
@@ -2211,6 +2252,7 @@ export type UserCreateWithoutDoctorProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -2256,6 +2298,7 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -2317,6 +2360,7 @@ export type UserUpdateWithoutDoctorProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -2362,6 +2406,7 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -2407,6 +2452,7 @@ export type UserCreateWithoutNurseProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -2452,6 +2498,7 @@ export type UserUncheckedCreateWithoutNurseProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -2513,6 +2560,7 @@ export type UserUpdateWithoutNurseProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -2558,6 +2606,7 @@ export type UserUncheckedUpdateWithoutNurseProfileInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -2604,6 +2653,7 @@ export type UserCreateWithoutVitalsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
@@ -2649,6 +2699,7 @@ export type UserUncheckedCreateWithoutVitalsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
@@ -2699,6 +2750,7 @@ export type UserCreateWithoutVitalsRecordedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -2744,6 +2796,7 @@ export type UserUncheckedCreateWithoutVitalsRecordedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -2805,6 +2858,7 @@ export type UserUpdateWithoutVitalsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
@@ -2850,6 +2904,7 @@ export type UserUncheckedUpdateWithoutVitalsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
@@ -2906,6 +2961,7 @@ export type UserUpdateWithoutVitalsRecordedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -2951,6 +3007,7 @@ export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -2996,6 +3053,7 @@ export type UserCreateWithoutNursePaymentLogsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
@@ -3041,6 +3099,7 @@ export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
@@ -3102,6 +3161,7 @@ export type UserUpdateWithoutNursePaymentLogsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
@@ -3147,6 +3207,7 @@ export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
@@ -3192,6 +3253,7 @@ export type UserCreateWithoutStaffAccountInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -3237,6 +3299,7 @@ export type UserUncheckedCreateWithoutStaffAccountInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -3287,6 +3350,7 @@ export type UserCreateWithoutStaffMembersInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -3332,6 +3396,7 @@ export type UserUncheckedCreateWithoutStaffMembersInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -3393,6 +3458,7 @@ export type UserUpdateWithoutStaffAccountInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -3438,6 +3504,7 @@ export type UserUncheckedUpdateWithoutStaffAccountInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -3494,6 +3561,7 @@ export type UserUpdateWithoutStaffMembersInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -3539,6 +3607,7 @@ export type UserUncheckedUpdateWithoutStaffMembersInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -3583,6 +3652,7 @@ export type UserCreateWithoutAsPatientInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -3628,6 +3698,7 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -3678,6 +3749,7 @@ export type UserCreateWithoutAsDoctorInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -3723,6 +3795,7 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -3784,6 +3857,7 @@ export type UserUpdateWithoutAsPatientInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -3829,6 +3903,7 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -3885,6 +3960,7 @@ export type UserUpdateWithoutAsDoctorInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -3930,6 +4006,7 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -3975,6 +4052,7 @@ export type UserCreateWithoutWalletInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -4020,6 +4098,7 @@ export type UserUncheckedCreateWithoutWalletInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -4081,6 +4160,7 @@ export type UserUpdateWithoutWalletInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -4126,6 +4206,7 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -4171,6 +4252,7 @@ export type UserCreateWithoutWalletTransactionsAdjustedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -4216,6 +4298,7 @@ export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -4277,6 +4360,7 @@ export type UserUpdateWithoutWalletTransactionsAdjustedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -4322,6 +4406,7 @@ export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -4367,6 +4452,7 @@ export type UserCreateWithoutSettlementsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -4412,6 +4498,7 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -4462,6 +4549,7 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -4507,6 +4595,7 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -4568,6 +4657,7 @@ export type UserUpdateWithoutSettlementsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -4613,6 +4703,7 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -4669,6 +4760,7 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -4714,6 +4806,7 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -4759,6 +4852,7 @@ export type UserCreateWithoutPayoutRequestsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -4804,6 +4898,7 @@ export type UserUncheckedCreateWithoutPayoutRequestsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -4865,6 +4960,7 @@ export type UserUpdateWithoutPayoutRequestsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -4910,6 +5006,7 @@ export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -4955,6 +5052,7 @@ export type UserCreateWithoutPaymentLogsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -5000,6 +5098,7 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -5061,6 +5160,7 @@ export type UserUpdateWithoutPaymentLogsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -5106,6 +5206,7 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -5151,6 +5252,7 @@ export type UserCreateWithoutMessagesSentInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -5196,6 +5298,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -5257,6 +5360,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -5302,6 +5406,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -5347,6 +5452,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -5392,6 +5498,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -5442,6 +5549,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -5487,6 +5595,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -5548,6 +5657,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -5593,6 +5703,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -5649,6 +5760,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -5694,6 +5806,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -5739,6 +5852,7 @@ export type UserCreateWithoutComplaintsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -5784,6 +5898,7 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -5845,6 +5960,7 @@ export type UserUpdateWithoutComplaintsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -5890,6 +6006,7 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -5935,6 +6052,7 @@ export type UserCreateWithoutClinicsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -5980,6 +6098,7 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -6041,6 +6160,7 @@ export type UserUpdateWithoutClinicsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -6086,6 +6206,7 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -6131,6 +6252,7 @@ export type UserCreateWithoutAnnouncementsCreatedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -6176,6 +6298,7 @@ export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -6237,6 +6360,7 @@ export type UserUpdateWithoutAnnouncementsCreatedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -6282,6 +6406,7 @@ export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -6327,6 +6452,7 @@ export type UserCreateWithoutAnnouncementRecipientsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -6372,6 +6498,7 @@ export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -6433,6 +6560,7 @@ export type UserUpdateWithoutAnnouncementRecipientsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -6478,6 +6606,7 @@ export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -6523,6 +6652,7 @@ export type UserCreateWithoutImpersonationsStartedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -6568,6 +6698,7 @@ export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -6618,6 +6749,7 @@ export type UserCreateWithoutImpersonationsReceivedInput = {
   impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -6663,6 +6795,7 @@ export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
   impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -6724,6 +6857,7 @@ export type UserUpdateWithoutImpersonationsStartedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -6769,6 +6903,7 @@ export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -6825,6 +6960,7 @@ export type UserUpdateWithoutImpersonationsReceivedInput = {
   impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -6870,6 +7006,7 @@ export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
   impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -6915,6 +7052,7 @@ export type UserCreateWithoutCouponsCreatedInput = {
   impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -6960,6 +7098,7 @@ export type UserUncheckedCreateWithoutCouponsCreatedInput = {
   impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -7021,6 +7160,7 @@ export type UserUpdateWithoutCouponsCreatedInput = {
   impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -7066,6 +7206,7 @@ export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
   impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -7111,6 +7252,7 @@ export type UserCreateWithoutCouponRedemptionsInput = {
   impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
   impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
@@ -7156,6 +7298,7 @@ export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
   impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
   couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
@@ -7217,6 +7360,7 @@ export type UserUpdateWithoutCouponRedemptionsInput = {
   impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
   impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
@@ -7262,6 +7406,207 @@ export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
   impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
   impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
   couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+}
+
+export type UserCreateWithoutPaymentOrdersInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+}
+
+export type UserUncheckedCreateWithoutPaymentOrdersInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+}
+
+export type UserCreateOrConnectWithoutPaymentOrdersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPaymentOrdersInput, Prisma.UserUncheckedCreateWithoutPaymentOrdersInput>
+}
+
+export type UserUpsertWithoutPaymentOrdersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPaymentOrdersInput, Prisma.UserUncheckedUpdateWithoutPaymentOrdersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPaymentOrdersInput, Prisma.UserUncheckedCreateWithoutPaymentOrdersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPaymentOrdersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPaymentOrdersInput, Prisma.UserUncheckedUpdateWithoutPaymentOrdersInput>
+}
+
+export type UserUpdateWithoutPaymentOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
@@ -7297,6 +7642,7 @@ export type UserCountOutputType = {
   impersonationsReceived: number
   couponsCreated: number
   couponRedemptions: number
+  paymentOrders: number
   documents: number
   nursePaymentLogs: number
   vitals: number
@@ -7326,6 +7672,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   impersonationsReceived?: boolean | UserCountOutputTypeCountImpersonationsReceivedArgs
   couponsCreated?: boolean | UserCountOutputTypeCountCouponsCreatedArgs
   couponRedemptions?: boolean | UserCountOutputTypeCountCouponRedemptionsArgs
+  paymentOrders?: boolean | UserCountOutputTypeCountPaymentOrdersArgs
   documents?: boolean | UserCountOutputTypeCountDocumentsArgs
   nursePaymentLogs?: boolean | UserCountOutputTypeCountNursePaymentLogsArgs
   vitals?: boolean | UserCountOutputTypeCountVitalsArgs
@@ -7493,6 +7840,13 @@ export type UserCountOutputTypeCountCouponRedemptionsArgs<ExtArgs extends runtim
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountPaymentOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentOrderWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PatientDocumentWhereInput
 }
@@ -7564,6 +7918,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   impersonationsReceived?: boolean | Prisma.User$impersonationsReceivedArgs<ExtArgs>
   couponsCreated?: boolean | Prisma.User$couponsCreatedArgs<ExtArgs>
   couponRedemptions?: boolean | Prisma.User$couponRedemptionsArgs<ExtArgs>
+  paymentOrders?: boolean | Prisma.User$paymentOrdersArgs<ExtArgs>
   documents?: boolean | Prisma.User$documentsArgs<ExtArgs>
   nursePaymentLogs?: boolean | Prisma.User$nursePaymentLogsArgs<ExtArgs>
   vitals?: boolean | Prisma.User$vitalsArgs<ExtArgs>
@@ -7645,6 +8000,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   impersonationsReceived?: boolean | Prisma.User$impersonationsReceivedArgs<ExtArgs>
   couponsCreated?: boolean | Prisma.User$couponsCreatedArgs<ExtArgs>
   couponRedemptions?: boolean | Prisma.User$couponRedemptionsArgs<ExtArgs>
+  paymentOrders?: boolean | Prisma.User$paymentOrdersArgs<ExtArgs>
   documents?: boolean | Prisma.User$documentsArgs<ExtArgs>
   nursePaymentLogs?: boolean | Prisma.User$nursePaymentLogsArgs<ExtArgs>
   vitals?: boolean | Prisma.User$vitalsArgs<ExtArgs>
@@ -7684,6 +8040,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     impersonationsReceived: Prisma.$ImpersonationLogPayload<ExtArgs>[]
     couponsCreated: Prisma.$CouponPayload<ExtArgs>[]
     couponRedemptions: Prisma.$CouponRedemptionPayload<ExtArgs>[]
+    paymentOrders: Prisma.$PaymentOrderPayload<ExtArgs>[]
     documents: Prisma.$PatientDocumentPayload<ExtArgs>[]
     nursePaymentLogs: Prisma.$NursePaymentLogPayload<ExtArgs>[]
     vitals: Prisma.$VitalReadingPayload<ExtArgs>[]
@@ -8123,6 +8480,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   impersonationsReceived<T extends Prisma.User$impersonationsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$impersonationsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ImpersonationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   couponsCreated<T extends Prisma.User$couponsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$couponsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CouponPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   couponRedemptions<T extends Prisma.User$couponRedemptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$couponRedemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CouponRedemptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  paymentOrders<T extends Prisma.User$paymentOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$paymentOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   documents<T extends Prisma.User$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   nursePaymentLogs<T extends Prisma.User$nursePaymentLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$nursePaymentLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NursePaymentLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   vitals<T extends Prisma.User$vitalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vitalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VitalReadingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -9140,6 +9498,30 @@ export type User$couponRedemptionsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.CouponRedemptionScalarFieldEnum | Prisma.CouponRedemptionScalarFieldEnum[]
+}
+
+/**
+ * User.paymentOrders
+ */
+export type User$paymentOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentOrder
+   */
+  select?: Prisma.PaymentOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentOrder
+   */
+  omit?: Prisma.PaymentOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentOrderInclude<ExtArgs> | null
+  where?: Prisma.PaymentOrderWhereInput
+  orderBy?: Prisma.PaymentOrderOrderByWithRelationInput | Prisma.PaymentOrderOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentOrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentOrderScalarFieldEnum | Prisma.PaymentOrderScalarFieldEnum[]
 }
 
 /**

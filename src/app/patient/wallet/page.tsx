@@ -12,9 +12,11 @@ const TYPE_LABEL: Record<string, string> = {
   ADMIN_CREDIT: "Credited by admin",
   ADMIN_DEBIT: "Debited by admin",
   REASSIGNMENT_CREDIT: "Appointment cancelled — refunded",
+  CANCELLATION_REFUND: "Appointment cancelled — refunded",
+  PAYMENT_CREDIT: "Payment credited to wallet",
 };
 
-const CREDIT_TYPES = new Set(["TOPUP", "ADMIN_CREDIT", "REASSIGNMENT_CREDIT"]);
+const CREDIT_TYPES = new Set(["TOPUP", "ADMIN_CREDIT", "REASSIGNMENT_CREDIT", "CANCELLATION_REFUND", "PAYMENT_CREDIT"]);
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: "Processing",

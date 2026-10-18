@@ -5,10 +5,13 @@ import crypto from "crypto";
 export const DOCTOR_REGISTRATION_FEE = 99;
 export const DOCTOR_SUBSCRIPTION_FEE = 499;
 
+// CASHFREE_API_BASE points at a local mock in tests (tests/payment-orders.ts)
+// so they never reach the real gateway. Never set it in production.
 const CASHFREE_BASE =
-  process.env.CASHFREE_ENV === "sandbox"
+  process.env.CASHFREE_API_BASE ??
+  (process.env.CASHFREE_ENV === "sandbox"
     ? "https://sandbox.cashfree.com/pg"
-    : "https://api.cashfree.com/pg";
+    : "https://api.cashfree.com/pg");
 
 const CASHFREE_API_VERSION = "2026-01-01";
 
@@ -72,6 +75,25 @@ export async function createCashfreeOrder({
   }
 
   return { paymentSessionId: data.payment_session_id, cfOrderId: data.cf_order_id };
+}
+
+// The successful payment on an order, if any — for the return page's
+// verify-order fallback when the webhook is late or never arrives.
+export async function fetchSuccessfulPayment(
+  orderId: string
+): Promise<{ cfPaymentId: string; amount: number } | null> {
+  const res = await fetch(`${CASHFREE_BASE}/orders/${encodeURIComponent(orderId)}/payments`, {
+    headers: cashfreeHeaders(),
+    cache: "no-store",
+  });
+  if (res.status === 404) return null;
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !Array.isArray(data)) {
+    console.error("Cashfree get-payments failed:", res.status, data);
+    throw new Error("Could not check payment status");
+  }
+  const paid = data.find((p: { payment_status?: string }) => p.payment_status === "SUCCESS");
+  return paid ? { cfPaymentId: String(paid.cf_payment_id), amount: Number(paid.payment_amount) } : null;
 }
 
 // Cashfree signs `timestamp + rawBody` with HMAC-SHA256 (base64-encoded) using

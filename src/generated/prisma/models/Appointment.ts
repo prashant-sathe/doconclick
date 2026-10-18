@@ -606,6 +606,7 @@ export type AppointmentWhereInput = {
   attachments?: Prisma.PrescriptionAttachmentListRelationFilter
   messages?: Prisma.MessageListRelationFilter
   walletTransaction?: Prisma.XOR<Prisma.WalletTransactionNullableScalarRelationFilter, Prisma.WalletTransactionWhereInput> | null
+  paymentOrderItems?: Prisma.PaymentOrderItemListRelationFilter
   couponRedemption?: Prisma.XOR<Prisma.CouponRedemptionNullableScalarRelationFilter, Prisma.CouponRedemptionWhereInput> | null
 }
 
@@ -680,6 +681,7 @@ export type AppointmentOrderByWithRelationInput = {
   attachments?: Prisma.PrescriptionAttachmentOrderByRelationAggregateInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
   walletTransaction?: Prisma.WalletTransactionOrderByWithRelationInput
+  paymentOrderItems?: Prisma.PaymentOrderItemOrderByRelationAggregateInput
   couponRedemption?: Prisma.CouponRedemptionOrderByWithRelationInput
 }
 
@@ -757,6 +759,7 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   attachments?: Prisma.PrescriptionAttachmentListRelationFilter
   messages?: Prisma.MessageListRelationFilter
   walletTransaction?: Prisma.XOR<Prisma.WalletTransactionNullableScalarRelationFilter, Prisma.WalletTransactionWhereInput> | null
+  paymentOrderItems?: Prisma.PaymentOrderItemListRelationFilter
   couponRedemption?: Prisma.XOR<Prisma.CouponRedemptionNullableScalarRelationFilter, Prisma.CouponRedemptionWhereInput> | null
 }, "id" | "reassignedFromId">
 
@@ -929,6 +932,7 @@ export type AppointmentCreateInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -991,6 +995,7 @@ export type AppointmentUncheckedCreateInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -1053,6 +1058,7 @@ export type AppointmentUpdateInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -1115,6 +1121,7 @@ export type AppointmentUncheckedUpdateInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -2110,6 +2117,20 @@ export type AppointmentUpdateOneWithoutCouponRedemptionNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AppointmentUpdateToOneWithWhereWithoutCouponRedemptionInput, Prisma.AppointmentUpdateWithoutCouponRedemptionInput>, Prisma.AppointmentUncheckedUpdateWithoutCouponRedemptionInput>
 }
 
+export type AppointmentCreateNestedOneWithoutPaymentOrderItemsInput = {
+  create?: Prisma.XOR<Prisma.AppointmentCreateWithoutPaymentOrderItemsInput, Prisma.AppointmentUncheckedCreateWithoutPaymentOrderItemsInput>
+  connectOrCreate?: Prisma.AppointmentCreateOrConnectWithoutPaymentOrderItemsInput
+  connect?: Prisma.AppointmentWhereUniqueInput
+}
+
+export type AppointmentUpdateOneRequiredWithoutPaymentOrderItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.AppointmentCreateWithoutPaymentOrderItemsInput, Prisma.AppointmentUncheckedCreateWithoutPaymentOrderItemsInput>
+  connectOrCreate?: Prisma.AppointmentCreateOrConnectWithoutPaymentOrderItemsInput
+  upsert?: Prisma.AppointmentUpsertWithoutPaymentOrderItemsInput
+  connect?: Prisma.AppointmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AppointmentUpdateToOneWithWhereWithoutPaymentOrderItemsInput, Prisma.AppointmentUpdateWithoutPaymentOrderItemsInput>, Prisma.AppointmentUncheckedUpdateWithoutPaymentOrderItemsInput>
+}
+
 export type AppointmentCreateWithoutPatientInput = {
   id?: string
   symptoms: string
@@ -2168,6 +2189,7 @@ export type AppointmentCreateWithoutPatientInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -2229,6 +2251,7 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -2300,6 +2323,7 @@ export type AppointmentCreateWithoutDoctorInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -2361,6 +2385,7 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -2518,6 +2543,7 @@ export type AppointmentCreateWithoutDependentInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -2579,6 +2605,7 @@ export type AppointmentUncheckedCreateWithoutDependentInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -2666,6 +2693,7 @@ export type AppointmentCreateWithoutPrescriptionDocInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -2727,6 +2755,7 @@ export type AppointmentUncheckedCreateWithoutPrescriptionDocInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -2814,6 +2843,7 @@ export type AppointmentCreateWithoutNurseServiceInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -2875,6 +2905,7 @@ export type AppointmentUncheckedCreateWithoutNurseServiceInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -2962,6 +2993,7 @@ export type AppointmentCreateWithoutVitalsInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3023,6 +3055,7 @@ export type AppointmentUncheckedCreateWithoutVitalsInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3100,6 +3133,7 @@ export type AppointmentUpdateWithoutVitalsInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -3161,6 +3195,7 @@ export type AppointmentUncheckedUpdateWithoutVitalsInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -3222,6 +3257,7 @@ export type AppointmentCreateWithoutPackageInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3283,6 +3319,7 @@ export type AppointmentUncheckedCreateWithoutPackageInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3370,6 +3407,7 @@ export type AppointmentCreateWithoutReferralGivenInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3431,6 +3469,7 @@ export type AppointmentUncheckedCreateWithoutReferralGivenInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3497,6 +3536,7 @@ export type AppointmentCreateWithoutNurseReferralInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3558,6 +3598,7 @@ export type AppointmentUncheckedCreateWithoutNurseReferralInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3640,6 +3681,7 @@ export type AppointmentUpdateWithoutReferralGivenInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -3701,6 +3743,7 @@ export type AppointmentUncheckedUpdateWithoutReferralGivenInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -3778,6 +3821,7 @@ export type AppointmentCreateWithoutFollowUpsInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3839,6 +3883,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3905,6 +3950,7 @@ export type AppointmentCreateWithoutFollowUpOfInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -3966,6 +4012,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -4037,6 +4084,7 @@ export type AppointmentCreateWithoutReassignedToInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -4098,6 +4146,7 @@ export type AppointmentUncheckedCreateWithoutReassignedToInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -4164,6 +4213,7 @@ export type AppointmentCreateWithoutReassignedFromInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -4225,6 +4275,7 @@ export type AppointmentUncheckedCreateWithoutReassignedFromInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -4302,6 +4353,7 @@ export type AppointmentUpdateWithoutFollowUpsInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -4363,6 +4415,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -4451,6 +4504,7 @@ export type AppointmentUpdateWithoutReassignedToInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -4512,6 +4566,7 @@ export type AppointmentUncheckedUpdateWithoutReassignedToInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -4584,6 +4639,7 @@ export type AppointmentUpdateWithoutReassignedFromInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -4645,6 +4701,7 @@ export type AppointmentUncheckedUpdateWithoutReassignedFromInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -4706,6 +4763,7 @@ export type AppointmentCreateWithoutWalletTransactionInput = {
   tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -4767,6 +4825,7 @@ export type AppointmentUncheckedCreateWithoutWalletTransactionInput = {
   tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -4844,6 +4903,7 @@ export type AppointmentUpdateWithoutWalletTransactionInput = {
   tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -4905,6 +4965,7 @@ export type AppointmentUncheckedUpdateWithoutWalletTransactionInput = {
   tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -4966,6 +5027,7 @@ export type AppointmentCreateWithoutSettlementInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -5027,6 +5089,7 @@ export type AppointmentUncheckedCreateWithoutSettlementInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -5114,6 +5177,7 @@ export type AppointmentCreateWithoutMessagesInput = {
   tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -5175,6 +5239,7 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -5252,6 +5317,7 @@ export type AppointmentUpdateWithoutMessagesInput = {
   tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -5313,6 +5379,7 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -5374,6 +5441,7 @@ export type AppointmentCreateWithoutMedicinesInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -5435,6 +5503,7 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -5512,6 +5581,7 @@ export type AppointmentUpdateWithoutMedicinesInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -5573,6 +5643,7 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -5634,6 +5705,7 @@ export type AppointmentCreateWithoutTestsInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -5695,6 +5767,7 @@ export type AppointmentUncheckedCreateWithoutTestsInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -5772,6 +5845,7 @@ export type AppointmentUpdateWithoutTestsInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -5833,6 +5907,7 @@ export type AppointmentUncheckedUpdateWithoutTestsInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -5894,6 +5969,7 @@ export type AppointmentCreateWithoutAttachmentsInput = {
   tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -5955,6 +6031,7 @@ export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
   tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -6032,6 +6109,7 @@ export type AppointmentUpdateWithoutAttachmentsInput = {
   tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -6093,6 +6171,7 @@ export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
   tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -6154,6 +6233,7 @@ export type AppointmentCreateWithoutReviewInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -6215,6 +6295,7 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -6292,6 +6373,7 @@ export type AppointmentUpdateWithoutReviewInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -6353,6 +6435,7 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -6414,6 +6497,7 @@ export type AppointmentCreateWithoutClinicInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -6475,6 +6559,7 @@ export type AppointmentUncheckedCreateWithoutClinicInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -6562,6 +6647,7 @@ export type AppointmentCreateWithoutCouponInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
 }
 
@@ -6623,6 +6709,7 @@ export type AppointmentUncheckedCreateWithoutCouponInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
 }
 
@@ -6711,6 +6798,7 @@ export type AppointmentCreateWithoutCouponRedemptionInput = {
   attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutCouponRedemptionInput = {
@@ -6772,6 +6860,7 @@ export type AppointmentUncheckedCreateWithoutCouponRedemptionInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutCouponRedemptionInput = {
@@ -6849,6 +6938,7 @@ export type AppointmentUpdateWithoutCouponRedemptionInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutCouponRedemptionInput = {
@@ -6910,6 +7000,271 @@ export type AppointmentUncheckedUpdateWithoutCouponRedemptionInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
+}
+
+export type AppointmentCreateWithoutPaymentOrderItemsInput = {
+  id?: string
+  symptoms: string
+  patientName?: string | null
+  relation?: string
+  allergies?: string | null
+  consentGiven?: boolean
+  consultType?: string
+  providerType?: string
+  serviceName?: string | null
+  visitOtp?: string | null
+  visitOtpAttempts?: number
+  visitStartedAt?: Date | string | null
+  visitStartNote?: string | null
+  packageIndex?: number | null
+  status?: string
+  acceptedAt?: Date | string | null
+  paymentMethod?: string
+  paymentStatus?: string
+  paidAt?: Date | string | null
+  isEmergency?: boolean
+  amount?: number
+  platformFee?: number
+  couponCode?: string | null
+  discountAmount?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
+  prescriptionUrl?: string | null
+  doctorNotes?: string | null
+  travelStatus?: string
+  doctorLat?: number | null
+  doctorLng?: number | null
+  doctorLocationUpdatedAt?: Date | string | null
+  scheduledAt?: Date | string
+  requestedScheduledAt?: Date | string | null
+  reminderSentAt?: Date | string | null
+  createdAt?: Date | string
+  patient: Prisma.UserCreateNestedOneWithoutAsPatientInput
+  doctor: Prisma.UserCreateNestedOneWithoutAsDoctorInput
+  dependent?: Prisma.PatientDependentCreateNestedOneWithoutAppointmentsInput
+  nurseService?: Prisma.NurseServiceCreateNestedOneWithoutAppointmentsInput
+  prescriptionDoc?: Prisma.PatientDocumentCreateNestedOneWithoutNurseBookingsInput
+  package?: Prisma.NursePackageCreateNestedOneWithoutAppointmentsInput
+  nurseReferral?: Prisma.NurseReferralCreateNestedOneWithoutBookingsInput
+  referralGiven?: Prisma.NurseReferralCreateNestedOneWithoutAppointmentInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutAppointmentInput
+  coupon?: Prisma.CouponCreateNestedOneWithoutAppointmentsInput
+  settlement?: Prisma.SettlementCreateNestedOneWithoutAppointmentsInput
+  followUpOf?: Prisma.AppointmentCreateNestedOneWithoutFollowUpsInput
+  followUps?: Prisma.AppointmentCreateNestedManyWithoutFollowUpOfInput
+  reassignedFrom?: Prisma.AppointmentCreateNestedOneWithoutReassignedToInput
+  reassignedTo?: Prisma.AppointmentCreateNestedOneWithoutReassignedFromInput
+  clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
+  review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
+  medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
+  attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
+  messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
+  walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+}
+
+export type AppointmentUncheckedCreateWithoutPaymentOrderItemsInput = {
+  id?: string
+  patientId: string
+  doctorId: string
+  symptoms: string
+  patientName?: string | null
+  relation?: string
+  allergies?: string | null
+  dependentId?: string | null
+  consentGiven?: boolean
+  consultType?: string
+  providerType?: string
+  nurseServiceId?: string | null
+  serviceName?: string | null
+  prescriptionDocId?: string | null
+  visitOtp?: string | null
+  visitOtpAttempts?: number
+  visitStartedAt?: Date | string | null
+  visitStartNote?: string | null
+  packageId?: string | null
+  packageIndex?: number | null
+  nurseReferralId?: string | null
+  status?: string
+  acceptedAt?: Date | string | null
+  paymentMethod?: string
+  paymentStatus?: string
+  paidAt?: Date | string | null
+  isEmergency?: boolean
+  amount?: number
+  platformFee?: number
+  couponId?: string | null
+  couponCode?: string | null
+  discountAmount?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
+  settlementId?: string | null
+  prescriptionUrl?: string | null
+  doctorNotes?: string | null
+  travelStatus?: string
+  doctorLat?: number | null
+  doctorLng?: number | null
+  doctorLocationUpdatedAt?: Date | string | null
+  followUpOfId?: string | null
+  reassignedFromId?: string | null
+  clinicId?: string | null
+  scheduledAt?: Date | string
+  requestedScheduledAt?: Date | string | null
+  reminderSentAt?: Date | string | null
+  createdAt?: Date | string
+  referralGiven?: Prisma.NurseReferralUncheckedCreateNestedOneWithoutAppointmentInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutAppointmentInput
+  followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
+  reassignedTo?: Prisma.AppointmentUncheckedCreateNestedOneWithoutReassignedFromInput
+  review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
+  medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
+  attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
+  walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+}
+
+export type AppointmentCreateOrConnectWithoutPaymentOrderItemsInput = {
+  where: Prisma.AppointmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppointmentCreateWithoutPaymentOrderItemsInput, Prisma.AppointmentUncheckedCreateWithoutPaymentOrderItemsInput>
+}
+
+export type AppointmentUpsertWithoutPaymentOrderItemsInput = {
+  update: Prisma.XOR<Prisma.AppointmentUpdateWithoutPaymentOrderItemsInput, Prisma.AppointmentUncheckedUpdateWithoutPaymentOrderItemsInput>
+  create: Prisma.XOR<Prisma.AppointmentCreateWithoutPaymentOrderItemsInput, Prisma.AppointmentUncheckedCreateWithoutPaymentOrderItemsInput>
+  where?: Prisma.AppointmentWhereInput
+}
+
+export type AppointmentUpdateToOneWithWhereWithoutPaymentOrderItemsInput = {
+  where?: Prisma.AppointmentWhereInput
+  data: Prisma.XOR<Prisma.AppointmentUpdateWithoutPaymentOrderItemsInput, Prisma.AppointmentUncheckedUpdateWithoutPaymentOrderItemsInput>
+}
+
+export type AppointmentUpdateWithoutPaymentOrderItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  consultType?: Prisma.StringFieldUpdateOperationsInput | string
+  providerType?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitOtp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitOtpAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  visitStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visitStartNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patient?: Prisma.UserUpdateOneRequiredWithoutAsPatientNestedInput
+  doctor?: Prisma.UserUpdateOneRequiredWithoutAsDoctorNestedInput
+  dependent?: Prisma.PatientDependentUpdateOneWithoutAppointmentsNestedInput
+  nurseService?: Prisma.NurseServiceUpdateOneWithoutAppointmentsNestedInput
+  prescriptionDoc?: Prisma.PatientDocumentUpdateOneWithoutNurseBookingsNestedInput
+  package?: Prisma.NursePackageUpdateOneWithoutAppointmentsNestedInput
+  nurseReferral?: Prisma.NurseReferralUpdateOneWithoutBookingsNestedInput
+  referralGiven?: Prisma.NurseReferralUpdateOneWithoutAppointmentNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutAppointmentNestedInput
+  coupon?: Prisma.CouponUpdateOneWithoutAppointmentsNestedInput
+  settlement?: Prisma.SettlementUpdateOneWithoutAppointmentsNestedInput
+  followUpOf?: Prisma.AppointmentUpdateOneWithoutFollowUpsNestedInput
+  followUps?: Prisma.AppointmentUpdateManyWithoutFollowUpOfNestedInput
+  reassignedFrom?: Prisma.AppointmentUpdateOneWithoutReassignedToNestedInput
+  reassignedTo?: Prisma.AppointmentUpdateOneWithoutReassignedFromNestedInput
+  clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
+  review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
+  medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
+  attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
+  walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+}
+
+export type AppointmentUncheckedUpdateWithoutPaymentOrderItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  patientId?: Prisma.StringFieldUpdateOperationsInput | string
+  doctorId?: Prisma.StringFieldUpdateOperationsInput | string
+  symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dependentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  consultType?: Prisma.StringFieldUpdateOperationsInput | string
+  providerType?: Prisma.StringFieldUpdateOperationsInput | string
+  nurseServiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prescriptionDocId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitOtp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitOtpAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  visitStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visitStartNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  packageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settlementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  followUpOfId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reassignedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  referralGiven?: Prisma.NurseReferralUncheckedUpdateOneWithoutAppointmentNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutAppointmentNestedInput
+  followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
+  reassignedTo?: Prisma.AppointmentUncheckedUpdateOneWithoutReassignedFromNestedInput
+  review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
+  attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
+  walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateManyPatientInput = {
@@ -7070,6 +7425,7 @@ export type AppointmentUpdateWithoutPatientInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -7131,6 +7487,7 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -7242,6 +7599,7 @@ export type AppointmentUpdateWithoutDoctorInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -7303,6 +7661,7 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -7464,6 +7823,7 @@ export type AppointmentUpdateWithoutDependentInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -7525,6 +7885,7 @@ export type AppointmentUncheckedUpdateWithoutDependentInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -7686,6 +8047,7 @@ export type AppointmentUpdateWithoutPrescriptionDocInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -7747,6 +8109,7 @@ export type AppointmentUncheckedUpdateWithoutPrescriptionDocInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -7908,6 +8271,7 @@ export type AppointmentUpdateWithoutNurseServiceInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -7969,6 +8333,7 @@ export type AppointmentUncheckedUpdateWithoutNurseServiceInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -8130,6 +8495,7 @@ export type AppointmentUpdateWithoutPackageInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -8191,6 +8557,7 @@ export type AppointmentUncheckedUpdateWithoutPackageInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -8352,6 +8719,7 @@ export type AppointmentUpdateWithoutNurseReferralInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -8413,6 +8781,7 @@ export type AppointmentUncheckedUpdateWithoutNurseReferralInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -8574,6 +8943,7 @@ export type AppointmentUpdateWithoutFollowUpOfInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -8635,6 +9005,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -8796,6 +9167,7 @@ export type AppointmentUpdateWithoutSettlementInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -8857,6 +9229,7 @@ export type AppointmentUncheckedUpdateWithoutSettlementInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -9018,6 +9391,7 @@ export type AppointmentUpdateWithoutClinicInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -9079,6 +9453,7 @@ export type AppointmentUncheckedUpdateWithoutClinicInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -9240,6 +9615,7 @@ export type AppointmentUpdateWithoutCouponInput = {
   attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -9301,6 +9677,7 @@ export type AppointmentUncheckedUpdateWithoutCouponInput = {
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
 }
 
@@ -9366,6 +9743,7 @@ export type AppointmentCountOutputType = {
   tests: number
   attachments: number
   messages: number
+  paymentOrderItems: number
 }
 
 export type AppointmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -9375,6 +9753,7 @@ export type AppointmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   tests?: boolean | AppointmentCountOutputTypeCountTestsArgs
   attachments?: boolean | AppointmentCountOutputTypeCountAttachmentsArgs
   messages?: boolean | AppointmentCountOutputTypeCountMessagesArgs
+  paymentOrderItems?: boolean | AppointmentCountOutputTypeCountPaymentOrderItemsArgs
 }
 
 /**
@@ -9427,6 +9806,13 @@ export type AppointmentCountOutputTypeCountAttachmentsArgs<ExtArgs extends runti
  */
 export type AppointmentCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.MessageWhereInput
+}
+
+/**
+ * AppointmentCountOutputType without action
+ */
+export type AppointmentCountOutputTypeCountPaymentOrderItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentOrderItemWhereInput
 }
 
 
@@ -9501,6 +9887,7 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   attachments?: boolean | Prisma.Appointment$attachmentsArgs<ExtArgs>
   messages?: boolean | Prisma.Appointment$messagesArgs<ExtArgs>
   walletTransaction?: boolean | Prisma.Appointment$walletTransactionArgs<ExtArgs>
+  paymentOrderItems?: boolean | Prisma.Appointment$paymentOrderItemsArgs<ExtArgs>
   couponRedemption?: boolean | Prisma.Appointment$couponRedemptionArgs<ExtArgs>
   _count?: boolean | Prisma.AppointmentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["appointment"]>
@@ -9706,6 +10093,7 @@ export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.Internal
   attachments?: boolean | Prisma.Appointment$attachmentsArgs<ExtArgs>
   messages?: boolean | Prisma.Appointment$messagesArgs<ExtArgs>
   walletTransaction?: boolean | Prisma.Appointment$walletTransactionArgs<ExtArgs>
+  paymentOrderItems?: boolean | Prisma.Appointment$paymentOrderItemsArgs<ExtArgs>
   couponRedemption?: boolean | Prisma.Appointment$couponRedemptionArgs<ExtArgs>
   _count?: boolean | Prisma.AppointmentCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -9763,6 +10151,7 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     attachments: Prisma.$PrescriptionAttachmentPayload<ExtArgs>[]
     messages: Prisma.$MessagePayload<ExtArgs>[]
     walletTransaction: Prisma.$WalletTransactionPayload<ExtArgs> | null
+    paymentOrderItems: Prisma.$PaymentOrderItemPayload<ExtArgs>[]
     couponRedemption: Prisma.$CouponRedemptionPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -10230,6 +10619,7 @@ export interface Prisma__AppointmentClient<T, Null = never, ExtArgs extends runt
   attachments<T extends Prisma.Appointment$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrescriptionAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messages<T extends Prisma.Appointment$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   walletTransaction<T extends Prisma.Appointment$walletTransactionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$walletTransactionArgs<ExtArgs>>): Prisma.Prisma__WalletTransactionClient<runtime.Types.Result.GetResult<Prisma.$WalletTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  paymentOrderItems<T extends Prisma.Appointment$paymentOrderItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$paymentOrderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentOrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   couponRedemption<T extends Prisma.Appointment$couponRedemptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$couponRedemptionArgs<ExtArgs>>): Prisma.Prisma__CouponRedemptionClient<runtime.Types.Result.GetResult<Prisma.$CouponRedemptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -11116,6 +11506,30 @@ export type Appointment$walletTransactionArgs<ExtArgs extends runtime.Types.Exte
    */
   include?: Prisma.WalletTransactionInclude<ExtArgs> | null
   where?: Prisma.WalletTransactionWhereInput
+}
+
+/**
+ * Appointment.paymentOrderItems
+ */
+export type Appointment$paymentOrderItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentOrderItem
+   */
+  select?: Prisma.PaymentOrderItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentOrderItem
+   */
+  omit?: Prisma.PaymentOrderItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentOrderItemInclude<ExtArgs> | null
+  where?: Prisma.PaymentOrderItemWhereInput
+  orderBy?: Prisma.PaymentOrderItemOrderByWithRelationInput | Prisma.PaymentOrderItemOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentOrderItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentOrderItemScalarFieldEnum | Prisma.PaymentOrderItemScalarFieldEnum[]
 }
 
 /**

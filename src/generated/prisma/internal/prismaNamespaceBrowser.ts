@@ -87,7 +87,9 @@ export const ModelName = {
   ImpersonationLog: 'ImpersonationLog',
   PlatformSettings: 'PlatformSettings',
   Coupon: 'Coupon',
-  CouponRedemption: 'CouponRedemption'
+  CouponRedemption: 'CouponRedemption',
+  PaymentOrder: 'PaymentOrder',
+  PaymentOrderItem: 'PaymentOrderItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -457,6 +459,7 @@ export const WalletTransactionScalarFieldEnum = {
   status: 'status',
   appointmentId: 'appointmentId',
   refundOfAppointmentId: 'refundOfAppointmentId',
+  creditOfPaymentId: 'creditOfPaymentId',
   cashfreeOrderId: 'cashfreeOrderId',
   cashfreePaymentId: 'cashfreePaymentId',
   adminId: 'adminId',
@@ -730,6 +733,31 @@ export const CouponRedemptionScalarFieldEnum = {
 } as const
 
 export type CouponRedemptionScalarFieldEnum = (typeof CouponRedemptionScalarFieldEnum)[keyof typeof CouponRedemptionScalarFieldEnum]
+
+
+export const PaymentOrderScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  patientId: 'patientId',
+  amount: 'amount',
+  status: 'status',
+  cfPaymentId: 'cfPaymentId',
+  settledAt: 'settledAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentOrderScalarFieldEnum = (typeof PaymentOrderScalarFieldEnum)[keyof typeof PaymentOrderScalarFieldEnum]
+
+
+export const PaymentOrderItemScalarFieldEnum = {
+  id: 'id',
+  paymentOrderId: 'paymentOrderId',
+  appointmentId: 'appointmentId',
+  amount: 'amount',
+  outcome: 'outcome'
+} as const
+
+export type PaymentOrderItemScalarFieldEnum = (typeof PaymentOrderItemScalarFieldEnum)[keyof typeof PaymentOrderItemScalarFieldEnum]
 
 
 export const SortOrder = {

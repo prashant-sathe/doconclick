@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyCashfreeWebhookSignature, DOCTOR_REGISTRATION_FEE, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
-import { WALLET_TOPUP_ORDER_PREFIX, getOrCreateWallet } from "@/lib/wallet";
-import { netPayable, confirmCouponRedemption, releaseCouponRedemption } from "@/lib/coupons";
+import { WALLET_TOPUP_ORDER_PREFIX } from "@/lib/wallet";
+import { releaseCouponRedemption } from "@/lib/coupons";
+import { settleAppointmentPayment, notifySettlement } from "@/lib/paymentOrders";
 import { NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX } from "@/lib/nurseConstants";
 
 interface CashfreeWebhookPayload {
@@ -12,6 +13,7 @@ interface CashfreeWebhookPayload {
   data: {
     order: { order_id: string; order_amount: number };
     payment: { cf_payment_id: string; payment_status: string };
+    customer_details?: { customer_id?: string };
   };
 }
 
@@ -278,101 +280,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  // One order can cover several appointments — a nurse package's visits all
-  // share the order id they were paid with.
-  const covered = await prisma.appointment.findMany({
-    where: { cashfreeOrderId: orderId },
-    include: { patient: { select: { name: true } } },
-    orderBy: { scheduledAt: "asc" },
+  // Everything else is an appointment order. Settlement applies what it can
+  // and credits the rest — orphaned, mismatched, duplicate or no-longer-
+  // SCHEDULED payments — to the patient's wallet, idempotently per payment.
+  const result = await settleAppointmentPayment({
+    orderId,
+    amount: payload.data.order.order_amount,
+    cfPaymentId: String(payload.data.payment.cf_payment_id),
+    customerId: payload.data.customer_details?.customer_id,
   });
-  const appointment = covered[0];
-  if (!appointment) {
-    console.error("Cashfree webhook: no appointment found for order", orderId);
-    return NextResponse.json({ ok: true }); // ack anyway — nothing to retry into
-  }
-
-  // The order was created for the coupon-discounted amount, so that's what to
-  // reconcile against — not the doctor's full fee.
-  const expectedAmount = Math.round(covered.reduce((sum, a) => sum + netPayable(a), 0) * 100) / 100;
-  if (payload.data.order.order_amount !== expectedAmount) {
-    console.error(
-      "Cashfree webhook amount mismatch for appointment", appointment.id,
-      "expected", expectedAmount, "got", payload.data.order.order_amount
-    );
-    return NextResponse.json({ ok: true }); // don't mark paid; flagged above for manual review
-  }
-
-  const paymentId = payload.data.payment.cf_payment_id;
-  // The money has already been captured, but a visit may have been cancelled
-  // (or rejected/expired) between order creation and payment. Those visits
-  // must not be marked PAID — their share goes back to the patient's wallet.
-  const live = covered.filter((a) => a.status === "SCHEDULED");
-  // Already-PAID visits are excluded: on a webhook retry they were settled
-  // the first time (and if since cancelled, refunded by the cancel flow).
-  const stale = covered.filter((a) => a.status !== "SCHEDULED" && a.paymentStatus !== "PAID");
-  const staleAmount = Math.round(stale.reduce((sum, a) => sum + netPayable(a), 0) * 100) / 100;
-
-  const credited = await prisma.$transaction(async (tx) => {
-    for (const a of live) {
-      await tx.appointment.update({
-        where: { id: a.id },
-        data: {
-          paymentStatus: "PAID",
-          paidAt: a.paidAt ?? new Date(),
-          cashfreePaymentId: paymentId,
-        },
-      });
-      await confirmCouponRedemption(tx, { appointmentId: a.id });
-    }
-
-    if (staleAmount <= 0) return null;
-    // Cashfree retries webhooks — the refund row carries the payment id so a
-    // retry never credits the same payment twice.
-    const already = await tx.walletTransaction.findFirst({
-      where: { cashfreePaymentId: paymentId, type: "CANCELLATION_REFUND" },
-    });
-    if (already) return null;
-    const wallet = await getOrCreateWallet(tx, appointment.patientId);
-    const updatedWallet = await tx.wallet.update({
-      where: { id: wallet.id },
-      data: { balance: { increment: staleAmount } },
-    });
-    await tx.walletTransaction.create({
-      data: {
-        walletId: wallet.id,
-        type: "CANCELLATION_REFUND",
-        amount: staleAmount,
-        balanceAfter: updatedWallet.balance,
-        status: "SUCCESS",
-        cashfreeOrderId: orderId,
-        cashfreePaymentId: paymentId,
-        note: `Payment received for no-longer-active appointment(s) ${stale.map((a) => a.id).join(", ")}`,
-      },
-    });
-    return { amount: staleAmount, balance: updatedWallet.balance };
-  });
-
-  if (credited) {
-    void sendPushToUser(appointment.patientId, {
-      title: "Payment credited to wallet",
-      body: live.length > 0
-        ? `${stale.length} of your visits had already been cancelled — ₹${credited.amount} for those was credited to your wallet. New balance ₹${credited.balance}.`
-        : `This appointment was no longer active when your payment went through, so ₹${credited.amount} was credited to your wallet. New balance ₹${credited.balance}.`,
-      url: "/patient/wallet",
-    });
-  }
-
-  if (live.length > 0) {
-    void sendPushToUser(appointment.doctorId, {
-      title: "Payment received",
-      body: appointment.providerType === "NURSE"
-        ? live.length > 1
-          ? `${appointment.patient.name} paid for all ${live.length} ${appointment.serviceName ?? "home"} visits.`
-          : `${appointment.patient.name} paid for the ${appointment.serviceName ?? "home"} visit — you can complete it once you're done.`
-        : `Payment received for your consultation with ${appointment.patient.name}.`,
-      url: appointment.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
-    });
-  }
+  notifySettlement(result);
 
   return NextResponse.json({ ok: true });
 }

@@ -202,3 +202,13 @@ export type Coupon = Prisma.CouponModel
  * 
  */
 export type CouponRedemption = Prisma.CouponRedemptionModel
+/**
+ * Model PaymentOrder
+ * 
+ */
+export type PaymentOrder = Prisma.PaymentOrderModel
+/**
+ * Model PaymentOrderItem
+ * 
+ */
+export type PaymentOrderItem = Prisma.PaymentOrderItemModel

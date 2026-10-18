@@ -16,7 +16,8 @@
     "test:slots": "tsx tests/slot-booking.ts",
     "test:settlements": "tsx tests/settlement-idempotency.ts",
     "test:auth": "tsx tests/auth-sessions.ts",
-    "test:admin-delete": "tsx tests/admin-delete-guards.ts"
+    "test:admin-delete": "tsx tests/admin-delete-guards.ts",
+    "test:payments": "tsx tests/payment-orders.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

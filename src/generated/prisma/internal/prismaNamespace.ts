@@ -433,7 +433,9 @@ export const ModelName = {
   ImpersonationLog: 'ImpersonationLog',
   PlatformSettings: 'PlatformSettings',
   Coupon: 'Coupon',
-  CouponRedemption: 'CouponRedemption'
+  CouponRedemption: 'CouponRedemption',
+  PaymentOrder: 'PaymentOrder',
+  PaymentOrderItem: 'PaymentOrderItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -449,7 +451,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption"
+    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3191,6 +3193,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PaymentOrder: {
+      payload: Prisma.$PaymentOrderPayload<ExtArgs>
+      fields: Prisma.PaymentOrderFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaymentOrderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaymentOrderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload>
+        }
+        findFirst: {
+          args: Prisma.PaymentOrderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaymentOrderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload>
+        }
+        findMany: {
+          args: Prisma.PaymentOrderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload>[]
+        }
+        create: {
+          args: Prisma.PaymentOrderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload>
+        }
+        createMany: {
+          args: Prisma.PaymentOrderCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaymentOrderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload>[]
+        }
+        delete: {
+          args: Prisma.PaymentOrderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload>
+        }
+        update: {
+          args: Prisma.PaymentOrderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaymentOrderDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaymentOrderUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaymentOrderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload>[]
+        }
+        upsert: {
+          args: Prisma.PaymentOrderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderPayload>
+        }
+        aggregate: {
+          args: Prisma.PaymentOrderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaymentOrder>
+        }
+        groupBy: {
+          args: Prisma.PaymentOrderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentOrderGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaymentOrderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentOrderCountAggregateOutputType> | number
+        }
+      }
+    }
+    PaymentOrderItem: {
+      payload: Prisma.$PaymentOrderItemPayload<ExtArgs>
+      fields: Prisma.PaymentOrderItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaymentOrderItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaymentOrderItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload>
+        }
+        findFirst: {
+          args: Prisma.PaymentOrderItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaymentOrderItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload>
+        }
+        findMany: {
+          args: Prisma.PaymentOrderItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload>[]
+        }
+        create: {
+          args: Prisma.PaymentOrderItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload>
+        }
+        createMany: {
+          args: Prisma.PaymentOrderItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaymentOrderItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload>[]
+        }
+        delete: {
+          args: Prisma.PaymentOrderItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload>
+        }
+        update: {
+          args: Prisma.PaymentOrderItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaymentOrderItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaymentOrderItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaymentOrderItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.PaymentOrderItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentOrderItemPayload>
+        }
+        aggregate: {
+          args: Prisma.PaymentOrderItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaymentOrderItem>
+        }
+        groupBy: {
+          args: Prisma.PaymentOrderItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentOrderItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaymentOrderItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentOrderItemCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3581,6 +3731,7 @@ export const WalletTransactionScalarFieldEnum = {
   status: 'status',
   appointmentId: 'appointmentId',
   refundOfAppointmentId: 'refundOfAppointmentId',
+  creditOfPaymentId: 'creditOfPaymentId',
   cashfreeOrderId: 'cashfreeOrderId',
   cashfreePaymentId: 'cashfreePaymentId',
   adminId: 'adminId',
@@ -3854,6 +4005,31 @@ export const CouponRedemptionScalarFieldEnum = {
 } as const
 
 export type CouponRedemptionScalarFieldEnum = (typeof CouponRedemptionScalarFieldEnum)[keyof typeof CouponRedemptionScalarFieldEnum]
+
+
+export const PaymentOrderScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  patientId: 'patientId',
+  amount: 'amount',
+  status: 'status',
+  cfPaymentId: 'cfPaymentId',
+  settledAt: 'settledAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentOrderScalarFieldEnum = (typeof PaymentOrderScalarFieldEnum)[keyof typeof PaymentOrderScalarFieldEnum]
+
+
+export const PaymentOrderItemScalarFieldEnum = {
+  id: 'id',
+  paymentOrderId: 'paymentOrderId',
+  appointmentId: 'appointmentId',
+  amount: 'amount',
+  outcome: 'outcome'
+} as const
+
+export type PaymentOrderItemScalarFieldEnum = (typeof PaymentOrderItemScalarFieldEnum)[keyof typeof PaymentOrderItemScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -4167,6 +4343,8 @@ export type GlobalOmitConfig = {
   platformSettings?: Prisma.PlatformSettingsOmit
   coupon?: Prisma.CouponOmit
   couponRedemption?: Prisma.CouponRedemptionOmit
+  paymentOrder?: Prisma.PaymentOrderOmit
+  paymentOrderItem?: Prisma.PaymentOrderItemOmit
 }
 
 /* Types for Logging */
