@@ -11,6 +11,7 @@ import {
   MoreHorizontal, UserX, CalendarClock, ChevronDown, HeartPulse,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import { isOverdue, byVisitAsc, byVisitDesc, nextUpcoming } from "@/lib/doctorQueue";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
@@ -946,11 +947,14 @@ export default function DoctorDashboard() {
   const matchesSearch = (a: Appointment) =>
     patientLabel(a).toLowerCase().includes(search.trim().toLowerCase());
   const completedAll = appointments.filter((a) => a.status === "COMPLETED");
-  const pending = appointments.filter((a) => a.status === "PENDING_APPROVAL" && matchesSearch(a));
-  const upcoming = appointments.filter((a) => a.status === "SCHEDULED" && matchesSearch(a));
-  const cancelled = appointments.filter((a) => a.status === "CANCELLED" && matchesSearch(a));
-  const noShow = appointments.filter((a) => a.status === "NO_SHOW" && matchesSearch(a));
-  const completed = completedAll.filter((a) => a.paymentStatus === "PAID").filter(matchesSearch);
+  // The queue (pending, upcoming) runs soonest-first; history newest-first.
+  const pending = appointments.filter((a) => a.status === "PENDING_APPROVAL" && matchesSearch(a)).sort(byVisitAsc);
+  const upcoming = appointments.filter((a) => a.status === "SCHEDULED" && matchesSearch(a)).sort(byVisitAsc);
+  const cancelled = appointments.filter((a) => a.status === "CANCELLED" && matchesSearch(a)).sort(byVisitDesc);
+  const noShow = appointments.filter((a) => a.status === "NO_SHOW" && matchesSearch(a)).sort(byVisitDesc);
+  const completed = completedAll.filter((a) => a.paymentStatus === "PAID").filter(matchesSearch).sort(byVisitDesc);
+  // Past visits nobody closed — regardless of the search box.
+  const overdue = appointments.filter((a) => isOverdue(a, now)).sort(byVisitAsc);
 
   const isToday = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
   const todayUpcoming = upcoming.filter((a) => isToday(a.scheduledAt));
@@ -991,7 +995,8 @@ export default function DoctorDashboard() {
   const todayEarnings = completedAll
     .filter((a) => a.paymentStatus === "PAID" && isToday(a.scheduledAt))
     .reduce((sum, a) => sum + (a.amount - a.platformFee), 0);
-  const nextAppt = [...upcoming].sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0];
+  // The soonest visit that isn't already over — never a stale one from days ago.
+  const nextAppt = nextUpcoming(upcoming, now);
   const minutesTo = (iso: string) => Math.round((new Date(iso).getTime() - now) / 60000);
   // "in 41576 min" is meaningless for anything beyond a same-day appointment —
   // scale the unit up as the gap grows instead of always showing raw minutes.
@@ -1052,7 +1057,7 @@ export default function DoctorDashboard() {
               </p>
               <p className="text-[12.5px] text-white/75 mt-0.5">
                 {nextAppt.consultType === "HOME" ? "Home visit" : nextAppt.consultType === "VIDEO" ? "Video consultation" : "Clinic visit"}
-                {minutesTo(nextAppt.scheduledAt) > 0 && ` · in ${formatTimeUntil(minutesTo(nextAppt.scheduledAt))}`}
+                {minutesTo(nextAppt.scheduledAt) > 0 ? ` · in ${formatTimeUntil(minutesTo(nextAppt.scheduledAt))}` : " · due now"}
               </p>
             </>
           ) : (
@@ -1078,6 +1083,65 @@ export default function DoctorDashboard() {
             )}
           </div>
         </div>
+
+        {/* Past visits still open — closing them keeps the queue, "Next" and
+            earnings honest. Complete opens the visit's prescription form in
+            Upcoming; no-show confirms first. */}
+        {overdue.length > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6">
+            <div className="flex items-start gap-2 mb-3">
+              <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+              <div>
+                <p className="font-bold text-amber-900 text-sm">
+                  {overdue.length} past appointment{overdue.length === 1 ? "" : "s"} still open
+                </p>
+                <p className="text-xs text-amber-800 mt-0.5">
+                  Mark each one complete or a no-show so your schedule and earnings stay accurate.
+                </p>
+              </div>
+            </div>
+            <ul className="space-y-2">
+              {overdue.slice(0, 5).map((a) => {
+                const homeNotArrived = a.consultType === "HOME" && a.travelStatus !== "ARRIVED";
+                const unpaidOnline = a.paymentMethod === "ONLINE" && a.paymentStatus !== "PAID";
+                return (
+                  <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 bg-white rounded-xl border border-amber-100 px-3 py-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-800 truncate">{patientLabel(a)}</p>
+                      <p className="text-xs text-slate-500">
+                        {new Date(a.scheduledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
+                        {" · "}{a.consultType === "HOME" ? "Home visit" : a.consultType === "VIDEO" ? "Video" : "Clinic"}
+                        {homeNotArrived ? " · mark arrived first" : unpaidOnline ? " · not paid yet" : ""}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      {homeNotArrived ? (
+                        <button onClick={() => { setSearch(""); jumpToCard(a.id); }} className="btn-secondary py-1.5 px-3 text-xs">
+                          Open visit
+                        </button>
+                      ) : (
+                        <>
+                          {!isStaff && !unpaidOnline && (
+                            <button onClick={() => { setSearch(""); setCompletingId(a.id); jumpToCard(a.id); }} className="btn-primary py-1.5 px-3 text-xs">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Complete
+                            </button>
+                          )}
+                          <button onClick={() => setNoShowTarget(a)} className="btn-secondary py-1.5 px-3 text-xs text-amber-700 border-amber-200">
+                            <UserX className="w-3.5 h-3.5" /> No-show
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            {overdue.length > 5 && (
+              <p className="text-xs text-amber-800 mt-2">…and {overdue.length - 5} more at the top of Upcoming Appointments.</p>
+            )}
+            {isStaff && <p className="text-xs text-amber-800 mt-2">Only the doctor can mark a visit complete.</p>}
+          </div>
+        )}
 
         {/* Today's Timeline — a calendar-style at-a-glance view of the day's
             shape, complementing the flat sorted lists below rather than
@@ -1285,6 +1349,12 @@ export default function DoctorDashboard() {
                         <div className="text-[10px] font-semibold text-slate-400 leading-tight">
                           {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true }).match(/[AP]M$/i)?.[0]}
                         </div>
+                        {/* Any other day needs its date — the list now spans past and future. */}
+                        {!isToday(a.scheduledAt) && (
+                          <div className="text-[10px] font-semibold text-slate-500 leading-tight mt-0.5">
+                            {new Date(a.scheduledAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                          </div>
+                        )}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start gap-2.5">
@@ -1322,6 +1392,11 @@ export default function DoctorDashboard() {
                             {a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
                               <div className="inline-flex items-center gap-1 text-xs text-slate-500 font-semibold mt-1">
                                 <MapPinCheck className="w-3 h-3" /> Marked arrived
+                              </div>
+                            )}
+                            {isOverdue(a, now) && (
+                              <div className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-0.5 font-semibold mt-1 ml-1">
+                                <AlertTriangle className="w-3 h-3" /> Past — mark complete or no-show
                               </div>
                             )}
                           </div>

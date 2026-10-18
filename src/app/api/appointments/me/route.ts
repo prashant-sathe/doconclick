@@ -81,7 +81,9 @@ export async function GET() {
 
     const appointments = await prisma.appointment.findMany({
       where: { doctorId: scope.doctorId },
-      orderBy: [{ createdAt: "desc" }],
+      // By visit time, soonest first — the queue order. (History lists on the
+      // dashboard re-sort newest-first themselves.)
+      orderBy: [{ scheduledAt: "asc" }, { createdAt: "asc" }],
       include: {
         patient: {
           select: {
