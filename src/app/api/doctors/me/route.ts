@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, verifyPassword } from "@/lib/auth";
+import { requireRole, readJson } from "@/lib/routeGuards";
+import { verifyPassword } from "@/lib/auth";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 import type { Prisma } from "@/generated/prisma/client";
 import { createRateLimiter } from "@/lib/rateLimit";
@@ -12,10 +13,8 @@ import {
 
 // GET: The currently logged-in doctor's own profile
 export async function GET() {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("DOCTOR");
+  if (denied) return denied;
   const suspendedResponse = await requireActiveDoctor(authUser);
   if (suspendedResponse) return suspendedResponse;
 
@@ -92,14 +91,13 @@ const normalizeText = (v: unknown) => (v === "" || v == null ? null : String(v).
 //   remove), validated, and only with `currentPassword`; the doctor is pushed
 //   a notice so a change they didn't make is noticed.
 export async function PATCH(req: Request) {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("DOCTOR");
+  if (denied) return denied;
   const suspendedResponse = await requireActiveDoctor(authUser);
   if (suspendedResponse) return suspendedResponse;
 
-  const body = await req.json().catch(() => ({}));
+  const { body, invalid } = await readJson(req);
+  if (invalid) return invalid;
   const profile = await prisma.doctorProfile.findUnique({
     where: { userId: authUser.id },
     select: { isVerified: true, status: true, medRegNo: true, qualification: true, specialty: true, bankDetails: true },

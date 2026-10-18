@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { requireRole, readJson } from "@/lib/routeGuards";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { getOrCreateWallet } from "@/lib/wallet";
 import { netPayable, confirmCouponRedemption } from "@/lib/coupons";
@@ -9,13 +9,13 @@ import { netPayable, confirmCouponRedemption } from "@/lib/coupons";
 // balance. Unlike Cashfree, this is a direct authenticated server call with
 // an immediate result — no external redirect, no webhook, no return page.
 export async function POST(req: Request) {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "PATIENT") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("PATIENT");
+  if (denied) return denied;
 
-  const { appointmentId } = await req.json();
-  if (!appointmentId) {
+  const { body, invalid } = await readJson(req);
+  if (invalid) return invalid;
+  const { appointmentId } = body;
+  if (typeof appointmentId !== "string" || !appointmentId) {
     return NextResponse.json({ error: "Missing appointmentId" }, { status: 400 });
   }
 

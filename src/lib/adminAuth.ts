@@ -1,16 +1,9 @@
-import { NextResponse } from "next/server";
-import { getAuthUser, type JWTPayload } from "@/lib/auth";
+import { requireRole } from "@/lib/routeGuards";
 
-// Shared by the admin report routes — returns the authenticated admin, or a
-// 403 response to return immediately if the caller isn't one.
-export async function requireAdmin(): Promise<
-  { authUser: JWTPayload; denied: null } | { authUser: null; denied: NextResponse }
-> {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "ADMIN") {
-    return { authUser: null, denied: NextResponse.json({ error: "Not authorized" }, { status: 403 }) };
-  }
-  return { authUser, denied: null };
+// Shared by the admin routes — returns the authenticated admin, or a 401 (no
+// session) / 403 (not an admin) response to return immediately.
+export function requireAdmin() {
+  return requireRole("ADMIN");
 }
 
 // A handful of legacy Appointment rows have NaN stored for amount/platformFee

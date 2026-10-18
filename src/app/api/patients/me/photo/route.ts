@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { requireRole, isRecordNotFound } from "@/lib/routeGuards";
 import { uploadToS3 } from "@/lib/s3";
 
 const ALLOWED_TYPES: Record<string, string> = {
@@ -11,10 +11,8 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 // POST: Patient uploads/replaces their profile photo.
 export async function POST(req: Request) {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "PATIENT") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("PATIENT");
+  if (denied) return denied;
 
   const form = await req.formData();
   const file = form.get("file");
@@ -41,8 +39,11 @@ export async function POST(req: Request) {
     });
     return NextResponse.json(updated);
   } catch (err) {
+    if (isRecordNotFound(err)) {
+      return NextResponse.json({ error: "Patient profile not found" }, { status: 404 });
+    }
     console.error(err);
-    return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
+    return NextResponse.json({ error: "Could not update your photo. Please try again." }, { status: 500 });
   }
 }
 
@@ -50,10 +51,8 @@ export async function POST(req: Request) {
 // S3, just detaches it — same as "Replace" already leaving the old file
 // orphaned there.
 export async function DELETE() {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "PATIENT") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("PATIENT");
+  if (denied) return denied;
 
   try {
     const updated = await prisma.patientProfile.update({
@@ -62,7 +61,10 @@ export async function DELETE() {
     });
     return NextResponse.json(updated);
   } catch (err) {
+    if (isRecordNotFound(err)) {
+      return NextResponse.json({ error: "Patient profile not found" }, { status: 404 });
+    }
     console.error(err);
-    return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
+    return NextResponse.json({ error: "Could not update your photo. Please try again." }, { status: 500 });
   }
 }

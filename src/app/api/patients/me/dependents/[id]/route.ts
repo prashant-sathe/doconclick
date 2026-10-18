@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { requireRole, readJson } from "@/lib/routeGuards";
 import { parseBody, dependentUpdateSchema, dependentData } from "@/lib/schemas";
 
 // PATCH: update a saved family-member profile
@@ -8,10 +8,8 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "PATIENT") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("PATIENT");
+  if (denied) return denied;
 
   const { id } = await params;
   const dependent = await prisma.patientDependent.findUnique({
@@ -22,7 +20,9 @@ export async function PATCH(
     return NextResponse.json({ error: "Family member not found" }, { status: 404 });
   }
 
-  const parsed = parseBody(dependentUpdateSchema, await req.json().catch(() => null));
+  const { body, invalid } = await readJson(req);
+  if (invalid) return invalid;
+  const parsed = parseBody(dependentUpdateSchema, body);
   if (parsed.response) return parsed.response;
 
   const updated = await prisma.patientDependent.update({
@@ -40,10 +40,8 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "PATIENT") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("PATIENT");
+  if (denied) return denied;
 
   const { id } = await params;
   const dependent = await prisma.patientDependent.findUnique({

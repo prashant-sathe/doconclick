@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { requireRole, isRecordNotFound } from "@/lib/routeGuards";
 import { uploadToS3 } from "@/lib/s3";
 import { slugify } from "@/lib/utils";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
@@ -30,10 +30,8 @@ const DOC_FIELD: Record<string, "photoUrl" | "medRegCertUrl" | "degreeCertUrl" |
 // POST: Doctor uploads a verification document or profile photo.
 // `type` (form field) selects which slot: photo | medRegCert | degreeCert | kyc
 export async function POST(req: Request) {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("DOCTOR");
+  if (denied) return denied;
   const suspendedResponse = await requireActiveDoctor(authUser);
   if (suspendedResponse) return suspendedResponse;
 
@@ -83,8 +81,11 @@ export async function POST(req: Request) {
     });
     return NextResponse.json(updated);
   } catch (err) {
+    if (isRecordNotFound(err)) {
+      return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
+    }
     console.error(err);
-    return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
+    return NextResponse.json({ error: "Could not update your document. Please try again." }, { status: 500 });
   }
 }
 
@@ -92,10 +93,8 @@ export async function POST(req: Request) {
 // POST — this doesn't remove the file from S3, just detaches it, matching
 // how "Replace" already leaves the old file orphaned there.
 export async function DELETE(req: Request) {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("DOCTOR");
+  if (denied) return denied;
   const suspendedResponse = await requireActiveDoctor(authUser);
   if (suspendedResponse) return suspendedResponse;
 
@@ -124,7 +123,10 @@ export async function DELETE(req: Request) {
     });
     return NextResponse.json(updated);
   } catch (err) {
+    if (isRecordNotFound(err)) {
+      return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
+    }
     console.error(err);
-    return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
+    return NextResponse.json({ error: "Could not update your document. Please try again." }, { status: 500 });
   }
 }

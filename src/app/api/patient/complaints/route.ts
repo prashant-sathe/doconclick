@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { requireRole, readJson } from "@/lib/routeGuards";
 
 // Shared by patients and nurses (nurses have no separate support channel).
 // GET: the current user's own support tickets
 export async function GET() {
-  const authUser = await getAuthUser();
-  if (!authUser || (authUser.role !== "PATIENT" && authUser.role !== "NURSE")) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("PATIENT", "NURSE");
+  if (denied) return denied;
 
   const complaints = await prisma.complaint.findMany({
     where: { userId: authUser.id },
@@ -21,12 +19,12 @@ export async function GET() {
 
 // POST: raise a new support ticket
 export async function POST(req: Request) {
-  const authUser = await getAuthUser();
-  if (!authUser || (authUser.role !== "PATIENT" && authUser.role !== "NURSE")) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("PATIENT", "NURSE");
+  if (denied) return denied;
 
-  const { subject, description } = await req.json();
+  const { body, invalid } = await readJson(req);
+  if (invalid) return invalid;
+  const { subject, description } = body;
   const trimmedSubject = String(subject ?? "").trim();
   const trimmedDescription = String(description ?? "").trim();
   if (!trimmedSubject || !trimmedDescription) {

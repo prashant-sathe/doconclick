@@ -32,7 +32,8 @@
     "test:doctor-queue": "tsx tests/doctor-queue.ts",
     "test:clinic-hours": "tsx tests/clinic-hours.ts",
     "test:visit-timing": "tsx tests/visit-timing.ts",
-    "test:schemas": "tsx tests/request-schemas.ts"
+    "test:schemas": "tsx tests/request-schemas.ts",
+    "test:route-errors": "tsx tests/route-errors.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

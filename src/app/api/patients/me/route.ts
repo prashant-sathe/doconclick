@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { requireRole, readJson, isRecordNotFound } from "@/lib/routeGuards";
 import { parseBody, definedOnly, patientProfilePatchSchema } from "@/lib/schemas";
 
 // GET: The logged-in patient's own profile
 export async function GET() {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "PATIENT") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("PATIENT");
+  if (denied) return denied;
 
   const patient = await prisma.user.findUnique({
     where: { id: authUser.id },
@@ -30,12 +28,12 @@ export async function GET() {
 
 // PATCH: Update the logged-in patient's own profile
 export async function PATCH(req: Request) {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "PATIENT") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("PATIENT");
+  if (denied) return denied;
 
-  const parsed = parseBody(patientProfilePatchSchema, await req.json().catch(() => null));
+  const { body, invalid } = await readJson(req);
+  if (invalid) return invalid;
+  const parsed = parseBody(patientProfilePatchSchema, body);
   if (parsed.response) return parsed.response;
   const data: Record<string, string | number | null> = definedOnly(parsed.data);
 
@@ -56,7 +54,10 @@ export async function PATCH(req: Request) {
     }
     return NextResponse.json(updated);
   } catch (err) {
+    if (isRecordNotFound(err)) {
+      return NextResponse.json({ error: "Patient profile not found" }, { status: 404 });
+    }
     console.error(err);
-    return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
+    return NextResponse.json({ error: "Could not save your profile. Please try again." }, { status: 500 });
   }
 }
