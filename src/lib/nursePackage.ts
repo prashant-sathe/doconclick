@@ -50,3 +50,38 @@ export function shiftLabel(durationMinutes: number): string {
   const h = Math.round(durationMinutes / 60);
   return `${h}-hour shift`;
 }
+
+// When a nurse may start a visit/shift (code or skip-reason): from 30 min
+// before the booked time to 4 h after it — never hours early, never a missed
+// visit started the next day.
+export const VISIT_START_EARLY_MS = 30 * 60 * 1000;
+export const VISIT_START_LATE_MS = 4 * 60 * 60 * 1000;
+
+const fmtTimeIST = (d: Date) =>
+  d.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+
+export function visitStartProblem(scheduledAt: Date, now = new Date()): string | null {
+  const t = now.getTime(), at = scheduledAt.getTime();
+  if (t < at - VISIT_START_EARLY_MS) {
+    return `This visit is booked for ${fmtTimeIST(scheduledAt)}. You can start it from ${fmtTimeIST(new Date(at - VISIT_START_EARLY_MS))}.`;
+  }
+  if (t > at + VISIT_START_LATE_MS) {
+    return "It's too long past the booked time to start this visit. Ask the patient to reschedule, or cancel it.";
+  }
+  return null;
+}
+
+// A shift is paid in full, so it can only be completed once the nurse has
+// actually stayed its length (counted from when the visit started), less a
+// small handover allowance.
+export const SHIFT_END_TOLERANCE_MS = 15 * 60 * 1000;
+
+export function shiftCompletableAt(visitStartedAt: Date, durationMinutes: number): Date {
+  return new Date(visitStartedAt.getTime() + durationMinutes * 60000 - SHIFT_END_TOLERANCE_MS);
+}
+
+export function shiftCompleteProblem(visitStartedAt: Date, durationMinutes: number, now = new Date()): string | null {
+  const ready = shiftCompletableAt(visitStartedAt, durationMinutes);
+  if (now.getTime() >= ready.getTime()) return null;
+  return `This is a ${shiftLabel(durationMinutes)} — you can complete it from ${fmtTimeIST(ready)}.`;
+}

@@ -13,7 +13,7 @@ import RescheduleRequestBox from "@/components/RescheduleRequestBox";
 import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
 import { cn } from "@/lib/utils";
-import { intervalLabel } from "@/lib/nursePackage";
+import { intervalLabel, visitStartProblem, shiftCompleteProblem } from "@/lib/nursePackage";
 import { SUGAR_TYPES, fToC, cToF, vitalsSummary, type VitalsInput } from "@/lib/vitals";
 
 type VitalRow = VitalsInput & { id: string; recordedAt: string; alertLevel: string; alerts: string | null };
@@ -210,7 +210,7 @@ function RecordVitalsBox({ visit, onSaved }: { visit: Visit; onSaved: () => void
 // At the door: the patient reads out the 4-digit code from their app. If
 // they truly can't, the nurse may start anyway — with a reason, which the
 // patient and the admin both see.
-function StartVisitBox({ visitId, onStarted }: { visitId: string; onStarted: () => void }) {
+function StartVisitBox({ visitId, scheduledAt, onStarted }: { visitId: string; scheduledAt: string; onStarted: () => void }) {
   const [code, setCode] = useState("");
   const [skipping, setSkipping] = useState(false);
   const [reason, setReason] = useState("");
@@ -231,6 +231,15 @@ function StartVisitBox({ visitId, onStarted }: { visitId: string; onStarted: () 
     }
     onStarted();
   };
+
+  const outsideWindow = visitStartProblem(new Date(scheduledAt));
+  if (outsideWindow) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <p className="text-xs text-slate-600 flex items-center gap-1.5"><Clock className="w-4 h-4 text-slate-400 shrink-0" />{outsideWindow}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-3">
@@ -425,6 +434,7 @@ export default function NurseDashboardPage() {
               const busy = busyId === v.id;
               const earning = Math.round((v.amount - v.platformFee) * 100) / 100;
               const paid = v.paymentStatus === "PAID";
+              const shiftWait = v.nurseService?.kind === "SHIFT" && v.visitStartedAt ? shiftCompleteProblem(new Date(v.visitStartedAt), v.nurseService.durationMinutes) : null;
               return (
                 <div key={v.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                   <div className="flex items-start justify-between gap-3">
@@ -542,14 +552,17 @@ export default function NurseDashboardPage() {
                           </button>
                         )}
                         {v.travelStatus === "ARRIVED" && !v.visitStartedAt && (
-                          <StartVisitBox visitId={v.id} onStarted={load} />
+                          <StartVisitBox visitId={v.id} scheduledAt={v.scheduledAt} onStarted={load} />
                         )}
                         {v.travelStatus === "ARRIVED" && v.visitStartedAt && (
                           <RecordVitalsBox visit={v} onSaved={load} />
                         )}
+                        {v.travelStatus === "ARRIVED" && shiftWait && (
+                          <p className="text-[11px] text-slate-500 mb-1.5 flex items-center gap-1"><Clock className="w-3 h-3" />{shiftWait}</p>
+                        )}
                         {v.travelStatus === "ARRIVED" && v.visitStartedAt && (
                           <button
-                            disabled={busy || !paid}
+                            disabled={busy || !paid || !!shiftWait}
                             onClick={() => { setVisitNotes(""); setCompleteTarget(v); }}
                             className="btn-primary w-full justify-center py-2.5 text-sm disabled:opacity-50"
                           >

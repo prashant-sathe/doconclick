@@ -8,6 +8,7 @@ import { refundAppointmentToWallet } from "@/lib/wallet";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
+import { shiftCompleteProblem } from "@/lib/nursePackage";
 import { netPayable } from "@/lib/coupons";
 import { cancelAndRefund, claimStatusChange, isAlreadyClosed, ALREADY_CLOSED_MESSAGE } from "@/lib/appointmentCancel";
 import { cancelAndReassign } from "@/lib/reassignment";
@@ -274,6 +275,11 @@ export async function PATCH(
         { error: "Start the visit with the patient's 4-digit code before completing it." },
         { status: 400 }
       );
+    }
+    if (status === "COMPLETED" && appointment.providerType === "NURSE" && appointment.visitStartedAt && appointment.nurseServiceId) {
+      const svc = await prisma.nurseService.findUnique({ where: { id: appointment.nurseServiceId }, select: { kind: true, durationMinutes: true } });
+      const early = svc?.kind === "SHIFT" ? shiftCompleteProblem(appointment.visitStartedAt, svc.durationMinutes) : null;
+      if (early) return NextResponse.json({ error: early, code: "SHIFT_NOT_OVER" }, { status: 400 });
     }
     if (status === "COMPLETED" && appointment.consultType === "HOME" && appointment.travelStatus !== "ARRIVED") {
       return NextResponse.json(

@@ -30,7 +30,8 @@
     "test:admin-stats": "tsx tests/admin-stats.ts",
     "test:paid-at": "tsx tests/paid-at.ts",
     "test:doctor-queue": "tsx tests/doctor-queue.ts",
-    "test:clinic-hours": "tsx tests/clinic-hours.ts"
+    "test:clinic-hours": "tsx tests/clinic-hours.ts",
+    "test:visit-timing": "tsx tests/visit-timing.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

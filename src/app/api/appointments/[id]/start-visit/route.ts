@@ -5,6 +5,7 @@ import { getAuthUser } from "@/lib/auth";
 import { requireActiveNurse } from "@/lib/providerGuard";
 import { sendPushToUser, sendPushToAdmins } from "@/lib/firebaseAdmin";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { visitStartProblem } from "@/lib/nursePackage";
 
 const MAX_ATTEMPTS = 5;
 
@@ -38,6 +39,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
   if (appt.visitStartedAt) {
     return NextResponse.json({ error: "This visit has already started." }, { status: 400 });
+  }
+  // Applies to both paths below, so skipping the code can't dodge it.
+  const tooEarlyOrLate = visitStartProblem(appt.scheduledAt);
+  if (tooEarlyOrLate) {
+    return NextResponse.json({ error: tooEarlyOrLate, code: "OUTSIDE_START_WINDOW" }, { status: 400 });
   }
 
   const body = await req.json().catch(() => ({}));
