@@ -23,11 +23,14 @@ export async function findReassignmentDoctor(params: {
   specialty: string;
   consultType: string;
   patientId: string;
+  // Where the visit happens (a HOME booking's snapshot); defaults to the
+  // patient's saved profile location.
+  visitLocation?: { lat: number; lng: number };
   now?: Date;
 }): Promise<ReassignmentCandidate | null> {
-  const { excludeDoctorId, specialty, consultType, patientId, now = new Date() } = params;
+  const { excludeDoctorId, specialty, consultType, patientId, visitLocation, now = new Date() } = params;
 
-  const patientProfile = await prisma.patientProfile.findUnique({
+  const patientProfile = visitLocation ?? await prisma.patientProfile.findUnique({
     where: { userId: patientId },
     select: { lat: true, lng: true },
   });

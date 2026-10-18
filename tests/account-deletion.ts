@@ -65,7 +65,7 @@ async function main() {
     const paid = await appt({ status: "SCHEDULED", paymentMethod: "ONLINE", paymentStatus: "PAID", discountAmount: 100 });
     const unpaid = await appt({ status: "PENDING_APPROVAL", couponId: coupon.id, couponCode: coupon.code, discountAmount: 50 });
     await prisma.couponRedemption.create({ data: { couponId: coupon.id, userId: patient.id, appointmentId: unpaid.id, discountAmount: 50 } });
-    const done = await appt({ status: "COMPLETED", paymentStatus: "PAID" });
+    const done = await appt({ status: "COMPLETED", paymentStatus: "PAID", consultType: "HOME", visitAddress: "12 Test Lane", visitLat: 18.5, visitLng: 73.8 });
     await prisma.wallet.create({ data: { userId: patient.id, balance: 25 } });
     await prisma.patientDocument.create({ data: { patientId: patient.id, title: "Old report", fileUrl: "https://x/r.pdf" } });
     await prisma.vitalReading.create({ data: { patientId: patient.id, recordedById: patient.id, pulse: 70 } });
@@ -107,6 +107,9 @@ async function main() {
       vitals: await prisma.vitalReading.count({ where: { patientId: patient.id } }),
       tokens: await prisma.pushToken.count({ where: { userId: patient.id } }),
     };
+    const doneRow = await prisma.appointment.findUniqueOrThrow({ where: { id: done.id } });
+    check("visit address cleared from kept bookings", doneRow.status === "COMPLETED" && doneRow.visitAddress === null && doneRow.visitLat === null,
+      `${doneRow.status}, ${doneRow.visitAddress}`);
     check("documents, self-logged vitals, push tokens removed", Object.values(leftovers).every((n) => n === 0), JSON.stringify(leftovers));
     r = await call(patient, "GET", "/api/auth/me");
     check("old session rejected", r.status === 401, `${r.status}`);

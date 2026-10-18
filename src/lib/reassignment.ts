@@ -4,6 +4,7 @@ import { findReassignmentDoctor, type ReassignmentCandidate } from "@/lib/doctor
 import { doctorSlotProblem, isTimedBooking, isSlotIndexViolation } from "@/lib/doctorSlots";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
 import { cancelAndRefund } from "@/lib/appointmentCancel";
+import { copyVisitSnapshot } from "@/lib/visitAddress";
 
 // The nearest other doctor who can take over a doctor's appointment — same
 // specialty and consult type, and actually free at its time — with the fee
@@ -19,6 +20,10 @@ async function findReplacement(appointment: Appointment) {
     specialty: doctorProfile.specialty,
     consultType: appointment.consultType,
     patientId: appointment.patientId,
+    // A home visit goes where it was booked to, not the current profile address.
+    visitLocation: appointment.visitLat != null && appointment.visitLng != null
+      ? { lat: appointment.visitLat, lng: appointment.visitLng }
+      : undefined,
   });
   if (!match) return null;
   // The replacement inherits the slot, so they must actually be free then.
@@ -74,6 +79,7 @@ export async function cancelAndReassign(
               paymentStatus: "PENDING",
               clinicId: withReplacement.candidate.clinicId ?? undefined,
               scheduledAt: appointment.scheduledAt,
+              ...copyVisitSnapshot(appointment),
               reassignedFromId: appointment.id,
             },
           })

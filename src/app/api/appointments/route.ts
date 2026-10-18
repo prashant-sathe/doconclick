@@ -7,6 +7,7 @@ import { haversine } from "@/lib/geo";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
 import { isDoctorBookable, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
+import { parseVisitInput, snapshotFromProfile, type VisitSnapshot } from "@/lib/visitAddress";
 import { doctorSlotProblem, snapToClinicGrid, isSlotIndexViolation } from "@/lib/doctorSlots";
 
 export async function POST(req: Request) {
@@ -16,6 +17,7 @@ export async function POST(req: Request) {
   }
 
   try {
+    const body = await req.json();
     const {
       doctorId,
       symptoms,
@@ -28,7 +30,7 @@ export async function POST(req: Request) {
       clinicId,
       patientLat,
       patientLng,
-    } = await req.json();
+    } = body;
 
     if (!doctorId || !symptoms || !consultType) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -64,7 +66,9 @@ export async function POST(req: Request) {
     // reseed) — verify it still resolves before writing anything.
     const patient = await prisma.user.findUnique({
       where: { id: authUser.id },
-      include: { patientProfile: { select: { age: true, gender: true } } },
+      include: {
+        patientProfile: { select: { age: true, gender: true, homeAddress: true, landmark: true, pinCode: true, lat: true, lng: true } },
+      },
     });
     if (!patient) {
       return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
@@ -109,7 +113,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "This doctor does not offer home visits" }, { status: 400 });
     }
 
-    if (consultType === "HOME" && typeof patientLat === "number" && typeof patientLng === "number") {
+    // A home visit's address is snapshotted onto the booking, so a later
+    // profile edit can't send the doctor to the wrong house: the visit
+    // address the client sent, else the saved profile address — with the
+    // phone's position as the coordinates only when the profile has none.
+    let visit: VisitSnapshot | null = null;
+    if (consultType === "HOME") {
+      const visitInput = parseVisitInput(body.visit);
+      if (visitInput && "error" in visitInput) {
+        return NextResponse.json({ error: visitInput.error, code: "LOCATION_REQUIRED" }, { status: 400 });
+      }
+      visit = visitInput?.snapshot ?? snapshotFromProfile(patient.patientProfile);
+      if (visit.visitLat == null && typeof patientLat === "number" && typeof patientLng === "number") {
+        visit = { ...visit, visitLat: patientLat, visitLng: patientLng };
+      }
+    }
+
+    if (consultType === "HOME" && visit?.visitLat != null && visit.visitLng != null) {
+      const visitLat = visit.visitLat;
+      const visitLng = visit.visitLng;
       let baseLat = doctor.doctorProfile.lat;
       let baseLng = doctor.doctorProfile.lng;
       if (baseLat == null || baseLng == null) {
@@ -121,7 +143,7 @@ export async function POST(req: Request) {
         baseLng = firstClinic?.lng ?? null;
       }
       if (baseLat != null && baseLng != null) {
-        const distanceKm = haversine(patientLat, patientLng, baseLat, baseLng);
+        const distanceKm = haversine(visitLat, visitLng, baseLat, baseLng);
         if (distanceKm > doctor.doctorProfile.radius) {
           return NextResponse.json(
             {
@@ -212,6 +234,7 @@ export async function POST(req: Request) {
         paymentMethod: "ONLINE",
         followUpOfId: followUpOfId ?? undefined,
         clinicId: consultType === "CLINIC" && clinicId ? clinicId : undefined,
+        ...(visit ?? {}),
         ...(bookAt ? { scheduledAt: bookAt } : {}),
       },
       include: {

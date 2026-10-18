@@ -23,7 +23,8 @@
     "test:admin-doctor-status": "tsx tests/admin-doctor-status.ts",
     "test:clinic-leave": "tsx tests/clinic-leave.ts",
     "test:clinic-close": "tsx tests/clinic-close.ts",
-    "test:account-impact": "tsx tests/account-impact.ts"
+    "test:account-impact": "tsx tests/account-impact.ts",
+    "test:visit-address": "tsx tests/visit-address.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

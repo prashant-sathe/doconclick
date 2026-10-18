@@ -21,6 +21,8 @@ type VitalRow = VitalsInput & { id: string; recordedAt: string; alertLevel: stri
 type Visit = {
   id: string;
   patientId: string;
+  // Where to go: the address snapshotted at booking (profile for older rows).
+  visit: { address: string | null; landmark: string | null; pinCode: string | null; lat: number | null; lng: number | null } | null;
   dependentId: string | null;
   vitals: VitalRow[];
   nurseService: { kind: string; durationMinutes: number } | null;
@@ -83,10 +85,12 @@ function ageGender(v: Visit) {
   return [age ? `${age} yrs` : null, gender || null].filter(Boolean).join(" · ");
 }
 
+// Directions to the address snapshotted when the visit was booked (the
+// profile for older rows) — never the patient's current profile address.
 function directionsUrl(v: Visit) {
-  const p = v.patient.patientProfile;
+  const p = v.visit;
   if (p?.lat != null && p?.lng != null) return `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
-  if (p?.homeAddress) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.homeAddress)}`;
+  if (p?.address) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`;
   return null;
 }
 
@@ -417,7 +421,6 @@ export default function NurseDashboardPage() {
         ) : (
           <div className="space-y-3">
             {list.map((v) => {
-              const p = v.patient.patientProfile;
               const dir = directionsUrl(v);
               const busy = busyId === v.id;
               const earning = Math.round((v.amount - v.platformFee) * 100) / 100;
@@ -456,9 +459,9 @@ export default function NurseDashboardPage() {
                         </span>
                       )}
                     </p>
-                    {p?.homeAddress && (
+                    {v.visit?.address && (
                       <p className="flex items-start gap-1.5"><MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
-                        <span>{p.homeAddress}{p.landmark ? `, ${p.landmark}` : ""}{p.pinCode ? ` — ${p.pinCode}` : ""}</span>
+                        <span>{v.visit.address}{v.visit.landmark ? `, ${v.visit.landmark}` : ""}{v.visit.pinCode ? ` — ${v.visit.pinCode}` : ""}</span>
                       </p>
                     )}
                     {v.allergies && <p className="flex items-center gap-1.5 text-amber-700"><AlertTriangle className="w-4 h-4" />Allergies: {v.allergies}</p>}

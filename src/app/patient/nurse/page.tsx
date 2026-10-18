@@ -74,7 +74,17 @@ function PatientNurseContent() {
   const [notes, setNotes] = useState("");
   const [visits, setVisits] = useState(1);
   const [intervalDays, setIntervalDays] = useState(1);
-  const [address, setAddress] = useState({ text: "", lat: null as number | null, lng: null as number | null, saved: "" });
+  // The visit address. lat/lng belong to `coordsFor` — the text they were
+  // picked or pinned for — so editing the address drops them and the patient
+  // has to pick a suggestion (or pin GPS) again: a typed address alone can't
+  // be booked. Landmark/flat and PIN are free text on top.
+  const [address, setAddress] = useState({
+    text: "", lat: null as number | null, lng: null as number | null, coordsFor: "",
+    landmark: "", pinCode: "",
+    saved: { text: "", landmark: "", pinCode: "", lat: null as number | null, lng: null as number | null },
+  });
+  const [pinningVisit, setPinningVisit] = useState(false);
+  const visitPinned = address.lat != null && address.lng != null && address.coordsFor === address.text;
   // Where to look for nurses. The nurse travels to the visit address, so the
   // saved home address wins over GPS; an explicitly chosen browse location
   // (shared with the doctor map) wins over both. null = still resolving.
@@ -107,6 +117,28 @@ function PatientNurseContent() {
     setNurses(d.nurses ?? []);
   };
 
+  // Pins the visit address to where the phone is now (e.g. typed a flat
+  // address the suggestions don't know). Fills the address/PIN from the
+  // reverse lookup only when they're empty.
+  const pinVisitToGps = async () => {
+    setPinningVisit(true);
+    setError("");
+    try {
+      const pos = await getCurrentPositionCompat({ enableHighAccuracy: true, timeout: 10000 });
+      const { latitude: lat, longitude: lng } = pos.coords;
+      const d = await fetch(`/api/geocode/reverse?lat=${lat}&lon=${lng}`).then((r) => r.json()).catch(() => ({}));
+      setAddress((a) => {
+        const text = a.text.trim() ? a.text : d.label ?? `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        const pinCode = a.pinCode || (typeof d.pinCode === "string" && /^\d{6}$/.test(d.pinCode) ? d.pinCode : "");
+        return { ...a, text, pinCode, lat, lng, coordsFor: text };
+      });
+    } catch {
+      setError("Couldn't get your location. Allow location access, or pick your address from the suggestions.");
+    } finally {
+      setPinningVisit(false);
+    }
+  };
+
   const locateWithGps = async (silent = false) => {
     setLocating(true);
     try {
@@ -126,7 +158,10 @@ function PatientNurseContent() {
     if (!user?.id || user.role !== "PATIENT") return;
     fetch("/api/patients/me").then((r) => (r.ok ? r.json() : null)).then((d) => {
       const p = d?.patientProfile;
-      if (p) setAddress({ text: p.homeAddress ?? "", lat: p.lat ?? null, lng: p.lng ?? null, saved: p.homeAddress ?? "" });
+      if (p) {
+        const saved = { text: p.homeAddress ?? "", landmark: p.landmark ?? "", pinCode: p.pinCode ?? "", lat: p.lat ?? null, lng: p.lng ?? null };
+        setAddress({ ...saved, coordsFor: saved.lat != null ? saved.text : "", saved });
+      }
       const chosen = readPatientLocation();
       if (chosen) { setSearchLoc(chosen); return; }
       if (p?.lat != null && p?.lng != null) { setSearchLoc({ lat: p.lat, lng: p.lng, label: "your home address" }); return; }
@@ -249,6 +284,8 @@ function PatientNurseContent() {
       return;
     }
     if (!address.text.trim()) { setError("Please add the address where the nurse should come."); return; }
+    if (!visitPinned) { setError("Pick your address from the suggestions, or tap “Use my current location”, so the nurse can find you."); return; }
+    if (address.pinCode && !/^\d{6}$/.test(address.pinCode)) { setError("PIN code must be 6 digits."); return; }
     if (service.requiresPrescription && !prescriptionDocId && !(referral && referral.service.id === service.id)) { setError(`${service.name} needs a doctor's prescription. Please attach one.`); return; }
     if (!consent) { setError("Please agree to the consent statement to continue."); return; }
     setError("");
@@ -259,13 +296,19 @@ function PatientNurseContent() {
     if (!service || !nurse) return;
     setBooking(true); setError("");
     try {
-      // Keep the visit address on the profile — it's where the nurse goes.
-      if (address.text.trim() !== address.saved.trim()) {
+      // Keep the visit address on the profile for next time. The booking
+      // itself carries its own copy (`visit`), so this is only a convenience.
+      const sv = address.saved;
+      if (address.text.trim() !== sv.text.trim() || address.landmark.trim() !== sv.landmark.trim()
+        || address.pinCode !== sv.pinCode || address.lat !== sv.lat || address.lng !== sv.lng) {
         await patchPatientProfile({
           homeAddress: address.text.trim(),
-          ...(address.lat != null && address.lng != null ? { lat: address.lat, lng: address.lng } : {}),
+          landmark: address.landmark.trim() || null,
+          ...(address.pinCode ? { pinCode: address.pinCode } : {}),
+          lat: address.lat,
+          lng: address.lng,
         });
-        setAddress((a) => ({ ...a, saved: a.text }));
+        setAddress((a) => ({ ...a, saved: { text: a.text, landmark: a.landmark, pinCode: a.pinCode, lat: a.lat, lng: a.lng } }));
       }
       const res = await fetch("/api/nurse-bookings", {
         method: "POST",
@@ -281,10 +324,15 @@ function PatientNurseContent() {
           intervalDays,
           ...(referral && referral.service.id === service.id ? { nurseReferralId: referral.id } : {}),
           ...(when === "LATER" && scheduledAt ? { scheduledAt: new Date(scheduledAt).toISOString() } : {}),
-          // The visit address's own coordinates; else wherever we searched from.
-          ...(address.lat != null && address.lng != null
-            ? { patientLat: address.lat, patientLng: address.lng }
-            : searchLoc && searchLoc !== "none" ? { patientLat: searchLoc.lat, patientLng: searchLoc.lng } : {}),
+          // Snapshotted onto the booking — where the nurse goes, and what
+          // her travel radius is checked against.
+          visit: {
+            address: address.text.trim(),
+            landmark: address.landmark.trim() || undefined,
+            pinCode: address.pinCode || undefined,
+            lat: address.lat,
+            lng: address.lng,
+          },
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -548,9 +596,26 @@ function PatientNurseContent() {
                       multiline
                       value={address.text}
                       onChange={(v) => setAddress((a) => ({ ...a, text: v }))}
-                      onSelect={(s) => setAddress((a) => ({ ...a, text: s.label, lat: s.lat, lng: s.lon }))}
-                      placeholder="House no., building, street, area"
+                      onSelect={(s) => setAddress((a) => ({ ...a, text: s.label, lat: s.lat, lng: s.lon, coordsFor: s.label }))}
+                      placeholder="Search your building, street or area"
                     />
+                    <div className="flex items-center justify-between gap-2 mt-1.5">
+                      {visitPinned ? (
+                        <p className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3 h-3" />Location set</p>
+                      ) : (
+                        <p className="text-[11px] text-amber-600 font-semibold">Pick a suggestion or use your current location</p>
+                      )}
+                      <button type="button" onClick={pinVisitToGps} disabled={pinningVisit}
+                        className="text-[11px] font-semibold text-blue-600 flex items-center gap-1 disabled:opacity-60">
+                        {pinningVisit ? <Loader2 className="w-3 h-3 animate-spin" /> : <LocateFixed className="w-3 h-3" />} Use my current location
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      <input className="input-field col-span-2" placeholder="Flat no., landmark (optional)" maxLength={120}
+                        value={address.landmark} onChange={(e) => setAddress((a) => ({ ...a, landmark: e.target.value }))} />
+                      <input className="input-field" inputMode="numeric" placeholder="PIN" maxLength={6}
+                        value={address.pinCode} onChange={(e) => setAddress((a) => ({ ...a, pinCode: e.target.value.replace(/\D/g, "").slice(0, 6) }))} />
+                    </div>
                     <p className="text-[11px] text-slate-400 mt-1">Saved to your profile for next time.</p>
                   </div>
 

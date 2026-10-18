@@ -32,6 +32,8 @@ export type AppointmentAvgAggregateOutputType = {
   amount: number | null
   platformFee: number | null
   discountAmount: number | null
+  visitLat: number | null
+  visitLng: number | null
   doctorLat: number | null
   doctorLng: number | null
 }
@@ -42,6 +44,8 @@ export type AppointmentSumAggregateOutputType = {
   amount: number | null
   platformFee: number | null
   discountAmount: number | null
+  visitLat: number | null
+  visitLng: number | null
   doctorLat: number | null
   doctorLng: number | null
 }
@@ -85,6 +89,11 @@ export type AppointmentMinAggregateOutputType = {
   prescriptionUrl: string | null
   doctorNotes: string | null
   travelStatus: string | null
+  visitAddress: string | null
+  visitLandmark: string | null
+  visitPinCode: string | null
+  visitLat: number | null
+  visitLng: number | null
   doctorLat: number | null
   doctorLng: number | null
   doctorLocationUpdatedAt: Date | null
@@ -136,6 +145,11 @@ export type AppointmentMaxAggregateOutputType = {
   prescriptionUrl: string | null
   doctorNotes: string | null
   travelStatus: string | null
+  visitAddress: string | null
+  visitLandmark: string | null
+  visitPinCode: string | null
+  visitLat: number | null
+  visitLng: number | null
   doctorLat: number | null
   doctorLng: number | null
   doctorLocationUpdatedAt: Date | null
@@ -187,6 +201,11 @@ export type AppointmentCountAggregateOutputType = {
   prescriptionUrl: number
   doctorNotes: number
   travelStatus: number
+  visitAddress: number
+  visitLandmark: number
+  visitPinCode: number
+  visitLat: number
+  visitLng: number
   doctorLat: number
   doctorLng: number
   doctorLocationUpdatedAt: number
@@ -207,6 +226,8 @@ export type AppointmentAvgAggregateInputType = {
   amount?: true
   platformFee?: true
   discountAmount?: true
+  visitLat?: true
+  visitLng?: true
   doctorLat?: true
   doctorLng?: true
 }
@@ -217,6 +238,8 @@ export type AppointmentSumAggregateInputType = {
   amount?: true
   platformFee?: true
   discountAmount?: true
+  visitLat?: true
+  visitLng?: true
   doctorLat?: true
   doctorLng?: true
 }
@@ -260,6 +283,11 @@ export type AppointmentMinAggregateInputType = {
   prescriptionUrl?: true
   doctorNotes?: true
   travelStatus?: true
+  visitAddress?: true
+  visitLandmark?: true
+  visitPinCode?: true
+  visitLat?: true
+  visitLng?: true
   doctorLat?: true
   doctorLng?: true
   doctorLocationUpdatedAt?: true
@@ -311,6 +339,11 @@ export type AppointmentMaxAggregateInputType = {
   prescriptionUrl?: true
   doctorNotes?: true
   travelStatus?: true
+  visitAddress?: true
+  visitLandmark?: true
+  visitPinCode?: true
+  visitLat?: true
+  visitLng?: true
   doctorLat?: true
   doctorLng?: true
   doctorLocationUpdatedAt?: true
@@ -362,6 +395,11 @@ export type AppointmentCountAggregateInputType = {
   prescriptionUrl?: true
   doctorNotes?: true
   travelStatus?: true
+  visitAddress?: true
+  visitLandmark?: true
+  visitPinCode?: true
+  visitLat?: true
+  visitLng?: true
   doctorLat?: true
   doctorLng?: true
   doctorLocationUpdatedAt?: true
@@ -500,6 +538,11 @@ export type AppointmentGroupByOutputType = {
   prescriptionUrl: string | null
   doctorNotes: string | null
   travelStatus: string
+  visitAddress: string | null
+  visitLandmark: string | null
+  visitPinCode: string | null
+  visitLat: number | null
+  visitLng: number | null
   doctorLat: number | null
   doctorLng: number | null
   doctorLocationUpdatedAt: Date | null
@@ -574,6 +617,11 @@ export type AppointmentWhereInput = {
   prescriptionUrl?: Prisma.StringNullableFilter<"Appointment"> | string | null
   doctorNotes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   travelStatus?: Prisma.StringFilter<"Appointment"> | string
+  visitAddress?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  visitLandmark?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  visitPinCode?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  visitLat?: Prisma.FloatNullableFilter<"Appointment"> | number | null
+  visitLng?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   doctorLat?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   doctorLng?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   doctorLocationUpdatedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -649,6 +697,11 @@ export type AppointmentOrderByWithRelationInput = {
   prescriptionUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   doctorNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   travelStatus?: Prisma.SortOrder
+  visitAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitLandmark?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitPinCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitLat?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitLng?: Prisma.SortOrderInput | Prisma.SortOrder
   doctorLat?: Prisma.SortOrderInput | Prisma.SortOrder
   doctorLng?: Prisma.SortOrderInput | Prisma.SortOrder
   doctorLocationUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -728,6 +781,11 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   prescriptionUrl?: Prisma.StringNullableFilter<"Appointment"> | string | null
   doctorNotes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   travelStatus?: Prisma.StringFilter<"Appointment"> | string
+  visitAddress?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  visitLandmark?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  visitPinCode?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  visitLat?: Prisma.FloatNullableFilter<"Appointment"> | number | null
+  visitLng?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   doctorLat?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   doctorLng?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   doctorLocationUpdatedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -802,6 +860,11 @@ export type AppointmentOrderByWithAggregationInput = {
   prescriptionUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   doctorNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   travelStatus?: Prisma.SortOrder
+  visitAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitLandmark?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitPinCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitLat?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitLng?: Prisma.SortOrderInput | Prisma.SortOrder
   doctorLat?: Prisma.SortOrderInput | Prisma.SortOrder
   doctorLng?: Prisma.SortOrderInput | Prisma.SortOrder
   doctorLocationUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -861,6 +924,11 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   prescriptionUrl?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   doctorNotes?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   travelStatus?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
+  visitAddress?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
+  visitLandmark?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
+  visitPinCode?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
+  visitLat?: Prisma.FloatNullableWithAggregatesFilter<"Appointment"> | number | null
+  visitLng?: Prisma.FloatNullableWithAggregatesFilter<"Appointment"> | number | null
   doctorLat?: Prisma.FloatNullableWithAggregatesFilter<"Appointment"> | number | null
   doctorLng?: Prisma.FloatNullableWithAggregatesFilter<"Appointment"> | number | null
   doctorLocationUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
@@ -903,6 +971,11 @@ export type AppointmentCreateInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -975,6 +1048,11 @@ export type AppointmentUncheckedCreateInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -1029,6 +1107,11 @@ export type AppointmentUpdateInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1101,6 +1184,11 @@ export type AppointmentUncheckedUpdateInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1164,6 +1252,11 @@ export type AppointmentCreateManyInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -1206,6 +1299,11 @@ export type AppointmentUpdateManyMutationInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1254,6 +1352,11 @@ export type AppointmentUncheckedUpdateManyInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1325,6 +1428,11 @@ export type AppointmentCountOrderByAggregateInput = {
   prescriptionUrl?: Prisma.SortOrder
   doctorNotes?: Prisma.SortOrder
   travelStatus?: Prisma.SortOrder
+  visitAddress?: Prisma.SortOrder
+  visitLandmark?: Prisma.SortOrder
+  visitPinCode?: Prisma.SortOrder
+  visitLat?: Prisma.SortOrder
+  visitLng?: Prisma.SortOrder
   doctorLat?: Prisma.SortOrder
   doctorLng?: Prisma.SortOrder
   doctorLocationUpdatedAt?: Prisma.SortOrder
@@ -1343,6 +1451,8 @@ export type AppointmentAvgOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
   discountAmount?: Prisma.SortOrder
+  visitLat?: Prisma.SortOrder
+  visitLng?: Prisma.SortOrder
   doctorLat?: Prisma.SortOrder
   doctorLng?: Prisma.SortOrder
 }
@@ -1386,6 +1496,11 @@ export type AppointmentMaxOrderByAggregateInput = {
   prescriptionUrl?: Prisma.SortOrder
   doctorNotes?: Prisma.SortOrder
   travelStatus?: Prisma.SortOrder
+  visitAddress?: Prisma.SortOrder
+  visitLandmark?: Prisma.SortOrder
+  visitPinCode?: Prisma.SortOrder
+  visitLat?: Prisma.SortOrder
+  visitLng?: Prisma.SortOrder
   doctorLat?: Prisma.SortOrder
   doctorLng?: Prisma.SortOrder
   doctorLocationUpdatedAt?: Prisma.SortOrder
@@ -1437,6 +1552,11 @@ export type AppointmentMinOrderByAggregateInput = {
   prescriptionUrl?: Prisma.SortOrder
   doctorNotes?: Prisma.SortOrder
   travelStatus?: Prisma.SortOrder
+  visitAddress?: Prisma.SortOrder
+  visitLandmark?: Prisma.SortOrder
+  visitPinCode?: Prisma.SortOrder
+  visitLat?: Prisma.SortOrder
+  visitLng?: Prisma.SortOrder
   doctorLat?: Prisma.SortOrder
   doctorLng?: Prisma.SortOrder
   doctorLocationUpdatedAt?: Prisma.SortOrder
@@ -1455,6 +1575,8 @@ export type AppointmentSumOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   platformFee?: Prisma.SortOrder
   discountAmount?: Prisma.SortOrder
+  visitLat?: Prisma.SortOrder
+  visitLng?: Prisma.SortOrder
   doctorLat?: Prisma.SortOrder
   doctorLng?: Prisma.SortOrder
 }
@@ -2161,6 +2283,11 @@ export type AppointmentCreateWithoutPatientInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -2231,6 +2358,11 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -2295,6 +2427,11 @@ export type AppointmentCreateWithoutDoctorInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -2365,6 +2502,11 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -2457,6 +2599,11 @@ export type AppointmentScalarWhereInput = {
   prescriptionUrl?: Prisma.StringNullableFilter<"Appointment"> | string | null
   doctorNotes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   travelStatus?: Prisma.StringFilter<"Appointment"> | string
+  visitAddress?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  visitLandmark?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  visitPinCode?: Prisma.StringNullableFilter<"Appointment"> | string | null
+  visitLat?: Prisma.FloatNullableFilter<"Appointment"> | number | null
+  visitLng?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   doctorLat?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   doctorLng?: Prisma.FloatNullableFilter<"Appointment"> | number | null
   doctorLocationUpdatedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -2515,6 +2662,11 @@ export type AppointmentCreateWithoutDependentInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -2585,6 +2737,11 @@ export type AppointmentUncheckedCreateWithoutDependentInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -2665,6 +2822,11 @@ export type AppointmentCreateWithoutPrescriptionDocInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -2735,6 +2897,11 @@ export type AppointmentUncheckedCreateWithoutPrescriptionDocInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -2815,6 +2982,11 @@ export type AppointmentCreateWithoutNurseServiceInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -2885,6 +3057,11 @@ export type AppointmentUncheckedCreateWithoutNurseServiceInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -2965,6 +3142,11 @@ export type AppointmentCreateWithoutVitalsInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3036,6 +3218,11 @@ export type AppointmentUncheckedCreateWithoutVitalsInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3105,6 +3292,11 @@ export type AppointmentUpdateWithoutVitalsInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3176,6 +3368,11 @@ export type AppointmentUncheckedUpdateWithoutVitalsInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3229,6 +3426,11 @@ export type AppointmentCreateWithoutPackageInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3299,6 +3501,11 @@ export type AppointmentUncheckedCreateWithoutPackageInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3379,6 +3586,11 @@ export type AppointmentCreateWithoutReferralGivenInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3450,6 +3662,11 @@ export type AppointmentUncheckedCreateWithoutReferralGivenInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3508,6 +3725,11 @@ export type AppointmentCreateWithoutNurseReferralInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3578,6 +3800,11 @@ export type AppointmentUncheckedCreateWithoutNurseReferralInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3653,6 +3880,11 @@ export type AppointmentUpdateWithoutReferralGivenInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3724,6 +3956,11 @@ export type AppointmentUncheckedUpdateWithoutReferralGivenInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3793,6 +4030,11 @@ export type AppointmentCreateWithoutFollowUpsInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3864,6 +4106,11 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3922,6 +4169,11 @@ export type AppointmentCreateWithoutFollowUpOfInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -3993,6 +4245,11 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -4056,6 +4313,11 @@ export type AppointmentCreateWithoutReassignedToInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -4127,6 +4389,11 @@ export type AppointmentUncheckedCreateWithoutReassignedToInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -4185,6 +4452,11 @@ export type AppointmentCreateWithoutReassignedFromInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -4256,6 +4528,11 @@ export type AppointmentUncheckedCreateWithoutReassignedFromInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -4325,6 +4602,11 @@ export type AppointmentUpdateWithoutFollowUpsInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4396,6 +4678,11 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4476,6 +4763,11 @@ export type AppointmentUpdateWithoutReassignedToInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4547,6 +4839,11 @@ export type AppointmentUncheckedUpdateWithoutReassignedToInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4611,6 +4908,11 @@ export type AppointmentUpdateWithoutReassignedFromInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4682,6 +4984,11 @@ export type AppointmentUncheckedUpdateWithoutReassignedFromInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4735,6 +5042,11 @@ export type AppointmentCreateWithoutWalletTransactionInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -4806,6 +5118,11 @@ export type AppointmentUncheckedCreateWithoutWalletTransactionInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -4875,6 +5192,11 @@ export type AppointmentUpdateWithoutWalletTransactionInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4946,6 +5268,11 @@ export type AppointmentUncheckedUpdateWithoutWalletTransactionInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4999,6 +5326,11 @@ export type AppointmentCreateWithoutSettlementInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -5069,6 +5401,11 @@ export type AppointmentUncheckedCreateWithoutSettlementInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -5149,6 +5486,11 @@ export type AppointmentCreateWithoutMessagesInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -5220,6 +5562,11 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -5289,6 +5636,11 @@ export type AppointmentUpdateWithoutMessagesInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5360,6 +5712,11 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5413,6 +5770,11 @@ export type AppointmentCreateWithoutMedicinesInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -5484,6 +5846,11 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -5553,6 +5920,11 @@ export type AppointmentUpdateWithoutMedicinesInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5624,6 +5996,11 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5677,6 +6054,11 @@ export type AppointmentCreateWithoutTestsInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -5748,6 +6130,11 @@ export type AppointmentUncheckedCreateWithoutTestsInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -5817,6 +6204,11 @@ export type AppointmentUpdateWithoutTestsInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5888,6 +6280,11 @@ export type AppointmentUncheckedUpdateWithoutTestsInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5941,6 +6338,11 @@ export type AppointmentCreateWithoutAttachmentsInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -6012,6 +6414,11 @@ export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -6081,6 +6488,11 @@ export type AppointmentUpdateWithoutAttachmentsInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6152,6 +6564,11 @@ export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6205,6 +6622,11 @@ export type AppointmentCreateWithoutReviewInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -6276,6 +6698,11 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -6345,6 +6772,11 @@ export type AppointmentUpdateWithoutReviewInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6416,6 +6848,11 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6469,6 +6906,11 @@ export type AppointmentCreateWithoutClinicInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -6540,6 +6982,11 @@ export type AppointmentUncheckedCreateWithoutClinicInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -6619,6 +7066,11 @@ export type AppointmentCreateWithoutCouponInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -6689,6 +7141,11 @@ export type AppointmentUncheckedCreateWithoutCouponInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -6769,6 +7226,11 @@ export type AppointmentCreateWithoutCouponRedemptionInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -6840,6 +7302,11 @@ export type AppointmentUncheckedCreateWithoutCouponRedemptionInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -6909,6 +7376,11 @@ export type AppointmentUpdateWithoutCouponRedemptionInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6980,6 +7452,11 @@ export type AppointmentUncheckedUpdateWithoutCouponRedemptionInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7033,6 +7510,11 @@ export type AppointmentCreateWithoutPaymentOrderItemsInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -7104,6 +7586,11 @@ export type AppointmentUncheckedCreateWithoutPaymentOrderItemsInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -7173,6 +7660,11 @@ export type AppointmentUpdateWithoutPaymentOrderItemsInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7244,6 +7736,11 @@ export type AppointmentUncheckedUpdateWithoutPaymentOrderItemsInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7305,6 +7802,11 @@ export type AppointmentCreateManyPatientInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -7355,6 +7857,11 @@ export type AppointmentCreateManyDoctorInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -7397,6 +7904,11 @@ export type AppointmentUpdateWithoutPatientInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7467,6 +7979,11 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7529,6 +8046,11 @@ export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7571,6 +8093,11 @@ export type AppointmentUpdateWithoutDoctorInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7641,6 +8168,11 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7703,6 +8235,11 @@ export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7753,6 +8290,11 @@ export type AppointmentCreateManyDependentInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -7795,6 +8337,11 @@ export type AppointmentUpdateWithoutDependentInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7865,6 +8412,11 @@ export type AppointmentUncheckedUpdateWithoutDependentInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7927,6 +8479,11 @@ export type AppointmentUncheckedUpdateManyWithoutDependentInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7977,6 +8534,11 @@ export type AppointmentCreateManyPrescriptionDocInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -8019,6 +8581,11 @@ export type AppointmentUpdateWithoutPrescriptionDocInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8089,6 +8656,11 @@ export type AppointmentUncheckedUpdateWithoutPrescriptionDocInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8151,6 +8723,11 @@ export type AppointmentUncheckedUpdateManyWithoutPrescriptionDocInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8201,6 +8778,11 @@ export type AppointmentCreateManyNurseServiceInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -8243,6 +8825,11 @@ export type AppointmentUpdateWithoutNurseServiceInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8313,6 +8900,11 @@ export type AppointmentUncheckedUpdateWithoutNurseServiceInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8375,6 +8967,11 @@ export type AppointmentUncheckedUpdateManyWithoutNurseServiceInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8425,6 +9022,11 @@ export type AppointmentCreateManyPackageInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -8467,6 +9069,11 @@ export type AppointmentUpdateWithoutPackageInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8537,6 +9144,11 @@ export type AppointmentUncheckedUpdateWithoutPackageInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8599,6 +9211,11 @@ export type AppointmentUncheckedUpdateManyWithoutPackageInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8649,6 +9266,11 @@ export type AppointmentCreateManyNurseReferralInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -8691,6 +9313,11 @@ export type AppointmentUpdateWithoutNurseReferralInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8761,6 +9388,11 @@ export type AppointmentUncheckedUpdateWithoutNurseReferralInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8823,6 +9455,11 @@ export type AppointmentUncheckedUpdateManyWithoutNurseReferralInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8874,6 +9511,11 @@ export type AppointmentCreateManyFollowUpOfInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -8915,6 +9557,11 @@ export type AppointmentUpdateWithoutFollowUpOfInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8986,6 +9633,11 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9048,6 +9700,11 @@ export type AppointmentUncheckedUpdateManyWithoutFollowUpOfInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9097,6 +9754,11 @@ export type AppointmentCreateManySettlementInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -9139,6 +9801,11 @@ export type AppointmentUpdateWithoutSettlementInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9209,6 +9876,11 @@ export type AppointmentUncheckedUpdateWithoutSettlementInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9271,6 +9943,11 @@ export type AppointmentUncheckedUpdateManyWithoutSettlementInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9322,6 +9999,11 @@ export type AppointmentCreateManyClinicInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -9363,6 +10045,11 @@ export type AppointmentUpdateWithoutClinicInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9434,6 +10121,11 @@ export type AppointmentUncheckedUpdateWithoutClinicInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9496,6 +10188,11 @@ export type AppointmentUncheckedUpdateManyWithoutClinicInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9545,6 +10242,11 @@ export type AppointmentCreateManyCouponInput = {
   prescriptionUrl?: string | null
   doctorNotes?: string | null
   travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
   doctorLat?: number | null
   doctorLng?: number | null
   doctorLocationUpdatedAt?: Date | string | null
@@ -9587,6 +10289,11 @@ export type AppointmentUpdateWithoutCouponInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9657,6 +10364,11 @@ export type AppointmentUncheckedUpdateWithoutCouponInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9719,6 +10431,11 @@ export type AppointmentUncheckedUpdateManyWithoutCouponInput = {
   prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9855,6 +10572,11 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   prescriptionUrl?: boolean
   doctorNotes?: boolean
   travelStatus?: boolean
+  visitAddress?: boolean
+  visitLandmark?: boolean
+  visitPinCode?: boolean
+  visitLat?: boolean
+  visitLng?: boolean
   doctorLat?: boolean
   doctorLng?: boolean
   doctorLocationUpdatedAt?: boolean
@@ -9931,6 +10653,11 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   prescriptionUrl?: boolean
   doctorNotes?: boolean
   travelStatus?: boolean
+  visitAddress?: boolean
+  visitLandmark?: boolean
+  visitPinCode?: boolean
+  visitLat?: boolean
+  visitLng?: boolean
   doctorLat?: boolean
   doctorLng?: boolean
   doctorLocationUpdatedAt?: boolean
@@ -9994,6 +10721,11 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   prescriptionUrl?: boolean
   doctorNotes?: boolean
   travelStatus?: boolean
+  visitAddress?: boolean
+  visitLandmark?: boolean
+  visitPinCode?: boolean
+  visitLat?: boolean
+  visitLng?: boolean
   doctorLat?: boolean
   doctorLng?: boolean
   doctorLocationUpdatedAt?: boolean
@@ -10057,6 +10789,11 @@ export type AppointmentSelectScalar = {
   prescriptionUrl?: boolean
   doctorNotes?: boolean
   travelStatus?: boolean
+  visitAddress?: boolean
+  visitLandmark?: boolean
+  visitPinCode?: boolean
+  visitLat?: boolean
+  visitLng?: boolean
   doctorLat?: boolean
   doctorLng?: boolean
   doctorLocationUpdatedAt?: boolean
@@ -10069,7 +10806,7 @@ export type AppointmentSelectScalar = {
   createdAt?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "providerType" | "nurseServiceId" | "serviceName" | "prescriptionDocId" | "visitOtp" | "visitOtpAttempts" | "visitStartedAt" | "visitStartNote" | "packageId" | "packageIndex" | "nurseReferralId" | "status" | "acceptedAt" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "couponId" | "couponCode" | "discountAmount" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "reassignedFromId" | "clinicId" | "scheduledAt" | "requestedScheduledAt" | "reminderSentAt" | "createdAt", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "providerType" | "nurseServiceId" | "serviceName" | "prescriptionDocId" | "visitOtp" | "visitOtpAttempts" | "visitStartedAt" | "visitStartNote" | "packageId" | "packageIndex" | "nurseReferralId" | "status" | "acceptedAt" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "couponId" | "couponCode" | "discountAmount" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "visitAddress" | "visitLandmark" | "visitPinCode" | "visitLat" | "visitLng" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "reassignedFromId" | "clinicId" | "scheduledAt" | "requestedScheduledAt" | "reminderSentAt" | "createdAt", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -10193,6 +10930,11 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     prescriptionUrl: string | null
     doctorNotes: string | null
     travelStatus: string
+    visitAddress: string | null
+    visitLandmark: string | null
+    visitPinCode: string | null
+    visitLat: number | null
+    visitLng: number | null
     doctorLat: number | null
     doctorLng: number | null
     doctorLocationUpdatedAt: Date | null
@@ -10688,6 +11430,11 @@ export interface AppointmentFieldRefs {
   readonly prescriptionUrl: Prisma.FieldRef<"Appointment", 'String'>
   readonly doctorNotes: Prisma.FieldRef<"Appointment", 'String'>
   readonly travelStatus: Prisma.FieldRef<"Appointment", 'String'>
+  readonly visitAddress: Prisma.FieldRef<"Appointment", 'String'>
+  readonly visitLandmark: Prisma.FieldRef<"Appointment", 'String'>
+  readonly visitPinCode: Prisma.FieldRef<"Appointment", 'String'>
+  readonly visitLat: Prisma.FieldRef<"Appointment", 'Float'>
+  readonly visitLng: Prisma.FieldRef<"Appointment", 'Float'>
   readonly doctorLat: Prisma.FieldRef<"Appointment", 'Float'>
   readonly doctorLng: Prisma.FieldRef<"Appointment", 'Float'>
   readonly doctorLocationUpdatedAt: Prisma.FieldRef<"Appointment", 'DateTime'>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { haversine } from "@/lib/geo";
+import { parseVisitInput, snapshotFromProfile } from "@/lib/visitAddress";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
 import { isNurseBookable } from "@/lib/providerGuard";
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json().catch(() => ({}));
-  const { nurseId, serviceId, notes, dependentId, consentGiven, scheduledAt, prescriptionDocId, patientLat, patientLng } = body;
+  const { nurseId, serviceId, notes, dependentId, consentGiven, scheduledAt, prescriptionDocId } = body;
 
   if (!nurseId || !serviceId) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -43,7 +44,11 @@ export async function POST(req: Request) {
 
   const patient = await prisma.user.findUnique({
     where: { id: authUser.id },
-    include: { patientProfile: { select: { age: true, gender: true, homeAddress: true, allergies: true, lat: true, lng: true } } },
+    include: {
+      patientProfile: {
+        select: { age: true, gender: true, homeAddress: true, landmark: true, pinCode: true, allergies: true, lat: true, lng: true },
+      },
+    },
   });
   if (!patient) {
     return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
@@ -55,8 +60,15 @@ export async function POST(req: Request) {
       { status: 409 }
     );
   }
-  // The nurse comes to the patient — there has to be somewhere to go.
-  if (!patient.patientProfile?.homeAddress?.trim()) {
+  // The nurse comes to the patient — there has to be somewhere to go. The
+  // visit address the form sent (else the saved profile address) is
+  // snapshotted onto every visit, so a later profile edit can't move them.
+  const visitInput = parseVisitInput(body.visit);
+  if (visitInput && "error" in visitInput) {
+    return NextResponse.json({ error: visitInput.error, code: "LOCATION_REQUIRED" }, { status: 400 });
+  }
+  const visit = visitInput?.snapshot ?? snapshotFromProfile(patient.patientProfile);
+  if (!visit.visitAddress) {
     return NextResponse.json(
       { error: "Please add your home address so the nurse knows where to come.", code: "ADDRESS_REQUIRED" },
       { status: 409 }
@@ -165,8 +177,10 @@ export async function POST(req: Request) {
     );
   }
 
-  const pLat = typeof patientLat === "number" ? patientLat : patient.patientProfile.lat;
-  const pLng = typeof patientLng === "number" ? patientLng : patient.patientProfile.lng;
+  // The travel radius is checked against the visit address itself — not
+  // wherever the patient's phone happens to be.
+  const pLat = visit.visitLat;
+  const pLng = visit.visitLng;
   if (pLat == null || pLng == null) {
     return NextResponse.json(
       { error: "Please pick your visit address from the suggestions (or allow location) so we can check the nurse travels there.", code: "LOCATION_REQUIRED" },
@@ -217,6 +231,7 @@ export async function POST(req: Request) {
           status: "PENDING_APPROVAL",
           paymentMethod: "ONLINE",
           scheduledAt: schedule[i],
+          ...visit,
           ...(pkg ? { packageId: pkg.id, packageIndex: i + 1 } : {}),
         },
       }));

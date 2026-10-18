@@ -72,6 +72,16 @@ interface Appointment {
     mobile: string;
     patientProfile: { lat: number | null; lng: number | null; homeAddress: string | null } | null;
   };
+  // HOME only: the address snapshotted at booking (profile for older rows).
+  visit: VisitLocation | null;
+}
+
+interface VisitLocation {
+  address: string | null;
+  landmark: string | null;
+  pinCode: string | null;
+  lat: number | null;
+  lng: number | null;
 }
 
 interface MedicineRow {
@@ -609,6 +619,35 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
 function navigateUrl(lat: number, lng: number) {
   return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+}
+
+// Directions to the booked visit address — its coordinates when known, else a
+// search for the address text.
+function visitNavUrl(v: VisitLocation | null) {
+  if (v?.lat != null && v.lng != null) return navigateUrl(v.lat, v.lng);
+  if (v?.address) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.address)}`;
+  return null;
+}
+
+function visitAddressText(v: VisitLocation) {
+  return [v.address, v.landmark].filter(Boolean).join(", ") + (v.pinCode ? ` — ${v.pinCode}` : "");
+}
+
+// The home-visit address line on a request/visit card, tappable for directions.
+function VisitAddressLine({ visit }: { visit: VisitLocation | null }) {
+  const url = visitNavUrl(visit);
+  if (!visit || !url) return null;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-start gap-1 text-xs text-blue-600 font-semibold mt-1 hover:underline"
+    >
+      <Navigation className="w-3 h-3 mt-0.5 flex-shrink-0" />
+      <span>{visit.address ? visitAddressText(visit) : "View patient location"}</span>
+    </a>
+  );
 }
 
 export default function DoctorDashboard() {
@@ -1160,7 +1199,6 @@ export default function DoctorDashboard() {
             ) : (
               pending.map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
-                const patientLoc = a.patient.patientProfile;
                 return (
                   <div
                     key={a.id}
@@ -1189,16 +1227,7 @@ export default function DoctorDashboard() {
                             <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}
                           </div>
                         )}
-                        {a.consultType === "HOME" && patientLoc?.lat != null && patientLoc?.lng != null && (
-                          <a
-                            href={navigateUrl(patientLoc.lat, patientLoc.lng)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs text-blue-600 font-semibold mt-1 hover:underline"
-                          >
-                            <Navigation className="w-3 h-3" /> {patientLoc.homeAddress || "View patient location"}
-                          </a>
-                        )}
+                        <VisitAddressLine visit={a.visit} />
                         {respondError?.id === a.id && (
                           <div className="text-xs text-red-600 mt-1">{respondError.message}</div>
                         )}
@@ -1235,7 +1264,7 @@ export default function DoctorDashboard() {
             ) : (
               (upcomingExpanded ? upcoming : upcoming.slice(0, PAGE_SIZE)).map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
-                const patientLoc = a.patient.patientProfile;
+                const visitUrl = visitNavUrl(a.visit);
                 // One primary action per visit instead of a row of small
                 // buttons — a home visit needs the journey moved along first,
                 // otherwise it's whatever unlocks the consult itself.
@@ -1277,6 +1306,7 @@ export default function DoctorDashboard() {
                                 <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}
                               </div>
                             )}
+                            <VisitAddressLine visit={a.visit} />
                             <div className={`text-xs mt-1 flex items-center gap-1 ${paymentBlocked ? "text-amber-600 font-semibold" : "text-slate-400"}`}>
                               <IndianRupee className="w-3 h-3" /> {a.amount} · {
                                 a.paymentMethod === "ONLINE"
@@ -1367,9 +1397,9 @@ export default function DoctorDashboard() {
                                       <History className="w-4 h-4 text-slate-400" /> Patient history
                                     </Link>
                                   )}
-                                  {a.consultType === "HOME" && patientLoc?.lat != null && patientLoc?.lng != null && (
+                                  {visitUrl && (
                                     <a
-                                      href={navigateUrl(patientLoc.lat, patientLoc.lng)}
+                                      href={visitUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       onClick={() => setOpenMenu(null)}

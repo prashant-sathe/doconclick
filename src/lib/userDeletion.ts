@@ -119,6 +119,12 @@ async function anonymize(tx: Prisma.TransactionClient, userId: string, role: str
     // Self-logged readings only — ones taken during a visit belong to it.
     await tx.vitalReading.deleteMany({ where: { patientId: userId, appointmentId: null } });
     await tx.savedDoctor.deleteMany({ where: { patientId: userId } });
+    // Home-visit addresses copied onto their bookings are the same personal
+    // data as the profile address — the visit records stay, the address goes.
+    await tx.appointment.updateMany({
+      where: { patientId: userId },
+      data: { visitAddress: null, visitLandmark: null, visitPinCode: null, visitLat: null, visitLng: null },
+    });
   }
 
   if (role === "DOCTOR") {

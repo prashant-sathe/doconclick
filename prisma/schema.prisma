@@ -405,6 +405,15 @@ model Appointment {
   prescriptionUrl String? // deprecated — superseded by `attachments`; kept so existing data isn't dropped
   doctorNotes   String?
   travelStatus  String    @default("NOT_STARTED") // NOT_STARTED, ON_THE_WAY, ARRIVED
+  // Where a HOME visit happens, copied from the booking — so editing the
+  // profile address later never sends the doctor/nurse to the wrong house.
+  // Null on CLINIC/VIDEO and on rows booked before the snapshot existed
+  // (readers fall back to the profile then; see src/lib/visitAddress.ts).
+  visitAddress  String?
+  visitLandmark String?
+  visitPinCode  String?
+  visitLat      Float?
+  visitLng      Float?
   doctorLat     Float?
   doctorLng     Float?
   doctorLocationUpdatedAt DateTime?

@@ -6,6 +6,7 @@ import { safeNum } from "@/lib/adminAuth";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
 import { isDoctorBookable } from "@/lib/doctorBookable";
+import { visitLocation } from "@/lib/visitAddress";
 
 // GET: The logged-in user's own appointments (as patient or as doctor)
 export async function GET() {
@@ -86,7 +87,7 @@ export async function GET() {
           select: {
             name: true,
             mobile: true,
-            patientProfile: { select: { lat: true, lng: true, homeAddress: true } },
+            patientProfile: { select: { lat: true, lng: true, homeAddress: true, landmark: true, pinCode: true } },
           },
         },
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
@@ -119,6 +120,8 @@ export async function GET() {
         amount: safeNum(a.amount),
         platformFee: safeNum(a.platformFee),
         unreadMessageCount: _count.messages,
+        // Where to go for a HOME visit: the booking's snapshot (profile for older rows).
+        visit: visitLocation(a, a.patient.patientProfile),
         latestVitals: latestFor(a.patientId, a.dependentId),
         recentVitalsCount: countFor(a.patientId, a.dependentId),
       }))
@@ -169,6 +172,8 @@ export async function GET() {
         amount: safeNum(a.amount),
         platformFee: safeNum(a.platformFee),
         unreadMessageCount: _count.messages,
+        // Where to go: the booking's snapshot (profile for older rows).
+        visit: visitLocation(a, a.patient.patientProfile),
       }))
     );
   }
