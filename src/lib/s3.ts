@@ -36,3 +36,14 @@ export async function uploadToS3(key: string, buffer: Buffer, contentType: strin
   const region = process.env.AWS_REGION;
   return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 }
+
+// Whether `url` is a file we uploaded to our own bucket under `folder` —
+// for fields a client sends back after an upload (e.g. a clinic photo), so
+// they can't point at an arbitrary site or a javascript:/data: URL.
+export function isOwnUploadUrl(url: string, folder: string): boolean {
+  const bucket = process.env.S3_BUCKET_NAME;
+  const region = process.env.AWS_REGION;
+  if (!bucket || !region) return false;
+  const prefix = `https://${bucket}.s3.${region}.amazonaws.com/${folder}/`;
+  return url.startsWith(prefix) && !url.slice(prefix.length).includes("..");
+}

@@ -67,6 +67,20 @@ const EDITABLE_FIELDS = [
 // Caps password guesses on the bank-details change by someone holding a session.
 const checkBankAttemptLimit = createRateLimiter(5, 15 * 60 * 1000);
 
+const MAX_FEE = 50000;
+const MAX_EXPERIENCE_YEARS = 70;
+const FEE_LABELS = { consultFee: "Clinic fee", videoFee: "Video fee", homeVisitFee: "Home visit fee" } as const;
+
+// A number from a form field: blank/null → `blank`; a finite number or
+// numeric string → that number; anything else (NaN, "abc", true, {}) → null.
+function parseNumber(value: unknown, blank: number | null): number | null {
+  if (value === "" || value == null) return blank;
+  if (typeof value !== "number" && typeof value !== "string") return null;
+  if (typeof value === "string" && !/^\s*-?\d+(\.\d+)?\s*$/.test(value)) return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
 const normalizeText = (v: unknown) => (v === "" || v == null ? null : String(v).trim() || null);
 
 // PATCH: Update the logged-in doctor's own profile.
@@ -98,13 +112,29 @@ export async function PATCH(req: Request) {
     if (!(key in body)) continue;
     const value = body[key];
     if (key === "experience") {
-      data[key] = value === "" || value == null ? 0 : Number(value);
+      const years = parseNumber(value, 0);
+      if (years === null || !Number.isInteger(years) || years < 0 || years > MAX_EXPERIENCE_YEARS) {
+        return NextResponse.json({ error: `Experience must be a whole number of years (0–${MAX_EXPERIENCE_YEARS}).` }, { status: 400 });
+      }
+      data[key] = years;
     } else if (key === "consultFee" || key === "videoFee" || key === "homeVisitFee") {
-      data[key] = value === "" || value == null ? 0 : Number(value);
+      // Blank means "not offered" → ₹0. Anything else must be a real amount.
+      const fee = parseNumber(value, 0);
+      if (fee === null || fee < 0 || fee > MAX_FEE) {
+        return NextResponse.json({ error: `${FEE_LABELS[key]} must be between ₹0 and ₹${MAX_FEE.toLocaleString("en-IN")}.` }, { status: 400 });
+      }
+      data[key] = Math.round(fee * 100) / 100;
     } else if (key === "radius") {
       data[key] = Math.min(20, Math.max(5, Number(value) || 5));
     } else if (key === "lat" || key === "lng") {
-      data[key] = value === "" || value == null ? null : Number(value);
+      const coord = parseNumber(value, null);
+      if (coord === null && !(value === "" || value == null)) {
+        return NextResponse.json({ error: "Invalid location." }, { status: 400 });
+      }
+      if (coord !== null && Math.abs(coord) > (key === "lat" ? 90 : 180)) {
+        return NextResponse.json({ error: "Invalid location." }, { status: 400 });
+      }
+      data[key] = coord;
     } else if (key === "offersHomeVisit" || key === "offersClinic" || key === "offersVideo") {
       data[key] = Boolean(value);
     } else {

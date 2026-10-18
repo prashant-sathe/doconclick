@@ -23,6 +23,84 @@ function nowInIst(now: Date): { weekday: string; minutes: number } {
   return { weekday, minutes: hour * 60 + minute };
 }
 
+const DAY_ORDER = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+export const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+const nextDay = (day: string) => DAY_ORDER[(DAY_ORDER.indexOf(day) + 1) % 7];
+const MIDNIGHT = 24 * 60;
+
+// One stretch of open time on one weekday, in minutes from midnight, with
+// end <= 1440.
+interface SlotWindow { dayOfWeek: string; start: number; end: number }
+
+// The open windows a clinic's slots describe — the single place that decides
+// how a slot's times are read, used by every check below:
+// - toTime "00:00" means "until midnight" (a time picker can't say 24:00),
+//   so 20:00–00:00 is the last four hours of that day.
+// - A legacy slot that runs past midnight (from > to, e.g. Mon 20:00–02:00,
+//   saved before validation existed) is split: Mon 20:00–24:00 plus the tail
+//   Tue 00:00–02:00 — the early hours belong to the next day, not the start
+//   of the same one.
+function slotWindows(slots: ClinicSlotLike[]): SlotWindow[] {
+  const windows: SlotWindow[] = [];
+  for (const slot of slots) {
+    const from = toMinutes(slot.fromTime);
+    const to = toMinutes(slot.toTime);
+    if (from == null || to == null || DAY_ORDER.indexOf(slot.dayOfWeek) === -1) continue;
+    const end = to === 0 ? MIDNIGHT : to;
+    if (end > from) {
+      windows.push({ dayOfWeek: slot.dayOfWeek, start: from, end });
+    } else if (end < from) {
+      windows.push({ dayOfWeek: slot.dayOfWeek, start: from, end: MIDNIGHT });
+      windows.push({ dayOfWeek: nextDay(slot.dayOfWeek), start: 0, end });
+    }
+    // from === to (other than 00:00–00:00, a full day): zero length, ignored.
+  }
+  return windows;
+}
+
+const HHMM_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+const MAX_SLOTS = 50;
+
+// Validates a clinic's day-wise hours as sent by the clinic form: a known
+// day, strict "HH:MM" 24h times, start before end (an end of "00:00" means
+// midnight), and no two ranges on the same day overlapping (touching is
+// fine). A clinic open past midnight is two slots: Mon 20:00–00:00 and
+// Tue 00:00–02:00.
+export function validateSlotInput(raw: unknown): { slots: ClinicSlotLike[] } | { error: string } {
+  if (!Array.isArray(raw) || raw.length === 0) return { error: "Please set at least one day-wise time slot." };
+  if (raw.length > MAX_SLOTS) return { error: `Too many time slots (max ${MAX_SLOTS}).` };
+  const slots: ClinicSlotLike[] = [];
+  for (const item of raw) {
+    const s = (item ?? {}) as Record<string, unknown>;
+    const dayOfWeek = typeof s.dayOfWeek === "string" ? s.dayOfWeek : "";
+    const fromTime = typeof s.fromTime === "string" ? s.fromTime : "";
+    const toTime = typeof s.toTime === "string" ? s.toTime : "";
+    if (!(WEEK_DAYS as readonly string[]).includes(dayOfWeek)) return { error: `"${dayOfWeek}" isn't a day of the week.` };
+    if (!HHMM_RE.test(fromTime) || !HHMM_RE.test(toTime)) {
+      return { error: `${dayOfWeek}: times must be HH:MM (24-hour), e.g. 09:00.` };
+    }
+    const from = toMinutes(fromTime)!;
+    const end = toTime === "00:00" ? MIDNIGHT : toMinutes(toTime)!;
+    if (from >= end) {
+      return { error: `${dayOfWeek}: the closing time must be after the opening time (${formatSlotTime(fromTime)} – ${formatSlotTime(toTime)}). For hours past midnight, add the early-morning part to the next day.` };
+    }
+    slots.push({ dayOfWeek, fromTime, toTime });
+  }
+  for (const day of WEEK_DAYS) {
+    const ranges = slots
+      .filter((s) => s.dayOfWeek === day)
+      .map((s) => ({ s, start: toMinutes(s.fromTime)!, end: s.toTime === "00:00" ? MIDNIGHT : toMinutes(s.toTime)! }))
+      .sort((a, b) => a.start - b.start);
+    for (let i = 1; i < ranges.length; i++) {
+      if (ranges[i].start < ranges[i - 1].end) {
+        const a = ranges[i - 1].s, b = ranges[i].s;
+        return { error: `${day}: ${formatSlotTime(a.fromTime)} – ${formatSlotTime(a.toTime)} overlaps ${formatSlotTime(b.fromTime)} – ${formatSlotTime(b.toTime)}.` };
+      }
+    }
+  }
+  return { slots };
+}
+
 // Today's calendar date in IST as "YYYY-MM-DD" — the reference date/weekday
 // this whole file's slot math is anchored to (see the "Slot-time math
 // assumes IST" note elsewhere in this codebase).
@@ -42,14 +120,7 @@ export function isClinicOpenNow(slots: ClinicSlotLike[], now: Date = new Date(),
   if (slots.length === 0) return true;
 
   const { weekday, minutes: nowMin } = nowInIst(now);
-  return slots.some((slot) => {
-    if (slot.dayOfWeek !== weekday) return false;
-    const fromMin = toMinutes(slot.fromTime);
-    const toMin = toMinutes(slot.toTime);
-    if (fromMin == null || toMin == null) return false;
-    if (fromMin <= toMin) return nowMin >= fromMin && nowMin < toMin;
-    return nowMin >= fromMin || nowMin < toMin; // overnight window, e.g. 20:00–02:00
-  });
+  return slotWindows(slots).some((w) => w.dayOfWeek === weekday && nowMin >= w.start && nowMin < w.end);
 }
 
 // Returns the first currently-open clinic (by sortOrder) among a doctor's
@@ -62,8 +133,6 @@ export function findOpenClinic<T extends { sortOrder: number; slots: ClinicSlotL
   const sorted = [...clinics].sort((a, b) => a.sortOrder - b.sortOrder);
   return sorted.find((clinic) => isClinicOpenNow(clinic.slots, now, clinic.leaves ?? [])) ?? null;
 }
-
-const DAY_ORDER = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function addDaysIso(dateIso: string, days: number): string {
   const [y, m, d] = dateIso.split("-").map(Number);
@@ -102,14 +171,12 @@ export function findNextOpening<T extends { slots: ClinicSlotLike[]; leaves?: st
 
     for (const clinic of clinics) {
       if (clinic.leaves?.includes(dateIso)) continue;
-      for (const slot of clinic.slots) {
-        if (slot.dayOfWeek !== dayOfWeek) continue;
-        const fromMin = toMinutes(slot.fromTime);
-        if (fromMin == null) continue;
-        if (daysAhead === 0 && fromMin <= nowMin) continue; // already started/passed today
-        if (fromMin < bestMin) {
-          bestMin = fromMin;
-          best = { clinic, dayOfWeek, fromTime: slot.fromTime, daysAhead };
+      for (const w of slotWindows(clinic.slots)) {
+        if (w.dayOfWeek !== dayOfWeek) continue;
+        if (daysAhead === 0 && w.start <= nowMin) continue; // already started/passed today
+        if (w.start < bestMin) {
+          bestMin = w.start;
+          best = { clinic, dayOfWeek, fromTime: minutesToHHMM(w.start), daysAhead };
         }
       }
     }
@@ -163,9 +230,9 @@ export const SLOT_INTERVAL_MINUTES = 10;
 // is a plain "YYYY-MM-DD" (e.g. from a patient's date picker) — its weekday
 // is computed independent of any timezone (a calendar date has one weekday
 // no matter where it's evaluated), and only that day's ranges are used.
-// Already-past slots are dropped when `date` is today (IST). Overnight
-// ranges (toTime <= fromTime, e.g. "20:00"–"02:00") are skipped rather than
-// wrapped — a rare enough case that it's not worth the extra complexity here.
+// Already-past slots are dropped when `date` is today (IST). Hours are read
+// through slotWindows: an "00:00" end runs to midnight, and a legacy
+// overnight range contributes its after-midnight tail to the next day.
 export function generateSlotsForDate(
   slots: ClinicSlotLike[],
   date: string,
@@ -181,19 +248,19 @@ export function generateSlotsForDate(
   const nowMin = isToday ? nowInIst(now).minutes : -1;
 
   const result: TimeSlot[] = [];
-  for (const slot of slots) {
-    if (slot.dayOfWeek !== weekday) continue;
-    const fromMin = toMinutes(slot.fromTime);
-    const toMin = toMinutes(slot.toTime);
-    if (fromMin == null || toMin == null || toMin <= fromMin) continue;
-    for (let t = fromMin; t + SLOT_INTERVAL_MINUTES <= toMin; t += SLOT_INTERVAL_MINUTES) {
+  const windows = slotWindows(slots).filter((w) => w.dayOfWeek === weekday).sort((a, b) => a.start - b.start);
+  for (const w of windows) {
+    for (let t = w.start; t + SLOT_INTERVAL_MINUTES <= w.end; t += SLOT_INTERVAL_MINUTES) {
       if (isToday && t <= nowMin) continue;
-      const time = `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
+      const time = minutesToHHMM(t);
+      if (result.some((r) => r.time === time)) continue; // overlapping legacy ranges
       result.push({ time, label: formatSlotTime(time) });
     }
   }
   return result;
 }
+
+const minutesToHHMM = (t: number) => `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
 
 // "14:05" → "2:05 PM"
 export function formatSlotTime(hhmm: string): string {

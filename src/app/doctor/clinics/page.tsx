@@ -481,6 +481,9 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
         <button type="button" onClick={addGroup} className="btn-secondary mt-2.5 py-1.5 px-3 text-xs gap-1">
           <Plus className="w-3.5 h-3.5" /> Add another time range
         </button>
+        <p className="text-[11px] text-slate-400 mt-1.5">
+          Closing at midnight? Set “To” to 12:00 AM. Open past midnight? Add the early-morning hours as a separate range on the next day.
+        </p>
       </div>
 
       {clinic.id && <ClinicLeaveManager clinicId={clinic.id} />}

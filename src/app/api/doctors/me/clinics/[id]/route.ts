@@ -9,24 +9,8 @@ import {
   cancelManyAndRefund, isAlreadyClosed, isTransientConflict,
   needsBookingConfirmation, affectedBookingSummary, BOOKINGS_CHANGED_MESSAGE,
 } from "@/lib/appointmentCancel";
+import { validateClinicInput } from "@/lib/clinicInput";
 
-interface SlotInput {
-  dayOfWeek: string;
-  fromTime: string;
-  toTime: string;
-}
-
-interface ClinicInput {
-  name: string;
-  address: string;
-  photoUrl?: string | null;
-  lat: number;
-  lng: number;
-  sortOrder?: number;
-  isActive?: boolean;
-  slots: SlotInput[];
-  confirmBookingIds?: string[];
-}
 
 async function loadOwnedClinic(doctorId: string, id: string) {
   const clinic = await prisma.clinic.findUnique({ where: { id } });
@@ -124,26 +108,26 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: "Clinic not found" }, { status: 404 });
   }
 
-  const body: ClinicInput = await req.json();
-  if (!body.address?.trim() || body.lat == null || body.lng == null) {
-    return NextResponse.json({ error: "Address and location are required." }, { status: 400 });
-  }
-  if (!body.slots?.length) {
-    return NextResponse.json({ error: "Please set at least one day-wise time slot." }, { status: 400 });
+  const raw = await req.json().catch(() => ({}));
+  const input = validateClinicInput(raw, existing.photoUrl);
+  if ("error" in input) return NextResponse.json({ error: input.error }, { status: 400 });
+  const body = input.clinic;
+  if (raw.isActive !== undefined && typeof raw.isActive !== "boolean") {
+    return NextResponse.json({ error: "isActive must be true or false." }, { status: 400 });
   }
 
-  const isActive = body.isActive ?? existing.isActive;
+  const isActive: boolean = raw.isActive ?? existing.isActive;
   const save = async (tx: Prisma.TransactionClient) => {
     await tx.clinicSlot.deleteMany({ where: { clinicId: id } });
     await tx.clinicSlot.createMany({
-      data: (body.slots ?? []).map((s) => ({ clinicId: id, dayOfWeek: s.dayOfWeek, fromTime: s.fromTime, toTime: s.toTime })),
+      data: body.slots.map((s) => ({ clinicId: id, dayOfWeek: s.dayOfWeek, fromTime: s.fromTime, toTime: s.toTime })),
     });
     return tx.clinic.update({
       where: { id },
       data: {
-        name: body.name?.trim() || `${formatDoctorName(authUser.name)}'s Clinic`,
-        address: body.address.trim(),
-        photoUrl: body.photoUrl || null,
+        name: body.name || `${formatDoctorName(authUser.name)}'s Clinic`,
+        address: body.address,
+        photoUrl: body.photoUrl,
         lat: body.lat,
         lng: body.lng,
         sortOrder: body.sortOrder ?? existing.sortOrder,
@@ -156,7 +140,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   // Turning an active clinic off strands its open bookings — same confirm,
   // cancel and refund as deleting it.
   if (existing.isActive && !isActive) {
-    const closed = await closeClinic(existing, formatDoctorName(authUser.name), "deactivate", body.confirmBookingIds, save);
+    const closed = await closeClinic(existing, formatDoctorName(authUser.name), "deactivate", raw.confirmBookingIds, save);
     if (closed instanceof NextResponse) return closed;
     return NextResponse.json({ ...closed.result, cancelledBookings: closed.cancelledBookings, refundTotal: closed.refundTotal });
   }
