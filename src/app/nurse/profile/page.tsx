@@ -524,7 +524,7 @@ function NurseProfileContent() {
         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-1.5">Account</p>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-50 mb-4">
           {[
-            { href: "/nurse/security", label: "Change Password", icon: Lock },
+            { href: "/nurse/security", label: "Password & Security", icon: Lock },
             { href: "/nurse/notifications", label: "Notifications", icon: Bell },
             { href: "/nurse/support", label: "Help & Support", icon: LifeBuoy },
             { href: "/nurse/terms", label: "Terms & Privacy Policy", icon: FileCheck },

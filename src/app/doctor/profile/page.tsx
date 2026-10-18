@@ -237,7 +237,7 @@ export default function DoctorProfilePage() {
           <Row href="/doctor/profile/notifications" tint="bg-amber-50 text-amber-500" icon={<Bell className="w-4 h-4" />}
             title="Notifications" />
           <Row href="/doctor/profile/security" tint="bg-indigo-50 text-indigo-500" icon={<Lock className="w-4 h-4" />}
-            title="Change Password" />
+            title="Password & Security" />
           <Row href="/doctor/profile/staff" tint="bg-cyan-50 text-cyan-600" icon={<Users className="w-4 h-4" />}
             title="Staff Access" />
           <Row href="/doctor/support/tickets" tint="bg-indigo-50 text-indigo-500" icon={<LifeBuoy className="w-4 h-4" />}

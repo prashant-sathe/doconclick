@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
-import { softDeleteUser } from "@/lib/userDeletion";
+import { deleteAccount } from "@/lib/userDeletion";
 
 // DELETE: remove an admin account. Blocked for the caller's own account and
 // for the last remaining admin, so the panel can never lock everyone out.
@@ -28,7 +28,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Can't remove the last remaining admin." }, { status: 400 });
   }
 
-  const deleted = await softDeleteUser(id, "ADMIN");
+  const deleted = await deleteAccount(id, "ADMIN");
   if (!deleted) return NextResponse.json({ error: "Admin not found." }, { status: 404 });
-  return NextResponse.json({ ...deleted, password: undefined });
+  return NextResponse.json({ ...deleted.user, password: undefined });
 }

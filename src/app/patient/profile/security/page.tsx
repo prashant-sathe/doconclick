@@ -5,7 +5,7 @@ import { Lock, Eye, EyeOff } from "lucide-react";
 import ProfileSubShell from "@/components/patient/ProfileSubShell";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
 import { useAuth } from "@/components/AuthProvider";
-import { SetPasswordViaGoogle, LogoutAllDevices } from "@/components/AccountSecurity";
+import { SetPasswordViaGoogle, LogoutAllDevices, DeleteAccount } from "@/components/AccountSecurity";
 
 export default function PatientSecurityPage() {
   const router = useRouter();
@@ -65,8 +65,8 @@ export default function PatientSecurityPage() {
 
   return (
     <ProfileSubShell
-      title="Change Password"
-      description="Choose a new password for your account."
+      title="Password & Security"
+      description="Change your password, sign out everywhere, or delete your account."
       icon={<Lock className="w-5 h-5" />}
       tint="bg-indigo-50 text-indigo-500"
       saving={saving}
@@ -125,6 +125,9 @@ export default function PatientSecurityPage() {
       )}
       <div className="pt-4 border-t border-slate-100">
         <LogoutAllDevices />
+      </div>
+      <div className="pt-4 border-t border-slate-100">
+        <DeleteAccount />
       </div>
     </ProfileSubShell>
   );

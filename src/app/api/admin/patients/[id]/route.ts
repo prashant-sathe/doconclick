@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { softDeleteUser } from "@/lib/userDeletion";
+import { deleteAccount, DeletionBlockedError } from "@/lib/userDeletion";
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -52,7 +52,8 @@ export async function GET(
   });
 }
 
-// DELETE – soft-delete the patient's account, freeing their mobile/email for reuse
+// DELETE – cancel + refund the patient's open bookings, then soft-delete and
+// anonymize their account (src/lib/userDeletion.ts), freeing their mobile/email for reuse
 export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -61,8 +62,14 @@ export async function DELETE(
   if (denied) return denied;
 
   const { id } = await params;
-  const deleted = await softDeleteUser(id, "PATIENT");
+  let deleted;
+  try {
+    deleted = await deleteAccount(id, "PATIENT");
+  } catch (err) {
+    if (err instanceof DeletionBlockedError) return NextResponse.json({ error: err.message }, { status: 409 });
+    throw err;
+  }
   if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  return NextResponse.json({ ...deleted, password: undefined });
+  return NextResponse.json({ ...deleted.user, password: undefined });
 }

@@ -84,7 +84,7 @@ export async function POST(req: Request) {
       where: { id: doctorId },
       include: { doctorProfile: true },
     });
-    if (!doctor?.doctorProfile || doctor.role !== "DOCTOR" || doctor.doctorProfile.status !== "APPROVED") {
+    if (!doctor?.doctorProfile || doctor.role !== "DOCTOR" || doctor.deletedAt || doctor.doctorProfile.status !== "APPROVED") {
       return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
     }
 

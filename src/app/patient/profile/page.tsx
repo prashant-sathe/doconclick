@@ -257,7 +257,7 @@ export default function PatientProfilePage() {
           <Row href="/patient/wallet" tint="bg-emerald-50 text-emerald-600" icon={<WalletIcon className="w-4 h-4" />}
             title="Wallet" />
           <Row href="/patient/profile/security" tint="bg-indigo-50 text-indigo-500" icon={<Lock className="w-4 h-4" />}
-            title="Change Password" />
+            title="Password & Security" />
           <Row href="/patient/support" tint="bg-indigo-50 text-indigo-500" icon={<LifeBuoy className="w-4 h-4" />}
             title="Help & Support" />
           <Row href="/patient/profile/terms" tint="bg-slate-100 text-slate-500" icon={<FileCheck className="w-4 h-4" />}

@@ -5,7 +5,7 @@ import { Lock, Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react";
 import NurseSubShell from "@/components/nurse/NurseSubShell";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
 import { useAuth } from "@/components/AuthProvider";
-import { SetPasswordViaGoogle, LogoutAllDevices } from "@/components/AccountSecurity";
+import { SetPasswordViaGoogle, LogoutAllDevices, DeleteAccount } from "@/components/AccountSecurity";
 
 // Same flow as the doctor's Change Password page (PATCH /api/auth/password).
 export default function NurseSecurityPage() {
@@ -39,7 +39,7 @@ export default function NurseSecurityPage() {
   };
 
   return (
-    <NurseSubShell title="Change Password" description="Choose a new password for your account." icon={<Lock className="w-5 h-5" />}>
+    <NurseSubShell title="Password & Security" description="Change your password, sign out everywhere, or delete your account." icon={<Lock className="w-5 h-5" />}>
       {user?.hasPassword === false ? (
         <SetPasswordViaGoogle />
       ) : (
@@ -73,6 +73,9 @@ export default function NurseSecurityPage() {
       )}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mt-4">
         <LogoutAllDevices />
+      </div>
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mt-4">
+        <DeleteAccount />
       </div>
     </NurseSubShell>
   );
