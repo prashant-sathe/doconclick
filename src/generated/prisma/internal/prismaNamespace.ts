@@ -3240,6 +3240,7 @@ export const UserScalarFieldEnum = {
   photoUrl: 'photoUrl',
   termsAcceptedAt: 'termsAcceptedAt',
   deletedAt: 'deletedAt',
+  tokenVersion: 'tokenVersion',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

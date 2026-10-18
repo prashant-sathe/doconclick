@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
+import { revokeSessions } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 
 const STATUS_PUSH_COPY: Record<string, { title: string; body: string }> = {
@@ -71,6 +72,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (Object.keys(data).length === 0) return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
 
   const updated = await prisma.nurseProfile.update({ where: { userId: id }, data });
+  // Sign them out everywhere; they can log back in, and then see the
+  // suspended notice instead of a session that keeps working as before.
+  if (data.status === "SUSPENDED") await revokeSessions(id);
   if (data.status && data.status !== profile.status && STATUS_PUSH_COPY[data.status]) {
     void sendPushToUser(id, { ...STATUS_PUSH_COPY[data.status], url: "/nurse/dashboard" });
   }

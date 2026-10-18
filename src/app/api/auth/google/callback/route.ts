@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { signToken, COOKIE_SECURE } from "@/lib/auth";
+import { signToken, signPasswordResetToken, COOKIE_SECURE, PWRESET_COOKIE_NAME, PWRESET_COOKIE_OPTIONS } from "@/lib/auth";
 import { STATE_COOKIE_NAME, decodeState, oauthCanonicalOrigin } from "@/lib/googleOAuth";
 import { resolveGoogleUser } from "@/lib/googleAuth";
 
@@ -93,6 +93,15 @@ export async function GET(req: Request) {
       maxAge: COOKIE_MAX_AGE,
       path: "/",
     });
+    // Google just re-verified this person, so /reset-password may set a new
+    // password without the old one.
+    if (state.intent === "reset") {
+      response.cookies.set(
+        PWRESET_COOKIE_NAME,
+        signPasswordResetToken({ id: resolved.payload.id, tokenVersion: resolved.payload.tv ?? 0 }),
+        PWRESET_COOKIE_OPTIONS,
+      );
+    }
     response.cookies.set(STATE_COOKIE_NAME, "", { maxAge: 0, path: "/" });
     return response;
   } catch (err) {

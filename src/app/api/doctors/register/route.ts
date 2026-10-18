@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
+import { hashPassword, signToken, sessionPayload, COOKIE_SECURE } from "@/lib/auth";
 import { sendPushToAdmins } from "@/lib/firebaseAdmin";
 import { validateRegistration } from "@/lib/validation";
 
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
       url: "/admin/doctors",
     });
 
-    const payload: JWTPayload = { id: user.id, name: user.name, role: user.role, mobile: user.mobile };
+    const payload = sessionPayload(user);
     const token = signToken(payload);
 
     const response = NextResponse.json({ id: user.id, name: user.name, role: user.role });

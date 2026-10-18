@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, hashPassword } from "@/lib/auth";
+import { getAuthUser, hashPassword, revokeSessions } from "@/lib/auth";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
 
 // PATCH: revoke/reactivate a staff account, or reset its password.
@@ -33,6 +33,9 @@ export async function PATCH(
   const updated = active === undefined
     ? staffProfile
     : await prisma.staffProfile.update({ where: { userId: id }, data: { active: Boolean(active) } });
+
+  // A password reset or a revoke signs the staff member out of every device.
+  if (password !== undefined || (active !== undefined && !updated.active)) await revokeSessions(id);
 
   return NextResponse.json({ staffProfileId: updated.id, userId: id, active: updated.active });
 }

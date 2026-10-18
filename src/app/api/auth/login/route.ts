@@ -1,12 +1,23 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword, signToken, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME, type JWTPayload } from "@/lib/auth";
+import { verifyPassword, signToken, sessionPayload, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
 import { normalizeMobile, MOBILE_REGEX } from "@/lib/validation";
+import { createRateLimiter, createFailureLimiter, clientIp } from "@/lib/rateLimit";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
+const LOCKOUT_MESSAGE = "Too many sign-in attempts. Please wait 15 minutes and try again.";
+// Per mobile: wrong passwords only, cleared on success — stops guessing one
+// account's password. Per IP: every attempt — stops one client spraying
+// passwords across many accounts.
+const mobileFailures = createFailureLimiter(5, 15 * 60 * 1000);
+const checkIpLimit = createRateLimiter(30, 15 * 60 * 1000);
+
 export async function POST(req: Request) {
+  if (!checkIpLimit(clientIp(req))) {
+    return NextResponse.json({ error: LOCKOUT_MESSAGE }, { status: 429 });
+  }
   try {
     const { mobile, password } = await req.json().catch(() => ({}));
 
@@ -25,9 +36,16 @@ export async function POST(req: Request) {
       );
     }
 
+    if (mobileFailures.isBlocked(normalizedMobile)) {
+      return NextResponse.json({ error: LOCKOUT_MESSAGE }, { status: 429 });
+    }
+
     const user = await prisma.user.findUnique({ where: { mobile: normalizedMobile } });
 
     if (!user || !user.password) {
+      // Counted like a wrong password, so the response doesn't reveal
+      // which mobiles have accounts.
+      mobileFailures.recordFailure(normalizedMobile);
       return NextResponse.json(
         { error: "Invalid mobile number or password." },
         { status: 401 }
@@ -36,20 +54,15 @@ export async function POST(req: Request) {
 
     const valid = await verifyPassword(password, user.password);
     if (!valid) {
+      mobileFailures.recordFailure(normalizedMobile);
       return NextResponse.json(
         { error: "Invalid mobile number or password." },
         { status: 401 }
       );
     }
 
-    const payload: JWTPayload = {
-      id: user.id,
-      name: user.name,
-      role: user.role,
-      mobile: user.mobile,
-    };
-
-    const token = signToken(payload);
+    mobileFailures.reset(normalizedMobile);
+    const token = signToken(sessionPayload(user));
 
     // Set cookie directly on the response — required for Route Handlers in Next.js 15+
     const response = NextResponse.json({

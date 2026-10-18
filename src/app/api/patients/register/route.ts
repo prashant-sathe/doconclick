@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, signToken, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME, type JWTPayload } from "@/lib/auth";
+import { hashPassword, signToken, sessionPayload, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
 import { validateQuickRegistration } from "@/lib/validation";
 
 const COOKIE_NAME = "doconclick_token";
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       },
     });
 
-    const payload: JWTPayload = { id: user.id, name: user.name, role: user.role, mobile: user.mobile };
+    const payload = sessionPayload(user);
     const response = NextResponse.json({ id: user.id, name: user.name, role: user.role });
     response.cookies.set(COOKIE_NAME, signToken(payload), {
       httpOnly: true,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { verifySession, verifyToken, type JWTPayload } from "@/lib/auth";
 import { ROLE_HOME, safeNext } from "@/lib/roleHome";
 
 const COOKIE_NAME = "doconclick_token";
@@ -18,7 +18,7 @@ const PROTECTED: { pattern: RegExp; roles: string[] }[] = [
 ];
 
 // Next.js 16 requires export name "proxy" (renamed from "middleware")
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip API routes, static files, and public pages — but not "/login",
@@ -38,7 +38,17 @@ export function proxy(request: NextRequest) {
   }
 
   const token = request.cookies.get(COOKIE_NAME)?.value;
-  const user = token ? verifyToken(token) : null;
+  let user: JWTPayload | null = null;
+  if (token) {
+    try {
+      // Revoked/deleted sessions go to /login rather than an empty page shell.
+      user = await verifySession(token);
+    } catch {
+      // DB unreachable: fall back to the signature check for page routing
+      // only — every API route still enforces the full session check.
+      user = verifyToken(token);
+    }
+  }
 
   // Already logged in and visiting /login → send them on to ?next= (e.g. a
   // doctor's booking page from a QR scan), else to their home. A wrong-role

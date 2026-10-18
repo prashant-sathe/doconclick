@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
-import type { JWTPayload } from "@/lib/auth";
+import { sessionPayload, type JWTPayload } from "@/lib/auth";
 import type { OAuthRole, OAuthIntent } from "@/lib/googleOAuth";
 import { ROLE_HOME, safeNext } from "@/lib/roleHome";
 
@@ -44,12 +44,7 @@ export async function resolveGoogleUser(params: {
     });
   }
 
-  const payload: JWTPayload = {
-    id: user.id,
-    name: user.name,
-    role: user.role,
-    mobile: user.mobile,
-  };
+  const payload: JWTPayload = sessionPayload(user);
 
   const safe = safeNext(next);
   const destination =

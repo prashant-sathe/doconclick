@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import {
   getAuthUser,
   signToken,
+  sessionPayload,
   COOKIE_SECURE,
   IMPERSONATOR_COOKIE_NAME,
   type JWTPayload,
@@ -33,18 +34,10 @@ export async function POST(
     return NextResponse.json({ error: "Cannot impersonate another admin." }, { status: 403 });
   }
 
-  const targetPayload: JWTPayload = {
-    id: target.id,
-    name: target.name,
-    role: target.role,
-    mobile: target.mobile,
-  };
-  const adminPayload: JWTPayload = {
-    id: authUser.id,
-    name: authUser.name,
-    role: authUser.role,
-    mobile: authUser.mobile,
-  };
+  const targetPayload: JWTPayload = sessionPayload(target);
+  // authUser came from a verified session, so its `tv` is current — the
+  // stashed admin token is revoked along with the admin's other sessions.
+  const adminPayload: JWTPayload = authUser;
 
   await prisma.impersonationLog.create({
     data: { adminId: authUser.id, targetUserId: target.id },

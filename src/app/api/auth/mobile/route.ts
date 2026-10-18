@@ -1,17 +1,26 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
+import { getAuthUser, signToken, sessionPayload, COOKIE_SECURE } from "@/lib/auth";
 import { normalizeMobile, MOBILE_REGEX } from "@/lib/validation";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
 // PATCH: One-time step for Google sign-ins — set a real mobile number in
-// place of the "pending_..." placeholder created at account creation.
+// place of the "pending_..." placeholder created at account creation. Only
+// that: the mobile number is the password-login identifier, so changing an
+// already-set one without verifying the new number would be an account
+// takeover path.
 export async function PATCH(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  // The DB row, not the token — a stale token could still say pending_.
+  const current = await prisma.user.findUnique({ where: { id: authUser.id }, select: { mobile: true } });
+  if (!current?.mobile.startsWith("pending_")) {
+    return NextResponse.json({ error: "Your mobile number is already set." }, { status: 403 });
   }
 
   const { mobile } = await req.json().catch(() => ({ mobile: undefined }));
@@ -21,18 +30,17 @@ export async function PATCH(req: Request) {
   }
 
   try {
-    const updated = await prisma.user.update({
-      where: { id: authUser.id },
+    // Conditional on still being pending_, so two racing requests can't both set it.
+    const claimed = await prisma.user.updateMany({
+      where: { id: authUser.id, mobile: { startsWith: "pending_" } },
       data: { mobile: normalizedMobile },
     });
+    if (claimed.count === 0) {
+      return NextResponse.json({ error: "Your mobile number is already set." }, { status: 403 });
+    }
+    const updated = await prisma.user.findUniqueOrThrow({ where: { id: authUser.id } });
 
-    const payload: JWTPayload = {
-      id: updated.id,
-      name: updated.name,
-      role: updated.role,
-      mobile: updated.mobile,
-    };
-    const token = signToken(payload);
+    const token = signToken(sessionPayload(updated));
 
     const response = NextResponse.json({ id: updated.id, name: updated.name, role: updated.role });
     response.cookies.set(COOKIE_NAME, token, {

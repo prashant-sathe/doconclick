@@ -14,7 +14,8 @@
     "test:expire-refund": "tsx tests/expire-refund.ts",
     "test:reschedule": "tsx tests/reschedule-request.ts",
     "test:slots": "tsx tests/slot-booking.ts",
-    "test:settlements": "tsx tests/settlement-idempotency.ts"
+    "test:settlements": "tsx tests/settlement-idempotency.ts",
+    "test:auth": "tsx tests/auth-sessions.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

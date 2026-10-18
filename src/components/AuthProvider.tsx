@@ -20,6 +20,7 @@ type AuthUser = {
   role: string;
   mobile: string;
   termsAcceptedAt?: string | null;
+  hasPassword?: boolean;
 };
 
 type ImpersonatedBy = {

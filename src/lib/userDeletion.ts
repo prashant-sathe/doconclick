@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { revokeSessions } from "@/lib/auth";
 
 // Soft-deletes a User: blocks login, hides them from all lists, and frees up
 // their mobile/email for reuse — without touching any related appointments,
@@ -9,7 +10,7 @@ export async function softDeleteUser(userId: string) {
   if (!user) return null;
 
   const stamp = Date.now();
-  return prisma.user.update({
+  const deleted = await prisma.user.update({
     where: { id: userId },
     data: {
       deletedAt: new Date(),
@@ -17,4 +18,8 @@ export async function softDeleteUser(userId: string) {
       email: user.email ? `deleted_${stamp}_${user.email}` : null,
     },
   });
+  // deletedAt alone already fails verifySession, but this also evicts the
+  // cached session state so the user is signed out immediately.
+  await revokeSessions(userId);
+  return deleted;
 }

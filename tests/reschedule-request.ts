@@ -11,7 +11,7 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
-const SECRET = process.env.JWT_SECRET ?? "doconclick_super_secret_jwt_key_change_in_prod";
+const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
 
 let failures = 0;
 function check(label: string, ok: boolean, detail: string) {

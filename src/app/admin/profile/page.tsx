@@ -9,6 +9,7 @@ import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
 import EditableName from "@/components/EditableName";
 import ImageCropModal from "@/components/ImageCropModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { LogoutAllDevices } from "@/components/AccountSecurity";
 
 function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -116,6 +117,7 @@ function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) 
 }
 
 function ChangePassword() {
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -128,6 +130,10 @@ function ChangePassword() {
     setError("");
     setSuccess(false);
 
+    if (!currentPassword) {
+      setError("Enter your current password.");
+      return;
+    }
     if (password.length < PASSWORD_MIN_LENGTH) {
       setError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`);
       return;
@@ -141,11 +147,12 @@ function ChangePassword() {
     const res = await fetch("/api/auth/password", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ currentPassword, password }),
     });
     setSaving(false);
 
     if (res.ok) {
+      setCurrentPassword("");
       setPassword("");
       setConfirmPassword("");
       setSuccess(true);
@@ -161,6 +168,18 @@ function ChangePassword() {
           <Lock className="w-5 h-5" />
         </div>
         <h2 className="font-bold text-slate-800">Change Password</h2>
+      </div>
+
+      <div className="mb-3">
+        <label className="input-label">Current Password</label>
+        <input
+          type={showPassword ? "text" : "password"}
+          autoComplete="current-password"
+          className="input-field"
+          placeholder="Your current password"
+          value={currentPassword}
+          onChange={(e) => { setCurrentPassword(e.target.value); setError(""); setSuccess(false); }}
+        />
       </div>
 
       <div className="grid sm:grid-cols-2 gap-3 mb-3">
@@ -208,7 +227,7 @@ function ChangePassword() {
         </p>
       )}
 
-      <button type="submit" disabled={saving || !password || !confirmPassword} className="btn-primary py-2.5 px-4">
+      <button type="submit" disabled={saving || !currentPassword || !password || !confirmPassword} className="btn-primary py-2.5 px-4">
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
         {saving ? "Saving…" : "Update Password"}
       </button>
@@ -250,6 +269,10 @@ export default function AdminProfile() {
         </div>
 
         <ChangePassword />
+
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <LogoutAllDevices />
+        </div>
 
         <div className="flex items-start gap-2.5 text-xs text-slate-400 px-1">
           <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />

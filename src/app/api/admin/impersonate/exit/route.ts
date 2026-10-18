@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { verifyToken, signToken, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME, type JWTPayload } from "@/lib/auth";
+import { verifySession, verifyToken, signToken, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -10,7 +10,9 @@ export async function POST() {
   const cookieStore = await cookies();
 
   const impersonatorToken = cookieStore.get(IMPERSONATOR_COOKIE_NAME)?.value;
-  const impersonatorPayload = impersonatorToken ? verifyToken(impersonatorToken) : null;
+  // verifySession, not verifyToken: an admin removed or revoked mid-
+  // impersonation must not be able to "exit" back into the admin panel.
+  const impersonatorPayload = impersonatorToken ? await verifySession(impersonatorToken) : null;
   if (!impersonatorPayload) {
     return NextResponse.json({ error: "Not currently impersonating." }, { status: 400 });
   }
@@ -31,12 +33,7 @@ export async function POST() {
     }
   }
 
-  const adminPayload: JWTPayload = {
-    id: impersonatorPayload.id,
-    name: impersonatorPayload.name,
-    role: impersonatorPayload.role,
-    mobile: impersonatorPayload.mobile,
-  };
+  const adminPayload = impersonatorPayload;
 
   const response = NextResponse.json({ role: adminPayload.role });
 

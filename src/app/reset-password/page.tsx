@@ -42,7 +42,13 @@ export default function ResetPassword() {
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Could not update your password.");
+      // No current password is sent from here, so any of these means the
+      // 15-minute Google verification has lapsed (or was never done).
+      setError(
+        ["REVERIFY_REQUIRED", "CURRENT_PASSWORD_REQUIRED", "WRONG_PASSWORD"].includes(data.code)
+          ? "Your verification expired. Go back to Forgot Password and verify with Google again."
+          : data.error ?? "Could not update your password."
+      );
       return;
     }
 

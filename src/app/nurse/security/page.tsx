@@ -4,10 +4,14 @@ import { useRouter } from "next/navigation";
 import { Lock, Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react";
 import NurseSubShell from "@/components/nurse/NurseSubShell";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
+import { useAuth } from "@/components/AuthProvider";
+import { SetPasswordViaGoogle, LogoutAllDevices } from "@/components/AccountSecurity";
 
 // Same flow as the doctor's Change Password page (PATCH /api/auth/password).
 export default function NurseSecurityPage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [show, setShow] = useState(false);
@@ -18,24 +22,33 @@ export default function NurseSecurityPage() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!currentPassword) { setError("Enter your current password."); return; }
     if (password.length < PASSWORD_MIN_LENGTH) { setError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`); return; }
     if (password !== confirmPassword) { setError("Passwords do not match."); return; }
     setSaving(true);
     const res = await fetch("/api/auth/password", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ currentPassword, password }),
     });
     setSaving(false);
     if (!res.ok) { setError((await res.json().catch(() => ({}))).error ?? "Could not update your password."); return; }
     setSaved(true);
-    setPassword(""); setConfirmPassword("");
+    setCurrentPassword(""); setPassword(""); setConfirmPassword("");
     setTimeout(() => router.push("/nurse/profile"), 800);
   };
 
   return (
     <NurseSubShell title="Change Password" description="Choose a new password for your account." icon={<Lock className="w-5 h-5" />}>
+      {user?.hasPassword === false ? (
+        <SetPasswordViaGoogle />
+      ) : (
       <form onSubmit={save} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
+        <div>
+          <label className="input-label">Current Password</label>
+          <input type={show ? "text" : "password"} autoComplete="current-password" className="input-field" placeholder="Your current password"
+            value={currentPassword} onChange={(e) => { setCurrentPassword(e.target.value); setError(""); setSaved(false); }} />
+        </div>
         <div>
           <label className="input-label">New Password</label>
           <div className="relative">
@@ -57,6 +70,10 @@ export default function NurseSecurityPage() {
           {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : "Update password"}
         </button>
       </form>
+      )}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mt-4">
+        <LogoutAllDevices />
+      </div>
     </NurseSubShell>
   );
 }

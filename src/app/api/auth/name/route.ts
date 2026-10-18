@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, signToken, COOKIE_SECURE, type JWTPayload } from "@/lib/auth";
+import { getAuthUser, signToken, sessionPayload, COOKIE_SECURE } from "@/lib/auth";
 import { nameError } from "@/lib/validation";
 
 const COOKIE_NAME = "doconclick_token";
@@ -26,13 +26,7 @@ export async function PATCH(req: Request) {
     data: { name: trimmed },
   });
 
-  const payload: JWTPayload = {
-    id: updated.id,
-    name: updated.name,
-    role: updated.role,
-    mobile: updated.mobile,
-  };
-  const token = signToken(payload);
+  const token = signToken(sessionPayload(updated));
 
   const response = NextResponse.json({ id: updated.id, name: updated.name, role: updated.role });
   response.cookies.set(COOKIE_NAME, token, {

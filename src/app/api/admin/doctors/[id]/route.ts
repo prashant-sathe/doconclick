@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getAuthUser, revokeSessions } from "@/lib/auth";
 import { softDeleteUser } from "@/lib/userDeletion";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 
@@ -106,6 +106,9 @@ export async function PATCH(
     where: { userId: id },
     data,
   });
+  // Sign them out everywhere; they can log back in, and then see the
+  // suspended notice instead of a session that keeps working as before.
+  if (data.status === "SUSPENDED") await revokeSessions(id);
 
   if (data.status && STATUS_PUSH_COPY[data.status]) {
     void sendPushToUser(id, { ...STATUS_PUSH_COPY[data.status], url: "/doctor/dashboard" });

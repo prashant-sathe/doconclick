@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getAuthUser, verifyToken, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
+import { getAuthUser, verifySession, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SUSPENDED_MESSAGE } from "@/lib/doctorGuard";
 
@@ -42,16 +42,19 @@ export async function GET() {
 
   const cookieStore = await cookies();
   const impersonatorToken = cookieStore.get(IMPERSONATOR_COOKIE_NAME)?.value;
-  const impersonator = impersonatorToken ? verifyToken(impersonatorToken) : null;
+  const impersonator = impersonatorToken ? await verifySession(impersonatorToken) : null;
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { termsAcceptedAt: true },
+    select: { termsAcceptedAt: true, password: true },
   });
 
   return NextResponse.json({
     ...user,
     termsAcceptedAt: dbUser?.termsAcceptedAt ?? null,
+    // Google-only accounts have none; the security pages then offer
+    // "verify with Google to set one" instead of asking for a current password.
+    hasPassword: !!dbUser?.password,
     impersonatedBy: impersonator ? { name: impersonator.name, role: impersonator.role } : null,
   });
 }

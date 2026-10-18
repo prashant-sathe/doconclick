@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
-import { setAuthCookie } from "@/lib/auth";
+import { setAuthCookie, setPasswordResetCookie } from "@/lib/auth";
 import { resolveGoogleUser } from "@/lib/googleAuth";
 import type { OAuthRole, OAuthIntent } from "@/lib/googleOAuth";
 
@@ -61,5 +61,8 @@ export async function POST(req: Request) {
   }
 
   await setAuthCookie(resolved.payload);
+  // Google just re-verified this person, so /reset-password may set a new
+  // password without the old one.
+  if (intent === "reset") await setPasswordResetCookie(resolved.payload);
   return NextResponse.json({ next: resolved.destination });
 }

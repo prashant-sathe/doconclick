@@ -20,6 +20,9 @@ model User {
   photoUrl  String?  // admin's own profile photo — patients/doctors use their profile-table column instead
   termsAcceptedAt DateTime? // set when the patient/doctor accepts the Terms of Service + Privacy Policy gate
   deletedAt DateTime?
+  // Bumped to revoke every session at once (logout-all, password change,
+  // delete, suspend). Sessions carry it as the JWT `tv` claim.
+  tokenVersion Int @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
