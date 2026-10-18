@@ -1,15 +1,13 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { revokeSessions } from "@/lib/auth";
-import { refundAppointmentToWallet } from "@/lib/wallet";
-import { netPayable, releaseCouponRedemption } from "@/lib/coupons";
+import { netPayable } from "@/lib/coupons";
+import { cancelManyAndRefund, LIVE_STATUSES } from "@/lib/appointmentCancel";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 
 // Roles that can delete their own account in-app (Profile → Password &
 // Security). Admins are removed by another admin; staff by their doctor.
 export const SELF_DELETABLE_ROLES = ["PATIENT", "DOCTOR", "NURSE"];
-
-const OPEN_STATUSES = ["PENDING_APPROVAL", "SCHEDULED"];
 
 export const IN_PROGRESS_MESSAGE =
   "A visit is in progress right now. Finish or sort it out with the other party first, then delete your account.";
@@ -29,8 +27,8 @@ const isInProgress = (a: OpenBooking) => a.travelStatus === "ARRIVED" || !!a.vis
 
 // Patients own bookings as patientId; doctors and nurses both as doctorId.
 function openBookingsWhere(userId: string, role: string): Prisma.AppointmentWhereInput | null {
-  if (role === "PATIENT") return { patientId: userId, status: { in: OPEN_STATUSES } };
-  if (role === "DOCTOR" || role === "NURSE") return { doctorId: userId, status: { in: OPEN_STATUSES } };
+  if (role === "PATIENT") return { patientId: userId, status: { in: LIVE_STATUSES } };
+  if (role === "DOCTOR" || role === "NURSE") return { doctorId: userId, status: { in: LIVE_STATUSES } };
   return null;
 }
 
@@ -65,10 +63,9 @@ type Cancelled = {
   refund: number;
 };
 
-// Cancels every open booking the user is party to: paid ones are refunded to
-// the patient's wallet, unpaid ones give back their reserved coupon slot.
-// Each row is claimed conditionally, so one a concurrent request already
-// closed is skipped rather than refunded twice.
+// Cancels every open booking the user is party to, through the shared
+// cancel-and-refund path (paid → patient's wallet, unpaid → coupon slot
+// back). One a concurrent request already closed is skipped, not refunded twice.
 async function cancelOpenBookings(tx: Prisma.TransactionClient, userId: string, role: string): Promise<Cancelled[]> {
   const where = openBookingsWhere(userId, role);
   if (!where) return [];
@@ -76,30 +73,13 @@ async function cancelOpenBookings(tx: Prisma.TransactionClient, userId: string, 
   if (open.some(isInProgress)) throw new DeletionBlockedError(IN_PROGRESS_MESSAGE);
 
   const by = role === "PATIENT" ? "the patient" : `the ${role === "NURSE" ? "nurse" : "doctor"}`;
-  const cancelled: Cancelled[] = [];
-  for (const { id } of open) {
-    const { count } = await tx.appointment.updateMany({
-      where: { id, status: { in: OPEN_STATUSES } },
-      data: { status: "CANCELLED", requestedScheduledAt: null },
-    });
-    if (count === 0) continue;
-    // Read under the row lock the claim took — a payment may have landed since.
-    const row = await tx.appointment.findUniqueOrThrow({ where: { id } });
-    let refund = 0;
-    if (row.paymentStatus === "PAID") {
-      refund = netPayable(row);
-      await refundAppointmentToWallet(tx, {
-        patientId: row.patientId,
-        appointmentId: row.id,
-        amount: refund,
-        type: "CANCELLATION_REFUND",
-        note: `Refund for appointment ${row.id}, cancelled because ${by} deleted their account`,
-      });
-    } else {
-      await releaseCouponRedemption(tx, { appointmentId: row.id });
-    }
-    cancelled.push({ id: row.id, patientId: row.patientId, doctorId: row.doctorId, providerType: row.providerType, scheduledAt: row.scheduledAt, refund });
-  }
+  const results = await cancelManyAndRefund(tx, open.map((a) => a.id), {
+    note: (id) => `Refund for appointment ${id}, cancelled because ${by} deleted their account`,
+    skipClosed: true,
+  });
+  const cancelled: Cancelled[] = results.map(({ cancelled: row, refund }) => ({
+    id: row.id, patientId: row.patientId, doctorId: row.doctorId, providerType: row.providerType, scheduledAt: row.scheduledAt, refund,
+  }));
   return cancelled;
 }
 

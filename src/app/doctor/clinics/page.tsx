@@ -16,6 +16,7 @@ import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import LocationPickerMap from "@/components/LocationPickerMap";
 import ImageCropModal from "@/components/ImageCropModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { todayIsoDateIst } from "@/lib/clinicAvailability";
 import { prepareBlobUpload } from "@/lib/compressImage";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -155,6 +156,16 @@ interface ClinicLeave {
   reason: string | null;
 }
 
+// A live booking that falls on a leave day being added — the API returns
+// these so the doctor confirms before they're cancelled and refunded.
+interface AffectedBooking {
+  id: string;
+  patientName: string;
+  scheduledAt: string;
+  paid: boolean;
+  refund: number;
+}
+
 function formatLeaveDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-IN", {
@@ -174,6 +185,8 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [affected, setAffected] = useState<AffectedBooking[] | null>(null);
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -184,23 +197,36 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
     return () => { cancelled = true; };
   }, [clinicId]);
 
-  const addLeave = async () => {
+  // First call without confirmBookingIds; if patients are booked that day
+  // the API answers 409 LEAVE_HAS_BOOKINGS and we ask before cancelling them.
+  const addLeave = async (confirmBookingIds?: string[]) => {
     if (!date) return;
     setAdding(true);
     setError("");
+    setNotice("");
     const res = await fetch(`/api/doctors/me/clinics/${clinicId}/leaves`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date, reason: reason.trim() || undefined }),
+      body: JSON.stringify({ date, reason: reason.trim() || undefined, confirmBookingIds }),
     });
     setAdding(false);
+    const body = await res.json().catch(() => ({}));
     if (res.ok) {
-      const created: ClinicLeave = await res.json();
+      const { cancelledBookings, refundTotal, ...created } = body as ClinicLeave & { cancelledBookings: number; refundTotal: number };
       setLeaves((cur) => [...cur, created].sort((a, b) => a.date.localeCompare(b.date)));
       setDate("");
       setReason("");
+      setAffected(null);
+      if (cancelledBookings > 0) {
+        setNotice(
+          `${cancelledBookings} booking${cancelledBookings === 1 ? "" : "s"} cancelled and the patients notified.`
+            + (refundTotal > 0 ? ` ₹${refundTotal} refunded to their wallets.` : "")
+        );
+      }
+    } else if (res.status === 409 && body.code === "LEAVE_HAS_BOOKINGS") {
+      setAffected(body.bookings);
     } else {
-      const err = await res.json().catch(() => ({}));
-      setError(err.error ?? "Could not add that date.");
+      setAffected(null);
+      setError(body.error ?? "Could not add that date.");
     }
   };
 
@@ -211,7 +237,13 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
     if (res.ok) setLeaves((cur) => cur.filter((l) => l.id !== leaveId));
   };
 
-  const todayIso = new Date().toISOString().slice(0, 10);
+  // IST, not the device's UTC date — the API rejects anything before today in IST.
+  const todayIso = todayIsoDateIst();
+  const maxIso = (() => {
+    const [y, m, d] = todayIso.split("-").map(Number);
+    return new Date(Date.UTC(y, m - 1, d + 365)).toISOString().slice(0, 10);
+  })();
+  const refundTotal = affected?.reduce((sum, b) => sum + b.refund, 0) ?? 0;
 
   return (
     <div>
@@ -240,17 +272,50 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
           )}
 
           <div className="flex items-center gap-2">
-            <input type="date" className="input-field flex-1" min={todayIso} value={date}
-              onChange={(e) => setDate(e.target.value)} />
+            <input type="date" className="input-field flex-1" min={todayIso} max={maxIso} value={date}
+              onChange={(e) => { setDate(e.target.value); setError(""); setNotice(""); }} />
             <input type="text" className="input-field flex-1" placeholder="Reason (optional)" value={reason}
               onChange={(e) => setReason(e.target.value)} />
-            <button type="button" onClick={addLeave} disabled={!date || adding}
+            <button type="button" onClick={() => addLeave()} disabled={!date || adding}
               className="btn-secondary flex-shrink-0 px-3 text-xs gap-1 disabled:opacity-60">
               {adding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />} Add
             </button>
           </div>
           {error && <p className="text-xs text-red-600 mt-1.5">{error}</p>}
+          {notice && <p className="text-xs text-emerald-600 mt-1.5">{notice}</p>}
         </>
+      )}
+
+      {affected && (
+        <ConfirmDialog
+          icon={CalendarOff}
+          title={`Cancel ${affected.length} booking${affected.length === 1 ? "" : "s"} on ${formatLeaveDate(date)}?`}
+          message={
+            <>
+              <p>These patients are booked at this clinic that day. Adding the leave cancels their appointments and notifies them.</p>
+              <ul className="mt-3 max-h-48 overflow-y-auto space-y-1.5">
+                {affected.map((b) => (
+                  <li key={b.id} className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
+                    <span className="font-semibold text-slate-700 truncate">{b.patientName}</span>
+                    <span className="text-slate-500 flex-shrink-0">
+                      {new Date(b.scheduledAt).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit" })}
+                      {b.paid ? ` · ₹${b.refund} refund` : " · unpaid"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              {refundTotal > 0 && (
+                <p className="mt-3 text-xs">₹{refundTotal} in total goes back to the patients&apos; wallets.</p>
+              )}
+            </>
+          }
+          confirmLabel="Cancel bookings & add leave"
+          busyLabel="Cancelling…"
+          tone="danger"
+          busy={adding}
+          onCancel={() => setAffected(null)}
+          onConfirm={() => addLeave(affected.map((b) => b.id))}
+        />
       )}
     </div>
   );

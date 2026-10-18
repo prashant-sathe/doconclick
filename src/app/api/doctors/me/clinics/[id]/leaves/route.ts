@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { todayIsoDateIst } from "@/lib/clinicAvailability";
+import { netPayable } from "@/lib/coupons";
+import { cancelManyAndRefund, isAlreadyClosed, isTransientConflict, LIVE_STATUSES } from "@/lib/appointmentCancel";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { formatDoctorName } from "@/lib/utils";
 
 async function loadOwnedClinic(doctorId: string, id: string) {
   const clinic = await prisma.clinic.findUnique({ where: { id } });
@@ -29,7 +34,34 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   return NextResponse.json({ leaves });
 }
 
-// POST: Add a leave/holiday date for one of the logged-in doctor's clinics
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const MAX_DAYS_AHEAD = 365;
+const MAX_REASON_LENGTH = 200;
+const BOOKINGS_CHANGED_MESSAGE = "A booking on that day just changed. Tap Add again to review the latest list.";
+
+// "YYYY-MM-DD" → that calendar day's bounds in IST, or null for anything
+// that isn't a real date (2026-02-31, 2026-13-01, …).
+function istDayBounds(date: unknown): { start: Date; end: Date } | null {
+  if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const [y, m, d] = date.split("-").map(Number);
+  const utcMidnight = Date.UTC(y, m - 1, d);
+  if (new Date(utcMidnight).toISOString().slice(0, 10) !== date) return null;
+  const start = new Date(utcMidnight - IST_OFFSET_MS);
+  return { start, end: new Date(start.getTime() + DAY_MS) };
+}
+
+const fmtTime = (d: Date) => d.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit" });
+const fmtDay = (d: Date) => d.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short" });
+
+// POST { date, reason?, confirmBookingIds? }: mark a leave day for one of the
+// logged-in doctor's clinics. The date must be real and today or later (IST).
+// If live bookings at this clinic fall on that day, the first call returns
+// 409 LEAVE_HAS_BOOKINGS with the list so the doctor can confirm; repeating
+// it with exactly those ids adds the leave and cancels them — each refunded
+// to the patient's wallet (or its coupon slot freed) through the shared
+// cancel path, and each patient pushed. A booking that appears in between
+// re-triggers the confirmation instead of being cancelled unseen.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
@@ -44,17 +76,84 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ error: "Clinic not found" }, { status: 404 });
   }
 
-  const { date, reason } = await req.json();
-  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return NextResponse.json({ error: "A valid date (YYYY-MM-DD) is required." }, { status: 400 });
+  const { date, reason: rawReason, confirmBookingIds } = await req.json().catch(() => ({}));
+  const day = istDayBounds(date);
+  if (!day) {
+    return NextResponse.json({ error: "Pick a valid date." }, { status: 400 });
   }
-
-  try {
-    const leave = await prisma.clinicLeave.create({
-      data: { clinicId: id, date, reason: reason?.trim() ? reason.trim() : null },
-    });
-    return NextResponse.json(leave);
-  } catch {
+  const today = todayIsoDateIst();
+  if (date < today) {
+    return NextResponse.json({ error: "Leave can't be added for a date that has already passed." }, { status: 400 });
+  }
+  if (day.start.getTime() > istDayBounds(today)!.start.getTime() + MAX_DAYS_AHEAD * DAY_MS) {
+    return NextResponse.json({ error: `Leave can be added up to ${MAX_DAYS_AHEAD} days ahead.` }, { status: 400 });
+  }
+  const reason = typeof rawReason === "string" && rawReason.trim() ? rawReason.trim() : null;
+  if (reason && reason.length > MAX_REASON_LENGTH) {
+    return NextResponse.json({ error: `Keep the reason under ${MAX_REASON_LENGTH} characters.` }, { status: 400 });
+  }
+  if (await prisma.clinicLeave.findUnique({ where: { clinicId_date: { clinicId: id, date } } })) {
     return NextResponse.json({ error: "That date is already marked as a leave day." }, { status: 409 });
   }
+
+  const affected = await prisma.appointment.findMany({
+    where: { clinicId: id, status: { in: LIVE_STATUSES }, scheduledAt: { gte: day.start, lt: day.end } },
+    orderBy: { scheduledAt: "asc" },
+    include: { patient: { select: { name: true } } },
+  });
+  const confirmed = new Set(Array.isArray(confirmBookingIds) ? confirmBookingIds : []);
+  if (affected.some((a) => !confirmed.has(a.id))) {
+    return NextResponse.json(
+      {
+        error: "Some patients are booked at this clinic that day. Confirm to cancel and refund them.",
+        code: "LEAVE_HAS_BOOKINGS",
+        bookings: affected.map((a) => ({
+          id: a.id,
+          patientName: a.patientName ?? a.patient.name,
+          scheduledAt: a.scheduledAt,
+          status: a.status,
+          paid: a.paymentStatus === "PAID",
+          refund: a.paymentStatus === "PAID" ? netPayable(a) : 0,
+        })),
+      },
+      { status: 409 }
+    );
+  }
+
+  let result;
+  try {
+    result = await prisma.$transaction(async (tx) => {
+      const leave = await tx.clinicLeave.create({ data: { clinicId: id, date, reason } });
+      const cancelled = await cancelManyAndRefund(tx, affected.map((a) => a.id), {
+        data: { doctorNotes: `Cancelled: clinic closed on ${date}${reason ? ` (${reason})` : ""}` },
+        note: (apptId) => `Refund for appointment ${apptId}, cancelled for the doctor's leave on ${date}`,
+      });
+      return { leave, cancelled };
+    }, { timeout: 30_000 });
+  } catch (err) {
+    // A concurrent add of the same date, or a booking that changed in the
+    // meantime — the transaction rolled back, so nothing was written.
+    if (!isAlreadyClosed(err) && !isTransientConflict(err)) throw err;
+    if (await prisma.clinicLeave.findUnique({ where: { clinicId_date: { clinicId: id, date } } })) {
+      return NextResponse.json({ error: "That date is already marked as a leave day." }, { status: 409 });
+    }
+    return NextResponse.json({ error: BOOKINGS_CHANGED_MESSAGE }, { status: 409 });
+  }
+
+  const doctorName = formatDoctorName(authUser.name);
+  for (const { cancelled, refund } of result.cancelled) {
+    void sendPushToUser(cancelled.patientId, {
+      title: "Appointment cancelled",
+      body: `${doctorName} won't be at ${clinic.name} on ${fmtDay(cancelled.scheduledAt)}${reason ? ` (${reason})` : ""}, so your ${fmtTime(cancelled.scheduledAt)} appointment was cancelled.`
+        + (refund > 0 ? ` ₹${refund} was refunded to your wallet.` : "")
+        + " Please book another day.",
+      url: "/patient/appointments",
+    });
+  }
+
+  return NextResponse.json({
+    ...result.leave,
+    cancelledBookings: result.cancelled.length,
+    refundTotal: result.cancelled.reduce((sum, c) => sum + c.refund, 0),
+  });
 }
