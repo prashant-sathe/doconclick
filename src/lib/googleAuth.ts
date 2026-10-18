@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import type { JWTPayload } from "@/lib/auth";
 import type { OAuthRole, OAuthIntent } from "@/lib/googleOAuth";
-import { ROLE_HOME } from "@/lib/roleHome";
+import { ROLE_HOME, safeNext } from "@/lib/roleHome";
 
 /**
  * Shared "a Google identity signed in — find or create the account and decide
@@ -51,12 +51,13 @@ export async function resolveGoogleUser(params: {
     mobile: user.mobile,
   };
 
+  const safe = safeNext(next);
   const destination =
     intent === "reset"
       ? "/reset-password"
       : user.mobile.startsWith("pending_")
-        ? "/complete-profile"
-        : next || ROLE_HOME[user.role] || "/";
+        ? safe ? `/complete-profile?next=${encodeURIComponent(safe)}` : "/complete-profile"
+        : safe || ROLE_HOME[user.role] || "/";
 
   return { payload, destination };
 }

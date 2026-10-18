@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/patient/register" },
 };
 
-export default function PatientRegisterPage() {
-  return <PatientRegisterClient />;
+export default async function PatientRegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { next } = await searchParams;
+  return <PatientRegisterClient next={typeof next === "string" ? next : undefined} />;
 }

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Phone, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { isValidMobile, normalizeMobile } from "@/lib/validation";
-import { ROLE_HOME } from "@/lib/roleHome";
+import { ROLE_HOME, safeNext } from "@/lib/roleHome";
 
 export default function CompleteProfile() {
   const router = useRouter();
@@ -37,7 +37,9 @@ export default function CompleteProfile() {
     }
 
     await refresh();
-    router.push(ROLE_HOME[data.role] ?? "/");
+    // Carried over from sign-in (e.g. a doctor's booking page reached via QR).
+    const next = safeNext(new URLSearchParams(window.location.search).get("next"));
+    router.push(next ?? ROLE_HOME[data.role] ?? "/");
     router.refresh();
   };
 

@@ -8,7 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { isNative } from "@/lib/platform";
 import { isValidMobile, normalizeMobile } from "@/lib/validation";
-import { ROLE_HOME } from "@/lib/roleHome";
+import { ROLE_HOME, safeNext } from "@/lib/roleHome";
 
 const ERROR_MESSAGES: Record<string, string> = {
   google_failed: "Something went wrong verifying your Google account. Please try again.",
@@ -19,7 +19,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextUrl = searchParams.get("next");
+  const nextUrl = safeNext(searchParams.get("next"));
   const { refresh } = useAuth();
 
   const [form, setForm] = useState({ mobile: "", password: "" });
@@ -153,7 +153,7 @@ function LoginForm() {
         <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-2 text-sm text-slate-400">
           <p>
             New patient?{" "}
-            <Link href="/patient/register" className="text-blue-600 font-semibold hover:underline">
+            <Link href={nextUrl ? `/patient/register?next=${encodeURIComponent(nextUrl)}` : "/patient/register"} className="text-blue-600 font-semibold hover:underline">
               Create account →
             </Link>
           </p>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
-import { ROLE_HOME } from "@/lib/roleHome";
+import { ROLE_HOME, safeNext } from "@/lib/roleHome";
 
 const COOKIE_NAME = "doconclick_token";
 
@@ -40,10 +40,13 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get(COOKIE_NAME)?.value;
   const user = token ? verifyToken(token) : null;
 
-  // Already logged in and visiting /login → redirect to their home
+  // Already logged in and visiting /login → send them on to ?next= (e.g. a
+  // doctor's booking page from a QR scan), else to their home. A wrong-role
+  // `next` is bounced again by the PROTECTED check on that request.
   if (pathname === "/login" && user) {
+    const next = safeNext(request.nextUrl.searchParams.get("next"));
     return NextResponse.redirect(
-      new URL(ROLE_HOME[user.role] ?? "/", request.url)
+      new URL(next ?? ROLE_HOME[user.role] ?? "/", request.url)
     );
   }
 

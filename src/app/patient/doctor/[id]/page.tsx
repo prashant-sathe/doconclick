@@ -71,6 +71,7 @@ interface DoctorReview {
 
 function Header() {
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
   return (
     <header className="safe-top sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
@@ -78,7 +79,7 @@ function Header() {
           <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-8 h-8 object-contain" />
           <span className="font-extrabold text-slate-900">DocOnClick</span>
         </Link>
-        <Link href={user ? "/patient/dashboard" : "/login"} className="btn-secondary py-2 px-3.5 text-sm">
+        <Link href={user ? "/patient/dashboard" : `/login?next=${encodeURIComponent(`/patient/doctor/${id}`)}`} className="btn-secondary py-2 px-3.5 text-sm">
           {user ? "My Dashboard" : "Login"}
         </Link>
       </div>

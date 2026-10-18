@@ -7,8 +7,13 @@ import { Heart, Phone, Lock, Eye, EyeOff, Loader2, ArrowRight } from "lucide-rea
 import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { useAuth } from "@/components/AuthProvider";
 import { isValidMobile, normalizeMobile, PASSWORD_MIN_LENGTH } from "@/lib/validation";
+import { safeNext } from "@/lib/roleHome";
 
-export default function PatientRegisterClient() {
+// `next` is where the visitor was headed before being sent to sign up (e.g. a
+// doctor's booking page reached by scanning their QR) — land them back there.
+export default function PatientRegisterClient({ next: rawNext }: { next?: string }) {
+  const next = safeNext(rawNext);
+  const loginHref = next ? `/login?next=${encodeURIComponent(next)}` : "/login";
   const router = useRouter();
   const { refresh } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -46,12 +51,12 @@ export default function PatientRegisterClient() {
 
     // The register route already signed us in — go straight to the app.
     await refresh();
-    router.push("/patient/dashboard");
+    router.push(next ?? "/patient/dashboard");
     router.refresh();
   };
 
   return (
-    <AuthPageShell backHref="/login">
+    <AuthPageShell backHref={loginHref}>
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -97,12 +102,12 @@ export default function PatientRegisterClient() {
             <span className="text-xs text-slate-400 font-medium">OR</span>
             <div className="h-px bg-slate-100 flex-1" />
           </div>
-          <GoogleSignInButton role="PATIENT" label="Sign up with Google" />
+          <GoogleSignInButton role="PATIENT" next={next ?? undefined} label="Sign up with Google" />
         </div>
 
         <p className="text-center text-sm text-slate-400 mt-4">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-600 font-semibold hover:underline">Sign In →</Link>
+          <Link href={loginHref} className="text-blue-600 font-semibold hover:underline">Sign In →</Link>
         </p>
       </div>
     </AuthPageShell>
