@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, signToken, sessionPayload, COOKIE_SECURE } from "@/lib/auth";
-import { nameError } from "@/lib/validation";
+import { parseBody, updateNameSchema } from "@/lib/schemas";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -14,12 +14,9 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { name } = await req.json().catch(() => ({ name: undefined }));
-  const trimmed = String(name ?? "").trim();
-  const err = nameError(trimmed);
-  if (err) {
-    return NextResponse.json({ error: err }, { status: 400 });
-  }
+  const parsed = parseBody(updateNameSchema, await req.json().catch(() => null));
+  if (parsed.response) return parsed.response;
+  const trimmed = parsed.data.name;
 
   const updated = await prisma.user.update({
     where: { id: authUser.id },

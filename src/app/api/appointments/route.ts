@@ -8,6 +8,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
 import { isDoctorBookable, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
 import { parseVisitInput, snapshotFromProfile, type VisitSnapshot } from "@/lib/visitAddress";
+import { parseBody, appointmentBookingSchema } from "@/lib/schemas";
 import { doctorSlotProblem, snapToClinicGrid, isSlotIndexViolation } from "@/lib/doctorSlots";
 
 export async function POST(req: Request) {
@@ -17,10 +18,12 @@ export async function POST(req: Request) {
   }
 
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => null);
+    const parsed = parseBody(appointmentBookingSchema, body);
+    if (parsed.response) return parsed.response;
+    const { symptoms, patientLat, patientLng } = parsed.data;
     const {
       doctorId,
-      symptoms,
       dependentId,
       allergies,
       consentGiven,
@@ -28,8 +31,6 @@ export async function POST(req: Request) {
       scheduledAt,
       followUpOfId,
       clinicId,
-      patientLat,
-      patientLng,
     } = body;
 
     if (!doctorId || !symptoms || !consultType) {

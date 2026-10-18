@@ -110,8 +110,8 @@ export function todayIsoDateIst(now: Date = new Date()): string {
 
 // Whether a clinic is currently within one of its day-wise slots, evaluated in
 // IST regardless of the visitor's timezone. A clinic with no slots at all
-// (hours never configured) fails open — consistent with isDoctorAvailableNow
-// in src/lib/availability.ts — so it's never wrongly hidden/dimmed by default.
+// (hours never configured) fails open so it's never wrongly hidden/dimmed by
+// default.
 // `leaves` are specific "YYYY-MM-DD" dates the clinic is closed regardless of
 // its normal weekly hours (a doctor's day off) — checked first since a leave
 // day overrides everything else.

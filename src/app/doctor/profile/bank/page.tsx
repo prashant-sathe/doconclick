@@ -6,8 +6,7 @@ import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import { useDoctorProfile, patchDoctorProfile } from "@/lib/useDoctorProfile";
 import { useAuth } from "@/components/AuthProvider";
 import { SetPasswordViaGoogle } from "@/components/AccountSecurity";
-
-const IFSC_RE = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+import { IFSC_REGEX } from "@/lib/validation";
 
 // Stored as "Bank | Account | IFSC: CODE" (see src/lib/doctorProfileLock.ts).
 function parseBankDetails(raw: string | null | undefined) {
@@ -46,7 +45,7 @@ export default function BankDetailsPage() {
     if (form.bankName.trim().length < 2) { setError("Enter your bank's name."); return; }
     if (!/^\d{9,18}$/.test(account)) { setError("Account number must be 9 to 18 digits."); return; }
     if (account !== form.accountNumberConfirm.replace(/[\s-]/g, "")) { setError("The account numbers don't match."); return; }
-    if (!IFSC_RE.test(form.ifsc)) { setError("IFSC must be 11 characters, like HDFC0001234."); return; }
+    if (!IFSC_REGEX.test(form.ifsc)) { setError("IFSC must be 11 characters, like HDFC0001234."); return; }
     if (!form.currentPassword) { setError("Enter your password to confirm."); return; }
 
     setSaving(true);

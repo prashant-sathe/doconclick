@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { parseBody, dependentUpdateSchema, dependentData } from "@/lib/schemas";
 
 // PATCH: update a saved family-member profile
 export async function PATCH(
@@ -21,29 +22,12 @@ export async function PATCH(
     return NextResponse.json({ error: "Family member not found" }, { status: 404 });
   }
 
-  const body = await req.json();
-  const { name, age, gender, bloodGroup, height, weight, allergies, chronicDiseases, medications, surgeries, emergencyContactName, emergencyContactPhone } = body;
-
-  if (!name?.trim()) {
-    return NextResponse.json({ error: "Name is required" }, { status: 400 });
-  }
+  const parsed = parseBody(dependentUpdateSchema, await req.json().catch(() => null));
+  if (parsed.response) return parsed.response;
 
   const updated = await prisma.patientDependent.update({
     where: { id },
-    data: {
-      name: name.trim(),
-      age: age === "" || age == null ? null : Number(age),
-      gender: gender || null,
-      bloodGroup: bloodGroup || null,
-      height: height === "" || height == null ? null : Number(height),
-      weight: weight === "" || weight == null ? null : Number(weight),
-      allergies: allergies?.trim() ? allergies.trim() : null,
-      chronicDiseases: chronicDiseases?.trim() ? chronicDiseases.trim() : null,
-      medications: medications?.trim() ? medications.trim() : null,
-      surgeries: surgeries?.trim() ? surgeries.trim() : null,
-      emergencyContactName: emergencyContactName?.trim() ? emergencyContactName.trim() : null,
-      emergencyContactPhone: emergencyContactPhone?.trim() ? emergencyContactPhone.trim() : null,
-    },
+    data: dependentData(parsed.data),
   });
 
   return NextResponse.json(updated);

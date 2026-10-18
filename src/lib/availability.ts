@@ -93,23 +93,31 @@ export function parseAvailabilityString(
   return days.map((dayOfWeek) => ({ dayOfWeek, fromTime, toTime }));
 }
 
+// Whether an availability string parses into at least one day and a
+// non-empty time window — the bar a provider's saved hours must clear.
+export function isValidAvailability(availability: string | null | undefined): boolean {
+  const rows = parseAvailabilityString(availability);
+  return rows.length > 0 && rows[0].fromTime !== rows[0].toTime;
+}
+
 // Whether a doctor is currently within their set "Available Timings" window,
-// evaluated in IST regardless of the visitor's own timezone. Fails open
-// (returns true) on anything unparseable so a format we didn't anticipate
-// never wrongly hides a doctor from the map.
+// evaluated in IST regardless of the visitor's own timezone. Fails closed
+// (returns false) on a missing or unparseable string: saved hours are
+// validated with isValidAvailability, so anything else is bad data and must
+// not let a patient book outside the provider's real hours.
 export function isDoctorAvailableNow(availability: string | null | undefined, now: Date = new Date()): boolean {
-  if (!availability) return true;
+  if (!availability) return false;
 
   const timeMatch = availability.match(TIME_RANGE_RE);
-  if (!timeMatch || timeMatch.index == null) return true;
+  if (!timeMatch || timeMatch.index == null) return false;
 
   const fromMin = parseTimeToMinutes(timeMatch[1]);
   const toMin = parseTimeToMinutes(timeMatch[2]);
-  if (fromMin == null || toMin == null) return true;
+  if (fromMin == null || toMin == null) return false;
 
   const dayPart = availability.slice(0, timeMatch.index).replace(/,\s*$/, "").trim();
   const days = parseDays(dayPart);
-  if (days.length === 0) return true;
+  if (days.length === 0) return false;
 
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Kolkata", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false,

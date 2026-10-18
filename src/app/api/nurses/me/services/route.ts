@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { requireActiveNurse } from "@/lib/providerGuard";
-
-const MAX_PRICE = 100000;
+import { parseBody, nurseServicesSchema } from "@/lib/schemas";
 
 // PUT: replace the services this nurse offers. Body: { services: [{ serviceId, price }] }
 export async function PUT(req: Request) {
@@ -14,19 +13,10 @@ export async function PUT(req: Request) {
   const denied = await requireActiveNurse(authUser);
   if (denied) return denied;
 
-  const body = await req.json().catch(() => ({}));
-  if (!Array.isArray(body.services)) {
-    return NextResponse.json({ error: "services must be a list" }, { status: 400 });
-  }
+  const parsed = parseBody(nurseServicesSchema, await req.json().catch(() => null));
+  if (parsed.response) return parsed.response;
 
-  const wanted = new Map<string, number>();
-  for (const s of body.services) {
-    const price = Number(s?.price);
-    if (typeof s?.serviceId !== "string" || !Number.isFinite(price) || price <= 0 || price > MAX_PRICE) {
-      return NextResponse.json({ error: "Every selected service needs a price above ₹0." }, { status: 400 });
-    }
-    wanted.set(s.serviceId, Math.round(price));
-  }
+  const wanted = new Map(parsed.data.services.map((s) => [s.serviceId, s.price]));
 
   const valid = await prisma.nurseService.findMany({
     where: { id: { in: [...wanted.keys()] }, isActive: true },

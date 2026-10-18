@@ -31,7 +31,8 @@
     "test:paid-at": "tsx tests/paid-at.ts",
     "test:doctor-queue": "tsx tests/doctor-queue.ts",
     "test:clinic-hours": "tsx tests/clinic-hours.ts",
-    "test:visit-timing": "tsx tests/visit-timing.ts"
+    "test:visit-timing": "tsx tests/visit-timing.ts",
+    "test:schemas": "tsx tests/request-schemas.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -85,7 +86,8 @@
     "react-dom": "19.2.4",
     "react-easy-crop": "^6.2.3",
     "react-leaflet": "^5.0.0",
-    "tailwind-merge": "^3.6.0"
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.0",

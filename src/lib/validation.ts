@@ -91,3 +91,6 @@ export function validateQuickRegistration(body: { mobile?: unknown; password?: u
 
   return { data: { mobile, password } };
 }
+
+/** Indian IFSC: 4-letter bank code, a literal 0, then a 6-character branch code. */
+export const IFSC_REGEX = /^[A-Z]{4}0[A-Z0-9]{6}$/;
