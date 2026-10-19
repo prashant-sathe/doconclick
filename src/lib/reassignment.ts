@@ -1,13 +1,14 @@
 import type { Appointment, Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { findReassignmentDoctor, type ReassignmentCandidate } from "@/lib/doctorMatching";
+import { findReassignmentCandidates, type ReassignmentCandidate } from "@/lib/doctorMatching";
 import { doctorSlotProblem, isTimedBooking, isSlotIndexViolation } from "@/lib/doctorSlots";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
 import { cancelAndRefund } from "@/lib/appointmentCancel";
 import { copyVisitSnapshot } from "@/lib/visitAddress";
 
 // The nearest other doctor who can take over a doctor's appointment — same
-// specialty and consult type, and actually free at its time — with the fee
+// specialty and consult type, working at its time (clinic hours/leave or
+// their available hours), and with nothing else booked then — with the fee
 // they'd charge. Null when there's nobody.
 async function findReplacement(appointment: Appointment) {
   const doctorProfile = await prisma.doctorProfile.findUnique({
@@ -15,7 +16,8 @@ async function findReplacement(appointment: Appointment) {
     select: { specialty: true },
   });
   if (!doctorProfile) return null;
-  const match = await findReassignmentDoctor({
+  const timed = isTimedBooking(appointment);
+  const candidates = await findReassignmentCandidates({
     excludeDoctorId: appointment.doctorId,
     specialty: doctorProfile.specialty,
     consultType: appointment.consultType,
@@ -24,13 +26,18 @@ async function findReplacement(appointment: Appointment) {
     visitLocation: appointment.visitLat != null && appointment.visitLng != null
       ? { lat: appointment.visitLat, lng: appointment.visitLng }
       : undefined,
+    // A booking for a chosen time keeps that time; "book now" needs someone now.
+    when: timed ? appointment.scheduledAt : new Date(),
   });
-  if (!match) return null;
-  // The replacement inherits the slot, so they must actually be free then.
-  if (isTimedBooking(appointment)
-    && await doctorSlotProblem({ doctorId: match.id, when: appointment.scheduledAt, against: "live", viewer: "doctor" })) {
-    return null;
+  // The replacement inherits the slot, so they must actually be free then —
+  // try the next-nearest rather than giving up on the first clash.
+  let match: ReassignmentCandidate | null = null;
+  for (const c of candidates) {
+    if (timed && await doctorSlotProblem({ doctorId: c.id, when: appointment.scheduledAt, against: "live", viewer: "doctor" })) continue;
+    match = c;
+    break;
   }
+  if (!match) return null;
   const settings = await prisma.platformSettings.findFirst();
   const commission = commissionPercentForConsultType(settings, appointment.consultType);
   return { candidate: match, amount: match.fee, platformFee: (match.fee * commission) / 100 };

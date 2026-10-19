@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { bookableDoctorWhere } from "@/lib/doctorBookable";
 import { haversine } from "@/lib/geo";
 import { findOpenClinic } from "@/lib/clinicAvailability";
+import { isDoctorAvailableNow } from "@/lib/availability";
 
 export interface ReassignmentCandidate {
   id: string;
@@ -15,10 +16,14 @@ export interface ReassignmentCandidate {
 // so keep them local rather than shunting them to a far-away clinic/home visit.
 const LOCAL_REASSIGN_RADIUS_KM = 20;
 
-// Finds the nearest doctor who can take over a cancelled appointment: same
-// specialty as the original doctor, offers the same consult type, and is
-// currently reachable/open for it — excluding the doctor who cancelled.
-export async function findReassignmentDoctor(params: {
+// Every doctor who could take over a cancelled appointment, nearest first:
+// same specialty as the original doctor, offers the same consult type, and
+// works at `when` — the appointment's own time for a booking at a chosen
+// time, or now for a "book now" request. For a clinic visit that's one of
+// their clinics open then (hours and leave days); for home/video, their
+// set available hours. Excludes the doctor who cancelled. The caller still
+// checks each one's calendar for a clash (src/lib/reassignment.ts).
+export async function findReassignmentCandidates(params: {
   excludeDoctorId: string;
   specialty: string;
   consultType: string;
@@ -26,9 +31,9 @@ export async function findReassignmentDoctor(params: {
   // Where the visit happens (a HOME booking's snapshot); defaults to the
   // patient's saved profile location.
   visitLocation?: { lat: number; lng: number };
-  now?: Date;
-}): Promise<ReassignmentCandidate | null> {
-  const { excludeDoctorId, specialty, consultType, patientId, visitLocation, now = new Date() } = params;
+  when?: Date;
+}): Promise<ReassignmentCandidate[]> {
+  const { excludeDoctorId, specialty, consultType, patientId, visitLocation, when = new Date() } = params;
 
   const patientProfile = visitLocation ?? await prisma.patientProfile.findUnique({
     where: { userId: patientId },
@@ -59,7 +64,7 @@ export async function findReassignmentDoctor(params: {
     where: { ...bookableDoctorWhere({ specialty }), id: { not: excludeDoctorId } },
     include: {
       doctorProfile: true,
-      clinics: { where: { isActive: true }, orderBy: { sortOrder: "asc" }, include: { slots: true } },
+      clinics: { where: { isActive: true }, orderBy: { sortOrder: "asc" }, include: { slots: true, leaves: { select: { date: true } } } },
     },
   });
 
@@ -83,14 +88,16 @@ export async function findReassignmentDoctor(params: {
 
     if (consultType === "VIDEO") {
       if (profile.offersVideo !== true) continue;
+      if (!isDoctorAvailableNow(profile.availability, when)) continue;
       eligible.push({ id: d.id, name: d.name, distanceKm, clinicId: null, fee: profile.videoFee });
     } else if (consultType === "HOME") {
       if (!profile.offersHomeVisit) continue;
       if (distanceKm != null && distanceKm > profile.radius) continue;
+      if (!isDoctorAvailableNow(profile.availability, when)) continue;
       eligible.push({ id: d.id, name: d.name, distanceKm, clinicId: null, fee: profile.homeVisitFee });
     } else {
       if (profile.offersClinic === false) continue;
-      const openClinic = findOpenClinic(d.clinics, now);
+      const openClinic = findOpenClinic(d.clinics.map((c) => ({ ...c, leaves: c.leaves.map((l) => l.date) })), when);
       if (!openClinic) continue;
       eligible.push({ id: d.id, name: d.name, distanceKm, clinicId: openClinic.id, fee: profile.consultFee });
     }
@@ -103,6 +110,5 @@ export async function findReassignmentDoctor(params: {
     return a.distanceKm - b.distanceKm;
   });
 
-  const nearest = eligible[0];
-  return nearest ? { id: nearest.id, name: nearest.name, clinicId: nearest.clinicId, fee: nearest.fee } : null;
+  return eligible.map((c) => ({ id: c.id, name: c.name, clinicId: c.clinicId, fee: c.fee }));
 }

@@ -13,7 +13,7 @@ import { netPayable } from "@/lib/coupons";
 import { cancelAndRefund, claimStatusChange, isAlreadyClosed, ALREADY_CLOSED_MESSAGE } from "@/lib/appointmentCancel";
 import { cancelAndReassign } from "@/lib/reassignment";
 import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
-import { doctorSlotProblem, snapToClinicGrid, isTimedBooking, isSlotIndexViolation } from "@/lib/doctorSlots";
+import { doctorSlotProblem, snapToClinicGrid, isTimedBooking, isSlotIndexViolation, acceptTimeProblem } from "@/lib/doctorSlots";
 import { getBookingHorizonDays, horizonProblem, doctorHoursProblem } from "@/lib/bookingLimits";
 import { referralPushCopy } from "@/lib/nurseReferral";
 
@@ -406,6 +406,11 @@ export async function PATCH(
     // Accepting confirms the slot — it must not overlap one the doctor has
     // already confirmed (another clinic, a video call…). Nurse accepts are
     // checked above with their visit durations.
+    if (status === "SCHEDULED" && appointment.providerType !== "NURSE") {
+      // Same checks bulk-accept runs (src/lib/doctorSlots.ts).
+      const timeProblem = await acceptTimeProblem(appointment);
+      if (timeProblem) return NextResponse.json({ error: timeProblem }, { status: 409 });
+    }
     if (status === "SCHEDULED" && appointment.providerType !== "NURSE" && isTimedBooking(appointment)) {
       const problem = await doctorSlotProblem({
         doctorId: appointment.doctorId, when: appointment.scheduledAt, excludeAppointmentId: appointment.id, against: "confirmed", viewer: "doctor",

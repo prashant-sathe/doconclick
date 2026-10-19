@@ -40,7 +40,8 @@ async function main() {
   const admin = await mk("ADMIN");
   const doctorA = await mk("DOCTOR", { doctorProfile: { create: { ...bookable, offersVideo: true, videoFee: 300 } } });
   // The only possible replacement: same specialty, video only, free.
-  const doctorB = await mk("DOCTOR", { doctorProfile: { create: { ...bookable, offersVideo: true, videoFee: 450, offersClinic: false, offersHomeVisit: false } } });
+  // All-day hours: the replacement must be working at each booking's time (src/lib/doctorMatching.ts).
+  const doctorB = await mk("DOCTOR", { doctorProfile: { create: { ...bookable, offersVideo: true, videoFee: 450, offersClinic: false, offersHomeVisit: false, availability: "Sun-Sat, 12AM-11:59PM" } } });
   const doctorC = await mk("DOCTOR", { doctorProfile: { create: { ...bookable, specialty: `${specialty} other` } } });
   const doctorIdle = await mk("DOCTOR", { doctorProfile: { create: bookable } });
   const nurse = await mk("NURSE", { nurseProfile: { create: { status: "APPROVED", councilRegNo: `IMP${stamp}`, councilCertUrl: "https://x/c.pdf", lat: 18.5, lng: 73.8 } } });

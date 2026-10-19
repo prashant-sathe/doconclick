@@ -90,6 +90,37 @@ export async function doctorSlotProblem(params: {
     : `You already have ${clash.status === "SCHEDULED" ? "a confirmed appointment" : "a request"} at ${fmtIST(clashAt)} that overlaps this one.`;
 }
 
+/**
+ * A reason a doctor can't confirm this timed request (any more), or null —
+ * shared by single accept and bulk-accept so the two can't drift. The slot
+ * itself was validated at booking; what can change since: its time passes,
+ * or its clinic is deactivated or put on leave for that day. (Changed
+ * working hours don't block — the doctor accepting is their own call.)
+ */
+export async function acceptTimeProblem(appt: {
+  scheduledAt: Date;
+  createdAt: Date;
+  consultType: string;
+  clinicId: string | null;
+}): Promise<string | null> {
+  if (!isTimedBooking(appt)) return null;
+  if (appt.scheduledAt.getTime() + SLOT_MS < Date.now()) {
+    return `This request was for ${fmtIST(appt.scheduledAt)}, which has already passed.`;
+  }
+  if (appt.consultType === "CLINIC" && appt.clinicId) {
+    const clinic = await prisma.clinic.findUnique({
+      where: { id: appt.clinicId },
+      select: { isActive: true, leaves: { select: { date: true } } },
+    });
+    if (!clinic?.isActive) return "This clinic is no longer active, so the request can't be confirmed there.";
+    const { date } = istParts(appt.scheduledAt);
+    if (clinic.leaves.some((l) => l.date === date)) {
+      return `You've marked ${date} as leave at this clinic. Remove the leave or decline the request.`;
+    }
+  }
+  return null;
+}
+
 /** The partial unique index on live (doctorId, scheduledAt) rejected a write. */
 export function isSlotIndexViolation(err: unknown): boolean {
   if (!(err instanceof Prisma.PrismaClientKnownRequestError) || err.code !== "P2002") return false;
