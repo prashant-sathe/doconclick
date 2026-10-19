@@ -41,7 +41,8 @@
     "test:prescriptions": "tsx tests/prescriptions.ts",
     "test:nurse-referrals": "tsx tests/nurse-referrals.ts",
     "test:chat-access": "tsx tests/chat-access.ts",
-    "test:doctor-subscription": "tsx tests/doctor-subscription.ts"
+    "test:doctor-subscription": "tsx tests/doctor-subscription.ts",
+    "test:video": "tsx tests/video-call.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

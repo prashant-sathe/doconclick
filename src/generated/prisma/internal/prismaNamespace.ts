@@ -3847,6 +3847,7 @@ export const AppointmentScalarFieldEnum = {
   nurseReferralId: 'nurseReferralId',
   status: 'status',
   acceptedAt: 'acceptedAt',
+  videoStartedPushAt: 'videoStartedPushAt',
   completedAt: 'completedAt',
   paymentMethod: 'paymentMethod',
   paymentStatus: 'paymentStatus',

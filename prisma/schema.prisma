@@ -408,6 +408,7 @@ model Appointment {
   vitals            VitalReading[]
   status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED, NO_SHOW
   acceptedAt    DateTime? // set when the doctor accepts (PENDING_APPROVAL → SCHEDULED); used for the late-cancellation warning
+  videoStartedPushAt DateTime? // set when the "video consultation started" push goes out — once per appointment
   completedAt   DateTime? // set when marked COMPLETED; starts the prescription edit window (src/lib/prescriptionLock.ts). Null on rows completed before it existed
   paymentMethod String    @default("CASH") // ONLINE, CASH
   paymentStatus String    @default("PENDING") // PENDING, PAID

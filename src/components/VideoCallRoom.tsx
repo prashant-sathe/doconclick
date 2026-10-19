@@ -20,6 +20,9 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
   const router = useRouter();
   const [status, setStatus] = useState<"connecting" | "waiting" | "connected" | "error">("connecting");
   const [error, setError] = useState("");
+  // Non-fatal: the call keeps going (e.g. token renewal was refused because
+  // the consultation window closed — the call ends when the token expires).
+  const [warning, setWarning] = useState("");
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
   const localRef = useRef<HTMLDivElement>(null);
@@ -69,7 +72,7 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
         setStatus("error");
         return;
       }
-      const { appId, token, channel } = await res.json();
+      const { appId, token, channel, uid } = await res.json();
       if (cancelled) return;
 
       const AgoraRTC = (await import("agora-rtc-sdk-ng")).default;
@@ -87,6 +90,31 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
       client.on("user-unpublished", () => setStatus("waiting"));
       client.on("user-left", () => setStatus("waiting"));
 
+      // Tokens last an hour — fetch a fresh one shortly before that so a long
+      // consultation isn't cut off. The same route re-checks the booking, so
+      // renewal stops once the consultation window has closed.
+      client.on("token-privilege-will-expire", async () => {
+        try {
+          const renew = await fetch(`/api/appointments/${appointmentId}/video-token`);
+          const data = await renew.json().catch(() => ({}));
+          if (!renew.ok || !data.token) {
+            setWarning(data.error ?? "Couldn't extend the call — it may end in a few minutes.");
+            return;
+          }
+          await client.renewToken(data.token);
+          setWarning("");
+        } catch {
+          setWarning("Couldn't extend the call — it may end in a few minutes. Check your connection.");
+        }
+      });
+      client.on("token-privilege-did-expire", () => {
+        localTracksRef.current?.audio.close();
+        localTracksRef.current?.video.close();
+        client.leave();
+        setError("The call has ended — the time for this video consultation is over.");
+        setStatus("error");
+      });
+
       const [audioTrack, videoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks();
       if (cancelled) {
         audioTrack.close();
@@ -96,7 +124,8 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
       localTracksRef.current = { audio: audioTrack, video: videoTrack };
       videoTrack.play(localRef.current!);
 
-      await client.join(appId, channel, token, 0);
+      // Join as ourselves (the uid the token was issued for), not uid 0.
+      await client.join(appId, channel, token, uid);
       if (cancelled) return;
       await client.publish([audioTrack, videoTrack]);
       setStatus((prev) => (prev === "connecting" ? "waiting" : prev));
@@ -155,6 +184,11 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-300">
             <Loader2 className={cn("w-6 h-6 animate-spin", accentText)} />
             <p className="text-sm">{status === "connecting" ? "Connecting…" : "Waiting for the other participant to join…"}</p>
+          </div>
+        )}
+        {warning && (
+          <div className="absolute top-3 left-3 right-3 rounded-lg bg-amber-500/90 text-white text-xs font-semibold px-3 py-2 text-center">
+            {warning}
           </div>
         )}
         <div

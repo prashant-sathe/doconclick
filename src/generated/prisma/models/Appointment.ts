@@ -74,6 +74,7 @@ export type AppointmentMinAggregateOutputType = {
   nurseReferralId: string | null
   status: string | null
   acceptedAt: Date | null
+  videoStartedPushAt: Date | null
   completedAt: Date | null
   paymentMethod: string | null
   paymentStatus: string | null
@@ -131,6 +132,7 @@ export type AppointmentMaxAggregateOutputType = {
   nurseReferralId: string | null
   status: string | null
   acceptedAt: Date | null
+  videoStartedPushAt: Date | null
   completedAt: Date | null
   paymentMethod: string | null
   paymentStatus: string | null
@@ -188,6 +190,7 @@ export type AppointmentCountAggregateOutputType = {
   nurseReferralId: number
   status: number
   acceptedAt: number
+  videoStartedPushAt: number
   completedAt: number
   paymentMethod: number
   paymentStatus: number
@@ -271,6 +274,7 @@ export type AppointmentMinAggregateInputType = {
   nurseReferralId?: true
   status?: true
   acceptedAt?: true
+  videoStartedPushAt?: true
   completedAt?: true
   paymentMethod?: true
   paymentStatus?: true
@@ -328,6 +332,7 @@ export type AppointmentMaxAggregateInputType = {
   nurseReferralId?: true
   status?: true
   acceptedAt?: true
+  videoStartedPushAt?: true
   completedAt?: true
   paymentMethod?: true
   paymentStatus?: true
@@ -385,6 +390,7 @@ export type AppointmentCountAggregateInputType = {
   nurseReferralId?: true
   status?: true
   acceptedAt?: true
+  videoStartedPushAt?: true
   completedAt?: true
   paymentMethod?: true
   paymentStatus?: true
@@ -529,6 +535,7 @@ export type AppointmentGroupByOutputType = {
   nurseReferralId: string | null
   status: string
   acceptedAt: Date | null
+  videoStartedPushAt: Date | null
   completedAt: Date | null
   paymentMethod: string
   paymentStatus: string
@@ -609,6 +616,7 @@ export type AppointmentWhereInput = {
   nurseReferralId?: Prisma.StringNullableFilter<"Appointment"> | string | null
   status?: Prisma.StringFilter<"Appointment"> | string
   acceptedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  videoStartedPushAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   paymentMethod?: Prisma.StringFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringFilter<"Appointment"> | string
@@ -691,6 +699,7 @@ export type AppointmentOrderByWithRelationInput = {
   nurseReferralId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  videoStartedPushAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
@@ -777,6 +786,7 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   nurseReferralId?: Prisma.StringNullableFilter<"Appointment"> | string | null
   status?: Prisma.StringFilter<"Appointment"> | string
   acceptedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  videoStartedPushAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   paymentMethod?: Prisma.StringFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringFilter<"Appointment"> | string
@@ -858,6 +868,7 @@ export type AppointmentOrderByWithAggregationInput = {
   nurseReferralId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  videoStartedPushAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
@@ -923,6 +934,7 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   nurseReferralId?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   status?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
   acceptedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
+  videoStartedPushAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   paymentMethod?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
@@ -973,6 +985,7 @@ export type AppointmentCreateInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -1050,6 +1063,7 @@ export type AppointmentUncheckedCreateInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -1113,6 +1127,7 @@ export type AppointmentUpdateInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1190,6 +1205,7 @@ export type AppointmentUncheckedUpdateInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1260,6 +1276,7 @@ export type AppointmentCreateManyInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -1310,6 +1327,7 @@ export type AppointmentUpdateManyMutationInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1362,6 +1380,7 @@ export type AppointmentUncheckedUpdateManyInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1439,6 +1458,7 @@ export type AppointmentCountOrderByAggregateInput = {
   nurseReferralId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  videoStartedPushAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
@@ -1508,6 +1528,7 @@ export type AppointmentMaxOrderByAggregateInput = {
   nurseReferralId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  videoStartedPushAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
@@ -1565,6 +1586,7 @@ export type AppointmentMinOrderByAggregateInput = {
   nurseReferralId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  videoStartedPushAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
@@ -2313,6 +2335,7 @@ export type AppointmentCreateWithoutPatientInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -2388,6 +2411,7 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -2461,6 +2485,7 @@ export type AppointmentCreateWithoutDoctorInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -2536,6 +2561,7 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -2635,6 +2661,7 @@ export type AppointmentScalarWhereInput = {
   nurseReferralId?: Prisma.StringNullableFilter<"Appointment"> | string | null
   status?: Prisma.StringFilter<"Appointment"> | string
   acceptedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  videoStartedPushAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   paymentMethod?: Prisma.StringFilter<"Appointment"> | string
   paymentStatus?: Prisma.StringFilter<"Appointment"> | string
@@ -2701,6 +2728,7 @@ export type AppointmentCreateWithoutDependentInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -2776,6 +2804,7 @@ export type AppointmentUncheckedCreateWithoutDependentInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -2865,6 +2894,7 @@ export type AppointmentCreateWithoutPrescriptionDocInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -2940,6 +2970,7 @@ export type AppointmentUncheckedCreateWithoutPrescriptionDocInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3029,6 +3060,7 @@ export type AppointmentCreateWithoutNurseServiceInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3104,6 +3136,7 @@ export type AppointmentUncheckedCreateWithoutNurseServiceInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3193,6 +3226,7 @@ export type AppointmentCreateWithoutVitalsInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3269,6 +3303,7 @@ export type AppointmentUncheckedCreateWithoutVitalsInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3347,6 +3382,7 @@ export type AppointmentUpdateWithoutVitalsInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3423,6 +3459,7 @@ export type AppointmentUncheckedUpdateWithoutVitalsInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3485,6 +3522,7 @@ export type AppointmentCreateWithoutPackageInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3560,6 +3598,7 @@ export type AppointmentUncheckedCreateWithoutPackageInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3649,6 +3688,7 @@ export type AppointmentCreateWithoutReferralGivenInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3725,6 +3765,7 @@ export type AppointmentUncheckedCreateWithoutReferralGivenInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3792,6 +3833,7 @@ export type AppointmentCreateWithoutNurseReferralInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3867,6 +3909,7 @@ export type AppointmentUncheckedCreateWithoutNurseReferralInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -3951,6 +3994,7 @@ export type AppointmentUpdateWithoutReferralGivenInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -4027,6 +4071,7 @@ export type AppointmentUncheckedUpdateWithoutReferralGivenInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -4105,6 +4150,7 @@ export type AppointmentCreateWithoutFollowUpsInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -4181,6 +4227,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -4248,6 +4295,7 @@ export type AppointmentCreateWithoutFollowUpOfInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -4324,6 +4372,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -4396,6 +4445,7 @@ export type AppointmentCreateWithoutReassignedToInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -4472,6 +4522,7 @@ export type AppointmentUncheckedCreateWithoutReassignedToInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -4539,6 +4590,7 @@ export type AppointmentCreateWithoutReassignedFromInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -4615,6 +4667,7 @@ export type AppointmentUncheckedCreateWithoutReassignedFromInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -4693,6 +4746,7 @@ export type AppointmentUpdateWithoutFollowUpsInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -4769,6 +4823,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -4858,6 +4913,7 @@ export type AppointmentUpdateWithoutReassignedToInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -4934,6 +4990,7 @@ export type AppointmentUncheckedUpdateWithoutReassignedToInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -5007,6 +5064,7 @@ export type AppointmentUpdateWithoutReassignedFromInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -5083,6 +5141,7 @@ export type AppointmentUncheckedUpdateWithoutReassignedFromInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -5145,6 +5204,7 @@ export type AppointmentCreateWithoutWalletTransactionInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -5221,6 +5281,7 @@ export type AppointmentUncheckedCreateWithoutWalletTransactionInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -5299,6 +5360,7 @@ export type AppointmentUpdateWithoutWalletTransactionInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -5375,6 +5437,7 @@ export type AppointmentUncheckedUpdateWithoutWalletTransactionInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -5437,6 +5500,7 @@ export type AppointmentCreateWithoutSettlementInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -5513,6 +5577,7 @@ export type AppointmentUncheckedCreateWithoutSettlementInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -5601,6 +5666,7 @@ export type AppointmentCreateWithoutMessagesInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -5677,6 +5743,7 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -5755,6 +5822,7 @@ export type AppointmentUpdateWithoutMessagesInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -5831,6 +5899,7 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -5893,6 +5962,7 @@ export type AppointmentCreateWithoutMedicinesInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -5969,6 +6039,7 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -6047,6 +6118,7 @@ export type AppointmentUpdateWithoutMedicinesInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -6123,6 +6195,7 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -6185,6 +6258,7 @@ export type AppointmentCreateWithoutTestsInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -6261,6 +6335,7 @@ export type AppointmentUncheckedCreateWithoutTestsInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -6339,6 +6414,7 @@ export type AppointmentUpdateWithoutTestsInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -6415,6 +6491,7 @@ export type AppointmentUncheckedUpdateWithoutTestsInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -6477,6 +6554,7 @@ export type AppointmentCreateWithoutPrescriptionVersionsInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -6553,6 +6631,7 @@ export type AppointmentUncheckedCreateWithoutPrescriptionVersionsInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -6631,6 +6710,7 @@ export type AppointmentUpdateWithoutPrescriptionVersionsInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -6707,6 +6787,7 @@ export type AppointmentUncheckedUpdateWithoutPrescriptionVersionsInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -6769,6 +6850,7 @@ export type AppointmentCreateWithoutAttachmentsInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -6845,6 +6927,7 @@ export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -6923,6 +7006,7 @@ export type AppointmentUpdateWithoutAttachmentsInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -6999,6 +7083,7 @@ export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -7061,6 +7146,7 @@ export type AppointmentCreateWithoutReviewInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -7137,6 +7223,7 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -7215,6 +7302,7 @@ export type AppointmentUpdateWithoutReviewInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -7291,6 +7379,7 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -7353,6 +7442,7 @@ export type AppointmentCreateWithoutClinicInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -7429,6 +7519,7 @@ export type AppointmentUncheckedCreateWithoutClinicInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -7517,6 +7608,7 @@ export type AppointmentCreateWithoutCouponInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -7593,6 +7685,7 @@ export type AppointmentUncheckedCreateWithoutCouponInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -7681,6 +7774,7 @@ export type AppointmentCreateWithoutCouponRedemptionInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -7757,6 +7851,7 @@ export type AppointmentUncheckedCreateWithoutCouponRedemptionInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -7835,6 +7930,7 @@ export type AppointmentUpdateWithoutCouponRedemptionInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -7911,6 +8007,7 @@ export type AppointmentUncheckedUpdateWithoutCouponRedemptionInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -7973,6 +8070,7 @@ export type AppointmentCreateWithoutPaymentOrderItemsInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -8049,6 +8147,7 @@ export type AppointmentUncheckedCreateWithoutPaymentOrderItemsInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -8127,6 +8226,7 @@ export type AppointmentUpdateWithoutPaymentOrderItemsInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -8203,6 +8303,7 @@ export type AppointmentUncheckedUpdateWithoutPaymentOrderItemsInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -8271,6 +8372,7 @@ export type AppointmentCreateManyPatientInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -8327,6 +8429,7 @@ export type AppointmentCreateManyDoctorInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -8377,6 +8480,7 @@ export type AppointmentUpdateWithoutPatientInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -8452,6 +8556,7 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -8521,6 +8626,7 @@ export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -8571,6 +8677,7 @@ export type AppointmentUpdateWithoutDoctorInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -8646,6 +8753,7 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -8715,6 +8823,7 @@ export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -8771,6 +8880,7 @@ export type AppointmentCreateManyDependentInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -8821,6 +8931,7 @@ export type AppointmentUpdateWithoutDependentInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -8896,6 +9007,7 @@ export type AppointmentUncheckedUpdateWithoutDependentInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -8965,6 +9077,7 @@ export type AppointmentUncheckedUpdateManyWithoutDependentInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9021,6 +9134,7 @@ export type AppointmentCreateManyPrescriptionDocInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -9071,6 +9185,7 @@ export type AppointmentUpdateWithoutPrescriptionDocInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9146,6 +9261,7 @@ export type AppointmentUncheckedUpdateWithoutPrescriptionDocInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9215,6 +9331,7 @@ export type AppointmentUncheckedUpdateManyWithoutPrescriptionDocInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9271,6 +9388,7 @@ export type AppointmentCreateManyNurseServiceInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -9321,6 +9439,7 @@ export type AppointmentUpdateWithoutNurseServiceInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9396,6 +9515,7 @@ export type AppointmentUncheckedUpdateWithoutNurseServiceInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9465,6 +9585,7 @@ export type AppointmentUncheckedUpdateManyWithoutNurseServiceInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9521,6 +9642,7 @@ export type AppointmentCreateManyPackageInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -9571,6 +9693,7 @@ export type AppointmentUpdateWithoutPackageInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9646,6 +9769,7 @@ export type AppointmentUncheckedUpdateWithoutPackageInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9715,6 +9839,7 @@ export type AppointmentUncheckedUpdateManyWithoutPackageInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9771,6 +9896,7 @@ export type AppointmentCreateManyNurseReferralInput = {
   packageIndex?: number | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -9821,6 +9947,7 @@ export type AppointmentUpdateWithoutNurseReferralInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9896,6 +10023,7 @@ export type AppointmentUncheckedUpdateWithoutNurseReferralInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9965,6 +10093,7 @@ export type AppointmentUncheckedUpdateManyWithoutNurseReferralInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10022,6 +10151,7 @@ export type AppointmentCreateManyFollowUpOfInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -10071,6 +10201,7 @@ export type AppointmentUpdateWithoutFollowUpOfInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10147,6 +10278,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10216,6 +10348,7 @@ export type AppointmentUncheckedUpdateManyWithoutFollowUpOfInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10272,6 +10405,7 @@ export type AppointmentCreateManySettlementInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -10321,6 +10455,7 @@ export type AppointmentUpdateWithoutSettlementInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10397,6 +10532,7 @@ export type AppointmentUncheckedUpdateWithoutSettlementInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10466,6 +10602,7 @@ export type AppointmentUncheckedUpdateManyWithoutSettlementInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10522,6 +10659,7 @@ export type AppointmentCreateManyClinicInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -10571,6 +10709,7 @@ export type AppointmentUpdateWithoutClinicInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10647,6 +10786,7 @@ export type AppointmentUncheckedUpdateWithoutClinicInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10716,6 +10856,7 @@ export type AppointmentUncheckedUpdateManyWithoutClinicInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10772,6 +10913,7 @@ export type AppointmentCreateManyCouponInput = {
   nurseReferralId?: string | null
   status?: string
   acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
   completedAt?: Date | string | null
   paymentMethod?: string
   paymentStatus?: string
@@ -10821,6 +10963,7 @@ export type AppointmentUpdateWithoutCouponInput = {
   packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10897,6 +11040,7 @@ export type AppointmentUncheckedUpdateWithoutCouponInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -10966,6 +11110,7 @@ export type AppointmentUncheckedUpdateManyWithoutCouponInput = {
   nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -11116,6 +11261,7 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   nurseReferralId?: boolean
   status?: boolean
   acceptedAt?: boolean
+  videoStartedPushAt?: boolean
   completedAt?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
@@ -11199,6 +11345,7 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   nurseReferralId?: boolean
   status?: boolean
   acceptedAt?: boolean
+  videoStartedPushAt?: boolean
   completedAt?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
@@ -11268,6 +11415,7 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   nurseReferralId?: boolean
   status?: boolean
   acceptedAt?: boolean
+  videoStartedPushAt?: boolean
   completedAt?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
@@ -11337,6 +11485,7 @@ export type AppointmentSelectScalar = {
   nurseReferralId?: boolean
   status?: boolean
   acceptedAt?: boolean
+  videoStartedPushAt?: boolean
   completedAt?: boolean
   paymentMethod?: boolean
   paymentStatus?: boolean
@@ -11370,7 +11519,7 @@ export type AppointmentSelectScalar = {
   createdAt?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "providerType" | "nurseServiceId" | "serviceName" | "prescriptionDocId" | "visitOtp" | "visitOtpAttempts" | "visitStartedAt" | "visitStartNote" | "packageId" | "packageIndex" | "nurseReferralId" | "status" | "acceptedAt" | "completedAt" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "couponId" | "couponCode" | "discountAmount" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "visitAddress" | "visitLandmark" | "visitPinCode" | "visitLat" | "visitLng" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "reassignedFromId" | "clinicId" | "scheduledAt" | "requestedScheduledAt" | "reminderSentAt" | "createdAt", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "providerType" | "nurseServiceId" | "serviceName" | "prescriptionDocId" | "visitOtp" | "visitOtpAttempts" | "visitStartedAt" | "visitStartNote" | "packageId" | "packageIndex" | "nurseReferralId" | "status" | "acceptedAt" | "videoStartedPushAt" | "completedAt" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "couponId" | "couponCode" | "discountAmount" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "visitAddress" | "visitLandmark" | "visitPinCode" | "visitLat" | "visitLng" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "reassignedFromId" | "clinicId" | "scheduledAt" | "requestedScheduledAt" | "reminderSentAt" | "createdAt", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -11481,6 +11630,7 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     nurseReferralId: string | null
     status: string
     acceptedAt: Date | null
+    videoStartedPushAt: Date | null
     completedAt: Date | null
     paymentMethod: string
     paymentStatus: string
@@ -11983,6 +12133,7 @@ export interface AppointmentFieldRefs {
   readonly nurseReferralId: Prisma.FieldRef<"Appointment", 'String'>
   readonly status: Prisma.FieldRef<"Appointment", 'String'>
   readonly acceptedAt: Prisma.FieldRef<"Appointment", 'DateTime'>
+  readonly videoStartedPushAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly paymentMethod: Prisma.FieldRef<"Appointment", 'String'>
   readonly paymentStatus: Prisma.FieldRef<"Appointment", 'String'>

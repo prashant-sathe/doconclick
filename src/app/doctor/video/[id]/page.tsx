@@ -7,19 +7,21 @@ import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import VideoCallRoom from "@/components/VideoCallRoom";
-import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
+import { VIDEO_UNLOCK_DELAY_SECONDS, videoJoinWindow } from "@/lib/videoCall";
+import { useVideoAppointment } from "@/lib/useVideoAppointment";
 
 interface VideoAppointment {
   status: string;
   consultType: string;
   paymentStatus: string;
   paidAt: string | null;
+  scheduledAt: string;
+  createdAt: string;
+  acceptedAt: string | null;
   patientName: string | null;
   relation: string;
   patient: { name: string };
 }
-
-const POLL_MS = 3000;
 
 function patientLabel(a: VideoAppointment): string {
   return a.relation !== "Self" && a.patientName ? a.patientName : a.patient.name;
@@ -29,8 +31,6 @@ export default function DoctorVideoCallPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const [appt, setAppt] = useState<VideoAppointment | null>(null);
-  const [error, setError] = useState("");
   const [now, setNow] = useState(() => Date.now());
   const [started, setStarted] = useState(false);
 
@@ -39,16 +39,8 @@ export default function DoctorVideoCallPage() {
     if (!authLoading && user && user.role !== "DOCTOR") router.push("/login");
   }, [authLoading, user, router, params.id]);
 
-  useEffect(() => {
-    if (!user || user.role !== "DOCTOR") return;
-    const load = () => fetch(`/api/appointments/${params.id}`).then(async (r) => {
-      if (!r.ok) { setError((await r.json().catch(() => ({}))).error ?? "Could not load this appointment."); return; }
-      setAppt(await r.json());
-    });
-    load();
-    const interval = setInterval(load, POLL_MS);
-    return () => clearInterval(interval);
-  }, [user, params.id]);
+  // Tolerates a failed poll — never swaps a live call out for an error.
+  const { appt, error, connectionWarning } = useVideoAppointment<VideoAppointment>(params.id, user?.role === "DOCTOR");
 
   useEffect(() => {
     const tick = setInterval(() => setNow(Date.now()), 1000);
@@ -65,6 +57,9 @@ export default function DoctorVideoCallPage() {
   const paid = appt?.paymentStatus === "PAID";
   const unlockAt = appt?.paidAt ? new Date(appt.paidAt).getTime() + VIDEO_UNLOCK_DELAY_SECONDS * 1000 : 0;
   const unlockRemainingSec = Math.max(0, Math.ceil((unlockAt - now) / 1000));
+  // Same window the video-token route enforces.
+  const joinWindow = appt ? videoJoinWindow(appt) : null;
+  const fmtTime = (t: number) => new Date(t).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -89,7 +84,12 @@ export default function DoctorVideoCallPage() {
             </div>
           </div>
 
-          {error ? (
+          {connectionWarning && (
+            <div className="px-5 py-1.5 bg-amber-50 text-amber-700 text-[11px] font-semibold text-center flex-shrink-0">
+              Connection to DocOnClick is unstable — the call continues, retrying…
+            </div>
+          )}
+          {error && !appt ? (
             <div className="flex-1 flex items-center justify-center text-sm text-slate-400 text-center px-6">{error}</div>
           ) : !appt ? (
             <div className="flex-1 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-slate-300" /></div>
@@ -110,6 +110,17 @@ export default function DoctorVideoCallPage() {
               <p className="text-xs text-slate-400">
                 Consultation will start at {new Date(unlockAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
               </p>
+            </div>
+          ) : !started && joinWindow && now < joinWindow.opensAt ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
+              <Clock className="w-6 h-6 text-amber-400" />
+              <p className="text-sm text-slate-500">The video consultation opens at {fmtTime(joinWindow.opensAt)}.</p>
+              <p className="text-xs text-slate-400">You can join a few minutes before the appointment time.</p>
+            </div>
+          ) : !started && joinWindow && now > joinWindow.closesAt ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
+              <Clock className="w-6 h-6 text-slate-400" />
+              <p className="text-sm text-slate-500">The time for this video consultation has passed.</p>
             </div>
           ) : !started ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-3">
