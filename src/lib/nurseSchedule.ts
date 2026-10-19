@@ -6,6 +6,17 @@ import { isDoctorAvailableNow, formatAvailability } from "@/lib/availability";
 export const NURSE_TRAVEL_BUFFER_MIN = 30;
 const DEFAULT_VISIT_MIN = 60;
 
+/**
+ * How far back a confirmed visit can start and still overlap a moment: the
+ * longest service in the catalogue (inactive ones too — old bookings may
+ * still use them) plus travel. A 24h shift started yesterday at 7 AM still
+ * covers this morning, which a fixed ±1 day window would miss.
+ */
+async function longestVisitMs(): Promise<number> {
+  const { _max } = await prisma.nurseService.aggregate({ _max: { durationMinutes: true } });
+  return (Math.max(_max.durationMinutes ?? 0, DEFAULT_VISIT_MIN) + NURSE_TRAVEL_BUFFER_MIN) * 60000;
+}
+
 const fmt = (d: Date) =>
   d.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
 
@@ -21,7 +32,7 @@ export async function nursesBusyNow(nurseIds: string[]): Promise<Set<string>> {
     where: {
       doctorId: { in: nurseIds },
       status: "SCHEDULED",
-      scheduledAt: { gte: new Date(now - 24 * 60 * 60 * 1000), lte: new Date(now) },
+      scheduledAt: { gte: new Date(now - (await longestVisitMs())), lte: new Date(now) },
     },
     select: { doctorId: true, scheduledAt: true, nurseService: { select: { durationMinutes: true } } },
   });
@@ -56,14 +67,14 @@ export async function nurseSlotProblem(params: {
       : `That time is outside your working hours (${formatAvailability(availability)}).`;
   }
 
-  // Longest service is a few hours — a ±1 day window is plenty to find overlaps.
-  const dayMs = 24 * 60 * 60 * 1000;
+  // Anything that could overlap [when, when + duration): visits starting up
+  // to the longest service (+ travel) before it, through to its own end.
   const nearby = await prisma.appointment.findMany({
     where: {
       doctorId: nurseId,
       status: "SCHEDULED",
       ...(excludeAppointmentId ? { id: { not: excludeAppointmentId } } : {}),
-      scheduledAt: { gte: new Date(when.getTime() - dayMs), lte: new Date(when.getTime() + dayMs) },
+      scheduledAt: { gte: new Date(when.getTime() - (await longestVisitMs())), lt: new Date(when.getTime() + duration * 60000) },
     },
     select: { scheduledAt: true, serviceName: true, nurseService: { select: { durationMinutes: true } } },
   });

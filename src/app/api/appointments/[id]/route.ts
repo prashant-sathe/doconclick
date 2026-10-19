@@ -8,7 +8,7 @@ import { refundAppointmentToWallet } from "@/lib/wallet";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
-import { shiftCompleteProblem } from "@/lib/nursePackage";
+import { shiftCompleteProblem, isShift, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
 import { netPayable } from "@/lib/coupons";
 import { cancelAndRefund, claimStatusChange, isAlreadyClosed, ALREADY_CLOSED_MESSAGE } from "@/lib/appointmentCancel";
 import { cancelAndReassign } from "@/lib/reassignment";
@@ -528,6 +528,11 @@ export async function PATCH(
             ? prisma.nurseService.findUnique({ where: { id: appointment.nurseServiceId }, select: { durationMinutes: true, kind: true } })
             : null,
         ]);
+        // Same lead time as booking a shift (nurse-bookings): planned care, so
+        // the nurse needs at least an hour's notice of the new start.
+        if (isShift(svc) && when.getTime() < Date.now() + SHIFT_MIN_LEAD_MS) {
+          return NextResponse.json({ error: "Pick the shift's new start time — at least an hour from now." }, { status: 400 });
+        }
         const problem = await nurseSlotProblem({
           nurseId: appointment.doctorId,
           availability: nurseProfile?.availability,

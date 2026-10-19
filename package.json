@@ -44,7 +44,8 @@
     "test:doctor-subscription": "tsx tests/doctor-subscription.ts",
     "test:video": "tsx tests/video-call.ts",
     "test:reassign-accept": "tsx tests/reassign-accept.ts",
-    "test:journey": "tsx tests/journey.ts"
+    "test:journey": "tsx tests/journey.ts",
+    "test:nurse-shifts": "tsx tests/nurse-shifts.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
