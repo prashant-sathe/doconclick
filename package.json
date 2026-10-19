@@ -43,7 +43,8 @@
     "test:chat-access": "tsx tests/chat-access.ts",
     "test:doctor-subscription": "tsx tests/doctor-subscription.ts",
     "test:video": "tsx tests/video-call.ts",
-    "test:reassign-accept": "tsx tests/reassign-accept.ts"
+    "test:reassign-accept": "tsx tests/reassign-accept.ts",
+    "test:journey": "tsx tests/journey.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

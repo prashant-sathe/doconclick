@@ -864,7 +864,11 @@ export default function DoctorDashboard() {
   const lastSentRef = useRef<number>(0);
   const [startingJourneyId, setStartingJourneyId] = useState<string | null>(null);
 
-  const sendPosition = (apptId: string, travelStatus: "ON_THE_WAY" | "ARRIVED", lat?: number, lng?: number) => {
+  // "Start journey" / "Stop journey" both notify the patient — confirm first.
+  const [journeyConfirm, setJourneyConfirm] = useState<{ appt: Appointment; action: "start" | "stop" } | null>(null);
+  const [journeyError, setJourneyError] = useState<{ id: string; message: string } | null>(null);
+
+  const sendPosition = (apptId: string, travelStatus: "NOT_STARTED" | "ON_THE_WAY" | "ARRIVED", lat?: number, lng?: number) => {
     return fetch(`/api/appointments/${apptId}/travel`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -872,59 +876,65 @@ export default function DoctorDashboard() {
     });
   };
 
-  const startJourney = (apptId: string) => {
-    setStartingJourneyId(apptId);
-
+  const stopWatch = async () => {
     if (isNative()) {
-      // Native: a background-geolocation watcher survives the app being
-      // backgrounded/screen locked, unlike navigator.geolocation below.
-      getCurrentPositionCompat({ enableHighAccuracy: true })
-        .then(async (pos) => {
-          await sendPosition(apptId, "ON_THE_WAY", pos.coords.latitude, pos.coords.longitude);
-          setStartingJourneyId(null);
-          loadAppointments();
-          lastSentRef.current = Date.now();
-          await startBackgroundLocationWatch((lat, lng) => {
-            const now = Date.now();
-            if (now - lastSentRef.current < 10000) return; // throttle to ~1 update/10s
-            lastSentRef.current = now;
-            sendPosition(apptId, "ON_THE_WAY", lat, lng);
-          });
-        })
-        .catch(() => setStartingJourneyId(null));
-      return;
-    }
-
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        await sendPosition(apptId, "ON_THE_WAY", pos.coords.latitude, pos.coords.longitude);
-        setStartingJourneyId(null);
-        loadAppointments();
-        if (watchIdRef.current != null) navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = navigator.geolocation.watchPosition(
-          (p) => {
-            const now = Date.now();
-            if (now - lastSentRef.current < 10000) return; // throttle to ~1 update/10s
-            lastSentRef.current = now;
-            sendPosition(apptId, "ON_THE_WAY", p.coords.latitude, p.coords.longitude);
-          },
-          () => {},
-          { enableHighAccuracy: true }
-        );
-      },
-      () => setStartingJourneyId(null),
-      { enableHighAccuracy: true }
-    );
-  };
-
-  const markArrived = async (apptId: string) => {
-    if (isNative()) {
-      await stopBackgroundLocationWatch();
+      await stopBackgroundLocationWatch().catch(() => {});
     } else if (watchIdRef.current != null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
     }
+  };
+
+  const startJourney = async (apptId: string) => {
+    setStartingJourneyId(apptId);
+    setJourneyError(null);
+    try {
+      const pos = await getCurrentPositionCompat({ enableHighAccuracy: true });
+      const res = await sendPosition(apptId, "ON_THE_WAY", pos.coords.latitude, pos.coords.longitude);
+      // The server refuses outside the start window (src/lib/journeyWindow.ts)
+      // — don't start sharing location then.
+      if (!res.ok) {
+        setJourneyError({ id: apptId, message: (await res.json().catch(() => ({}))).error ?? "Could not start the journey." });
+        return;
+      }
+      lastSentRef.current = Date.now();
+      const onMove = (lat: number, lng: number) => {
+        const now = Date.now();
+        if (now - lastSentRef.current < 10000) return; // throttle to ~1 update/10s
+        lastSentRef.current = now;
+        sendPosition(apptId, "ON_THE_WAY", lat, lng);
+      };
+      if (isNative()) {
+        // Native: a background-geolocation watcher survives the app being
+        // backgrounded/screen locked, unlike navigator.geolocation below.
+        await startBackgroundLocationWatch(onMove);
+      } else if (navigator.geolocation) {
+        if (watchIdRef.current != null) navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = navigator.geolocation.watchPosition(
+          (p) => onMove(p.coords.latitude, p.coords.longitude),
+          () => {},
+          { enableHighAccuracy: true }
+        );
+      }
+    } catch {
+      setJourneyError({ id: apptId, message: "Location access is needed to share your journey with the patient." });
+    } finally {
+      setStartingJourneyId(null);
+      loadAppointments();
+    }
+  };
+
+  // Back to "not started" — e.g. tapped by mistake, or turned back.
+  const stopJourney = async (apptId: string) => {
+    setJourneyError(null);
+    await stopWatch();
+    const res = await sendPosition(apptId, "NOT_STARTED");
+    if (!res.ok) setJourneyError({ id: apptId, message: (await res.json().catch(() => ({}))).error ?? "Could not stop the journey." });
+    loadAppointments();
+  };
+
+  const markArrived = async (apptId: string) => {
+    await stopWatch();
     await sendPosition(apptId, "ARRIVED");
     loadAppointments();
   };
@@ -1419,15 +1429,23 @@ export default function DoctorDashboard() {
                           <RescheduleRequestBox appointmentId={a.id} requestedAt={a.requestedScheduledAt} onDone={loadAppointments} />
                         )}
 
+                        {journeyError?.id === a.id && (
+                          <div className="text-xs text-red-600 mt-2">{journeyError.message}</div>
+                        )}
                         <div className="flex items-center gap-2 mt-3">
                           {a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (
-                            <button onClick={() => startJourney(a.id)} disabled={startingJourneyId === a.id} className="btn-secondary flex-1 h-11 justify-center text-blue-600 border-blue-200 hover:bg-blue-50">
+                            <button onClick={() => setJourneyConfirm({ appt: a, action: "start" })} disabled={startingJourneyId === a.id} className="btn-secondary flex-1 h-11 justify-center text-blue-600 border-blue-200 hover:bg-blue-50">
                               {startingJourneyId === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Car className="w-4 h-4" />} Start Journey
                             </button>
                           )}
                           {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
                             <button onClick={() => markArrived(a.id)} className="btn-secondary flex-1 h-11 justify-center text-emerald-600 border-emerald-200 hover:bg-emerald-50">
                               <MapPinCheck className="w-4 h-4" /> Mark Arrived
+                            </button>
+                          )}
+                          {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
+                            <button onClick={() => setJourneyConfirm({ appt: a, action: "stop" })} className="btn-secondary h-11 px-3 justify-center text-slate-500 text-xs" title="Stop sharing your journey">
+                              Stop
                             </button>
                           )}
                           {a.consultType === "VIDEO" && a.paymentStatus === "PAID" && (
@@ -1714,6 +1732,28 @@ export default function DoctorDashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Start / stop journey confirmation */}
+      {journeyConfirm && (
+        <ConfirmDialog
+          icon={Car}
+          tone={journeyConfirm.action === "start" ? "primary" : "warning"}
+          title={journeyConfirm.action === "start" ? `Start your journey to ${patientLabel(journeyConfirm.appt)}?` : "Stop the journey?"}
+          message={journeyConfirm.action === "start"
+            ? "The patient will be told you're on the way and can follow your live location until you arrive."
+            : "Your live location stops being shared and the patient is told you're not on the way right now. You can start again later."}
+          confirmLabel={journeyConfirm.action === "start" ? "Start Journey" : "Stop Journey"}
+          busyLabel={journeyConfirm.action === "start" ? "Starting…" : "Stopping…"}
+          busy={startingJourneyId === journeyConfirm.appt.id}
+          onCancel={() => setJourneyConfirm(null)}
+          onConfirm={async () => {
+            const { appt, action } = journeyConfirm;
+            if (action === "start") await startJourney(appt.id);
+            else await stopJourney(appt.id);
+            setJourneyConfirm(null);
+          }}
+        />
       )}
 
       {/* Bulk accept confirmation */}

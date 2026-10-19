@@ -289,6 +289,8 @@ export default function NurseDashboardPage() {
   const [completeTarget, setCompleteTarget] = useState<Visit | null>(null);
   const [visitNotes, setVisitNotes] = useState("");
   const [cancelTarget, setCancelTarget] = useState<Visit | null>(null);
+  // "Start journey" / "Stop journey" both notify the patient — confirm first.
+  const [journeyConfirm, setJourneyConfirm] = useState<{ visit: Visit; action: "start" | "stop" } | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/nurse/dashboard");
@@ -313,7 +315,7 @@ export default function NurseDashboardPage() {
   // ── Live journey tracking (same flow as the doctor dashboard) ──
   const watchIdRef = useRef<number | null>(null);
   const lastSentRef = useRef(0);
-  const sendPosition = (id: string, travelStatus: "ON_THE_WAY" | "ARRIVED", lat?: number, lng?: number) =>
+  const sendPosition = (id: string, travelStatus: "NOT_STARTED" | "ON_THE_WAY" | "ARRIVED", lat?: number, lng?: number) =>
     fetch(`/api/appointments/${id}/travel`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -347,10 +349,24 @@ export default function NurseDashboardPage() {
     }
   };
 
-  const markArrived = async (id: string) => {
-    setBusyId(id); setError("");
+  const stopWatch = async () => {
     if (isNative()) await stopBackgroundLocationWatch().catch(() => {});
     else if (watchIdRef.current != null) { navigator.geolocation.clearWatch(watchIdRef.current); watchIdRef.current = null; }
+  };
+
+  // Back to "not started" — e.g. tapped by mistake, or turned back.
+  const stopJourney = async (id: string) => {
+    setBusyId(id); setError("");
+    await stopWatch();
+    const res = await sendPosition(id, "NOT_STARTED");
+    if (!res.ok) setError((await res.json().catch(() => ({}))).error ?? "Could not stop the journey.");
+    setBusyId(null);
+    load();
+  };
+
+  const markArrived = async (id: string) => {
+    setBusyId(id); setError("");
+    await stopWatch();
     const res = await sendPosition(id, "ARRIVED");
     if (!res.ok) setError((await res.json().catch(() => ({}))).error ?? "Could not update.");
     setBusyId(null);
@@ -542,13 +558,18 @@ export default function NurseDashboardPage() {
                       </div>
                       <div className="mt-3">
                         {v.travelStatus === "NOT_STARTED" && (
-                          <button disabled={busy} onClick={() => startJourney(v.id)} className="btn-primary w-full justify-center py-2.5 text-sm">
+                          <button disabled={busy} onClick={() => setJourneyConfirm({ visit: v, action: "start" })} className="btn-primary w-full justify-center py-2.5 text-sm">
                             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Car className="w-4 h-4" />} Start journey
                           </button>
                         )}
                         {v.travelStatus === "ON_THE_WAY" && (
                           <button disabled={busy} onClick={() => markArrived(v.id)} className="btn-primary w-full justify-center py-2.5 text-sm">
                             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flag className="w-4 h-4" />} I&apos;ve arrived
+                          </button>
+                        )}
+                        {v.travelStatus === "ON_THE_WAY" && (
+                          <button disabled={busy} onClick={() => setJourneyConfirm({ visit: v, action: "stop" })} className="w-full text-xs font-semibold text-slate-500 mt-2 py-1 hover:text-slate-700">
+                            Stop journey
                           </button>
                         )}
                         {v.travelStatus === "ARRIVED" && !v.visitStartedAt && (
@@ -621,6 +642,27 @@ export default function NurseDashboardPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {journeyConfirm && (
+        <ConfirmDialog
+          icon={Car}
+          tone={journeyConfirm.action === "start" ? "primary" : "warning"}
+          title={journeyConfirm.action === "start" ? `Start your journey to ${patientLabel(journeyConfirm.visit)}?` : "Stop the journey?"}
+          message={journeyConfirm.action === "start"
+            ? "The patient will be told you're on the way and can follow your live location until you arrive."
+            : "Your live location stops being shared and the patient is told you're not on the way right now. You can start again later."}
+          confirmLabel={journeyConfirm.action === "start" ? "Start journey" : "Stop journey"}
+          busyLabel={journeyConfirm.action === "start" ? "Starting…" : "Stopping…"}
+          busy={busyId === journeyConfirm.visit.id}
+          onCancel={() => setJourneyConfirm(null)}
+          onConfirm={async () => {
+            const { visit, action } = journeyConfirm;
+            if (action === "start") await startJourney(visit.id);
+            else await stopJourney(visit.id);
+            setJourneyConfirm(null);
+          }}
+        />
       )}
 
       {cancelTarget && (
