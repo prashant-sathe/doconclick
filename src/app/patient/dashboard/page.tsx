@@ -299,7 +299,7 @@ function DoctorListCard({
 // PAGE COMPONENT
 // ══════════════════════════════════════════════════════════════════════════
 function PatientDashboardInner() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, requireTerms } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { specialties, colorFor } = useSpecialties();
@@ -939,6 +939,7 @@ function PatientDashboardInner() {
     setBooking(false);
     setConfirmBookingOpen(false);
     if (res.ok) setBooked({ id: data.id, fee });
+    else if (data.code === "TERMS_REQUIRED") requireTerms(() => setConfirmBookingOpen(true));
     else if (data.code === "PROFILE_INCOMPLETE") profileGate.open(data.missing, () => setConfirmBookingOpen(true));
     else setBookingError(data.error ?? "Booking failed. Please try again.");
   };

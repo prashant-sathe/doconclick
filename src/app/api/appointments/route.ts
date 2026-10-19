@@ -75,6 +75,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
     }
 
+    // The Terms gate in AuthProvider is client-side only — enforce it here so
+    // an old app build or a direct API call can't book without accepting.
+    if (!patient.termsAcceptedAt) {
+      return NextResponse.json(
+        { error: "Please accept the Terms of Service and Privacy Policy to book.", code: "TERMS_REQUIRED" },
+        { status: 409 }
+      );
+    }
+
     // Quick signup skips name/age/gender — they're collected by the booking
     // page's profile sheet, and enforced here so no appointment is ever
     // created without them.

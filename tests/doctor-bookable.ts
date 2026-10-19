@@ -50,7 +50,7 @@ async function main() {
   doctors.deleted = deleted;
 
   const patient = await prisma.user.create({
-    data: { name: "Bookable Test Patient", mobile: `6${stamp}0`, role: "PATIENT", patientProfile: { create: { age: 30, gender: "Male" } } },
+    data: { name: "Bookable Test Patient", mobile: `6${stamp}0`, role: "PATIENT", termsAcceptedAt: new Date(), patientProfile: { create: { age: 30, gender: "Male" } } },
   });
   ids.push(patient.id);
   const cookie = `doconclick_token=${jwt.sign({ id: patient.id, name: patient.name, role: "PATIENT", mobile: patient.mobile, tv: 0 }, SECRET)}`;

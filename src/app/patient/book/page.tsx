@@ -132,7 +132,7 @@ function feeForConsultType(profile: Doctor["doctorProfile"], consultType: string
 }
 
 function PatientBookInner() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, requireTerms } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { colorFor } = useSpecialties();
@@ -347,6 +347,7 @@ function PatientBookInner() {
     setLoading(false);
     setConfirmOpen(false);
     if (res.ok) { setFee(currentFee); setAppointmentId(data.id); setBooked(true); }
+    else if (data.code === "TERMS_REQUIRED") requireTerms(() => setConfirmOpen(true));
     else if (data.code === "PROFILE_INCOMPLETE") profileGate.open(data.missing, () => setConfirmOpen(true));
     else setError(data.error ?? "Booking failed. Please try again.");
   };

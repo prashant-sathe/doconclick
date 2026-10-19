@@ -49,12 +49,12 @@ async function main() {
   const profile = (extra: Record<string, unknown> = {}) => ({
     create: { age: 30, gender: "Female", homeAddress: "12 Old Lane, Pune", landmark: "Near Temple", pinCode: "411001", ...HOME_A, ...extra },
   });
-  const patient = await mk("PATIENT", { patientProfile: profile() });
-  const noCoords = await mk("PATIENT", { patientProfile: profile({ lat: null, lng: null }) });
+  const patient = await mk("PATIENT", { termsAcceptedAt: new Date(), patientProfile: profile() });
+  const noCoords = await mk("PATIENT", { termsAcceptedAt: new Date(), patientProfile: profile({ lat: null, lng: null }) });
   const nurse = await mk("NURSE", {
     nurseProfile: {
       create: {
-        status: "APPROVED", ...HOME_A, radius: 10, availability: "",
+        status: "APPROVED", ...HOME_A, radius: 10, availability: "Sun-Sat, 12AM-11:59PM", // ~24×7 — bookings land at arbitrary hours
         registrationFeePaid: true, subscriptionPaidUntil: new Date(Date.now() + 30 * DAY),
       },
     },
@@ -84,7 +84,7 @@ async function main() {
     const booked = await prisma.appointment.findUnique({ where: { id: r.json.id ?? "" } });
     check("nurse booking snapshots the visit address", r.status === 200 && booked?.visitAddress === visitB.address
       && booked.visitLandmark === "Opp. Park" && booked.visitPinCode === "411045" && booked.visitLat === NEAR.lat && booked.visitLng === NEAR.lng,
-      `${r.status} ${booked?.visitAddress}`);
+      `${r.status} ${booked?.visitAddress ?? JSON.stringify(r.json)}`);
 
     await prisma.patientProfile.update({ where: { userId: patient.id }, data: { homeAddress: "99 Moved Away Rd", lat: FAR.lat, lng: FAR.lng } });
     const after = await prisma.appointment.findUniqueOrThrow({ where: { id: booked!.id } });

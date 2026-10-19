@@ -53,6 +53,14 @@ export async function POST(req: Request) {
   if (!patient) {
     return NextResponse.json({ error: "Your session has expired. Please log in again." }, { status: 401 });
   }
+  // The Terms gate in AuthProvider is client-side only — enforce it here so
+  // an old app build or a direct API call can't book without accepting.
+  if (!patient.termsAcceptedAt) {
+    return NextResponse.json(
+      { error: "Please accept the Terms of Service and Privacy Policy to book.", code: "TERMS_REQUIRED" },
+      { status: 409 }
+    );
+  }
   const missing = missingProfileFields(patient.name, patient.patientProfile, { forDependent: !!dependent });
   if (missing.length > 0) {
     return NextResponse.json(

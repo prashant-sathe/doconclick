@@ -45,7 +45,7 @@ async function main() {
     patientProfile: { create: { age: 30, gender: "Male", homeAddress: "12 Test Lane", emergencyContactPhone: "9000000000", allergies: "Peanuts" } },
   });
   const otherPatient = await mk({
-    name: "Del Test Patient 2", mobile: "62" + stamp.slice(1), role: "PATIENT",
+    name: "Del Test Patient 2", mobile: "62" + stamp.slice(1), role: "PATIENT", termsAcceptedAt: new Date(),
     patientProfile: { create: { age: 40, gender: "Female" } },
   });
   const doctor = await mk({
@@ -144,7 +144,7 @@ async function main() {
       `${doc.name} / reg ${doc.doctorProfile?.medRegNo} / bio ${doc.doctorProfile?.bio}`);
     const staffRow = await prisma.user.findUniqueOrThrow({ where: { id: staff.id }, include: { staffAccount: true } });
     check("doctor's staff deleted too", !!staffRow.deletedAt && staffRow.staffAccount?.active === false && staffRow.mobile === `deleted_${staff.id}`, staffRow.mobile);
-    r = await call(otherPatient, "POST", "/api/appointments", { doctorId: doctor.id, symptoms: "x", consultType: "VIDEO", consentGiven: true });
+    r = await call(otherPatient, "POST", "/api/appointments", { doctorId: doctor.id, symptoms: "fever", consultType: "VIDEO", consentGiven: true });
     check("can't book a deleted doctor", r.status === 404, `${r.status} ${r.json.error}`);
 
     // ── Nurse ──

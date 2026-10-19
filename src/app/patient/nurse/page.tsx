@@ -48,7 +48,7 @@ function localInputValue(d: Date) {
 }
 
 function PatientNurseContent() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, requireTerms } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   // "Book Again" from a completed visit: ?nurseId=…&serviceId=…
@@ -338,7 +338,8 @@ function PatientNurseContent() {
       const data = await res.json().catch(() => ({}));
       setConfirmOpen(false);
       if (res.ok) { setBooked(true); window.scrollTo({ top: 0 }); return; }
-      if (data.code === "PROFILE_INCOMPLETE") profileGate.open(data.missing, () => setConfirmOpen(true));
+      if (data.code === "TERMS_REQUIRED") requireTerms(() => setConfirmOpen(true));
+      else if (data.code === "PROFILE_INCOMPLETE") profileGate.open(data.missing, () => setConfirmOpen(true));
       else setError(data.error ?? "Booking failed. Please try again.");
     } catch (err) {
       setConfirmOpen(false);
