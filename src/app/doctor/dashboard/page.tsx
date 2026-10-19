@@ -48,6 +48,7 @@ interface DoctorMe {
 interface Appointment {
   id: string;
   patientId: string;
+  referralGiven?: { id: string; service: { name: string } } | null;
   // Latest vitals a nurse recorded for this patient in the last 30 days.
   latestVitals?: (VitalsInput & { recordedAt: string; alertLevel: string; alerts: string | null }) | null;
   recentVitalsCount?: number;
@@ -741,6 +742,19 @@ export default function DoctorDashboard() {
   }, [user, router]);
 
   const unreadTotalRef = useRef<number | null>(null);
+  const [removingReferral, setRemovingReferral] = useState<string | null>(null);
+  const removeReferral = async (appointmentId: string) => {
+    setRemovingReferral(appointmentId);
+    try {
+      const res = await fetch(`/api/appointments/${appointmentId}/nurse-referral`, { method: "DELETE" });
+      if (res.ok) {
+        setAppointments((list) => list.map((x) => (x.id === appointmentId ? { ...x, referralGiven: null } : x)));
+      }
+    } finally {
+      setRemovingReferral(null);
+    }
+  };
+
   const loadAppointments = useCallback(() => {
     fetch("/api/appointments/me")
       .then((r) => (r.ok ? r.json() : []))
@@ -1581,7 +1595,21 @@ export default function DoctorDashboard() {
                       {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
                     </div>
                   </div>
-                  <span className="badge badge-danger">Cancelled</span>
+                  <div className="flex flex-col items-end gap-1.5">
+                    <span className="badge badge-danger">Cancelled</span>
+                    {/* A referral on a cancelled consultation is void (src/lib/nurseReferral.ts) — let the doctor clear it. */}
+                    {a.referralGiven && !isStaff && (
+                      <button
+                        type="button"
+                        onClick={() => removeReferral(a.id)}
+                        disabled={removingReferral === a.id}
+                        className="text-[11px] font-semibold text-red-500 hover:underline disabled:opacity-50"
+                        title={`Nurse referral for ${a.referralGiven.service.name} — no longer valid`}
+                      >
+                        {removingReferral === a.id ? "Removing…" : `Remove nurse referral (${a.referralGiven.service.name})`}
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

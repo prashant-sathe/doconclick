@@ -197,8 +197,13 @@ function PatientNurseContent() {
 
   useEffect(() => {
     if (!referralId || !user?.id) return;
-    fetch(`/api/nurse-referrals/${referralId}`).then((r) => (r.ok ? r.json() : null)).then((r) => {
-      if (!r) { setNotice("That referral wasn't found — you can still book a nurse below."); return; }
+    fetch(`/api/nurse-referrals/${referralId}`).then(async (res) => {
+      const r = await res.json().catch(() => null);
+      if (!res.ok || !r) {
+        // e.g. the consultation it came from was cancelled (src/lib/nurseReferral.ts).
+        setNotice(`${r?.error ?? "That referral wasn't found."} You can still book a nurse below.`);
+        return;
+      }
       setReferral(r);
       setVisits(r.visits);
       setIntervalDays(r.intervalDays);

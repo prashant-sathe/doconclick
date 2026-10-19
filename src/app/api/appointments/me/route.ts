@@ -93,6 +93,8 @@ export async function GET() {
             patientProfile: { select: { lat: true, lng: true, homeAddress: true, landmark: true, pinCode: true } },
           },
         },
+        // So a cancelled consultation can show its (now void) referral for removal.
+        referralGiven: { select: { id: true, service: { select: { name: true } } } },
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });

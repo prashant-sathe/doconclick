@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { referralProblem, REFERRAL_INACTIVE_CODE } from "@/lib/nurseReferral";
 
 // GET: a referral from one of the patient's own consultations — what the
 // nurse booking form needs to pre-fill and to show "prescription attached".
@@ -14,12 +15,14 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     where: { id },
     include: {
       service: { select: { id: true, name: true } },
-      appointment: { select: { patientId: true, scheduledAt: true, doctor: { select: { name: true } } } },
+      appointment: { select: { patientId: true, status: true, scheduledAt: true, doctor: { select: { name: true } } } },
     },
   });
   if (!referral || referral.appointment.patientId !== authUser.id) {
     return NextResponse.json({ error: "Referral not found" }, { status: 404 });
   }
+  const inactive = referralProblem(referral.appointment.status);
+  if (inactive) return NextResponse.json({ error: inactive, code: REFERRAL_INACTIVE_CODE }, { status: 409 });
   return NextResponse.json({
     id: referral.id,
     service: referral.service,

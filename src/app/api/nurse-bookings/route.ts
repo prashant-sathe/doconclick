@@ -8,6 +8,7 @@ import { missingProfileFields } from "@/lib/bookingProfile";
 import { isNurseBookable } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
 import { buildVisitSchedule, intervalLabel, isShift, shiftLabel, PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
+import { referralProblem, REFERRAL_INACTIVE_CODE } from "@/lib/nurseReferral";
 import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, openRequestsProblem } from "@/lib/bookingLimits";
 
 // POST: patient books a nurse home visit (or a multi-visit package) for one service. Stored as a
@@ -167,11 +168,15 @@ export async function POST(req: Request) {
   if (body.nurseReferralId) {
     const found = await prisma.nurseReferral.findUnique({
       where: { id: String(body.nurseReferralId) },
-      include: { appointment: { select: { patientId: true } }, service: { select: { name: true } } },
+      include: { appointment: { select: { patientId: true, status: true } }, service: { select: { name: true } } },
     });
     if (!found || found.appointment.patientId !== authUser.id) {
       return NextResponse.json({ error: "That doctor's referral wasn't found." }, { status: 400 });
     }
+    // Only a referral from a consultation that actually happened stands in
+    // for a prescription (src/lib/nurseReferral.ts).
+    const inactive = referralProblem(found.appointment.status);
+    if (inactive) return NextResponse.json({ error: inactive, code: REFERRAL_INACTIVE_CODE }, { status: 400 });
     if (found.serviceId !== offering.serviceId) {
       return NextResponse.json({ error: `Your doctor's referral is for ${found.service.name}, not ${offering.service.name}.` }, { status: 400 });
     }

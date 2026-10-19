@@ -15,6 +15,7 @@ import { cancelAndReassign } from "@/lib/reassignment";
 import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
 import { doctorSlotProblem, snapToClinicGrid, isTimedBooking, isSlotIndexViolation } from "@/lib/doctorSlots";
 import { getBookingHorizonDays, horizonProblem, doctorHoursProblem } from "@/lib/bookingLimits";
+import { referralPushCopy } from "@/lib/nurseReferral";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
   SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
@@ -431,6 +432,12 @@ export async function PATCH(
         body: copy.body(actingDoctorName),
         url: copy.url,
       });
+    }
+    // Nurse care the doctor added during the consultation becomes bookable
+    // now (src/lib/nurseReferral.ts) — tell the patient.
+    if (status === "COMPLETED") {
+      const referral = await prisma.nurseReferral.findUnique({ where: { appointmentId: id }, select: { service: { select: { name: true } } } });
+      if (referral) void sendPushToUser(appointment.patientId, referralPushCopy(actingDoctorName, referral.service.name));
     }
     return NextResponse.json(withoutVisitCode(updated));
   }

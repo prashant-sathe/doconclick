@@ -281,7 +281,8 @@ async function findNurses(patientId: string, args: { serviceName: string }, orig
   const [result, referral] = await Promise.all([
     searchNurses({ patientId, serviceId: service.id, lat: origin?.lat ?? null, lng: origin?.lng ?? null }),
     prisma.nurseReferral.findFirst({
-      where: { serviceId: service.id, appointment: { patientId }, bookings: { none: {} } },
+      // Only referrals from completed consultations count (src/lib/nurseReferral.ts).
+      where: { serviceId: service.id, appointment: { patientId, status: "COMPLETED" }, bookings: { none: {} } },
       select: { id: true },
     }),
   ]);
@@ -341,7 +342,7 @@ async function getMyAppointments(patientId: string) {
 
   // Nurse care a doctor recommended that the patient hasn't booked yet.
   const referrals = await prisma.nurseReferral.findMany({
-    where: { appointment: { patientId }, bookings: { none: {} } },
+    where: { appointment: { patientId, status: "COMPLETED" }, bookings: { none: {} } },
     orderBy: { createdAt: "desc" },
     take: 3,
     select: {
