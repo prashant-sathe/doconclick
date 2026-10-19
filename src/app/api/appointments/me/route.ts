@@ -7,6 +7,7 @@ import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
 import { isDoctorBookable } from "@/lib/doctorBookable";
 import { visitLocation } from "@/lib/visitAddress";
+import { hasCareAccess } from "@/lib/careAccess";
 
 // GET: The logged-in user's own appointments (as patient or as doctor)
 export async function GET() {
@@ -96,8 +97,15 @@ export async function GET() {
       },
     });
     // Vitals nurses recorded for these patients in the last 30 days — so at
-    // the next consultation the doctor sees what happened in between.
-    const active = appointments.filter((a) => ["PENDING_APPROVAL", "SCHEDULED", "COMPLETED"].includes(a.status));
+    // the next consultation the doctor sees what happened in between. Only
+    // for people the doctor currently has care access to (accepted visit, or
+    // completed within the window — src/lib/careAccess.ts), never for a
+    // pending, declined or long-past booking.
+    const person = (a: { patientId: string; dependentId: string | null }) => `${a.patientId}|${a.dependentId ?? ""}`;
+    const visitsByPerson = new Map<string, typeof appointments>();
+    for (const a of appointments) visitsByPerson.set(person(a), [...(visitsByPerson.get(person(a)) ?? []), a]);
+    const withAccess = new Set([...visitsByPerson].filter(([, visits]) => hasCareAccess(visits)).map(([key]) => key));
+    const active = appointments.filter((a) => withAccess.has(person(a)));
     const recentVitals = active.length
       ? await prisma.vitalReading.findMany({
           where: {
@@ -109,7 +117,7 @@ export async function GET() {
             patientId: true, dependentId: true, recordedAt: true, alertLevel: true, alerts: true,
             systolic: true, diastolic: true, pulse: true, spo2: true, temperatureC: true, sugarMgDl: true, sugarType: true,
           },
-        })
+        }).then((rows) => rows.filter((v) => withAccess.has(person(v))))
       : [];
     const latestFor = (patientId: string, dependentId: string | null) =>
       recentVitals.find((v) => v.patientId === patientId && v.dependentId === dependentId) ?? null;

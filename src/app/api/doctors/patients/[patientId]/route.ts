@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { requireRole } from "@/lib/routeGuards";
+import { careAccessProblem } from "@/lib/careAccess";
 
 // GET: A patient's (or one of their family member's) profile + shared
-// appointment history, visible to a doctor only if they have at least one
-// appointment together (booking itself is the consent). Scoped by an
+// appointment history, visible to a doctor only with an accepted or completed
+// visit together (src/lib/careAccess.ts — booking is the consent). Scoped by an
 // optional `?dependentId=` — when present, both the medical-info block and
 // the appointment list are restricted to that specific family member, never
 // mixed with the account holder's own records or anyone else's.
@@ -12,10 +13,8 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ patientId: string }> }
 ) {
-  const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { authUser, denied } = await requireRole("DOCTOR");
+  if (denied) return denied;
 
   const { patientId } = await params;
   const dependentId = new URL(req.url).searchParams.get("dependentId");
@@ -31,15 +30,14 @@ export async function GET(
     }
   }
 
+  const noAccess = await careAccessProblem({ providerId: authUser.id, patientId, dependentId });
+  if (noAccess) return NextResponse.json({ error: noAccess, code: "NO_CARE_ACCESS" }, { status: 403 });
+
   const sharedAppointments = await prisma.appointment.findMany({
     where: { doctorId: authUser.id, patientId, dependentId: dependentId ?? null },
     orderBy: { scheduledAt: "desc" },
     include: { medicines: true, attachments: true, review: true },
   });
-
-  if (sharedAppointments.length === 0) {
-    return NextResponse.json({ error: "You have no appointment history with this patient" }, { status: 403 });
-  }
 
   const patient = await prisma.user.findUnique({
     where: { id: patientId },
