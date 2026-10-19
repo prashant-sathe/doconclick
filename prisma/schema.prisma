@@ -753,6 +753,9 @@ model PlatformSettings {
   // How far ahead a patient can book or reschedule (doctor and nurse), in
   // days — see src/lib/bookingLimits.ts.
   bookingHorizonDays      Int      @default(60)
+  // Days after a visit is completed that patient and provider can still send
+  // chat messages (0 = read-only right away) — see src/lib/chatAccess.ts.
+  chatFollowUpDays        Int      @default(7)
   // Mobile app splash: admin uploads an image that the native shell shows over
   // the WebView while it boots (the real native splash is baked into the app
   // binary and can't change without a store update — this is the dynamic layer

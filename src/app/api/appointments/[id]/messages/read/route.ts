@@ -16,7 +16,7 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const { error } = await loadAndAuthorize(id, authUser);
+  const { error } = await loadAndAuthorize(id, authUser, "read");
   if (error) return error;
 
   await prisma.message.updateMany({

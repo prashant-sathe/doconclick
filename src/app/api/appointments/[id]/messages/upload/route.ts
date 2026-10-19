@@ -30,7 +30,7 @@ export async function POST(
   }
 
   const { id } = await params;
-  const { error } = await loadAndAuthorize(id, authUser);
+  const { error } = await loadAndAuthorize(id, authUser, "send");
   if (error) return error;
 
   const form = await req.formData();

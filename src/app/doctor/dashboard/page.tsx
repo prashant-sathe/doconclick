@@ -1564,7 +1564,18 @@ export default function DoctorDashboard() {
                       {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
                     </div>
                   </div>
-                  {!isStaff && <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>}
+                  <div className="flex items-center gap-3">
+                    {!isStaff && <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>}
+                    {/* Readable after completion; open for follow-up questions for a few days. */}
+                    <Link href={`/doctor/chat/${a.id}`} className="relative w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title="Chat with patient">
+                      <MessageCircle className="w-4 h-4 text-slate-500" />
+                      {a.unreadMessageCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
+                          {a.unreadMessageCount > 9 ? "9+" : a.unreadMessageCount}
+                        </span>
+                      )}
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>

@@ -485,7 +485,8 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
             Video call unlocks after payment
           </span>
         )}
-        {a.status === "SCHEDULED" && (
+        {/* After completion the chat stays readable, and open for follow-up questions for a few days. */}
+        {(a.status === "SCHEDULED" || a.status === "COMPLETED") && (
           <Link href={`/patient/chat/${a.id}`} className="relative btn-secondary py-2 px-3 text-xs">
             <MessageCircle className="w-3.5 h-3.5" /> Chat
             {a.unreadMessageCount > 0 && (

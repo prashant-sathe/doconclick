@@ -725,6 +725,7 @@ export const PlatformSettingsScalarFieldEnum = {
   nurseSubscriptionFee: 'nurseSubscriptionFee',
   nurseShiftServicesSeeded: 'nurseShiftServicesSeeded',
   bookingHorizonDays: 'bookingHorizonDays',
+  chatFollowUpDays: 'chatFollowUpDays',
   splashImageUrl: 'splashImageUrl',
   splashFit: 'splashFit',
   splashBgColor: 'splashBgColor',

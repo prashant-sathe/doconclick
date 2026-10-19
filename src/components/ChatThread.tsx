@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Send, Paperclip, FileText, Download, X } from "lucide-react";
+import { Loader2, Send, Paperclip, FileText, Download, X, Lock, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { downloadOrShareUrl } from "@/lib/nativeDownload";
@@ -15,6 +15,13 @@ interface ChatMessage {
   fileName: string | null;
   fileType: string | null;
   sender: { id: string; name: string; role: string };
+}
+
+// Whether this chat accepts new messages, from GET /messages (src/lib/chatAccess.ts).
+interface ChatStatus {
+  canSend: boolean;
+  reason: string | null;
+  sendUntil: string | null;
 }
 
 const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
@@ -48,6 +55,7 @@ const POLL_MS = 4000;
 
 export default function ChatThread({ appointmentId, meId, accent = "blue" }: ChatThreadProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [chat, setChat] = useState<ChatStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [text, setText] = useState("");
@@ -69,8 +77,10 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       setLoading(false);
       return;
     }
-    const data: ChatMessage[] = await res.json();
+    const body = await res.json();
+    const data: ChatMessage[] = body.messages ?? [];
     setMessages(data);
+    setChat(body.chat ?? null);
     setLoading(false);
     if (data.length !== messageCountRef.current) {
       messageCountRef.current = data.length;
@@ -98,8 +108,13 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       body: JSON.stringify({ text: trimmed }),
     });
     setSending(false);
-    if (res.ok) load();
-    else setError((await res.json().catch(() => ({}))).error ?? "Could not send message.");
+    if (res.ok) { load(); return; }
+    const failure = await res.json().catch(() => ({}));
+    // The chat just closed (e.g. the follow-up window ran out) — refresh so
+    // the read-only notice replaces the composer; keep the history visible.
+    if (failure.code === "CHAT_CLOSED") { setText(trimmed); load(); return; }
+    setText(trimmed);
+    setUploadError(failure.error ?? "Could not send message.");
   };
 
   const attachFile = async (file: File) => {
@@ -140,7 +155,11 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
         body: JSON.stringify({ text: "", fileUrl: url, fileName, fileType }),
       });
       if (sendRes.ok) load();
-      else setUploadError((await sendRes.json().catch(() => ({}))).error ?? "Could not send file.");
+      else {
+        const failure = await sendRes.json().catch(() => ({}));
+        if (failure.code === "CHAT_CLOSED") load();
+        setUploadError(failure.error ?? "Could not send file.");
+      }
     } catch {
       setUploadError("Could not upload that file. Please try again.");
     } finally {
@@ -175,7 +194,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
           <div className="flex items-center justify-center h-full text-sm text-slate-400 text-center px-6">{error}</div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-sm text-slate-400 text-center px-6">
-            No messages yet. Say hello!
+            {chat && !chat.canSend ? "No messages in this chat." : "No messages yet. Say hello!"}
           </div>
         ) : (
           messages.map((m) => {
@@ -234,6 +253,19 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       {uploadError && (
         <div className="px-3 pt-2 text-xs text-red-500 bg-white border-t border-slate-100">{uploadError}</div>
       )}
+      {chat && !chat.canSend ? (
+        <div className="border-t border-slate-100 bg-slate-50 px-4 py-3 flex items-start gap-2 text-xs text-slate-500">
+          <Lock className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-slate-400" />
+          <span>{chat.reason ?? "This chat is read-only."}</span>
+        </div>
+      ) : (
+      <>
+      {chat?.sendUntil && (
+        <div className="border-t border-slate-100 bg-amber-50 px-4 py-2 flex items-center gap-1.5 text-[11px] text-amber-700">
+          <Clock className="w-3 h-3 flex-shrink-0" />
+          Follow-up chat open until {new Date(chat.sendUntil).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+        </div>
+      )}
       <div className="border-t border-slate-100 bg-white p-3 flex items-end gap-2">
         <input
           ref={fileInputRef}
@@ -276,6 +308,8 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
         </button>
       </div>
+      </>
+      )}
 
       {pendingFile && (
         <ConfirmDialog

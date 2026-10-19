@@ -44,8 +44,10 @@ export default function NurseChatPage() {
     </div>;
   }
 
-  const chatOpen = appt?.status === "SCHEDULED";
-  const chatClosed = appt?.status === "COMPLETED";
+  // Only a still-pending request has no chat yet; for every other status the
+  // thread shows, and ChatThread explains when it's read-only
+  // (src/lib/chatAccess.ts).
+  const chatOpen = appt?.status !== "PENDING_APPROVAL";
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -78,9 +80,7 @@ export default function NurseChatPage() {
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
               <p className="text-sm text-slate-500">
-                {chatClosed
-                  ? `This chat closed when the visit with ${patientLabel(appt)} was completed.`
-                  : `Accept this request to start chatting with ${patientLabel(appt)}.`}
+                {`Accept this request to start chatting with ${patientLabel(appt)}.`}
               </p>
             </div>
           ) : (

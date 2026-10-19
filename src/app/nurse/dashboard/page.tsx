@@ -579,7 +579,16 @@ export default function NurseDashboardPage() {
                   {!["PENDING_APPROVAL", "SCHEDULED"].includes(v.status) && (
                     <div className="mt-3 flex items-center justify-between gap-2">
                       <span className={cn("badge", v.status === "COMPLETED" ? "badge-success" : "badge-gray")}>{STATUS_LABEL[v.status] ?? v.status}</span>
-                      {v.review && <span className="text-xs text-amber-600 font-semibold flex items-center gap-1"><Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />{v.review.rating}/5</span>}
+                      <div className="flex items-center gap-3">
+                        {v.review && <span className="text-xs text-amber-600 font-semibold flex items-center gap-1"><Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />{v.review.rating}/5</span>}
+                        {/* Readable after the visit; open for follow-up questions for a few days. */}
+                        {v.status === "COMPLETED" && (
+                          <Link href={`/nurse/chat/${v.id}`} className="relative text-xs font-semibold text-rose-600 flex items-center gap-1 hover:underline">
+                            <MessageCircle className="w-3.5 h-3.5" /> Chat
+                            {v.unreadMessageCount > 0 && <span className="min-w-4 h-4 px-1 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">{v.unreadMessageCount}</span>}
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   )}
                   {v.status === "COMPLETED" && v.doctorNotes && <p className="text-xs text-slate-500 mt-2">Notes: {v.doctorNotes}</p>}

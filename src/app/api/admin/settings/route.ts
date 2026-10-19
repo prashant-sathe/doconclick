@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { BOOKING_HORIZON_MIN_DAYS, BOOKING_HORIZON_MAX_DAYS } from "@/lib/bookingHorizon";
+import { BOOKING_HORIZON_MIN_DAYS, BOOKING_HORIZON_MAX_DAYS, CHAT_FOLLOW_UP_MIN_DAYS, CHAT_FOLLOW_UP_MAX_DAYS } from "@/lib/bookingHorizon";
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -76,6 +76,17 @@ export async function PATCH(req: Request) {
       );
     }
     data.bookingHorizonDays = value;
+  }
+
+  if (body.chatFollowUpDays !== undefined) {
+    const value = finiteNumber(body.chatFollowUpDays);
+    if (value === null || !Number.isInteger(value) || value < CHAT_FOLLOW_UP_MIN_DAYS || value > CHAT_FOLLOW_UP_MAX_DAYS) {
+      return NextResponse.json(
+        { error: `Follow-up chat window must be a whole number of days between ${CHAT_FOLLOW_UP_MIN_DAYS} and ${CHAT_FOLLOW_UP_MAX_DAYS}.` },
+        { status: 400 }
+      );
+    }
+    data.chatFollowUpDays = value;
   }
 
   if (body.splashImageUrl !== undefined) {

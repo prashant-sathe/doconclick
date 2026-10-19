@@ -4,11 +4,8 @@ import { getAuthUser, type JWTPayload } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { requireActiveProvider } from "@/lib/providerGuard";
 import { resolveDoctorScope } from "@/lib/staffGuard";
-
-// Chat is open only while a booking is accepted and still upcoming
-// (SCHEDULED). It closes for everyone once the visit is COMPLETED (and was
-// never open for PENDING_APPROVAL / REJECTED / CANCELLED).
-const CHAT_ENABLED_STATUSES = ["SCHEDULED"];
+import { readJson } from "@/lib/routeGuards";
+import { chatState, getChatFollowUpDays } from "@/lib/chatAccess";
 
 // A message's fileUrl must point at our own upload bucket — it's only ever
 // meant to be set from the upload endpoint's response, never a client-typed
@@ -26,8 +23,10 @@ function isOwnAttachmentUrl(url: string): boolean {
 
 // `authUser` rather than a bare userId — a STAFF caller's own id never
 // matches appointment.doctorId directly, so it needs their assigned
-// doctor's id resolved via resolveDoctorScope instead.
-export async function loadAndAuthorize(id: string, authUser: JWTPayload) {
+// doctor's id resolved via resolveDoctorScope instead. `purpose` is what the
+// caller wants to do: reading works for most statuses, sending only while
+// the chat is open (src/lib/chatAccess.ts).
+export async function loadAndAuthorize(id: string, authUser: JWTPayload, purpose: "read" | "send") {
   const appointment = await prisma.appointment.findUnique({ where: { id } });
   if (!appointment) {
     return { error: NextResponse.json({ error: "Appointment not found" }, { status: 404 }) };
@@ -40,14 +39,11 @@ export async function loadAndAuthorize(id: string, authUser: JWTPayload) {
   if (!authorized) {
     return { error: NextResponse.json({ error: "Appointment not found" }, { status: 404 }) };
   }
-  if (!CHAT_ENABLED_STATUSES.includes(appointment.status)) {
-    const message =
-      appointment.status === "COMPLETED"
-        ? "This chat has closed now that the visit is complete."
-        : `Chat opens once the ${appointment.providerType === "NURSE" ? "nurse" : "doctor"} accepts this appointment.`;
-    return { error: NextResponse.json({ error: message }, { status: 403 }) };
+  const chat = chatState(appointment, await getChatFollowUpDays());
+  if (purpose === "read" ? !chat.canRead : !chat.canSend) {
+    return { error: NextResponse.json({ error: chat.reason, code: "CHAT_CLOSED" }, { status: 403 }) };
   }
-  return { appointment };
+  return { appointment, chat };
 }
 
 export async function GET(
@@ -60,7 +56,7 @@ export async function GET(
   }
 
   const { id } = await params;
-  const { error } = await loadAndAuthorize(id, authUser);
+  const { error, chat } = await loadAndAuthorize(id, authUser, "read");
   if (error) return error;
 
   const messages = await prisma.message.findMany({
@@ -69,7 +65,8 @@ export async function GET(
     include: { sender: { select: { id: true, name: true, role: true } } },
   });
 
-  return NextResponse.json(messages);
+  // `chat` tells the UI whether to show the composer, and why not.
+  return NextResponse.json({ messages, chat: { canSend: chat!.canSend, reason: chat!.reason, sendUntil: chat!.sendUntil } });
 }
 
 export async function POST(
@@ -87,10 +84,12 @@ export async function POST(
   }
 
   const { id } = await params;
-  const { error, appointment } = await loadAndAuthorize(id, authUser);
+  const { error, appointment } = await loadAndAuthorize(id, authUser, "send");
   if (error) return error;
 
-  const { text, fileUrl, fileName, fileType } = await req.json();
+  const { body, invalid } = await readJson(req);
+  if (invalid) return invalid;
+  const { text, fileUrl, fileName, fileType } = body;
   const trimmedText = typeof text === "string" ? text.trim() : "";
 
   if (fileUrl !== undefined && fileUrl !== null) {
