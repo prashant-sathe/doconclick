@@ -124,7 +124,11 @@ export async function PATCH(
   const providerDashboard = appointment.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard";
 
   if (authUser.role === "DOCTOR" || authUser.role === "STAFF" || authUser.role === "NURSE") {
-    const scope = await resolveProviderScope(authUser);
+    // Accepting (a request or a new time) and completing are what a plan pays
+    // for; cancelling, declining and no-shows stay open to an expired doctor
+    // so their patients are still refunded / reassigned.
+    const needsPlan = status === "SCHEDULED" || status === "COMPLETED" || reschedule === "ACCEPT";
+    const scope = await resolveProviderScope(authUser, { requireSubscription: needsPlan });
     if (scope.denied) return scope.denied;
     if (appointment.doctorId !== scope.doctorId) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });

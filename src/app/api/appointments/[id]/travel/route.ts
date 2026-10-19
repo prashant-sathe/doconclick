@@ -24,7 +24,7 @@ export async function PATCH(
 ) {
   const { authUser, denied } = await requireRole("DOCTOR", "NURSE");
   if (denied) return denied;
-  const suspendedResponse = await requireActiveProvider(authUser);
+  const suspendedResponse = await requireActiveProvider(authUser, { requireSubscription: true });
   if (suspendedResponse) return suspendedResponse;
 
   const { id } = await params;

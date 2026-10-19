@@ -2,13 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, hashPassword } from "@/lib/auth";
 import { validateRegistration } from "@/lib/validation";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 // GET: the logged-in doctor's own staff/receptionist accounts
 export async function GET() {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
-    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
-  }
+  if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  if (authUser.role !== "DOCTOR") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  // Listing stays open without a plan, so an expired doctor can still revoke access.
+  const denied = await requireActiveDoctor(authUser);
+  if (denied) return denied;
 
   const staff = await prisma.staffProfile.findMany({
     where: { doctorId: authUser.id },
@@ -34,9 +37,10 @@ export async function GET() {
 // codebase to build an invite-link flow on top of.
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
-    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
-  }
+  if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  if (authUser.role !== "DOCTOR") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  const denied = await requireActiveDoctor(authUser, { requireSubscription: true });
+  if (denied) return denied;
 
   const body = await req.json().catch(() => ({}));
   const parsed = validateRegistration(body);

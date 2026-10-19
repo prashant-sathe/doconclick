@@ -40,7 +40,8 @@
     "test:care-access": "tsx tests/care-access.ts",
     "test:prescriptions": "tsx tests/prescriptions.ts",
     "test:nurse-referrals": "tsx tests/nurse-referrals.ts",
-    "test:chat-access": "tsx tests/chat-access.ts"
+    "test:chat-access": "tsx tests/chat-access.ts",
+    "test:doctor-subscription": "tsx tests/doctor-subscription.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -17,7 +17,7 @@ export async function POST() {
   if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "STAFF")) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
-  const scope = await resolveDoctorScope(authUser);
+  const scope = await resolveDoctorScope(authUser, { requireSubscription: true });
   if (scope.denied) return scope.denied;
 
   await expireStalePendingRequests();

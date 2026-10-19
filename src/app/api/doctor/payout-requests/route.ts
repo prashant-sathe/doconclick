@@ -10,9 +10,10 @@ const PENDING_APPOINTMENT_WHERE = { status: "COMPLETED", paymentStatus: "PAID", 
 // GET: the current doctor's own payout requests, newest first
 export async function GET() {
   const authUser = await getAuthUser();
-  if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "NURSE")) {
-    return NextResponse.json({ error: "Not authorized" }, { status: 401 });
-  }
+  if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  if (authUser.role !== "DOCTOR" && authUser.role !== "NURSE") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  const denied = await requireActiveProvider(authUser, { requireSubscription: true });
+  if (denied) return denied;
 
   const requests = await prisma.payoutRequest.findMany({
     where: { doctorId: authUser.id },
@@ -27,10 +28,9 @@ export async function GET() {
 // there's nothing currently owed to request against.
 export async function POST() {
   const authUser = await getAuthUser();
-  if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "NURSE")) {
-    return NextResponse.json({ error: "Not authorized" }, { status: 401 });
-  }
-  const suspendedResponse = await requireActiveProvider(authUser);
+  if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  if (authUser.role !== "DOCTOR" && authUser.role !== "NURSE") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  const suspendedResponse = await requireActiveProvider(authUser, { requireSubscription: true });
   if (suspendedResponse) return suspendedResponse;
 
   const existing = await prisma.payoutRequest.findFirst({

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 import { safeNum } from "@/lib/adminAuth";
 
 const MONTHS = 6;
@@ -10,9 +11,10 @@ const MONTHS = 6;
 // report; no cross-doctor comparison here, just this doctor's own numbers over time.
 export async function GET() {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
-    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
-  }
+  if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  if (authUser.role !== "DOCTOR") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  const denied = await requireActiveDoctor(authUser, { requireSubscription: true });
+  if (denied) return denied;
 
   const now = new Date();
   const windowStart = new Date(now.getFullYear(), now.getMonth() - (MONTHS - 1), 1);

@@ -68,7 +68,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
-  const suspendedResponse = await requireActiveDoctor(authUser);
+  const suspendedResponse = await requireActiveDoctor(authUser, { requireSubscription: true });
   if (suspendedResponse) return suspendedResponse;
 
   const { id } = await params;

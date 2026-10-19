@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { JWTPayload } from "@/lib/auth";
-import { SUSPENDED_MESSAGE } from "@/lib/doctorGuard";
+import { doctorAccessProblem, type DoctorGuardOptions } from "@/lib/doctorGuard";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 
 // Nurses reuse the appointment / payment / chat / payout machinery that was
@@ -36,25 +36,25 @@ export async function requireActiveNurse(authUser: JWTPayload): Promise<NextResp
  * id). Use in shared appointment-queue routes only.
  */
 export async function resolveProviderScope(
-  authUser: JWTPayload
+  authUser: JWTPayload,
+  options: DoctorGuardOptions = {}
 ): Promise<{ doctorId: string; denied: null } | { doctorId: null; denied: NextResponse }> {
   if (authUser.role === "NURSE") {
     const denied = await requireActiveNurse(authUser);
     if (denied) return { doctorId: null, denied };
     return { doctorId: authUser.id, denied: null };
   }
-  return resolveDoctorScope(authUser);
+  return resolveDoctorScope(authUser, options);
 }
 
-/** 403 if a DOCTOR or NURSE caller is suspended; null for everyone else. */
-export async function requireActiveProvider(authUser: JWTPayload): Promise<NextResponse | null> {
+/**
+ * 403 if a DOCTOR or NURSE caller is suspended — or, with
+ * `requireSubscription`, a doctor out of plan (nurses' fees are checked by
+ * isNurseBookable instead); null for everyone else.
+ */
+export async function requireActiveProvider(authUser: JWTPayload, options: DoctorGuardOptions = {}): Promise<NextResponse | null> {
   if (authUser.role === "NURSE") return requireActiveNurse(authUser);
-  if (authUser.role === "DOCTOR") {
-    const profile = await prisma.doctorProfile.findUnique({ where: { userId: authUser.id }, select: { status: true } });
-    if (profile?.status === "SUSPENDED") {
-      return NextResponse.json({ error: SUSPENDED_MESSAGE, suspended: true }, { status: 403 });
-    }
-  }
+  if (authUser.role === "DOCTOR") return doctorAccessProblem(authUser.id, options);
   return null;
 }
 

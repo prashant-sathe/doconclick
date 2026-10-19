@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, hashPassword, revokeSessions } from "@/lib/auth";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
+import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 // PATCH: revoke/reactivate a staff account, or reset its password.
 // `id` here is the staff User's id (not the StaffProfile id) — matches what
@@ -11,9 +12,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
-    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
-  }
+  if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  if (authUser.role !== "DOCTOR") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
 
   const { id } = await params;
   const staffProfile = await prisma.staffProfile.findUnique({ where: { userId: id } });
@@ -22,6 +22,12 @@ export async function PATCH(
   }
 
   const { active, password } = await req.json().catch(() => ({}));
+  // Revoking a receptionist's access is always allowed — an expired doctor
+  // must be able to lock out staff. Reactivating or resetting a password is
+  // giving access back, which needs an active plan.
+  const revokeOnly = password === undefined && active !== undefined && !active;
+  const denied = await requireActiveDoctor(authUser, { requireSubscription: !revokeOnly });
+  if (denied) return denied;
 
   if (password !== undefined) {
     if (typeof password !== "string" || password.length < PASSWORD_MIN_LENGTH) {
