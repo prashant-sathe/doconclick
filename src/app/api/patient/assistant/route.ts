@@ -9,6 +9,8 @@ import { haversine, withinSearchRadius } from "@/lib/geo";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
 import { ensureNurseServices } from "@/lib/nurseServices";
 import { searchNurses } from "@/lib/nurseSearch";
+import { readJson } from "@/lib/routeGuards";
+import { parseBody, assistantRequestSchema } from "@/lib/schemas";
 
 type InputItem = OpenAI.Responses.ResponseInputItem;
 type FunctionCall = OpenAI.Responses.ResponseFunctionToolCall;
@@ -36,7 +38,21 @@ const SYSTEM_PROMPT = `You are the DocOnClick Health Assistant — you help pati
 Rules:
 - Never diagnose a condition, and never recommend medicines, dosages, or treatment. Your only job is triage: understand the symptoms well enough to recommend a medical specialty.
 - All prices are in Indian Rupees (₹). Never mention insurance or copays — those aren't part of this app.
-- Emergencies are the narrow exception, not the default. Only stop triage and tell the patient to call 112 or go to the nearest hospital ER for a specific, genuine red flag: severe chest pain/pressure, significant difficulty breathing, uncontrolled or heavy bleeding, sudden loss of consciousness or unresponsiveness, sudden one-sided weakness or slurred speech (stroke signs), or active suicidal intent. For everything else — including symptoms that sound worrying, are painful, or have lasted a while — do NOT suggest calling emergency services or an ER. Your job is to recommend the right doctor on the platform; that's the right next step for almost every patient here, so default to that.
+- Emergencies come first. If the patient describes any of these red flags, stop triage and tell them clearly to call 112 or go to the nearest hospital emergency department now (you can still offer to find a doctor for afterwards):
+  - severe chest pain or pressure;
+  - significant difficulty breathing;
+  - uncontrolled or heavy bleeding;
+  - sudden loss of consciousness, fainting with no recovery, or unresponsiveness;
+  - sudden one-sided weakness, facial droop or slurred speech (stroke signs);
+  - a seizure or convulsions (fits) that are happening now, last over 5 minutes, repeat, or are a first-ever seizure;
+  - signs of a severe allergic reaction (anaphylaxis) — swelling of the face, lips, tongue or throat, trouble breathing or swallowing, or collapse after a sting, food or medicine;
+  - poisoning or overdose — swallowed medicines, chemicals, pesticide or kerosene, or a snake or scorpion bite;
+  - a head injury followed by vomiting, confusion, drowsiness, a seizure, or having been knocked out;
+  - bleeding from the vagina, severe abdominal pain, or fits during pregnancy;
+  - fever in a baby under 3 months old, or a baby or child who is floppy, unusually drowsy, or not feeding;
+  - serious burns — large, deep, or on the face, hands, genitals or airway, or electrical or chemical burns.
+- Self-harm or suicide: if the patient mentions thoughts of harming themselves or ending their life, respond with care and without judgement, and share Tele-MANAS — India's free, 24×7 mental health helpline — on 14416 (or 1-800-891-4416). If they are in immediate danger or have already harmed themselves, tell them to call 112 now. Gently encourage them to reach out to someone they trust; you can also offer to find a psychiatrist or psychologist on the platform.
+- Without a red flag, the right next step is the right doctor on the platform — recommend one as usual rather than adding a routine "go to the ER" to every answer. If you genuinely can't tell whether something is an emergency, err on the side of safety and say so.
 - Call get_my_profile early if useful context (age, allergies, existing conditions) would sharpen your triage — don't make the patient repeat what's already on file. Call get_my_appointments if they ask about a past or upcoming visit.
 - Always call the list_specialties and find_doctors tools rather than naming a specialty or doctor from your own knowledge — the app's specialty list and doctor directory are the source of truth.
 - Ask short, focused questions, one or two at a time. Whenever a question has a small set of likely answers, also call suggest_quick_replies with those options so the app can show tappable chips.
@@ -412,16 +428,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Too many requests. Please try again in a bit." }, { status: 429 });
   }
 
-  let body: { messages?: unknown; location?: unknown };
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
-  }
-  if (!Array.isArray(body.messages)) {
-    return NextResponse.json({ error: "Missing messages" }, { status: 400 });
-  }
-  const priorItems = body.messages as InputItem[];
+  const { body: raw, invalid } = await readJson(req);
+  if (invalid) return invalid;
+  const parsed = parseBody(assistantRequestSchema, raw);
+  if (parsed.response) return parsed.response;
+  const body = parsed.data;
+  const priorItems: InputItem[] = body.messages.map((m) => ({ role: m.role, content: m.content }));
 
   const loc = body.location as { lat?: unknown; lng?: unknown; label?: unknown } | undefined;
   const origin: Origin =

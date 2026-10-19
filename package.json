@@ -35,7 +35,8 @@
     "test:schemas": "tsx tests/request-schemas.ts",
     "test:route-errors": "tsx tests/route-errors.ts",
     "test:terms": "tsx tests/terms-required.ts",
-    "test:booking-limits": "tsx tests/booking-limits.ts"
+    "test:booking-limits": "tsx tests/booking-limits.ts",
+    "test:assistant": "tsx tests/assistant-safety.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -12,10 +12,11 @@ import { useAuth } from "@/components/AuthProvider";
 import { formatDoctorName, formatProviderName } from "@/lib/utils";
 import { renderChatText } from "@/lib/chatMarkdown";
 import { readPatientLocation } from "@/lib/patientLocation";
+import { ASSISTANT_MAX_MESSAGES, ASSISTANT_MAX_TOTAL_CHARS, ASSISTANT_MAX_MESSAGE_CHARS, type AssistantMessage } from "@/lib/assistantInput";
 
 // Loosely typed mirror of the OpenAI Responses API's input/output items —
-// the client only needs enough shape to render and to echo the array back
-// as conversation history on the next request, not the full SDK surface.
+// the client only needs enough shape to render them, not the full SDK
+// surface. The server only accepts text turns back (see toTranscript).
 interface ConversationItem {
   type?: string;
   role?: string;
@@ -79,6 +80,27 @@ function extractText(content: ConversationItem["content"]): string {
   if (typeof content === "string") return content;
   if (Array.isArray(content)) return content.map((c) => c.text ?? "").join("");
   return "";
+}
+
+// The history sent with each request: just the text of the user/assistant
+// turns (the server rejects tool calls and outputs), newest kept when the
+// conversation outgrows the server's limits.
+function toTranscript(items: ConversationItem[]): AssistantMessage[] {
+  const all: AssistantMessage[] = [];
+  for (const item of items) {
+    if (!(item.type === "message" || (!item.type && item.role))) continue;
+    if (item.role !== "user" && item.role !== "assistant") continue;
+    const text = extractText(item.content).trim().slice(0, ASSISTANT_MAX_MESSAGE_CHARS);
+    if (text) all.push({ role: item.role, content: text });
+  }
+  const kept: AssistantMessage[] = [];
+  let chars = 0;
+  for (let i = all.length - 1; i >= 0; i--) {
+    if (kept.length >= ASSISTANT_MAX_MESSAGES || chars + all[i].content.length > ASSISTANT_MAX_TOTAL_CHARS) break;
+    kept.unshift(all[i]);
+    chars += all[i].content.length;
+  }
+  return kept;
 }
 
 function buildDisplayEntries(items: ConversationItem[]): DisplayEntry[] {
@@ -516,7 +538,7 @@ export default function HealthAssistantPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: nextItems,
+            messages: toTranscript(nextItems),
             ...(pinned ? { location: { lat: pinned.lat, lng: pinned.lng, label: pinned.label } } : {}),
           }),
         });
@@ -617,6 +639,7 @@ export default function HealthAssistantPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Describe how you're feeling…"
+            maxLength={ASSISTANT_MAX_MESSAGE_CHARS}
             disabled={loading}
             className="flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none disabled:opacity-60"
           />

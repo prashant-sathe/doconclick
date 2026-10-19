@@ -12,6 +12,7 @@ import { BLOOD_GROUPS } from "@/lib/medicalOptions";
 import { RELATIONS } from "@/lib/relations";
 import { NURSE_QUALIFICATIONS } from "@/lib/nurseConstants";
 import { normalizeSearchRadiusKm } from "@/lib/geo";
+import { ASSISTANT_MAX_MESSAGES, ASSISTANT_MAX_TOTAL_CHARS, ASSISTANT_MAX_MESSAGE_CHARS } from "@/lib/assistantInput";
 
 /**
  * Validates `body` against `schema`. On failure returns `{ response }` — a
@@ -369,6 +370,43 @@ export const appointmentBookingSchema = z.object(
     ),
     patientLat: latitude.optional(),
     patientLng: longitude.optional(),
+  },
+  BODY_ERROR,
+);
+
+// ── Health Assistant ──
+
+/**
+ * The conversation so far as plain text turns only. Tool calls/outputs and
+ * system/developer messages are never accepted from the client — the
+ * assistant's tool results come from the server, not from history the
+ * client could forge.
+ */
+export const assistantRequestSchema = z.object(
+  {
+    messages: z
+      .array(
+        z.strictObject(
+          {
+            role: z.enum(["user", "assistant"], { error: "Each message's role must be \"user\" or \"assistant\"." }),
+            content: z
+              .string({ error: "Each message's content must be text." })
+              .trim()
+              .min(1, "Messages can't be empty.")
+              .max(ASSISTANT_MAX_MESSAGE_CHARS, `Each message must be at most ${ASSISTANT_MAX_MESSAGE_CHARS} characters.`),
+          },
+          { error: "Each message must be { role, content } only." },
+        ),
+        { error: "messages must be a list." },
+      )
+      .min(1, "Missing messages.")
+      .max(ASSISTANT_MAX_MESSAGES, `The conversation is too long (at most ${ASSISTANT_MAX_MESSAGES} messages). Start a new chat.`)
+      .refine(
+        (msgs) => msgs.reduce((n, m) => n + m.content.length, 0) <= ASSISTANT_MAX_TOTAL_CHARS,
+        `The conversation is too long (at most ${ASSISTANT_MAX_TOTAL_CHARS} characters). Start a new chat.`,
+      )
+      .refine((msgs) => msgs[msgs.length - 1]?.role === "user", "The last message must be from you."),
+    location: z.unknown().optional(),
   },
   BODY_ERROR,
 );
