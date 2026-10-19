@@ -416,6 +416,8 @@ export async function PATCH(
         requestedScheduledAt: null,
         doctorNotes: doctorNotes ?? appointment.doctorNotes,
         ...(status === "SCHEDULED" ? { acceptedAt: new Date() } : {}),
+        // Starts the prescription edit window (src/lib/prescriptionLock.ts).
+        ...(status === "COMPLETED" ? { completedAt: new Date() } : {}),
         // Cash is collected at the visit, so completing it is when it was paid.
         ...(status === "COMPLETED" && appointment.paymentMethod === "CASH"
           ? { paymentStatus: "PAID", paidAt: appointment.paidAt ?? new Date() }

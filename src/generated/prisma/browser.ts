@@ -143,6 +143,11 @@ export type PrescriptionMedicine = Prisma.PrescriptionMedicineModel
  */
 export type PrescriptionTest = Prisma.PrescriptionTestModel
 /**
+ * Model PrescriptionVersion
+ * 
+ */
+export type PrescriptionVersion = Prisma.PrescriptionVersionModel
+/**
  * Model PrescriptionAttachment
  * 
  */

@@ -408,6 +408,7 @@ model Appointment {
   vitals            VitalReading[]
   status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED, NO_SHOW
   acceptedAt    DateTime? // set when the doctor accepts (PENDING_APPROVAL → SCHEDULED); used for the late-cancellation warning
+  completedAt   DateTime? // set when marked COMPLETED; starts the prescription edit window (src/lib/prescriptionLock.ts). Null on rows completed before it existed
   paymentMethod String    @default("CASH") // ONLINE, CASH
   paymentStatus String    @default("PENDING") // PENDING, PAID
   paidAt        DateTime?
@@ -468,6 +469,7 @@ model Appointment {
   medicines     PrescriptionMedicine[]
   tests         PrescriptionTest[]
   attachments   PrescriptionAttachment[]
+  prescriptionVersions PrescriptionVersion[]
   messages      Message[]
   walletTransaction WalletTransaction?
   paymentOrderItems PaymentOrderItem[]
@@ -592,6 +594,21 @@ model PrescriptionTest {
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   name          String
   instructions  String?
+}
+
+// Audit trail of a prescription's medicines + tests: one row per saved change
+// (an unchanged re-save adds nothing). Never edited or deleted by the app.
+model PrescriptionVersion {
+  id            String      @id @default(cuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  version       Int         // 1, 2, 3… per appointment
+  medicines     Json        // [{ name, dosage, frequency, duration, instructions }]
+  tests         Json        // [{ name, instructions }]
+  editedById    String      // the doctor's user id (no FK, so history survives account changes)
+  createdAt     DateTime    @default(now())
+
+  @@unique([appointmentId, version])
 }
 
 model PrescriptionAttachment {

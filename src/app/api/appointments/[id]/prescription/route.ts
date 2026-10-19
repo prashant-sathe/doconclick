@@ -12,7 +12,9 @@ const ALLOWED_TYPES: Record<string, string> = {
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 const MAX_FILES = 10;
 
-// GET: The patient fetches structured prescription data for their own completed appointment
+// GET: Structured prescription data for PrescriptionDocument — for the
+// patient and the doctor who wrote it (once the consultation is completed),
+// and for admins (any status, e.g. reviewing a disputed booking).
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -27,6 +29,7 @@ export async function GET(
     where: { id },
     include: {
       patient: { select: { name: true, patientProfile: { select: { age: true, gender: true, homeAddress: true } } } },
+      dependent: { select: { age: true, gender: true } },
       doctor: { select: { name: true, doctorProfile: { select: { qualification: true, medRegNo: true, specialty: true, clinicName: true, signatureUrl: true } } } },
       medicines: true,
       tests: true,
@@ -39,12 +42,19 @@ export async function GET(
   if (appointment.providerType === "NURSE") {
     return NextResponse.json({ error: "Nurse visits don't have a prescription." }, { status: 404 });
   }
-  if (authUser.id !== appointment.patientId) {
+  const isAdmin = authUser.role === "ADMIN";
+  const isOwnDoctor = authUser.role === "DOCTOR" && authUser.id === appointment.doctorId;
+  if (!isAdmin && !isOwnDoctor && authUser.id !== appointment.patientId) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
-  if (appointment.status !== "COMPLETED") {
+  if (!isAdmin && appointment.status !== "COMPLETED") {
     return NextResponse.json({ error: "Prescription not available yet" }, { status: 400 });
   }
+
+  // A family member's prescription carries their own age/gender — never the
+  // account holder's. Dependents have no saved address of their own.
+  const forDependent = !!appointment.dependentId;
+  const profile = appointment.patient.patientProfile;
 
   return NextResponse.json({
     id: appointment.id,
@@ -52,9 +62,9 @@ export async function GET(
     patientName: appointment.patientName,
     accountHolderName: appointment.patient.name,
     relation: appointment.relation,
-    patientAge: appointment.patient.patientProfile?.age ?? null,
-    patientGender: appointment.patient.patientProfile?.gender ?? null,
-    patientAddress: appointment.patient.patientProfile?.homeAddress ?? null,
+    patientAge: (forDependent ? appointment.dependent?.age : profile?.age) ?? null,
+    patientGender: (forDependent ? appointment.dependent?.gender : profile?.gender) ?? null,
+    patientAddress: forDependent ? null : profile?.homeAddress ?? null,
     doctorName: appointment.doctor.name,
     doctorQualification: appointment.doctor.doctorProfile?.qualification ?? null,
     doctorRegNo: appointment.doctor.doctorProfile?.medRegNo ?? null,

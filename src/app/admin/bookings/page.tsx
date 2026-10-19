@@ -6,7 +6,6 @@ import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-
 import { cn, formatProviderName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
-import type { PrescriptionData } from "@/components/patient/PrescriptionDocument";
 
 interface Appointment {
   id: string;
@@ -85,30 +84,6 @@ const FILTERS = ["ALL", "SCHEDULED", "COMPLETED", "CANCELLED", "NO_SHOW"];
 
 function downloadUrl(fileUrl: string, name: string) {
   return `/api/files/download?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(name)}`;
-}
-
-function toPrescriptionData(a: AppointmentDetail): PrescriptionData {
-  return {
-    id: a.id,
-    scheduledAt: a.scheduledAt,
-    patientName: a.patientName,
-    accountHolderName: a.patient.name,
-    relation: a.relation,
-    patientAge: a.patient.patientProfile?.age ?? null,
-    patientGender: a.patient.patientProfile?.gender ?? null,
-    patientAddress: a.patient.patientProfile?.homeAddress ?? null,
-    doctorName: a.doctor.name,
-    doctorQualification: a.doctor.doctorProfile?.qualification ?? null,
-    doctorRegNo: a.doctor.doctorProfile?.medRegNo ?? null,
-    doctorSpecialty: a.doctor.doctorProfile?.specialty ?? "General Physician",
-    clinicName: a.doctor.doctorProfile?.clinicName ?? null,
-    doctorNotes: a.doctorNotes,
-    doctorSignatureUrl: a.doctor.doctorProfile?.signatureUrl ?? null,
-    medicines: a.medicines.map((m) => ({
-      name: m.name, dosage: m.dosage, frequency: m.frequency, duration: m.duration, instructions: m.instructions,
-    })),
-    tests: a.tests.map((t) => ({ name: t.name, instructions: t.instructions })),
-  };
 }
 
 // ── Booking Detail Drawer ────────────────────────────────────────
@@ -195,11 +170,7 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
                 ) : (
                   <div className="p-4 space-y-4">
                     {(data.medicines.length > 0 || data.tests.length > 0) && (
-                      <PrescriptionDownloadButton
-                        appointmentId={data.id}
-                        patientId={data.patientId}
-                        data={toPrescriptionData(data)}
-                      />
+                      <PrescriptionDownloadButton appointmentId={data.id} patientId={data.patientId} />
                     )}
                     {data.attachments.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">

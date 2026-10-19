@@ -422,6 +422,7 @@ export const ModelName = {
   Message: 'Message',
   PrescriptionMedicine: 'PrescriptionMedicine',
   PrescriptionTest: 'PrescriptionTest',
+  PrescriptionVersion: 'PrescriptionVersion',
   PrescriptionAttachment: 'PrescriptionAttachment',
   Review: 'Review',
   Complaint: 'Complaint',
@@ -452,7 +453,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
+    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionVersion" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2306,6 +2307,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PrescriptionVersion: {
+      payload: Prisma.$PrescriptionVersionPayload<ExtArgs>
+      fields: Prisma.PrescriptionVersionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PrescriptionVersionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PrescriptionVersionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload>
+        }
+        findFirst: {
+          args: Prisma.PrescriptionVersionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PrescriptionVersionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload>
+        }
+        findMany: {
+          args: Prisma.PrescriptionVersionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload>[]
+        }
+        create: {
+          args: Prisma.PrescriptionVersionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload>
+        }
+        createMany: {
+          args: Prisma.PrescriptionVersionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PrescriptionVersionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload>[]
+        }
+        delete: {
+          args: Prisma.PrescriptionVersionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload>
+        }
+        update: {
+          args: Prisma.PrescriptionVersionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PrescriptionVersionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PrescriptionVersionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PrescriptionVersionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PrescriptionVersionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrescriptionVersionPayload>
+        }
+        aggregate: {
+          args: Prisma.PrescriptionVersionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePrescriptionVersion>
+        }
+        groupBy: {
+          args: Prisma.PrescriptionVersionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PrescriptionVersionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PrescriptionVersionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PrescriptionVersionCountAggregateOutputType> | number
+        }
+      }
+    }
     PrescriptionAttachment: {
       payload: Prisma.$PrescriptionAttachmentPayload<ExtArgs>
       fields: Prisma.PrescriptionAttachmentFieldRefs
@@ -3772,6 +3847,7 @@ export const AppointmentScalarFieldEnum = {
   nurseReferralId: 'nurseReferralId',
   status: 'status',
   acceptedAt: 'acceptedAt',
+  completedAt: 'completedAt',
   paymentMethod: 'paymentMethod',
   paymentStatus: 'paymentStatus',
   paidAt: 'paidAt',
@@ -3919,6 +3995,19 @@ export const PrescriptionTestScalarFieldEnum = {
 } as const
 
 export type PrescriptionTestScalarFieldEnum = (typeof PrescriptionTestScalarFieldEnum)[keyof typeof PrescriptionTestScalarFieldEnum]
+
+
+export const PrescriptionVersionScalarFieldEnum = {
+  id: 'id',
+  appointmentId: 'appointmentId',
+  version: 'version',
+  medicines: 'medicines',
+  tests: 'tests',
+  editedById: 'editedById',
+  createdAt: 'createdAt'
+} as const
+
+export type PrescriptionVersionScalarFieldEnum = (typeof PrescriptionVersionScalarFieldEnum)[keyof typeof PrescriptionVersionScalarFieldEnum]
 
 
 export const PrescriptionAttachmentScalarFieldEnum = {
@@ -4436,6 +4525,7 @@ export type GlobalOmitConfig = {
   message?: Prisma.MessageOmit
   prescriptionMedicine?: Prisma.PrescriptionMedicineOmit
   prescriptionTest?: Prisma.PrescriptionTestOmit
+  prescriptionVersion?: Prisma.PrescriptionVersionOmit
   prescriptionAttachment?: Prisma.PrescriptionAttachmentOmit
   review?: Prisma.ReviewOmit
   complaint?: Prisma.ComplaintOmit

@@ -10,6 +10,7 @@ import VitalsCharts, { type VitalReadingRow } from "@/components/VitalsCharts";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import { computeBMI, bmiCategoryClasses } from "@/lib/bmi";
+import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
 
 interface Medicine {
   id: string;
@@ -35,6 +36,7 @@ interface HistoryAppointment {
   doctorNotes: string | null;
   scheduledAt: string;
   medicines: Medicine[];
+  tests: { id: string }[];
   attachments: Attachment[];
   review: { rating: number; comment: string | null } | null;
 }
@@ -255,6 +257,12 @@ function DoctorPatientHistoryInner() {
                           <Paperclip className="w-3 h-3" /> {att.fileName ?? `Attachment ${i + 1}`}
                         </a>
                       ))}
+                    </div>
+                  )}
+                  {/* The prescription exactly as issued to the patient — same document they download. */}
+                  {a.status === "COMPLETED" && (a.medicines.length > 0 || a.tests.length > 0 || !!a.doctorNotes) && (
+                    <div className="mb-2">
+                      <PrescriptionDownloadButton appointmentId={a.id} patientId={params.id} />
                     </div>
                   )}
                   {a.review && (

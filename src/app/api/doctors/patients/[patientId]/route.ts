@@ -36,7 +36,7 @@ export async function GET(
   const sharedAppointments = await prisma.appointment.findMany({
     where: { doctorId: authUser.id, patientId, dependentId: dependentId ?? null },
     orderBy: { scheduledAt: "desc" },
-    include: { medicines: true, attachments: true, review: true },
+    include: { medicines: true, tests: true, attachments: true, review: true },
   });
 
   const patient = await prisma.user.findUnique({
