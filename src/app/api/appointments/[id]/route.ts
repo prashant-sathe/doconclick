@@ -14,6 +14,7 @@ import { cancelAndRefund, claimStatusChange, isAlreadyClosed, ALREADY_CLOSED_MES
 import { cancelAndReassign } from "@/lib/reassignment";
 import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
 import { doctorSlotProblem, snapToClinicGrid, isTimedBooking, isSlotIndexViolation } from "@/lib/doctorSlots";
+import { getBookingHorizonDays, horizonProblem, doctorHoursProblem } from "@/lib/bookingLimits";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
   SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
@@ -485,6 +486,8 @@ export async function PATCH(
         return NextResponse.json({ error: "Please pick a time in the future." }, { status: 400 });
       }
       let when = new Date(Math.floor(picked.getTime() / 60_000) * 60_000);
+      const tooFar = horizonProblem(when, await getBookingHorizonDays());
+      if (tooFar) return NextResponse.json({ error: tooFar }, { status: 400 });
       if (appointment.consultType === "CLINIC" && appointment.clinicId) {
         const clinic = await prisma.clinic.findUnique({
           where: { id: appointment.clinicId },
@@ -518,6 +521,12 @@ export async function PATCH(
           checkHours: svc?.kind !== "SHIFT",
         });
         if (problem) return NextResponse.json({ error: problem }, { status: 409 });
+      }
+      if (appointment.providerType !== "NURSE" && appointment.consultType !== "CLINIC") {
+        // Same rule as a new home/video booking: within the doctor's set hours.
+        const profile = await prisma.doctorProfile.findUnique({ where: { userId: appointment.doctorId }, select: { availability: true } });
+        const outside = doctorHoursProblem(profile?.availability, when);
+        if (outside) return NextResponse.json({ error: outside, code: "OUTSIDE_HOURS" }, { status: 400 });
       }
       if (appointment.providerType !== "NURSE") {
         const problem = await doctorSlotProblem({

@@ -4,6 +4,7 @@ import { Settings, Info, ShieldCheck, ChevronRight } from "lucide-react";
 import NotificationSettings from "@/components/NotificationSettings";
 import SplashSettings from "@/components/SplashSettings";
 import NurseSettings from "@/components/admin/NurseSettings";
+import BookingSettings from "@/components/admin/BookingSettings";
 
 export default function AdminSettings() {
   return (
@@ -42,6 +43,8 @@ export default function AdminSettings() {
           </div>
           <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
         </Link>
+
+        <BookingSettings />
 
         <NurseSettings />
 

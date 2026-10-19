@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { BOOKING_HORIZON_MIN_DAYS, BOOKING_HORIZON_MAX_DAYS } from "@/lib/bookingHorizon";
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -64,6 +65,17 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "Nurse fees must be between ₹0 and ₹1,00,000." }, { status: 400 });
     }
     data[key] = Math.round(value);
+  }
+
+  if (body.bookingHorizonDays !== undefined) {
+    const value = finiteNumber(body.bookingHorizonDays);
+    if (value === null || !Number.isInteger(value) || value < BOOKING_HORIZON_MIN_DAYS || value > BOOKING_HORIZON_MAX_DAYS) {
+      return NextResponse.json(
+        { error: `Booking window must be a whole number of days between ${BOOKING_HORIZON_MIN_DAYS} and ${BOOKING_HORIZON_MAX_DAYS}.` },
+        { status: 400 }
+      );
+    }
+    data.bookingHorizonDays = value;
   }
 
   if (body.splashImageUrl !== undefined) {

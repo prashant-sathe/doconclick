@@ -53,6 +53,9 @@ async function main() {
   const noCoords = await mk("PATIENT", { termsAcceptedAt: new Date(), patientProfile: profile({ lat: null, lng: null }) });
   const noAddress = await mk("PATIENT", { termsAcceptedAt: new Date(), patientProfile: profile({ homeAddress: null }) });
   const farHome = await mk("PATIENT", { termsAcceptedAt: new Date(), patientProfile: profile({ homeAddress: "7 Far Rd, Mumbai", ...FAR }) });
+  // The doctor section books as its own patient — booking POSTs are
+  // rate-limited per user, and `patient` already makes the nurse bookings.
+  const docPatient = await mk("PATIENT", { termsAcceptedAt: new Date(), patientProfile: profile() });
   const nurse = await mk("NURSE", {
     nurseProfile: {
       create: {
@@ -69,7 +72,7 @@ async function main() {
   const docProfile = (extra: Record<string, unknown> = {}) => ({
     create: {
       status: "APPROVED", isVerified: true, trialEndsAt: new Date(Date.now() + 30 * DAY), specialty,
-      offersHomeVisit: true, homeVisitFee: 800, radius: 10, availability: "", ...HOME_A, ...extra,
+      offersHomeVisit: true, homeVisitFee: 800, radius: 10, availability: "Sun-Sat, 12AM-11:59PM", ...HOME_A, ...extra,
     },
   });
   const doctor = await mk("DOCTOR", { doctorProfile: docProfile() });
@@ -127,7 +130,7 @@ async function main() {
     // ── Doctor HOME bookings ──
     const docBook = (as: typeof patient, extra: Record<string, unknown> = {}) =>
       call(as, "POST", "/api/appointments", { doctorId: doctor.id, symptoms: "fever", consultType: "HOME", consentGiven: true, scheduledAt: later(), ...extra });
-    r = await docBook(patient, { patientLat: NEAR.lat, patientLng: NEAR.lng });
+    r = await docBook(docPatient, { patientLat: NEAR.lat, patientLng: NEAR.lng });
     const dh = await prisma.appointment.findUnique({ where: { id: r.json.id ?? "" } });
     check("doctor HOME snapshots the profile address with its own coordinates", r.status === 200 && dh?.visitAddress === "12 Old Lane, Pune"
       && dh.visitLat === HOME_A.lat && dh.visitPinCode === "411001", `${r.status} ${dh?.visitAddress} @ ${dh?.visitLat}`);
@@ -135,10 +138,10 @@ async function main() {
     const dn = await prisma.appointment.findUnique({ where: { id: r.json.id ?? "" } });
     check("profile without coordinates → phone position as the coordinates", r.status === 200 && dn?.visitAddress === "12 Old Lane, Pune" && dn.visitLat === NEAR.lat,
       `${r.status} ${dn?.visitLat}`);
-    r = await docBook(patient, { visit: visitB });
+    r = await docBook(docPatient, { visit: visitB });
     const dv = await prisma.appointment.findUnique({ where: { id: r.json.id ?? "" } });
     check("doctor HOME accepts an explicit visit address", r.status === 200 && dv?.visitAddress === visitB.address && dv.visitLat === NEAR.lat, `${r.status}`);
-    r = await docBook(patient, { visit: { address: "Far flat, Mumbai", ...FAR } });
+    r = await docBook(docPatient, { visit: { address: "Far flat, Mumbai", ...FAR } });
     check("doctor radius checked against the visit address", r.status === 400 && /within 10 km/.test(r.json.error ?? ""), `${r.status} ${r.json.error}`);
     r = await docBook(noAddress, { patientLat: NEAR.lat, patientLng: NEAR.lng });
     check("doctor HOME without any address → 409 ADDRESS_REQUIRED", r.status === 409 && r.json.code === "ADDRESS_REQUIRED", `${r.status} ${r.json.code}`);
@@ -146,7 +149,7 @@ async function main() {
     check("doctor HOME with no coordinates anywhere → 409 LOCATION_REQUIRED (radius never skipped)", r.status === 409 && r.json.code === "LOCATION_REQUIRED", `${r.status} ${r.json.code}`);
     r = await docBook(farHome);
     check("doctor radius falls back to the saved profile coordinates", r.status === 400 && /within 10 km/.test(r.json.error ?? ""), `${r.status} ${r.json.error}`);
-    r = await docBook(patient, { visit: { address: "typed only" } });
+    r = await docBook(docPatient, { visit: { address: "typed only" } });
     check("doctor HOME rejects a typed address without coordinates", r.status === 400 && r.json.code === "LOCATION_REQUIRED", `${r.status}`);
 
     // Legacy row (booked before snapshots): dashboard falls back to the profile.
@@ -156,7 +159,7 @@ async function main() {
     const video = await prisma.appointment.create({
       data: { patientId: patient.id, doctorId: doctor.id, symptoms: "v", consultType: "VIDEO", amount: 300, status: "SCHEDULED", scheduledAt: new Date(later()) },
     });
-    await prisma.patientProfile.update({ where: { userId: patient.id }, data: { homeAddress: "99 Moved Away Rd", lat: FAR.lat, lng: FAR.lng } });
+    await prisma.patientProfile.updateMany({ where: { userId: { in: [patient.id, docPatient.id] } }, data: { homeAddress: "99 Moved Away Rd", lat: FAR.lat, lng: FAR.lng } });
     const docView = (await call(doctor, "GET", "/api/appointments/me")).json as { id: string; visit: { address: string; lat: number; snapshot: boolean } | null }[];
     const byId = Object.fromEntries(docView.map((a) => [a.id, a.visit]));
     check("doctor dashboard: snapshot for new bookings", byId[dh!.id]?.address === "12 Old Lane, Pune" && byId[dh!.id]?.lat === HOME_A.lat && byId[dh!.id]?.snapshot === true,

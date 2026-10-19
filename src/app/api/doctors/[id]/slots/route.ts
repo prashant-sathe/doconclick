@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { generateSlotsForDate, SLOT_INTERVAL_MINUTES } from "@/lib/clinicAvailability";
 import { isTimedBooking } from "@/lib/doctorSlots";
+import { getBookingHorizonDays, horizonProblem } from "@/lib/bookingLimits";
 
 // GET /api/doctors/[id]/slots?clinicId=X&date=YYYY-MM-DD
 // Discrete bookable time slots for one of a doctor's clinics on one date —
@@ -34,7 +35,10 @@ export async function GET(
     return NextResponse.json({ error: "Clinic not found" }, { status: 404 });
   }
 
-  const candidates = generateSlotsForDate(clinic.slots, date, new Date(), clinic.leaves.map((l) => l.date));
+  // Nothing past the booking horizon — the booking route would refuse it.
+  const horizonDays = await getBookingHorizonDays();
+  const candidates = generateSlotsForDate(clinic.slots, date, new Date(), clinic.leaves.map((l) => l.date))
+    .filter((s) => !horizonProblem(new Date(`${date}T${s.time}:00+05:30`), horizonDays));
   if (candidates.length === 0) {
     return NextResponse.json({ slots: [] });
   }

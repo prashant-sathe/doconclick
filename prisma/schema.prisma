@@ -733,6 +733,9 @@ model PlatformSettings {
   // One-time: the starter 12h/24h shift services were added to an existing
   // catalogue (so an admin deleting them later doesn't bring them back).
   nurseShiftServicesSeeded Boolean @default(false)
+  // How far ahead a patient can book or reschedule (doctor and nurse), in
+  // days — see src/lib/bookingLimits.ts.
+  bookingHorizonDays      Int      @default(60)
   // Mobile app splash: admin uploads an image that the native shell shows over
   // the WebView while it boots (the real native splash is baked into the app
   // binary and can't change without a store update — this is the dynamic layer

@@ -8,6 +8,7 @@ import { missingProfileFields } from "@/lib/bookingProfile";
 import { isNurseBookable } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
 import { buildVisitSchedule, intervalLabel, isShift, shiftLabel, PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
+import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, openRequestsProblem } from "@/lib/bookingLimits";
 
 // POST: patient books a nurse home visit (or a multi-visit package) for one service. Stored as a
 // regular Appointment (providerType NURSE, doctorId = the nurse) so payment,
@@ -18,6 +19,10 @@ export async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+  // Every request pushes the nurse — cap how fast one patient can send them.
+  if (!checkBookingRateLimit(authUser.id)) {
+    return NextResponse.json({ error: "Too many booking attempts. Please wait a few minutes and try again." }, { status: 429 });
   }
 
   const body = await req.json().catch(() => ({}));
@@ -106,7 +111,13 @@ export async function POST(req: Request) {
     if (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()) {
       return NextResponse.json({ error: "Please pick a time in the future." }, { status: 400 });
     }
+    // The package's later visits may run past this; the start may not.
+    const tooFar = horizonProblem(when, await getBookingHorizonDays());
+    if (tooFar) return NextResponse.json({ error: tooFar }, { status: 400 });
   }
+
+  const tooMany = await openRequestsProblem(authUser.id, nurseId);
+  if (tooMany) return NextResponse.json({ error: tooMany, code: "TOO_MANY_REQUESTS" }, { status: 409 });
 
   // A shift (12h / 24h) is planned care: it needs a start time, at least an
   // hour ahead, and runs on consecutive days. It isn't bound by the nurse's

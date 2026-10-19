@@ -33,6 +33,7 @@ export type PlatformSettingsAvgAggregateOutputType = {
   nurseCommissionPercent: number | null
   nurseRegistrationFee: number | null
   nurseSubscriptionFee: number | null
+  bookingHorizonDays: number | null
 }
 
 export type PlatformSettingsSumAggregateOutputType = {
@@ -42,6 +43,7 @@ export type PlatformSettingsSumAggregateOutputType = {
   nurseCommissionPercent: number | null
   nurseRegistrationFee: number | null
   nurseSubscriptionFee: number | null
+  bookingHorizonDays: number | null
 }
 
 export type PlatformSettingsMinAggregateOutputType = {
@@ -53,6 +55,7 @@ export type PlatformSettingsMinAggregateOutputType = {
   nurseRegistrationFee: number | null
   nurseSubscriptionFee: number | null
   nurseShiftServicesSeeded: boolean | null
+  bookingHorizonDays: number | null
   splashImageUrl: string | null
   splashFit: string | null
   splashBgColor: string | null
@@ -68,6 +71,7 @@ export type PlatformSettingsMaxAggregateOutputType = {
   nurseRegistrationFee: number | null
   nurseSubscriptionFee: number | null
   nurseShiftServicesSeeded: boolean | null
+  bookingHorizonDays: number | null
   splashImageUrl: string | null
   splashFit: string | null
   splashBgColor: string | null
@@ -83,6 +87,7 @@ export type PlatformSettingsCountAggregateOutputType = {
   nurseRegistrationFee: number
   nurseSubscriptionFee: number
   nurseShiftServicesSeeded: number
+  bookingHorizonDays: number
   splashImageUrl: number
   splashFit: number
   splashBgColor: number
@@ -98,6 +103,7 @@ export type PlatformSettingsAvgAggregateInputType = {
   nurseCommissionPercent?: true
   nurseRegistrationFee?: true
   nurseSubscriptionFee?: true
+  bookingHorizonDays?: true
 }
 
 export type PlatformSettingsSumAggregateInputType = {
@@ -107,6 +113,7 @@ export type PlatformSettingsSumAggregateInputType = {
   nurseCommissionPercent?: true
   nurseRegistrationFee?: true
   nurseSubscriptionFee?: true
+  bookingHorizonDays?: true
 }
 
 export type PlatformSettingsMinAggregateInputType = {
@@ -118,6 +125,7 @@ export type PlatformSettingsMinAggregateInputType = {
   nurseRegistrationFee?: true
   nurseSubscriptionFee?: true
   nurseShiftServicesSeeded?: true
+  bookingHorizonDays?: true
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
@@ -133,6 +141,7 @@ export type PlatformSettingsMaxAggregateInputType = {
   nurseRegistrationFee?: true
   nurseSubscriptionFee?: true
   nurseShiftServicesSeeded?: true
+  bookingHorizonDays?: true
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
@@ -148,6 +157,7 @@ export type PlatformSettingsCountAggregateInputType = {
   nurseRegistrationFee?: true
   nurseSubscriptionFee?: true
   nurseShiftServicesSeeded?: true
+  bookingHorizonDays?: true
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
@@ -250,6 +260,7 @@ export type PlatformSettingsGroupByOutputType = {
   nurseRegistrationFee: number
   nurseSubscriptionFee: number
   nurseShiftServicesSeeded: boolean
+  bookingHorizonDays: number
   splashImageUrl: string | null
   splashFit: string
   splashBgColor: string
@@ -288,6 +299,7 @@ export type PlatformSettingsWhereInput = {
   nurseRegistrationFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseSubscriptionFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseShiftServicesSeeded?: Prisma.BoolFilter<"PlatformSettings"> | boolean
+  bookingHorizonDays?: Prisma.IntFilter<"PlatformSettings"> | number
   splashImageUrl?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringFilter<"PlatformSettings"> | string
@@ -303,6 +315,7 @@ export type PlatformSettingsOrderByWithRelationInput = {
   nurseRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
+  bookingHorizonDays?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -321,6 +334,7 @@ export type PlatformSettingsWhereUniqueInput = Prisma.AtLeast<{
   nurseRegistrationFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseSubscriptionFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseShiftServicesSeeded?: Prisma.BoolFilter<"PlatformSettings"> | boolean
+  bookingHorizonDays?: Prisma.IntFilter<"PlatformSettings"> | number
   splashImageUrl?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringFilter<"PlatformSettings"> | string
@@ -336,6 +350,7 @@ export type PlatformSettingsOrderByWithAggregationInput = {
   nurseRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
+  bookingHorizonDays?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -359,6 +374,7 @@ export type PlatformSettingsScalarWhereWithAggregatesInput = {
   nurseRegistrationFee?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   nurseSubscriptionFee?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   nurseShiftServicesSeeded?: Prisma.BoolWithAggregatesFilter<"PlatformSettings"> | boolean
+  bookingHorizonDays?: Prisma.IntWithAggregatesFilter<"PlatformSettings"> | number
   splashImageUrl?: Prisma.StringNullableWithAggregatesFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
@@ -374,6 +390,7 @@ export type PlatformSettingsCreateInput = {
   nurseRegistrationFee?: number
   nurseSubscriptionFee?: number
   nurseShiftServicesSeeded?: boolean
+  bookingHorizonDays?: number
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
@@ -389,6 +406,7 @@ export type PlatformSettingsUncheckedCreateInput = {
   nurseRegistrationFee?: number
   nurseSubscriptionFee?: number
   nurseShiftServicesSeeded?: boolean
+  bookingHorizonDays?: number
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
@@ -404,6 +422,7 @@ export type PlatformSettingsUpdateInput = {
   nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -419,6 +438,7 @@ export type PlatformSettingsUncheckedUpdateInput = {
   nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -434,6 +454,7 @@ export type PlatformSettingsCreateManyInput = {
   nurseRegistrationFee?: number
   nurseSubscriptionFee?: number
   nurseShiftServicesSeeded?: boolean
+  bookingHorizonDays?: number
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
@@ -449,6 +470,7 @@ export type PlatformSettingsUpdateManyMutationInput = {
   nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -464,6 +486,7 @@ export type PlatformSettingsUncheckedUpdateManyInput = {
   nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -479,6 +502,7 @@ export type PlatformSettingsCountOrderByAggregateInput = {
   nurseRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
+  bookingHorizonDays?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -492,6 +516,7 @@ export type PlatformSettingsAvgOrderByAggregateInput = {
   nurseCommissionPercent?: Prisma.SortOrder
   nurseRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
+  bookingHorizonDays?: Prisma.SortOrder
 }
 
 export type PlatformSettingsMaxOrderByAggregateInput = {
@@ -503,6 +528,7 @@ export type PlatformSettingsMaxOrderByAggregateInput = {
   nurseRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
+  bookingHorizonDays?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -518,6 +544,7 @@ export type PlatformSettingsMinOrderByAggregateInput = {
   nurseRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
+  bookingHorizonDays?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -531,6 +558,7 @@ export type PlatformSettingsSumOrderByAggregateInput = {
   nurseCommissionPercent?: Prisma.SortOrder
   nurseRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
+  bookingHorizonDays?: Prisma.SortOrder
 }
 
 
@@ -544,6 +572,7 @@ export type PlatformSettingsSelect<ExtArgs extends runtime.Types.Extensions.Inte
   nurseRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
+  bookingHorizonDays?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
@@ -559,6 +588,7 @@ export type PlatformSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   nurseRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
+  bookingHorizonDays?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
@@ -574,6 +604,7 @@ export type PlatformSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   nurseRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
+  bookingHorizonDays?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
@@ -589,13 +620,14 @@ export type PlatformSettingsSelectScalar = {
   nurseRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
+  bookingHorizonDays?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
   updatedAt?: boolean
 }
 
-export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "nurseSubscriptionFee" | "nurseShiftServicesSeeded" | "splashImageUrl" | "splashFit" | "splashBgColor" | "updatedAt", ExtArgs["result"]["platformSettings"]>
+export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "nurseSubscriptionFee" | "nurseShiftServicesSeeded" | "bookingHorizonDays" | "splashImageUrl" | "splashFit" | "splashBgColor" | "updatedAt", ExtArgs["result"]["platformSettings"]>
 
 export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlatformSettings"
@@ -609,6 +641,7 @@ export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.In
     nurseRegistrationFee: number
     nurseSubscriptionFee: number
     nurseShiftServicesSeeded: boolean
+    bookingHorizonDays: number
     splashImageUrl: string | null
     splashFit: string
     splashBgColor: string
@@ -1044,6 +1077,7 @@ export interface PlatformSettingsFieldRefs {
   readonly nurseRegistrationFee: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly nurseSubscriptionFee: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly nurseShiftServicesSeeded: Prisma.FieldRef<"PlatformSettings", 'Boolean'>
+  readonly bookingHorizonDays: Prisma.FieldRef<"PlatformSettings", 'Int'>
   readonly splashImageUrl: Prisma.FieldRef<"PlatformSettings", 'String'>
   readonly splashFit: Prisma.FieldRef<"PlatformSettings", 'String'>
   readonly splashBgColor: Prisma.FieldRef<"PlatformSettings", 'String'>

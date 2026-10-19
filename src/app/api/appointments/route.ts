@@ -10,11 +10,16 @@ import { isDoctorBookable, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
 import { parseVisitInput, snapshotFromProfile, type VisitSnapshot } from "@/lib/visitAddress";
 import { parseBody, appointmentBookingSchema } from "@/lib/schemas";
 import { doctorSlotProblem, snapToClinicGrid, isSlotIndexViolation } from "@/lib/doctorSlots";
+import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, doctorHoursProblem, openRequestsProblem } from "@/lib/bookingLimits";
 
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+  // Every request pushes the doctor — cap how fast one patient can send them.
+  if (!checkBookingRateLimit(authUser.id)) {
+    return NextResponse.json({ error: "Too many booking attempts. Please wait a few minutes and try again." }, { status: 429 });
   }
 
   try {
@@ -117,6 +122,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Please pick a time in the future." }, { status: 400 });
       }
       bookAt = new Date(Math.floor(when.getTime() / 60_000) * 60_000);
+      const tooFar = horizonProblem(bookAt, await getBookingHorizonDays());
+      if (tooFar) return NextResponse.json({ error: tooFar }, { status: 400 });
     }
 
     if (consultType === "HOME" && !doctor.doctorProfile.offersHomeVisit) {
@@ -209,6 +216,16 @@ export async function POST(req: Request) {
     if (consultType === "VIDEO" && !doctor.doctorProfile.offersVideo) {
       return NextResponse.json({ error: "This doctor does not offer video consultations" }, { status: 400 });
     }
+
+    // A scheduled home/video time must be within the doctor's set hours (a
+    // clinic time was already checked against that clinic's slots above).
+    if (bookAt && consultType !== "CLINIC") {
+      const outside = doctorHoursProblem(doctor.doctorProfile.availability, bookAt);
+      if (outside) return NextResponse.json({ error: outside, code: "OUTSIDE_HOURS" }, { status: 400 });
+    }
+
+    const tooMany = await openRequestsProblem(authUser.id, doctorId);
+    if (tooMany) return NextResponse.json({ error: tooMany, code: "TOO_MANY_REQUESTS" }, { status: 409 });
 
     // A scheduled booking holds the doctor for a slot across all their clinics
     // and consult types. "Now" bookings are exempt: there's no discrete slot
