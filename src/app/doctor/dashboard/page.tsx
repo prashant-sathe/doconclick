@@ -23,8 +23,8 @@ import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { cn, formatDoctorName } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import RescheduleRequestBox from "@/components/RescheduleRequestBox";
-import { isNative, getCurrentPositionCompat } from "@/lib/platform";
-import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
+import { getCurrentPositionCompat } from "@/lib/platform";
+import { useJourneyTracker } from "@/components/JourneyTracker";
 import { useResync } from "@/hooks/useResync";
 import PullToRefresh from "@/components/PullToRefresh";
 import { compressImage } from "@/lib/compressImage";
@@ -860,10 +860,10 @@ export default function DoctorDashboard() {
   };
 
   // ── Live journey tracking for home visits ───────────────────────────────
-  const watchIdRef = useRef<number | null>(null);
-  const lastSentRef = useRef<number>(0);
+  // The watcher itself lives in JourneyTracker (the doctor layout), so it
+  // survives leaving this page (chat, video…) and resumes after a reload.
+  const journey = useJourneyTracker();
   const [startingJourneyId, setStartingJourneyId] = useState<string | null>(null);
-
   // "Start journey" / "Stop journey" both notify the patient — confirm first.
   const [journeyConfirm, setJourneyConfirm] = useState<{ appt: Appointment; action: "start" | "stop" } | null>(null);
   const [journeyError, setJourneyError] = useState<{ id: string; message: string } | null>(null);
@@ -874,15 +874,6 @@ export default function DoctorDashboard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ travelStatus, ...(lat != null && lng != null ? { lat, lng } : {}) }),
     });
-  };
-
-  const stopWatch = async () => {
-    if (isNative()) {
-      await stopBackgroundLocationWatch().catch(() => {});
-    } else if (watchIdRef.current != null) {
-      navigator.geolocation.clearWatch(watchIdRef.current);
-      watchIdRef.current = null;
-    }
   };
 
   const startJourney = async (apptId: string) => {
@@ -897,25 +888,7 @@ export default function DoctorDashboard() {
         setJourneyError({ id: apptId, message: (await res.json().catch(() => ({}))).error ?? "Could not start the journey." });
         return;
       }
-      lastSentRef.current = Date.now();
-      const onMove = (lat: number, lng: number) => {
-        const now = Date.now();
-        if (now - lastSentRef.current < 10000) return; // throttle to ~1 update/10s
-        lastSentRef.current = now;
-        sendPosition(apptId, "ON_THE_WAY", lat, lng);
-      };
-      if (isNative()) {
-        // Native: a background-geolocation watcher survives the app being
-        // backgrounded/screen locked, unlike navigator.geolocation below.
-        await startBackgroundLocationWatch(onMove);
-      } else if (navigator.geolocation) {
-        if (watchIdRef.current != null) navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = navigator.geolocation.watchPosition(
-          (p) => onMove(p.coords.latitude, p.coords.longitude),
-          () => {},
-          { enableHighAccuracy: true }
-        );
-      }
+      await journey.track(apptId, { justSent: true });
     } catch {
       setJourneyError({ id: apptId, message: "Location access is needed to share your journey with the patient." });
     } finally {
@@ -927,27 +900,17 @@ export default function DoctorDashboard() {
   // Back to "not started" — e.g. tapped by mistake, or turned back.
   const stopJourney = async (apptId: string) => {
     setJourneyError(null);
-    await stopWatch();
+    await journey.stop();
     const res = await sendPosition(apptId, "NOT_STARTED");
     if (!res.ok) setJourneyError({ id: apptId, message: (await res.json().catch(() => ({}))).error ?? "Could not stop the journey." });
     loadAppointments();
   };
 
   const markArrived = async (apptId: string) => {
-    await stopWatch();
+    await journey.stop();
     await sendPosition(apptId, "ARRIVED");
     loadAppointments();
   };
-
-  useEffect(() => {
-    return () => {
-      if (isNative()) {
-        stopBackgroundLocationWatch();
-      } else if (watchIdRef.current != null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-      }
-    };
-  }, []);
 
   if (authLoading || !user || (user.role !== "DOCTOR" && user.role !== "STAFF")) {
     return (

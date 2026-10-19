@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -10,8 +10,8 @@ import { useAuth } from "@/components/AuthProvider";
 import { NurseHeader, NurseMobileNav } from "@/components/nurse/NurseNav";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import RescheduleRequestBox from "@/components/RescheduleRequestBox";
-import { isNative, getCurrentPositionCompat } from "@/lib/platform";
-import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
+import { getCurrentPositionCompat } from "@/lib/platform";
+import { useJourneyTracker } from "@/components/JourneyTracker";
 import { cn } from "@/lib/utils";
 import { intervalLabel, visitStartProblem, shiftCompleteProblem } from "@/lib/nursePackage";
 import { SUGAR_TYPES, fToC, cToF, vitalsSummary, type VitalsInput } from "@/lib/vitals";
@@ -312,9 +312,10 @@ export default function NurseDashboardPage() {
     return () => clearInterval(t);
   }, [user, load]);
 
-  // ── Live journey tracking (same flow as the doctor dashboard) ──
-  const watchIdRef = useRef<number | null>(null);
-  const lastSentRef = useRef(0);
+  // ── Live journey tracking ──
+  // The watcher itself lives in JourneyTracker (the nurse layout), so it
+  // survives leaving this page and resumes after a reload.
+  const journey = useJourneyTracker();
   const sendPosition = (id: string, travelStatus: "NOT_STARTED" | "ON_THE_WAY" | "ARRIVED", lat?: number, lng?: number) =>
     fetch(`/api/appointments/${id}/travel`, {
       method: "PATCH",
@@ -328,19 +329,7 @@ export default function NurseDashboardPage() {
       const pos = await getCurrentPositionCompat({ enableHighAccuracy: true });
       const res = await sendPosition(id, "ON_THE_WAY", pos.coords.latitude, pos.coords.longitude);
       if (!res.ok) { setError((await res.json().catch(() => ({}))).error ?? "Could not start the journey."); return; }
-      lastSentRef.current = Date.now();
-      const onMove = (lat: number, lng: number) => {
-        const now = Date.now();
-        if (now - lastSentRef.current < 10000) return; // ~1 update / 10s
-        lastSentRef.current = now;
-        sendPosition(id, "ON_THE_WAY", lat, lng);
-      };
-      if (isNative()) {
-        await startBackgroundLocationWatch(onMove);
-      } else if (navigator.geolocation) {
-        if (watchIdRef.current != null) navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = navigator.geolocation.watchPosition((p) => onMove(p.coords.latitude, p.coords.longitude), () => {}, { enableHighAccuracy: true });
-      }
+      await journey.track(id, { justSent: true });
     } catch {
       setError("Location access is needed to share your journey with the patient.");
     } finally {
@@ -349,15 +338,10 @@ export default function NurseDashboardPage() {
     }
   };
 
-  const stopWatch = async () => {
-    if (isNative()) await stopBackgroundLocationWatch().catch(() => {});
-    else if (watchIdRef.current != null) { navigator.geolocation.clearWatch(watchIdRef.current); watchIdRef.current = null; }
-  };
-
   // Back to "not started" — e.g. tapped by mistake, or turned back.
   const stopJourney = async (id: string) => {
     setBusyId(id); setError("");
-    await stopWatch();
+    await journey.stop();
     const res = await sendPosition(id, "NOT_STARTED");
     if (!res.ok) setError((await res.json().catch(() => ({}))).error ?? "Could not stop the journey.");
     setBusyId(null);
@@ -366,7 +350,7 @@ export default function NurseDashboardPage() {
 
   const markArrived = async (id: string) => {
     setBusyId(id); setError("");
-    await stopWatch();
+    await journey.stop();
     const res = await sendPosition(id, "ARRIVED");
     if (!res.ok) setError((await res.json().catch(() => ({}))).error ?? "Could not update.");
     setBusyId(null);

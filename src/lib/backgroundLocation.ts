@@ -1,9 +1,9 @@
 import { registerPlugin } from "@capacitor/core";
 import type { BackgroundGeolocationPlugin } from "@capacitor-community/background-geolocation";
 
-// Only registered/used on native — see src/app/doctor/dashboard/page.tsx's
-// startJourney/markArrived for the web navigator.geolocation.watchPosition
-// equivalent, which stops the moment the app is backgrounded.
+// Only registered/used on native — see src/components/JourneyTracker.tsx for
+// the web navigator.geolocation.watchPosition equivalent, which stops the
+// moment the app is backgrounded.
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>("BackgroundGeolocation");
 
 let watcherId: string | null = null;
