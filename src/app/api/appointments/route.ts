@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { commissionPercentForConsultType } from "@/lib/platformFee";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
-import { haversine } from "@/lib/geo";
+import { haversine, withinSearchRadius } from "@/lib/geo";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
 import { isDoctorBookable, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
@@ -137,11 +137,21 @@ export async function POST(req: Request) {
       if (visit.visitLat == null && typeof patientLat === "number" && typeof patientLng === "number") {
         visit = { ...visit, visitLat: patientLat, visitLng: patientLng };
       }
-    }
+      // Same gates as nurse-bookings: somewhere to go, and coordinates to
+      // check the doctor's travel radius against — never skipped.
+      if (!visit.visitAddress) {
+        return NextResponse.json(
+          { error: "Please add your home address (Profile → Address) so the doctor knows where to come.", code: "ADDRESS_REQUIRED" },
+          { status: 409 }
+        );
+      }
+      if (visit.visitLat == null || visit.visitLng == null) {
+        return NextResponse.json(
+          { error: "Please pin your home address on the map (Profile → Address) or allow location, so we can check the doctor travels there.", code: "LOCATION_REQUIRED" },
+          { status: 409 }
+        );
+      }
 
-    if (consultType === "HOME" && visit?.visitLat != null && visit.visitLng != null) {
-      const visitLat = visit.visitLat;
-      const visitLng = visit.visitLng;
       let baseLat = doctor.doctorProfile.lat;
       let baseLng = doctor.doctorProfile.lng;
       if (baseLat == null || baseLng == null) {
@@ -152,16 +162,15 @@ export async function POST(req: Request) {
         baseLat = firstClinic?.lat ?? null;
         baseLng = firstClinic?.lng ?? null;
       }
-      if (baseLat != null && baseLng != null) {
-        const distanceKm = haversine(visitLat, visitLng, baseLat, baseLng);
-        if (distanceKm > doctor.doctorProfile.radius) {
-          return NextResponse.json(
-            {
-              error: `This doctor only offers home visits within ${doctor.doctorProfile.radius} km, and you're ${distanceKm.toFixed(1)} km away. Home visit isn't available right now.`,
-            },
-            { status: 400 }
-          );
-        }
+      // A doctor with no pin at all isn't blocked — same rule as the listing.
+      const distanceKm = baseLat != null && baseLng != null ? haversine(visit.visitLat, visit.visitLng, baseLat, baseLng) : null;
+      if (!withinSearchRadius(distanceKm, doctor.doctorProfile.radius, false)) {
+        return NextResponse.json(
+          {
+            error: `This doctor only offers home visits within ${doctor.doctorProfile.radius} km, and you're ${distanceKm!.toFixed(1)} km away. Home visit isn't available right now.`,
+          },
+          { status: 400 }
+        );
       }
     }
     if (consultType === "CLINIC" && !doctor.doctorProfile.offersClinic) {

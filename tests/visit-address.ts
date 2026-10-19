@@ -51,6 +51,8 @@ async function main() {
   });
   const patient = await mk("PATIENT", { termsAcceptedAt: new Date(), patientProfile: profile() });
   const noCoords = await mk("PATIENT", { termsAcceptedAt: new Date(), patientProfile: profile({ lat: null, lng: null }) });
+  const noAddress = await mk("PATIENT", { termsAcceptedAt: new Date(), patientProfile: profile({ homeAddress: null }) });
+  const farHome = await mk("PATIENT", { termsAcceptedAt: new Date(), patientProfile: profile({ homeAddress: "7 Far Rd, Mumbai", ...FAR }) });
   const nurse = await mk("NURSE", {
     nurseProfile: {
       create: {
@@ -138,6 +140,12 @@ async function main() {
     check("doctor HOME accepts an explicit visit address", r.status === 200 && dv?.visitAddress === visitB.address && dv.visitLat === NEAR.lat, `${r.status}`);
     r = await docBook(patient, { visit: { address: "Far flat, Mumbai", ...FAR } });
     check("doctor radius checked against the visit address", r.status === 400 && /within 10 km/.test(r.json.error ?? ""), `${r.status} ${r.json.error}`);
+    r = await docBook(noAddress, { patientLat: NEAR.lat, patientLng: NEAR.lng });
+    check("doctor HOME without any address → 409 ADDRESS_REQUIRED", r.status === 409 && r.json.code === "ADDRESS_REQUIRED", `${r.status} ${r.json.code}`);
+    r = await docBook(noCoords);
+    check("doctor HOME with no coordinates anywhere → 409 LOCATION_REQUIRED (radius never skipped)", r.status === 409 && r.json.code === "LOCATION_REQUIRED", `${r.status} ${r.json.code}`);
+    r = await docBook(farHome);
+    check("doctor radius falls back to the saved profile coordinates", r.status === 400 && /within 10 km/.test(r.json.error ?? ""), `${r.status} ${r.json.error}`);
     r = await docBook(patient, { visit: { address: "typed only" } });
     check("doctor HOME rejects a typed address without coordinates", r.status === 400 && r.json.code === "LOCATION_REQUIRED", `${r.status}`);
 
