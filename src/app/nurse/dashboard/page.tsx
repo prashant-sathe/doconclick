@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -9,10 +9,13 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import { NurseHeader, NurseMobileNav } from "@/components/nurse/NurseNav";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import LoadError from "@/components/LoadError";
+import { useToast } from "@/components/Toast";
 import RescheduleRequestBox from "@/components/RescheduleRequestBox";
 import { getCurrentPositionCompat } from "@/lib/platform";
 import { useJourneyTracker } from "@/components/JourneyTracker";
 import { cn } from "@/lib/utils";
+import { mutate, useLoad } from "@/lib/apiClient";
 import { intervalLabel, visitStartProblem, shiftCompleteProblem } from "@/lib/nursePackage";
 import { SUGAR_TYPES, fToC, cToF, vitalsSummary, type VitalsInput } from "@/lib/vitals";
 
@@ -116,18 +119,17 @@ function RecordVitalsBox({ visit, onSaved }: { visit: Visit; onSaved: () => void
   const set = (k: keyof typeof f, val: string) => { setF((x) => ({ ...x, [k]: val })); setError(""); };
   const save = async () => {
     setBusy(true); setError("");
-    const res = await fetch(`/api/appointments/${visit.id}/vitals`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const res = await mutate<{ level: string; alerts?: { level: string; message: string }[]; doctorAlerted?: boolean }>(`/api/appointments/${visit.id}/vitals`, {
+      body: {
         systolic: f.systolic, diastolic: f.diastolic, pulse: f.pulse, spo2: f.spo2,
         temperatureC: f.tempF ? fToC(Number(f.tempF)) : "",
         sugarMgDl: f.sugar, sugarType: f.sugarType, notes: f.notes,
-      }),
+      },
+      fallback: "Could not save vitals.",
     });
-    const data = await res.json().catch(() => ({}));
     setBusy(false);
-    if (!res.ok) { setError(data.error ?? "Could not save vitals."); return; }
+    if (!res.ok) { setError(res.error); return; }
+    const data = res.data;
     setResult({ level: data.level, alerts: data.alerts ?? [], doctorAlerted: !!data.doctorAlerted });
     setF({ systolic: "", diastolic: "", pulse: "", spo2: "", tempF: "", sugar: "", sugarType: "RANDOM", notes: "" });
     setOpen(false);
@@ -219,9 +221,17 @@ function StartVisitBox({ visitId, scheduledAt, onStarted }: { visitId: string; s
 
   const send = async (payload: Record<string, string>) => {
     setBusy(true); setError("");
-    const res = await fetch(`/api/appointments/${visitId}/start-visit`, {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
-    });
+    // Not mutate(): a failure's `code` (OTP_LOCKED) matters here.
+    let res: Response;
+    try {
+      res = await fetch(`/api/appointments/${visitId}/start-visit`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+      });
+    } catch {
+      setBusy(false);
+      setError("Network error — check your connection and try again.");
+      return;
+    }
     const data = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok) {
@@ -281,8 +291,7 @@ function StartVisitBox({ visitId, scheduledAt, onStarted }: { visitId: string; s
 export default function NurseDashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [visits, setVisits] = useState<Visit[] | null>(null);
-  const [profileStatus, setProfileStatus] = useState<{ status: string; bookable: boolean } | null>(null);
+  const toast = useToast();
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("requests");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -296,42 +305,43 @@ export default function NurseDashboardPage() {
     if (!authLoading && !user) router.push("/login?next=/nurse/dashboard");
   }, [authLoading, user, router]);
 
-  const load = useCallback(async () => {
-    const res = await fetch("/api/appointments/me");
-    if (res.ok) setVisits(await res.json());
-  }, []);
-
-  useEffect(() => {
-    if (!user || user.role !== "NURSE") return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    load();
-    fetch("/api/nurses/me").then(async (r) => {
-      if (r.ok) { const d = await r.json(); setProfileStatus({ status: d.nurseProfile.status, bookable: d.bookable }); }
-    });
-    const t = setInterval(load, 10000);
-    return () => clearInterval(t);
-  }, [user, load]);
+  // Visits poll every 10s; a failed poll keeps the last list on screen.
+  const isNurse = !!user && user.role === "NURSE";
+  const visitsLoad = useLoad<Visit[]>(isNurse ? "/api/appointments/me" : null, { pollMs: 10000, fallback: "Couldn't load your visits." });
+  const profileLoad = useLoad<{ nurseProfile: { status: string }; bookable: boolean }>(isNurse ? "/api/nurses/me" : null, { fallback: "Couldn't load your profile status." });
+  const visits = visitsLoad.data;
+  const load = visitsLoad.reload;
+  const profileStatus = profileLoad.data ? { status: profileLoad.data.nurseProfile.status, bookable: profileLoad.data.bookable } : null;
+  const loadError = visitsLoad.error ?? profileLoad.error;
+  const retryLoad = () => { void visitsLoad.reload(); if (profileLoad.error) void profileLoad.reload(); };
 
   // ── Live journey tracking ──
   // The watcher itself lives in JourneyTracker (the nurse layout), so it
   // survives leaving this page and resumes after a reload.
   const journey = useJourneyTracker();
-  const sendPosition = (id: string, travelStatus: "NOT_STARTED" | "ON_THE_WAY" | "ARRIVED", lat?: number, lng?: number) =>
-    fetch(`/api/appointments/${id}/travel`, {
+  const sendPosition = (id: string, travelStatus: "NOT_STARTED" | "ON_THE_WAY" | "ARRIVED", fallback: string, lat?: number, lng?: number) =>
+    mutate(`/api/appointments/${id}/travel`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ travelStatus, ...(lat != null && lng != null ? { lat, lng } : {}) }),
+      body: { travelStatus, ...(lat != null && lng != null ? { lat, lng } : {}) },
+      fallback,
     });
+
+  // The inline error sits above the list (often scrolled off, or behind a
+  // dialog) — toast it too.
+  const fail = (msg: string) => { setError(msg); toast.error(msg); };
 
   const startJourney = async (id: string) => {
     setBusyId(id); setError("");
     try {
       const pos = await getCurrentPositionCompat({ enableHighAccuracy: true });
-      const res = await sendPosition(id, "ON_THE_WAY", pos.coords.latitude, pos.coords.longitude);
-      if (!res.ok) { setError((await res.json().catch(() => ({}))).error ?? "Could not start the journey."); return; }
+      // mutate() never throws — the catch below is only for location access.
+      const res = await sendPosition(id, "ON_THE_WAY", "Could not start the journey.", pos.coords.latitude, pos.coords.longitude);
+      if (!res.ok) { fail(res.error); return false; }
       await journey.track(id, { justSent: true });
+      return true;
     } catch {
-      setError("Location access is needed to share your journey with the patient.");
+      fail("Location access is needed to share your journey with the patient.");
+      return false;
     } finally {
       setBusyId(null);
       load();
@@ -342,36 +352,51 @@ export default function NurseDashboardPage() {
   const stopJourney = async (id: string) => {
     setBusyId(id); setError("");
     await journey.stop();
-    const res = await sendPosition(id, "NOT_STARTED");
-    if (!res.ok) setError((await res.json().catch(() => ({}))).error ?? "Could not stop the journey.");
+    const res = await sendPosition(id, "NOT_STARTED", "Could not stop the journey.");
+    if (!res.ok) fail(res.error);
     setBusyId(null);
     load();
+    return res.ok;
   };
 
   const markArrived = async (id: string) => {
     setBusyId(id); setError("");
     await journey.stop();
-    const res = await sendPosition(id, "ARRIVED");
-    if (!res.ok) setError((await res.json().catch(() => ({}))).error ?? "Could not update.");
+    const res = await sendPosition(id, "ARRIVED", "Could not update.");
+    if (!res.ok) fail(res.error);
     setBusyId(null);
     load();
   };
 
   const setStatus = async (id: string, status: string, doctorNotes?: string) => {
     setBusyId(id); setError("");
-    const res = await fetch(`/api/appointments/${id}`, {
+    const res = await mutate(`/api/appointments/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, ...(doctorNotes !== undefined ? { doctorNotes } : {}) }),
+      body: { status, ...(doctorNotes !== undefined ? { doctorNotes } : {}) },
+      fallback: "Could not update this visit.",
     });
-    if (!res.ok) setError((await res.json().catch(() => ({}))).error ?? "Could not update this visit.");
+    if (!res.ok) fail(res.error);
     setBusyId(null);
     load();
     return res.ok;
   };
 
-  if (authLoading || !user || visits === null) {
+  if (authLoading || !user || (visits === null && !visitsLoad.error)) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-rose-500" /></div>;
+  }
+
+  // First load failed — nothing to show yet.
+  if (visits === null) {
+    return (
+      <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
+        <NurseHeader />
+        <NurseMobileNav />
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+          <h1 className="text-2xl font-extrabold text-slate-900 mb-4">My Visits</h1>
+          <LoadError error={visitsLoad.error!} onRetry={retryLoad} retrying={visitsLoad.reloading} />
+        </div>
+      </div>
+    );
   }
 
   // A package is one request: show its first pending visit, with the rest listed on the card.
@@ -394,6 +419,8 @@ export default function NurseDashboardPage() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
         <h1 className="text-2xl font-extrabold text-slate-900 mb-4">My Visits</h1>
+
+        {loadError && <LoadError error={loadError} onRetry={retryLoad} retrying={visitsLoad.reloading || profileLoad.reloading} hasData />}
 
         {profileStatus && !profileStatus.bookable && (
           <Link href="/nurse/profile" className="block rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 mb-4 text-sm text-amber-800">
@@ -642,9 +669,9 @@ export default function NurseDashboardPage() {
           onCancel={() => setJourneyConfirm(null)}
           onConfirm={async () => {
             const { visit, action } = journeyConfirm;
-            if (action === "start") await startJourney(visit.id);
-            else await stopJourney(visit.id);
-            setJourneyConfirm(null);
+            // Stays open on failure so it can be retried.
+            const ok = action === "start" ? await startJourney(visit.id) : await stopJourney(visit.id);
+            if (ok) setJourneyConfirm(null);
           }}
         />
       )}
@@ -661,7 +688,7 @@ export default function NurseDashboardPage() {
           busyLabel="Cancelling…"
           busy={busyId === cancelTarget.id}
           onCancel={() => setCancelTarget(null)}
-          onConfirm={async () => { await setStatus(cancelTarget.id, "CANCELLED"); setCancelTarget(null); }}
+          onConfirm={async () => { if (await setStatus(cancelTarget.id, "CANCELLED")) setCancelTarget(null); }}
         />
       )}
     </div>

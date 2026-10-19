@@ -1,11 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Users, Stethoscope, CalendarCheck, IndianRupee, AlertCircle, Clock, TrendingUp } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { cn, formatProviderName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
+import LoadError from "@/components/LoadError";
+import { useLoad } from "@/lib/apiClient";
 
 type RecentAppointment = Analytics["recentAppointments"][number];
 
@@ -60,14 +61,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default function AdminOverview() {
-  const [data, setData] = useState<Analytics | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/admin/analytics")
-      .then((r) => r.json())
-      .then((d) => { setData(d); setLoading(false); });
-  }, []);
+  const { data, error, loading, reloading, reload } = useLoad<Analytics>("/api/admin/analytics", { fallback: "Couldn't load the dashboard." });
 
   if (loading) {
     return (
@@ -111,11 +105,18 @@ export default function AdminOverview() {
     },
   ];
 
-  if (!data) return null;
+  if (!data) {
+    return (
+      <div className="p-4 sm:p-6 lg:p-8">
+        {error && <LoadError error={error} onRetry={reload} retrying={reloading} />}
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <EnableNotificationsPrompt />
+      {error && <LoadError error={error} onRetry={reload} retrying={reloading} hasData />}
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>

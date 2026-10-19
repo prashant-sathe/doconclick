@@ -1,7 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
 import { MessageCircle, CheckCheck, Clock, AlertCircle } from "lucide-react";
 import { cn, formatDoctorName } from "@/lib/utils";
+import LoadError from "@/components/LoadError";
+import { useToast } from "@/components/Toast";
+import { mutate, useLoad } from "@/lib/apiClient";
 
 interface Complaint {
   id: string;
@@ -25,24 +27,18 @@ const STATUS_ICON: Record<string, React.ElementType> = {
 };
 
 export default function AdminComplaints() {
-  const [complaints, setComplaints] = useState<Complaint[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const load = () => {
-    fetch("/api/admin/complaints")
-      .then((r) => r.json())
-      .then((d) => { setComplaints(d); setLoading(false); });
-  };
-
-  useEffect(() => { load(); }, []);
+  const { data, error, loading, reloading, reload } = useLoad<Complaint[]>("/api/admin/complaints", { fallback: "Couldn't load complaints." });
+  const complaints = data ?? [];
+  const toast = useToast();
 
   const updateStatus = async (id: string, status: string) => {
-    await fetch("/api/admin/complaints", {
+    const res = await mutate("/api/admin/complaints", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
+      body: { id, status },
+      fallback: "Couldn't update the complaint status.",
     });
-    load();
+    if (!res.ok) { toast.error(res.error); return; }
+    reload();
   };
 
   return (
@@ -52,11 +48,12 @@ export default function AdminComplaints() {
         <p className="text-slate-500 text-sm mt-1">Review and resolve patient and doctor complaints.</p>
       </div>
 
+      {error && <LoadError error={error} onRetry={reload} retrying={reloading} hasData={!!data} />}
       {loading ? (
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-28 rounded-2xl" />)}
         </div>
-      ) : (
+      ) : !data ? null : (
         <div className="space-y-4">
           {complaints.length === 0 && (
             <div className="text-center py-16 text-slate-400">

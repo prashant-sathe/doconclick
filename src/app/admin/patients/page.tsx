@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import {
   Search, Users, Eye, X, Phone, Mail, MapPin, Calendar,
@@ -13,6 +13,9 @@ import { cn, formatProviderName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useAccountImpact } from "@/components/admin/AccountImpactDialog";
+import LoadError from "@/components/LoadError";
+import { useToast } from "@/components/Toast";
+import { mutate, useLoad } from "@/lib/apiClient";
 
 // ── Types ──────────────────────────────────────────────────────
 interface PatientProfile {
@@ -75,15 +78,7 @@ const COMPLAINT_BADGE: Record<string, string> = {
 
 // ── Patient Profile Drawer ─────────────────────────────────────
 function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () => void }) {
-  const [data, setData] = useState<PatientDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    fetch(`/api/admin/patients/${patientId}`)
-      .then((r) => r.json())
-      .then((d) => { setData(d); setLoading(false); });
-  }, [patientId]);
+  const { data, error, loading, reloading, reload } = useLoad<PatientDetail>(`/api/admin/patients/${patientId}`, { fallback: "Couldn't load this patient." });
 
   const prof = data?.patientProfile;
   const s    = data?.stats;
@@ -108,7 +103,7 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
               )}
             </div>
             <div>
-              <div className="text-xl font-extrabold text-white">{data ? (data.name || "Name not added") : "Loading…"}</div>
+              <div className="text-xl font-extrabold text-white">{data ? (data.name || "Name not added") : loading ? "Loading…" : "Patient"}</div>
               <div className="text-blue-100 text-sm mt-0.5">
                 {prof && prof.age > 0 && prof.gender ? `${prof.age} yrs · ${prof.gender}` : "Patient"}
               </div>
@@ -131,8 +126,13 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
             <div className="p-6 space-y-4">
               {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-10 rounded-xl" />)}
             </div>
+          ) : !data ? (
+            <div className="p-6">
+              {error && <LoadError error={error} onRetry={reload} retrying={reloading} />}
+            </div>
           ) : (
             <div className="p-6 space-y-6">
+              {error && <LoadError error={error} onRetry={reload} retrying={reloading} hasData />}
 
               {/* Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -265,26 +265,17 @@ function Row({ icon: Icon, label, value }: { icon: React.ElementType; label: str
 
 // ── Main page ──────────────────────────────────────────────────
 export default function AdminPatients() {
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [loading, setLoading]   = useState(true);
+  const { data, error: loadError, loading, reloading, reload } = useLoad<Patient[]>("/api/admin/patients", { fallback: "Couldn't load patients." });
+  const patients = data ?? [];
   const [search, setSearch]     = useState("");
   const [viewId, setViewId]     = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Patient | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [impersonatingId, setImpersonatingId] = useState<string | null>(null);
-  const [impersonateError, setImpersonateError] = useState("");
   const [impersonateTarget, setImpersonateTarget] = useState<Patient | null>(null);
   const [deleteNotice, setDeleteNotice] = useState("");
   const impact = useAccountImpact();
-
-  const load = useCallback(() => {
-    setLoading(true);
-    fetch("/api/admin/patients")
-      .then((r) => r.json())
-      .then((d) => { setPatients(d); setLoading(false); });
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
+  const toast = useToast();
 
   // A patient with upcoming bookings or wallet money goes through the impact
   // step first (see useAccountImpact) — the admin sees what will be cancelled
@@ -311,20 +302,20 @@ export default function AdminPatients() {
           + (wallet > 0 ? ` ₹${wallet} is left in their wallet — pay it out manually.` : "")
       );
     }
-    await load();
+    await reload();
   };
 
+  // Resolves false on failure (toasted) so the confirm dialog stays open to retry.
   const impersonate = async (patient: Patient) => {
-    setImpersonateError("");
     setImpersonatingId(patient.id);
-    const res = await fetch(`/api/admin/impersonate/${patient.id}`, { method: "POST" });
+    const res = await mutate(`/api/admin/impersonate/${patient.id}`, { method: "POST", fallback: "Could not log in as this patient." });
     if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      setImpersonateError(body.error ?? "Could not log in as this patient.");
+      toast.error(res.error);
       setImpersonatingId(null);
-      return;
+      return false;
     }
     window.location.href = "/patient/dashboard";
+    return true;
   };
 
   const filtered = patients.filter(
@@ -427,16 +418,12 @@ export default function AdminPatients() {
             View all registered patients. Click <Eye className="inline w-3.5 h-3.5 text-blue-500" /> to see full profile.
           </p>
         </div>
-        <button onClick={load} className="btn-ghost gap-2">
-          <RefreshCw className="w-4 h-4" /> Refresh
+        <button onClick={reload} disabled={reloading} className="btn-ghost gap-2">
+          <RefreshCw className={cn("w-4 h-4", reloading && "animate-spin")} /> Refresh
         </button>
       </div>
 
-      {impersonateError && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
-          {impersonateError}
-        </div>
-      )}
+      {loadError && data && <LoadError error={loadError} onRetry={reload} retrying={reloading} hasData />}
       {impact.error && (
         <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
           {impact.error}
@@ -464,6 +451,8 @@ export default function AdminPatients() {
           <div className="p-4 sm:p-6 lg:p-8 space-y-3">
             {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
           </div>
+        ) : !data ? (
+          loadError && <LoadError error={loadError} onRetry={reload} retrying={reloading} />
         ) : filtered.length === 0 ? (
           <div className="text-center py-12 text-slate-400">
             <Users className="w-8 h-8 mx-auto mb-2 opacity-30" />
@@ -523,8 +512,7 @@ export default function AdminPatients() {
           busy={impersonatingId === impersonateTarget.id}
           onCancel={() => setImpersonateTarget(null)}
           onConfirm={async () => {
-            await impersonate(impersonateTarget);
-            setImpersonateTarget(null);
+            if (await impersonate(impersonateTarget)) setImpersonateTarget(null);
           }}
         />
       )}

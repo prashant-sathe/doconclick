@@ -22,6 +22,9 @@ import { FREQUENCY_OPTIONS, DURATION_OPTIONS, TEST_SUGGESTIONS } from "@/lib/med
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { cn, formatDoctorName } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import LoadError from "@/components/LoadError";
+import { useToast } from "@/components/Toast";
+import { errorMessage, mutate, useLoad } from "@/lib/apiClient";
 import RescheduleRequestBox from "@/components/RescheduleRequestBox";
 import { getCurrentPositionCompat } from "@/lib/platform";
 import { useJourneyTracker } from "@/components/JourneyTracker";
@@ -269,12 +272,10 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   const [confirmed, setConfirmed] = useState(() => loadDraft(appt.id).confirmed === true);
   // Doctor -> nurse referral: "this patient needs nurse care at home".
   const [nurseCare, setNurseCare] = useState<NurseCareDraft>(() => ({ ...EMPTY_NURSE_CARE, ...(loadDraft(appt.id).nurseCare ?? {}) }));
-  const [nurseServices, setNurseServices] = useState<{ id: string; name: string; requiresPrescription: boolean }[]>([]);
+  const servicesLoad = useLoad<{ id: string; name: string; requiresPrescription: boolean }[]>("/api/nurse-services", { fallback: "Couldn't load nurse services." });
+  const nurseServices = servicesLoad.data ?? [];
   const [referralError, setReferralError] = useState("");
   const [submitError, setSubmitError] = useState("");
-  useEffect(() => {
-    fetch("/api/nurse-services").then((r) => (r.ok ? r.json() : [])).then(setNurseServices).catch(() => {});
-  }, []);
   const [busy, setBusy] = useState(false);
   const [confirmingComplete, setConfirmingComplete] = useState(false);
   const [confirmingCancel, setConfirmingCancel] = useState(false);
@@ -505,6 +506,12 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
               <option value="">Nurse service…</option>
               {nurseServices.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
+            {servicesLoad.error && (
+              <p className="text-xs text-red-500 sm:col-span-3">
+                {servicesLoad.error}{" "}
+                <button type="button" onClick={servicesLoad.reload} disabled={servicesLoad.reloading} className="font-semibold underline disabled:opacity-60">Retry</button>
+              </p>
+            )}
             <select className="input-field text-xs py-1.5" value={nurseCare.visits} onChange={(e) => setNurseCare((c) => ({ ...c, visits: Number(e.target.value) }))}>
               {PACKAGE_VISIT_OPTIONS.map((n) => <option key={n} value={n}>{n} visit{n === 1 ? "" : "s"}</option>)}
             </select>
@@ -661,7 +668,15 @@ export default function DoctorDashboard() {
   const [staffDoctorName, setStaffDoctorName] = useState<string | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [search, setSearch] = useState("");
+  // True until the first successful load; a failed (re)load sets apptsError
+  // and keeps whatever was last loaded.
   const [loadingAppts, setLoadingAppts] = useState(true);
+  const [apptsError, setApptsError] = useState<string | null>(null);
+  const [apptsRetrying, setApptsRetrying] = useState(false);
+  // /api/doctors/me (or staff/me for STAFF) failing — the page is gated on it.
+  const [bootError, setBootError] = useState<string | null>(null);
+  const [bootRetrying, setBootRetrying] = useState(false);
+  const toast = useToast();
   const [completingId, setCompletingId] = useState<string | null>(null);
   const [respondingId, setRespondingId] = useState<string | null>(null);
   const [respondError, setRespondError] = useState<{ id: string; message: string } | null>(null);
@@ -705,68 +720,107 @@ export default function DoctorDashboard() {
     if (!authLoading && user && user.role !== "DOCTOR" && user.role !== "STAFF") router.push("/login");
   }, [authLoading, user, router]);
 
+  const loadDoctor = useCallback(async () => {
+    try {
+      const res = await fetch("/api/doctors/me");
+      if (!res.ok) { setBootError(await errorMessage(res, "Couldn't load your profile.")); return; }
+      const d: DoctorMe = await res.json();
+      setDoctor(d);
+      setBootError(null);
+      if (!d.doctorProfile?.registrationFeePaid) {
+        router.push("/doctor/profile");
+      } else if (!hasActiveDoctorSubscription(d.doctorProfile)) {
+        router.push("/doctor/subscribe");
+      }
+    } catch {
+      setBootError("Network error — check your connection and try again.");
+    }
+  }, [router]);
+
   useEffect(() => {
     if (!user || user.role !== "DOCTOR") return;
-    fetch("/api/doctors/me")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((d: DoctorMe | null) => {
-        setDoctor(d);
-        if (d && !d.doctorProfile?.registrationFeePaid) {
-          router.push("/doctor/profile");
-        } else if (d?.doctorProfile && !hasActiveDoctorSubscription(d.doctorProfile)) {
-          router.push("/doctor/subscribe");
-        }
-      })
-      .catch(() => setDoctor(null));
-  }, [user, router]);
+    // Fetching on mount: it only sets state after its first await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadDoctor();
+  }, [user, loadDoctor]);
 
   // Staff has no doctorProfile of their own — check their assignment is
   // still active instead of the registration/subscription gates above. A
   // revoked account is signed out directly (skipping the confirm-dialog
   // `logout()` used for the header's user-initiated Sign Out button).
+  const loadStaff = useCallback(async () => {
+    try {
+      const res = await fetch("/api/doctor/staff/me");
+      // 403/404 = no assignment any more (signed out below, like a revoked
+      // one). Anything else is a failed load, not a revocation — retryable.
+      if (!res.ok && res.status !== 403 && res.status !== 404) {
+        setBootError(await errorMessage(res, "Couldn't load your account."));
+        return;
+      }
+      const d: { active: boolean; doctorName: string } | null = res.ok ? await res.json() : null;
+      if (!d || !d.active) {
+        setStaffActive(false);
+        // Signing out regardless — a failed logout call doesn't change that.
+        await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+        router.push("/login");
+        return;
+      }
+      setBootError(null);
+      setStaffActive(true);
+      setStaffDoctorName(d.doctorName);
+    } catch {
+      setBootError("Network error — check your connection and try again.");
+    }
+  }, [router]);
+
   useEffect(() => {
     if (!user || user.role !== "STAFF") return;
-    fetch("/api/doctor/staff/me")
-      .then((res) => (res.ok ? res.json() : null))
-      .then(async (d: { active: boolean; doctorName: string } | null) => {
-        if (!d || !d.active) {
-          setStaffActive(false);
-          await fetch("/api/auth/logout", { method: "POST" });
-          router.push("/login");
-          return;
-        }
-        setStaffActive(true);
-        setStaffDoctorName(d.doctorName);
-      })
-      .catch(() => setStaffActive(false));
-  }, [user, router]);
+    // Fetching on mount: it only sets state after its first await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadStaff();
+  }, [user, loadStaff]);
+
+  const retryBoot = async () => {
+    setBootRetrying(true);
+    await (isStaff ? loadStaff() : loadDoctor());
+    setBootRetrying(false);
+  };
 
   const unreadTotalRef = useRef<number | null>(null);
   const [removingReferral, setRemovingReferral] = useState<string | null>(null);
   const removeReferral = async (appointmentId: string) => {
     setRemovingReferral(appointmentId);
-    try {
-      const res = await fetch(`/api/appointments/${appointmentId}/nurse-referral`, { method: "DELETE" });
-      if (res.ok) {
-        setAppointments((list) => list.map((x) => (x.id === appointmentId ? { ...x, referralGiven: null } : x)));
-      }
-    } finally {
-      setRemovingReferral(null);
+    const res = await mutate(`/api/appointments/${appointmentId}/nurse-referral`, { method: "DELETE", fallback: "Could not remove the nurse referral." });
+    if (res.ok) {
+      setAppointments((list) => list.map((x) => (x.id === appointmentId ? { ...x, referralGiven: null } : x)));
+    } else {
+      toast.error(res.error);
     }
+    setRemovingReferral(null);
   };
 
-  const loadAppointments = useCallback(() => {
-    fetch("/api/appointments/me")
-      .then((r) => (r.ok ? r.json() : []))
-      .then((d: Appointment[]) => {
-        setAppointments(d);
-        setLoadingAppts(false);
-        const total = d.reduce((sum, a) => sum + a.unreadMessageCount, 0);
-        if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
-        unreadTotalRef.current = total;
-      })
-      .catch(() => setLoadingAppts(false));
+  // A failed load/poll keeps the last list on screen (with a Retry banner);
+  // the next successful poll clears the error.
+  const loadAppointments = useCallback(async () => {
+    try {
+      const r = await fetch("/api/appointments/me");
+      if (!r.ok) { setApptsError(await errorMessage(r, "Couldn't load your appointments.")); return; }
+      const d: Appointment[] = await r.json();
+      setAppointments(d);
+      setApptsError(null);
+      setLoadingAppts(false);
+      const total = d.reduce((sum, a) => sum + a.unreadMessageCount, 0);
+      if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
+      unreadTotalRef.current = total;
+    } catch {
+      setApptsError("Network error — check your connection and try again.");
+    }
   }, []);
+  const retryAppointments = async () => {
+    setApptsRetrying(true);
+    await loadAppointments();
+    setApptsRetrying(false);
+  };
 
   // The 5s poll below keeps this fresh while the tab/app stays open, but
   // mobile WebViews commonly suspend timers while backgrounded — force an
@@ -784,6 +838,8 @@ export default function DoctorDashboard() {
   // disappears from the queue without the doctor needing to refresh.
   useEffect(() => {
     if (user?.role !== "DOCTOR" && user?.role !== "STAFF") return;
+    // Fetching on mount: it only sets state after its first await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadAppointments();
     const interval = setInterval(loadAppointments, 5000);
     return () => clearInterval(interval);
@@ -792,15 +848,10 @@ export default function DoctorDashboard() {
   const respond = async (id: string, status: "SCHEDULED" | "REJECTED") => {
     setRespondingId(id);
     setRespondError(null);
-    const res = await fetch(`/api/appointments/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
+    const res = await mutate(`/api/appointments/${id}`, { method: "PATCH", body: { status }, fallback: "Could not update this request." });
     setRespondingId(null);
-    if (!res.ok) {
-      setRespondError({ id, message: (await res.json().catch(() => ({}))).error ?? "Could not update this request." });
-    }
+    // Shown inline on the request's card.
+    if (!res.ok) setRespondError({ id, message: res.error });
     loadAppointments();
   };
 
@@ -815,12 +866,10 @@ export default function DoctorDashboard() {
   const confirmCancel = async () => {
     if (!cancelTarget) return;
     setCancelling(true);
-    await fetch(`/api/appointments/${cancelTarget.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "CANCELLED" }),
-    });
+    const res = await mutate(`/api/appointments/${cancelTarget.id}`, { method: "PATCH", body: { status: "CANCELLED" }, fallback: "Could not cancel this appointment." });
     setCancelling(false);
+    // Failed: the dialog stays open for a retry.
+    if (!res.ok) { toast.error(res.error); return; }
     setCancelTarget(null);
     loadAppointments();
   };
@@ -849,12 +898,9 @@ export default function DoctorDashboard() {
   const confirmNoShow = async () => {
     if (!noShowTarget) return;
     setMarkingNoShow(true);
-    await fetch(`/api/appointments/${noShowTarget.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "NO_SHOW" }),
-    });
+    const res = await mutate(`/api/appointments/${noShowTarget.id}`, { method: "PATCH", body: { status: "NO_SHOW" }, fallback: "Could not mark this appointment as a no-show." });
     setMarkingNoShow(false);
+    if (!res.ok) { toast.error(res.error); return; }
     setNoShowTarget(null);
     loadAppointments();
   };
@@ -868,11 +914,11 @@ export default function DoctorDashboard() {
   const [journeyConfirm, setJourneyConfirm] = useState<{ appt: Appointment; action: "start" | "stop" } | null>(null);
   const [journeyError, setJourneyError] = useState<{ id: string; message: string } | null>(null);
 
-  const sendPosition = (apptId: string, travelStatus: "NOT_STARTED" | "ON_THE_WAY" | "ARRIVED", lat?: number, lng?: number) => {
-    return fetch(`/api/appointments/${apptId}/travel`, {
+  const sendPosition = (apptId: string, travelStatus: "NOT_STARTED" | "ON_THE_WAY" | "ARRIVED", fallback: string, lat?: number, lng?: number) => {
+    return mutate(`/api/appointments/${apptId}/travel`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ travelStatus, ...(lat != null && lng != null ? { lat, lng } : {}) }),
+      body: { travelStatus, ...(lat != null && lng != null ? { lat, lng } : {}) },
+      fallback,
     });
   };
 
@@ -881,11 +927,12 @@ export default function DoctorDashboard() {
     setJourneyError(null);
     try {
       const pos = await getCurrentPositionCompat({ enableHighAccuracy: true });
-      const res = await sendPosition(apptId, "ON_THE_WAY", pos.coords.latitude, pos.coords.longitude);
+      // mutate() never throws — the catch below is only for location access.
+      const res = await sendPosition(apptId, "ON_THE_WAY", "Could not start the journey.", pos.coords.latitude, pos.coords.longitude);
       // The server refuses outside the start window (src/lib/journeyWindow.ts)
       // — don't start sharing location then.
       if (!res.ok) {
-        setJourneyError({ id: apptId, message: (await res.json().catch(() => ({}))).error ?? "Could not start the journey." });
+        setJourneyError({ id: apptId, message: res.error });
         return;
       }
       await journey.track(apptId, { justSent: true });
@@ -901,14 +948,16 @@ export default function DoctorDashboard() {
   const stopJourney = async (apptId: string) => {
     setJourneyError(null);
     await journey.stop();
-    const res = await sendPosition(apptId, "NOT_STARTED");
-    if (!res.ok) setJourneyError({ id: apptId, message: (await res.json().catch(() => ({}))).error ?? "Could not stop the journey." });
+    const res = await sendPosition(apptId, "NOT_STARTED", "Could not stop the journey.");
+    if (!res.ok) setJourneyError({ id: apptId, message: res.error });
     loadAppointments();
   };
 
   const markArrived = async (apptId: string) => {
+    setJourneyError(null);
     await journey.stop();
-    await sendPosition(apptId, "ARRIVED");
+    const res = await sendPosition(apptId, "ARRIVED", "Could not mark you as arrived.");
+    if (!res.ok) setJourneyError({ id: apptId, message: res.error });
     loadAppointments();
   };
 
@@ -924,8 +973,12 @@ export default function DoctorDashboard() {
     (!isStaff && (!doctor?.doctorProfile?.registrationFeePaid || !hasActiveDoctorSubscription(doctor.doctorProfile)))
   ) {
     return (
-      <div className="min-h-screen gradient-surface flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+      <div className="min-h-screen gradient-surface flex items-center justify-center p-4">
+        {bootError ? (
+          <div className="w-full max-w-sm"><LoadError error={bootError} onRetry={retryBoot} retrying={bootRetrying} /></div>
+        ) : (
+          <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+        )}
       </div>
     );
   }
@@ -1021,6 +1074,8 @@ export default function DoctorDashboard() {
             )}
           </div>
         </div>
+
+        {apptsError && !loadingAppts && <LoadError error={apptsError} onRetry={retryAppointments} retrying={apptsRetrying} hasData />}
 
         <AnnouncementPopup onAllSeen={() => setAnnouncementsDone(true)} />
         {announcementsDone && <EnableNotificationsPrompt />}
@@ -1243,7 +1298,9 @@ export default function DoctorDashboard() {
           </div>
           {bulkNotice && <p className="px-6 py-2 text-xs font-semibold text-amber-700 bg-amber-50 border-b border-amber-100">{bulkNotice}</p>}
           <div className="divide-y divide-slate-50">
-            {loadingAppts ? (
+            {loadingAppts && apptsError ? (
+              <div className="p-4"><LoadError error={apptsError} onRetry={retryAppointments} retrying={apptsRetrying} /></div>
+            ) : loadingAppts ? (
               <div className="p-6 space-y-3">{[...Array(2)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
             ) : pending.length === 0 ? (
               <p className="text-sm text-slate-400 text-center py-10">{search ? "No pending requests match your search." : "No pending requests."}</p>
@@ -1306,7 +1363,10 @@ export default function DoctorDashboard() {
             <h2 className="font-bold text-slate-800">Upcoming Appointments</h2>
           </div>
           <div className="divide-y divide-slate-50">
-            {loadingAppts ? (
+            {loadingAppts && apptsError ? (
+              // The Retry card is in Pending Requests above.
+              <p className="text-sm text-slate-400 text-center py-10">Couldn&apos;t load appointments.</p>
+            ) : loadingAppts ? (
               <div className="p-6 space-y-3">
                 {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}
               </div>
@@ -1746,6 +1806,7 @@ export default function DoctorDashboard() {
           busy={respondingId === acceptTarget.id}
           onCancel={() => setAcceptTarget(null)}
           onConfirm={async () => {
+            // A failure shows inline on the request's card.
             await respond(acceptTarget.id, "SCHEDULED");
             setAcceptTarget(null);
           }}

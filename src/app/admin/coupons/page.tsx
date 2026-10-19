@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { TicketPercent, Plus } from "lucide-react";
+import { useLoad } from "@/lib/apiClient";
+import LoadError from "@/components/LoadError";
 
 interface CouponRow {
   id: string;
@@ -51,14 +52,8 @@ function windowLabel(c: CouponRow): string {
 }
 
 export default function AdminCoupons() {
-  const [coupons, setCoupons] = useState<CouponRow[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/admin/coupons")
-      .then((r) => r.json())
-      .then((d) => { setCoupons(Array.isArray(d) ? d : []); setLoading(false); });
-  }, []);
+  const { data, error, loading, reloading, reload } = useLoad<CouponRow[]>("/api/admin/coupons", { fallback: "Couldn't load coupons." });
+  const coupons = Array.isArray(data) ? data : [];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -75,11 +70,13 @@ export default function AdminCoupons() {
         </Link>
       </div>
 
+      {error && <LoadError error={error} onRetry={reload} retrying={reloading} hasData={!!data} />}
+
       {loading ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-20 rounded-2xl" />)}
         </div>
-      ) : coupons.length === 0 ? (
+      ) : !data ? null : coupons.length === 0 ? (
         <div className="text-center py-16 text-slate-400">
           <TicketPercent className="w-10 h-10 mx-auto mb-3 opacity-30" />
           No coupons yet.

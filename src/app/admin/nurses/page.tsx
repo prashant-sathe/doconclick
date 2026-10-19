@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import {
   HeartPulse, Loader2, Search, CheckCircle2, XCircle, Ban, RotateCcw, BadgeCheck, LogIn, FileText,
   Circle, MapPin, Phone, Mail, X, AlertCircle, Trash2,
@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils";
 import { nurseChecklist } from "@/lib/nurseChecklist";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useAccountImpact, impactResultText } from "@/components/admin/AccountImpactDialog";
+import LoadError from "@/components/LoadError";
+import { useToast } from "@/components/Toast";
+import { mutate, useLoad } from "@/lib/apiClient";
 
 interface NurseRow {
   id: string;
@@ -39,26 +42,21 @@ const DOCS: { key: keyof NonNullable<NurseRow["nurseProfile"]>; label: string }[
 ];
 
 export default function AdminNurses() {
-  const [nurses, setNurses] = useState<NurseRow[] | null>(null);
+  const { data: nurses, error: loadError, loading, reloading, reload } = useLoad<NurseRow[]>("/api/admin/nurses", { fallback: "Couldn't load nurses." });
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("ALL");
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
   // status is SUSPENDED / REJECTED, or DELETE for removing the account.
   const [confirm, setConfirm] = useState<{ nurse: NurseRow; status: string } | null>(null);
   const [notice, setNotice] = useState("");
   const impact = useAccountImpact();
-
-  const load = useCallback(() => {
-    fetch("/api/admin/nurses").then((r) => r.json()).then(setNurses);
-  }, []);
-  useEffect(() => { load(); }, [load]);
+  const toast = useToast();
 
   // Suspending/rejecting an approved nurse, or deleting one, goes through the
   // impact step (her upcoming bookings) when she has any — see useAccountImpact.
   const send = async (nurse: NurseRow, method: "PATCH" | "DELETE", body: Record<string, unknown>) => {
-    setBusy(true); setError(""); setNotice("");
+    setBusy(true); setNotice("");
     const result = await impact.run(
       (extra) => fetch(`/api/admin/nurses/${nurse.id}`, {
         method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, ...extra }),
@@ -68,15 +66,15 @@ export default function AdminNurses() {
     setBusy(false);
     if (!result) return false;
     setNotice(impactResultText(result.bookings as never));
-    load();
+    reload();
     return true;
   };
   const update = (nurse: NurseRow, body: Record<string, unknown>) => send(nurse, "PATCH", body);
 
   const impersonate = async (id: string) => {
-    setBusy(true); setError("");
-    const res = await fetch(`/api/admin/impersonate/${id}`, { method: "POST" });
-    if (!res.ok) { setBusy(false); setError((await res.json().catch(() => ({}))).error ?? "Could not log in as this nurse."); return; }
+    setBusy(true);
+    const res = await mutate(`/api/admin/impersonate/${id}`, { method: "POST", fallback: "Could not log in as this nurse." });
+    if (!res.ok) { setBusy(false); toast.error(res.error); return; }
     window.location.href = "/nurse/dashboard";
   };
 
@@ -114,11 +112,11 @@ export default function AdminNurses() {
         </div>
       </div>
 
-      {error && <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4" />{error}</div>}
+      {loadError && <LoadError error={loadError} onRetry={reload} retrying={reloading} hasData={!!nurses} />}
 
-      {nurses === null ? (
+      {loading ? (
         <Loader2 className="w-6 h-6 animate-spin text-slate-300" />
-      ) : list.length === 0 ? (
+      ) : !nurses ? null : list.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center text-sm text-slate-400">No nurses here yet.</div>
       ) : (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-50">
@@ -126,7 +124,7 @@ export default function AdminNurses() {
             const p = n.nurseProfile;
             const check = p ? nurseChecklist({ ...p, serviceCount: p.services.length }) : null;
             return (
-              <button key={n.id} onClick={() => { setError(""); setOpenId(n.id); }} className="w-full text-left px-5 py-4 hover:bg-slate-50 flex items-center gap-4">
+              <button key={n.id} onClick={() => { impact.clearError(); setOpenId(n.id); }} className="w-full text-left px-5 py-4 hover:bg-slate-50 flex items-center gap-4">
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-slate-900 flex items-center gap-1.5">
                     {n.name}{p?.isVerified && <BadgeCheck className="w-4 h-4 text-blue-500" />}
@@ -155,7 +153,7 @@ export default function AdminNurses() {
             </div>
 
             <div className="p-6 space-y-6">
-              {(error || impact.error) && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4 flex-shrink-0" />{error || impact.error}</div>}
+              {impact.error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4 flex-shrink-0" />{impact.error}</div>}
               {notice && <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">{notice}</div>}
               <div className="flex flex-wrap gap-2">
                 {op.status !== "APPROVED" && (

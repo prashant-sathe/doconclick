@@ -1,11 +1,13 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Search, CalendarCheck, Eye, X, FileText, Pill, FlaskConical, Phone, Download } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { cn, formatProviderName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
+import LoadError from "@/components/LoadError";
+import { useLoad } from "@/lib/apiClient";
 
 interface Appointment {
   id: string;
@@ -88,15 +90,7 @@ function downloadUrl(fileUrl: string, name: string) {
 
 // ── Booking Detail Drawer ────────────────────────────────────────
 function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () => void }) {
-  const [data, setData] = useState<AppointmentDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    fetch(`/api/admin/bookings/${bookingId}`)
-      .then((r) => r.json())
-      .then((d) => { setData(d); setLoading(false); });
-  }, [bookingId]);
+  const { data, error, loading, reloading, reload } = useLoad<AppointmentDetail>(`/api/admin/bookings/${bookingId}`, { fallback: "Couldn't load this booking." });
 
   const hasDocuments = (data?.attachments.length ?? 0) > 0 || !!data?.prescriptionUrl;
 
@@ -113,7 +107,7 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
               {data && (data.relation !== "Self" && data.patientName ? data.patientName : data.patient.name)}
             </div>
             <div className="text-blue-100 text-sm mt-0.5">
-              {data ? `with ${formatProviderName(data.doctor.name, data.providerType)}` : "Loading…"}
+              {data ? `with ${formatProviderName(data.doctor.name, data.providerType)}` : loading ? "Loading…" : "Booking"}
             </div>
           </div>
           <button onClick={onClose}
@@ -128,8 +122,13 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
             <div className="p-6 space-y-4">
               {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-10 rounded-xl" />)}
             </div>
-          ) : data && (
+          ) : !data ? (
+            <div className="p-6">
+              {error && <LoadError error={error} onRetry={reload} retrying={reloading} />}
+            </div>
+          ) : (
             <div className="p-6 space-y-6">
+              {error && <LoadError error={error} onRetry={reload} retrying={reloading} hasData />}
 
               {/* Summary */}
               <div className="flex items-center gap-2 flex-wrap">
@@ -262,17 +261,11 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 export default function AdminBookings() {
-  const [bookings, setBookings] = useState<Appointment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, error, loading, reloading, reload } = useLoad<Appointment[]>("/api/admin/bookings", { fallback: "Couldn't load bookings." });
+  const bookings = data ?? [];
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("ALL");
   const [viewId, setViewId] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/admin/bookings")
-      .then((r) => r.json())
-      .then((d) => { setBookings(d); setLoading(false); });
-  }, []);
 
   const filtered = bookings
     .filter((b) => filter === "ALL" || b.status === filter)
@@ -433,11 +426,15 @@ export default function AdminBookings() {
         </div>
       </div>
 
+      {error && data && <LoadError error={error} onRetry={reload} retrying={reloading} hasData />}
+
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-4 sm:p-6 lg:p-8 space-y-3">
             {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
           </div>
+        ) : !data ? (
+          error && <LoadError error={error} onRetry={reload} retrying={reloading} />
         ) : filtered.length === 0 ? (
           <div className="text-center py-12 text-slate-400">
             <CalendarCheck className="w-8 h-8 mx-auto mb-2 opacity-30" />

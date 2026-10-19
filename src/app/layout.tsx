@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
+import { ToastProvider } from "@/components/Toast";
 import { NativeBootstrap } from "@/components/NativeBootstrap";
 import { SplashOverlay } from "@/components/SplashOverlay";
 import { OfflineBanner } from "@/components/OfflineBanner";
@@ -77,11 +78,13 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <SplashOverlay />
-        <AuthProvider>
-          <NativeBootstrap />
-          <OfflineBanner />
-          {children}
-        </AuthProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <NativeBootstrap />
+            <OfflineBanner />
+            {children}
+          </AuthProvider>
+        </ToastProvider>
       </body>
       <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
     </html>

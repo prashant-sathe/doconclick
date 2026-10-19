@@ -57,11 +57,22 @@ export function useAccountImpact() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  // A network failure must surface as an error, not leave a promise (and
+  // the caller's busy state) hanging forever.
+  const NETWORK_ERROR = "Network error — check your connection and try again.";
+
   const run = (send: Send, { title, actionLabel }: { title: string; actionLabel: string }) =>
     new Promise<Record<string, unknown> | null>((resolve) => {
       setError("");
       void (async () => {
-        const res = await send({});
+        let res: Response;
+        try {
+          res = await send({});
+        } catch {
+          setError(NETWORK_ERROR);
+          resolve(null);
+          return;
+        }
         const body = await res.json().catch(() => ({}));
         if (res.status === 409 && body.code === "ACCOUNT_HAS_IMPACT") {
           setPending({ impact: body.impact, title, actionLabel, send, resolve });
@@ -80,7 +91,14 @@ export function useAccountImpact() {
     if (!pending) return;
     setBusy(true);
     setError("");
-    const res = await pending.send({ bookingAction: action, confirmBookingIds: pending.impact.bookings.map((b) => b.id) });
+    let res: Response;
+    try {
+      res = await pending.send({ bookingAction: action, confirmBookingIds: pending.impact.bookings.map((b) => b.id) });
+    } catch {
+      setBusy(false);
+      setError(NETWORK_ERROR);
+      return;
+    }
     const body = await res.json().catch(() => ({}));
     setBusy(false);
     if (res.status === 409 && body.code === "ACCOUNT_HAS_IMPACT") {

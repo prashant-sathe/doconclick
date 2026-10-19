@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import {
   CheckCircle, XCircle, PauseCircle, Search, RefreshCw, Stethoscope,
@@ -13,6 +13,9 @@ import { cn, formatDoctorName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog, { type ConfirmTone } from "@/components/ConfirmDialog";
 import { useAccountImpact, impactResultText } from "@/components/admin/AccountImpactDialog";
+import LoadError from "@/components/LoadError";
+import { useToast } from "@/components/Toast";
+import { mutate, useLoad } from "@/lib/apiClient";
 
 // ── Types ──────────────────────────────────────────────────────
 interface DoctorProfile {
@@ -158,6 +161,26 @@ function RejectionReasonField({ value, onChange }: { value: string; onChange: (v
   );
 }
 
+// The `send` for impact.run(). run() resolves null both for a failure and for
+// the admin backing out of the impact dialog, so a failure's message (network
+// errors included) also goes to `onFail` — the caller can toast it and keep
+// its confirm dialog open.
+function impactSend(url: string, method: string, body: (extra: object) => object, onFail: (error: string) => void) {
+  return async (extra: object) => {
+    let res: Response;
+    try {
+      res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body(extra)) });
+    } catch {
+      res = new Response(JSON.stringify({ error: "Network error — check your connection and try again." }), { status: 503 });
+    }
+    if (!res.ok) {
+      const data = await res.clone().json().catch(() => ({}));
+      if (data.code !== "ACCOUNT_HAS_IMPACT") onFail(data.error ?? "Something went wrong.");
+    }
+    return res;
+  };
+}
+
 // ── Profile Drawer ─────────────────────────────────────────────
 function DoctorDrawer({
   doctorId,
@@ -168,8 +191,9 @@ function DoctorDrawer({
   onClose: () => void;
   onStatusChange: () => void;
 }) {
-  const [data, setData] = useState<DoctorDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+  const toast = useToast();
+  const detail = useLoad<DoctorDetail>(`/api/admin/doctors/${doctorId}`, { fallback: "Couldn't load this doctor's profile." });
+  const { data, loading } = detail;
   const [updating, setUpdating] = useState(false);
   const [actionError, setActionError] = useState("");
   const [confirmStatus, setConfirmStatus] = useState<string | null>(null);
@@ -186,78 +210,70 @@ function DoctorDrawer({
     setActionError("");
     setActionNotice("");
     setUpdating(true);
-    const res = await fetch(`/api/admin/doctors/${doctorId}/change-request`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action, note: reviewNote.trim() || undefined }),
+    const res = await mutate(`/api/admin/doctors/${doctorId}/change-request`, {
+      body: { action, note: reviewNote.trim() || undefined },
+      fallback: "Could not review the change.",
     });
     setUpdating(false);
     if (!res.ok) {
-      setActionError((await res.json().catch(() => ({}))).error ?? "Could not review the change.");
+      setActionError(res.error);
       return;
     }
     setReviewing(null);
     setReviewNote("");
     setActionNotice(action === "APPROVE" ? "Change approved — the profile now shows the new details." : "Change rejected — the doctor has been told why.");
     onStatusChange();
-    const r = await fetch(`/api/admin/doctors/${doctorId}`);
-    setData(await r.json());
+    void detail.reload();
   };
-
-  useEffect(() => {
-    setLoading(true);
-    setActionError("");
-    fetch(`/api/admin/doctors/${doctorId}`)
-      .then((r) => r.json())
-      .then((d) => { setData(d); setLoading(false); });
-  }, [doctorId]);
 
   // Taking an approved doctor off the platform goes through the impact step
   // (their upcoming bookings) when they have any — see useAccountImpact.
+  // Resolves false if the change failed (the confirm dialog stays open).
   const changeStatus = async (status: string, rejectionReason?: string) => {
-    if (!data) return;
+    if (!data) return false;
     setActionError("");
     setActionNotice("");
     setUpdating(true);
+    let failure = null as string | null;
     const body = await impact.run(
-      (extra) => fetch(`/api/admin/doctors/${doctorId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, rejectionReason, ...extra }),
-      }),
+      impactSend(`/api/admin/doctors/${doctorId}`, "PATCH", (extra) => ({ status, rejectionReason, ...extra }), (e) => { failure = e; }),
       { title: `Open bookings with ${formatDoctorName(data.name)}`, actionLabel: STATUS_CONFIRM_CONFIG[status]?.confirmLabel ?? "Confirm" },
     );
     setUpdating(false);
-    if (!body) return;
+    if (!body) {
+      if (failure) toast.error(failure);
+      return !failure;
+    }
     setActionNotice(impactResultText(body.bookings as never));
     onStatusChange();
     // Refresh detail
-    const res = await fetch(`/api/admin/doctors/${doctorId}`);
-    setData(await res.json());
+    void detail.reload();
+    return true;
   };
 
+  // Resolves false if the update failed (the confirm dialog stays open).
   const toggleVerified = async () => {
-    if (!data?.doctorProfile) return;
+    if (!data?.doctorProfile) return false;
     const turningOn = !data.doctorProfile.isVerified;
     if (turningOn && !data.doctorProfile.registrationFeePaid) {
       setActionError("Doctor hasn't paid the ₹99 registration fee yet.");
-      return;
+      return false;
     }
     setActionError("");
     setUpdating(true);
-    const patchRes = await fetch(`/api/admin/doctors/${doctorId}`, {
+    const res = await mutate(`/api/admin/doctors/${doctorId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isVerified: turningOn }),
+      body: { isVerified: turningOn },
+      fallback: "Could not update verification status.",
     });
     setUpdating(false);
-    if (!patchRes.ok) {
-      const body = await patchRes.json().catch(() => ({}));
-      setActionError(body.error ?? "Could not update verification status.");
-      return;
+    if (!res.ok) {
+      setActionError(res.error);
+      toast.error(res.error);
+      return false;
     }
-    const res = await fetch(`/api/admin/doctors/${doctorId}`);
-    setData(await res.json());
+    void detail.reload();
+    return true;
   };
 
   const p = data?.doctorProfile;
@@ -333,8 +349,13 @@ function DoctorDrawer({
             <div className="p-6 space-y-4">
               {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-10 rounded-xl" />)}
             </div>
+          ) : !data ? (
+            <div className="p-6">
+              <LoadError error={detail.error ?? "Couldn't load this doctor's profile."} onRetry={detail.reload} retrying={detail.reloading} />
+            </div>
           ) : (
             <div className="p-6 space-y-6">
+              {detail.error && <LoadError error={detail.error} onRetry={detail.reload} retrying={detail.reloading} hasData />}
 
               {/* Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -559,7 +580,7 @@ function DoctorDrawer({
           confirmDisabled={confirmStatus === "REJECTED" && !rejectReason.trim()}
           onCancel={() => { setConfirmStatus(null); setRejectReason(""); }}
           onConfirm={async () => {
-            await changeStatus(confirmStatus, confirmStatus === "REJECTED" ? rejectReason.trim() : undefined);
+            if (!(await changeStatus(confirmStatus, confirmStatus === "REJECTED" ? rejectReason.trim() : undefined))) return;
             setConfirmStatus(null);
             setRejectReason("");
           }}
@@ -579,8 +600,7 @@ function DoctorDrawer({
           busy={updating}
           onCancel={() => setConfirmUnverify(false)}
           onConfirm={async () => {
-            await toggleVerified();
-            setConfirmUnverify(false);
+            if (await toggleVerified()) setConfirmUnverify(false);
           }}
         />
       )}
@@ -615,8 +635,10 @@ function Row({ icon: Icon, label, value, mono }: { icon: React.ElementType; labe
 
 // ── Main page ──────────────────────────────────────────────────
 export default function AdminDoctors() {
-  const [doctors, setDoctors]   = useState<Doctor[]>([]);
-  const [loading, setLoading]   = useState(true);
+  const toast = useToast();
+  const list = useLoad<Doctor[]>("/api/admin/doctors", { fallback: "Couldn't load doctors." });
+  const { loading, reload: load } = list;
+  const doctors = useMemo(() => (Array.isArray(list.data) ? list.data : []), [list.data]);
   const [search, setSearch]     = useState("");
   const [filter, setFilter]     = useState("ALL");
   const [docsOnly, setDocsOnly] = useState(false);
@@ -632,30 +654,22 @@ export default function AdminDoctors() {
   const [impersonateTarget, setImpersonateTarget] = useState<Doctor | null>(null);
   const [impersonateError, setImpersonateError] = useState("");
 
-  const load = useCallback(() => {
-    setLoading(true);
-    fetch("/api/admin/doctors")
-      .then((r) => r.json())
-      .then((d) => { setDoctors(d); setLoading(false); });
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
-
+  // Resolves false if the change failed (the confirm dialog stays open).
   const updateStatus = async (doctor: Doctor, status: string, rejectionReason?: string) => {
     setStatusError("");
     setStatusNotice("");
     setUpdating(doctor.id);
+    let failure = null as string | null;
     const body = await impact.run(
-      (extra) => fetch(`/api/admin/doctors/${doctor.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, rejectionReason, ...extra }),
-      }),
+      impactSend(`/api/admin/doctors/${doctor.id}`, "PATCH", (extra) => ({ status, rejectionReason, ...extra }), (e) => { failure = e; }),
       { title: `Open bookings with ${formatDoctorName(doctor.name)}`, actionLabel: STATUS_CONFIRM_CONFIG[status]?.confirmLabel ?? "Confirm" },
     );
     if (body) setStatusNotice(impactResultText(body.bookings as never));
+    // The page-top error banner may be scrolled out of view.
+    if (failure) toast.error(failure);
     await load();
     setUpdating(null);
+    return !failure;
   };
 
   const confirmDelete = async () => {
@@ -665,30 +679,31 @@ export default function AdminDoctors() {
     setStatusNotice("");
     setUpdating(target.id);
     setDeleteTarget(null);
+    let failure = null as string | null;
     const body = await impact.run(
-      (extra) => fetch(`/api/admin/doctors/${target.id}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(extra),
-      }),
+      impactSend(`/api/admin/doctors/${target.id}`, "DELETE", (extra) => extra, (e) => { failure = e; }),
       { title: `Open bookings with ${formatDoctorName(target.name)}`, actionLabel: "Delete Account" },
     );
     if (body) setStatusNotice(impactResultText(body.bookings as never));
+    if (failure) toast.error(failure);
     await load();
     setUpdating(null);
   };
 
+  // Resolves false if it failed (the confirm dialog stays open); on success
+  // the page navigates away.
   const impersonate = async (doctor: Doctor) => {
     setImpersonateError("");
     setUpdating(doctor.id);
-    const res = await fetch(`/api/admin/impersonate/${doctor.id}`, { method: "POST" });
+    const res = await mutate(`/api/admin/impersonate/${doctor.id}`, { method: "POST", fallback: "Could not log in as this doctor." });
     if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      setImpersonateError(body.error ?? "Could not log in as this doctor.");
+      setImpersonateError(res.error);
+      toast.error(res.error);
       setUpdating(null);
-      return;
+      return false;
     }
     window.location.href = "/doctor/dashboard";
+    return true;
   };
 
   const filtered = doctors
@@ -863,8 +878,8 @@ export default function AdminDoctors() {
           <h1 className="text-2xl font-extrabold text-slate-900">Doctor Management</h1>
           <p className="text-slate-500 text-sm mt-1">Verify credentials, approve or suspend doctors. Click <Eye className="inline w-3.5 h-3.5 text-blue-500" /> to view full profile.</p>
         </div>
-        <button onClick={load} className="btn-ghost gap-2">
-          <RefreshCw className="w-4 h-4" /> Refresh
+        <button onClick={load} disabled={list.reloading} className="btn-ghost gap-2">
+          <RefreshCw className={cn("w-4 h-4", list.reloading && "animate-spin")} /> Refresh
         </button>
       </div>
 
@@ -916,31 +931,35 @@ export default function AdminDoctors() {
         </div>
       </div>
 
+      {list.error && <LoadError error={list.error} onRetry={load} retrying={list.reloading} hasData={!!list.data} />}
+
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="p-4 sm:p-6 lg:p-8 space-y-3">
-            {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-slate-400">
-            <Stethoscope className="w-8 h-8 mx-auto mb-2 opacity-30" />
-            No doctors found.
-          </div>
-        ) : (
-          <AgGridReact<Doctor>
-            theme={brandGridTheme}
-            rowData={filtered}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            domLayout="autoHeight"
-            pagination
-            paginationPageSize={10}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            animateRows
-          />
-        )}
-      </div>
+      {!(list.error && !list.data) && (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          {loading ? (
+            <div className="p-4 sm:p-6 lg:p-8 space-y-3">
+              {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-12 text-slate-400">
+              <Stethoscope className="w-8 h-8 mx-auto mb-2 opacity-30" />
+              No doctors found.
+            </div>
+          ) : (
+            <AgGridReact<Doctor>
+              theme={brandGridTheme}
+              rowData={filtered}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColDef}
+              domLayout="autoHeight"
+              pagination
+              paginationPageSize={10}
+              paginationPageSizeSelector={[10, 20, 50, 100]}
+              animateRows
+            />
+          )}
+        </div>
+      )}
 
       {/* Drawer */}
       {viewId && (
@@ -989,7 +1008,7 @@ export default function AdminDoctors() {
           confirmDisabled={statusTarget.status === "REJECTED" && !rejectReason.trim()}
           onCancel={() => { setStatusTarget(null); setRejectReason(""); }}
           onConfirm={async () => {
-            await updateStatus(statusTarget.doctor, statusTarget.status, statusTarget.status === "REJECTED" ? rejectReason.trim() : undefined);
+            if (!(await updateStatus(statusTarget.doctor, statusTarget.status, statusTarget.status === "REJECTED" ? rejectReason.trim() : undefined))) return;
             setStatusTarget(null);
             setRejectReason("");
           }}
@@ -1010,8 +1029,7 @@ export default function AdminDoctors() {
           busy={updating === impersonateTarget.id}
           onCancel={() => setImpersonateTarget(null)}
           onConfirm={async () => {
-            await impersonate(impersonateTarget);
-            setImpersonateTarget(null);
+            if (await impersonate(impersonateTarget)) setImpersonateTarget(null);
           }}
         />
       )}

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef } from "react";
 import { IndianRupee, TrendingUp, Save, Wallet } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
@@ -9,11 +9,19 @@ import { formatProviderName } from "@/lib/utils";
 const providerName = (name: string, role?: string | null) => formatProviderName(name, role === "NURSE" ? "NURSE" : "DOCTOR");
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import LoadError from "@/components/LoadError";
+import { useToast } from "@/components/Toast";
+import { useLoad } from "@/lib/apiClient";
 
 interface Analytics {
   totalRevenue: number;
   totalPlatformFee: number;
   totalAppointments: number;
+}
+interface CommissionSettings {
+  clinicCommissionPercent: number;
+  videoCommissionPercent: number;
+  homeCommissionPercent: number;
 }
 interface PendingSettlement {
   doctorId: string;
@@ -48,15 +56,28 @@ function newIdempotencyKey(): string {
 }
 
 export default function AdminFinance() {
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [clinicCommission, setClinicCommission] = useState("10");
-  const [videoCommission, setVideoCommission] = useState("10");
-  const [homeCommission, setHomeCommission] = useState("10");
+  const toast = useToast();
+  // Each section loads on its own, so one failing endpoint doesn't hide the rest.
+  const analyticsLoad = useLoad<Analytics>("/api/admin/analytics", { fallback: "Couldn't load revenue figures." });
+  const settingsLoad = useLoad<CommissionSettings>("/api/admin/settings", { fallback: "Couldn't load commission settings." });
+  const pendingLoad = useLoad<PendingSettlement[]>("/api/admin/finance/settlements", { fallback: "Couldn't load pending settlements." });
+  const historyLoad = useLoad<SettlementRecord[]>("/api/admin/finance/settlements/history", { fallback: "Couldn't load settlement history." });
+  const analytics = analyticsLoad.data;
+  const pending = useMemo(() => (Array.isArray(pendingLoad.data) ? pendingLoad.data : []), [pendingLoad.data]);
+  const history = useMemo(() => (Array.isArray(historyLoad.data) ? historyLoad.data : []), [historyLoad.data]);
+  // A field shows the saved rate until the admin edits it (null = untouched).
+  // Until the settings load there's nothing to show — and saving is blocked,
+  // so placeholder values can never overwrite the real rates.
+  const [clinicEdit, setClinicCommission] = useState<string | null>(null);
+  const [videoEdit, setVideoCommission] = useState<string | null>(null);
+  const [homeEdit, setHomeCommission] = useState<string | null>(null);
+  const savedRates = settingsLoad.data;
+  const clinicCommission = clinicEdit ?? (savedRates ? String(savedRates.clinicCommissionPercent) : "");
+  const videoCommission = videoEdit ?? (savedRates ? String(savedRates.videoCommissionPercent) : "");
+  const homeCommission = homeEdit ?? (savedRates ? String(savedRates.homeCommissionPercent) : "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [settingsError, setSettingsError] = useState("");
-  const [pending, setPending] = useState<PendingSettlement[]>([]);
-  const [history, setHistory] = useState<SettlementRecord[]>([]);
   const [settlingId, setSettlingId] = useState<string | null>(null);
   const [confirmNegative, setConfirmNegative] = useState<PendingSettlement | null>(null);
   const [settleTarget, setSettleTarget] = useState<PendingSettlement | null>(null);
@@ -70,22 +91,9 @@ export default function AdminFinance() {
   const [confirmSaveSettings, setConfirmSaveSettings] = useState(false);
 
   const loadSettlements = () => {
-    fetch("/api/admin/finance/settlements").then((r) => r.json()).then(setPending);
-    fetch("/api/admin/finance/settlements/history").then((r) => r.json()).then(setHistory);
+    void pendingLoad.reload();
+    void historyLoad.reload();
   };
-
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/admin/settings").then((r) => r.json()),
-      fetch("/api/admin/analytics").then((r) => r.json()),
-    ]).then(([s, a]) => {
-      setClinicCommission(String(s.clinicCommissionPercent));
-      setVideoCommission(String(s.videoCommissionPercent));
-      setHomeCommission(String(s.homeCommissionPercent));
-      setAnalytics(a);
-    });
-    loadSettlements();
-  }, []);
 
   // A blank or out-of-range field must never be sent — the API would reject
   // it, and before that it used to silently become 0%.
@@ -96,6 +104,7 @@ export default function AdminFinance() {
 
   const requestSaveSettings = () => {
     setSaved(false);
+    if (!settingsLoad.data) return;
     if (!parseCommissions()) {
       setSettingsError("Enter every commission as a number between 0 and 100.");
       return;
@@ -130,6 +139,7 @@ export default function AdminFinance() {
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
+      void settingsLoad.reload();
     } catch {
       setSettingsError("Network error — commission settings were not saved.");
     } finally {
@@ -137,8 +147,10 @@ export default function AdminFinance() {
     }
   };
 
-  const settleDoctor = async (doctorId: string, acknowledgeNegative = false) => {
-    if (settleInFlight.current) return;
+  // Resolves true once the settle went through or moved on to the
+  // negative-net acknowledgement; false if it failed (the dialog stays open).
+  const settleDoctor = async (doctorId: string, acknowledgeNegative = false): Promise<boolean> => {
+    if (settleInFlight.current) return false;
     settleInFlight.current = true;
     setSettlingId(doctorId);
     setSettleError("");
@@ -155,18 +167,23 @@ export default function AdminFinance() {
         const doctorName = row?.doctorName ?? "This doctor";
         const providerRole = row?.providerRole;
         setConfirmNegative({ doctorId, doctorName, providerRole, ...data });
-        return;
+        return true;
       }
       if (!res.ok) {
-        setSettleError(data.error ?? "Could not settle. Please try again.");
-        return;
+        const message = data.error ?? "Could not settle. Please try again.";
+        setSettleError(message);
+        toast.error(message);
+        return false;
       }
       delete settleKeys.current[doctorId];
       setConfirmNegative(null);
       loadSettlements();
+      return true;
     } catch {
       // Safe to retry: the same key returns the settlement if this one actually went through.
       setSettleError("Network error — please try again.");
+      toast.error("Network error — the settlement may not have gone through. Please try again.");
+      return false;
     } finally {
       settleInFlight.current = false;
       setSettlingId(null);
@@ -303,46 +320,53 @@ export default function AdminFinance() {
       </div>
 
       {/* Revenue Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-        <div className="stat-card">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Gross Revenue</p>
-              <p className="text-3xl font-extrabold text-slate-900">₹{analytics?.totalRevenue.toLocaleString() ?? "—"}</p>
-              <p className="text-xs text-slate-400 mt-1">From completed consultations</p>
+      {analyticsLoad.error && (
+        <div className="mb-8">
+          <LoadError error={analyticsLoad.error} onRetry={analyticsLoad.reload} retrying={analyticsLoad.reloading} hasData={!!analytics} />
+        </div>
+      )}
+      {!(analyticsLoad.error && !analytics) && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+          <div className="stat-card">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Gross Revenue</p>
+                <p className="text-3xl font-extrabold text-slate-900">₹{analytics?.totalRevenue.toLocaleString() ?? "—"}</p>
+                <p className="text-xs text-slate-400 mt-1">From completed consultations</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
+                <IndianRupee className="w-6 h-6" />
+              </div>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
-              <IndianRupee className="w-6 h-6" />
+          </div>
+          <div className="stat-card">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Platform Earnings</p>
+                <p className="text-3xl font-extrabold text-emerald-600">₹{analytics?.totalPlatformFee.toLocaleString() ?? "—"}</p>
+                <p className="text-xs text-slate-400 mt-1">Varies by visit type</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Doctor Payouts</p>
+                <p className="text-3xl font-extrabold text-purple-600">
+                  ₹{((analytics?.totalRevenue ?? 0) - (analytics?.totalPlatformFee ?? 0)).toLocaleString()}
+                </p>
+                <p className="text-xs text-slate-400 mt-1">Net to doctors</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center">
+                <IndianRupee className="w-6 h-6" />
+              </div>
             </div>
           </div>
         </div>
-        <div className="stat-card">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Platform Earnings</p>
-              <p className="text-3xl font-extrabold text-emerald-600">₹{analytics?.totalPlatformFee.toLocaleString() ?? "—"}</p>
-              <p className="text-xs text-slate-400 mt-1">Varies by visit type</p>
-            </div>
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Doctor Payouts</p>
-              <p className="text-3xl font-extrabold text-purple-600">
-                ₹{((analytics?.totalRevenue ?? 0) - (analytics?.totalPlatformFee ?? 0)).toLocaleString()}
-              </p>
-              <p className="text-xs text-slate-400 mt-1">Net to doctors</p>
-            </div>
-            <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center">
-              <IndianRupee className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Commission Settings */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 max-w-lg">
@@ -350,60 +374,67 @@ export default function AdminFinance() {
         <p className="text-xs text-slate-400 mb-5">
           Set a different platform commission per visit type. Applies to future appointments only — already-booked appointments keep the rate they were charged at.
         </p>
-        <div className="form-group mb-4">
-          <label className="input-label">Clinic Visit Commission (%)</label>
-          <div className="relative">
-            <input
-              type="number"
-              min={0}
-              max={100}
-              step={0.5}
-              value={clinicCommission}
-              onChange={(e) => setClinicCommission(e.target.value)}
-              className="input-field pr-16"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">% fee</span>
+        {settingsLoad.error && (
+          <LoadError error={settingsLoad.error} onRetry={settingsLoad.reload} retrying={settingsLoad.reloading} hasData={!!settingsLoad.data} />
+        )}
+        {settingsLoad.error && !settingsLoad.data ? null : (
+          <>
+          <div className="form-group mb-4">
+            <label className="input-label">Clinic Visit Commission (%)</label>
+            <div className="relative">
+              <input
+                type="number"
+                min={0}
+                max={100}
+                step={0.5}
+                value={clinicCommission}
+                onChange={(e) => setClinicCommission(e.target.value)}
+                className="input-field pr-16"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">% fee</span>
+            </div>
           </div>
-        </div>
-        <div className="form-group mb-4">
-          <label className="input-label">Video Consultation Commission (%)</label>
-          <div className="relative">
-            <input
-              type="number"
-              min={0}
-              max={100}
-              step={0.5}
-              value={videoCommission}
-              onChange={(e) => setVideoCommission(e.target.value)}
-              className="input-field pr-16"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">% fee</span>
+          <div className="form-group mb-4">
+            <label className="input-label">Video Consultation Commission (%)</label>
+            <div className="relative">
+              <input
+                type="number"
+                min={0}
+                max={100}
+                step={0.5}
+                value={videoCommission}
+                onChange={(e) => setVideoCommission(e.target.value)}
+                className="input-field pr-16"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">% fee</span>
+            </div>
           </div>
-        </div>
-        <div className="form-group mb-5">
-          <label className="input-label">Home Visit Commission (%)</label>
-          <div className="relative">
-            <input
-              type="number"
-              min={0}
-              max={100}
-              step={0.5}
-              value={homeCommission}
-              onChange={(e) => setHomeCommission(e.target.value)}
-              className="input-field pr-16"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">% fee</span>
+          <div className="form-group mb-5">
+            <label className="input-label">Home Visit Commission (%)</label>
+            <div className="relative">
+              <input
+                type="number"
+                min={0}
+                max={100}
+                step={0.5}
+                value={homeCommission}
+                onChange={(e) => setHomeCommission(e.target.value)}
+                className="input-field pr-16"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">% fee</span>
+            </div>
           </div>
-        </div>
-        <button
-          onClick={requestSaveSettings}
-          disabled={saving}
-          className="btn-primary gap-2"
-        >
-          <Save className="w-4 h-4" />
-          {saving ? "Saving…" : saved ? "✓ Saved!" : "Save Settings"}
-        </button>
-        {settingsError && <p className="text-sm text-red-600 mt-3">{settingsError}</p>}
+          <button
+            onClick={requestSaveSettings}
+            disabled={saving || !settingsLoad.data}
+            className="btn-primary gap-2"
+          >
+            <Save className="w-4 h-4" />
+            {saving ? "Saving…" : saved ? "✓ Saved!" : "Save Settings"}
+          </button>
+          {settingsError && <p className="text-sm text-red-600 mt-3">{settingsError}</p>}
+          </>
+        )}
       </div>
 
       {/* Pending Settlements */}
@@ -413,7 +444,12 @@ export default function AdminFinance() {
         <p className="text-xs text-slate-400 mb-5">
           Cash fee owed = commission the doctor collected in cash and owes the platform. Online payout owed = money the platform holds and owes the doctor.
         </p>
-        {pending.length === 0 ? (
+        {pendingLoad.error && (
+          <LoadError error={pendingLoad.error} onRetry={pendingLoad.reload} retrying={pendingLoad.reloading} hasData={!!pendingLoad.data} />
+        )}
+        {pendingLoad.loading ? (
+          <div className="skeleton h-24 rounded-xl" />
+        ) : !pendingLoad.data ? null : pending.length === 0 ? (
           <p className="text-sm text-slate-400 text-center py-8">Nothing to settle right now.</p>
         ) : (
           <AgGridReact<PendingSettlement>
@@ -430,7 +466,12 @@ export default function AdminFinance() {
       {/* Settlement History */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-6">
         <h2 className="font-bold text-slate-800 mb-5 text-lg">Settlement History</h2>
-        {history.length === 0 ? (
+        {historyLoad.error && (
+          <LoadError error={historyLoad.error} onRetry={historyLoad.reload} retrying={historyLoad.reloading} hasData={!!historyLoad.data} />
+        )}
+        {historyLoad.loading ? (
+          <div className="skeleton h-24 rounded-xl" />
+        ) : !historyLoad.data ? null : history.length === 0 ? (
           <p className="text-sm text-slate-400 text-center py-8">No settlements recorded yet.</p>
         ) : (
           <AgGridReact<SettlementRecord>
@@ -500,8 +541,7 @@ export default function AdminFinance() {
           busy={settlingId === settleTarget.doctorId}
           onCancel={() => setSettleTarget(null)}
           onConfirm={async () => {
-            await settleDoctor(settleTarget.doctorId);
-            setSettleTarget(null);
+            if (await settleDoctor(settleTarget.doctorId)) setSettleTarget(null);
           }}
         />
       )}
