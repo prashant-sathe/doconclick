@@ -48,7 +48,8 @@
     "test:nurse-shifts": "tsx tests/nurse-shifts.ts",
     "test:upload-sniff": "tsx tests/upload-sniff.ts",
     "test:coupons": "tsx tests/coupons.ts",
-    "test:wallet-adjust": "tsx tests/wallet-adjust.ts"
+    "test:wallet-adjust": "tsx tests/wallet-adjust.ts",
+    "test:complaints": "tsx tests/complaints.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
