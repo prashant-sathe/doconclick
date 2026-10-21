@@ -31,7 +31,9 @@ async function main() {
     const u = await prisma.user.create({
       data: {
         name: `Slot Test Doctor ${n}`, mobile: `7${n}${stamp}`, role: "DOCTOR",
-        doctorProfile: { create: { status: "APPROVED", isVerified: true, trialEndsAt: new Date(Date.now() + 30 * 86_400_000), offersClinic: true, offersVideo: true, consultFee: 300, videoFee: 200 } },
+        doctorProfile: { create: { status: "APPROVED", isVerified: true, trialEndsAt: new Date(Date.now() + 30 * 86_400_000), offersClinic: true, offersVideo: true, consultFee: 300, videoFee: 200,
+          // Any day: the booking day is "today + 3", which can be a weekend, and video times must be within the doctor's hours.
+          availability: "Sun-Sat, 12AM-11:59PM" } },
       },
     });
     ids.push(u.id);

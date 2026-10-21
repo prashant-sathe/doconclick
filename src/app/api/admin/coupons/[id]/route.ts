@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { parseCouponInput } from "@/lib/coupons";
+import { parseCouponInput, validateCouponConfig } from "@/lib/coupons";
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -49,15 +49,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
   }
 
-  // Cross-field check needs the merged view, since PATCH may send only one date.
-  const startsAt = "startsAt" in parsed.data ? parsed.data.startsAt : existing.startsAt;
-  const expiresAt = "expiresAt" in parsed.data ? parsed.data.expiresAt : existing.expiresAt;
-  if (startsAt && expiresAt && expiresAt <= startsAt) {
-    return NextResponse.json({ error: "Expiry must be after the start date." }, { status: 400 });
-  }
+  // Validate the coupon as it will be stored — existing + patch. A PATCH
+  // that sends only `discountType` or only one date must be judged against
+  // the rest of the coupon, not on its own.
+  const merged = { ...existing, ...parsed.data };
+  const config = validateCouponConfig(merged, {
+    // A past expiry is refused when it's being set or the coupon is being
+    // turned back on — deactivating or editing one that already expired is fine.
+    checkExpiry: "expiresAt" in parsed.data || parsed.data.isActive === true,
+  });
+  if ("error" in config) return NextResponse.json({ error: config.error }, { status: 400 });
 
   const coupon = await prisma.coupon.update({ where: { id }, data: parsed.data });
-  return NextResponse.json(coupon);
+  return NextResponse.json({ ...coupon, warnings: config.warnings });
 }
 
 // DELETE: hard-delete only if never redeemed, otherwise tell the admin to deactivate

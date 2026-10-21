@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
 import { createCashfreeOrder } from "@/lib/cashfree";
-import { APPOINTMENT_ORDER_PREFIX, recordPaymentOrder } from "@/lib/paymentOrders";
+import { APPOINTMENT_ORDER_PREFIX, recordPaymentOrder, totalPayable, settleFreeAppointments, notifySettlement } from "@/lib/paymentOrders";
 
 // POST: Creates a real Cashfree order for an appointment's online payment
 // and returns a payment_session_id for the client to redirect into checkout.
@@ -43,6 +43,17 @@ export async function POST(req: Request) {
     : [appointment];
   if (covered.length === 0) {
     return NextResponse.json({ error: "Wait for the nurse to accept your visits before paying." }, { status: 400 });
+  }
+
+  // Nothing left to pay (a 100% coupon, or a ₹0 fee): Cashfree can't create a
+  // ₹0 order, so settle without it — mark the visits PAID and tell the provider.
+  if (totalPayable(covered) === 0) {
+    const settled = await settleFreeAppointments(covered.map((a) => a.id), authUser.id);
+    if (settled.paid.length === 0) {
+      return NextResponse.json({ error: "This appointment can't be confirmed right now. Please refresh and try again." }, { status: 409 });
+    }
+    notifySettlement(settled);
+    return NextResponse.json({ paid: true, free: true, visitsPaid: settled.paid.length });
   }
 
   const orderId = `${APPOINTMENT_ORDER_PREFIX}${appointment.id}_${Date.now()}`;

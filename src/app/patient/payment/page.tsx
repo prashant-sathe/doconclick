@@ -65,6 +65,14 @@ function PaymentContent() {
       setError(data.error ?? "Could not start payment. Please try again.");
       return;
     }
+    // Nothing to pay (a 100% coupon): the server confirmed the booking itself,
+    // no gateway — same paid screen as a wallet payment.
+    if (data.paid) {
+      setPaying(false);
+      setJustPaid({ amount: 0, visits: data.visitsPaid ?? 1 });
+      setAppt((a) => (a ? { ...a, paymentStatus: "PAID" } : a));
+      return;
+    }
     const { load } = await import("@cashfreepayments/cashfree-js");
     // NEXT_PUBLIC_ env vars are inlined at Docker *build* time, not container
     // runtime, so env_file: .env.production can't toggle this — hardcoded to
@@ -152,10 +160,12 @@ function PaymentContent() {
         <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-emerald-500" />
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{justPaid ? "Payment successful" : "Already Paid"}</h2>
+        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{justPaid ? (justPaid.amount === 0 ? "Booking confirmed" : "Payment successful") : "Already Paid"}</h2>
         <p className="text-slate-500 mb-8">
           {justPaid
-            ? `₹${justPaid.amount} paid from your wallet${justPaid.visits > 1 ? ` for all ${justPaid.visits} visits` : ""}.`
+            ? justPaid.amount === 0
+              ? "Your coupon covered the full fee — nothing was charged."
+              : `₹${justPaid.amount} paid from your wallet${justPaid.visits > 1 ? ` for all ${justPaid.visits} visits` : ""}.`
             : "This appointment has already been paid for."}
         </p>
         <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">My Appointments</Link>
@@ -248,7 +258,7 @@ function PaymentContent() {
         </div>
       )}
 
-      {(() => {
+      {netPayable > 0 && (() => {
         const canPayWithWallet = walletBalance != null && walletBalance >= netPayable;
         return (
           <div className="mb-3">
@@ -278,9 +288,11 @@ function PaymentContent() {
       })()}
 
       <button onClick={pay} disabled={paying || payingWallet} className="btn-primary w-full justify-center py-3.5 text-base">
-        {paying
-          ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</>
-          : `Pay ₹${netPayable} via Cashfree`}
+        {netPayable === 0
+          ? (paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Confirming…</> : "Confirm booking — nothing to pay")
+          : paying
+            ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</>
+            : `Pay ₹${netPayable} via Cashfree`}
       </button>
 
       {confirmWalletPay && (

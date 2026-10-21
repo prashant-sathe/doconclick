@@ -61,6 +61,10 @@ export async function POST(req: Request) {
       // the platform is absorbing (summed across a package's visits).
       const payable = Math.round(fresh.reduce((sum, a) => sum + netPayable(a), 0) * 100) / 100;
 
+      // Nothing to pay (a 100% coupon): no wallet debit or ₹0 ledger row —
+      // the booking is confirmed through /api/payments/create-order instead.
+      if (payable === 0) throw new Error("NOTHING_TO_PAY");
+
       // Guarded conditional update instead of read-then-write: a double-click
       // or two concurrent requests must not both pass a balance check before
       // either commits. If the WHERE clause doesn't match, count is 0.
@@ -118,6 +122,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ appointment: result.updatedAppt, walletBalance: result.wallet.balance, visitsPaid: result.count });
   } catch (err) {
+    if (err instanceof Error && err.message === "NOTHING_TO_PAY") {
+      return NextResponse.json({ error: "Nothing to pay — confirm the booking instead." }, { status: 400 });
+    }
     if (err instanceof Error && err.message === "INSUFFICIENT_BALANCE") {
       return NextResponse.json({ error: "Insufficient wallet balance" }, { status: 400 });
     }

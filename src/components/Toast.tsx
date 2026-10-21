@@ -8,14 +8,15 @@ import { cn } from "@/lib/utils";
 // For a page's data failing to load, use <LoadError> instead — a toast
 // disappears, a load error has to stay until it's retried.
 
-type Tone = "error" | "success";
+type Tone = "error" | "success" | "warning";
 type ToastItem = { id: number; tone: Tone; message: string };
 
-const DISMISS_MS = { error: 6000, success: 3500 } as const;
+const DISMISS_MS = { error: 6000, success: 3500, warning: 9000 } as const;
 
-const ToastContext = createContext<{ error: (message: string) => void; success: (message: string) => void }>({
+const ToastContext = createContext<{ error: (message: string) => void; success: (message: string) => void; warning: (message: string) => void }>({
   error: () => {},
   success: () => {},
+  warning: () => {},
 });
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
@@ -32,9 +33,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const error = useCallback((message: string) => show("error", message), [show]);
   const success = useCallback((message: string) => show("success", message), [show]);
+  const warning = useCallback((message: string) => show("warning", message), [show]);
 
   return (
-    <ToastContext.Provider value={{ error, success }}>
+    <ToastContext.Provider value={{ error, success, warning }}>
       {children}
       <div className="fixed z-[120] bottom-24 lg:bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm space-y-2 pointer-events-none" aria-live="polite">
         {toasts.map((t) => (
@@ -43,10 +45,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             role={t.tone === "error" ? "alert" : "status"}
             className={cn(
               "pointer-events-auto flex items-start gap-2.5 rounded-xl px-4 py-3 text-sm font-medium shadow-lg animate-fade-in-up",
-              t.tone === "error" ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
+              t.tone === "error" ? "bg-red-600 text-white" : t.tone === "warning" ? "bg-amber-500 text-white" : "bg-emerald-600 text-white"
             )}
           >
-            {t.tone === "error" ? <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" /> : <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />}
+            {t.tone === "success" ? <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />}
             <span className="flex-1">{t.message}</span>
             <button type="button" onClick={() => dismiss(t.id)} className="opacity-80 hover:opacity-100" aria-label="Dismiss">
               <X className="w-4 h-4" />

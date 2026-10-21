@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2, Save, Trash2, AlertCircle } from "lucide-react";
+import { useToast } from "@/components/Toast";
 
 const CONSULT_TYPES = ["CLINIC", "VIDEO", "HOME"] as const;
 const APPLIES_TO = [
@@ -39,6 +40,7 @@ function toLocalInput(iso: string | null): string {
 
 export default function CouponForm({ coupon }: { coupon?: CouponData }) {
   const router = useRouter();
+  const toast = useToast();
   const isEdit = !!coupon;
 
   const [code, setCode] = useState(coupon?.code ?? "");
@@ -96,6 +98,9 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
     });
     setSaving(false);
     if (res.ok) {
+      // Allowed but worth a second look (e.g. a 100% coupon) — shown on the next page.
+      const saved = await res.json().catch(() => null);
+      for (const w of (saved?.warnings as string[] | undefined) ?? []) toast.warning(w);
       router.push("/admin/coupons");
       router.refresh();
     } else {

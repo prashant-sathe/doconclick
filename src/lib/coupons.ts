@@ -8,6 +8,13 @@ export const COUPON_CONSULT_TYPES = ["CLINIC", "VIDEO", "HOME"] as const;
 export const COUPON_APPLIES_TO = ["APPOINTMENT", "DOCTOR_REGISTRATION", "DOCTOR_SUBSCRIPTION"] as const;
 export type CouponContext = (typeof COUPON_APPLIES_TO)[number];
 
+/**
+ * Largest rupee amount a FLAT discount (or a PERCENT coupon's max-discount
+ * cap) may be — the same ceiling as the biggest fee the app takes (₹1,00,000),
+ * so a typo like 9000000 can't become a coupon.
+ */
+export const MAX_COUPON_RUPEES = 100000;
+
 /** The contexts a coupon is valid for; empty/legacy value means APPOINTMENT only. */
 export function couponContexts(coupon: Pick<Coupon, "appliesTo">): string[] {
   const list = (coupon.appliesTo ?? "")
@@ -109,6 +116,12 @@ export function validateCoupon({
   if (discountAmount <= 0) {
     return { ok: false, error: "This coupon has no effect on this amount." };
   }
+  // Fully free (₹0) is fine — bookings settle without the gateway — but the
+  // gateway can't charge under ₹1, so a leftover of a few paise is refused.
+  const net = round2(baseAmount - discountAmount);
+  if (net > 0 && net < 1) {
+    return { ok: false, error: "This coupon would leave less than ₹1 to pay on this booking, so it can't be used here." };
+  }
   return { ok: true, discountAmount };
 }
 
@@ -176,10 +189,6 @@ export function parseCouponInput(
     if (!Number.isFinite(value) || value <= 0) {
       return { error: "Discount value must be greater than 0." };
     }
-    const effectiveType = data.discountType ?? "PERCENT";
-    if (effectiveType === "PERCENT" && value > 100) {
-      return { error: "A percentage discount can't be more than 100." };
-    }
     data.discountValue = value;
   }
 
@@ -246,13 +255,57 @@ export function parseCouponInput(
     data.isActive = Boolean(body.isActive);
   }
 
-  const startsAt = data.startsAt ?? null;
-  const expiresAt = data.expiresAt ?? null;
-  if (startsAt && expiresAt && expiresAt <= startsAt) {
+  return { data };
+}
+
+type CouponConfig = Pick<CouponInput, "discountType" | "discountValue" | "maxDiscount" | "startsAt" | "expiresAt">;
+
+/**
+ * Validates a coupon as it will actually be stored — an existing coupon with
+ * a PATCH merged over it, or a new one with its defaults. Field-by-field
+ * checks can't see these: sending only `discountType: "PERCENT"` for a ₹500
+ * FLAT coupon made it a 500% coupon.
+ *
+ * `checkExpiry`: reject an expiry that's already past. Callers pass it when
+ * the expiry is being set, or the coupon is being (re)activated — not when
+ * an admin deactivates or tweaks a coupon that has already expired.
+ *
+ * Returns `warnings` (shown to the admin, not blocking) for settings that
+ * are allowed but worth a second look.
+ */
+export function validateCouponConfig(
+  c: CouponConfig,
+  { checkExpiry, now = new Date() }: { checkExpiry: boolean; now?: Date },
+): { error: string } | { warnings: string[] } {
+  const money = (n: number) => `₹${n.toLocaleString("en-IN")}`;
+  if (!Number.isFinite(c.discountValue) || c.discountValue <= 0) {
+    return { error: "Discount value must be greater than 0." };
+  }
+  if (c.discountType === "PERCENT" && c.discountValue > 100) {
+    return { error: "A percentage discount can't be more than 100%." };
+  }
+  if (c.discountType === "FLAT" && c.discountValue > MAX_COUPON_RUPEES) {
+    return { error: `A flat discount can't be more than ${money(MAX_COUPON_RUPEES)}.` };
+  }
+  if (c.maxDiscount != null && c.maxDiscount > MAX_COUPON_RUPEES) {
+    return { error: `Max discount can't be more than ${money(MAX_COUPON_RUPEES)}.` };
+  }
+  if (c.startsAt && c.expiresAt && c.expiresAt <= c.startsAt) {
     return { error: "Expiry must be after the start date." };
   }
+  if (checkExpiry && c.expiresAt && c.expiresAt <= now) {
+    return { error: "Expiry must be in the future — this date has already passed." };
+  }
 
-  return { data };
+  const warnings: string[] = [];
+  if (c.discountType === "PERCENT" && c.discountValue >= 100) {
+    warnings.push(
+      c.maxDiscount != null
+        ? `This is a 100% coupon: bookings up to ${money(c.maxDiscount)} become completely free.`
+        : "This is a 100% coupon with no max-discount cap: matching bookings become completely free (₹0). Set a max discount if that isn't intended.",
+    );
+  }
+  return { warnings };
 }
 
 // Identifies a single redemption: a patient booking (appointmentId) or a

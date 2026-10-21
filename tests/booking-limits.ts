@@ -34,10 +34,10 @@ async function call(u: U, method: string, path: string, body?: unknown) {
 // isn't) a weekend, and an instant at hh:mm IST on a date.
 const istDate = (d: Date) => d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
 const istWeekday = (date: string) => new Date(`${date}T12:00:00+05:30`).toLocaleDateString("en-US", { timeZone: "Asia/Kolkata", weekday: "short" });
-function dateAhead(minDays: number, weekend: boolean): string {
-  for (let i = minDays; i < minDays + 8; i++) {
+function dateAhead(minDays: number, weekend: boolean, not: string[] = []): string {
+  for (let i = minDays; i < minDays + 10; i++) {
     const date = istDate(new Date(Date.now() + i * DAY));
-    if (["Sat", "Sun"].includes(istWeekday(date)) === weekend) return date;
+    if (["Sat", "Sun"].includes(istWeekday(date)) === weekend && !not.includes(date)) return date;
   }
   throw new Error("unreachable");
 }
@@ -80,7 +80,8 @@ async function main() {
 
   const video = (scheduledAt?: string) => ({ doctorId: doctor.id, symptoms: "fever and cough", consultType: "VIDEO", consentGiven: true, ...(scheduledAt ? { scheduledAt } : {}) });
   const weekday = dateAhead(3, false);
-  const weekday2 = dateAhead(4, false);
+  // A different day from `weekday` — over a weekend, "3 ahead" and "4 ahead" are the same Monday.
+  const weekday2 = dateAhead(4, false, [weekday]);
   const weekend = dateAhead(3, true);
   const tooFar = dateAhead(horizon + 2, false);
 

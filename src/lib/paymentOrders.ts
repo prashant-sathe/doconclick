@@ -34,6 +34,56 @@ export async function recordPaymentOrder({
   });
 }
 
+/** What a set of appointments costs the patient once coupon discounts are applied. */
+export function totalPayable(appointments: { amount: number; discountAmount: number }[]): number {
+  return round2(appointments.reduce((sum, a) => sum + netPayable(a), 0));
+}
+
+/**
+ * The zero-amount path: when coupons leave nothing to pay (or the fee is ₹0)
+ * there is no gateway order — Cashfree won't create a ₹0 one — so the
+ * appointments are marked PAID directly. Same conditional update as a
+ * gateway settlement (still SCHEDULED, not yet PAID), so a concurrent cancel
+ * or wallet payment makes it a no-op rather than a double settlement, and the
+ * coupon redemption is confirmed. Returns the same shape as a settlement so
+ * `notifySettlement` tells the provider.
+ */
+export async function settleFreeAppointments(
+  appointmentIds: string[],
+  patientId: string,
+): Promise<Extract<SettleResult, { outcome: "settled" }>> {
+  const paidIds: string[] = [];
+  await prisma.$transaction(async (tx) => {
+    for (const id of appointmentIds) {
+      const appt = await tx.appointment.findUnique({ where: { id } });
+      // Only what's genuinely free: re-checked inside the transaction, in case
+      // a coupon was removed since the caller looked.
+      if (!appt || appt.patientId !== patientId || netPayable(appt) !== 0) continue;
+      const marked = await tx.appointment.updateMany({
+        where: { id, status: "SCHEDULED", paymentStatus: { not: "PAID" } },
+        data: { paymentStatus: "PAID", paidAt: appt.paidAt ?? new Date() },
+      });
+      if (marked.count === 1) {
+        paidIds.push(id);
+        await confirmCouponRedemption(tx, { appointmentId: id });
+      }
+    }
+  });
+  const paid = paidIds.length
+    ? await prisma.appointment.findMany({
+        where: { id: { in: paidIds } },
+        select: { id: true, doctorId: true, providerType: true, serviceName: true, patient: { select: { name: true } } },
+        orderBy: { scheduledAt: "asc" },
+      })
+    : [];
+  return {
+    outcome: "settled",
+    patientId,
+    paid: paid.map((a) => ({ id: a.id, doctorId: a.doctorId, providerType: a.providerType, serviceName: a.serviceName, patientName: a.patient.name })),
+    credited: null,
+  };
+}
+
 export type SettleResult =
   | { outcome: "retry" | "unattributed" }
   | {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { parseCouponInput } from "@/lib/coupons";
+import { parseCouponInput, validateCouponConfig } from "@/lib/coupons";
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -50,6 +50,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: parsed.error }, { status: 400 });
   }
 
+  // The coupon as it will be stored, defaults included.
+  const config = validateCouponConfig(
+    {
+      discountType: parsed.data.discountType ?? "PERCENT",
+      discountValue: parsed.data.discountValue!,
+      maxDiscount: parsed.data.maxDiscount ?? null,
+      startsAt: parsed.data.startsAt ?? null,
+      expiresAt: parsed.data.expiresAt ?? null,
+    },
+    { checkExpiry: true },
+  );
+  if ("error" in config) return NextResponse.json({ error: config.error }, { status: 400 });
+
   const existing = await prisma.coupon.findUnique({ where: { code: parsed.data.code! } });
   if (existing) {
     return NextResponse.json({ error: "A coupon with that code already exists." }, { status: 409 });
@@ -73,5 +86,5 @@ export async function POST(req: Request) {
       createdByAdminId: admin.id,
     },
   });
-  return NextResponse.json(coupon);
+  return NextResponse.json({ ...coupon, warnings: config.warnings });
 }
