@@ -49,7 +49,8 @@
     "test:upload-sniff": "tsx tests/upload-sniff.ts",
     "test:coupons": "tsx tests/coupons.ts",
     "test:wallet-adjust": "tsx tests/wallet-adjust.ts",
-    "test:complaints": "tsx tests/complaints.ts"
+    "test:complaints": "tsx tests/complaints.ts",
+    "test:admin-reports": "tsx tests/admin-reports.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

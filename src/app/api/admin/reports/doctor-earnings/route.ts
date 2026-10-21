@@ -9,7 +9,9 @@ export async function GET(req: Request) {
   if (denied) return denied;
 
   const { searchParams } = new URL(req.url);
-  const range = parseDateRange(searchParams);
+  const parsedRange = parseDateRange(searchParams);
+  if (parsedRange.response) return parsedRange.response;
+  const range = parsedRange.range;
   const dateFilter = range.gte || range.lte ? range : undefined;
 
   // Summed in JS rather than via Prisma's groupBy/_sum: a single row with a

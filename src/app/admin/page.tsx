@@ -1,5 +1,5 @@
 "use client";
-import { Users, Stethoscope, CalendarCheck, IndianRupee, AlertCircle, Clock, TrendingUp } from "lucide-react";
+import { Users, Stethoscope, HeartPulse, CalendarCheck, IndianRupee, AlertCircle, Clock, TrendingUp } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { cn, formatProviderName } from "@/lib/utils";
@@ -16,6 +16,9 @@ interface Analytics {
   totalAppointments: number;
   totalRevenue: number;
   totalPlatformFee: number;
+  totalNurses: number;
+  totalCouponDiscounts: number;
+  totalPlatformEarnings: number;
   recentAppointments: {
     id: string;
     patient: { name: string };
@@ -27,6 +30,7 @@ interface Analytics {
     createdAt: string;
   }[];
   pendingDoctors: number;
+  pendingNurses: number;
   openComplaints: number;
 }
 
@@ -130,21 +134,38 @@ export default function AdminOverview() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-8">
         <StatCard icon={Users} label="Total Patients" value={data.totalPatients} sub="Registered users" color="bg-blue-50 text-blue-500" delay={0.05} />
         <StatCard icon={Stethoscope} label="Total Doctors" value={data.totalDoctors} sub={`${data.pendingDoctors} pending`} color="bg-teal-50 text-teal-500" delay={0.10} />
-        <StatCard icon={CalendarCheck} label="Consultations" value={data.totalAppointments} sub="All time" color="bg-purple-50 text-purple-500" delay={0.15} />
-        <StatCard icon={IndianRupee} label="Platform Revenue" value={`₹${data.totalPlatformFee.toLocaleString()}`} sub={`₹${data.totalRevenue.toLocaleString()} gross`} color="bg-emerald-50 text-emerald-500" delay={0.20} />
+        <StatCard icon={HeartPulse} label="Total Nurses" value={data.totalNurses} sub={`${data.pendingNurses} pending`} color="bg-rose-50 text-rose-500" delay={0.15} />
+        <StatCard icon={CalendarCheck} label="Consultations" value={data.totalAppointments} sub="Doctor and nurse visits, all time" color="bg-purple-50 text-purple-500" delay={0.20} />
+        <StatCard
+          icon={IndianRupee}
+          label="Platform Revenue"
+          value={`₹${data.totalPlatformEarnings.toLocaleString()}`}
+          sub={data.totalCouponDiscounts > 0
+            ? `₹${data.totalRevenue.toLocaleString()} gross · after ₹${data.totalCouponDiscounts.toLocaleString()} coupons`
+            : `₹${data.totalRevenue.toLocaleString()} gross`}
+          color="bg-emerald-50 text-emerald-500"
+          delay={0.25}
+        />
       </div>
 
       {/* Alert strips */}
-      {(data.pendingDoctors > 0 || data.openComplaints > 0) && (
+      {(data.pendingDoctors > 0 || data.pendingNurses > 0 || data.openComplaints > 0) && (
         <div className="flex flex-wrap gap-4 mb-8">
           {data.pendingDoctors > 0 && (
             <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 text-sm text-amber-700 font-medium">
               <AlertCircle className="w-4 h-4" />
               {data.pendingDoctors} doctor{data.pendingDoctors > 1 ? "s" : ""} pending verification
               <a href="/admin/doctors" className="underline ml-1 hover:text-amber-800">Review →</a>
+            </div>
+          )}
+          {data.pendingNurses > 0 && (
+            <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 text-sm text-amber-700 font-medium">
+              <AlertCircle className="w-4 h-4" />
+              {data.pendingNurses} nurse{data.pendingNurses > 1 ? "s" : ""} pending verification
+              <a href="/admin/nurses" className="underline ml-1 hover:text-amber-800">Review →</a>
             </div>
           )}
           {data.openComplaints > 0 && (

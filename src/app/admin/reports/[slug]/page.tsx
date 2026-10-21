@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import ReportTable, { type SummaryCard } from "@/components/admin/reports/ReportTable";
+import LoadError from "@/components/LoadError";
+import { errorMessage } from "@/lib/apiClient";
 import { getReportConfig, type ReportRow } from "../report-configs";
 
 export default function ReportDetailPage() {
@@ -13,29 +15,37 @@ export default function ReportDetailPage() {
   const [rows, setRows] = useState<ReportRow[]>([]);
   const [summary, setSummary] = useState<ReportRow | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  // A failed load (a bad date range, the server down) keeps the last good rows
+  // on screen with this message and a Retry.
+  const [error, setError] = useState<string | null>(null);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [status, setStatus] = useState("ALL");
 
-  const load = useCallback(() => {
+  const load = useCallback(async () => {
     if (!config) return;
     setLoading(true);
     const qs = new URLSearchParams();
     if (config.dateFilter && from) qs.set("from", from);
     if (config.dateFilter && to) qs.set("to", to);
     if (config.statusFilter && status !== "ALL") qs.set(config.statusFilter.param, status);
-    fetch(`${config.endpoint}${qs.toString() ? `?${qs}` : ""}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (config.responseIsArray) {
-          setRows(Array.isArray(data) ? data : []);
-          setSummary(undefined);
-        } else {
-          setRows(Array.isArray(data?.rows) ? data.rows : []);
-          setSummary(data?.summary);
-        }
-        setLoading(false);
-      });
+    try {
+      const res = await fetch(`${config.endpoint}${qs.toString() ? `?${qs}` : ""}`);
+      if (!res.ok) { setError(await errorMessage(res, "Couldn't load this report.")); return; }
+      const data = await res.json();
+      if (config.responseIsArray) {
+        setRows(Array.isArray(data) ? data : []);
+        setSummary(undefined);
+      } else {
+        setRows(Array.isArray(data?.rows) ? data.rows : []);
+        setSummary(data?.summary);
+      }
+      setError(null);
+    } catch {
+      setError("Network error — check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   }, [config, from, to, status]);
 
   useEffect(() => { load(); }, [load]);
@@ -90,6 +100,7 @@ export default function ReportDetailPage() {
         </div>
       )}
 
+      {error && <LoadError error={error} onRetry={load} retrying={loading} hasData={rows.length > 0} />}
       <ReportTable
         columns={config.columns}
         rows={rows}

@@ -16,6 +16,8 @@ import { useLoad } from "@/lib/apiClient";
 interface Analytics {
   totalRevenue: number;
   totalPlatformFee: number;
+  totalCouponDiscounts: number;
+  totalPlatformEarnings: number;
   totalAppointments: number;
 }
 interface CommissionSettings {
@@ -343,8 +345,12 @@ export default function AdminFinance() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Platform Earnings</p>
-                <p className="text-3xl font-extrabold text-emerald-600">₹{analytics?.totalPlatformFee.toLocaleString() ?? "—"}</p>
-                <p className="text-xs text-slate-400 mt-1">Varies by visit type</p>
+                <p className="text-3xl font-extrabold text-emerald-600">₹{analytics?.totalPlatformEarnings.toLocaleString() ?? "—"}</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {analytics && analytics.totalCouponDiscounts > 0
+                    ? `₹${analytics.totalPlatformFee.toLocaleString()} commission − ₹${analytics.totalCouponDiscounts.toLocaleString()} coupons`
+                    : "Varies by visit type"}
+                </p>
               </div>
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
                 <TrendingUp className="w-6 h-6" />

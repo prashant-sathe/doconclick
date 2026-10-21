@@ -9,7 +9,9 @@ export async function GET(req: Request) {
   if (denied) return denied;
 
   const { searchParams } = new URL(req.url);
-  const range = parseDateRange(searchParams);
+  const parsedRange = parseDateRange(searchParams);
+  if (parsedRange.response) return parsedRange.response;
+  const range = parsedRange.range;
   const dateFilter = range.gte || range.lte ? range : undefined;
 
   // Summed in JS rather than via Prisma's groupBy/_sum: a single row with a
@@ -19,15 +21,19 @@ export async function GET(req: Request) {
     // Rows without paidAt (older ones) are dated by their visit instead of
     // silently dropping out of every date range.
     where: { status: "COMPLETED", paymentStatus: "PAID", ...(dateFilter ? paidInRange(dateFilter) : {}) },
-    select: { consultType: true, amount: true, platformFee: true },
+    select: { consultType: true, amount: true, platformFee: true, discountAmount: true },
   });
 
-  const byType = new Map<string, { bookingCount: number; grossRevenue: number; platformCommission: number }>();
+  // The platform absorbs coupon discounts (see revenue-summary): its commission
+  // on a visit is `platformFee - discountAmount`; the provider is still owed
+  // `amount - platformFee`.
+  const byType = new Map<string, { bookingCount: number; grossRevenue: number; commissionBeforeCoupons: number; couponDiscounts: number }>();
   for (const a of appointments) {
-    const e = byType.get(a.consultType) ?? { bookingCount: 0, grossRevenue: 0, platformCommission: 0 };
+    const e = byType.get(a.consultType) ?? { bookingCount: 0, grossRevenue: 0, commissionBeforeCoupons: 0, couponDiscounts: 0 };
     e.bookingCount += 1;
     e.grossRevenue += safeNum(a.amount);
-    e.platformCommission += safeNum(a.platformFee);
+    e.commissionBeforeCoupons += safeNum(a.platformFee);
+    e.couponDiscounts += safeNum(a.discountAmount);
     byType.set(a.consultType, e);
   }
 
@@ -36,8 +42,10 @@ export async function GET(req: Request) {
       consultType,
       bookingCount: e.bookingCount,
       grossRevenue: e.grossRevenue,
-      platformCommission: e.platformCommission,
-      doctorNetPayout: e.grossRevenue - e.platformCommission,
+      commissionBeforeCoupons: e.commissionBeforeCoupons,
+      couponDiscounts: e.couponDiscounts,
+      platformCommission: e.commissionBeforeCoupons - e.couponDiscounts,
+      doctorNetPayout: e.grossRevenue - e.commissionBeforeCoupons,
     }))
     .sort((a, b) => b.grossRevenue - a.grossRevenue);
 

@@ -8,7 +8,9 @@ export async function GET(req: Request) {
   if (denied) return denied;
 
   const { searchParams } = new URL(req.url);
-  const range = parseDateRange(searchParams);
+  const parsedRange = parseDateRange(searchParams);
+  if (parsedRange.response) return parsedRange.response;
+  const range = parsedRange.range;
   const dateFilter = range.gte || range.lte ? range : undefined;
   const where = dateFilter ? { createdAt: dateFilter } : {};
 

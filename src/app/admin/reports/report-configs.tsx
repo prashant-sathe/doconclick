@@ -105,22 +105,27 @@ export const REPORT_CONFIGS: ReportConfig[] = [
   {
     slug: "revenue-summary",
     title: "Platform Revenue Summary",
-    description: "Gross revenue, platform commission, registration/subscription income, and doctor payouts — with a daily trend.",
+    description: "Gross revenue, platform commission (after coupon discounts), doctor and nurse registration/subscription income, and provider payouts — with a daily trend (IST days).",
     category: "Platform Revenue & Bookings",
     endpoint: "/api/admin/reports/revenue-summary",
     dateFilter: true,
     columns: [
       { key: "date", label: "Date", render: (r) => fmtDate(r.date), csvValue: (r) => str(r.date) },
       { key: "consultRevenue", label: "Consult Revenue", align: "right", render: (r) => fmtCurrency(r.consultRevenue), csvValue: (r) => Number(r.consultRevenue ?? 0) },
-      { key: "platformCommission", label: "Platform Commission", align: "right", render: (r) => fmtCurrency(r.platformCommission), csvValue: (r) => Number(r.platformCommission ?? 0) },
-      { key: "registrationRevenue", label: "Registration Fees", align: "right", render: (r) => fmtCurrency(r.registrationRevenue), csvValue: (r) => Number(r.registrationRevenue ?? 0) },
-      { key: "subscriptionRevenue", label: "Subscription Fees", align: "right", render: (r) => fmtCurrency(r.subscriptionRevenue), csvValue: (r) => Number(r.subscriptionRevenue ?? 0) },
+      { key: "couponDiscounts", label: "Coupon Discounts", align: "right", render: (r) => fmtCurrency(r.couponDiscounts), csvValue: (r) => Number(r.couponDiscounts ?? 0) },
+      { key: "platformCommission", label: "Commission (net of coupons)", align: "right", render: (r) => fmtCurrency(r.platformCommission), csvValue: (r) => Number(r.platformCommission ?? 0) },
+      { key: "registrationRevenue", label: "Doctor Registration", align: "right", render: (r) => fmtCurrency(r.registrationRevenue), csvValue: (r) => Number(r.registrationRevenue ?? 0) },
+      { key: "subscriptionRevenue", label: "Doctor Subscription", align: "right", render: (r) => fmtCurrency(r.subscriptionRevenue), csvValue: (r) => Number(r.subscriptionRevenue ?? 0) },
+      { key: "nurseRevenue", label: "Nurse Fees", align: "right", render: (r) => fmtCurrency(r.nurseRevenue), csvValue: (r) => Number(r.nurseRevenue ?? 0) },
     ],
     summaryCards: (data) => [
       { label: "Gross Consult Revenue", value: fmtCurrency(data.summary?.grossConsultRevenue) },
       { label: "Platform Earnings", value: fmtCurrency(data.summary?.totalPlatformEarnings), tone: "success" },
-      { label: "Doctor Net Payout", value: fmtCurrency(data.summary?.doctorNetPayout), tone: "purple" },
-      { label: "Registration + Subscription", value: fmtCurrency(Number(data.summary?.registrationRevenue ?? 0) + Number(data.summary?.subscriptionRevenue ?? 0)) },
+      { label: "Coupon Discounts Absorbed", value: fmtCurrency(data.summary?.couponDiscounts), tone: "warning" },
+      { label: "Provider Net Payout", value: fmtCurrency(data.summary?.doctorNetPayout), tone: "purple" },
+      { label: "Registration + Subscription (doctors and nurses)", value: fmtCurrency(
+        Number(data.summary?.registrationRevenue ?? 0) + Number(data.summary?.subscriptionRevenue ?? 0)
+        + Number(data.summary?.nurseRegistrationRevenue ?? 0) + Number(data.summary?.nurseSubscriptionRevenue ?? 0)) },
     ],
   },
   {
@@ -134,8 +139,9 @@ export const REPORT_CONFIGS: ReportConfig[] = [
       { key: "consultType", label: "Consult Type" },
       { key: "bookingCount", label: "Bookings", align: "right" },
       { key: "grossRevenue", label: "Gross Revenue", align: "right", render: (r) => fmtCurrency(r.grossRevenue), csvValue: (r) => Number(r.grossRevenue ?? 0) },
-      { key: "platformCommission", label: "Platform Commission", align: "right", render: (r) => fmtCurrency(r.platformCommission), csvValue: (r) => Number(r.platformCommission ?? 0) },
-      { key: "doctorNetPayout", label: "Doctor Net Payout", align: "right", render: (r) => fmtCurrency(r.doctorNetPayout), csvValue: (r) => Number(r.doctorNetPayout ?? 0) },
+      { key: "couponDiscounts", label: "Coupon Discounts", align: "right", render: (r) => fmtCurrency(r.couponDiscounts), csvValue: (r) => Number(r.couponDiscounts ?? 0) },
+      { key: "platformCommission", label: "Commission (net of coupons)", align: "right", render: (r) => fmtCurrency(r.platformCommission), csvValue: (r) => Number(r.platformCommission ?? 0) },
+      { key: "doctorNetPayout", label: "Provider Net Payout", align: "right", render: (r) => fmtCurrency(r.doctorNetPayout), csvValue: (r) => Number(r.doctorNetPayout ?? 0) },
     ],
     summaryCards: (data) => [
       { label: "Total Bookings", value: str(data.summary?.totalBookings) },

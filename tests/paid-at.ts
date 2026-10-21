@@ -55,7 +55,8 @@ async function main() {
     const paidInside = await appt({ status: "COMPLETED", paymentStatus: "PAID", paymentMethod: "ONLINE", scheduledAt: day(20), paidAt: day(6) });
     const paidOutside = await appt({ status: "COMPLETED", paymentStatus: "PAID", paymentMethod: "ONLINE", scheduledAt: day(5), paidAt: day(25) });
     const get = async (path: string) => (await fetch(`${BASE}${path}`, { headers: { Cookie: cookieFor(admin) } })).json();
-    const range = `from=${day(1, 0).toISOString()}&to=${day(10, 23).toISOString()}`;
+    // Dates as the admin UI sends them: whole IST days (the fixtures sit at 11:30 IST, so their IST day is the UTC day).
+    const range = "from=2001-01-01&to=2001-01-10";
 
     const summary = await get(`/api/admin/reports/revenue-summary?${range}`);
     check("revenue summary counts the no-paidAt row and dates by paidAt otherwise", summary.summary?.grossConsultRevenue === 1000,
