@@ -84,6 +84,27 @@ export async function settleFreeAppointments(
   };
 }
 
+/**
+ * Accepting a booking that costs nothing (a ₹0 fee): there's no payment step,
+ * so it's marked PAID as soon as it's accepted (BUG-TRACKER #58) — the
+ * patient never lands on /patient/payment for it. Call after the rows are
+ * SCHEDULED. No "payment received" push: the provider has just accepted it
+ * themselves. Returns the ids that were marked PAID.
+ */
+export async function settleIfFreeOnAccept(
+  appointments: { id: string; patientId: string; amount: number; discountAmount: number }[],
+): Promise<Set<string>> {
+  const free = appointments.filter((a) => netPayable(a) === 0);
+  const byPatient = new Map<string, string[]>();
+  for (const a of free) byPatient.set(a.patientId, [...(byPatient.get(a.patientId) ?? []), a.id]);
+  const paid = new Set<string>();
+  for (const [patientId, ids] of byPatient) {
+    const result = await settleFreeAppointments(ids, patientId);
+    for (const p of result.paid) paid.add(p.id);
+  }
+  return paid;
+}
+
 export type SettleResult =
   | { outcome: "retry" | "unattributed" }
   | {

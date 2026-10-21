@@ -1316,7 +1316,9 @@ function PatientDashboardInner() {
                     <p className="text-xs text-slate-400 font-mono mt-2">ID: {booked.id.slice(0, 14)}…</p>
                   </div>
                   <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 w-full">
-                    You&apos;ll be notified once accepted — pay online from My Appointments after that.
+                    {booked.fee === 0
+                      ? "This consultation is free — nothing to pay. You'll be notified once it's accepted."
+                      : <>You&apos;ll be notified once accepted — pay online from My Appointments after that.</>}
                   </div>
                   <button
                     onClick={() => router.push("/patient/appointments")}

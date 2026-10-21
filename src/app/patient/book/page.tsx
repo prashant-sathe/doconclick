@@ -373,7 +373,9 @@ function PatientBookInner() {
               <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Request Sent!</h2>
               <p className="text-slate-500 mb-6">Waiting for the doctor to confirm your appointment.</p>
               <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3">
-                You&apos;ll be notified once accepted — pay online from My Appointments after that.
+                {fee === 0
+                  ? "This consultation is free — nothing to pay. You'll be notified once it's accepted."
+                  : <>You&apos;ll be notified once accepted — pay online from My Appointments after that.</>}
               </div>
               <Link href="/patient/appointments" className="btn-secondary w-full justify-center py-3 mt-3">View My Appointments</Link>
             </div>

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { settleIfFreeOnAccept } from "@/lib/paymentOrders";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
@@ -26,7 +27,7 @@ export async function POST() {
 
   const pending = await prisma.appointment.findMany({
     where: { doctorId: scope.doctorId, status: "PENDING_APPROVAL" },
-    select: { id: true, patientId: true, scheduledAt: true, createdAt: true, consultType: true, clinicId: true },
+    select: { id: true, patientId: true, scheduledAt: true, createdAt: true, consultType: true, clinicId: true, amount: true, discountAmount: true },
     orderBy: [{ scheduledAt: "asc" }, { createdAt: "asc" }],
   });
   if (pending.length === 0) {
@@ -55,10 +56,12 @@ export async function POST() {
   const doctorName = authUser.role === "DOCTOR"
     ? authUser.name
     : (await prisma.user.findUnique({ where: { id: scope.doctorId }, select: { name: true } }))?.name ?? "Your doctor";
+  // A ₹0 booking has no payment step — PAID as soon as it's accepted.
+  const free = await settleIfFreeOnAccept(accepted);
   for (const a of accepted) {
     void sendPushToUser(a.patientId, {
       title: "Appointment confirmed!",
-      body: `${doctorName} accepted your request.`,
+      body: `${doctorName} accepted your request.${free.has(a.id) ? " Nothing to pay — you're all set." : ""}`,
       url: "/patient/appointments",
     });
   }

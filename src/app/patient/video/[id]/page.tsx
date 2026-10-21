@@ -15,6 +15,8 @@ interface VideoAppointment {
   status: string;
   consultType: string;
   paymentStatus: string;
+  amount: number;
+  discountAmount: number;
   paidAt: string | null;
   scheduledAt: string;
   createdAt: string;
@@ -94,9 +96,12 @@ export default function PatientVideoCallPage() {
           ) : !paid ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-3">
               <CreditCard className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">Please complete the payment to start the video consultation.</p>
+              {/* ₹0: just confirmed, no gateway (normally already PAID on accept). */}
+              <p className="text-sm text-slate-500">
+                {appt.amount - appt.discountAmount <= 0 ? "Confirm your free booking to start the video consultation." : "Please complete the payment to start the video consultation."}
+              </p>
               <Link href={`/patient/payment?apptId=${params.id}`} className="btn-primary py-2.5 px-4 text-sm">
-                Pay Now
+                {appt.amount - appt.discountAmount <= 0 ? "Confirm booking" : "Pay Now"}
               </Link>
             </div>
           ) : unlockRemainingSec > 0 ? (

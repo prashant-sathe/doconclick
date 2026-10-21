@@ -16,6 +16,7 @@ import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT, UNBOOKABLE_MESSAGE } from "@/
 import { doctorSlotProblem, snapToClinicGrid, isTimedBooking, isSlotIndexViolation, acceptTimeProblem } from "@/lib/doctorSlots";
 import { getBookingHorizonDays, horizonProblem, doctorHoursProblem } from "@/lib/bookingLimits";
 import { referralPushCopy } from "@/lib/nurseReferral";
+import { settleIfFreeOnAccept } from "@/lib/paymentOrders";
 import { GATEWAY_OMIT, LIVE_LOCATION_CLEARED, withLiveLocationOnlyWhileLive } from "@/lib/appointmentView";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
@@ -25,6 +26,9 @@ const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: stri
   CANCELLED: { title: "Appointment cancelled", body: (d) => `Your appointment with ${d} was cancelled.`, url: "/patient/appointments" },
   NO_SHOW: { title: "Marked as a no-show", body: (d) => `You were marked as a no-show for your appointment with ${d}.`, url: "/patient/appointments" },
 };
+
+// Added to the "confirmed" push when a ₹0 booking is marked PAID on accept.
+const NOTHING_TO_PAY = " Nothing to pay — you're all set.";
 
 const SLOT_TAKEN_MESSAGE = "That time was just taken. Please pick a different slot.";
 
@@ -265,13 +269,15 @@ export async function PATCH(
             : { status, doctorNotes: doctorNotes ?? g.doctorNotes },
         }))
       );
+      // A ₹0 booking has no payment step — PAID as soon as it's accepted.
+      const free = status === "SCHEDULED" ? await settleIfFreeOnAccept(group) : new Set<string>();
       const copy = PATIENT_PUSH_COPY[status];
       if (copy) {
         void sendPushToUser(appointment.patientId, {
           title: copy.title,
-          body: group.length > 1
+          body: (group.length > 1
             ? `${actingDoctorName} ${status === "SCHEDULED" ? "accepted" : "couldn't accept"} your ${group.length}-visit package.`
-            : copy.body(actingDoctorName),
+            : copy.body(actingDoctorName)) + (free.size > 0 && free.size === group.length ? NOTHING_TO_PAY : ""),
           url: copy.url,
         });
       }
@@ -439,11 +445,13 @@ export async function PATCH(
           : {}),
       },
     });
+    // A ₹0 booking has no payment step — PAID as soon as it's accepted.
+    const free = status === "SCHEDULED" && (await settleIfFreeOnAccept([updated])).size > 0;
     const copy = PATIENT_PUSH_COPY[status];
     if (copy) {
       void sendPushToUser(appointment.patientId, {
         title: copy.title,
-        body: copy.body(actingDoctorName),
+        body: copy.body(actingDoctorName) + (free ? NOTHING_TO_PAY : ""),
         url: copy.url,
       });
     }
@@ -453,7 +461,7 @@ export async function PATCH(
       const referral = await prisma.nurseReferral.findUnique({ where: { appointmentId: id }, select: { service: { select: { name: true } } } });
       if (referral) void sendPushToUser(appointment.patientId, referralPushCopy(actingDoctorName, referral.service.name));
     }
-    return NextResponse.json(withoutVisitCode(updated));
+    return NextResponse.json(withoutVisitCode(free ? await prisma.appointment.findUniqueOrThrow({ where: { id } }) : updated));
   }
 
   if (authUser.role === "PATIENT") {

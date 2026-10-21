@@ -220,6 +220,9 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
   const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
   const router = useRouter();
   const needsPayment = a.status === "SCHEDULED" && a.paymentMethod === "ONLINE" && a.paymentStatus === "PENDING";
+  // ₹0 (free fee or a 100% coupon): accepting normally marks it PAID; an older
+  // row still waiting is just confirmed, never sent to a gateway.
+  const nothingToPay = Math.max(0, a.amount - a.discountAmount) === 0;
   const timeLeftMs = REQUEST_TIMEOUT_MS - (now - new Date(a.createdAt).getTime());
   // A booking made for a future slot (more than the response window ahead)
   // isn't on the 30-min accept clock — the doctor has until the slot time.
@@ -385,7 +388,10 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       {needsPayment && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
           <span className="flex items-center gap-2">
-            <CardIcon className="w-4 h-4 flex-shrink-0" /> Payment pending — pay ₹{Math.max(0, a.amount - a.discountAmount)}{a.discountAmount > 0 ? ` (${a.couponCode} applied)` : ""} to confirm your consultation with {formatProviderName(a.doctor.name, a.providerType)}.
+            <CardIcon className="w-4 h-4 flex-shrink-0" />
+            {nothingToPay
+              ? <>Nothing to pay — confirm your booking with {formatProviderName(a.doctor.name, a.providerType)}.</>
+              : <>Payment pending — pay ₹{Math.max(0, a.amount - a.discountAmount)}{a.discountAmount > 0 ? ` (${a.couponCode} applied)` : ""} to confirm your consultation with {formatProviderName(a.doctor.name, a.providerType)}.</>}
           </span>
         </div>
       )}
@@ -477,7 +483,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         )}
         {needsPayment && (
           <Link href={`/patient/payment?apptId=${a.id}`} className="btn-primary py-2 px-3 text-xs">
-            <CardIcon className="w-3.5 h-3.5" /> Pay Now
+            <CardIcon className="w-3.5 h-3.5" /> {nothingToPay ? "Confirm" : "Pay Now"}
           </Link>
         )}
         {needsPayment && a.consultType === "VIDEO" && (

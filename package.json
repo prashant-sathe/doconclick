@@ -59,7 +59,8 @@
     "test:geocode": "tsx tests/geocode.ts",
     "test:appointments-feed": "tsx tests/appointments-feed.ts",
     "test:csv": "tsx tests/csv.ts",
-    "test:payouts": "tsx tests/payouts.ts"
+    "test:payouts": "tsx tests/payouts.ts",
+    "test:free-bookings": "tsx tests/free-bookings.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

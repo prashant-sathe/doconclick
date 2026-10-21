@@ -20,7 +20,9 @@ interface AppointmentSummary {
   doctor: { name: string };
 }
 
-function PaymentContent() {
+// `onFreeChange`: whether there's nothing to pay, so the page header can drop
+// the "Complete Payment / Secured by Cashfree" framing for a ₹0 booking.
+function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => void }) {
   const searchParams = useSearchParams();
   const apptId = searchParams.get("apptId");
 
@@ -87,6 +89,9 @@ function PaymentContent() {
   const netPayable = !appt ? 0
     : isPackage ? Math.round(appt.package!.unpaidTotal * 100) / 100
       : Math.max(0, Math.round((appt.amount - appt.discountAmount) * 100) / 100);
+
+  const free = !!appt && netPayable === 0;
+  useEffect(() => { onFreeChange(free); }, [free, onFreeChange]);
 
   const applyCoupon = async () => {
     if (!apptId || !couponInput.trim()) return;
@@ -160,13 +165,16 @@ function PaymentContent() {
         <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-emerald-500" />
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{justPaid ? (justPaid.amount === 0 ? "Booking confirmed" : "Payment successful") : "Already Paid"}</h2>
+        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{free || justPaid?.amount === 0 ? "Booking confirmed" : justPaid ? "Payment successful" : "Already Paid"}</h2>
         <p className="text-slate-500 mb-8">
-          {justPaid
-            ? justPaid.amount === 0
+          {free || justPaid?.amount === 0
+            // A ₹0 booking is confirmed on accept (or here) — there was never anything to pay.
+            ? appt.discountAmount > 0
               ? "Your coupon covered the full fee — nothing was charged."
-              : `₹${justPaid.amount} paid from your wallet${justPaid.visits > 1 ? ` for all ${justPaid.visits} visits` : ""}.`
-            : "This appointment has already been paid for."}
+              : "This consultation is free — there's nothing to pay."
+            : justPaid
+              ? `₹${justPaid.amount} paid from your wallet${justPaid.visits > 1 ? ` for all ${justPaid.visits} visits` : ""}.`
+              : "This appointment has already been paid for."}
         </p>
         <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">My Appointments</Link>
       </div>
@@ -214,8 +222,9 @@ function PaymentContent() {
         </div>
       </div>
 
-      {/* Coupon — single visits only (a coupon discounts one visit, which reads wrong on a package bill). */}
-      <div className={isPackage ? "hidden" : "mb-4"}>
+      {/* Coupon — single visits only (a coupon discounts one visit, which reads
+          wrong on a package bill), and not on a free booking with nothing to discount. */}
+      <div className={isPackage || (free && !appt.couponCode) ? "hidden" : "mb-4"}>
         {appt.couponCode ? (
           <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 text-sm">
             <span className="flex items-center gap-2 font-semibold text-emerald-700">
@@ -316,6 +325,7 @@ function PaymentContent() {
 }
 
 export default function PatientPayment() {
+  const [free, setFree] = useState(false);
   return (
     <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       <div className="fixed top-[calc(1.25rem_+_var(--safe-area-inset-top,env(safe-area-inset-top)))] left-6">
@@ -324,15 +334,18 @@ export default function PatientPayment() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <CreditCard className="w-7 h-7 text-white" />
+            {free ? <CheckCircle className="w-7 h-7 text-white" /> : <CreditCard className="w-7 h-7 text-white" />}
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Complete Payment</h1>
-          <p className="text-slate-500 mt-2 flex items-center justify-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" /> Secured by Cashfree
-          </p>
+          <h1 className="text-3xl font-extrabold text-slate-900">{free ? "Confirm Booking" : "Complete Payment"}</h1>
+          {/* No gateway for ₹0 — don't mention one. */}
+          {!free && (
+            <p className="text-slate-500 mt-2 flex items-center justify-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" /> Secured by Cashfree
+            </p>
+          )}
         </div>
         <Suspense fallback={<div className="bg-white rounded-2xl p-8 text-center text-slate-400">Loading…</div>}>
-          <PaymentContent />
+          <PaymentContent onFreeChange={setFree} />
         </Suspense>
       </div>
     </div>
