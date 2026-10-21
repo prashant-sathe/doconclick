@@ -134,7 +134,7 @@ export default function DoctorHeader() {
                           <p className="text-sm font-semibold text-slate-800">{patientLabelFor(r)}</p>
                           <p className="text-xs text-slate-400 mt-0.5 truncate">{r.symptoms}</p>
                           <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-                            <Clock className="w-3 h-3" /> {new Date(r.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                            <Clock className="w-3 h-3" /> {new Date(r.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}
                           </p>
                         </button>
                       ))}

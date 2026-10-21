@@ -149,12 +149,12 @@ function RecordVitalsBox({ visit, onSaved }: { visit: Visit; onSaved: () => void
         {!open && <button type="button" onClick={() => { setOpen(true); setResult(null); }} className="text-xs font-semibold text-blue-600">+ Record</button>}
       </div>
       {previous && (
-        <p className="text-[11px] text-slate-500 mt-1">Previous ({new Date(previous.recordedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}): {vitalsSummary(previous)}</p>
+        <p className="text-[11px] text-slate-500 mt-1">Previous ({new Date(previous.recordedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" })}): {vitalsSummary(previous)}</p>
       )}
       {visit.vitals.map((r) => (
         <p key={r.id} className={cn("text-xs mt-1", r.alertLevel === "CRITICAL" ? "text-red-700 font-semibold" : r.alertLevel === "WARNING" ? "text-amber-800" : "text-slate-600")}>
           {r.alertLevel !== "NORMAL" && <AlertTriangle className="w-3 h-3 inline mr-1" />}
-          {new Date(r.recordedAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}: {vitalsSummary(r)}
+          {new Date(r.recordedAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}: {vitalsSummary(r)}
         </p>
       ))}
       {result?.level === "CRITICAL" && (
@@ -488,10 +488,10 @@ export default function NurseDashboardPage() {
 
                   <div className="mt-3 space-y-1.5 text-sm text-slate-600">
                     <p className="flex items-center gap-1.5"><CalendarClock className="w-4 h-4 text-slate-400" />
-                      {new Date(v.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                      {new Date(v.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}
                       {v.nurseService?.kind === "SHIFT" && (
                         <span className="font-semibold text-slate-700">
-                          → {new Date(new Date(v.scheduledAt).getTime() + v.nurseService.durationMinutes * 60000).toLocaleString("en-IN", { weekday: "short", hour: "numeric", minute: "2-digit" })}
+                          → {new Date(new Date(v.scheduledAt).getTime() + v.nurseService.durationMinutes * 60000).toLocaleString("en-IN", { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}
                           {" "}({Math.round(v.nurseService.durationMinutes / 60)}-hour shift)
                         </span>
                       )}
@@ -515,7 +515,7 @@ export default function NurseDashboardPage() {
                       <div className="mt-3 rounded-xl border border-rose-200 px-3 py-2.5">
                         <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5"><Layers className="w-4 h-4 text-rose-500" />Package · {sessions.length} visits · {intervalLabel(v.package.intervalDays)}</p>
                         <ol className="text-xs text-slate-600 mt-1 space-y-0.5 list-decimal list-inside">
-                          {sessions.map((x) => <li key={x.id}>{new Date(x.scheduledAt).toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</li>)}
+                          {sessions.map((x) => <li key={x.id}>{new Date(x.scheduledAt).toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}</li>)}
                         </ol>
                         <p className="text-xs text-emerald-700 font-semibold mt-1.5">You get ₹{Math.round(earning * sessions.length * 100) / 100} for the package</p>
                         <p className="text-[11px] text-slate-400">Accepting confirms every visit above.</p>
@@ -525,7 +525,7 @@ export default function NurseDashboardPage() {
 
                   {v.nurseReferral && (
                     <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-2.5 text-xs text-slate-700">
-                      <p className="font-semibold text-blue-800 flex items-center gap-1.5"><Stethoscope className="w-3.5 h-3.5" />Referred by Dr. {v.nurseReferral.appointment.doctor.name.replace(/^dr\.?\s*/i, "")} · {new Date(v.nurseReferral.appointment.scheduledAt).toLocaleDateString("en-IN")}</p>
+                      <p className="font-semibold text-blue-800 flex items-center gap-1.5"><Stethoscope className="w-3.5 h-3.5" />Referred by Dr. {v.nurseReferral.appointment.doctor.name.replace(/^dr\.?\s*/i, "")} · {new Date(v.nurseReferral.appointment.scheduledAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}</p>
                       {v.nurseReferral.instructions && <p className="mt-1">Instructions: {v.nurseReferral.instructions}</p>}
                       {v.nurseReferral.appointment.medicines.length > 0 && (
                         <ul className="mt-1 space-y-0.5">
@@ -625,7 +625,7 @@ export default function NurseDashboardPage() {
                   )}
                   {v.status === "COMPLETED" && v.doctorNotes && <p className="text-xs text-slate-500 mt-2">Notes: {v.doctorNotes}</p>}
                   {v.status === "PENDING_APPROVAL" && (
-                    <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1"><Clock className="w-3 h-3" />Requested {new Date(v.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</p>
+                    <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1"><Clock className="w-3 h-3" />Requested {new Date(v.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</p>
                   )}
                 </div>
               );

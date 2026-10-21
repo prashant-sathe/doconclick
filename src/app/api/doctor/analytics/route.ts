@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 import { safeNum } from "@/lib/adminAuth";
+import { istMonthKey, shiftMonthKey, istStartOfMonth, monthShortLabel } from "@/lib/istDate";
 
 const MONTHS = 6;
 
@@ -16,8 +17,10 @@ export async function GET() {
   const denied = await requireActiveDoctor(authUser, { requireSubscription: true });
   if (denied) return denied;
 
-  const now = new Date();
-  const windowStart = new Date(now.getFullYear(), now.getMonth() - (MONTHS - 1), 1);
+  // Months are IST calendar months, however the server's clock is set: a
+  // payment at 11:45 pm IST on the 31st counts in that month, not the next.
+  const thisMonth = istMonthKey(new Date());
+  const windowStart = istStartOfMonth(shiftMonthKey(thisMonth, -(MONTHS - 1)));
 
   const [appointments, doctorProfile, reviews] = await Promise.all([
     prisma.appointment.findMany({
@@ -39,11 +42,11 @@ export async function GET() {
     }),
   ]);
 
-  const monthKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  const monthKey = (d: Date) => istMonthKey(d);
 
   const months = [...Array(MONTHS)].map((_, i) => {
-    const d = new Date(windowStart.getFullYear(), windowStart.getMonth() + i, 1);
-    return { key: monthKey(d), label: d.toLocaleDateString("en-IN", { month: "short" }) };
+    const key = shiftMonthKey(thisMonth, -(MONTHS - 1) + i);
+    return { key, label: monthShortLabel(key) };
   });
 
   const byMonth = new Map(months.map((m) => [m.key, { bookings: 0, gross: 0, platformFee: 0, net: 0 }]));

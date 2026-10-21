@@ -240,7 +240,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                   )}
                   {m.text && <p className="whitespace-pre-wrap break-words">{m.text}</p>}
                   <p className={cn("text-[10px] mt-1", mine ? "text-white/70" : "text-slate-400")}>
-                    {new Date(m.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                    {new Date(m.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })}
                   </p>
                 </div>
               </div>
@@ -263,7 +263,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       {chat?.sendUntil && (
         <div className="border-t border-slate-100 bg-amber-50 px-4 py-2 flex items-center gap-1.5 text-[11px] text-amber-700">
           <Clock className="w-3 h-3 flex-shrink-0" />
-          Follow-up chat open until {new Date(chat.sendUntil).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+          Follow-up chat open until {new Date(chat.sendUntil).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}
         </div>
       )}
       <div className="border-t border-slate-100 bg-white p-3 flex items-end gap-2">

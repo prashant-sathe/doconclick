@@ -155,7 +155,7 @@ function TicketCreatedCard({ ticket }: { ticket: SupportTicket }) {
       </div>
       <p className="text-sm text-slate-700 font-semibold mt-2">{ticket.subject}</p>
       <p className="text-[11px] text-slate-400 mt-1">
-        Ref #{ticket.id.slice(-8)} · {new Date(ticket.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+        Ref #{ticket.id.slice(-8)} · {new Date(ticket.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}
       </p>
     </div>
   );
@@ -171,7 +171,7 @@ function TicketListCard({ tickets }: { tickets: SupportTicket[] }) {
             <StatusBadge status={t.status} />
           </div>
           <p className="flex items-center gap-1 text-[11px] text-slate-400 mt-1.5">
-            <Clock className="w-3 h-3" /> {new Date(t.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+            <Clock className="w-3 h-3" /> {new Date(t.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}
           </p>
         </div>
       ))}

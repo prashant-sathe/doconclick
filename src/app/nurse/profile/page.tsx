@@ -336,7 +336,7 @@ function NurseProfileContent() {
                   <p className="text-sm font-semibold text-slate-800">Monthly subscription</p>
                   <p className="text-xs text-slate-500">
                     ₹{me.fees.subscriptionFee}/month ·{" "}
-                    {subActive ? `active until ${new Date(p.subscriptionPaidUntil!).toLocaleDateString("en-IN")}` : "not active"}
+                    {subActive ? `active until ${new Date(p.subscriptionPaidUntil!).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}` : "not active"}
                   </p>
                 </div>
                 <button onClick={() => pay("SUBSCRIPTION")} disabled={!!paying || needsRegFee} className="btn-secondary py-2 px-4 text-sm">

@@ -230,7 +230,7 @@ function DoctorPatientHistoryInner() {
                     <div className="flex items-center gap-2">
                       <Icon className="w-4 h-4 text-teal-500" />
                       <span className="font-semibold text-slate-800 text-sm">
-                        {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
+                        {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {a.consultType}
                       </span>
                     </div>
                     <span className={STATUS_BADGE[a.status] ?? "badge badge-gray"}>{STATUS_LABEL[a.status] ?? a.status}</span>

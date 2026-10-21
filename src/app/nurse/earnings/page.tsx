@@ -87,7 +87,7 @@ export default function NurseEarningsPage() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-4">
           {openRequest ? (
             <p className="text-sm text-amber-700 flex items-center gap-1.5"><Clock className="w-4 h-4" />
-              Payout of {inr(openRequest.amount)} requested on {new Date(openRequest.createdAt).toLocaleDateString("en-IN")} — the admin will settle it soon.
+              Payout of {inr(openRequest.amount)} requested on {new Date(openRequest.createdAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })} — the admin will settle it soon.
             </p>
           ) : (
             <button onClick={requestPayout} disabled={requesting || pendingPayout <= 0} className="btn-primary w-full justify-center py-2.5 text-sm disabled:opacity-50">
@@ -106,7 +106,7 @@ export default function NurseEarningsPage() {
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-800 truncate">{v.serviceName ?? "Nursing visit"}</p>
                 <p className="text-xs text-slate-400 truncate">
-                  {v.relation !== "Self" && v.patientName ? v.patientName : v.patient.name} · {new Date(v.scheduledAt).toLocaleDateString("en-IN")}
+                  {v.relation !== "Self" && v.patientName ? v.patientName : v.patient.name} · {new Date(v.scheduledAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}
                 </p>
               </div>
               <div className="text-right flex-shrink-0">
@@ -125,7 +125,7 @@ export default function NurseEarningsPage() {
             <div key={s.id} className="px-4 py-3 flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-slate-800">{inr(s.netAmount)}</p>
-                <p className="text-xs text-slate-400">{s.onlineCount} visit{s.onlineCount === 1 ? "" : "s"} · {new Date(s.createdAt).toLocaleDateString("en-IN")}</p>
+                <p className="text-xs text-slate-400">{s.onlineCount} visit{s.onlineCount === 1 ? "" : "s"} · {new Date(s.createdAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}</p>
               </div>
               {s.note && <p className="text-xs text-slate-500 max-w-[50%] truncate">{s.note}</p>}
             </div>

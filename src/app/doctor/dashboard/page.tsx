@@ -27,6 +27,7 @@ import { useToast } from "@/components/Toast";
 import { errorMessage, mutate, useLoad } from "@/lib/apiClient";
 import RescheduleRequestBox from "@/components/RescheduleRequestBox";
 import { getCurrentPositionCompat } from "@/lib/platform";
+import { istDayKey, istMinutesOfDay } from "@/lib/istDate";
 import { useJourneyTracker } from "@/components/JourneyTracker";
 import { useResync } from "@/hooks/useResync";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -143,7 +144,7 @@ function VitalsChip({ a }: { a: Appointment }) {
   if (!v) return null;
   const critical = v.alertLevel === "CRITICAL";
   const warn = v.alertLevel === "WARNING";
-  const when = new Date(v.recordedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  const when = new Date(v.recordedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
   return (
     <Link
       href={historyHref(a)}
@@ -996,17 +997,17 @@ export default function DoctorDashboard() {
   // Past visits nobody closed — regardless of the search box.
   const overdue = appointments.filter((a) => isOverdue(a, now)).sort(byVisitAsc);
 
-  const isToday = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
+  // "Today" and the timeline's clock are IST, whatever the device's zone is.
+  const todayKey = istDayKey(new Date());
+  const isToday = (iso: string) => istDayKey(iso) === todayKey;
   const todayUpcoming = upcoming.filter((a) => isToday(a.scheduledAt));
   const todayPending = pending.filter((a) => isToday(a.scheduledAt));
   const timelineItems: TimelineItem[] = [...todayUpcoming, ...todayPending].map((a) => {
-    const d = new Date(a.scheduledAt);
-    const startMin = d.getHours() * 60 + d.getMinutes();
+    const startMin = istMinutesOfDay(a.scheduledAt);
     return { id: a.id, appt: a, startMin, endMin: startMin + TIMELINE_BLOCK_MINUTES };
   });
   const timelinePlacements = layoutTimeline(timelineItems);
-  const nowDate = new Date(now);
-  const nowMin = nowDate.getHours() * 60 + nowDate.getMinutes();
+  const nowMin = istMinutesOfDay(now);
   const timelineRangeStartHour = timelineItems.length
     ? Math.max(0, Math.min(nowMin, ...timelineItems.map((i) => i.startMin)) / 60 - 1)
     : 0;
@@ -1084,7 +1085,7 @@ export default function DoctorDashboard() {
         <div className="gradient-hero rounded-2xl p-5 mb-6 text-white shadow-lg">
           <div className="flex items-center justify-between mb-2.5">
             <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">
-              Today · {new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}
+              Today · {new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Kolkata" })}
             </span>
             <span className="text-[11px] font-bold bg-white/15 rounded-full px-2.5 py-1 flex-shrink-0">
               {todayUpcoming.length} appointment{todayUpcoming.length === 1 ? "" : "s"} today
@@ -1094,8 +1095,8 @@ export default function DoctorDashboard() {
             <>
               <p className="text-[15px] font-bold leading-snug">
                 Next: {patientLabel(nextAppt)} · {isToday(nextAppt.scheduledAt)
-                  ? new Date(nextAppt.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })
-                  : new Date(nextAppt.scheduledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
+                  ? new Date(nextAppt.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })
+                  : new Date(nextAppt.scheduledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}
               </p>
               <p className="text-[12.5px] text-white/75 mt-0.5">
                 {nextAppt.consultType === "HOME" ? "Home visit" : nextAppt.consultType === "VIDEO" ? "Video consultation" : "Clinic visit"}
@@ -1151,7 +1152,7 @@ export default function DoctorDashboard() {
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-800 truncate">{patientLabel(a)}</p>
                       <p className="text-xs text-slate-500">
-                        {new Date(a.scheduledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
+                        {new Date(a.scheduledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}
                         {" · "}{a.consultType === "HOME" ? "Home visit" : a.consultType === "VIDEO" ? "Video" : "Clinic"}
                         {homeNotArrived ? " · mark arrived first" : unpaidOnline ? " · not paid yet" : ""}
                       </p>
@@ -1249,7 +1250,7 @@ export default function DoctorDashboard() {
                             <span className="truncate">{patientLabel(a)}</span>
                           </div>
                           <div className={cn("text-[10px] truncate", isPending ? "text-amber-600" : "text-teal-600")}>
-                            {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}
+                            {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}
                           </div>
                         </button>
                       );
@@ -1326,7 +1327,7 @@ export default function DoctorDashboard() {
                         </div>
                         <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
                           <Clock className="w-3 h-3" />
-                          {new Date(a.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} · {a.consultType}
+                          {new Date(a.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })} · {a.consultType}
                         </div>
                         <div className="text-sm text-slate-600 mt-0.5">{a.symptoms}</div>
                         <VitalsChip a={a} />
@@ -1391,15 +1392,15 @@ export default function DoctorDashboard() {
                     <div className="flex gap-3">
                       <div className="w-11 flex-shrink-0 pt-0.5 text-right">
                         <div className="text-[13px] font-bold text-slate-700 leading-tight">
-                          {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true }).replace(/\s?[AP]M$/i, "")}
+                          {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).replace(/\s?[AP]M$/i, "")}
                         </div>
                         <div className="text-[10px] font-semibold text-slate-400 leading-tight">
-                          {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true }).match(/[AP]M$/i)?.[0]}
+                          {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).match(/[AP]M$/i)?.[0]}
                         </div>
                         {/* Any other day needs its date — the list now spans past and future. */}
                         {!isToday(a.scheduledAt) && (
                           <div className="text-[10px] font-semibold text-slate-500 leading-tight mt-0.5">
-                            {new Date(a.scheduledAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                            {new Date(a.scheduledAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" })}
                           </div>
                         )}
                       </div>
@@ -1602,7 +1603,7 @@ export default function DoctorDashboard() {
                       <span className="badge badge-gray text-[10px] ml-1.5">{a.relation} of {a.patient.name}</span>
                     )}
                     <div className="text-xs text-slate-400">
-                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
+                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {a.consultType}
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -1644,7 +1645,7 @@ export default function DoctorDashboard() {
                       <span className="badge badge-gray text-[10px] ml-1.5">{a.relation} of {a.patient.name}</span>
                     )}
                     <div className="text-xs text-slate-400">
-                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
+                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {a.consultType}
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1.5">
@@ -1689,7 +1690,7 @@ export default function DoctorDashboard() {
                       <span className="badge badge-gray text-[10px] ml-1.5">{a.relation} of {a.patient.name}</span>
                     )}
                     <div className="text-xs text-slate-400">
-                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType}
+                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {a.consultType}
                     </div>
                   </div>
                   <span className="badge badge-warning">No-Show</span>
@@ -1714,7 +1715,7 @@ export default function DoctorDashboard() {
               <h3 className="font-bold text-slate-800">Cancel this appointment?</h3>
             </div>
             <p className={cn("text-sm text-slate-500", isLateCancellation(cancelTarget) ? "mb-3" : "mb-5")}>
-              {patientLabel(cancelTarget)}&apos;s appointment on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
+              {patientLabel(cancelTarget)}&apos;s appointment on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })} will be cancelled. This cannot be undone.
             </p>
             {isLateCancellation(cancelTarget) && (
               <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-5 flex items-start gap-1.5">
@@ -1743,7 +1744,7 @@ export default function DoctorDashboard() {
               <h3 className="font-bold text-slate-800">Mark as no-show?</h3>
             </div>
             <p className="text-sm text-slate-500 mb-5">
-              This means {patientLabel(noShowTarget)} didn&apos;t show up for their appointment on {new Date(noShowTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}. Unlike cancelling, this won&apos;t count against your cancellation record and no refund is issued — this cannot be undone.
+              This means {patientLabel(noShowTarget)} didn&apos;t show up for their appointment on {new Date(noShowTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}. Unlike cancelling, this won&apos;t count against your cancellation record and no refund is issued — this cannot be undone.
             </p>
             <div className="flex gap-3">
               <button onClick={() => setNoShowTarget(null)} className="btn-secondary flex-1">

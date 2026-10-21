@@ -102,7 +102,7 @@ export default function DoctorSupportTicketsPage() {
                         <span className={STATUS_BADGE[t.status] ?? "badge badge-gray"}>{t.status.replace("_", " ")}</span>
                       </div>
                       <p className="text-sm text-slate-600 mb-1 whitespace-pre-wrap">{t.description}</p>
-                      <p className="text-xs text-slate-400">{new Date(t.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</p>
+                      <p className="text-xs text-slate-400">{new Date(t.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</p>
                     </div>
                   </div>
                 </div>

@@ -113,7 +113,7 @@ export default function DoctorSubscribe() {
             </div>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Plan Active</h2>
             <p className="text-slate-500 mb-8">
-              {activeUntil ? `Valid until ${new Date(activeUntil).toLocaleDateString("en-IN", { dateStyle: "medium" })}.` : ""}
+              {activeUntil ? `Valid until ${new Date(activeUntil).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })}.` : ""}
             </p>
             <button onClick={() => router.push("/doctor/dashboard")} className="btn-primary w-full justify-center py-3.5 text-base">
               Go to Dashboard

@@ -59,7 +59,7 @@ export default function DoctorVideoCallPage() {
   const unlockRemainingSec = Math.max(0, Math.ceil((unlockAt - now) / 1000));
   // Same window the video-token route enforces.
   const joinWindow = appt ? videoJoinWindow(appt) : null;
-  const fmtTime = (t: number) => new Date(t).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+  const fmtTime = (t: number) => new Date(t).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" });
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -108,7 +108,7 @@ export default function DoctorVideoCallPage() {
               <Loader2 className="w-6 h-6 text-teal-400 animate-spin" />
               <p className="text-sm text-slate-500">Video consultation unlocking in {unlockRemainingSec}s…</p>
               <p className="text-xs text-slate-400">
-                Consultation will start at {new Date(unlockAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                Consultation will start at {new Date(unlockAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })}
               </p>
             </div>
           ) : !started && joinWindow && now < joinWindow.opensAt ? (

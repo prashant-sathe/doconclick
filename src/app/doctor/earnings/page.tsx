@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
+import { istDayKey, istMonthKey, shiftMonthKey, addDaysYmd, mondayIndex, weekdayShortLabel } from "@/lib/istDate";
 
 interface Appointment {
   id: string;
@@ -42,15 +43,6 @@ interface PayoutRequestRecord {
   amount: number;
   status: string;
   createdAt: string;
-}
-
-function startOfWeek(d: Date) {
-  const day = d.getDay();
-  const diff = (day === 0 ? -6 : 1) - day; // Monday as start
-  const start = new Date(d);
-  start.setDate(d.getDate() + diff);
-  start.setHours(0, 0, 0, 0);
-  return start;
 }
 
 export default function DoctorEarnings() {
@@ -99,16 +91,12 @@ export default function DoctorEarnings() {
   const completed = appointments.filter((a) => a.status === "COMPLETED" && a.paymentStatus === "PAID");
   const net = (a: Appointment) => a.amount - a.platformFee;
 
+  // Months, weeks and days are IST calendar days (src/lib/istDate.ts), not the device's.
   const now = new Date();
-  const thisMonth = completed.filter((a) => {
-    const d = new Date(a.scheduledAt);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  });
-  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const lastMonth = completed.filter((a) => {
-    const d = new Date(a.scheduledAt);
-    return d.getMonth() === lastMonthDate.getMonth() && d.getFullYear() === lastMonthDate.getFullYear();
-  });
+  const thisMonthKey = istMonthKey(now);
+  const lastMonthKey = shiftMonthKey(thisMonthKey, -1);
+  const thisMonth = completed.filter((a) => istMonthKey(a.scheduledAt) === thisMonthKey);
+  const lastMonth = completed.filter((a) => istMonthKey(a.scheduledAt) === lastMonthKey);
 
   const totalEarnings = completed.reduce((sum, a) => sum + net(a), 0);
   const thisMonthEarnings = thisMonth.reduce((sum, a) => sum + net(a), 0);
@@ -132,17 +120,14 @@ export default function DoctorEarnings() {
   };
 
   // Last 7 days bar breakdown
-  const weekStart = startOfWeek(now);
+  const todayKey = istDayKey(now);
+  const weekStartKey = addDaysYmd(todayKey, -mondayIndex(todayKey)); // Monday as start
   const days = [...Array(7)].map((_, i) => {
-    const d = new Date(weekStart);
-    d.setDate(weekStart.getDate() + i);
+    const dayKey = addDaysYmd(weekStartKey, i);
     const dayEarnings = completed
-      .filter((a) => {
-        const ad = new Date(a.scheduledAt);
-        return ad.toDateString() === d.toDateString();
-      })
+      .filter((a) => istDayKey(a.scheduledAt) === dayKey)
       .reduce((sum, a) => sum + net(a), 0);
-    return { label: d.toLocaleDateString("en-IN", { weekday: "short" }), value: dayEarnings };
+    return { label: weekdayShortLabel(dayKey), value: dayEarnings };
   });
   const maxDay = Math.max(1, ...days.map((d) => d.value));
 
@@ -201,7 +186,7 @@ export default function DoctorEarnings() {
             <CheckCircle2 className="w-5 h-5 text-teal-600 flex-shrink-0" />
             <p className="text-sm text-teal-800">
               <span className="font-bold">Payout of ₹{openPayoutRequest.amount.toLocaleString("en-IN")} requested</span> on{" "}
-              {new Date(openPayoutRequest.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} — awaiting admin review.
+              {new Date(openPayoutRequest.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} — awaiting admin review.
             </p>
           </div>
         ) : onlinePending > 0 && (
@@ -265,7 +250,7 @@ export default function DoctorEarnings() {
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-800 truncate">{patientLabel(a)}</p>
                     <p className="text-xs text-slate-400">
-                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · {a.consultType} · {a.paymentMethod === "ONLINE" ? "Online" : "Cash"}
+                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {a.consultType} · {a.paymentMethod === "ONLINE" ? "Online" : "Cash"}
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
@@ -299,7 +284,7 @@ export default function DoctorEarnings() {
                 <div key={s.id} className="px-6 py-3.5 flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-800">
-                      {new Date(s.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                      {new Date(s.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })}
                     </p>
                     <p className="text-xs text-slate-400">{s.cashCount} cash · {s.onlineCount} online</p>
                   </div>
