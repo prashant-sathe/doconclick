@@ -16,6 +16,7 @@ import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT, UNBOOKABLE_MESSAGE } from "@/
 import { doctorSlotProblem, snapToClinicGrid, isTimedBooking, isSlotIndexViolation, acceptTimeProblem } from "@/lib/doctorSlots";
 import { getBookingHorizonDays, horizonProblem, doctorHoursProblem } from "@/lib/bookingLimits";
 import { referralPushCopy } from "@/lib/nurseReferral";
+import { GATEWAY_OMIT, LIVE_LOCATION_CLEARED, withLiveLocationOnlyWhileLive } from "@/lib/appointmentView";
 
 const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
   SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
@@ -50,6 +51,7 @@ export async function GET(
   const { id } = await params;
   const appointment = await prisma.appointment.findUnique({
     where: { id },
+    omit: GATEWAY_OMIT,
     include: {
       doctor: { select: { name: true, doctorProfile: { select: { specialty: true } } } },
       patient: { select: { name: true } },
@@ -70,7 +72,8 @@ export async function GET(
   const isPatient = appointment.patientId === authUser.id;
   // The visit-start code proves the nurse is actually at the patient's door —
   // only the patient may ever see it.
-  const { visitOtp, ...rest } = appointment;
+  // The provider's live position only while they're on the way (see /patient/track).
+  const { visitOtp, ...rest } = withLiveLocationOnlyWhileLive(appointment);
   // A package is paid in one go — the payment page needs the whole bill.
   let pkg = null;
   if (isPatient && appointment.packageId) {
@@ -428,6 +431,8 @@ export async function PATCH(
         ...(status === "SCHEDULED" ? { acceptedAt: new Date() } : {}),
         // Starts the prescription edit window (src/lib/prescriptionLock.ts).
         ...(status === "COMPLETED" ? { completedAt: new Date() } : {}),
+        // The visit is over (or never happens) — don't keep where the provider was.
+        ...(status !== "SCHEDULED" ? LIVE_LOCATION_CLEARED : {}),
         // Cash is collected at the visit, so completing it is when it was paid.
         ...(status === "COMPLETED" && appointment.paymentMethod === "CASH"
           ? { paymentStatus: "PAID", paidAt: appointment.paidAt ?? new Date() }

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { publicName } from "@/lib/publicName";
 
-// GET: Recent reviews for a doctor's public profile
+// GET: Recent reviews for a doctor's public profile. Unauthenticated, so the
+// reviewer is only "Raj S." — never the full name or any patient id.
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -21,5 +23,7 @@ export async function GET(
     },
   });
 
-  return NextResponse.json(reviews);
+  return NextResponse.json(
+    reviews.map(({ patient, ...r }) => ({ ...r, reviewer: publicName(patient.name) }))
+  );
 }

@@ -1,6 +1,7 @@
 import { Prisma } from "@/generated/prisma/client";
 import { refundAppointmentToWallet } from "@/lib/wallet";
 import { netPayable, releaseCouponRedemption } from "@/lib/coupons";
+import { LIVE_LOCATION_CLEARED } from "@/lib/appointmentView";
 
 // Thrown inside a cancel/decline transaction when a concurrent request has
 // already moved the appointment on — rolls the whole transaction back.
@@ -63,7 +64,7 @@ async function settleCancelled(
 }
 
 const cancelData = (data: Prisma.AppointmentUpdateManyMutationInput = {}) =>
-  ({ ...data, status: "CANCELLED", requestedScheduledAt: null });
+  ({ ...data, status: "CANCELLED", requestedScheduledAt: null, ...LIVE_LOCATION_CLEARED });
 
 // Cancels one live appointment and settles its money — the path every
 // single cancel uses (doctor, patient). Throws AppointmentAlreadyClosedError

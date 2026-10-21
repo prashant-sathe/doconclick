@@ -8,6 +8,7 @@ import { resolveProviderScope } from "@/lib/providerGuard";
 import { isDoctorBookable } from "@/lib/doctorBookable";
 import { visitLocation } from "@/lib/visitAddress";
 import { hasCareAccess } from "@/lib/careAccess";
+import { GATEWAY_OMIT, withLiveLocationOnlyWhileLive } from "@/lib/appointmentView";
 
 // GET: The logged-in user's own appointments (as patient or as doctor)
 export async function GET() {
@@ -22,6 +23,8 @@ export async function GET() {
     const appointments = await prisma.appointment.findMany({
       where: { patientId: authUser.id },
       orderBy: { scheduledAt: "desc" },
+      // No gateway ids or internal accounting; the visit code is the patient's own.
+      omit: { ...GATEWAY_OMIT, settlementId: true, visitOtpAttempts: true, couponId: true },
       include: {
         doctor: {
           select: {
@@ -57,7 +60,8 @@ export async function GET() {
     });
     return NextResponse.json(
       appointments.map(({ _count, doctor: { role, deletedAt, doctorProfile, ...doctor }, ...a }) => ({
-        ...a,
+        // The provider's position only while they're on the way (not after the visit).
+        ...withLiveLocationOnlyWhileLive(a),
         // The bookable-rule fields are only read here, never sent to the client.
         doctor: {
           ...doctor,
@@ -85,6 +89,8 @@ export async function GET() {
       // By visit time, soonest first — the queue order. (History lists on the
       // dashboard re-sort newest-first themselves.)
       orderBy: [{ scheduledAt: "asc" }, { createdAt: "asc" }],
+      // The door code is the patient's; gateway ids are the admin's.
+      omit: { ...GATEWAY_OMIT, visitOtp: true },
       include: {
         patient: {
           select: {
@@ -148,7 +154,7 @@ export async function GET() {
       where: { doctorId: authUser.id },
       orderBy: [{ createdAt: "desc" }],
       // The door code is the patient's to share — never the nurse's to read.
-      omit: { visitOtp: true },
+      omit: { ...GATEWAY_OMIT, visitOtp: true },
       include: {
         patient: {
           select: {

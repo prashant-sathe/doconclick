@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bookableDoctorWhere } from "@/lib/doctorBookable";
+import { PUBLIC_DOCTOR_PROFILE_SELECT, PUBLIC_CLINIC_SELECT, coarsenBase } from "@/lib/publicDoctor";
 
 // GET: List approved doctors for patient portal, optionally filtered by specialty
 export async function GET(req: Request) {
@@ -10,24 +11,15 @@ export async function GET(req: Request) {
   const doctors = await prisma.user.findMany({
     // Ignoring case — a name typed or linked as "dentist" still finds "Dentist".
     where: bookableDoctorWhere(specialty ? { specialty: { equals: specialty, mode: "insensitive" } } : {}),
+    // Public endpoint — public fields only (the doctor's own /api/doctors/me has the rest).
     select: {
       id: true,
       name: true,
-      // Public endpoint — never expose bank details, KYC/certificate files or
-      // payment ids (the doctor's own /api/doctors/me has those).
-      doctorProfile: {
-        omit: {
-          bankDetails: true,
-          kycDocUrl: true,
-          medRegCertUrl: true,
-          degreeCertUrl: true,
-          signatureUrl: true,
-          cashfreeOrderId: true,
-          cashfreePaymentId: true,
-        },
-      },
-      clinics: { where: { isActive: true }, orderBy: { sortOrder: "asc" }, include: { slots: true } },
+      doctorProfile: { select: PUBLIC_DOCTOR_PROFILE_SELECT },
+      clinics: { where: { isActive: true }, orderBy: { sortOrder: "asc" }, select: PUBLIC_CLINIC_SELECT },
     },
   });
-  return NextResponse.json(doctors);
+  return NextResponse.json(
+    doctors.map((d) => ({ ...d, doctorProfile: d.doctorProfile && coarsenBase(d.doctorProfile) }))
+  );
 }

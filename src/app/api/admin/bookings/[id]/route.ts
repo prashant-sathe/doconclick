@@ -13,6 +13,9 @@ export async function GET(
 
   const appointment = await prisma.appointment.findUnique({
     where: { id },
+    // The visit code is the patient's to share at the door, and the provider's
+    // live position is only for the patient during the journey.
+    omit: { visitOtp: true, visitOtpAttempts: true, doctorLat: true, doctorLng: true, doctorLocationUpdatedAt: true },
     include: {
       patient: {
         select: {

@@ -66,7 +66,7 @@ interface DoctorReview {
   id: string;
   rating: number;
   comment: string | null;
-  patient: { name: string };
+  reviewer: string; // "Raj S."
 }
 
 function Header() {
@@ -386,7 +386,7 @@ export default function DoctorProfilePage() {
                   <div key={r.id} className="bg-slate-50 rounded-xl px-3 py-2">
                     <RatingStars avgRating={r.rating} totalReviews={1} />
                     {r.comment && <p className="text-xs text-slate-600 mt-1">&ldquo;{r.comment}&rdquo;</p>}
-                    <p className="text-[10px] text-slate-400 mt-0.5">{r.patient.name}</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{r.reviewer}</p>
                   </div>
                 ))}
               </div>
