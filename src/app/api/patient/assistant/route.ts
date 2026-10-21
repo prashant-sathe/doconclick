@@ -207,7 +207,7 @@ async function findDoctors(
 
   const now = new Date();
   const doctors = await prisma.user.findMany({
-    where: bookableDoctorWhere({ specialty: args.specialty }),
+    where: bookableDoctorWhere({ specialty: { equals: args.specialty, mode: "insensitive" } }),
     include: { doctorProfile: true, clinics: { where: { isActive: true }, include: { slots: true } } },
     take: 20,
   });

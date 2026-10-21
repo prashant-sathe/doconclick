@@ -9,3 +9,9 @@
 CREATE UNIQUE INDEX IF NOT EXISTS "Appointment_doctorId_scheduledAt_live_key"
   ON "Appointment" ("doctorId", "scheduledAt")
   WHERE "status" IN ('PENDING_APPROVAL', 'SCHEDULED');
+
+-- Specialty names are unique ignoring case. Prisma's @unique is case-sensitive,
+-- so "Dentist" and "dentist" would otherwise both be allowed — two specialties
+-- no filter can tell apart. The routes check first; this settles a race.
+CREATE UNIQUE INDEX IF NOT EXISTS "Specialty_name_lower_key"
+  ON "Specialty" (lower("name"));

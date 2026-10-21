@@ -8,7 +8,8 @@ export async function GET(req: Request) {
   const specialty = searchParams.get("specialty");
 
   const doctors = await prisma.user.findMany({
-    where: bookableDoctorWhere(specialty ? { specialty } : {}),
+    // Ignoring case — a name typed or linked as "dentist" still finds "Dentist".
+    where: bookableDoctorWhere(specialty ? { specialty: { equals: specialty, mode: "insensitive" } } : {}),
     select: {
       id: true,
       name: true,

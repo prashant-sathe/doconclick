@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Tag, Plus, Trash2, Loader2, EyeOff, Eye, AlertCircle, Pencil, X, Check, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { useToast } from "@/components/Toast";
+import { mutate } from "@/lib/apiClient";
 
 interface SpecialtyRow {
   id: string;
@@ -12,6 +14,7 @@ interface SpecialtyRow {
 }
 
 export default function AdminSpecialties() {
+  const toast = useToast();
   const [specialties, setSpecialties] = useState<SpecialtyRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
@@ -61,12 +64,9 @@ export default function AdminSpecialties() {
 
   const toggleActive = async (s: SpecialtyRow) => {
     setBusyId(s.id);
-    await fetch(`/api/admin/specialties/${s.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isActive: !s.isActive }),
-    });
+    const res = await mutate(`/api/admin/specialties/${s.id}`, { method: "PATCH", body: { isActive: !s.isActive }, fallback: "Could not update the specialty." });
     setBusyId(null);
+    if (!res.ok) { toast.error(res.error); return; }
     load();
   };
 
@@ -86,17 +86,19 @@ export default function AdminSpecialties() {
     }
     setSaving(true);
     setEditError("");
-    const res = await fetch(`/api/admin/specialties/${editTarget.id}`, {
+    const res = await mutate<{ doctorsUpdated?: number }>(`/api/admin/specialties/${editTarget.id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: trimmed, color: editColor }),
+      body: { name: trimmed, color: editColor },
+      fallback: "Could not update specialty.",
     });
     setSaving(false);
     if (res.ok) {
+      const moved = res.data?.doctorsUpdated ?? 0;
+      if (moved > 0) toast.success(`Renamed — ${moved} doctor${moved === 1 ? "" : "s"} updated to the new name.`);
       setEditTarget(null);
       load();
     } else {
-      setEditError((await res.json().catch(() => ({}))).error ?? "Could not update specialty.");
+      setEditError(res.error);
     }
   };
 

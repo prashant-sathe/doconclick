@@ -5,6 +5,7 @@ import { verifyPassword } from "@/lib/auth";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 import type { Prisma } from "@/generated/prisma/client";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { canonicalSpecialtyName } from "@/lib/specialties";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import {
   LOCKED_FIELDS, LOCKED_FIELD_LABELS, isProfileLocked, validateBank, maskAccount,
@@ -145,9 +146,12 @@ export async function PATCH(req: Request) {
   const requested: FieldChanges = {};
   for (const field of LOCKED_FIELDS) {
     if (!(field in body)) continue;
-    const value = normalizeText(body[field]);
-    if (field === "specialty" && !value) {
-      return NextResponse.json({ error: "Choose a specialty." }, { status: 400 });
+    let value = normalizeText(body[field]);
+    if (field === "specialty") {
+      if (!value) return NextResponse.json({ error: "Choose a specialty." }, { status: 400 });
+      // Store the specialty's own spelling, so "dentist" is "Dentist" — and
+      // doesn't read as a change (→ a re-verification request) for a verified doctor.
+      value = await canonicalSpecialtyName(value);
     }
     if (!locked) {
       data[field] = value;

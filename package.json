@@ -50,7 +50,8 @@
     "test:coupons": "tsx tests/coupons.ts",
     "test:wallet-adjust": "tsx tests/wallet-adjust.ts",
     "test:complaints": "tsx tests/complaints.ts",
-    "test:admin-reports": "tsx tests/admin-reports.ts"
+    "test:admin-reports": "tsx tests/admin-reports.ts",
+    "test:specialties": "tsx tests/specialties.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
