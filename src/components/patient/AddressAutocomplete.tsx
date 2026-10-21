@@ -48,7 +48,8 @@ export default function AddressAutocomplete({
       setLoading(true);
       try {
         const res = await fetch(`/api/geocode/search?q=${encodeURIComponent(value)}`);
-        const data: Suggestion[] = await res.json();
+        // Signed out, rate-limited or busy → no suggestions (typing still works).
+        const data: Suggestion[] = res.ok ? await res.json() : [];
         setSuggestions(data);
         setOpen(data.length > 0);
         setActiveIndex(-1);
