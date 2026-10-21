@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Users, UserPlus, Eye, EyeOff, KeyRound, Ban, RotateCcw, Loader2 } from "lucide-react";
+import { Users, UserPlus, Eye, EyeOff, KeyRound, Ban, RotateCcw, Loader2, Pencil, Trash2 } from "lucide-react";
 import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
 
 interface StaffAccount {
@@ -23,8 +24,19 @@ export default function DoctorStaffPage() {
   const [adding, setAdding] = useState(false);
 
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [resetTargetId, setResetTargetId] = useState<string | null>(null);
+  // The inline form open under one row: a new password, or a new name.
+  const [panel, setPanel] = useState<{ id: string; kind: "reset" | "rename" } | null>(null);
   const [resetPassword, setResetPassword] = useState("");
+  const [newName, setNewName] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<StaffAccount | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const openPanel = (s: StaffAccount, kind: "reset" | "rename") => {
+    setError("");
+    if (panel?.id === s.userId && panel.kind === kind) { setPanel(null); return; }
+    setPanel({ id: s.userId, kind });
+    setResetPassword("");
+    setNewName(s.name);
+  };
 
   const load = () => {
     fetch("/api/doctor/staff")
@@ -64,6 +76,40 @@ export default function DoctorStaffPage() {
     });
     setBusyId(null);
     if (res.ok) load();
+    else setError((await res.json().catch(() => ({}))).error ?? "Could not update this staff account.");
+  };
+
+  const submitRename = async (userId: string) => {
+    setError("");
+    setBusyId(userId);
+    const res = await fetch(`/api/doctor/staff/${userId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newName }),
+    });
+    setBusyId(null);
+    if (res.ok) {
+      setPanel(null);
+      load();
+    } else {
+      setError((await res.json().catch(() => ({}))).error ?? "Could not rename this staff account.");
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    setError("");
+    const res = await fetch(`/api/doctor/staff/${deleteTarget.userId}`, { method: "DELETE" });
+    setDeleting(false);
+    if (res.ok) {
+      setDeleteTarget(null);
+      setPanel(null);
+      load();
+    } else {
+      setDeleteTarget(null);
+      setError((await res.json().catch(() => ({}))).error ?? "Could not delete this staff account.");
+    }
   };
 
   const submitReset = async (userId: string) => {
@@ -80,7 +126,7 @@ export default function DoctorStaffPage() {
     });
     setBusyId(null);
     if (res.ok) {
-      setResetTargetId(null);
+      setPanel(null);
       setResetPassword("");
     } else {
       setError((await res.json().catch(() => ({}))).error ?? "Could not reset the password.");
@@ -107,8 +153,17 @@ export default function DoctorStaffPage() {
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
-                    onClick={() => setResetTargetId(resetTargetId === s.userId ? null : s.userId)}
+                    onClick={() => openPanel(s, "rename")}
+                    title="Rename"
+                    aria-label={`Rename ${s.name}`}
+                    className="w-9 h-9 rounded-lg border border-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => openPanel(s, "reset")}
                     title="Reset password"
+                    aria-label={`Reset password for ${s.name}`}
                     className="w-9 h-9 rounded-lg border border-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-50"
                   >
                     <KeyRound className="w-4 h-4" />
@@ -121,9 +176,32 @@ export default function DoctorStaffPage() {
                   >
                     {busyId === s.userId ? <Loader2 className="w-4 h-4 animate-spin" /> : s.active ? <Ban className="w-4 h-4 text-red-500" /> : <RotateCcw className="w-4 h-4 text-emerald-500" />}
                   </button>
+                  <button
+                    onClick={() => setDeleteTarget(s)}
+                    title="Delete"
+                    aria-label={`Delete ${s.name}`}
+                    className="w-9 h-9 rounded-lg border border-slate-100 flex items-center justify-center text-red-500 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-              {resetTargetId === s.userId && (
+              {panel?.id === s.userId && panel.kind === "rename" && (
+                <div className="flex items-center gap-2 mt-3">
+                  <input
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") submitRename(s.userId); }}
+                    placeholder="Full name"
+                    className="input-field flex-1 text-sm"
+                    autoFocus
+                  />
+                  <button onClick={() => submitRename(s.userId)} disabled={busyId === s.userId || !newName.trim() || newName.trim() === s.name} className="btn-primary py-2 px-3 text-xs disabled:opacity-60">
+                    Save
+                  </button>
+                </div>
+              )}
+              {panel?.id === s.userId && panel.kind === "reset" && (
                 <div className="flex items-center gap-2 mt-3">
                   <input
                     type="password"
@@ -171,6 +249,20 @@ export default function DoctorStaffPage() {
           <p className="text-xs text-slate-400">Share this mobile number and password with your staff member directly — they&apos;ll use it to sign in.</p>
         </div>
       </div>
+
+      {deleteTarget && (
+        <ConfirmDialog
+          icon={Trash2}
+          title={`Delete ${deleteTarget.name}?`}
+          message="They're signed out everywhere and can't sign in again. Messages they sent stay in your patients' chats. To pause their access instead, use Revoke."
+          confirmLabel="Delete"
+          busyLabel="Deleting…"
+          tone="danger"
+          busy={deleting}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={confirmDelete}
+        />
+      )}
     </DoctorProfileSubShell>
   );
 }

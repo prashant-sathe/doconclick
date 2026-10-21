@@ -3,6 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser, hashPassword } from "@/lib/auth";
 import { validateRegistration } from "@/lib/validation";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { createRateLimiter } from "@/lib/rateLimit";
+import { Prisma } from "@/generated/prisma/client";
+
+// One message for "that number is taken" whoever owns it (a patient, another
+// doctor's receptionist, a doctor), so the staff form can't be used to find
+// out who has an account. Attempts are rate-limited for the same reason.
+const MOBILE_UNAVAILABLE = "This mobile number can't be used for a staff account. Please use a different number.";
+const createLimiter = createRateLimiter(10, 60 * 60_000); // per doctor, per hour
 
 // GET: the logged-in doctor's own staff/receptionist accounts
 export async function GET() {
@@ -14,7 +22,8 @@ export async function GET() {
   if (denied) return denied;
 
   const staff = await prisma.staffProfile.findMany({
-    where: { doctorId: authUser.id },
+    // Deleted staff are gone from the list (their account is anonymised).
+    where: { doctorId: authUser.id, user: { deletedAt: null } },
     include: { user: { select: { id: true, name: true, mobile: true } } },
     orderBy: { createdAt: "desc" },
   });
@@ -42,6 +51,10 @@ export async function POST(req: Request) {
   const denied = await requireActiveDoctor(authUser, { requireSubscription: true });
   if (denied) return denied;
 
+  if (!createLimiter(authUser.id)) {
+    return NextResponse.json({ error: "Too many staff accounts tried in a short time — please wait a while and try again." }, { status: 429 });
+  }
+
   const body = await req.json().catch(() => ({}));
   const parsed = validateRegistration(body);
   if ("error" in parsed) {
@@ -50,24 +63,26 @@ export async function POST(req: Request) {
 
   const { name, mobile, password } = parsed.data;
 
-  const existing = await prisma.user.findUnique({ where: { mobile } });
-  if (existing) {
-    return NextResponse.json(
-      { error: "An account with this mobile number already exists." },
-      { status: 409 }
-    );
-  }
+  const unavailable = () => NextResponse.json({ error: MOBILE_UNAVAILABLE, code: "MOBILE_UNAVAILABLE" }, { status: 409 });
+  if (await prisma.user.findUnique({ where: { mobile }, select: { id: true } })) return unavailable();
 
-  const created = await prisma.user.create({
-    data: {
-      name,
-      mobile,
-      password: await hashPassword(password),
-      role: "STAFF",
-      staffAccount: { create: { doctorId: authUser.id } },
-    },
-    select: { id: true, name: true, mobile: true, staffAccount: { select: { id: true, active: true, createdAt: true } } },
-  });
+  let created;
+  try {
+    created = await prisma.user.create({
+      data: {
+        name,
+        mobile,
+        password: await hashPassword(password),
+        role: "STAFF",
+        staffAccount: { create: { doctorId: authUser.id } },
+      },
+      select: { id: true, name: true, mobile: true, staffAccount: { select: { id: true, active: true, createdAt: true } } },
+    });
+  } catch (err) {
+    // Registered by someone else between the check and the insert.
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") return unavailable();
+    throw err;
+  }
 
   return NextResponse.json({
     staffProfileId: created.staffAccount!.id,

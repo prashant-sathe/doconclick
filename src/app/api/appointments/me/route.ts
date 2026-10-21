@@ -130,7 +130,10 @@ export async function GET(req: Request) {
       : [];
     const visitsByPerson = new Map<string, typeof allVisits>();
     for (const a of allVisits) visitsByPerson.set(person(a), [...(visitsByPerson.get(person(a)) ?? []), a]);
-    const withAccess = new Set([...visitsByPerson].filter(([, visits]) => hasCareAccess(visits)).map(([key]) => key));
+    // A receptionist (STAFF) runs the queue — nurse vitals are clinical, for the doctor only.
+    const withAccess = authUser.role === "STAFF"
+      ? new Set<string>()
+      : new Set([...visitsByPerson].filter(([, visits]) => hasCareAccess(visits)).map(([key]) => key));
     const active = appointments.filter((a) => withAccess.has(person(a)));
     const recentVitals = active.length
       ? await prisma.vitalReading.findMany({

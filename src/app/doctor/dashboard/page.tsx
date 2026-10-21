@@ -1143,7 +1143,7 @@ export default function DoctorDashboard() {
                       <p className="text-xs text-slate-500">
                         {new Date(a.scheduledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}
                         {" · "}{a.consultType === "HOME" ? "Home visit" : a.consultType === "VIDEO" ? "Video" : "Clinic"}
-                        {homeNotArrived ? " · mark arrived first" : unpaidOnline ? " · not paid yet" : ""}
+                        {homeNotArrived ? (isStaff ? " · doctor hasn't arrived" : " · mark arrived first") : unpaidOnline ? " · not paid yet" : ""}
                       </p>
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
@@ -1446,22 +1446,30 @@ export default function DoctorDashboard() {
                           <div className="text-xs text-red-600 mt-2">{journeyError.message}</div>
                         )}
                         <div className="flex items-center gap-2 mt-3">
-                          {a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (
+                          {/* Travelling and the video call are the doctor's own (the travel
+                              API and /doctor/video refuse STAFF) — a receptionist only sees status. */}
+                          {isStaff && a.consultType === "HOME" && (
+                            <span className="flex-1 h-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm font-semibold flex items-center justify-center gap-1.5">
+                              <Car className="w-4 h-4" />
+                              {a.travelStatus === "ARRIVED" ? "Doctor has arrived" : a.travelStatus === "ON_THE_WAY" ? "Doctor is on the way" : "Doctor hasn't left yet"}
+                            </span>
+                          )}
+                          {!isStaff && a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (
                             <button onClick={() => setJourneyConfirm({ appt: a, action: "start" })} disabled={startingJourneyId === a.id} className="btn-secondary flex-1 h-11 justify-center text-blue-600 border-blue-200 hover:bg-blue-50">
                               {startingJourneyId === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Car className="w-4 h-4" />} Start Journey
                             </button>
                           )}
-                          {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
+                          {!isStaff && a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
                             <button onClick={() => markArrived(a.id)} className="btn-secondary flex-1 h-11 justify-center text-emerald-600 border-emerald-200 hover:bg-emerald-50">
                               <MapPinCheck className="w-4 h-4" /> Mark Arrived
                             </button>
                           )}
-                          {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
+                          {!isStaff && a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
                             <button onClick={() => setJourneyConfirm({ appt: a, action: "stop" })} className="btn-secondary h-11 px-3 justify-center text-slate-500 text-xs" title="Stop sharing your journey">
                               Stop
                             </button>
                           )}
-                          {a.consultType === "VIDEO" && a.paymentStatus === "PAID" && (
+                          {!isStaff && a.consultType === "VIDEO" && a.paymentStatus === "PAID" && (
                             unlockSec > 0 ? (
                               <span className="flex-1 h-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm font-semibold flex items-center justify-center gap-1.5 opacity-70">
                                 <Loader2 className="w-4 h-4 animate-spin" /> Unlocking in {unlockSec}s
@@ -1517,7 +1525,7 @@ export default function DoctorDashboard() {
                                       <History className="w-4 h-4 text-slate-400" /> Patient history
                                     </Link>
                                   )}
-                                  {visitUrl && (
+                                  {visitUrl && !isStaff && (
                                     <a
                                       href={visitUrl}
                                       target="_blank"
