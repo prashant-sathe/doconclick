@@ -35,10 +35,10 @@ async function call(u: U, method: string, path: string, body?: unknown) {
 // IST helpers: the first weekday date at least `minDays` ahead, and an instant on it.
 const istDate = (d: Date) => d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
 const istWeekday = (date: string) => new Date(`${date}T12:00:00+05:30`).toLocaleDateString("en-US", { timeZone: "Asia/Kolkata", weekday: "short" });
-function weekdayAhead(minDays: number): string {
-  for (let i = minDays; i < minDays + 8; i++) {
+function weekdayAhead(minDays: number, not: string[] = []): string {
+  for (let i = minDays; i < minDays + 10; i++) {
     const date = istDate(new Date(Date.now() + i * DAY));
-    if (!["Sat", "Sun"].includes(istWeekday(date))) return date;
+    if (!["Sat", "Sun"].includes(istWeekday(date)) && !not.includes(date)) return date;
   }
   throw new Error("unreachable");
 }
@@ -79,7 +79,8 @@ async function main() {
     const open = await clinicFor(acceptor.id, "Open Clinic", 18.5, ALL_DAYS, [day]);
     const closed = await clinicFor(acceptor.id, "Closed Clinic", 18.5);
     await prisma.clinic.update({ where: { id: closed.id }, data: { isActive: false } });
-    const otherDay = weekdayAhead(5);
+    // A different day from `day` — over a weekend both searches land on the same Monday.
+    const otherDay = weekdayAhead(5, [day]);
     const onLeave = await appt(acceptor.id, { status: "PENDING_APPROVAL", consultType: "CLINIC", clinicId: open.id, scheduledAt: at(day, "10:00") });
     const passed = await appt(acceptor.id, { status: "PENDING_APPROVAL", createdAt: new Date(Date.now() - 25 * MIN), scheduledAt: new Date(Date.now() - 20 * MIN) });
     const atClosed = await appt(acceptor.id, { status: "PENDING_APPROVAL", consultType: "CLINIC", clinicId: closed.id, scheduledAt: at(otherDay, "11:00") });

@@ -9,6 +9,7 @@ import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { formatProviderName } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { MAX_ADMIN_ADJUSTMENT, ADJUSTMENT_REASON_MIN, ADJUSTMENT_REASON_MAX } from "@/lib/walletLimits";
 
 interface WalletRow {
   userId: string;
@@ -70,16 +71,33 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
 
   useEffect(() => { load(); }, [load]);
 
+  // Same rules as the route (POST .../adjust), so the admin hears about them
+  // before the confirm dialog rather than after it.
+  const adjustmentProblem = (): string | null => {
+    const amt = Math.round(Number(amount) * 100) / 100;
+    if (!Number.isFinite(amt) || amt < 0.01) return "Enter a valid amount (at least ₹0.01).";
+    if (amt > MAX_ADMIN_ADJUSTMENT) return `One adjustment can be at most ₹${MAX_ADMIN_ADJUSTMENT.toLocaleString("en-IN")}.`;
+    if (note.trim().length < ADJUSTMENT_REASON_MIN) return `Add a reason (at least ${ADJUSTMENT_REASON_MIN} characters) — it appears in the patient's wallet history.`;
+    return null;
+  };
+
   const submit = async (acknowledgeNegative = false) => {
-    const amt = Number(amount);
-    if (!amt || amt <= 0) { setError("Enter a valid amount."); return; }
+    const problem = adjustmentProblem();
+    if (problem) { setError(problem); return; }
     setSubmitting(true);
     setError("");
-    const res = await fetch(`/api/admin/wallets/${userId}/adjust`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ direction, amount: amt, note, acknowledgeNegative }),
-    });
+    let res: Response;
+    try {
+      res = await fetch(`/api/admin/wallets/${userId}/adjust`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ direction, amount: Math.round(Number(amount) * 100) / 100, note: note.trim(), acknowledgeNegative }),
+      });
+    } catch {
+      setSubmitting(false);
+      setError("Network error — the adjustment was not applied.");
+      return;
+    }
     const body = await res.json().catch(() => ({}));
     if (res.status === 409 && body.requiresAcknowledgement) {
       setSubmitting(false);
@@ -174,7 +192,9 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
                   </div>
                   <input
                     type="number"
-                    min={1}
+                    min={0.01}
+                    max={MAX_ADMIN_ADJUSTMENT}
+                    step="0.01"
                     placeholder="Amount (₹)"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
@@ -182,7 +202,8 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
                   />
                   <input
                     type="text"
-                    placeholder="Reason / note (optional)"
+                    placeholder="Reason (required — shown in the patient's wallet history)"
+                    maxLength={ADJUSTMENT_REASON_MAX}
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     className="input-field w-full"
@@ -190,8 +211,8 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
                   {error && <p className="text-sm text-red-600">{error}</p>}
                   <button
                     onClick={() => {
-                      const amt = Number(amount);
-                      if (!amt || amt <= 0) { setError("Enter a valid amount."); return; }
+                      const problem = adjustmentProblem();
+                      if (problem) { setError(problem); return; }
                       setError("");
                       setConfirmAdjust(true);
                     }}
