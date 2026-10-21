@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
+import { verifyUpload } from "@/lib/fileSniff";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 
 const ALLOWED_TYPES: Record<string, string> = {
@@ -37,6 +38,9 @@ export async function POST(req: Request) {
 
   const filename = `${authUser.id}-clinic-${Date.now()}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
-  const url = await uploadToS3(`doctor-docs/${filename}`, buffer, file.type);
+  // The bytes decide what this is, not the client-sent MIME type (src/lib/fileSniff.ts).
+  const sniffed = verifyUpload(buffer, file.type, Object.keys(ALLOWED_TYPES));
+  if ("error" in sniffed) return NextResponse.json({ error: sniffed.error }, { status: 400 });
+  const url = await uploadToS3(`doctor-docs/${filename}`, buffer, sniffed.type);
   return NextResponse.json({ url });
 }

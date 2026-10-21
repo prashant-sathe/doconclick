@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, isRecordNotFound } from "@/lib/routeGuards";
 import { uploadToS3 } from "@/lib/s3";
+import { verifyUpload } from "@/lib/fileSniff";
 import { slugify } from "@/lib/utils";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 
@@ -71,7 +72,10 @@ export async function POST(req: Request) {
   const folder = `${slugify(authUser.name)}-${authUser.id}`;
   const filename = `${type}-${Date.now()}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
-  const url = await uploadToS3(`doctor-docs/${folder}/${filename}`, buffer, file.type);
+  // The bytes decide what this is, not the client-sent MIME type (src/lib/fileSniff.ts).
+  const sniffed = verifyUpload(buffer, file.type, Object.keys(allowedTypes));
+  if ("error" in sniffed) return NextResponse.json({ error: sniffed.error }, { status: 400 });
+  const url = await uploadToS3(`doctor-docs/${folder}/${filename}`, buffer, sniffed.type);
   const field = DOC_FIELD[type];
 
   try {

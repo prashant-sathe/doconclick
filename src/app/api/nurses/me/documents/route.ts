@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
+import { verifyUpload } from "@/lib/fileSniff";
 import { slugify } from "@/lib/utils";
 import { requireActiveNurse } from "@/lib/providerGuard";
 
@@ -76,13 +77,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "File must be under 5MB" }, { status: 400 });
   }
 
+  const buffer = Buffer.from(await file.arrayBuffer());
+  // The bytes decide what this is, not the client-sent MIME type (src/lib/fileSniff.ts).
+  const sniffed = verifyUpload(buffer, file.type, Object.keys(type === "photo" ? IMAGE_ONLY_TYPES : ALLOWED_TYPES));
+  if ("error" in sniffed) return NextResponse.json({ error: sniffed.error }, { status: 400 });
+
   const folder = `${slugify(authUser.name)}-${authUser.id}`;
   let url: string;
   try {
     url = await uploadToS3(
       `nurse-docs/${folder}/${type}-${Date.now()}.${ext}`,
-      Buffer.from(await file.arrayBuffer()),
-      file.type
+      buffer,
+      sniffed.type
     );
   } catch (err) {
     console.error("Nurse document upload to S3 failed:", err);

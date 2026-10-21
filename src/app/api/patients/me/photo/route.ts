@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, isRecordNotFound } from "@/lib/routeGuards";
 import { uploadToS3 } from "@/lib/s3";
+import { verifyUpload } from "@/lib/fileSniff";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -30,7 +31,10 @@ export async function POST(req: Request) {
 
   const filename = `${authUser.id}-${Date.now()}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
-  const url = await uploadToS3(`patient-photos/${filename}`, buffer, file.type);
+  // The bytes decide what this is, not the client-sent MIME type (src/lib/fileSniff.ts).
+  const sniffed = verifyUpload(buffer, file.type, Object.keys(ALLOWED_TYPES));
+  if ("error" in sniffed) return NextResponse.json({ error: sniffed.error }, { status: 400 });
+  const url = await uploadToS3(`patient-photos/${filename}`, buffer, sniffed.type);
 
   try {
     const updated = await prisma.patientProfile.update({
