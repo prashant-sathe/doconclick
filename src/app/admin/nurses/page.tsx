@@ -29,6 +29,13 @@ interface NurseRow {
   } | null;
 }
 
+// GET /api/admin/nurses/[id] — what approving needs, each document read back
+// and checked to be the real file type (src/lib/nurseApproval.ts).
+interface NurseDetail {
+  id: string;
+  approvalChecklist: { items: { key: string; label: string; ok: boolean; problem: string | null }[]; ready: boolean } | null;
+}
+
 const FILTERS = ["ALL", "PENDING", "APPROVED", "REJECTED", "SUSPENDED"] as const;
 const STATUS_BADGE: Record<string, string> = {
   PENDING: "badge badge-warning", APPROVED: "badge badge-success", REJECTED: "badge badge-gray", SUSPENDED: "badge badge-danger",
@@ -52,6 +59,9 @@ export default function AdminNurses() {
   const [notice, setNotice] = useState("");
   const impact = useAccountImpact();
   const toast = useToast();
+  const detail = useLoad<NurseDetail>(openId ? `/api/admin/nurses/${openId}` : null, { fallback: "Couldn't check this nurse's documents." });
+  // useLoad keeps the previous nurse's data until this one loads — only trust a match.
+  const approval = detail.data?.id === openId ? detail.data.approvalChecklist : null;
 
   // Suspending/rejecting an approved nurse, or deleting one, goes through the
   // impact step (her upcoming bookings) when she has any — see useAccountImpact.
@@ -64,6 +74,7 @@ export default function AdminNurses() {
       { title: `Open bookings with ${nurse.name}`, actionLabel: method === "DELETE" ? "Delete account" : body.status === "SUSPENDED" ? "Suspend" : "Confirm" },
     );
     setBusy(false);
+    void detail.reload();
     if (!result) return false;
     setNotice(impactResultText(result.bookings as never));
     reload();
@@ -157,7 +168,12 @@ export default function AdminNurses() {
               {notice && <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">{notice}</div>}
               <div className="flex flex-wrap gap-2">
                 {op.status !== "APPROVED" && (
-                  <button disabled={busy} onClick={() => update(open, { status: "APPROVED" })} className="btn-primary py-2 px-4 text-sm"><CheckCircle2 className="w-4 h-4" /> Approve</button>
+                  <button
+                    disabled={busy || !approval?.ready}
+                    onClick={() => update(open, { status: "APPROVED" })}
+                    title={approval?.ready ? undefined : "Every approval requirement below has to be met first"}
+                    className="btn-primary py-2 px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  ><CheckCircle2 className="w-4 h-4" /> Approve</button>
                 )}
                 {op.status === "PENDING" && (
                   <button disabled={busy} onClick={() => setConfirm({ nurse: open, status: "REJECTED" })} className="btn-secondary py-2 px-4 text-sm"><XCircle className="w-4 h-4" /> Reject</button>
@@ -176,7 +192,33 @@ export default function AdminNurses() {
               </div>
 
               <section>
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Checklist</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Approval requirements</h3>
+                {detail.error && !approval ? (
+                  <LoadError error={detail.error} onRetry={detail.reload} retrying={detail.reloading} />
+                ) : !approval ? (
+                  <p className="text-sm text-slate-400 flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Checking documents…</p>
+                ) : (
+                  <>
+                    <ul className="space-y-1.5">
+                      {approval.items.map((i) => (
+                        <li key={i.key} className="text-sm flex items-start gap-2">
+                          {i.ok ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" /> : <XCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />}
+                          <span>
+                            <span className={i.ok ? "text-slate-600" : "text-slate-800 font-semibold"}>{i.label}</span>
+                            {i.problem && <span className="block text-xs text-red-600">{i.problem}</span>}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    {!approval.ready && op.status !== "APPROVED" && (
+                      <p className="text-xs text-slate-500 mt-2">Approve unlocks once every item above is met.</p>
+                    )}
+                  </>
+                )}
+              </section>
+
+              <section>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Profile completeness</h3>
                 <ul className="space-y-1.5">
                   {nurseChecklist({ ...op, serviceCount: op.services.length }).items.map((i) => (
                     <li key={i.key} className="text-sm flex items-center gap-2">

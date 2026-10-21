@@ -53,7 +53,8 @@
     "test:admin-reports": "tsx tests/admin-reports.ts",
     "test:specialties": "tsx tests/specialties.ts",
     "test:ist-dates": "tsx tests/ist-dates.ts",
-    "test:route-protection": "tsx tests/route-protection.ts"
+    "test:route-protection": "tsx tests/route-protection.ts",
+    "test:nurse-approval": "tsx tests/nurse-approval.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

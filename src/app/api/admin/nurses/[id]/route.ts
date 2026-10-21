@@ -5,6 +5,7 @@ import { revokeSessions } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { deleteAccount, DeletionBlockedError, accountDeletionPreview } from "@/lib/userDeletion";
 import { accountImpact, impactConfirmationResponse, resolveProviderBookings } from "@/lib/accountImpact";
+import { nurseApprovalChecklist } from "@/lib/nurseApproval";
 
 const STATUS_PUSH_COPY: Record<string, { title: string; body: string }> = {
   APPROVED: { title: "Application approved", body: "Your nurse application has been approved — patients can now book you." },
@@ -32,10 +33,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   });
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const visits = await prisma.appointment.groupBy({ by: ["status"], where: { doctorId: id }, _count: true });
+  const [visits, approvalChecklist] = await Promise.all([
+    prisma.appointment.groupBy({ by: ["status"], where: { doctorId: id }, _count: true }),
+    // What approving needs, with each document's file checked (src/lib/nurseApproval.ts).
+    user.nurseProfile ? nurseApprovalChecklist(user.nurseProfile) : null,
+  ]);
   const count = (s: string) => visits.find((v) => v.status === s)?._count ?? 0;
   return NextResponse.json({
     ...user,
+    approvalChecklist,
     stats: { completedCount: count("COMPLETED"), scheduledCount: count("SCHEDULED"), cancelledCount: count("CANCELLED") },
   });
 }
@@ -59,18 +65,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (!["APPROVED", "REJECTED", "SUSPENDED", "PENDING"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
-    // Registered nurses only — approval needs the council number and its certificate.
-    if (status === "APPROVED" && (!profile.councilRegNo || !profile.councilCertUrl)) {
-      return NextResponse.json(
-        { error: "Cannot approve: the nurse hasn't added a Nursing Council registration number and certificate yet." },
-        { status: 400 }
-      );
-    }
-    if (status === "APPROVED" && (profile.lat == null || profile.lng == null)) {
-      return NextResponse.json(
-        { error: "Cannot approve: the nurse hasn't set their base location yet, so patients can't be matched to them." },
-        { status: 400 }
-      );
+    // Approval needs the full checklist — council number, base location and
+    // every document, each one read back and checked to be the real file
+    // type (src/lib/nurseApproval.ts). Re-saving an approved nurse skips it.
+    if (status === "APPROVED" && profile.status !== "APPROVED") {
+      const checklist = await nurseApprovalChecklist(profile);
+      if (!checklist.ready) {
+        const missing = checklist.items.filter((i) => !i.ok).map((i) => `${i.label} (${i.problem})`);
+        return NextResponse.json(
+          { error: `Cannot approve yet: ${missing.join("; ")}.`, code: "APPROVAL_CHECKLIST", checklist },
+          { status: 400 }
+        );
+      }
     }
     data.status = status;
   }

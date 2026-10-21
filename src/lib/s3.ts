@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 
 let client: S3Client | null = null;
 
@@ -46,4 +46,26 @@ export function isOwnUploadUrl(url: string, folder: string): boolean {
   if (!bucket || !region) return false;
   const prefix = `https://${bucket}.s3.${region}.amazonaws.com/${folder}/`;
   return url.startsWith(prefix) && !url.slice(prefix.length).includes("..");
+}
+
+// The first `bytes` bytes of a file we uploaded under `folder` (for sniffing
+// what it really is — src/lib/fileSniff.ts), via a ranged GetObject with our
+// own credentials, so it works whether or not the bucket is public.
+// "foreign" when the URL isn't one of our uploads in that folder, "missing"
+// when the object isn't there. Other failures (S3 unreachable, bad
+// credentials) throw — callers decide how to fail.
+export async function readUploadHead(url: string, folder: string, bytes = 16): Promise<Uint8Array | "foreign" | "missing"> {
+  if (!isOwnUploadUrl(url, folder)) return "foreign";
+  const bucket = process.env.S3_BUCKET_NAME!;
+  const key = decodeURIComponent(new URL(url).pathname.slice(1));
+  try {
+    const res = await getClient().send(new GetObjectCommand({ Bucket: bucket, Key: key, Range: `bytes=0-${bytes - 1}` }));
+    return res.Body ? await res.Body.transformToByteArray() : "missing";
+  } catch (err) {
+    const name = (err as { name?: string })?.name;
+    // Without s3:ListBucket, S3 answers a missing key with 403 AccessDenied
+    // rather than 404 — our credentials can read every object we wrote.
+    if (name === "NoSuchKey" || name === "NotFound" || name === "AccessDenied") return "missing";
+    throw err;
+  }
 }
