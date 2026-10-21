@@ -1,6 +1,7 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { startRingingAlert } from "@/lib/playNotificationSound";
+import { useAppointmentFeed } from "@/components/AppointmentFeed";
 
 export interface AppointmentStatusEvent {
   id: string;
@@ -30,7 +31,6 @@ function deriveEvent(a: RawAppointment): string | null {
   return null;
 }
 
-const POLL_MS = 5000;
 const seenKey = (patientId: string) => `doconclick_notif_patient_seen_${patientId}`;
 
 function loadSeenMap(patientId: string): Record<string, string> {
@@ -42,9 +42,9 @@ function loadSeenMap(patientId: string): Record<string, string> {
 }
 
 export function usePatientNotifications(patientId: string | undefined) {
-  const [notableAppointments, setNotableAppointments] = useState<AppointmentStatusEvent[]>([]);
-  const [hasUnseen, setHasUnseen] = useState(false);
   const [activeToast, setActiveToast] = useState<AppointmentStatusEvent | null>(null);
+  // Bumped by markSeen so hasUnseen re-reads the seen map.
+  const [seenVersion, setSeenVersion] = useState(0);
   const lastKnownEvent = useRef<Map<string, string> | null>(null);
   const stopRingingRef = useRef<(() => void) | null>(null);
 
@@ -53,54 +53,57 @@ export function usePatientNotifications(patientId: string | undefined) {
     stopRingingRef.current = null;
   }, []);
 
-  const computeUnseen = useCallback((events: AppointmentStatusEvent[]) => {
-    if (!patientId) return false;
+  // The shared poll in the patient layout (src/components/AppointmentFeed.tsx).
+  const { items } = useAppointmentFeed<RawAppointment>();
+
+  const notableAppointments = useMemo(
+    () => (patientId && items
+      ? items.map((a) => ({ ...a, event: deriveEvent(a) })).filter((a): a is AppointmentStatusEvent => a.event !== null)
+      : []),
+    [patientId, items]
+  );
+
+  const hasUnseen = useMemo(() => {
+    if (!patientId || notableAppointments.length === 0) return false;
     const seen = loadSeenMap(patientId);
-    return events.some((e) => seen[e.id] !== e.event);
+    return notableAppointments.some((e) => seen[e.id] !== e.event);
+    // seenVersion: re-read localStorage after markSeen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patientId, notableAppointments, seenVersion]);
+
+  // A new patient starts a new baseline.
+  useEffect(() => {
+    lastKnownEvent.current = null;
   }, [patientId]);
 
+  // Toast + ring when an appointment reaches a new event since the last poll
+  // (the first poll only records the baseline).
   useEffect(() => {
-    if (!patientId) return;
-    lastKnownEvent.current = null;
-
-    const poll = async () => {
-      const res = await fetch("/api/appointments/me").catch(() => null);
-      if (!res?.ok) return;
-      const all: RawAppointment[] = await res.json();
-      const notable = all
-        .map((a) => ({ ...a, event: deriveEvent(a) }))
-        .filter((a): a is AppointmentStatusEvent => a.event !== null);
-      setNotableAppointments(notable);
-      setHasUnseen(computeUnseen(notable));
-
-      if (lastKnownEvent.current === null) {
-        lastKnownEvent.current = new Map(notable.map((a) => [a.id, a.event]));
-        return;
-      }
-      const changed = notable.find((a) => lastKnownEvent.current!.get(a.id) !== a.event);
-      if (changed) {
-        setActiveToast(changed);
-        stopRingingRef.current?.();
-        stopRingingRef.current = startRingingAlert();
-      }
-      for (const a of notable) lastKnownEvent.current.set(a.id, a.event);
-    };
-
-    poll();
-    const interval = setInterval(poll, POLL_MS);
-    return () => {
-      clearInterval(interval);
+    if (!patientId || !items) return;
+    if (lastKnownEvent.current === null) {
+      lastKnownEvent.current = new Map(notableAppointments.map((a) => [a.id, a.event]));
+      return;
+    }
+    const changed = notableAppointments.find((a) => lastKnownEvent.current!.get(a.id) !== a.event);
+    if (changed) {
+      setActiveToast(changed);
       stopRingingRef.current?.();
-      stopRingingRef.current = null;
-    };
-  }, [patientId, computeUnseen]);
+      stopRingingRef.current = startRingingAlert();
+    }
+    for (const a of notableAppointments) lastKnownEvent.current.set(a.id, a.event);
+  }, [patientId, items, notableAppointments]);
+
+  useEffect(() => () => {
+    stopRingingRef.current?.();
+    stopRingingRef.current = null;
+  }, []);
 
   const markSeen = useCallback(() => {
     if (!patientId) return;
     const seen: Record<string, string> = {};
     for (const a of notableAppointments) seen[a.id] = a.event;
     localStorage.setItem(seenKey(patientId), JSON.stringify(seen));
-    setHasUnseen(false);
+    setSeenVersion((v) => v + 1);
     stopRinging();
   }, [patientId, notableAppointments, stopRinging]);
 

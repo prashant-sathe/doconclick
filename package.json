@@ -56,7 +56,8 @@
     "test:route-protection": "tsx tests/route-protection.ts",
     "test:nurse-approval": "tsx tests/nurse-approval.ts",
     "test:api-trim": "tsx tests/api-trim.ts",
-    "test:geocode": "tsx tests/geocode.ts"
+    "test:geocode": "tsx tests/geocode.ts",
+    "test:appointments-feed": "tsx tests/appointments-feed.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

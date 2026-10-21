@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
@@ -29,7 +29,7 @@ import RescheduleRequestBox from "@/components/RescheduleRequestBox";
 import { getCurrentPositionCompat } from "@/lib/platform";
 import { istDayKey, istMinutesOfDay } from "@/lib/istDate";
 import { useJourneyTracker } from "@/components/JourneyTracker";
-import { useResync } from "@/hooks/useResync";
+import { useAppointmentFeed, useAppointmentHistory, mergeAppointments } from "@/components/AppointmentFeed";
 import PullToRefresh from "@/components/PullToRefresh";
 import { compressImage } from "@/lib/compressImage";
 import { PACKAGE_VISIT_OPTIONS, PACKAGE_INTERVAL_OPTIONS, intervalLabel } from "@/lib/nursePackage";
@@ -667,12 +667,17 @@ export default function DoctorDashboard() {
   const [doctor, setDoctor] = useState<DoctorMe | null>(null);
   const [staffActive, setStaffActive] = useState<boolean | null>(null);
   const [staffDoctorName, setStaffDoctorName] = useState<string | null>(null);
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  // Live + recent appointments come from the layout's shared 5s poll (the
+  // header's request bell reads the same one — src/components/AppointmentFeed.tsx);
+  // older history is paged in on demand.
+  const feed = useAppointmentFeed<Appointment>();
+  const past = useAppointmentHistory<Appointment>(user?.role === "DOCTOR" || user?.role === "STAFF");
+  const appointments = useMemo(() => mergeAppointments(feed.items, past.items), [feed.items, past.items]);
   const [search, setSearch] = useState("");
   // True until the first successful load; a failed (re)load sets apptsError
   // and keeps whatever was last loaded.
-  const [loadingAppts, setLoadingAppts] = useState(true);
-  const [apptsError, setApptsError] = useState<string | null>(null);
+  const loadingAppts = feed.items === null;
+  const apptsError = feed.error ?? past.error;
   const [apptsRetrying, setApptsRetrying] = useState(false);
   // /api/doctors/me (or staff/me for STAFF) failing — the page is gated on it.
   const [bootError, setBootError] = useState<string | null>(null);
@@ -793,40 +798,35 @@ export default function DoctorDashboard() {
     setRemovingReferral(appointmentId);
     const res = await mutate(`/api/appointments/${appointmentId}/nurse-referral`, { method: "DELETE", fallback: "Could not remove the nurse referral." });
     if (res.ok) {
-      setAppointments((list) => list.map((x) => (x.id === appointmentId ? { ...x, referralGiven: null } : x)));
+      void loadAppointments();
     } else {
       toast.error(res.error);
     }
     setRemovingReferral(null);
   };
 
-  // A failed load/poll keeps the last list on screen (with a Retry banner);
+  // After a change (and on Retry): fetch now rather than wait for the next
+  // poll. A failed load keeps the last list on screen (with a Retry banner);
   // the next successful poll clears the error.
+  const { refresh: refreshFeed } = feed;
+  const { refresh: refreshPast } = past;
   const loadAppointments = useCallback(async () => {
-    try {
-      const r = await fetch("/api/appointments/me");
-      if (!r.ok) { setApptsError(await errorMessage(r, "Couldn't load your appointments.")); return; }
-      const d: Appointment[] = await r.json();
-      setAppointments(d);
-      setApptsError(null);
-      setLoadingAppts(false);
-      const total = d.reduce((sum, a) => sum + a.unreadMessageCount, 0);
-      if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
-      unreadTotalRef.current = total;
-    } catch {
-      setApptsError("Network error — check your connection and try again.");
-    }
-  }, []);
+    await Promise.all([refreshFeed(), refreshPast()]);
+  }, [refreshFeed, refreshPast]);
+
+  // Chime when a new chat message arrives (the live/recent feed covers the
+  // chat follow-up window, so it has every chat that can still get one).
+  useEffect(() => {
+    if (!feed.items) return;
+    const total = feed.items.reduce((sum, a) => sum + a.unreadMessageCount, 0);
+    if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
+    unreadTotalRef.current = total;
+  }, [feed.items]);
   const retryAppointments = async () => {
     setApptsRetrying(true);
     await loadAppointments();
     setApptsRetrying(false);
   };
-
-  // The 5s poll below keeps this fresh while the tab/app stays open, but
-  // mobile WebViews commonly suspend timers while backgrounded — force an
-  // immediate refetch on resume/reconnect instead of waiting for the next tick.
-  useResync(loadAppointments);
 
   // Ticks the video-call payment-unlock countdown independently of the 5s data poll.
   const [now, setNow] = useState(() => Date.now());
@@ -834,17 +834,6 @@ export default function DoctorDashboard() {
     const tick = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(tick);
   }, []);
-
-  // Poll so a pending request that times out (no response within 30 min)
-  // disappears from the queue without the doctor needing to refresh.
-  useEffect(() => {
-    if (user?.role !== "DOCTOR" && user?.role !== "STAFF") return;
-    // Fetching on mount: it only sets state after its first await.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadAppointments();
-    const interval = setInterval(loadAppointments, 5000);
-    return () => clearInterval(interval);
-  }, [user, loadAppointments]);
 
   const respond = async (id: string, status: "SCHEDULED" | "REJECTED") => {
     setRespondingId(id);
@@ -1116,7 +1105,7 @@ export default function DoctorDashboard() {
             )}
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Total Consultations</p>
-              <p className="text-[15px] font-extrabold mt-0.5">{completedAll.length}</p>
+              <p className="text-[15px] font-extrabold mt-0.5">{Math.max(past.counts.COMPLETED ?? 0, completedAll.length)}</p>
             </div>
             {!isStaff && (
               <div>
@@ -1703,6 +1692,20 @@ export default function DoctorDashboard() {
               </button>
             )}
           </div>
+        )}
+
+        {/* History is paged from the server — older visits on request. */}
+        {past.hasMore && (
+          <button
+            onClick={() => {
+              setCompletedExpanded(true); setCancelledExpanded(true); setNoShowExpanded(true);
+              void past.loadMore();
+            }}
+            disabled={past.loadingMore}
+            className="btn-secondary w-full py-2.5 text-sm mb-6"
+          >
+            {past.loadingMore ? <Loader2 className="w-4 h-4 animate-spin" /> : "Load older history"}
+          </button>
         )}
       </PullToRefresh>
 

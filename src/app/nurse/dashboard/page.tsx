@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -14,6 +14,7 @@ import { useToast } from "@/components/Toast";
 import RescheduleRequestBox from "@/components/RescheduleRequestBox";
 import { getCurrentPositionCompat } from "@/lib/platform";
 import { useJourneyTracker } from "@/components/JourneyTracker";
+import { useAppointmentFeed, useAppointmentHistory, mergeAppointments } from "@/components/AppointmentFeed";
 import { cn } from "@/lib/utils";
 import { mutate, useLoad } from "@/lib/apiClient";
 import { intervalLabel, visitStartProblem, shiftCompleteProblem } from "@/lib/nursePackage";
@@ -305,15 +306,25 @@ export default function NurseDashboardPage() {
     if (!authLoading && !user) router.push("/login?next=/nurse/dashboard");
   }, [authLoading, user, router]);
 
-  // Visits poll every 10s; a failed poll keeps the last list on screen.
-  const isNurse = !!user && user.role === "NURSE";
-  const visitsLoad = useLoad<Visit[]>(isNurse ? "/api/appointments/me" : null, { pollMs: 10000, fallback: "Couldn't load your visits." });
+  // Live + recent visits come from the layout's shared 5s poll (the header's
+  // request bell reads the same one); older history is paged in on demand.
+  // A failed poll keeps the last list on screen.
+  const isNurse = user?.role === "NURSE";
+  const feed = useAppointmentFeed<Visit>();
+  const past = useAppointmentHistory<Visit>(isNurse);
   const profileLoad = useLoad<{ nurseProfile: { status: string }; bookable: boolean }>(isNurse ? "/api/nurses/me" : null, { fallback: "Couldn't load your profile status." });
-  const visits = visitsLoad.data;
-  const load = visitsLoad.reload;
+  const visits = useMemo(() => (feed.items ? mergeAppointments(feed.items, past.items) : null), [feed.items, past.items]);
+  const visitsError = feed.error ?? past.error;
+  const load = () => Promise.all([feed.refresh(), past.refresh()]);
+  const [retrying, setRetrying] = useState(false);
   const profileStatus = profileLoad.data ? { status: profileLoad.data.nurseProfile.status, bookable: profileLoad.data.bookable } : null;
-  const loadError = visitsLoad.error ?? profileLoad.error;
-  const retryLoad = () => { void visitsLoad.reload(); if (profileLoad.error) void profileLoad.reload(); };
+  const loadError = visitsError ?? profileLoad.error;
+  const retryLoad = async () => {
+    setRetrying(true);
+    if (profileLoad.error) void profileLoad.reload();
+    await load();
+    setRetrying(false);
+  };
 
   // ── Live journey tracking ──
   // The watcher itself lives in JourneyTracker (the nurse layout), so it
@@ -381,7 +392,7 @@ export default function NurseDashboardPage() {
     return res.ok;
   };
 
-  if (authLoading || !user || (visits === null && !visitsLoad.error)) {
+  if (authLoading || !user || (visits === null && !visitsError)) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-rose-500" /></div>;
   }
 
@@ -393,7 +404,7 @@ export default function NurseDashboardPage() {
         <NurseMobileNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
           <h1 className="text-2xl font-extrabold text-slate-900 mb-4">My Visits</h1>
-          <LoadError error={visitsLoad.error!} onRetry={retryLoad} retrying={visitsLoad.reloading} />
+          <LoadError error={visitsError!} onRetry={retryLoad} retrying={retrying} />
         </div>
       </div>
     );
@@ -408,9 +419,13 @@ export default function NurseDashboardPage() {
   const upcoming = visits
     .filter((v) => v.status === "SCHEDULED")
     .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
-  const history = visits.filter((v) => !["PENDING_APPROVAL", "SCHEDULED"].includes(v.status));
+  const history = visits
+    .filter((v) => !["PENDING_APPROVAL", "SCHEDULED"].includes(v.status))
+    .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
   const list = tab === "requests" ? requests : tab === "upcoming" ? upcoming : history;
-  const counts = { requests: requests.length, upcoming: upcoming.length, history: history.length };
+  // History is paged, so its tab shows the server's total, not what's loaded.
+  const historyTotal = Math.max(history.length, Object.values(past.counts).reduce((sum, n) => sum + n, 0));
+  const counts = { requests: requests.length, upcoming: upcoming.length, history: historyTotal };
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -420,7 +435,7 @@ export default function NurseDashboardPage() {
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
         <h1 className="text-2xl font-extrabold text-slate-900 mb-4">My Visits</h1>
 
-        {loadError && <LoadError error={loadError} onRetry={retryLoad} retrying={visitsLoad.reloading || profileLoad.reloading} hasData />}
+        {loadError && <LoadError error={loadError} onRetry={retryLoad} retrying={retrying || profileLoad.reloading} hasData />}
 
         {profileStatus && !profileStatus.bookable && (
           <Link href="/nurse/profile" className="block rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 mb-4 text-sm text-amber-800">
@@ -630,6 +645,11 @@ export default function NurseDashboardPage() {
                 </div>
               );
             })}
+            {tab === "history" && past.hasMore && (
+              <button onClick={() => void past.loadMore()} disabled={past.loadingMore} className="btn-secondary w-full py-2.5 text-sm">
+                {past.loadingMore ? <Loader2 className="w-4 h-4 animate-spin" /> : `Load more (${historyTotal - history.length} older)`}
+              </button>
+            )}
           </div>
         )}
       </div>

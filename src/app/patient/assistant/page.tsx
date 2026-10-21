@@ -493,15 +493,17 @@ export default function HealthAssistantPage() {
 
   // Lets "My Tickets" carry a signal of its own — a patient who raises a
   // ticket mid-conversation has no other way back to it without this.
+  // On the id, not the `user` object — AuthProvider re-polls every 30s with a fresh one.
+  const userId = user?.id;
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     fetch("/api/patient/complaints")
       .then((r) => (r.ok ? r.json() : []))
       .then((tickets: { status: string }[]) => {
         setOpenTicketCount(tickets.filter((t) => t.status === "OPEN" || t.status === "IN_PROGRESS").length);
       })
       .catch(() => {});
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
     if (!storageKey) return;

@@ -474,8 +474,13 @@ function PatientDashboardInner() {
   useEffect(() => { loadDoctors(); }, [loadDoctors]);
 
   // ── Fetch this patient's bookmarked doctors, for the save toggle in the detail panel ──
+  // Keyed on the id/role, not the `user` object — AuthProvider re-polls
+  // every 30s with a fresh object, which would otherwise refetch (and reset
+  // edits) on every tick.
+  const userId = user?.id;
+  const userRole = user?.role;
   const loadSavedDoctors = useCallback(async () => {
-    if (!user || user.role !== "PATIENT") return;
+    if (!userId || userRole !== "PATIENT") return;
     try {
       const r = await fetch("/api/patients/me/saved-doctors");
       const d: { saved?: { doctor: { id: string } }[] } | { doctor: { id: string } }[] =
@@ -485,7 +490,7 @@ function PatientDashboardInner() {
     } catch {
       /* keep current set */
     }
-  }, [user]);
+  }, [userId, userRole]);
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { loadSavedDoctors(); }, [loadSavedDoctors]);
 
@@ -838,14 +843,14 @@ function PatientDashboardInner() {
 
   // ── Redirect unauthenticated ───────────────────────────────────────────
   useEffect(() => {
-    if (!authLoading && !user) router.push("/login");
-    if (!authLoading && user && user.role !== "PATIENT") router.push("/login");
-  }, [authLoading, user, router]);
+    if (!authLoading && !userId) router.push("/login");
+    if (!authLoading && userId && userRole !== "PATIENT") router.push("/login");
+  }, [authLoading, userId, userRole, router]);
 
   // ── Load the patient profile: completion %, search range, allergies ─────
   const [profilePercent, setProfilePercent] = useState<number | null>(null);
   const loadProfile = useCallback(async () => {
-    if (!user || user.role !== "PATIENT") return;
+    if (!userId || userRole !== "PATIENT") return;
     try {
       const d = await (await fetch("/api/patients/me")).json();
       const { percent } = computeCompleteness(d.patientProfile);
@@ -866,7 +871,7 @@ function PatientDashboardInner() {
     } catch {
       /* keep current values */
     }
-  }, [user, router]);
+  }, [userId, userRole, router]);
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { loadProfile(); }, [loadProfile]);
 

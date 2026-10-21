@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -14,7 +14,7 @@ import { downloadOrShareUrl } from "@/lib/nativeDownload";
 import { isNative } from "@/lib/platform";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
-import { useResync } from "@/hooks/useResync";
+import { useAppointmentFeed, useAppointmentHistory, mergeAppointments } from "@/components/AppointmentFeed";
 import { intervalLabel } from "@/lib/nursePackage";
 import { vitalsSummary, type VitalsInput } from "@/lib/vitals";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -567,8 +567,13 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
 export default function PatientAppointments() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Live + recent appointments come from the layout's shared 5s poll (the
+  // header's notifications read the same one — src/components/AppointmentFeed.tsx);
+  // older past visits are paged in on demand.
+  const feed = useAppointmentFeed<Appointment>();
+  const history = useAppointmentHistory<Appointment>(user?.role === "PATIENT");
+  const appointments = useMemo(() => mergeAppointments(feed.items, history.items), [feed.items, history.items]);
+  const loading = feed.items === null && !feed.error;
   const [reviewFor, setReviewFor] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [pendingExpanded, setPendingExpanded] = useState(false);
@@ -584,37 +589,26 @@ export default function PatientAppointments() {
   const PAGE_SIZE = 5;
 
   const unreadTotalRef = useRef<number | null>(null);
-  const load = useCallback(() => {
-    fetch("/api/appointments/me")
-      .then((r) => (r.ok ? r.json() : []))
-      .then((d: Appointment[]) => {
-        setAppointments(d);
-        setLoading(false);
-        const total = d.reduce((sum, a) => sum + a.unreadMessageCount, 0);
-        if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
-        unreadTotalRef.current = total;
-      })
-      .catch(() => setLoading(false));
-  }, []);
+  // After a change: fetch now rather than wait for the next poll.
+  const { refresh: refreshFeed } = feed;
+  const { refresh: refreshHistory } = history;
+  const load = useCallback(async () => {
+    await Promise.all([refreshFeed(), refreshHistory()]);
+  }, [refreshFeed, refreshHistory]);
 
-  // The 5s poll below keeps this fresh while the tab/app stays open, but
-  // mobile WebViews commonly suspend timers while backgrounded — force an
-  // immediate refetch on resume/reconnect instead of waiting for the next tick.
-  useResync(load);
+  // Chime when a new chat message arrives (the live/recent feed covers the
+  // chat follow-up window, so it has every chat that can still get one).
+  useEffect(() => {
+    if (!feed.items) return;
+    const total = feed.items.reduce((sum, a) => sum + a.unreadMessageCount, 0);
+    if (unreadTotalRef.current !== null && total > unreadTotalRef.current) playMessageChime();
+    unreadTotalRef.current = total;
+  }, [feed.items]);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/patient/appointments");
     if (!authLoading && user && user.role !== "PATIENT") router.push("/login");
   }, [authLoading, user, router]);
-
-  // Poll so status changes (e.g. the doctor accepting a request) show up
-  // without the patient needing to refresh the page.
-  useEffect(() => {
-    if (user?.role !== "PATIENT") return;
-    load();
-    const interval = setInterval(load, 5000);
-    return () => clearInterval(interval);
-  }, [user, load]);
 
   // Ticks the pending-request countdown independently of the 5s data poll.
   useEffect(() => {
@@ -701,6 +695,9 @@ export default function PatientAppointments() {
   const past = appointments
     .filter((a) => !["PENDING_APPROVAL", "SCHEDULED"].includes(a.status))
     .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
+  // Past visits are paged, so the heading shows the server's total.
+  const pastTotal = Math.max(past.length, Object.values(history.counts).reduce((sum, n) => sum + n, 0));
+  const pastShown = pastExpanded ? past.length : Math.min(past.length, PAGE_SIZE);
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -764,7 +761,7 @@ export default function PatientAppointments() {
             </section>
 
             <section>
-              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Past ({past.length})</h2>
+              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Past ({pastTotal})</h2>
               {past.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-sm">
                   No past appointments yet.
@@ -776,9 +773,13 @@ export default function PatientAppointments() {
                   ))}
                 </div>
               )}
-              {!pastExpanded && past.length > PAGE_SIZE && (
-                <button onClick={() => setPastExpanded(true)} className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors">
-                  Load {past.length - PAGE_SIZE} more
+              {((!pastExpanded && past.length > PAGE_SIZE) || history.hasMore) && (
+                <button
+                  onClick={() => { if (!pastExpanded) setPastExpanded(true); else void history.loadMore(); }}
+                  disabled={history.loadingMore}
+                  className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+                >
+                  {history.loadingMore ? "Loading…" : `Load ${pastTotal - pastShown} more`}
                 </button>
               )}
             </section>

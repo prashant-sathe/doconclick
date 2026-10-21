@@ -9,20 +9,28 @@ import { isDoctorBookable } from "@/lib/doctorBookable";
 import { visitLocation } from "@/lib/visitAddress";
 import { hasCareAccess } from "@/lib/careAccess";
 import { GATEWAY_OMIT, withLiveLocationOnlyWhileLive } from "@/lib/appointmentView";
+import { parseFeedView, feedWhere, feedPaging, feedResponse, badCursor } from "@/lib/appointmentFeed";
 
-// GET: The logged-in user's own appointments (as patient or as doctor)
-export async function GET() {
+// GET: The logged-in user's own appointments (as patient or as doctor).
+// ?view=active (polling) / ?view=history (paged) — see src/lib/appointmentFeed.ts.
+export async function GET(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const parsed = await parseFeedView(req.url);
+  if ("response" in parsed) return parsed.response;
+  const { view } = parsed;
 
   await expireStalePendingRequests();
 
   if (authUser.role === "PATIENT") {
+    const owner = { patientId: authUser.id };
+    const bad = await badCursor(owner, view);
+    if (bad) return bad;
     const appointments = await prisma.appointment.findMany({
-      where: { patientId: authUser.id },
-      orderBy: { scheduledAt: "desc" },
+      where: feedWhere(owner, view),
+      ...feedPaging(view, [{ scheduledAt: "desc" }]),
       // No gateway ids or internal accounting; the visit code is the patient's own.
       omit: { ...GATEWAY_OMIT, settlementId: true, visitOtpAttempts: true, couponId: true },
       include: {
@@ -58,7 +66,7 @@ export async function GET() {
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });
-    return NextResponse.json(
+    return feedResponse(owner, view,
       appointments.map(({ _count, doctor: { role, deletedAt, doctorProfile, ...doctor }, ...a }) => ({
         // The provider's position only while they're on the way (not after the visit).
         ...withLiveLocationOnlyWhileLive(a),
@@ -83,12 +91,15 @@ export async function GET() {
   if (authUser.role === "DOCTOR" || authUser.role === "STAFF") {
     const scope = await resolveDoctorScope(authUser);
     if (scope.denied) return scope.denied;
+    const owner = { doctorId: scope.doctorId };
+    const bad = await badCursor(owner, view);
+    if (bad) return bad;
 
     const appointments = await prisma.appointment.findMany({
-      where: { doctorId: scope.doctorId },
+      where: feedWhere(owner, view),
       // By visit time, soonest first — the queue order. (History lists on the
       // dashboard re-sort newest-first themselves.)
-      orderBy: [{ scheduledAt: "asc" }, { createdAt: "asc" }],
+      ...feedPaging(view, [{ scheduledAt: "asc" }, { createdAt: "asc" }]),
       // The door code is the patient's; gateway ids are the admin's.
       omit: { ...GATEWAY_OMIT, visitOtp: true },
       include: {
@@ -109,9 +120,16 @@ export async function GET() {
     // for people the doctor currently has care access to (accepted visit, or
     // completed within the window — src/lib/careAccess.ts), never for a
     // pending, declined or long-past booking.
+    // Judged on every visit with the person, not just this page/view of them.
     const person = (a: { patientId: string; dependentId: string | null }) => `${a.patientId}|${a.dependentId ?? ""}`;
-    const visitsByPerson = new Map<string, typeof appointments>();
-    for (const a of appointments) visitsByPerson.set(person(a), [...(visitsByPerson.get(person(a)) ?? []), a]);
+    const allVisits = appointments.length
+      ? await prisma.appointment.findMany({
+          where: { doctorId: scope.doctorId, patientId: { in: [...new Set(appointments.map((a) => a.patientId))] } },
+          select: { patientId: true, dependentId: true, status: true, scheduledAt: true },
+        })
+      : [];
+    const visitsByPerson = new Map<string, typeof allVisits>();
+    for (const a of allVisits) visitsByPerson.set(person(a), [...(visitsByPerson.get(person(a)) ?? []), a]);
     const withAccess = new Set([...visitsByPerson].filter(([, visits]) => hasCareAccess(visits)).map(([key]) => key));
     const active = appointments.filter((a) => withAccess.has(person(a)));
     const recentVitals = active.length
@@ -132,7 +150,7 @@ export async function GET() {
     const countFor = (patientId: string, dependentId: string | null) =>
       recentVitals.filter((v) => v.patientId === patientId && v.dependentId === dependentId).length;
 
-    return NextResponse.json(
+    return feedResponse(owner, view,
       appointments.map(({ _count, ...a }) => ({
         ...a,
         amount: safeNum(a.amount),
@@ -150,9 +168,12 @@ export async function GET() {
     const scope = await resolveProviderScope(authUser);
     if (scope.denied) return scope.denied;
 
+    const owner = { doctorId: authUser.id };
+    const bad = await badCursor(owner, view);
+    if (bad) return bad;
     const appointments = await prisma.appointment.findMany({
-      where: { doctorId: authUser.id },
-      orderBy: [{ createdAt: "desc" }],
+      where: feedWhere(owner, view),
+      ...feedPaging(view, [{ createdAt: "desc" }]),
       // The door code is the patient's to share — never the nurse's to read.
       omit: { ...GATEWAY_OMIT, visitOtp: true },
       include: {
@@ -184,7 +205,7 @@ export async function GET() {
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });
-    return NextResponse.json(
+    return feedResponse(owner, view,
       appointments.map(({ _count, ...a }) => ({
         ...a,
         amount: safeNum(a.amount),

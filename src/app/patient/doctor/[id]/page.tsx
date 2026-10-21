@@ -122,23 +122,26 @@ export default function DoctorProfilePage() {
       .catch(() => setUserPos(null));
   }, []);
 
+  // Keyed on the id/role, not the `user` object (AuthProvider re-polls every 30s with a fresh one).
+  const userId = user?.id;
+  const userRole = user?.role;
   useEffect(() => {
-    if (user?.role !== "PATIENT") return;
+    if (!userId || userRole !== "PATIENT") return;
     fetch("/api/patients/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => setSearchRadiusKm(d?.patientProfile?.searchRadiusKm ?? null))
       .catch(() => {});
-  }, [user]);
+  }, [userId, userRole]);
 
   useEffect(() => {
-    if (user?.role !== "PATIENT") return;
+    if (!userId || userRole !== "PATIENT") return;
     fetch("/api/patients/me/saved-doctors")
       .then((r) => (r.ok ? r.json() : { saved: [] }))
       .then((d: { saved?: { doctor: { id: string } }[] } | { doctor: { id: string } }[]) => {
         const list = Array.isArray(d) ? d : d.saved ?? [];
         setSaved(list.some((s) => s.doctor.id === id));
       });
-  }, [user, id]);
+  }, [userId, userRole, id]);
 
   const toggleSave = async () => {
     setSavingBookmark(true);

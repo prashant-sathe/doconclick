@@ -475,6 +475,10 @@ model Appointment {
   walletTransaction WalletTransaction?
   paymentOrderItems PaymentOrderItem[]
   couponRedemption  CouponRedemption?
+
+  // /api/appointments/me pages and polls by owner + visit time (src/lib/appointmentFeed.ts).
+  @@index([patientId, scheduledAt])
+  @@index([doctorId, scheduledAt])
 }
 
 model Wallet {
