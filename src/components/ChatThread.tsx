@@ -57,11 +57,14 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [chat, setChat] = useState<ChatStatus | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  // `loadError`: the chat couldn't be loaded at all (nothing to show yet).
+  // `notice`: an inline problem under the thread — a failed send/upload/
+  // download or a failed refresh — that never hides the messages.
+  const [loadError, setLoadError] = useState("");
+  const [notice, setNotice] = useState("");
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState("");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [pendingPreviewUrl, setPendingPreviewUrl] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -69,61 +72,111 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messageCountRef = useRef(0);
+  // Has a load ever succeeded? After that, a failed refresh is only a notice.
+  const loadedRef = useRef(false);
+  // Only the latest load may update state (a slow poll mustn't undo a send's refresh).
+  const seqRef = useRef(0);
+  // The newest message from the other person that's been marked read — the
+  // read PATCH goes out only when a newer one arrives, not on every poll.
+  const lastMarkedRef = useRef<string | null>(null);
+  const latestIncomingRef = useRef<string | null>(null);
+
+  const markReadIfNew = useCallback(() => {
+    const newest = latestIncomingRef.current;
+    // Not while the screen is hidden: they haven't seen it yet.
+    if (!newest || newest === lastMarkedRef.current || document.visibilityState === "hidden") return;
+    lastMarkedRef.current = newest;
+    fetch(`/api/appointments/${appointmentId}/messages/read`, { method: "PATCH" })
+      .then((r) => { if (!r.ok && lastMarkedRef.current === newest) lastMarkedRef.current = null; })
+      .catch(() => { if (lastMarkedRef.current === newest) lastMarkedRef.current = null; }); // retried on the next poll
+  }, [appointmentId]);
 
   const load = useCallback(async () => {
-    const res = await fetch(`/api/appointments/${appointmentId}/messages`);
-    if (!res.ok) {
-      setError((await res.json().catch(() => ({}))).error ?? "Could not load chat.");
-      setLoading(false);
-      return;
+    const mine = ++seqRef.current;
+    try {
+      const res = await fetch(`/api/appointments/${appointmentId}/messages`);
+      if (seqRef.current !== mine) return;
+      if (!res.ok) {
+        const msg = (await res.json().catch(() => ({}))).error ?? "Could not load chat.";
+        if (loadedRef.current) setNotice("Couldn't refresh the chat — retrying…");
+        else setLoadError(msg);
+        return;
+      }
+      const body = await res.json();
+      if (seqRef.current !== mine) return;
+      const data: ChatMessage[] = body.messages ?? [];
+      loadedRef.current = true;
+      setMessages(data);
+      setChat(body.chat ?? null);
+      setLoadError("");
+      setNotice((n) => (n === "Couldn't refresh the chat — retrying…" ? "" : n));
+      if (data.length !== messageCountRef.current) {
+        messageCountRef.current = data.length;
+        requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }));
+      }
+      latestIncomingRef.current = [...data].reverse().find((m) => m.sender.id !== meId)?.id ?? null;
+      markReadIfNew();
+    } catch {
+      if (seqRef.current !== mine) return;
+      if (loadedRef.current) setNotice("Couldn't refresh the chat — retrying…");
+      else setLoadError("Network error — check your connection.");
+    } finally {
+      if (seqRef.current === mine) setLoading(false);
     }
-    const body = await res.json();
-    const data: ChatMessage[] = body.messages ?? [];
-    setMessages(data);
-    setChat(body.chat ?? null);
-    setLoading(false);
-    if (data.length !== messageCountRef.current) {
-      messageCountRef.current = data.length;
-      requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }));
-    }
-    if (data.some((m) => m.sender.id !== meId)) {
-      fetch(`/api/appointments/${appointmentId}/messages/read`, { method: "PATCH" });
-    }
-  }, [appointmentId, meId]);
+  }, [appointmentId, meId, markReadIfNew]);
 
   useEffect(() => {
+    // Fetching on mount: load() only sets state after its first await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
-    const interval = setInterval(load, POLL_MS);
-    return () => clearInterval(interval);
+    // Skipped while hidden; the visibility listener below catches up on return.
+    const interval = setInterval(() => { if (document.visibilityState !== "hidden") load(); }, POLL_MS);
+    const onVisible = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [load]);
 
+  // The text stays in the box until the server has it — a failed send
+  // (offline, server error, chat just closed) never loses what was typed.
   const send = async () => {
     const trimmed = text.trim();
     if (!trimmed || sending) return;
     setSending(true);
-    setText("");
-    const res = await fetch(`/api/appointments/${appointmentId}/messages`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: trimmed }),
-    });
-    setSending(false);
-    if (res.ok) { load(); return; }
-    const failure = await res.json().catch(() => ({}));
-    // The chat just closed (e.g. the follow-up window ran out) — refresh so
-    // the read-only notice replaces the composer; keep the history visible.
-    if (failure.code === "CHAT_CLOSED") { setText(trimmed); load(); return; }
-    setText(trimmed);
-    setUploadError(failure.error ?? "Could not send message.");
+    setNotice("");
+    try {
+      const res = await fetch(`/api/appointments/${appointmentId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: trimmed }),
+      });
+      if (res.ok) {
+        // Only clear what was sent — they may have kept typing meanwhile.
+        setText((cur) => (cur.trim() === trimmed ? "" : cur));
+        load();
+        return;
+      }
+      const failure = await res.json().catch(() => ({}));
+      setNotice(failure.error ?? "Could not send message.");
+      // The chat just closed (e.g. the follow-up window ran out) — refresh so
+      // the read-only notice replaces the composer; keep the history visible.
+      if (failure.code === "CHAT_CLOSED") load();
+    } catch {
+      setNotice("Message not sent — check your connection and try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   const attachFile = async (file: File) => {
     if (file.size > MAX_ATTACHMENT_BYTES) {
-      setUploadError("File must be under 5MB.");
+      setNotice("File must be under 5MB.");
       return;
     }
     setUploading(true);
-    setUploadError("");
+    setNotice("");
     try {
       // A File straight from <input type="file"> is backed by a content:// URI
       // on Android; the WebView often can't stream those bytes into a fetch()
@@ -145,7 +198,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
         body: form,
       });
       if (!uploadRes.ok) {
-        setUploadError((await uploadRes.json().catch(() => ({}))).error ?? "Could not upload file.");
+        setNotice((await uploadRes.json().catch(() => ({}))).error ?? "Could not upload file.");
         return;
       }
       const { url, fileName, fileType } = await uploadRes.json();
@@ -158,10 +211,10 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       else {
         const failure = await sendRes.json().catch(() => ({}));
         if (failure.code === "CHAT_CLOSED") load();
-        setUploadError(failure.error ?? "Could not send file.");
+        setNotice(failure.error ?? "Could not send file.");
       }
     } catch {
-      setUploadError("Could not upload that file. Please try again.");
+      setNotice("Could not upload that file. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -175,7 +228,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
     if (downloadingId) return;
     setDownloadingId(m.id);
     downloadOrShareUrl(downloadUrl(m.fileUrl, m.fileName, "attachment"), m.fileName ?? "attachment")
-      .catch(() => setError("Could not download that attachment."))
+      .catch(() => setNotice("Could not download that attachment."))
       .finally(() => setDownloadingId(null));
   };
 
@@ -190,8 +243,11 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
           <div className="flex items-center justify-center h-full">
             <Loader2 className="w-6 h-6 animate-spin text-slate-300" />
           </div>
-        ) : error ? (
-          <div className="flex items-center justify-center h-full text-sm text-slate-400 text-center px-6">{error}</div>
+        ) : loadError && messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full gap-3 text-sm text-slate-400 text-center px-6">
+            {loadError}
+            <button onClick={() => { setLoading(true); load(); }} className="btn-secondary py-1.5 px-3 text-xs">Retry</button>
+          </div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-sm text-slate-400 text-center px-6">
             {chat && !chat.canSend ? "No messages in this chat." : "No messages yet. Say hello!"}
@@ -250,8 +306,13 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
         <div ref={bottomRef} />
       </div>
 
-      {uploadError && (
-        <div className="px-3 pt-2 text-xs text-red-500 bg-white border-t border-slate-100">{uploadError}</div>
+      {notice && (
+        <div role="alert" className="px-3 py-2 text-xs text-red-600 bg-red-50 border-t border-red-100 flex items-center justify-between gap-2">
+          <span>{notice}</span>
+          <button onClick={() => setNotice("")} aria-label="Dismiss" className="text-red-400 hover:text-red-600 flex-shrink-0">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
       )}
       {chat && !chat.canSend ? (
         <div className="border-t border-slate-100 bg-slate-50 px-4 py-3 flex items-start gap-2 text-xs text-slate-500">

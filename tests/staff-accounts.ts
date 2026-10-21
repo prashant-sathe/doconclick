@@ -46,7 +46,7 @@ async function main() {
   const patient = await mk({ name: "Staff Patient", role: "PATIENT", patientProfile: { create: { age: 30, gender: "Male" } } });
   const nurse = await mk({ name: "Staff Nurse", role: "NURSE", nurseProfile: { create: { status: "APPROVED" } } });
   const createStaff = (by: U, mobile: string, name = "Front Desk") => call(by, "POST", "/api/doctor/staff", { name, mobile, password: "secret123" });
-  const track = (r: { json: J }) => { if (typeof r.json.userId === "string") ids.push(r.json.userId); return r; };
+  const track = <T extends { json: J }>(r: T): T => { if (typeof r.json.userId === "string") ids.push(r.json.userId); return r; };
 
   try {
     // ── Creating ──

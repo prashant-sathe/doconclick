@@ -10,6 +10,7 @@
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
+import { istDayKey, istStartOfDay, addDaysYmd } from "../src/lib/istDate";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
@@ -78,7 +79,10 @@ async function main() {
   const doctor = await mk("DOCTOR", { doctorProfile: docProfile() });
 
   let minute = 0;
-  const later = () => new Date(Date.now() + 2 * DAY + ++minute * 60 * 60_000).toISOString();
+  // From 10:00 IST two days ahead, an hour apart — "now + 2 days + n hours"
+  // ran past the nurse's 11:59 PM end when the suite ran late in the evening.
+  const base = istStartOfDay(addDaysYmd(istDayKey(new Date()), 2)).getTime() + 10 * 60 * 60_000;
+  const later = () => new Date(base + ++minute * 60 * 60_000).toISOString();
   const nurseBook = (as = patient, extra: Record<string, unknown> = {}) =>
     call(as, "POST", "/api/nurse-bookings", { nurseId: nurse.id, serviceId: service.id, consentGiven: true, scheduledAt: later(), ...extra });
   const visitB = { address: "Flat 5, New Tower, Baner, Pune", landmark: "Opp. Park", pinCode: "411045", ...NEAR };
