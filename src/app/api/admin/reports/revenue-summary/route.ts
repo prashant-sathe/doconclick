@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { money, sumMoney } from "@/lib/money";
 import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
 import { paidInRange, effectivePaidAt } from "@/lib/paidAt";
 import { istDayKey } from "@/lib/istDate";
@@ -41,12 +42,14 @@ export async function GET(req: Request) {
     }),
   ]);
 
-  const sum = (rows: { amount: number }[]) => rows.reduce((s, r) => s + safeNum(r.amount), 0);
-  const grossConsultRevenue = appointments.reduce((s, a) => s + safeNum(a.amount), 0);
-  const commissionBeforeCoupons = appointments.reduce((s, a) => s + safeNum(a.platformFee), 0);
-  const couponDiscounts = appointments.reduce((s, a) => s + safeNum(a.discountAmount), 0);
-  const platformCommission = commissionBeforeCoupons - couponDiscounts;
-  const doctorNetPayout = grossConsultRevenue - commissionBeforeCoupons;
+  // Summed in paise and rounded (src/lib/money.ts); derived figures come from
+  // the rounded parts, so the summary always adds up.
+  const sum = (rows: { amount: number }[]) => sumMoney(rows.map((r) => r.amount));
+  const grossConsultRevenue = sumMoney(appointments.map((a) => a.amount));
+  const commissionBeforeCoupons = sumMoney(appointments.map((a) => a.platformFee));
+  const couponDiscounts = sumMoney(appointments.map((a) => a.discountAmount));
+  const platformCommission = sumMoney([commissionBeforeCoupons, -couponDiscounts]);
+  const doctorNetPayout = sumMoney([grossConsultRevenue, -commissionBeforeCoupons]);
   const registrationRevenue = sum(doctorLogs.filter((l) => l.type === "REGISTRATION"));
   const subscriptionRevenue = sum(doctorLogs.filter((l) => l.type === "SUBSCRIPTION"));
   const nurseRegistrationRevenue = sum(nurseLogs.filter((l) => l.type === "REGISTRATION"));
@@ -75,7 +78,17 @@ export async function GET(req: Request) {
   }
   for (const l of nurseLogs) entry(istDayKey(l.createdAt)).nurseRevenue += safeNum(l.amount);
 
-  const rows = [...byDay.values()].sort((a, b) => b.date.localeCompare(a.date));
+  const rows = [...byDay.values()]
+    .map((d) => ({
+      date: d.date,
+      consultRevenue: money(d.consultRevenue),
+      couponDiscounts: money(d.couponDiscounts),
+      platformCommission: money(d.platformCommission),
+      registrationRevenue: money(d.registrationRevenue),
+      subscriptionRevenue: money(d.subscriptionRevenue),
+      nurseRevenue: money(d.nurseRevenue),
+    }))
+    .sort((a, b) => b.date.localeCompare(a.date));
 
   return NextResponse.json({
     summary: {
@@ -89,7 +102,7 @@ export async function GET(req: Request) {
       nurseRegistrationRevenue,
       nurseSubscriptionRevenue,
       totalPlatformEarnings:
-        platformCommission + registrationRevenue + subscriptionRevenue + nurseRegistrationRevenue + nurseSubscriptionRevenue,
+        sumMoney([platformCommission, registrationRevenue, subscriptionRevenue, nurseRegistrationRevenue, nurseSubscriptionRevenue]),
     },
     rows,
   });

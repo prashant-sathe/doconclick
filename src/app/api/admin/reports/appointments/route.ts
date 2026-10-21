@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
+import { money, sumMoney } from "@/lib/money";
+import { requireAdmin, parseDateRange } from "@/lib/adminAuth";
 
 // GET: full bookings register with filters — for export/audit.
 export async function GET(req: Request) {
@@ -38,15 +39,15 @@ export async function GET(req: Request) {
     status: a.status,
     paymentMethod: a.paymentMethod,
     paymentStatus: a.paymentStatus,
-    amount: safeNum(a.amount),
-    platformFee: safeNum(a.platformFee),
+    amount: money(a.amount),
+    platformFee: money(a.platformFee),
     scheduledAt: a.scheduledAt,
     createdAt: a.createdAt,
     paidAt: a.paidAt,
   }));
 
   return NextResponse.json({
-    summary: { totalBookings: rows.length, totalAmount: rows.reduce((s, r) => s + r.amount, 0) },
+    summary: { totalBookings: rows.length, totalAmount: sumMoney(rows.map((r) => r.amount)) },
     rows,
   });
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { money, sumMoney } from "@/lib/money";
 import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
 import { paidInRange } from "@/lib/paidAt";
 
@@ -38,21 +39,25 @@ export async function GET(req: Request) {
   }
 
   const rows = [...byType.entries()]
-    .map(([consultType, e]) => ({
-      consultType,
-      bookingCount: e.bookingCount,
-      grossRevenue: e.grossRevenue,
-      commissionBeforeCoupons: e.commissionBeforeCoupons,
-      couponDiscounts: e.couponDiscounts,
-      platformCommission: e.commissionBeforeCoupons - e.couponDiscounts,
-      doctorNetPayout: e.grossRevenue - e.commissionBeforeCoupons,
-    }))
+    .map(([consultType, e]) => {
+      // Rounded to paise; derived columns from the rounded parts (src/lib/money.ts).
+      const grossRevenue = money(e.grossRevenue), commissionBeforeCoupons = money(e.commissionBeforeCoupons), couponDiscounts = money(e.couponDiscounts);
+      return {
+        consultType,
+        bookingCount: e.bookingCount,
+        grossRevenue,
+        commissionBeforeCoupons,
+        couponDiscounts,
+        platformCommission: sumMoney([commissionBeforeCoupons, -couponDiscounts]),
+        doctorNetPayout: sumMoney([grossRevenue, -commissionBeforeCoupons]),
+      };
+    })
     .sort((a, b) => b.grossRevenue - a.grossRevenue);
 
   return NextResponse.json({
     summary: {
       totalBookings: rows.reduce((s, r) => s + r.bookingCount, 0),
-      totalRevenue: rows.reduce((s, r) => s + r.grossRevenue, 0),
+      totalRevenue: sumMoney(rows.map((r) => r.grossRevenue)),
     },
     rows,
   });

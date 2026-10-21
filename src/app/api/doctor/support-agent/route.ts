@@ -3,7 +3,8 @@ import type OpenAI from "openai";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { getOpenAIClient, ASSISTANT_MODEL } from "@/lib/openai";
-import { safeNum } from "@/lib/adminAuth";
+import { money, sumMoney } from "@/lib/money";
+import { duesFromGroups, UNSETTLED_WHERE } from "@/lib/payouts";
 import { computeDoctorCompleteness } from "@/lib/doctorProfileCompleteness";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 
@@ -164,7 +165,6 @@ async function getAppointmentOverview(doctorId: string) {
   };
 }
 
-const UNSETTLED_WHERE = { status: "COMPLETED", paymentStatus: "PAID", settlementId: null } as const;
 
 async function getEarningsSummary(doctorId: string) {
   const [unsettledGrouped, lifetime, recentSettlements] = await Promise.all([
@@ -183,36 +183,22 @@ async function getEarningsSummary(doctorId: string) {
   ]);
   const lastSettlement = recentSettlements[0] ?? null;
 
-  let cashCount = 0;
-  let onlineCount = 0;
-  let cashFeeOwed = 0;
-  let onlinePayoutOwed = 0;
-  for (const g of unsettledGrouped) {
-    if (g.paymentMethod === "CASH") {
-      cashCount = g._count;
-      cashFeeOwed = safeNum(g._sum.platformFee);
-    } else if (g.paymentMethod === "ONLINE") {
-      onlineCount = g._count;
-      onlinePayoutOwed = safeNum(g._sum.amount) - safeNum(g._sum.platformFee);
-    }
-  }
-
-  const grossEarnings = safeNum(lifetime._sum.amount);
-  const platformFeePaid = safeNum(lifetime._sum.platformFee);
+  const grossEarnings = money(lifetime._sum.amount);
+  const platformFeePaid = money(lifetime._sum.platformFee);
 
   return {
-    unsettled: { cashCount, onlineCount, cashFeeOwed, onlinePayoutOwed, netAmount: onlinePayoutOwed - cashFeeOwed },
-    lifetime: { completedCount: lifetime._count, grossEarnings, platformFeePaid, netEarnings: grossEarnings - platformFeePaid },
+    unsettled: duesFromGroups(unsettledGrouped),
+    lifetime: { completedCount: lifetime._count, grossEarnings, platformFeePaid, netEarnings: sumMoney([grossEarnings, -platformFeePaid]) },
     lastSettlement: lastSettlement
       ? {
-          netAmount: lastSettlement.netAmount,
+          netAmount: money(lastSettlement.netAmount),
           cashCount: lastSettlement.cashCount,
           onlineCount: lastSettlement.onlineCount,
           createdAt: lastSettlement.createdAt,
         }
       : null,
     settlementHistory: recentSettlements.map((s) => ({
-      netAmount: s.netAmount,
+      netAmount: money(s.netAmount),
       cashCount: s.cashCount,
       onlineCount: s.onlineCount,
       createdAt: s.createdAt,

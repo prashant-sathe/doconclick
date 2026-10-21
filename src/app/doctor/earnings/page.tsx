@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
+import { sumMoney } from "@/lib/money";
 import { istDayKey, istMonthKey, shiftMonthKey, addDaysYmd, mondayIndex, weekdayShortLabel } from "@/lib/istDate";
 
 interface Appointment {
@@ -45,12 +46,24 @@ interface PayoutRequestRecord {
   createdAt: string;
 }
 
+// What's owed right now (src/lib/payouts.ts): online payouts net of the
+// platform fee on cash visits — the amount a payout request asks for.
+interface Dues {
+  cashCount: number;
+  onlineCount: number;
+  cashFeeOwed: number;
+  onlinePayoutOwed: number;
+  netAmount: number;
+}
+
 export default function DoctorEarnings() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [settlements, setSettlements] = useState<SettlementRecord[]>([]);
   const [payoutRequests, setPayoutRequests] = useState<PayoutRequestRecord[]>([]);
+  const [dues, setDues] = useState<Dues | null>(null);
+  const [bankOnFile, setBankOnFile] = useState(true);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(10);
   const [requestingPayout, setRequestingPayout] = useState(false);
@@ -71,11 +84,13 @@ export default function DoctorEarnings() {
         return Promise.all([
           fetch("/api/appointments/me").then((r) => (r.ok ? r.json() : [])),
           fetch("/api/doctor/settlements").then((r) => (r.ok ? r.json() : [])),
-          fetch("/api/doctor/payout-requests").then((r) => (r.ok ? r.json() : [])),
-        ]).then(([appts, settled, requests]) => {
+          fetch("/api/doctor/payout-requests").then((r) => (r.ok ? r.json() : null)),
+        ]).then(([appts, settled, payouts]) => {
           setAppointments(appts);
           setSettlements(settled);
-          setPayoutRequests(requests);
+          setPayoutRequests(payouts?.requests ?? []);
+          setDues(payouts?.dues ?? null);
+          setBankOnFile(payouts?.bankDetailsOnFile ?? true);
           setLoading(false);
         });
       })
@@ -89,7 +104,9 @@ export default function DoctorEarnings() {
   }
 
   const completed = appointments.filter((a) => a.status === "COMPLETED" && a.paymentStatus === "PAID");
-  const net = (a: Appointment) => a.amount - a.platformFee;
+  // Summed in paise so ₹ figures don't drift (src/lib/money.ts).
+  const net = (a: Appointment) => sumMoney([a.amount, -a.platformFee]);
+  const total = (rows: Appointment[]) => sumMoney(rows.map(net));
 
   // Months, weeks and days are IST calendar days (src/lib/istDate.ts), not the device's.
   const now = new Date();
@@ -98,12 +115,10 @@ export default function DoctorEarnings() {
   const thisMonth = completed.filter((a) => istMonthKey(a.scheduledAt) === thisMonthKey);
   const lastMonth = completed.filter((a) => istMonthKey(a.scheduledAt) === lastMonthKey);
 
-  const totalEarnings = completed.reduce((sum, a) => sum + net(a), 0);
-  const thisMonthEarnings = thisMonth.reduce((sum, a) => sum + net(a), 0);
-  const lastMonthEarnings = lastMonth.reduce((sum, a) => sum + net(a), 0);
-  const unsettled = completed.filter((a) => !a.settlementId);
-  const onlinePending = unsettled.filter((a) => a.paymentMethod === "ONLINE").reduce((sum, a) => sum + net(a), 0);
-  const platformFeeDue = unsettled.filter((a) => a.paymentMethod === "CASH").reduce((sum, a) => sum + a.platformFee, 0);
+  const totalEarnings = total(completed);
+  const thisMonthEarnings = total(thisMonth);
+  const lastMonthEarnings = total(lastMonth);
+  const netPayout = dues?.netAmount ?? 0;
   const openPayoutRequest = payoutRequests.find((r) => r.status === "PENDING") ?? null;
 
   const requestPayout = async () => {
@@ -115,7 +130,10 @@ export default function DoctorEarnings() {
       const created: PayoutRequestRecord = await res.json();
       setPayoutRequests((cur) => [created, ...cur]);
     } else {
-      setPayoutError((await res.json().catch(() => ({}))).error ?? "Could not send the payout request.");
+      const body = await res.json().catch(() => ({}));
+      if (body.code === "BANK_DETAILS_REQUIRED") setBankOnFile(false);
+      if (body.dues) setDues(body.dues);
+      setPayoutError(body.error ?? "Could not send the payout request.");
     }
   };
 
@@ -124,9 +142,7 @@ export default function DoctorEarnings() {
   const weekStartKey = addDaysYmd(todayKey, -mondayIndex(todayKey)); // Monday as start
   const days = [...Array(7)].map((_, i) => {
     const dayKey = addDaysYmd(weekStartKey, i);
-    const dayEarnings = completed
-      .filter((a) => istDayKey(a.scheduledAt) === dayKey)
-      .reduce((sum, a) => sum + net(a), 0);
+    const dayEarnings = total(completed.filter((a) => istDayKey(a.scheduledAt) === dayKey));
     return { label: weekdayShortLabel(dayKey), value: dayEarnings };
   });
   const maxDay = Math.max(1, ...days.map((d) => d.value));
@@ -171,9 +187,9 @@ export default function DoctorEarnings() {
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wide text-white/65 flex items-center gap-1">
-                <CreditCard className="w-3 h-3" /> Payout Pending
+                <CreditCard className="w-3 h-3" /> {netPayout < 0 ? "You Owe" : "Net Payout"}
               </p>
-              <p className="text-[16px] font-extrabold mt-0.5">₹{onlinePending.toLocaleString("en-IN")}</p>
+              <p className="text-[16px] font-extrabold mt-0.5">₹{Math.abs(netPayout).toLocaleString("en-IN")}</p>
             </div>
           </div>
         </div>
@@ -189,23 +205,40 @@ export default function DoctorEarnings() {
               {new Date(openPayoutRequest.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} — awaiting admin review.
             </p>
           </div>
-        ) : onlinePending > 0 && (
-          <div className="flex items-center justify-between gap-3 bg-white border border-slate-100 rounded-2xl p-4 mb-6 shadow-sm">
-            <p className="text-sm text-slate-600">
-              ₹{onlinePending.toLocaleString("en-IN")} is waiting to be settled to you.
-            </p>
-            <button onClick={requestPayout} disabled={requestingPayout} className="btn-primary py-1.5 px-3 text-xs gap-1.5 flex-shrink-0">
-              {requestingPayout ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />} Request Payout
-            </button>
+        ) : netPayout > 0 && (
+          <div className="bg-white border border-slate-100 rounded-2xl p-4 mb-6 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm text-slate-600">
+                <span className="font-bold text-slate-800">₹{netPayout.toLocaleString("en-IN")}</span> is waiting to be settled to you.
+              </p>
+              {bankOnFile && (
+                <button onClick={requestPayout} disabled={requestingPayout} className="btn-primary py-1.5 px-3 text-xs gap-1.5 flex-shrink-0">
+                  {requestingPayout ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />} Request Payout
+                </button>
+              )}
+            </div>
+            {dues && dues.cashFeeOwed > 0 && (
+              <p className="text-xs text-slate-400 mt-1.5">
+                ₹{dues.onlinePayoutOwed.toLocaleString("en-IN")} from online consultations − ₹{dues.cashFeeOwed.toLocaleString("en-IN")} platform fee on cash consultations you collected.
+              </p>
+            )}
+            {!bankOnFile && (
+              <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 mt-3">
+                Add your bank details to request a payout.{" "}
+                <Link href="/doctor/profile/bank" className="font-bold underline">Add bank details →</Link>
+              </p>
+            )}
           </div>
         )}
         {payoutError && <p className="text-xs text-red-600 mb-6 -mt-4">{payoutError}</p>}
 
-        {platformFeeDue > 0 && (
+        {dues && netPayout <= 0 && dues.cashFeeOwed > 0 && (
           <div className="flex items-center gap-3 bg-red-50 border border-red-100 rounded-2xl p-4 mb-6">
             <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
             <p className="text-sm text-red-700">
-              <span className="font-bold">₹{platformFeeDue.toLocaleString("en-IN")} platform fee due</span> on cash consultations you&apos;ve collected. Admin will settle this with you.
+              <span className="font-bold">₹{dues.cashFeeOwed.toLocaleString("en-IN")} platform fee due</span> on cash consultations you&apos;ve collected
+              {dues.onlinePayoutOwed > 0 && <> — after your ₹{dues.onlinePayoutOwed.toLocaleString("en-IN")} of online earnings, you owe ₹{Math.abs(netPayout).toLocaleString("en-IN")}</>}
+              . Admin will settle this with you.
             </p>
           </div>
         )}

@@ -1,9 +1,11 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Loader2, Wallet, CheckCircle2, Clock, Send, History } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { NurseHeader, NurseMobileNav } from "@/components/nurse/NurseNav";
+import { money, sumMoney } from "@/lib/money";
 
 type Visit = {
   id: string; status: string; paymentStatus: string; paymentMethod: string; settlementId: string | null;
@@ -12,18 +14,23 @@ type Visit = {
 };
 type Settlement = { id: string; netAmount: number; onlineCount: number; createdAt: string; note: string | null };
 type PayoutRequest = { id: string; amount: number; status: string; createdAt: string };
+// What's owed right now (src/lib/payouts.ts): online payouts net of the
+// platform fee on any cash visits — the amount a payout request asks for.
+type Dues = { cashCount: number; onlineCount: number; cashFeeOwed: number; onlinePayoutOwed: number; netAmount: number };
 
-const inr = (n: number) => `₹${(Math.round(n * 100) / 100).toLocaleString("en-IN")}`;
+const inr = (n: number) => `₹${money(n).toLocaleString("en-IN")}`;
 
 // Same ledger rules as the doctor earnings page: completed + paid visits not
-// yet in a settlement are what the platform owes. Nurse visits are always
-// paid online, so there's no cash-commission side to net off.
+// yet in a settlement are what the platform owes, net of the commission on
+// any visit paid in cash.
 export default function NurseEarningsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [visits, setVisits] = useState<Visit[] | null>(null);
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [requests, setRequests] = useState<PayoutRequest[]>([]);
+  const [dues, setDues] = useState<Dues | null>(null);
+  const [bankOnFile, setBankOnFile] = useState(true);
   const [requesting, setRequesting] = useState(false);
   const [error, setError] = useState("");
 
@@ -35,15 +42,18 @@ export default function NurseEarningsPage() {
     const [a, s, r] = await Promise.all([
       fetch("/api/appointments/me").then((x) => (x.ok ? x.json() : [])),
       fetch("/api/doctor/settlements").then((x) => (x.ok ? x.json() : [])),
-      fetch("/api/doctor/payout-requests").then((x) => (x.ok ? x.json() : [])),
+      fetch("/api/doctor/payout-requests").then((x) => (x.ok ? x.json() : null)),
     ]);
-    setVisits(a); setSettlements(s); setRequests(r);
+    setVisits(a); setSettlements(s);
+    setRequests(r?.requests ?? []); setDues(r?.dues ?? null); setBankOnFile(r?.bankDetailsOnFile ?? true);
   }, []);
 
+  // On the role, not the `user` object — AuthProvider re-polls every 30s with a fresh one.
+  const isNurse = user?.role === "NURSE";
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (user?.role === "NURSE") load();
-  }, [user, load]);
+    if (isNurse) load();
+  }, [isNurse, load]);
 
   if (authLoading || !user || visits === null) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-rose-500" /></div>;
@@ -51,15 +61,20 @@ export default function NurseEarningsPage() {
 
   const completed = visits.filter((v) => v.status === "COMPLETED" && v.paymentStatus === "PAID");
   const unsettled = completed.filter((v) => !v.settlementId);
-  const pendingPayout = unsettled.reduce((sum, v) => sum + (v.amount - v.platformFee), 0);
-  const lifetime = completed.reduce((sum, v) => sum + (v.amount - v.platformFee), 0);
+  const pendingPayout = dues?.netAmount ?? 0;
+  const lifetime = sumMoney(completed.flatMap((v) => [v.amount, -v.platformFee]));
   const openRequest = requests.find((r) => r.status === "PENDING") ?? null;
 
   const requestPayout = async () => {
     setRequesting(true); setError("");
     const res = await fetch("/api/doctor/payout-requests", { method: "POST" });
     setRequesting(false);
-    if (!res.ok) { setError((await res.json().catch(() => ({}))).error ?? "Could not send the payout request."); return; }
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      if (body.code === "BANK_DETAILS_REQUIRED") setBankOnFile(false);
+      setError(body.error ?? "Could not send the payout request.");
+      return;
+    }
     load();
   };
 
@@ -73,9 +88,12 @@ export default function NurseEarningsPage() {
 
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-            <p className="text-xs font-semibold text-slate-500 flex items-center gap-1"><Wallet className="w-3.5 h-3.5" />Pending payout</p>
-            <p className="text-2xl font-extrabold text-slate-900 mt-1">{inr(pendingPayout)}</p>
-            <p className="text-[11px] text-slate-400">{unsettled.length} visit{unsettled.length === 1 ? "" : "s"}</p>
+            <p className="text-xs font-semibold text-slate-500 flex items-center gap-1"><Wallet className="w-3.5 h-3.5" />{pendingPayout < 0 ? "You owe" : "Net payout"}</p>
+            <p className="text-2xl font-extrabold text-slate-900 mt-1">{inr(Math.abs(pendingPayout))}</p>
+            <p className="text-[11px] text-slate-400">
+              {unsettled.length} visit{unsettled.length === 1 ? "" : "s"}
+              {dues && dues.cashFeeOwed > 0 && ` · ${inr(dues.onlinePayoutOwed)} online − ${inr(dues.cashFeeOwed)} fee on cash visits`}
+            </p>
           </div>
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
             <p className="text-xs font-semibold text-slate-500 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />Lifetime earnings</p>
@@ -88,6 +106,11 @@ export default function NurseEarningsPage() {
           {openRequest ? (
             <p className="text-sm text-amber-700 flex items-center gap-1.5"><Clock className="w-4 h-4" />
               Payout of {inr(openRequest.amount)} requested on {new Date(openRequest.createdAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })} — the admin will settle it soon.
+            </p>
+          ) : !bankOnFile && pendingPayout > 0 ? (
+            <p className="text-sm text-amber-700">
+              Add your bank details to request a payout.{" "}
+              <Link href="/nurse/profile#bank" className="font-bold underline">Add bank details →</Link>
             </p>
           ) : (
             <button onClick={requestPayout} disabled={requesting || pendingPayout <= 0} className="btn-primary w-full justify-center py-2.5 text-sm disabled:opacity-50">

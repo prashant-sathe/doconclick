@@ -58,7 +58,8 @@
     "test:api-trim": "tsx tests/api-trim.ts",
     "test:geocode": "tsx tests/geocode.ts",
     "test:appointments-feed": "tsx tests/appointments-feed.ts",
-    "test:csv": "tsx tests/csv.ts"
+    "test:csv": "tsx tests/csv.ts",
+    "test:payouts": "tsx tests/payouts.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

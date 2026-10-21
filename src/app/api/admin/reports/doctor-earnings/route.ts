@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { money, sumMoney } from "@/lib/money";
 import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
 import { paidInRange } from "@/lib/paidAt";
 
@@ -50,8 +51,9 @@ export async function GET(req: Request) {
   const rows = grouped
     .map((g) => {
       const d = byId.get(g.doctorId);
-      const grossEarnings = safeNum(g._sum.amount);
-      const platformFeePaid = safeNum(g._sum.platformFee);
+      // Rounded to paise; net from the rounded parts (src/lib/money.ts).
+      const grossEarnings = money(g._sum.amount);
+      const platformFeePaid = money(g._sum.platformFee);
       return {
         doctorId: g.doctorId,
         doctorName: d?.name ?? "Unknown",
@@ -63,7 +65,7 @@ export async function GET(req: Request) {
         completedBookings: g._count,
         grossEarnings,
         platformFeePaid,
-        netEarnings: grossEarnings - platformFeePaid,
+        netEarnings: sumMoney([grossEarnings, -platformFeePaid]),
       };
     })
     .sort((a, b) => b.grossEarnings - a.grossEarnings);
@@ -71,8 +73,8 @@ export async function GET(req: Request) {
   return NextResponse.json({
     summary: {
       activeDoctors: rows.length,
-      totalGrossEarnings: rows.reduce((s, r) => s + r.grossEarnings, 0),
-      totalNetToDoctor: rows.reduce((s, r) => s + r.netEarnings, 0),
+      totalGrossEarnings: sumMoney(rows.map((r) => r.grossEarnings)),
+      totalNetToDoctor: sumMoney(rows.map((r) => r.netEarnings)),
     },
     rows,
   });

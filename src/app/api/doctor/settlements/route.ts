@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { requireActiveProvider } from "@/lib/providerGuard";
+import { moneyFields } from "@/lib/money";
 
 // GET: the current doctor's own past settlements, newest first
 export async function GET() {
@@ -16,5 +17,6 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(settlements);
+  // Rounded to paise — older rows were stored from float sums.
+  return NextResponse.json(settlements.map((s) => moneyFields(s, ["cashFeeOwed", "onlinePayoutOwed", "netAmount"] as const)));
 }

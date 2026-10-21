@@ -60,9 +60,9 @@ const STATUS_CARD: Record<string, { icon: React.ElementType; tone: string; title
   SUSPENDED: { icon: Ban, tone: "bg-red-50 border-red-200 text-red-800", title: "Account suspended", body: "Contact support for assistance." },
 };
 
-function Section({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
+function Section({ title, icon: Icon, id, children }: { title: string; icon: React.ElementType; id?: string; children: React.ReactNode }) {
   return (
-    <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-4">
+    <section id={id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-4 scroll-mt-20">
       <h2 className="font-bold text-slate-900 flex items-center gap-2 mb-4"><Icon className="w-4 h-4 text-rose-500" />{title}</h2>
       {children}
     </section>
@@ -502,7 +502,8 @@ function NurseProfileContent() {
           <SaveRow {...locSaver} onSave={saveLocation} />
         </Section>
 
-        <Section title="Bank Details" icon={Landmark}>
+        {/* Linked from Earnings when a payout needs bank details (#bank). */}
+        <Section title="Bank Details" icon={Landmark} id="bank">
           <p className="text-xs text-slate-500 mb-3">Where DocOnClick sends your visit payouts.</p>
           <div className="space-y-4">
             <div>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { money, sumMoney } from "@/lib/money";
 import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
 
 // GET: Online vs Cash collection breakdown, plus the list of still-unpaid bookings.
@@ -41,14 +42,14 @@ export async function GET(req: Request) {
     e.total += safeNum(a.amount);
     byGroup.set(key, e);
   }
-  const breakdown = [...byGroup.values()];
+  const breakdown = [...byGroup.values()].map((b) => ({ ...b, total: money(b.total) }));
 
   const rows = unpaid.map((a) => ({
     appointmentId: a.id,
     patientName: a.patient.name,
     patientMobile: a.patient.mobile,
     doctorName: a.doctor.name,
-    amount: safeNum(a.amount),
+    amount: money(a.amount),
     paymentMethod: a.paymentMethod,
     status: a.status,
     scheduledAt: a.scheduledAt,
@@ -56,9 +57,9 @@ export async function GET(req: Request) {
 
   return NextResponse.json({
     summary: {
-      onlineCollected: breakdown.filter((b) => b.paymentMethod === "ONLINE" && b.paymentStatus === "PAID").reduce((s, b) => s + b.total, 0),
-      cashCollected: breakdown.filter((b) => b.paymentMethod === "CASH" && b.paymentStatus === "PAID").reduce((s, b) => s + b.total, 0),
-      unpaidAmount: rows.reduce((s, r) => s + r.amount, 0),
+      onlineCollected: sumMoney(breakdown.filter((b) => b.paymentMethod === "ONLINE" && b.paymentStatus === "PAID").map((b) => b.total)),
+      cashCollected: sumMoney(breakdown.filter((b) => b.paymentMethod === "CASH" && b.paymentStatus === "PAID").map((b) => b.total)),
+      unpaidAmount: sumMoney(rows.map((r) => r.amount)),
       unpaidCount: rows.length,
     },
     breakdown,

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { safeNum } from "@/lib/adminAuth";
+import { UNSETTLED_WHERE, duesFromGroups, duesFor } from "@/lib/payouts";
 import { Prisma } from "@/generated/prisma/client";
 
 async function requireAdmin() {
@@ -12,7 +12,7 @@ async function requireAdmin() {
   return null;
 }
 
-const PENDING_WHERE = { status: "COMPLETED", paymentStatus: "PAID", settlementId: null } as const;
+const PENDING_WHERE = UNSETTLED_WHERE;
 
 // GET: the settle queue — every doctor with at least one pending appointment
 export async function GET() {
@@ -26,18 +26,10 @@ export async function GET() {
     _count: true,
   });
 
-  const byDoctor = new Map<string, { cashCount: number; onlineCount: number; cashFeeOwed: number; onlinePayoutOwed: number }>();
-  for (const g of grouped) {
-    const entry = byDoctor.get(g.doctorId) ?? { cashCount: 0, onlineCount: 0, cashFeeOwed: 0, onlinePayoutOwed: 0 };
-    if (g.paymentMethod === "CASH") {
-      entry.cashCount = g._count;
-      entry.cashFeeOwed = safeNum(g._sum.platformFee);
-    } else if (g.paymentMethod === "ONLINE") {
-      entry.onlineCount = g._count;
-      entry.onlinePayoutOwed = safeNum(g._sum.amount) - safeNum(g._sum.platformFee);
-    }
-    byDoctor.set(g.doctorId, entry);
-  }
+  // Same netting as the provider's own earnings page (src/lib/payouts.ts).
+  const groupsByDoctor = new Map<string, typeof grouped>();
+  for (const g of grouped) groupsByDoctor.set(g.doctorId, [...(groupsByDoctor.get(g.doctorId) ?? []), g]);
+  const byDoctor = new Map([...groupsByDoctor].map(([doctorId, groups]) => [doctorId, duesFromGroups(groups)]));
 
   const doctorIds = [...byDoctor.keys()];
   const doctors = await prisma.user.findMany({
@@ -66,7 +58,7 @@ export async function GET() {
       onlineCount: t.onlineCount,
       cashFeeOwed: t.cashFeeOwed,
       onlinePayoutOwed: t.onlinePayoutOwed,
-      netAmount: t.onlinePayoutOwed - t.cashFeeOwed,
+      netAmount: t.netAmount,
       payoutRequestedAt: request?.createdAt ?? null,
     };
   });
@@ -87,24 +79,8 @@ class NeedsAcknowledgementError extends Error {
 
 // A doctor's dues, computed over exactly the rows a settlement claimed: online
 // payouts owed to them minus the platform's fee on cash they collected.
-async function totalsForSettlement(tx: Prisma.TransactionClient, settlementId: string) {
-  const grouped = await tx.appointment.groupBy({
-    by: ["paymentMethod"],
-    where: { settlementId },
-    _sum: { amount: true, platformFee: true },
-    _count: true,
-  });
-  let cashCount = 0, onlineCount = 0, cashFeeOwed = 0, onlinePayoutOwed = 0;
-  for (const g of grouped) {
-    if (g.paymentMethod === "CASH") {
-      cashCount = g._count;
-      cashFeeOwed = safeNum(g._sum.platformFee);
-    } else if (g.paymentMethod === "ONLINE") {
-      onlineCount = g._count;
-      onlinePayoutOwed = safeNum(g._sum.amount) - safeNum(g._sum.platformFee);
-    }
-  }
-  return { cashCount, onlineCount, cashFeeOwed, onlinePayoutOwed, netAmount: onlinePayoutOwed - cashFeeOwed };
+function totalsForSettlement(tx: Prisma.TransactionClient, settlementId: string) {
+  return duesFor({ settlementId }, tx);
 }
 
 // POST: settle every currently-pending appointment for one doctor into a single Settlement record.

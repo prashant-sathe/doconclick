@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { money, sumMoney } from "@/lib/money";
 import { safeNum } from "@/lib/adminAuth";
 import { istMonthKey, shiftMonthKey, istStartOfMonth, monthShortLabel } from "@/lib/istDate";
 
@@ -79,17 +80,23 @@ export async function GET() {
     }
   }
 
+  // Money rounded to paise (float sums drift — src/lib/money.ts); net is
+  // gross − fee of the rounded figures, so the columns always add up.
   return NextResponse.json({
-    months: months.map((m) => ({ label: m.label, ...byMonth.get(m.key)! })),
+    months: months.map((m) => {
+      const b = byMonth.get(m.key)!;
+      const gross = money(b.gross), platformFee = money(b.platformFee);
+      return { label: m.label, bookings: b.bookings, gross, platformFee, net: sumMoney([gross, -platformFee]) };
+    }),
     consultTypes: [...byConsultType.entries()]
-      .map(([type, v]) => ({ type, ...v }))
+      .map(([type, v]) => ({ type, count: v.count, net: money(v.net) }))
       .sort((a, b) => b.net - a.net),
     ratings: {
       avgRating: doctorProfile?.avgRating ?? 0,
       totalReviews: doctorProfile?.totalReviews ?? 0,
       monthly: months.map((m) => {
         const b = ratingByMonth.get(m.key)!;
-        return { label: m.label, avgRating: b.count > 0 ? b.sum / b.count : null, count: b.count };
+        return { label: m.label, avgRating: b.count > 0 ? Math.round((b.sum / b.count) * 10) / 10 : null, count: b.count };
       }),
     },
   });

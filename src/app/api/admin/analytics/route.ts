@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { safeNum, requireAdmin } from "@/lib/adminAuth";
+import { sumMoney } from "@/lib/money";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export async function GET() {
   const { denied } = await requireAdmin();
@@ -47,18 +48,18 @@ export async function GET() {
     // `totalPlatformFee` is the commission before coupons — what providers are
     // charged, so gross minus it is their payout. The platform absorbs coupon
     // discounts, so what it actually keeps is `totalPlatformEarnings`.
-    const totalPlatformFee = revenueData.reduce((s, a) => s + safeNum(a.platformFee), 0);
-    const totalCouponDiscounts = revenueData.reduce((s, a) => s + safeNum(a.discountAmount), 0);
+    const totalPlatformFee = sumMoney(revenueData.map((a) => a.platformFee));
+    const totalCouponDiscounts = sumMoney(revenueData.map((a) => a.discountAmount));
 
     return NextResponse.json({
       totalPatients,
       totalDoctors,
       totalNurses,
       totalAppointments,
-      totalRevenue: revenueData.reduce((s, a) => s + safeNum(a.amount), 0),
+      totalRevenue: sumMoney(revenueData.map((a) => a.amount)),
       totalPlatformFee,
       totalCouponDiscounts,
-      totalPlatformEarnings: totalPlatformFee - totalCouponDiscounts,
+      totalPlatformEarnings: sumMoney([totalPlatformFee, -totalCouponDiscounts]),
       recentAppointments,
       pendingDoctors,
       pendingNurses,
