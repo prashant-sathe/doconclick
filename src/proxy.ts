@@ -4,16 +4,24 @@ import { ROLE_HOME, safeNext } from "@/lib/roleHome";
 
 const COOKIE_NAME = "doconclick_token";
 
-// Routes that require authentication, mapped to allowed roles
+// Pages inside a role's area that anyone may open, signed in or not. A
+// doctor's public profile is shared (QR codes, links, the sitemap) — booking
+// from it asks for a patient login on its own.
+const PUBLIC: RegExp[] = [
+  /^\/patient\/doctor\/[^/]+\/?$/,
+];
+
+// Routes that require authentication, mapped to allowed roles. First match
+// wins, so the narrower DOCTOR+STAFF pages come before the rest of /doctor.
+// Every page under /patient, /doctor and /nurse is covered (their /register
+// pages are let through before this check), so none renders its shell for a
+// signed-out visitor before the page's own redirect kicks in.
 const PROTECTED: { pattern: RegExp; roles: string[] }[] = [
   { pattern: /^\/admin(\/|$)/, roles: ["ADMIN"] },
-  { pattern: /^\/doctor\/dashboard(\/|$)/, roles: ["DOCTOR", "STAFF"] },
-  { pattern: /^\/patient\/dashboard(\/|$)/, roles: ["PATIENT"] },
-  { pattern: /^\/patient\/book(\/|$)/, roles: ["PATIENT"] },
-  { pattern: /^\/patient\/assistant(\/|$)/, roles: ["PATIENT"] },
-  { pattern: /^\/patient\/payment(\/|$)/, roles: ["PATIENT"] },
-  { pattern: /^\/patient\/wallet(\/|$)/, roles: ["PATIENT"] },
-  { pattern: /^\/patient\/nurse(\/|$)/, roles: ["PATIENT"] },
+  // A receptionist (STAFF) works the doctor's queue and chats with patients.
+  { pattern: /^\/doctor\/(dashboard|chat)(\/|$)/, roles: ["DOCTOR", "STAFF"] },
+  { pattern: /^\/doctor(\/|$)/, roles: ["DOCTOR"] },
+  { pattern: /^\/patient(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/nurse(\/|$)/, roles: ["NURSE"] },
 ];
 
@@ -67,6 +75,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Check if this route requires authentication
+  if (PUBLIC.some((p) => p.test(pathname))) return NextResponse.next();
   const matched = PROTECTED.find((p) => p.pattern.test(pathname));
   if (!matched) return NextResponse.next();
 
