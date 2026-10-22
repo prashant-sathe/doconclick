@@ -60,6 +60,8 @@ export async function GET() {
       onlinePayoutOwed: t.onlinePayoutOwed,
       netAmount: t.netAmount,
       payoutRequestedAt: request?.createdAt ?? null,
+      // What they were owed when they asked — `netAmount` is what Settle Now pays.
+      payoutRequestedAmount: request ? request.amount : null,
     };
   });
 
@@ -132,9 +134,11 @@ export async function POST(req: Request) {
       if (totals.netAmount < 0 && acknowledgeNegative !== true) throw new NeedsAcknowledgementError(totals);
 
       const settled = await tx.settlement.update({ where: { id: created.id }, data: totals });
+      // The request is paid at what's owed now (these claimed rows), not what
+      // was owed when it was made — record that as its amount.
       await tx.payoutRequest.updateMany({
         where: { doctorId, status: "PENDING" },
-        data: { status: "FULFILLED", resolvedAt: new Date(), settlementId: created.id },
+        data: { status: "FULFILLED", resolvedAt: new Date(), settlementId: created.id, amount: settled.netAmount },
       });
       return settled;
     });

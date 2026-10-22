@@ -200,9 +200,15 @@ export default function DoctorEarnings() {
         {openPayoutRequest ? (
           <div className="flex items-center gap-3 bg-teal-50 border border-teal-100 rounded-2xl p-4 mb-6">
             <CheckCircle2 className="w-5 h-5 text-teal-600 flex-shrink-0" />
+            {/* Settling pays what's owed when the admin settles (it keeps
+                moving with new visits) — so show that, not the figure at request time. */}
             <p className="text-sm text-teal-800">
-              <span className="font-bold">Payout of ₹{openPayoutRequest.amount.toLocaleString("en-IN")} requested</span> on{" "}
-              {new Date(openPayoutRequest.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} — awaiting admin review.
+              <span className="font-bold">Payout requested</span> on{" "}
+              {new Date(openPayoutRequest.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} — awaiting admin review.{" "}
+              {netPayout > 0
+                ? <>You&apos;ll be paid what&apos;s owed when it&apos;s settled: <span className="font-bold">₹{netPayout.toLocaleString("en-IN")}</span> right now</>
+                : <>Nothing is owed to you right now — the admin will settle the balance</>}
+              {openPayoutRequest.amount !== netPayout && <span className="text-teal-700/70"> (₹{openPayoutRequest.amount.toLocaleString("en-IN")} when you asked)</span>}.
             </p>
           </div>
         ) : netPayout > 0 && (

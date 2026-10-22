@@ -105,7 +105,12 @@ export default function NurseEarningsPage() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-4">
           {openRequest ? (
             <p className="text-sm text-amber-700 flex items-center gap-1.5"><Clock className="w-4 h-4" />
-              Payout of {inr(openRequest.amount)} requested on {new Date(openRequest.createdAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })} — the admin will settle it soon.
+              {/* Settled at what's owed then, not the figure at request time. */}
+              <span>
+                Payout requested on {new Date(openRequest.createdAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })} — the admin will settle it soon.{" "}
+                {pendingPayout > 0 ? <>You&apos;ll be paid what&apos;s owed then: <b>{inr(pendingPayout)}</b> right now</> : <>Nothing is owed to you right now</>}
+                {openRequest.amount !== pendingPayout && <span className="opacity-70"> ({inr(openRequest.amount)} when you asked)</span>}.
+              </span>
             </p>
           ) : !bankOnFile && pendingPayout > 0 ? (
             <p className="text-sm text-amber-700">

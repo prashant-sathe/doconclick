@@ -37,6 +37,7 @@ interface PendingSettlement {
   onlinePayoutOwed: number;
   netAmount: number;
   payoutRequestedAt: string | null;
+  payoutRequestedAmount: number | null;
 }
 interface SettlementRecord {
   id: string;
@@ -206,7 +207,7 @@ export default function AdminFinance() {
             <div className="font-semibold text-slate-800 flex items-center gap-1.5">
               {providerName(row.doctorName, row.providerRole)}
               {row.payoutRequestedAt && (
-                <span className="badge badge-warning text-[10px]" title={`Requested ${new Date(row.payoutRequestedAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}`}>
+                <span className="badge badge-warning text-[10px]" title={`Requested ${new Date(row.payoutRequestedAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })}${row.payoutRequestedAmount != null && row.payoutRequestedAmount !== row.netAmount ? ` (₹${row.payoutRequestedAmount.toLocaleString("en-IN")} then; settling pays ₹${row.netAmount.toLocaleString("en-IN")}, what's owed now)` : ""}`}>
                   Requested
                 </span>
               )}

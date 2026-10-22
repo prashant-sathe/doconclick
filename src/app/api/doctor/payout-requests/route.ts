@@ -14,7 +14,8 @@ async function bankDetailsOnFile(userId: string, role: string): Promise<boolean>
   return !!profile?.bankDetails?.trim();
 }
 
-// GET: the provider's own payout requests (newest first), what's owed right
+// GET: the provider's own payout requests (newest first; a pending one with
+// `currentAmount`, what settling it would pay now), what's owed right
 // now (online payouts net of the commission on cash visits — the amount a
 // request would ask for; src/lib/payouts.ts), and whether bank details are on
 // file to pay it to.
@@ -30,7 +31,18 @@ export async function GET() {
     unsettledDues(authUser.id),
     bankDetailsOnFile(authUser.id, authUser.role),
   ]);
-  return NextResponse.json({ requests: requests.map((r) => ({ ...r, amount: money(r.amount) })), dues, bankDetailsOnFile: bank });
+  // A pending request isn't a frozen amount: the admin's settlement pays what's
+  // owed when it runs. `amount` is what was owed when it was asked for
+  // (or, once fulfilled, what was paid); `currentAmount` is what it'd pay now.
+  return NextResponse.json({
+    requests: requests.map((r) => ({
+      ...r,
+      amount: money(r.amount),
+      ...(r.status === "PENDING" ? { currentAmount: dues.netAmount } : {}),
+    })),
+    dues,
+    bankDetailsOnFile: bank,
+  });
 }
 
 // POST: the provider flags "please settle me" — doesn't settle anything itself

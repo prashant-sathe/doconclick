@@ -8,6 +8,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
 import { isDoctorBookable, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
 import { parseVisitInput, snapshotFromProfile, type VisitSnapshot } from "@/lib/visitAddress";
+import { verifyVisitCoordinates } from "@/lib/visitVerify";
 import { parseBody, appointmentBookingSchema } from "@/lib/schemas";
 import { doctorSlotProblem, snapToClinicGrid, isSlotIndexViolation } from "@/lib/doctorSlots";
 import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, doctorHoursProblem, openRequestsProblem } from "@/lib/bookingLimits";
@@ -141,8 +142,12 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: visitInput.error, code: "LOCATION_REQUIRED" }, { status: 400 });
       }
       visit = visitInput?.snapshot ?? snapshotFromProfile(patient.patientProfile);
+      // Coordinates straight from the saved profile need no re-check; the
+      // request's (visit input, or the phone's position) do.
+      let coordsFromSaved = !visitInput && visit.visitLat != null;
       if (visit.visitLat == null && typeof patientLat === "number" && typeof patientLng === "number") {
         visit = { ...visit, visitLat: patientLat, visitLng: patientLng };
+        coordsFromSaved = false;
       }
       // Same gates as nurse-bookings: somewhere to go, and coordinates to
       // check the doctor's travel radius against — never skipped.
@@ -159,6 +164,15 @@ export async function POST(req: Request) {
         );
       }
 
+      // They must belong to the address (src/lib/visitVerify.ts) — the radius
+      // check below is only as good as the coordinates it's given.
+      const verified = await verifyVisitCoordinates(visit, patient.patientProfile, { coordsFromSaved });
+      if ("problem" in verified) {
+        return NextResponse.json({ error: verified.problem.error, code: verified.problem.code }, { status: verified.problem.status });
+      }
+      visit = verified.visit;
+      const { visitLat, visitLng } = visit as { visitLat: number; visitLng: number };
+
       let baseLat = doctor.doctorProfile.lat;
       let baseLng = doctor.doctorProfile.lng;
       if (baseLat == null || baseLng == null) {
@@ -170,7 +184,7 @@ export async function POST(req: Request) {
         baseLng = firstClinic?.lng ?? null;
       }
       // A doctor with no pin at all isn't blocked — same rule as the listing.
-      const distanceKm = baseLat != null && baseLng != null ? haversine(visit.visitLat, visit.visitLng, baseLat, baseLng) : null;
+      const distanceKm = baseLat != null && baseLng != null ? haversine(visitLat, visitLng, baseLat, baseLng) : null;
       if (!withinSearchRadius(distanceKm, doctor.doctorProfile.radius, false)) {
         return NextResponse.json(
           {

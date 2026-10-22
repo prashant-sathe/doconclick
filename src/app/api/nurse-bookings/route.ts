@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { haversine } from "@/lib/geo";
 import { parseVisitInput, snapshotFromProfile } from "@/lib/visitAddress";
+import { verifyVisitCoordinates } from "@/lib/visitVerify";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
 import { isNurseBookable } from "@/lib/providerGuard";
@@ -81,7 +82,7 @@ export async function POST(req: Request) {
   if (visitInput && "error" in visitInput) {
     return NextResponse.json({ error: visitInput.error, code: "LOCATION_REQUIRED" }, { status: 400 });
   }
-  const visit = visitInput?.snapshot ?? snapshotFromProfile(patient.patientProfile);
+  let visit = visitInput?.snapshot ?? snapshotFromProfile(patient.patientProfile);
   if (!visit.visitAddress) {
     return NextResponse.json(
       { error: "Please add your home address so the nurse knows where to come.", code: "ADDRESS_REQUIRED" },
@@ -200,6 +201,15 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+
+  // The coordinates must belong to the address (src/lib/visitVerify.ts): the
+  // saved home address → its saved coordinates; any other → where it
+  // geocodes to. Never the request's numbers on their own.
+  const verified = await verifyVisitCoordinates(visit, patient.patientProfile, { coordsFromSaved: !visitInput });
+  if ("problem" in verified) {
+    return NextResponse.json({ error: verified.problem.error, code: verified.problem.code }, { status: verified.problem.status });
+  }
+  visit = verified.visit;
 
   // The travel radius is checked against the visit address itself — not
   // wherever the patient's phone happens to be.

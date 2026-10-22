@@ -63,7 +63,8 @@
     "test:free-bookings": "tsx tests/free-bookings.ts",
     "test:staff-accounts": "tsx tests/staff-accounts.ts",
     "test:availability": "tsx tests/availability.ts",
-    "test:admin-polish": "tsx tests/admin-polish.ts"
+    "test:admin-polish": "tsx tests/admin-polish.ts",
+    "test:visit-verify": "tsx tests/visit-verify.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

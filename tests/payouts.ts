@@ -97,6 +97,12 @@ async function main() {
     r = await call(doctor, "POST", "/api/doctor/payout-requests");
     check("a second request while one is open → 409", r.status === 409, `${r.status}`);
 
+    // ── The request isn't frozen: another online visit completes while it's pending ──
+    await visit(doctor.id, {});
+    const pendingView = await call(doctor, "GET", "/api/doctor/payout-requests");
+    const pend = (pendingView.json.requests as { status: string; amount: number; currentAmount?: number }[]).find((x) => x.status === "PENDING");
+    check("pending request: asked at ₹269.97, currentAmount ₹360.06 (what settling would pay now)", pend?.amount === 269.97 && pend?.currentAmount === 360.06 && (pendingView.json.dues as Record<string, number>).netAmount === 360.06, JSON.stringify(pend));
+
     // ── Cash fees exceed online payouts ──
     r = await call(owes, "POST", "/api/doctor/payout-requests");
     const od = r.json.dues as Record<string, number> | undefined;
@@ -111,19 +117,19 @@ async function main() {
     // ── Admin settle queue + settlement use the same figures ──
     const q = await call(admin, "GET", "/api/admin/finance/settlements");
     const row = (q.json as unknown as Record<string, unknown>[]).find((x) => x.doctorId === doctor.id) as Record<string, unknown>;
-    check("settle queue: same ₹269.97 net, ₹0.30 cash fee", row?.netAmount === 269.97 && row?.cashFeeOwed === 0.3 && row?.onlinePayoutOwed === 270.27, JSON.stringify(row ?? null).slice(0, 160));
+    check("settle queue: the current ₹360.06 net (₹0.30 cash fee), and the ₹269.97 they asked for", row?.netAmount === 360.06 && row?.cashFeeOwed === 0.3 && row?.onlinePayoutOwed === 360.36 && row?.payoutRequestedAmount === 269.97, JSON.stringify(row ?? null).slice(0, 200));
     const owesRow = (q.json as unknown as Record<string, unknown>[]).find((x) => x.doctorId === owes.id) as Record<string, unknown>;
     check("…and −₹55 for the doctor who owes", owesRow?.netAmount === -55, String(owesRow?.netAmount));
     const settled = await call(admin, "POST", "/api/admin/finance/settlements", { doctorId: doctor.id, idempotencyKey: `payout-test-${stamp}` });
-    check("settling stores the rounded totals", settled.status === 200 && settled.json.netAmount === 269.97 && settled.json.cashFeeOwed === 0.3, `${settled.status} ${settled.json.netAmount}`);
+    check("settling pays what's owed at settlement time (₹360.06), not the requested ₹269.97", settled.status === 200 && settled.json.netAmount === 360.06 && settled.json.cashFeeOwed === 0.3, `${settled.status} ${settled.json.netAmount}`);
     const pr = await prisma.payoutRequest.findFirst({ where: { doctorId: doctor.id } });
-    check("…and fulfils the payout request", pr?.status === "FULFILLED", String(pr?.status));
+    check("…and fulfils the payout request, recording the ₹360.06 actually paid", pr?.status === "FULFILLED" && pr.amount === 360.06 && pr.settlementId === settled.json.id, `${pr?.status} ${pr?.amount}`);
     // An old settlement stored from a float sum comes back rounded.
     await prisma.settlement.create({ data: { doctorId: doctor.id, netAmount: 300.29999999999995, onlinePayoutOwed: 300.29999999999995, cashFeeOwed: 0, settledByAdminId: admin.id } });
     const mine = await call(doctor, "GET", "/api/doctor/settlements");
     const hist = await call(admin, "GET", `/api/admin/finance/settlements/history?doctorId=${doctor.id}`);
     const nets = (x: unknown) => (x as { netAmount: number }[]).map((s) => s.netAmount).sort().join(",");
-    check("doctor's and admin's settlement lists round old float rows", nets(mine.json) === "269.97,300.3" && nets(hist.json) === "269.97,300.3", `${nets(mine.json)} / ${nets(hist.json)}`);
+    check("doctor's and admin's settlement lists round old float rows", nets(mine.json) === "300.3,360.06" && nets(hist.json) === "300.3,360.06", `${nets(mine.json)} / ${nets(hist.json)}`);
     const after = await call(doctor, "GET", "/api/doctor/payout-requests");
     check("after settling: nothing owed", (after.json.dues as Record<string, number>).netAmount === 0, JSON.stringify(after.json.dues));
 
@@ -131,7 +137,7 @@ async function main() {
     const an = await call(doctor, "GET", "/api/doctor/analytics");
     const months = an.json.months as { gross: number; platformFee: number; net: number }[];
     const cur = months?.[months.length - 1];
-    check("doctor analytics: this month gross ₹303.30, fee ₹30.33, net ₹272.97 (no float tails)", cur?.gross === 303.3 && cur?.platformFee === 30.33 && cur?.net === 272.97, JSON.stringify(cur));
+    check("doctor analytics: this month gross ₹403.40, fee ₹40.34, net ₹363.06 (no float tails)", cur?.gross === 403.4 && cur?.platformFee === 40.34 && cur?.net === 363.06, JSON.stringify(cur));
     check("…nothing in the whole response has more than 2 decimals", moneyProblems(an.json).length === 0, moneyProblems(an.json).join(" ") || "ok");
 
     // ── Admin reports: three ₹0.10 + one ₹0.20 visits on 1 Jan 2033 ──

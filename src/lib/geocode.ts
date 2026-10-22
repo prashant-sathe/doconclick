@@ -90,3 +90,32 @@ export async function cachedLookup<T>(key: string, url: URL, shape: (raw: unknow
   inFlight.set(key, p);
   return p;
 }
+
+export type AddressMatch = { id: number; label: string; lat: number; lon: number };
+
+/** Normalised search text — the same text in any case/spacing is one cache entry. */
+export const normaliseQuery = (q: string) => q.trim().replace(/\s+/g, " ").toLowerCase().slice(0, 200);
+
+/**
+ * Address search (India), cached and queued like every lookup here. Shared by
+ * the autocomplete route and the server-side visit-address check, so a
+ * suggestion the patient just picked is usually already cached. Throws
+ * GeocodeBusyError / a network error when Nominatim can't be asked.
+ */
+export function searchAddress(query: string): Promise<AddressMatch[]> {
+  const q = normaliseQuery(query);
+  const url = new URL("https://nominatim.openstreetmap.org/search");
+  url.searchParams.set("q", q);
+  url.searchParams.set("format", "json");
+  url.searchParams.set("addressdetails", "1");
+  url.searchParams.set("limit", "6");
+  url.searchParams.set("countrycodes", "in");
+  return cachedLookup(`search:${q}`, url, (raw) =>
+    (raw as { place_id: number; display_name: string; lat: string; lon: string }[]).map((r) => ({
+      id: r.place_id,
+      label: r.display_name,
+      lat: Number(r.lat),
+      lon: Number(r.lon),
+    }))
+  );
+}

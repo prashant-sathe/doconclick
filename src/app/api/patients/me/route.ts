@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { verifyVisitCoordinates } from "@/lib/visitVerify";
 import { prisma } from "@/lib/prisma";
 import { requireRole, readJson, isRecordNotFound } from "@/lib/routeGuards";
 import { parseBody, definedOnly, patientProfilePatchSchema } from "@/lib/schemas";
@@ -36,6 +37,35 @@ export async function PATCH(req: Request) {
   const parsed = parseBody(patientProfilePatchSchema, body);
   if (parsed.response) return parsed.response;
   const data: Record<string, string | number | null> = definedOnly(parsed.data);
+
+  // The saved home coordinates are what bookings trust for the home address
+  // (src/lib/visitVerify.ts), so they must belong to it: new coordinates are
+  // checked against the address they're saved with; a new address without a
+  // new pin keeps the old pin only if it still matches.
+  const sentCoords = typeof data.lat === "number" && typeof data.lng === "number";
+  if (sentCoords || typeof data.homeAddress === "string") {
+    const current = await prisma.patientProfile.findUnique({ where: { userId: authUser.id }, select: { homeAddress: true, pinCode: true, lat: true, lng: true } });
+    const address = (data.homeAddress as string | undefined) ?? current?.homeAddress ?? null;
+    const pinCode = (data.pinCode as string | undefined) ?? current?.pinCode ?? null;
+    const lat = sentCoords ? (data.lat as number) : current?.lat ?? null;
+    const lng = sentCoords ? (data.lng as number) : current?.lng ?? null;
+    const addressChanged = typeof data.homeAddress === "string" && data.homeAddress !== current?.homeAddress;
+    if (address && lat != null && lng != null && (sentCoords || addressChanged)) {
+      const check = await verifyVisitCoordinates(
+        { visitAddress: address, visitLandmark: null, visitPinCode: pinCode, visitLat: lat, visitLng: lng },
+        null,
+      );
+      if ("problem" in check) {
+        if (sentCoords) {
+          return NextResponse.json({ error: check.problem.error, code: check.problem.code }, { status: check.problem.status });
+        }
+        // The old pin doesn't belong to the new address — drop it rather
+        // than let a booking trust it (the address page asks for a new pin).
+        data.lat = null;
+        data.lng = null;
+      }
+    }
+  }
 
   try {
     let updated;
