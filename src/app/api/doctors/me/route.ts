@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { availabilityProblem, availabilityFromBlocks, availabilityToBlocks } from "@/lib/availability";
 import { prisma } from "@/lib/prisma";
 import { requireRole, readJson } from "@/lib/routeGuards";
 import { verifyPassword } from "@/lib/auth";
@@ -136,6 +137,13 @@ export async function PATCH(req: Request) {
       data[key] = coord;
     } else if (key === "offersHomeVisit" || key === "offersClinic" || key === "offersVideo") {
       data[key] = Boolean(value);
+    } else if (key === "availability") {
+      // Home-visit / video hours: one or more ranges, each with days and a
+      // start before its end, none overlapping (src/lib/availability.ts).
+      // Never defaulted — a bad or empty value is an error, not "Mon–Fri".
+      const problem = typeof value === "string" ? availabilityProblem(value) : "Pick at least one day and a time range.";
+      if (problem) return NextResponse.json({ error: problem }, { status: 400 });
+      data[key] = availabilityFromBlocks(availabilityToBlocks(value as string)!);
     } else {
       data[key] = value === "" || value == null ? null : String(value);
     }

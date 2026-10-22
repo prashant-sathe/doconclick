@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import {
   Loader2, Building2, Video, Home, Clock, Languages, UserX, Bookmark, BookmarkCheck, Compass, X,
 } from "lucide-react";
+import { formatAvailability } from "@/lib/availability";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useSpecialties } from "@/lib/useSpecialties";
@@ -290,7 +291,7 @@ export default function DoctorProfilePage() {
           <div className="flex flex-wrap gap-2 mb-5">
             <span className="badge badge-info">{profile.experience} yrs exp</span>
             <span className="badge badge-gray">
-              <Clock className="w-3 h-3" /> {profile.availability}
+              <Clock className="w-3 h-3" /> {formatAvailability(profile.availability)}
             </span>
             <span className="badge badge-purple">
               <Languages className="w-3 h-3" /> {profile.languages}

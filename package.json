@@ -61,7 +61,8 @@
     "test:csv": "tsx tests/csv.ts",
     "test:payouts": "tsx tests/payouts.ts",
     "test:free-bookings": "tsx tests/free-bookings.ts",
-    "test:staff-accounts": "tsx tests/staff-accounts.ts"
+    "test:staff-accounts": "tsx tests/staff-accounts.ts",
+    "test:availability": "tsx tests/availability.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

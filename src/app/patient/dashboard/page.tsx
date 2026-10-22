@@ -14,6 +14,7 @@ import {
   Bookmark, BookmarkCheck, Sparkles, Compass, RefreshCw, Crosshair,
   List,
 } from "lucide-react";
+import { formatAvailability } from "@/lib/availability";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime, formatClinicHours } from "@/lib/clinicAvailability";
@@ -1709,7 +1710,7 @@ function PatientDashboardInner() {
                       );
                     })() : (
                       <span className="badge badge-gray">
-                        <Clock className="w-3 h-3" /> {selectedDoctor.doctorProfile.availability}
+                        <Clock className="w-3 h-3" /> {formatAvailability(selectedDoctor.doctorProfile.availability)}
                       </span>
                     )}
                     <span className="badge badge-purple">
