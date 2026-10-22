@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { CreditCard, CheckCircle, Loader2, ShieldCheck, TicketPercent, X } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
+import DuesPayCard from "@/components/doctor/DuesPayCard";
 
 const SUBSCRIPTION_FEE = 499;
 
@@ -105,6 +106,9 @@ export default function DoctorSubscribe() {
             <ShieldCheck className="w-4 h-4 text-emerald-500" /> Secured by Cashfree
           </p>
         </div>
+
+        {/* A lapsed doctor can't open Earnings, so what they owe on cash visits is payable here too. */}
+        <DuesPayCard returnTo="subscribe" />
 
         {active ? (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center">

@@ -7,6 +7,7 @@ import { WALLET_TOPUP_ORDER_PREFIX } from "@/lib/wallet";
 import { releaseCouponRedemption } from "@/lib/coupons";
 import { settleAppointmentPayment, notifySettlement } from "@/lib/paymentOrders";
 import { NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX } from "@/lib/nurseConstants";
+import { DUES_ORDER_PREFIX, settleDuesPayment, notifyDuesSettled } from "@/lib/duesPayments";
 
 interface CashfreeWebhookPayload {
   type: "PAYMENT_SUCCESS_WEBHOOK" | "PAYMENT_FAILED_WEBHOOK" | string;
@@ -64,6 +65,9 @@ export async function POST(req: Request) {
         });
       }
     }
+    if (failedOrderId?.startsWith(DUES_ORDER_PREFIX)) {
+      await prisma.duesPayment.updateMany({ where: { orderId: failedOrderId, status: "CREATED" }, data: { status: "FAILED" } });
+    }
     // Free any coupon slot a doctor reserved for this failed fee payment.
     if (failedOrderId && (failedOrderId.startsWith("docreg") || failedOrderId.startsWith("docsub"))) {
       await prisma.$transaction((tx) => releaseCouponRedemption(tx, { orderId: failedOrderId })).catch(() => {});
@@ -81,6 +85,18 @@ export async function POST(req: Request) {
   // Two order types share this one webhook (Cashfree webhooks are registered
   // once per merchant account, not per order kind) — distinguished by the
   // order_id prefix each create-order route generates.
+  // A doctor paying the commission they owe on cash visits.
+  if (orderId.startsWith(DUES_ORDER_PREFIX)) {
+    const result = await settleDuesPayment({
+      orderId,
+      amount: payload.data.order.order_amount,
+      cfPaymentId: payload.data.payment.cf_payment_id,
+    });
+    if (result.outcome === "unknown") console.error("Cashfree webhook: no dues payment found for order", orderId);
+    notifyDuesSettled(result);
+    return NextResponse.json({ ok: true });
+  }
+
   if (orderId.startsWith("docreg")) {
     const profile = await prisma.doctorProfile.findFirst({ where: { cashfreeOrderId: orderId } });
     if (!profile) {

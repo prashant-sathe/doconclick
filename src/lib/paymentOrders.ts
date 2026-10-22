@@ -192,9 +192,11 @@ async function settle(
       } else {
         // Conditional, so a cancel or a wallet payment landing concurrently
         // makes this a no-op (→ credit) instead of a double settlement.
+        // Paid through the gateway is paid online — even a walk-in the desk
+        // switched to cash after the patient had opened the pay link.
         const marked = await tx.appointment.updateMany({
           where: { id: appt.id, status: "SCHEDULED", paymentStatus: { not: "PAID" } },
-          data: { paymentStatus: "PAID", paidAt: appt.paidAt ?? new Date(), cashfreeOrderId: orderId, cashfreePaymentId: cfPaymentId },
+          data: { paymentStatus: "PAID", paymentMethod: "ONLINE", paidAt: appt.paidAt ?? new Date(), cashfreeOrderId: orderId, cashfreePaymentId: cfPaymentId },
         });
         if (marked.count === 1) {
           applied = true;

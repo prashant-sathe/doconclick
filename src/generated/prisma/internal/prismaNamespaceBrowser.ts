@@ -71,6 +71,7 @@ export const ModelName = {
   Wallet: 'Wallet',
   WalletTransaction: 'WalletTransaction',
   Settlement: 'Settlement',
+  DuesPayment: 'DuesPayment',
   PayoutRequest: 'PayoutRequest',
   DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
@@ -459,6 +460,7 @@ export const AppointmentScalarFieldEnum = {
   scheduledAt: 'scheduledAt',
   requestedScheduledAt: 'requestedScheduledAt',
   reminderSentAt: 'reminderSentAt',
+  bookedById: 'bookedById',
   createdAt: 'createdAt'
 } as const
 
@@ -511,6 +513,22 @@ export const SettlementScalarFieldEnum = {
 } as const
 
 export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
+
+
+export const DuesPaymentScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  doctorId: 'doctorId',
+  amount: 'amount',
+  appointmentIds: 'appointmentIds',
+  status: 'status',
+  cfPaymentId: 'cfPaymentId',
+  paidAt: 'paidAt',
+  settlementId: 'settlementId',
+  createdAt: 'createdAt'
+} as const
+
+export type DuesPaymentScalarFieldEnum = (typeof DuesPaymentScalarFieldEnum)[keyof typeof DuesPaymentScalarFieldEnum]
 
 
 export const PayoutRequestScalarFieldEnum = {
@@ -729,6 +747,7 @@ export const PlatformSettingsScalarFieldEnum = {
   nurseShiftServicesSeeded: 'nurseShiftServicesSeeded',
   bookingHorizonDays: 'bookingHorizonDays',
   chatFollowUpDays: 'chatFollowUpDays',
+  cashDueLimit: 'cashDueLimit',
   splashImageUrl: 'splashImageUrl',
   splashFit: 'splashFit',
   splashBgColor: 'splashBgColor',

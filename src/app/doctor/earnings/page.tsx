@@ -2,10 +2,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, IndianRupee, TrendingUp, CreditCard, AlertCircle, Send, CheckCircle2 } from "lucide-react";
+import { Loader2, IndianRupee, TrendingUp, CreditCard, Send, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
+import DuesPayCard from "@/components/doctor/DuesPayCard";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { sumMoney } from "@/lib/money";
 import { istDayKey, istMonthKey, shiftMonthKey, addDaysYmd, mondayIndex, weekdayShortLabel } from "@/lib/istDate";
@@ -68,12 +69,6 @@ export default function DoctorEarnings() {
   const [visibleCount, setVisibleCount] = useState(10);
   const [requestingPayout, setRequestingPayout] = useState(false);
   const [payoutError, setPayoutError] = useState("");
-
-  useEffect(() => {
-    if (!authLoading && !user) router.push("/login?next=/doctor/earnings");
-    if (!authLoading && user && user.role !== "DOCTOR") router.push("/login");
-  }, [authLoading, user, router]);
-
   useEffect(() => {
     if (!user || user.role !== "DOCTOR") return;
     fetch("/api/doctors/me")
@@ -238,16 +233,15 @@ export default function DoctorEarnings() {
         )}
         {payoutError && <p className="text-xs text-red-600 mb-6 -mt-4">{payoutError}</p>}
 
-        {dues && netPayout <= 0 && dues.cashFeeOwed > 0 && (
-          <div className="flex items-center gap-3 bg-red-50 border border-red-100 rounded-2xl p-4 mb-6">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-            <p className="text-sm text-red-700">
-              <span className="font-bold">₹{dues.cashFeeOwed.toLocaleString("en-IN")} platform fee due</span> on cash consultations you&apos;ve collected
-              {dues.onlinePayoutOwed > 0 && <> — after your ₹{dues.onlinePayoutOwed.toLocaleString("en-IN")} of online earnings, you owe ₹{Math.abs(netPayout).toLocaleString("en-IN")}</>}
-              . Admin will settle this with you.
-            </p>
-          </div>
-        )}
+        <DuesPayCard
+          returnTo="earnings"
+          onSettled={() => {
+            void fetch("/api/doctor/settlements").then((r) => (r.ok ? r.json() : null)).then((x) => { if (x) setSettlements(x); });
+            void fetch("/api/doctor/payout-requests").then((r) => (r.ok ? r.json() : null)).then((x) => {
+              if (x) { setPayoutRequests(x.requests ?? []); setDues(x.dues ?? null); }
+            });
+          }}
+        />
 
         {lastMonthEarnings > 0 && (
           <p className="text-xs text-slate-400 mb-6">

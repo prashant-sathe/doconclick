@@ -38,6 +38,7 @@ model User {
   settlements       Settlement[] @relation("DoctorSettlements")
   settlementsAdmined Settlement[] @relation("AdminSettlements")
   payoutRequests    PayoutRequest[] @relation("DoctorPayoutRequests")
+  duesPayments      DuesPayment[]   @relation("DoctorDuesPayments")
   paymentLogs       DoctorPaymentLog[] @relation("DoctorPaymentLogs")
   savedDoctors      SavedDoctor[] @relation("PatientSavedDoctors")
   savedByPatients   SavedDoctor[] @relation("DoctorSavedBy")
@@ -469,6 +470,10 @@ model Appointment {
   // src/lib/appointmentReminders.ts), so the periodic sweep never reminds
   // the same appointment twice.
   reminderSentAt DateTime?
+  // Set when the doctor or their front desk (STAFF) booked this on the
+  // patient's behalf — a walk-in or phone-in (/doctor/walk-in) — to the id
+  // of whoever entered it. Null for everything the patient booked.
+  bookedById    String?
   createdAt     DateTime  @default(now())
   review        Review?
   medicines     PrescriptionMedicine[]
@@ -539,6 +544,7 @@ model Settlement {
   createdAt        DateTime @default(now())
   appointments     Appointment[]
   payoutRequests   PayoutRequest[]
+  duesPayment      DuesPayment?
 }
 
 // A doctor's own request to be paid out — settlement is still an admin
@@ -547,6 +553,29 @@ model Settlement {
 // `amount` is a snapshot of what was owed at request time (purely
 // informational — the actual settlement always recomputes live totals,
 // which may have moved on by the time it's fulfilled).
+// A doctor paying the platform what they owe — the commission on cash
+// visits they collected, net of online earnings — through Cashfree
+// (/doctor/earnings). The visits it covers are snapshotted when the order is
+// created; settling claims exactly those into a Settlement. If any of them
+// was settled some other way meanwhile, the payment is kept for the admin to
+// review (status PAID, no settlement) rather than applied to the wrong rows.
+model DuesPayment {
+  id             String      @id @default(cuid())
+  orderId        String      @unique // Cashfree order_id, "docdue<doctorId>_<ts>"
+  doctorId       String
+  doctor         User        @relation("DoctorDuesPayments", fields: [doctorId], references: [id], onDelete: Cascade)
+  amount         Float
+  appointmentIds String      // JSON array of the covered Appointment ids
+  status         String      @default("CREATED") // CREATED, PAID, FAILED
+  cfPaymentId    String?
+  paidAt         DateTime?
+  settlementId   String?     @unique
+  settlement     Settlement? @relation(fields: [settlementId], references: [id], onDelete: SetNull)
+  createdAt      DateTime    @default(now())
+
+  @@index([doctorId])
+}
+
 model PayoutRequest {
   id           String      @id @default(cuid())
   doctorId     String
@@ -769,6 +798,10 @@ model PlatformSettings {
   // Days after a visit is completed that patient and provider can still send
   // chat messages (0 = read-only right away) — see src/lib/chatAccess.ts.
   chatFollowUpDays        Int      @default(7)
+  // Most a doctor may owe in commission on cash visits (net of their online
+  // earnings) before new cash bookings from their side are refused until
+  // they pay it (src/lib/duesPayments.ts). ₹0 = no limit.
+  cashDueLimit            Float    @default(2000)
   // Mobile app splash: admin uploads an image that the native shell shows over
   // the WebView while it boots (the real native splash is baked into the app
   // binary and can't change without a store update — this is the dynamic layer

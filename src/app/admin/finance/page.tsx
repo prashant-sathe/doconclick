@@ -10,6 +10,7 @@ const providerName = (name: string, role?: string | null) => formatProviderName(
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import LoadError from "@/components/LoadError";
+import DuesReviewPanel from "@/components/admin/DuesReviewPanel";
 import { useToast } from "@/components/Toast";
 import { useLoad } from "@/lib/apiClient";
 
@@ -443,6 +444,8 @@ export default function AdminFinance() {
           </>
         )}
       </div>
+
+      <DuesReviewPanel />
 
       {/* Pending Settlements */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-8">

@@ -374,6 +374,67 @@ export const appointmentBookingSchema = z.object(
   BODY_ERROR,
 );
 
+// ── Walk-in / phone-in booking (doctor or front desk, /doctor/walk-in) ──
+
+export const walkInBookingSchema = z.object(
+  {
+    mobile: z.preprocess(
+      (v) => (typeof v === "string" || typeof v === "number" ? normalizeMobile(String(v)) : v),
+      z.string({ error: "Enter the patient's mobile number." }).regex(MOBILE_REGEX, "Enter a valid 10-digit mobile number."),
+    ),
+    // The account holder's details — used for a new patient, and to fill in
+    // what an existing (quick-signup) account is still missing.
+    name: optionalText("Name", 80),
+    age: optionalAge,
+    gender: optionalGender,
+    // Who the visit is for: the account holder (neither set), one of their
+    // saved family members, or a family member added now.
+    dependentId: z.preprocess(blankToNull, z.string().nullable()).optional(),
+    newDependent: z
+      .object(
+        {
+          name: nameSchema,
+          relation: z.enum(RELATIONS.filter((r) => r !== "Self") as [string, ...string[]], { error: "Select how they're related." }),
+          age: optionalAge,
+          gender: optionalGender,
+        },
+        BODY_ERROR,
+      )
+      .nullable()
+      .optional(),
+    consultType: z.enum(["CLINIC", "HOME", "VIDEO"], { error: "Select the type of visit." }),
+    clinicId: z.preprocess(blankToNull, z.string().nullable()).optional(),
+    // ISO time for a booking later; absent/null = the patient is here now.
+    scheduledAt: z.preprocess(blankToNull, z.string().nullable()).optional(),
+    symptoms: z.preprocess(
+      blankToNull,
+      z
+        .string({ error: "Enter the reason for the visit." })
+        .min(3, "Describe the reason for the visit in a few words.")
+        .max(1000, "Reason for visit must be at most 1000 characters."),
+    ),
+    allergies: optionalText("Allergies", 500),
+    // HOME only. A typed address is enough here — the doctor is booking their
+    // own visit, so there's no travel radius to check against coordinates.
+    visit: z
+      .object(
+        {
+          address: requiredText("Visit address", 300),
+          landmark: optionalText("Landmark", 120),
+          pinCode: z.preprocess(blankToNull, z.string().regex(/^\d{6}$/, "PIN code must be 6 digits.").nullable()),
+        },
+        BODY_ERROR,
+      )
+      .nullable()
+      .optional(),
+    paymentMethod: z.enum(["CASH", "ONLINE"], { error: "Select how the patient will pay." }),
+    consentGiven: z.literal(true, { error: "Confirm the patient agreed to share these details with the doctor." }),
+    // Book even though this person already has a live booking with the doctor.
+    force: z.boolean().optional(),
+  },
+  BODY_ERROR,
+);
+
 // ── Health Assistant ──
 
 /**

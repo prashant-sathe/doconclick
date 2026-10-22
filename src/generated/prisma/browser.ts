@@ -118,6 +118,11 @@ export type WalletTransaction = Prisma.WalletTransactionModel
  */
 export type Settlement = Prisma.SettlementModel
 /**
+ * Model DuesPayment
+ * 
+ */
+export type DuesPayment = Prisma.DuesPaymentModel
+/**
  * Model PayoutRequest
  * 
  */

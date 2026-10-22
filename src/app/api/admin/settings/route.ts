@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { isOwnUploadUrl } from "@/lib/s3";
 import { DOCTOR_REGISTRATION_FEE_MAX } from "@/lib/doctorFees";
+import { CASH_DUE_LIMIT_MAX } from "@/lib/duesPayments";
 import { BOOKING_HORIZON_MIN_DAYS, BOOKING_HORIZON_MAX_DAYS, CHAT_FOLLOW_UP_MIN_DAYS, CHAT_FOLLOW_UP_MAX_DAYS } from "@/lib/bookingHorizon";
 
 async function requireAdmin() {
@@ -77,6 +78,15 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "The doctor registration fee must be between ₹0 and ₹1,00,000." }, { status: 400 });
     }
     data.doctorRegistrationFee = Math.round(value);
+  }
+
+  // Most a doctor may owe on cash visits before cash bookings pause; ₹0 = no limit.
+  if (body.cashDueLimit !== undefined) {
+    const value = finiteNumber(body.cashDueLimit);
+    if (value === null || value < 0 || value > CASH_DUE_LIMIT_MAX) {
+      return NextResponse.json({ error: "The cash-due limit must be between ₹0 and ₹10,00,000." }, { status: 400 });
+    }
+    data.cashDueLimit = Math.round(value);
   }
 
   if (body.bookingHorizonDays !== undefined) {

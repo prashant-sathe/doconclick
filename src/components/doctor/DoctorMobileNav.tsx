@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, IndianRupee, Building2, UserCircle, Sparkles } from "lucide-react";
+import { LayoutDashboard, IndianRupee, Building2, UserCircle, Sparkles, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { computeDoctorCompleteness } from "@/lib/doctorProfileCompleteness";
 import { useAuth } from "@/components/AuthProvider";
@@ -15,9 +15,11 @@ const TABS = [
   { href: "/doctor/profile", label: "Profile", icon: UserCircle },
 ];
 
-// Staff only manages the queue — no earnings/clinics-edit/support-AI/profile.
+// Staff only manages the queue and books walk-ins — no
+// earnings/clinics-edit/support-AI/profile.
 const STAFF_TABS = [
   { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/doctor/walk-in", label: "Walk-in", icon: UserPlus },
 ];
 
 export default function DoctorMobileNav() {

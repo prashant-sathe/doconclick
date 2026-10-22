@@ -8,12 +8,13 @@ import {
   Loader2, CheckCircle2, XCircle, Paperclip, IndianRupee,
   Navigation, Plus, Trash2, History, ThumbsUp, ThumbsDown, Inbox,
   Car, MapPinCheck, AlertTriangle, MessageCircle, Search, X, FileText,
-  MoreHorizontal, UserX, CalendarClock, ChevronDown, HeartPulse,
+  MoreHorizontal, UserX, CalendarClock, ChevronDown, HeartPulse, UserPlus, QrCode,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { isOverdue, byVisitAsc, byVisitDesc, nextUpcoming } from "@/lib/doctorQueue";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
+import PaymentQrPanel from "@/components/doctor/PaymentQrPanel";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
@@ -73,6 +74,8 @@ interface Appointment {
   requestedScheduledAt: string | null;
   acceptedAt: string | null;
   unreadMessageCount: number;
+  // Set when the doctor or front desk booked it (/doctor/walk-in).
+  bookedById: string | null;
   patient: {
     name: string;
     mobile: string;
@@ -689,6 +692,8 @@ export default function DoctorDashboard() {
   const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [noShowTarget, setNoShowTarget] = useState<Appointment | null>(null);
+  // Unpaid online visit whose pay-by-phone QR is open.
+  const [payQrFor, setPayQrFor] = useState<Appointment | null>(null);
   const [markingNoShow, setMarkingNoShow] = useState(false);
   const [rejectTarget, setRejectTarget] = useState<Appointment | null>(null);
   const [rejecting, setRejecting] = useState(false);
@@ -1063,6 +1068,9 @@ export default function DoctorDashboard() {
               </p>
             )}
           </div>
+          <Link href="/doctor/walk-in" className="btn-primary ml-auto flex-shrink-0 py-2.5 px-3.5 text-sm" title="Book a walk-in or phone-in patient">
+            <UserPlus className="w-4 h-4" /> <span className="hidden sm:inline">Walk-in</span>
+          </Link>
         </div>
 
         {apptsError && !loadingAppts && <LoadError error={apptsError} onRetry={retryAppointments} retrying={apptsRetrying} hasData />}
@@ -1156,6 +1164,11 @@ export default function DoctorDashboard() {
                           {!isStaff && !unpaidOnline && (
                             <button onClick={() => { setSearch(""); setCompletingId(a.id); jumpToCard(a.id); }} className="btn-primary py-1.5 px-3 text-xs">
                               <CheckCircle2 className="w-3.5 h-3.5" /> Complete
+                            </button>
+                          )}
+                          {unpaidOnline && (
+                            <button onClick={() => setPayQrFor(a)} className="btn-secondary py-1.5 px-3 text-xs text-amber-700 border-amber-200">
+                              <QrCode className="w-3.5 h-3.5" /> Pay QR
                             </button>
                           )}
                           <button onClick={() => setNoShowTarget(a)} className="btn-secondary py-1.5 px-3 text-xs text-amber-700 border-amber-200">
@@ -1414,12 +1427,22 @@ export default function DoctorDashboard() {
                               </div>
                             )}
                             <VisitAddressLine visit={a.visit} />
-                            <div className={`text-xs mt-1 flex items-center gap-1 ${paymentBlocked ? "text-amber-600 font-semibold" : "text-slate-400"}`}>
+                            <div className={`text-xs mt-1 flex items-center gap-1 flex-wrap ${paymentBlocked ? "text-amber-600 font-semibold" : "text-slate-400"}`}>
                               <IndianRupee className="w-3 h-3" /> {a.amount} · {
                                 a.paymentMethod === "ONLINE"
                                   ? (a.paymentStatus === "PAID" ? "Paid Online" : "Payment Pending")
-                                  : "Cash Payment"
+                                  : a.paymentStatus === "PAID" ? "Paid in Cash" : "Cash Payment"
                               }
+                              {a.bookedById && <span className="badge badge-gray text-[10px] ml-1">Walk-in</span>}
+                              {paymentBlocked && a.status === "SCHEDULED" && (
+                                <button
+                                  type="button"
+                                  onClick={() => setPayQrFor(a)}
+                                  className="ml-1 inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-bold text-amber-700 hover:bg-amber-100"
+                                >
+                                  <QrCode className="w-3 h-3" /> Pay QR
+                                </button>
+                              )}
                             </div>
                             {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
                               <div className="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold mt-1">
@@ -1747,6 +1770,28 @@ export default function DoctorDashboard() {
       )}
 
       {/* No-show confirmation */}
+      {payQrFor && (
+        <div className="fixed inset-0 z-[100] bg-slate-900/50 flex items-end sm:items-center justify-center p-4" onClick={() => setPayQrFor(null)}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div className="min-w-0">
+                <p className="font-bold text-slate-900 truncate">{patientLabel(payQrFor)}</p>
+                <p className="text-xs text-slate-500">Pay on their phone — no sign-in needed</p>
+              </div>
+              <button type="button" onClick={() => setPayQrFor(null)} className="text-slate-400 hover:text-slate-700" aria-label="Close"><X className="w-5 h-5" /></button>
+            </div>
+            <PaymentQrPanel
+              appointmentId={payQrFor.id}
+              amount={payQrFor.amount}
+              patientMobile={payQrFor.patient.mobile}
+              canSwitchToCash={!!payQrFor.bookedById}
+              onPaid={() => { void loadAppointments(); }}
+              onSwitchedToCash={() => { setPayQrFor(null); void loadAppointments(); }}
+            />
+          </div>
+        </div>
+      )}
+
       {noShowTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">

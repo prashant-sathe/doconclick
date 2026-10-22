@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { LayoutDashboard, IndianRupee, UserCircle, Building2, Bell, Clock, Sparkles, LogOut } from "lucide-react";
+import { LayoutDashboard, IndianRupee, UserCircle, Building2, Bell, Clock, Sparkles, LogOut, UserPlus } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
@@ -18,11 +18,12 @@ const NAV = [
   { href: "/doctor/profile", label: "Profile", icon: UserCircle },
 ];
 
-// Staff accounts only ever see the queue — no earnings/profile/clinic-edit
-// access, so they get a single nav item and a direct logout instead of
-// routing through the doctor-only Profile page.
+// Staff accounts only ever see the queue and the walk-in desk — no
+// earnings/profile/clinic-edit access, so a direct logout instead of routing
+// through the doctor-only Profile page.
 const STAFF_NAV = [
   { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/doctor/walk-in", label: "Walk-in", icon: UserPlus },
 ];
 
 function patientLabelFor(r: { patientName: string | null; relation: string; patient: { name: string } }): string {

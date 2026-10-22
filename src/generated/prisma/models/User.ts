@@ -284,6 +284,7 @@ export type UserWhereInput = {
   settlements?: Prisma.SettlementListRelationFilter
   settlementsAdmined?: Prisma.SettlementListRelationFilter
   payoutRequests?: Prisma.PayoutRequestListRelationFilter
+  duesPayments?: Prisma.DuesPaymentListRelationFilter
   paymentLogs?: Prisma.DoctorPaymentLogListRelationFilter
   savedDoctors?: Prisma.SavedDoctorListRelationFilter
   savedByPatients?: Prisma.SavedDoctorListRelationFilter
@@ -333,6 +334,7 @@ export type UserOrderByWithRelationInput = {
   settlements?: Prisma.SettlementOrderByRelationAggregateInput
   settlementsAdmined?: Prisma.SettlementOrderByRelationAggregateInput
   payoutRequests?: Prisma.PayoutRequestOrderByRelationAggregateInput
+  duesPayments?: Prisma.DuesPaymentOrderByRelationAggregateInput
   paymentLogs?: Prisma.DoctorPaymentLogOrderByRelationAggregateInput
   savedDoctors?: Prisma.SavedDoctorOrderByRelationAggregateInput
   savedByPatients?: Prisma.SavedDoctorOrderByRelationAggregateInput
@@ -385,6 +387,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   settlements?: Prisma.SettlementListRelationFilter
   settlementsAdmined?: Prisma.SettlementListRelationFilter
   payoutRequests?: Prisma.PayoutRequestListRelationFilter
+  duesPayments?: Prisma.DuesPaymentListRelationFilter
   paymentLogs?: Prisma.DoctorPaymentLogListRelationFilter
   savedDoctors?: Prisma.SavedDoctorListRelationFilter
   savedByPatients?: Prisma.SavedDoctorListRelationFilter
@@ -472,6 +475,7 @@ export type UserCreateInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -521,6 +525,7 @@ export type UserUncheckedCreateInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -570,6 +575,7 @@ export type UserUpdateInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -619,6 +625,7 @@ export type UserUncheckedUpdateInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -1061,6 +1068,20 @@ export type UserUpdateOneWithoutSettlementsAdminedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSettlementsAdminedInput, Prisma.UserUpdateWithoutSettlementsAdminedInput>, Prisma.UserUncheckedUpdateWithoutSettlementsAdminedInput>
 }
 
+export type UserCreateNestedOneWithoutDuesPaymentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDuesPaymentsInput, Prisma.UserUncheckedCreateWithoutDuesPaymentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDuesPaymentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDuesPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDuesPaymentsInput, Prisma.UserUncheckedCreateWithoutDuesPaymentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDuesPaymentsInput
+  upsert?: Prisma.UserUpsertWithoutDuesPaymentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDuesPaymentsInput, Prisma.UserUpdateWithoutDuesPaymentsInput>, Prisma.UserUncheckedUpdateWithoutDuesPaymentsInput>
+}
+
 export type UserCreateNestedOneWithoutPayoutRequestsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutPayoutRequestsInput, Prisma.UserUncheckedCreateWithoutPayoutRequestsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutPayoutRequestsInput
@@ -1284,6 +1305,7 @@ export type UserCreateWithoutPushTokensInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -1332,6 +1354,7 @@ export type UserUncheckedCreateWithoutPushTokensInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -1396,6 +1419,7 @@ export type UserUpdateWithoutPushTokensInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -1444,6 +1468,7 @@ export type UserUncheckedUpdateWithoutPushTokensInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -1492,6 +1517,7 @@ export type UserCreateWithoutSavedDoctorsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
@@ -1540,6 +1566,7 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
@@ -1593,6 +1620,7 @@ export type UserCreateWithoutSavedByPatientsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
@@ -1641,6 +1669,7 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
@@ -1705,6 +1734,7 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
@@ -1753,6 +1783,7 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
@@ -1812,6 +1843,7 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
@@ -1860,6 +1892,7 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
@@ -1907,6 +1940,7 @@ export type UserCreateWithoutPatientProfileInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -1955,6 +1989,7 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -2019,6 +2054,7 @@ export type UserUpdateWithoutPatientProfileInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -2067,6 +2103,7 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -2116,6 +2153,7 @@ export type UserCreateWithoutDocumentsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -2164,6 +2202,7 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -2228,6 +2267,7 @@ export type UserUpdateWithoutDocumentsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -2276,6 +2316,7 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -2323,6 +2364,7 @@ export type UserCreateWithoutDoctorProfileInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -2371,6 +2413,7 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -2435,6 +2478,7 @@ export type UserUpdateWithoutDoctorProfileInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -2483,6 +2527,7 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -2531,6 +2576,7 @@ export type UserCreateWithoutNurseProfileInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -2579,6 +2625,7 @@ export type UserUncheckedCreateWithoutNurseProfileInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -2643,6 +2690,7 @@ export type UserUpdateWithoutNurseProfileInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -2691,6 +2739,7 @@ export type UserUncheckedUpdateWithoutNurseProfileInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -2740,6 +2789,7 @@ export type UserCreateWithoutVitalsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -2788,6 +2838,7 @@ export type UserUncheckedCreateWithoutVitalsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -2841,6 +2892,7 @@ export type UserCreateWithoutVitalsRecordedInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -2889,6 +2941,7 @@ export type UserUncheckedCreateWithoutVitalsRecordedInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -2953,6 +3006,7 @@ export type UserUpdateWithoutVitalsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -3001,6 +3055,7 @@ export type UserUncheckedUpdateWithoutVitalsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -3060,6 +3115,7 @@ export type UserUpdateWithoutVitalsRecordedInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -3108,6 +3164,7 @@ export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -3156,6 +3213,7 @@ export type UserCreateWithoutNursePaymentLogsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -3204,6 +3262,7 @@ export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -3268,6 +3327,7 @@ export type UserUpdateWithoutNursePaymentLogsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -3316,6 +3376,7 @@ export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -3364,6 +3425,7 @@ export type UserCreateWithoutChangeRequestsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -3412,6 +3474,7 @@ export type UserUncheckedCreateWithoutChangeRequestsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -3465,6 +3528,7 @@ export type UserCreateWithoutChangeRequestsResolvedInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -3513,6 +3577,7 @@ export type UserUncheckedCreateWithoutChangeRequestsResolvedInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -3577,6 +3642,7 @@ export type UserUpdateWithoutChangeRequestsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -3625,6 +3691,7 @@ export type UserUncheckedUpdateWithoutChangeRequestsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -3684,6 +3751,7 @@ export type UserUpdateWithoutChangeRequestsResolvedInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -3732,6 +3800,7 @@ export type UserUncheckedUpdateWithoutChangeRequestsResolvedInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -3780,6 +3849,7 @@ export type UserCreateWithoutStaffAccountInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -3828,6 +3898,7 @@ export type UserUncheckedCreateWithoutStaffAccountInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -3881,6 +3952,7 @@ export type UserCreateWithoutStaffMembersInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -3929,6 +4001,7 @@ export type UserUncheckedCreateWithoutStaffMembersInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -3993,6 +4066,7 @@ export type UserUpdateWithoutStaffAccountInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -4041,6 +4115,7 @@ export type UserUncheckedUpdateWithoutStaffAccountInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -4100,6 +4175,7 @@ export type UserUpdateWithoutStaffMembersInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -4148,6 +4224,7 @@ export type UserUncheckedUpdateWithoutStaffMembersInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -4195,6 +4272,7 @@ export type UserCreateWithoutAsPatientInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -4243,6 +4321,7 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -4296,6 +4375,7 @@ export type UserCreateWithoutAsDoctorInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -4344,6 +4424,7 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -4408,6 +4489,7 @@ export type UserUpdateWithoutAsPatientInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -4456,6 +4538,7 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -4515,6 +4598,7 @@ export type UserUpdateWithoutAsDoctorInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -4563,6 +4647,7 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -4612,6 +4697,7 @@ export type UserCreateWithoutWalletInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -4660,6 +4746,7 @@ export type UserUncheckedCreateWithoutWalletInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -4724,6 +4811,7 @@ export type UserUpdateWithoutWalletInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -4772,6 +4860,7 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -4820,6 +4909,7 @@ export type UserCreateWithoutWalletTransactionsAdjustedInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -4868,6 +4958,7 @@ export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -4932,6 +5023,7 @@ export type UserUpdateWithoutWalletTransactionsAdjustedInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -4980,6 +5072,7 @@ export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -5027,6 +5120,7 @@ export type UserCreateWithoutSettlementsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -5075,6 +5169,7 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -5128,6 +5223,7 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -5176,6 +5272,7 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -5240,6 +5337,7 @@ export type UserUpdateWithoutSettlementsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -5288,6 +5386,7 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -5347,6 +5446,7 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -5394,6 +5494,219 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
+}
+
+export type UserCreateWithoutDuesPaymentsInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
+}
+
+export type UserUncheckedCreateWithoutDuesPaymentsInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
+}
+
+export type UserCreateOrConnectWithoutDuesPaymentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDuesPaymentsInput, Prisma.UserUncheckedCreateWithoutDuesPaymentsInput>
+}
+
+export type UserUpsertWithoutDuesPaymentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDuesPaymentsInput, Prisma.UserUncheckedUpdateWithoutDuesPaymentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDuesPaymentsInput, Prisma.UserUncheckedCreateWithoutDuesPaymentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDuesPaymentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDuesPaymentsInput, Prisma.UserUncheckedUpdateWithoutDuesPaymentsInput>
+}
+
+export type UserUpdateWithoutDuesPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDuesPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
@@ -5443,6 +5756,7 @@ export type UserCreateWithoutPayoutRequestsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -5491,6 +5805,7 @@ export type UserUncheckedCreateWithoutPayoutRequestsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -5555,6 +5870,7 @@ export type UserUpdateWithoutPayoutRequestsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -5603,6 +5919,7 @@ export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -5652,6 +5969,7 @@ export type UserCreateWithoutPaymentLogsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
@@ -5700,6 +6018,7 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
   clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
@@ -5764,6 +6083,7 @@ export type UserUpdateWithoutPaymentLogsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
@@ -5812,6 +6132,7 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
   clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
@@ -5859,6 +6180,7 @@ export type UserCreateWithoutMessagesSentInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -5907,6 +6229,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -5971,6 +6294,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -6019,6 +6343,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -6067,6 +6392,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -6115,6 +6441,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -6168,6 +6495,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -6216,6 +6544,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -6280,6 +6609,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -6328,6 +6658,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -6387,6 +6718,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -6435,6 +6767,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -6483,6 +6816,7 @@ export type UserCreateWithoutComplaintsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -6531,6 +6865,7 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -6595,6 +6930,7 @@ export type UserUpdateWithoutComplaintsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -6643,6 +6979,7 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -6692,6 +7029,7 @@ export type UserCreateWithoutClinicsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -6740,6 +7078,7 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -6804,6 +7143,7 @@ export type UserUpdateWithoutClinicsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -6852,6 +7192,7 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -6900,6 +7241,7 @@ export type UserCreateWithoutAnnouncementsCreatedInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -6948,6 +7290,7 @@ export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -7012,6 +7355,7 @@ export type UserUpdateWithoutAnnouncementsCreatedInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -7060,6 +7404,7 @@ export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -7108,6 +7453,7 @@ export type UserCreateWithoutAnnouncementRecipientsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -7156,6 +7502,7 @@ export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -7220,6 +7567,7 @@ export type UserUpdateWithoutAnnouncementRecipientsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -7268,6 +7616,7 @@ export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -7316,6 +7665,7 @@ export type UserCreateWithoutImpersonationsStartedInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -7364,6 +7714,7 @@ export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -7417,6 +7768,7 @@ export type UserCreateWithoutImpersonationsReceivedInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -7465,6 +7817,7 @@ export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -7529,6 +7882,7 @@ export type UserUpdateWithoutImpersonationsStartedInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -7577,6 +7931,7 @@ export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -7636,6 +7991,7 @@ export type UserUpdateWithoutImpersonationsReceivedInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -7684,6 +8040,7 @@ export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -7732,6 +8089,7 @@ export type UserCreateWithoutCouponsCreatedInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -7780,6 +8138,7 @@ export type UserUncheckedCreateWithoutCouponsCreatedInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -7844,6 +8203,7 @@ export type UserUpdateWithoutCouponsCreatedInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -7892,6 +8252,7 @@ export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -7940,6 +8301,7 @@ export type UserCreateWithoutCouponRedemptionsInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -7988,6 +8350,7 @@ export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -8052,6 +8415,7 @@ export type UserUpdateWithoutCouponRedemptionsInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -8100,6 +8464,7 @@ export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -8148,6 +8513,7 @@ export type UserCreateWithoutPaymentOrdersInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
@@ -8196,6 +8562,7 @@ export type UserUncheckedCreateWithoutPaymentOrdersInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
   settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
   payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
   savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
   savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -8260,6 +8627,7 @@ export type UserUpdateWithoutPaymentOrdersInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
@@ -8308,6 +8676,7 @@ export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
   paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
   savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
   savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -8346,6 +8715,7 @@ export type UserCountOutputType = {
   settlements: number
   settlementsAdmined: number
   payoutRequests: number
+  duesPayments: number
   paymentLogs: number
   savedDoctors: number
   savedByPatients: number
@@ -8378,6 +8748,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   settlements?: boolean | UserCountOutputTypeCountSettlementsArgs
   settlementsAdmined?: boolean | UserCountOutputTypeCountSettlementsAdminedArgs
   payoutRequests?: boolean | UserCountOutputTypeCountPayoutRequestsArgs
+  duesPayments?: boolean | UserCountOutputTypeCountDuesPaymentsArgs
   paymentLogs?: boolean | UserCountOutputTypeCountPaymentLogsArgs
   savedDoctors?: boolean | UserCountOutputTypeCountSavedDoctorsArgs
   savedByPatients?: boolean | UserCountOutputTypeCountSavedByPatientsArgs
@@ -8471,6 +8842,13 @@ export type UserCountOutputTypeCountSettlementsAdminedArgs<ExtArgs extends runti
  */
 export type UserCountOutputTypeCountPayoutRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PayoutRequestWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDuesPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DuesPaymentWhereInput
 }
 
 /**
@@ -8639,6 +9017,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   settlements?: boolean | Prisma.User$settlementsArgs<ExtArgs>
   settlementsAdmined?: boolean | Prisma.User$settlementsAdminedArgs<ExtArgs>
   payoutRequests?: boolean | Prisma.User$payoutRequestsArgs<ExtArgs>
+  duesPayments?: boolean | Prisma.User$duesPaymentsArgs<ExtArgs>
   paymentLogs?: boolean | Prisma.User$paymentLogsArgs<ExtArgs>
   savedDoctors?: boolean | Prisma.User$savedDoctorsArgs<ExtArgs>
   savedByPatients?: boolean | Prisma.User$savedByPatientsArgs<ExtArgs>
@@ -8723,6 +9102,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   settlements?: boolean | Prisma.User$settlementsArgs<ExtArgs>
   settlementsAdmined?: boolean | Prisma.User$settlementsAdminedArgs<ExtArgs>
   payoutRequests?: boolean | Prisma.User$payoutRequestsArgs<ExtArgs>
+  duesPayments?: boolean | Prisma.User$duesPaymentsArgs<ExtArgs>
   paymentLogs?: boolean | Prisma.User$paymentLogsArgs<ExtArgs>
   savedDoctors?: boolean | Prisma.User$savedDoctorsArgs<ExtArgs>
   savedByPatients?: boolean | Prisma.User$savedByPatientsArgs<ExtArgs>
@@ -8765,6 +9145,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     settlements: Prisma.$SettlementPayload<ExtArgs>[]
     settlementsAdmined: Prisma.$SettlementPayload<ExtArgs>[]
     payoutRequests: Prisma.$PayoutRequestPayload<ExtArgs>[]
+    duesPayments: Prisma.$DuesPaymentPayload<ExtArgs>[]
     paymentLogs: Prisma.$DoctorPaymentLogPayload<ExtArgs>[]
     savedDoctors: Prisma.$SavedDoctorPayload<ExtArgs>[]
     savedByPatients: Prisma.$SavedDoctorPayload<ExtArgs>[]
@@ -9207,6 +9588,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   settlements<T extends Prisma.User$settlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   settlementsAdmined<T extends Prisma.User$settlementsAdminedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settlementsAdminedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payoutRequests<T extends Prisma.User$payoutRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$payoutRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  duesPayments<T extends Prisma.User$duesPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$duesPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DuesPaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   paymentLogs<T extends Prisma.User$paymentLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$paymentLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DoctorPaymentLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedDoctors<T extends Prisma.User$savedDoctorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedDoctorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedDoctorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedByPatients<T extends Prisma.User$savedByPatientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedByPatientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedDoctorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -9933,6 +10315,30 @@ export type User$payoutRequestsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.PayoutRequestScalarFieldEnum | Prisma.PayoutRequestScalarFieldEnum[]
+}
+
+/**
+ * User.duesPayments
+ */
+export type User$duesPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DuesPayment
+   */
+  select?: Prisma.DuesPaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DuesPayment
+   */
+  omit?: Prisma.DuesPaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DuesPaymentInclude<ExtArgs> | null
+  where?: Prisma.DuesPaymentWhereInput
+  orderBy?: Prisma.DuesPaymentOrderByWithRelationInput | Prisma.DuesPaymentOrderByWithRelationInput[]
+  cursor?: Prisma.DuesPaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DuesPaymentScalarFieldEnum | Prisma.DuesPaymentScalarFieldEnum[]
 }
 
 /**

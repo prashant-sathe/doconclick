@@ -21,22 +21,33 @@ export async function POST(req: Request) {
 
   try {
     const existing = await prisma.user.findUnique({ where: { mobile } });
-    if (existing) {
+    // A clinic's walk-in booking (/doctor/walk-in) creates the account for a
+    // number with none — no password, no email (a Google account always has
+    // one). Registering with that number takes it over, so the patient finds
+    // their visits already there instead of being told the number is taken.
+    const unclaimedWalkIn = !!existing && existing.role === "PATIENT" && !existing.password && !existing.email && !existing.deletedAt;
+    if (existing && !unclaimedWalkIn) {
       return NextResponse.json({ error: "This mobile number is already registered. Try signing in instead." }, { status: 409 });
     }
 
     const hashed = await hashPassword(password);
 
     // No `include` — the response only needs id/name/role.
-    const user = await prisma.user.create({
-      data: {
-        name: "",
-        mobile,
-        password: hashed,
-        role: "PATIENT",
-        patientProfile: { create: { age: 0, gender: "" } },
-      },
-    });
+    const user = unclaimedWalkIn
+      ? await prisma.user.update({
+          // Conditional: two sign-ups racing for the number — only one sets it.
+          where: { id: existing!.id, password: "" },
+          data: { password: hashed },
+        })
+      : await prisma.user.create({
+          data: {
+            name: "",
+            mobile,
+            password: hashed,
+            role: "PATIENT",
+            patientProfile: { create: { age: 0, gender: "" } },
+          },
+        });
 
     const payload = sessionPayload(user);
     const response = NextResponse.json({ id: user.id, name: user.name, role: user.role });
@@ -57,7 +68,7 @@ export async function POST(req: Request) {
     });
     return response;
   } catch (err) {
-    if (err && typeof err === "object" && "code" in err && (err as { code?: string }).code === "P2002") {
+    if (err && typeof err === "object" && "code" in err && ["P2002", "P2025"].includes((err as { code?: string }).code ?? "")) {
       return NextResponse.json({ error: "This mobile number is already registered. Try signing in instead." }, { status: 409 });
     }
     console.error("Patient registration failed:", err);

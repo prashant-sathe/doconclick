@@ -417,6 +417,7 @@ export const ModelName = {
   Wallet: 'Wallet',
   WalletTransaction: 'WalletTransaction',
   Settlement: 'Settlement',
+  DuesPayment: 'DuesPayment',
   PayoutRequest: 'PayoutRequest',
   DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
@@ -453,7 +454,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionVersion" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
+    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "duesPayment" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionVersion" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1934,6 +1935,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SettlementCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SettlementCountAggregateOutputType> | number
+        }
+      }
+    }
+    DuesPayment: {
+      payload: Prisma.$DuesPaymentPayload<ExtArgs>
+      fields: Prisma.DuesPaymentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DuesPaymentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DuesPaymentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload>
+        }
+        findFirst: {
+          args: Prisma.DuesPaymentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DuesPaymentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload>
+        }
+        findMany: {
+          args: Prisma.DuesPaymentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload>[]
+        }
+        create: {
+          args: Prisma.DuesPaymentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload>
+        }
+        createMany: {
+          args: Prisma.DuesPaymentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DuesPaymentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload>[]
+        }
+        delete: {
+          args: Prisma.DuesPaymentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload>
+        }
+        update: {
+          args: Prisma.DuesPaymentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload>
+        }
+        deleteMany: {
+          args: Prisma.DuesPaymentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DuesPaymentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DuesPaymentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload>[]
+        }
+        upsert: {
+          args: Prisma.DuesPaymentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DuesPaymentPayload>
+        }
+        aggregate: {
+          args: Prisma.DuesPaymentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDuesPayment>
+        }
+        groupBy: {
+          args: Prisma.DuesPaymentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DuesPaymentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DuesPaymentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DuesPaymentCountAggregateOutputType> | number
         }
       }
     }
@@ -3879,6 +3954,7 @@ export const AppointmentScalarFieldEnum = {
   scheduledAt: 'scheduledAt',
   requestedScheduledAt: 'requestedScheduledAt',
   reminderSentAt: 'reminderSentAt',
+  bookedById: 'bookedById',
   createdAt: 'createdAt'
 } as const
 
@@ -3931,6 +4007,22 @@ export const SettlementScalarFieldEnum = {
 } as const
 
 export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
+
+
+export const DuesPaymentScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  doctorId: 'doctorId',
+  amount: 'amount',
+  appointmentIds: 'appointmentIds',
+  status: 'status',
+  cfPaymentId: 'cfPaymentId',
+  paidAt: 'paidAt',
+  settlementId: 'settlementId',
+  createdAt: 'createdAt'
+} as const
+
+export type DuesPaymentScalarFieldEnum = (typeof DuesPaymentScalarFieldEnum)[keyof typeof DuesPaymentScalarFieldEnum]
 
 
 export const PayoutRequestScalarFieldEnum = {
@@ -4149,6 +4241,7 @@ export const PlatformSettingsScalarFieldEnum = {
   nurseShiftServicesSeeded: 'nurseShiftServicesSeeded',
   bookingHorizonDays: 'bookingHorizonDays',
   chatFollowUpDays: 'chatFollowUpDays',
+  cashDueLimit: 'cashDueLimit',
   splashImageUrl: 'splashImageUrl',
   splashFit: 'splashFit',
   splashBgColor: 'splashBgColor',
@@ -4524,6 +4617,7 @@ export type GlobalOmitConfig = {
   wallet?: Prisma.WalletOmit
   walletTransaction?: Prisma.WalletTransactionOmit
   settlement?: Prisma.SettlementOmit
+  duesPayment?: Prisma.DuesPaymentOmit
   payoutRequest?: Prisma.PayoutRequestOmit
   doctorPaymentLog?: Prisma.DoctorPaymentLogOmit
   message?: Prisma.MessageOmit
