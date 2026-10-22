@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 import { requireRole } from "@/lib/routeGuards";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
-import { PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS } from "@/lib/nursePackage";
+import { parseReferral } from "@/lib/consultation";
 import { referralPushCopy } from "@/lib/nurseReferral";
 
 // Writing a referral needs an accepted or completed consultation; removing
@@ -35,30 +35,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const { appt, authUser, error } = await loadOwnConsult(id, "write");
   if (error) return error;
 
-  const body = await req.json().catch(() => ({}));
-  const visits = Number(body.visits ?? 1);
-  const intervalDays = Number(body.intervalDays ?? 1);
-  if (!Number.isInteger(visits) || visits < 1 || visits > PACKAGE_MAX_VISITS) {
-    return NextResponse.json({ error: `Visits must be between 1 and ${PACKAGE_MAX_VISITS}.` }, { status: 400 });
-  }
-  if (!(PACKAGE_INTERVAL_OPTIONS as readonly number[]).includes(intervalDays)) {
-    return NextResponse.json({ error: "Visits can be every 1, 2 or 3 days." }, { status: 400 });
-  }
-  const service = await prisma.nurseService.findFirst({ where: { id: String(body.serviceId ?? ""), isActive: true } });
-  if (!service) return NextResponse.json({ error: "Pick a nurse service." }, { status: 400 });
-  const instructions = typeof body.instructions === "string" ? body.instructions.trim().slice(0, 1000) || null : null;
+  const input = await parseReferral(await req.json().catch(() => ({})));
+  if ("error" in input) return NextResponse.json({ error: input.error }, { status: 400 });
+  const { serviceId, serviceName, visits, intervalDays, instructions } = input;
 
   const existed = await prisma.nurseReferral.findUnique({ where: { appointmentId: appt!.id }, select: { id: true } });
   const referral = await prisma.nurseReferral.upsert({
     where: { appointmentId: appt!.id },
-    create: { appointmentId: appt!.id, serviceId: service.id, visits, intervalDays, instructions },
-    update: { serviceId: service.id, visits, intervalDays, instructions },
+    create: { appointmentId: appt!.id, serviceId, visits, intervalDays, instructions },
+    update: { serviceId, visits, intervalDays, instructions },
   });
   // A new referral on a completed consultation is bookable right away. One
   // added during an accepted consultation (the usual "complete" flow) is
   // announced when that consultation is marked complete instead.
   if (!existed && appt!.status === "COMPLETED") {
-    void sendPushToUser(appt!.patientId, referralPushCopy(authUser!.name, service.name));
+    void sendPushToUser(appt!.patientId, referralPushCopy(authUser!.name, serviceName));
   }
   return NextResponse.json(referral);
 }

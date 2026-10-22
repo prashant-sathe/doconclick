@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 let client: S3Client | null = null;
 
@@ -67,5 +67,17 @@ export async function readUploadHead(url: string, folder: string, bytes = 16): P
     // rather than 404 — our credentials can read every object we wrote.
     if (name === "NoSuchKey" || name === "NotFound" || name === "AccessDenied") return "missing";
     throw err;
+  }
+}
+
+// Deletes a file we uploaded under `folder` — e.g. to undo uploads when the
+// database write they belonged to failed. Best effort: never throws.
+export async function deleteFromS3(url: string, folder: string): Promise<void> {
+  if (!isOwnUploadUrl(url, folder)) return;
+  try {
+    const key = decodeURIComponent(new URL(url).pathname.slice(1));
+    await getClient().send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET_NAME!, Key: key }));
+  } catch (err) {
+    console.error("Could not delete", url, err);
   }
 }

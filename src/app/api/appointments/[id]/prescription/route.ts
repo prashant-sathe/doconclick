@@ -1,17 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { uploadToS3 } from "@/lib/s3";
-import { verifyUpload } from "@/lib/fileSniff";
+import { checkPrescriptionFiles, uploadPrescriptionFiles, discardPrescriptionFiles } from "@/lib/consultation";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
-
-const ALLOWED_TYPES: Record<string, string> = {
-  "application/pdf": "pdf",
-  "image/jpeg": "jpg",
-  "image/png": "png",
-};
-const MAX_SIZE_BYTES = 5 * 1024 * 1024;
-const MAX_FILES = 10;
 
 // GET: Structured prescription data for PrescriptionDocument — for the
 // patient and the doctor who wrote it (once the consultation is completed),
@@ -118,35 +109,18 @@ export async function POST(
   if (files.length === 0) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
-  if (files.length > MAX_FILES) {
-    return NextResponse.json({ error: `You can attach at most ${MAX_FILES} files at once` }, { status: 400 });
-  }
-  // Every file is checked — including its bytes (src/lib/fileSniff.ts) —
-  // before any is uploaded, so one bad file doesn't leave the rest half-saved.
-  const checked: { file: File; buffer: Buffer; type: string; ext: string }[] = [];
-  for (const file of files) {
-    if (!ALLOWED_TYPES[file.type]) {
-      return NextResponse.json({ error: "Only PDF, JPG, or PNG files are allowed" }, { status: 400 });
-    }
-    if (file.size > MAX_SIZE_BYTES) {
-      return NextResponse.json({ error: "Each file must be under 5MB" }, { status: 400 });
-    }
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const sniffed = verifyUpload(buffer, file.type, Object.keys(ALLOWED_TYPES));
-    if ("error" in sniffed) return NextResponse.json({ error: `${file.name}: ${sniffed.error}` }, { status: 400 });
-    checked.push({ file, buffer, type: sniffed.type, ext: sniffed.ext });
-  }
+  const checked = await checkPrescriptionFiles(files);
+  if ("error" in checked) return NextResponse.json({ error: checked.error }, { status: 400 });
 
-  const saved: { url: string; fileName: string }[] = [];
-  for (const [index, { file, buffer, type, ext }] of checked.entries()) {
-    const filename = `${id}-${Date.now()}-${index}.${ext}`;
-    const url = await uploadToS3(`prescriptions/${filename}`, buffer, type);
-    saved.push({ url, fileName: file.name });
+  const saved = await uploadPrescriptionFiles(id, checked.files);
+  try {
+    await prisma.prescriptionAttachment.createMany({
+      data: saved.map((s) => ({ appointmentId: id, url: s.url, fileName: s.fileName })),
+    });
+  } catch (err) {
+    await discardPrescriptionFiles(saved);
+    throw err;
   }
-
-  await prisma.prescriptionAttachment.createMany({
-    data: saved.map((s) => ({ appointmentId: id, url: s.url, fileName: s.fileName })),
-  });
 
   const attachments = await prisma.prescriptionAttachment.findMany({ where: { appointmentId: id } });
   return NextResponse.json({ attachments });

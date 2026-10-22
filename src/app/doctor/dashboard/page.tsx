@@ -336,9 +336,6 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
     setFileError("");
     setReferralError("");
     setSubmitError("");
-    const errorOf = async (res: Response, fallback: string) =>
-      ((await res.json().catch(() => ({}))) as { error?: string }).error ?? fallback;
-
     try {
       const validMedicines = medicines
         .filter((m) => m.name.trim())
@@ -352,60 +349,38 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       const validTests = tests
         .filter((t) => t.name.trim())
         .map((t) => ({ name: t.name, instructions: t.instructions }));
-      if (validMedicines.length > 0 || validTests.length > 0) {
-        const res = await fetch(`/api/appointments/${appt.id}/prescription-items`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ medicines: validMedicines, tests: validTests }),
+      // One call saves notes, prescription, files and referral and closes the
+      // visit — all or nothing (POST /api/appointments/[id]/complete), so a
+      // refusal (unpaid, not arrived) leaves nothing half-saved to retry over.
+      const form = new FormData();
+      form.append("data", JSON.stringify({
+        doctorNotes: notes,
+        medicines: validMedicines,
+        tests: validTests,
+        nurseReferral: nurseCare.on
+          ? { serviceId: nurseCare.serviceId, visits: nurseCare.visits, intervalDays: nurseCare.intervalDays, instructions: nurseCare.instructions }
+          : null,
+      }));
+      // Re-read each picked File into memory before appending: on Android the
+      // WebView can't stream a content:// -backed File into a fetch() multipart
+      // body, which fails the whole request with "Failed to fetch".
+      for (const f of files) {
+        const bytes = await new Promise<ArrayBuffer>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as ArrayBuffer);
+          reader.onerror = () => reject(reader.error ?? new Error("Could not read the file"));
+          reader.readAsArrayBuffer(f);
         });
-        if (!res.ok) {
-          setSubmitError(await errorOf(res, "Could not save the prescription."));
-          return;
-        }
+        const prepared = await compressImage(new File([bytes], f.name, { type: f.type || "application/octet-stream" }));
+        form.append("file", prepared, prepared.name);
       }
-      if (files.length > 0) {
-        const form = new FormData();
-        // Re-read each picked File into memory before appending: on Android the
-        // WebView can't stream a content:// -backed File into a fetch() multipart
-        // body, which fails the whole request with "Failed to fetch".
-        for (const f of files) {
-          const bytes = await new Promise<ArrayBuffer>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as ArrayBuffer);
-            reader.onerror = () => reject(reader.error ?? new Error("Could not read the file"));
-            reader.readAsArrayBuffer(f);
-          });
-          const prepared = await compressImage(new File([bytes], f.name, { type: f.type || "application/octet-stream" }));
-          form.append("file", prepared, prepared.name);
-        }
-        const res = await fetch(`/api/appointments/${appt.id}/prescription`, { method: "POST", body: form });
-        if (!res.ok) {
-          setFileError(await errorOf(res, "Could not upload attachments."));
-          return;
-        }
-        // Uploaded — drop them so a retry after a later failure doesn't attach duplicates.
-        setFiles([]);
-      }
-      if (nurseCare.on) {
-        const res = await fetch(`/api/appointments/${appt.id}/nurse-referral`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ serviceId: nurseCare.serviceId, visits: nurseCare.visits, intervalDays: nurseCare.intervalDays, instructions: nurseCare.instructions }),
-        });
-        if (!res.ok) {
-          setReferralError(await errorOf(res, "Could not save the nurse referral."));
-          return;
-        }
-      }
-      // Prescription is saved first; only then is the appointment closed —
-      // and only this PATCH may close it (payment/arrival guards live there).
-      const res = await fetch(`/api/appointments/${appt.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "COMPLETED", doctorNotes: notes }),
-      });
+      const res = await fetch(`/api/appointments/${appt.id}/complete`, { method: "POST", body: form });
       if (!res.ok) {
-        setSubmitError(await errorOf(res, "Could not mark this consultation complete."));
+        const body = (await res.json().catch(() => ({}))) as { error?: string; code?: string };
+        const message = body.error ?? "Could not mark this consultation complete.";
+        if (body.code === "INVALID_FILE") setFileError(message);
+        else if (body.code === "INVALID_REFERRAL") setReferralError(message);
+        else setSubmitError(message);
         return;
       }
       clearDraft();
