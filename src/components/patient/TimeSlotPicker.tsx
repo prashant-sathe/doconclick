@@ -75,7 +75,7 @@ export default function TimeSlotPicker({
                   type="button"
                   onClick={() => onChange(`${date}T${s.time}`)}
                   className={cn(
-                    "py-2 rounded-xl border text-xs font-semibold transition-all flex-shrink-0",
+                    "min-h-11 py-2 rounded-xl border text-xs font-semibold transition-all flex-shrink-0",
                     selectedTime === s.time
                       ? "border-blue-500 bg-blue-50 text-blue-700"
                       : "border-slate-200 text-slate-500 hover:border-slate-300"

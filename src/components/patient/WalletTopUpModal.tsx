@@ -39,7 +39,7 @@ export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-extrabold text-slate-900">Add Money</h2>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600">
+          <button aria-label="Close" onClick={onClose} className="tap-44 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600">
             <X className="w-4 h-4" />
           </button>
         </div>

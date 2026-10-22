@@ -79,7 +79,7 @@ export default function PatientHeader() {
       style={{ top: "var(--imp-banner-h, 0px)" }}
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-        <Link href="/patient/dashboard" className="flex items-center flex-shrink-0">
+        <Link href="/patient/dashboard" aria-label="DocOnClick home" className="tap-44-y flex items-center flex-shrink-0">
           <Image src="/logo.png" alt="DocOnClick" width={431} height={102} className="h-7 sm:h-8 w-auto object-contain" />
         </Link>
 
@@ -109,7 +109,8 @@ export default function PatientHeader() {
 
           <Link
             href="/patient/wallet"
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition-colors"
+            aria-label={balance != null ? `Wallet, balance ₹${balance.toLocaleString("en-IN")}` : "Wallet"}
+            className="tap-44-y flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition-colors"
           >
             <WalletIcon className="w-3.5 h-3.5" />
             <span>{balance != null ? `₹${balance.toLocaleString("en-IN")}` : "—"}</span>
@@ -119,7 +120,8 @@ export default function PatientHeader() {
             <button
               onClick={toggleBell}
               title="Notifications"
-              className="relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
+              aria-label={hasUnseen ? "Notifications (new)" : "Notifications"}
+              className="tap-44 relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
             >
               <Bell className={cn("w-4 h-4", hasUnseen && "animate-bell-ring")} />
               {hasUnseen && (

@@ -61,7 +61,7 @@ export default function SearchRangeSettingsPage() {
         <button
           type="button"
           onClick={() => change(null)}
-          className={cn("px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
+          className={cn("min-h-11 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
             radius == null ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300")}
         >
           Any distance
@@ -69,7 +69,7 @@ export default function SearchRangeSettingsPage() {
         <button
           type="button"
           onClick={() => change(radius ?? DEFAULT_RADIUS_KM)}
-          className={cn("px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
+          className={cn("min-h-11 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
             radius != null ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300")}
         >
           Within a set distance

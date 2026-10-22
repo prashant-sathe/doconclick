@@ -38,7 +38,7 @@ export default function ProfileSubShell({
       <PatientMobileNav />
 
       <div className="max-w-xl mx-auto py-6 px-4 sm:px-6">
-        <Link href="/patient/profile" className="btn-ghost gap-1 text-sm -ml-2 mb-3">
+        <Link href="/patient/profile" className="tap-44-y btn-ghost gap-1 text-sm -ml-2 mb-3">
           <ChevronLeft className="w-4 h-4" /> Profile
         </Link>
         <div className="flex items-center gap-3">

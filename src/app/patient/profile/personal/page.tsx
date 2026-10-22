@@ -147,7 +147,7 @@ export default function PersonalSettingsPage() {
         <div className="flex flex-wrap gap-2 mt-1">
           {CHRONIC_OPTIONS.map((o) => (
             <button key={o} type="button" onClick={() => toggleChronic(o)}
-              className={cn("px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
+              className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
                 form.chronicDiseases.includes(o) ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
               )}>
               {o}

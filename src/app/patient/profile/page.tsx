@@ -60,7 +60,7 @@ function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) 
 
   return (
     <div ref={menuRef} className="relative flex-shrink-0">
-      <button
+      <button aria-label="Change profile photo" aria-haspopup="menu"
         type="button"
         onClick={onAvatarClick}
         className="relative w-16 h-16 rounded-full block overflow-hidden bg-slate-100 border border-slate-200"

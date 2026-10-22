@@ -53,7 +53,7 @@ export default function DoctorFilters({
         type="button"
         onClick={() => setOpen(true)}
         className={cn(
-          "relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors flex-shrink-0",
+          "min-h-11 relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors flex-shrink-0",
           count > 0
             ? "bg-blue-600 border-blue-600 text-white"
             : "bg-white border-slate-200 text-slate-600 hover:border-slate-300",
@@ -77,7 +77,7 @@ export default function DoctorFilters({
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-extrabold text-slate-900">Filter &amp; Sort</h3>
-              <button onClick={() => setOpen(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
+              <button aria-label="Close filters" onClick={() => setOpen(false)} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -92,7 +92,7 @@ export default function DoctorFilters({
                     type="button"
                     onClick={() => onChange({ ...value, language: "" })}
                     className={cn(
-                      "px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+                      "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
                       value.language === "" ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
@@ -104,7 +104,7 @@ export default function DoctorFilters({
                       type="button"
                       onClick={() => onChange({ ...value, language: lang })}
                       className={cn(
-                        "px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+                        "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
                         value.language === lang ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                       )}
                     >
@@ -126,7 +126,7 @@ export default function DoctorFilters({
                     type="button"
                     onClick={() => onChange({ ...value, minExperience: yrs })}
                     className={cn(
-                      "px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+                      "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
                       value.minExperience === yrs ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
@@ -147,7 +147,7 @@ export default function DoctorFilters({
                     type="button"
                     onClick={() => onChange({ ...value, maxFee: fee })}
                     className={cn(
-                      "px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+                      "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
                       value.maxFee === fee ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
@@ -168,7 +168,7 @@ export default function DoctorFilters({
                     type="button"
                     onClick={() => onChange({ ...value, sortBy: id })}
                     className={cn(
-                      "px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+                      "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
                       value.sortBy === id ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >

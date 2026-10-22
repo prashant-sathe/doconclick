@@ -19,7 +19,7 @@ export default function SpecialtyFilter({
           type="button"
           onClick={() => onChange("")}
           className={cn(
-            "flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+            "min-h-11 flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors",
             value === ""
               ? "bg-blue-600 border-blue-600 text-white"
               : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
@@ -33,7 +33,7 @@ export default function SpecialtyFilter({
             type="button"
             onClick={() => onChange(name)}
             className={cn(
-              "flex-shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+              "min-h-11 flex-shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors",
               value === name
                 ? "text-white border-transparent"
                 : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"

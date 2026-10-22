@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { DEFAULT_APP_LANGUAGE, HTML_LANG_SCRIPT } from "@/lib/appLanguage";
 import { Inter } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
@@ -69,8 +70,11 @@ export default function RootLayout({
     // --safe-area-inset-* as an inline style on <html> before React
     // hydrates, which otherwise mismatches the SSR output and made
     // hydration fail silently app-wide inside the Android WebView.
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    // lang: the UI's language (en-IN), or a saved preference applied by the
+    // inline script below before paint (src/lib/appLanguage.ts).
+    <html lang={DEFAULT_APP_LANGUAGE} className={inter.variable} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: HTML_LANG_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }}

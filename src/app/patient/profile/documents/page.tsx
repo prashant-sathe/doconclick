@@ -83,7 +83,7 @@ export default function HealthDocumentsPage() {
       <button
         type="button"
         onClick={() => setUploadOpen(true)}
-        className="btn-secondary w-full justify-center py-2.5"
+        className="tap-44-y btn-secondary w-full justify-center py-2.5"
       >
         <Plus className="w-4 h-4" /> Add Document
       </button>
@@ -105,19 +105,19 @@ export default function HealthDocumentsPage() {
                     {doc.category} · {new Date(doc.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                   </p>
                 </div>
-                <button
+                <button aria-label={`View or download ${doc.title}`}
                   type="button"
                   onClick={() => onOpen(doc)}
                   disabled={downloadingId === doc.id}
-                  className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-slate-100 flex-shrink-0"
+                  className="tap-44 w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-slate-100 flex-shrink-0"
                   title="View / Download"
                 >
                   {downloadingId === doc.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                 </button>
-                <button
+                <button aria-label={`Remove ${doc.title}`}
                   type="button"
                   onClick={() => setDeleteTarget(doc)}
-                  className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0"
+                  className="tap-44 w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0"
                   title="Remove"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -187,7 +187,7 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-bold text-slate-800">Add Document</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
+          <button aria-label="Close" onClick={onClose} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
             <X className="w-4 h-4" />
           </button>
         </div>

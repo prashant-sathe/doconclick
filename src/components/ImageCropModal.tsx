@@ -75,7 +75,7 @@ export default function ImageCropModal({ file, aspect, round, onCancel, onConfir
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <h3 className="font-bold text-slate-900">Crop photo</h3>
-          <button type="button" onClick={cancel} className="text-slate-300 hover:text-slate-500">
+          <button aria-label="Close" type="button" onClick={cancel} className="text-slate-300 hover:text-slate-500">
             <X className="w-5 h-5" />
           </button>
         </div>

@@ -46,7 +46,7 @@ export default function PatientVitalsPage() {
       <PatientHeader />
       <PatientMobileNav />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
-        <Link href="/patient/profile" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 mb-4">
+        <Link href="/patient/profile" className="tap-44-y inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 mb-4">
           <ArrowLeft className="w-4 h-4" /> Back to Profile
         </Link>
         <div className="flex items-center gap-3 mb-4">
@@ -60,7 +60,7 @@ export default function PatientVitalsPage() {
           <div className="flex flex-wrap gap-2 mb-4">
             {people.map((p) => (
               <button key={p.id ?? "me"} onClick={() => setWho(p.id)}
-                className={cn("px-3 py-1.5 rounded-full text-xs font-semibold border", who === p.id ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200")}>
+                className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border", who === p.id ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200")}>
                 {p.label}
               </button>
             ))}

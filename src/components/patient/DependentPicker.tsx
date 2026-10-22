@@ -167,11 +167,11 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
               {confirmDeleteId === d.id ? (
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button type="button" onClick={() => deleteDependent(d.id)} disabled={deletingId === d.id}
-                    className="text-xs font-semibold text-red-600 px-2 py-2 rounded-lg hover:bg-red-50">
+                    className="tap-44-y text-xs font-semibold text-red-600 px-2 py-2 rounded-lg hover:bg-red-50">
                     {deletingId === d.id ? "…" : "Delete"}
                   </button>
                   <button type="button" onClick={() => setConfirmDeleteId(null)}
-                    className="text-xs font-semibold text-slate-400 px-2 py-2 rounded-lg hover:bg-slate-100">
+                    className="tap-44-y text-xs font-semibold text-slate-400 px-2 py-2 rounded-lg hover:bg-slate-100">
                     Cancel
                   </button>
                 </div>
@@ -220,7 +220,7 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
             <div className="flex flex-wrap gap-2 mt-1">
               {CHRONIC_OPTIONS.map((o) => (
                 <button key={o} type="button" onClick={() => toggleChronic(o)}
-                  className={cn("px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
+                  className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
                     form.chronicDiseases.includes(o) ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                   )}>
                   {o}

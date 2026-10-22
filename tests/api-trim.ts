@@ -130,7 +130,10 @@ async function main() {
     const rows = al.json as Row[];
     const h = rows.find((a) => a.id === heavy.id)!;
     check("admin list: only the table's columns", al.status === 200 && keys(h) === "amount,consultType,createdAt,doctor,id,patient,patientName,paymentMethod,paymentStatus,platformFee,providerType,relation,scheduledAt,status,symptoms", keys(h));
-    check("…no visit code anywhere in the list", rows.every((a) => !has(a, "visitOtp")) && !JSON.stringify(rows).includes("9876"), "ok");
+    // A visitOtp key at any depth (the code's digits alone could also turn up
+    // inside a patient's mobile number, which the list now carries).
+    const otpKeys = JSON.stringify(rows).match(/"visitOtp(Attempts)?":/g) ?? [];
+    check("…no visit code anywhere in the list", rows.every((a) => !has(a, "visitOtp")) && otpKeys.length === 0, `${otpKeys.length} visitOtp keys`);
     check("…long symptoms cut to a preview", typeof h.symptoms === "string" && h.symptoms.length === 120 && h.symptoms.endsWith("…"), `${String(h.symptoms).length}`);
     const ad = await call(admin, "GET", `/api/admin/bookings/${heavy.id}`);
     const det = ad.json as Row;

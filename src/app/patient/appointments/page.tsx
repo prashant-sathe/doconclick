@@ -165,13 +165,13 @@ function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: s
       <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-extrabold text-slate-900">Leave a Review</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
+          <button aria-label="Close" onClick={onClose} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
             <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="flex justify-center gap-1.5 mb-4">
+        <div className="flex justify-center mb-4">
           {[1, 2, 3, 4, 5].map((s) => (
-            <button key={s} type="button" onClick={() => setRating(s)}>
+            <button aria-label={`Rate ${s} star${s === 1 ? "" : "s"}`} aria-pressed={s <= rating} key={s} type="button" onClick={() => setRating(s)} className="p-1.5">
               <Star className={cn("w-8 h-8", s <= rating ? "fill-amber-400 text-amber-400" : "fill-slate-100 text-slate-200")} />
             </button>
           ))}
@@ -441,7 +441,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
           {a.referralGiven.bookings.length > 0 ? (
             <p className="text-xs font-semibold text-emerald-700 mt-2 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />Nurse booked</p>
           ) : (
-            <Link href={`/patient/nurse?serviceId=${a.referralGiven.service.id}&referralId=${a.referralGiven.id}`} className="btn-primary py-2 px-3 text-xs mt-2 inline-flex">
+            <Link href={`/patient/nurse?serviceId=${a.referralGiven.service.id}&referralId=${a.referralGiven.id}`} className="tap-44-y btn-primary py-2 px-3 text-xs mt-2 inline-flex">
               <HeartPulse className="w-3.5 h-3.5" /> Book a nurse
             </Link>
           )}
@@ -472,17 +472,17 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
 
       <div className="flex gap-2 flex-wrap">
         {canReschedule(a) && (
-          <button onClick={() => onReschedule(a)} className="btn-secondary py-2 px-3 text-xs">
+          <button onClick={() => onReschedule(a)} className="tap-44-y btn-secondary py-2 px-3 text-xs">
             <CalendarClock className="w-3.5 h-3.5" /> Reschedule
           </button>
         )}
         {canCancel(a) && (
-          <button onClick={() => onCancel(a)} className="btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
+          <button onClick={() => onCancel(a)} className="tap-44-y btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
             {a.status === "SCHEDULED" ? "Cancel Appointment" : "Cancel Request"}
           </button>
         )}
         {needsPayment && (
-          <Link href={`/patient/payment?apptId=${a.id}`} className="btn-primary py-2 px-3 text-xs">
+          <Link href={`/patient/payment?apptId=${a.id}`} className="tap-44-y btn-primary py-2 px-3 text-xs">
             <CardIcon className="w-3.5 h-3.5" /> {nothingToPay ? "Confirm" : "Pay Now"}
           </Link>
         )}
@@ -493,7 +493,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         )}
         {/* After completion the chat stays readable, and open for follow-up questions for a few days. */}
         {(a.status === "SCHEDULED" || a.status === "COMPLETED") && (
-          <Link href={`/patient/chat/${a.id}`} className="relative btn-secondary py-2 px-3 text-xs">
+          <Link href={`/patient/chat/${a.id}`} className="tap-44-y relative btn-secondary py-2 px-3 text-xs">
             <MessageCircle className="w-3.5 h-3.5" /> Chat
             {a.unreadMessageCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
@@ -504,11 +504,11 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         )}
         {a.consultType === "VIDEO" && a.status === "SCHEDULED" && a.paymentStatus === "PAID" && (
           videoUnlockRemainingSec(a, now) > 0 ? (
-            <span className="btn-secondary py-2 px-3 text-xs opacity-60 cursor-not-allowed">
+            <span className="tap-44-y btn-secondary py-2 px-3 text-xs opacity-60 cursor-not-allowed">
               <Loader2 className="w-3.5 h-3.5 animate-spin" /> Unlocking in {videoUnlockRemainingSec(a, now)}s
             </span>
           ) : (
-            <Link href={`/patient/video/${a.id}`} className="btn-secondary py-2 px-3 text-xs">
+            <Link href={`/patient/video/${a.id}`} className="tap-44-y btn-secondary py-2 px-3 text-xs">
               <Video className="w-3.5 h-3.5" /> Join Video Consultation
             </Link>
           )
@@ -523,7 +523,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => onAttachmentClick(e, att, fileName)}
-              className="btn-secondary py-2 px-3 text-xs"
+              className="tap-44-y btn-secondary py-2 px-3 text-xs"
             >
               {downloadingAtt === att.id
                 ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -537,7 +537,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
           <PrescriptionDownloadButton appointmentId={a.id} patientId={patientId} />
         )}
         {a.status === "COMPLETED" && !a.review && (
-          <button onClick={() => onReview(a.id)} className="btn-secondary py-2 px-3 text-xs">
+          <button onClick={() => onReview(a.id)} className="tap-44-y btn-secondary py-2 px-3 text-xs">
             <Star className="w-3.5 h-3.5" /> Leave a Review
           </button>
         )}
@@ -549,7 +549,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         {a.status === "COMPLETED" && a.providerType !== "NURSE" && a.doctorBookable === false ? (
           <span
             title="This doctor isn't taking bookings right now"
-            className="btn-secondary py-2 px-3 text-xs opacity-50 cursor-not-allowed"
+            className="tap-44-y btn-secondary py-2 px-3 text-xs opacity-50 cursor-not-allowed"
           >
             <RotateCcw className="w-3.5 h-3.5" /> Follow-up unavailable
           </span>
@@ -560,7 +560,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
                 ? `/patient/nurse?nurseId=${a.doctorId}${a.nurseServiceId ? `&serviceId=${a.nurseServiceId}` : ""}`
                 : `/patient/book?doctorId=${a.doctorId}&followUpOf=${a.id}`
             )}
-            className="btn-secondary py-2 px-3 text-xs"
+            className="tap-44-y btn-secondary py-2 px-3 text-xs"
           >
             <RotateCcw className="w-3.5 h-3.5" /> {a.providerType === "NURSE" ? "Book Again" : "Book Follow-up"}
           </button>
@@ -750,7 +750,7 @@ export default function PatientAppointments() {
               </h2>
               {upcoming.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-sm">
-                  No upcoming appointments. <Link href="/patient/dashboard" className="text-blue-600 font-semibold">Book one now →</Link>
+                  No upcoming appointments. <Link href="/patient/dashboard" className="tap-44-y text-blue-600 font-semibold">Book one now →</Link>
                 </div>
               ) : (
                 <div className="space-y-3">

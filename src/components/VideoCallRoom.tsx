@@ -198,7 +198,7 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
       </div>
 
       <div className="flex items-center justify-center gap-3 py-4 bg-slate-950">
-        <button
+        <button aria-label={micOn ? "Mute microphone" : "Unmute microphone"} aria-pressed={!micOn}
           onClick={toggleMic}
           className={cn(
             "w-11 h-11 rounded-full flex items-center justify-center text-white transition-colors",
@@ -207,7 +207,7 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
         >
           {micOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
         </button>
-        <button
+        <button aria-label={camOn ? "Turn camera off" : "Turn camera on"} aria-pressed={!camOn}
           onClick={toggleCam}
           className={cn(
             "w-11 h-11 rounded-full flex items-center justify-center text-white transition-colors",
@@ -216,7 +216,7 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
         >
           {camOn ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
         </button>
-        <button
+        <button aria-label="End call"
           onClick={leave}
           className="w-11 h-11 rounded-full flex items-center justify-center text-white bg-red-600 hover:bg-red-700"
         >

@@ -263,7 +263,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                 )}>
                   {m.fileUrl && (
                     m.fileType?.startsWith("image/") ? (
-                      <button
+                      <button aria-label={`Open image ${m.fileName ?? ""}`.trim()}
                         type="button"
                         onClick={() => setLightboxUrl(downloadUrl(m.fileUrl!, m.fileName, "inline"))}
                         className="block mb-1.5 -mx-1 w-full"
@@ -282,7 +282,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                         href={downloadUrl(m.fileUrl, m.fileName, "attachment")}
                         onClick={(e) => onAttachmentClick(e, m)}
                         className={cn(
-                          "flex items-center gap-2 rounded-lg px-2.5 py-2 mb-1.5 text-xs font-medium",
+                          "min-h-11 flex items-center gap-2 rounded-lg px-2.5 py-2 mb-1.5 text-xs font-medium",
                           mine ? "bg-white/15 hover:bg-white/25" : "bg-slate-50 hover:bg-slate-100"
                         )}
                       >
@@ -342,7 +342,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
             }
           }}
         />
-        <button
+        <button aria-label="Attach a file"
           type="button"
           title="Attach a medical report (PDF/JPG/PNG, under 5MB)"
           onClick={() => fileInputRef.current?.click()}
@@ -361,7 +361,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
             if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
           }}
         />
-        <button
+        <button aria-label="Send message"
           onClick={send}
           disabled={!text.trim() || sending}
           className={cn("w-11 h-11 rounded-xl flex items-center justify-center text-white flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed", accentBtn)}

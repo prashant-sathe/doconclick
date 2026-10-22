@@ -44,7 +44,7 @@ export default function WalletPage() {
           <p className="text-4xl font-extrabold text-slate-900 mt-2 mb-5">
             {loading || balance == null ? <Loader2 className="w-7 h-7 animate-spin text-slate-300" /> : `₹${balance.toLocaleString("en-IN")}`}
           </p>
-          <button onClick={() => setShowTopUp(true)} className="btn-primary gap-1.5">
+          <button onClick={() => setShowTopUp(true)} className="tap-44-y btn-primary gap-1.5">
             <Plus className="w-4 h-4" /> Add Money
           </button>
         </div>

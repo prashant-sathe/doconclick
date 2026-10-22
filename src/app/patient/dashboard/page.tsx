@@ -734,7 +734,8 @@ function PatientDashboardInner() {
         return;
       }
 
-      const marker = L.marker([clinic.lat, clinic.lng], { icon })
+      // title/alt: what a screen reader (and keyboard focus) announces for the pin.
+      const marker = L.marker([clinic.lat, clinic.lng], { icon, keyboard: true, title: `${formatDoctorName(doc.name)}, ${clinic.name}`, alt: `${formatDoctorName(doc.name)}, ${clinic.name}` })
         .addTo(map)
         .bindTooltip(tooltipHtml, {
           direction: "top",
@@ -779,7 +780,8 @@ function PatientDashboardInner() {
     // stack duplicates.
     userLayersRef.current.forEach((layer) => map.removeLayer(layer));
     userLayersRef.current = [
-      L.marker(pos, { icon: userIcon, zIndexOffset: 1000 }).addTo(map),
+      // Just where you are — not a control.
+      L.marker(pos, { icon: userIcon, zIndexOffset: 1000, interactive: false, keyboard: false }).addTo(map),
       L.circle(pos, { radius: 300, color: "#2563eb", fillColor: "#2563eb", fillOpacity: 0.06, weight: 1.5 }).addTo(map),
     ];
   }, []);
@@ -1023,7 +1025,7 @@ function PatientDashboardInner() {
         {profilePercent != null && profilePercent < 100 && (
           <button
             onClick={() => router.push("/patient/profile")}
-            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors"
+            className="tap-44 hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors"
             title="Complete your profile"
           >
             Profile {profilePercent}%
@@ -1031,21 +1033,21 @@ function PatientDashboardInner() {
         )}
         <button
           onClick={() => router.push("/patient/assistant")}
-          className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl gradient-primary text-white text-xs font-semibold hover:opacity-90 transition-opacity"
+          className="tap-44 hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl gradient-primary text-white text-xs font-semibold hover:opacity-90 transition-opacity"
           title="Health Assistant"
         >
           <Sparkles className="w-4 h-4" /> Ask AI
         </button>
-        <button
+        <button aria-label="My Appointments"
           onClick={() => router.push("/patient/appointments")}
-          className="hidden lg:flex w-8 h-8 rounded-xl bg-blue-50 items-center justify-center text-blue-500 hover:bg-blue-100 transition-colors"
+          className="tap-44 hidden lg:flex w-8 h-8 rounded-xl bg-blue-50 items-center justify-center text-blue-500 hover:bg-blue-100 transition-colors"
           title="My Appointments"
         >
           <CalendarCheck2 className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Profile"
           onClick={() => router.push("/patient/profile")}
-          className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors flex-shrink-0"
+          className="tap-44 w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors flex-shrink-0"
           title="Profile"
         >
           <UserCircle className="w-4 h-4" />
@@ -1068,7 +1070,7 @@ function PatientDashboardInner() {
               className="w-full pl-8 pr-8 py-2 rounded-xl border border-slate-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {search && (
-              <button
+              <button aria-label="Clear search"
                 type="button"
                 onClick={() => setSearch("")}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
@@ -1078,31 +1080,31 @@ function PatientDashboardInner() {
             )}
           </div>
           <div className="flex items-center gap-0.5 bg-white/80 border border-slate-200 rounded-xl p-1 flex-shrink-0">
-            <button
+            <button aria-label="Map view"
               onClick={() => setViewMode("map")}
               title="Map view"
               className={cn(
-                "w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
+                "tap-44-y w-11 h-7 rounded-lg flex items-center justify-center transition-colors",
                 viewMode === "map" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-slate-600"
               )}
             >
               <MapPin className="w-4 h-4" />
             </button>
-            <button
+            <button aria-label="List view"
               onClick={() => setViewMode("list")}
               title="List view"
               className={cn(
-                "w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
+                "tap-44-y w-11 h-7 rounded-lg flex items-center justify-center transition-colors",
                 viewMode === "list" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-slate-600"
               )}
             >
               <List className="w-4 h-4" />
             </button>
           </div>
-          <button
+          <button aria-label="Refresh doctors and location"
             onClick={refreshMap}
             disabled={refreshing}
-            className="w-9 h-9 rounded-xl bg-white/80 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 transition-colors disabled:opacity-60 flex-shrink-0"
+            className="tap-44 w-9 h-9 rounded-xl bg-white/80 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 transition-colors disabled:opacity-60 flex-shrink-0"
             title="Refresh doctors & location"
           >
             <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
@@ -1144,7 +1146,7 @@ function PatientDashboardInner() {
         ) : posError ? (
           <button
             onClick={() => setLocationPickerOpen(true)}
-            className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
+            className="min-h-11 flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
           >
             <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
             <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
@@ -1295,9 +1297,9 @@ function PatientDashboardInner() {
             </div>
 
             {/* Close */}
-            <button
+            <button aria-label="Close"
               onClick={() => { setPanelOpen(false); setBookingOpen(false); }}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 transition-colors"
+              className="tap-44 absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1495,11 +1497,11 @@ function PatientDashboardInner() {
                   <label className="input-label mb-2 block">When?</label>
                   <div className="grid grid-cols-2 gap-2 mb-3">
                     <button type="button" onClick={() => setScheduleMode("NOW")}
-                      className={`py-2.5 rounded-xl border text-xs font-semibold transition-all ${scheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
+                      className={`min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all ${scheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
                       Book Now
                     </button>
                     <button type="button" onClick={() => setScheduleMode("LATER")}
-                      className={`py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${scheduleMode === "LATER" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
+                      className={`min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${scheduleMode === "LATER" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
                       <CalendarClock className="w-3.5 h-3.5" /> Schedule Later
                     </button>
                   </div>
@@ -1529,7 +1531,7 @@ function PatientDashboardInner() {
                   <div className="grid grid-cols-4 gap-2 mb-3">
                     {RELATIONS.map((r) => (
                       <button key={r} type="button" onClick={() => { setRelation(r); setDependentId(null); }}
-                        className={`py-2 rounded-xl border text-xs font-semibold transition-all ${relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
+                        className={`min-h-11 py-2 rounded-xl border text-xs font-semibold transition-all ${relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
                         {r}
                       </button>
                     ))}
@@ -1637,12 +1639,12 @@ function PatientDashboardInner() {
                         />
                       </div>
                     </div>
-                    <button
+                    <button aria-label={savedDoctorIds.has(selectedDoctor.id) ? "Remove from saved doctors" : "Save doctor"} aria-pressed={savedDoctorIds.has(selectedDoctor.id)}
                       type="button"
                       onClick={toggleSaveDoctor}
                       disabled={savingBookmark}
                       title={savedDoctorIds.has(selectedDoctor.id) ? "Remove from saved doctors" : "Save doctor for later"}
-                      className={`w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors flex-shrink-0 ${
+                      className={`tap-44 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors flex-shrink-0 ${
                         savedDoctorIds.has(selectedDoctor.id)
                           ? "bg-blue-50 border-blue-200 text-blue-600"
                           : "bg-white border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-200"
@@ -1948,7 +1950,7 @@ function PatientDashboardInner() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-extrabold text-slate-900">Choose a location</h3>
-              <button onClick={() => setLocationPickerOpen(false)} className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
+              <button aria-label="Close" onClick={() => setLocationPickerOpen(false)} className="tap-44 w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
                 <X className="w-4 h-4" />
               </button>
             </div>

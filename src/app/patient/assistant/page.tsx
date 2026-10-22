@@ -419,7 +419,7 @@ function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: strin
             key={opt}
             disabled={!entry.active}
             onClick={() => onChip(opt)}
-            className="rounded-full border border-blue-100 bg-blue-50 text-blue-600 text-xs font-semibold px-3.5 py-1.5 disabled:cursor-default enabled:hover:bg-blue-100 transition-colors"
+            className="min-h-11 rounded-full border border-blue-100 bg-blue-50 text-blue-600 text-xs font-semibold px-3.5 py-1.5 disabled:cursor-default enabled:hover:bg-blue-100 transition-colors"
           >
             {opt}
           </button>
@@ -565,9 +565,9 @@ export default function HealthAssistantPage() {
         style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <button
+          <button aria-label="Back"
             onClick={() => router.push("/patient/dashboard")}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors flex-shrink-0"
+            className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors flex-shrink-0"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -580,9 +580,9 @@ export default function HealthAssistantPage() {
           </div>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
-          <Link
+          <Link aria-label="My tickets"
             href="/patient/support"
-            className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
+            className="tap-44 relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
           >
             <LifeBuoy className="w-3.5 h-3.5" /> <span className="hidden sm:inline">My Tickets</span>
             {openTicketCount > 0 && (
@@ -591,9 +591,9 @@ export default function HealthAssistantPage() {
               </span>
             )}
           </Link>
-          <button
+          <button aria-label="New chat"
             onClick={() => setItems([])}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
+            className="tap-44 flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
           >
             <Plus className="w-3.5 h-3.5" /> <span className="hidden sm:inline">New chat</span>
           </button>
@@ -645,10 +645,10 @@ export default function HealthAssistantPage() {
             disabled={loading}
             className="flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none disabled:opacity-60"
           />
-          <button
+          <button aria-label="Send message"
             type="submit"
             disabled={loading || !input.trim()}
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary text-white disabled:opacity-40 transition-opacity"
+            className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary text-white disabled:opacity-40 transition-opacity"
           >
             <ArrowUp className="w-4 h-4" />
           </button>

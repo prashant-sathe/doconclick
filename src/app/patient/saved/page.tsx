@@ -114,7 +114,7 @@ export default function SavedDoctorsPage() {
           <div className="text-center py-16 text-slate-400">
             <Bookmark className="w-10 h-10 mx-auto mb-3 opacity-30" />
             <p className="text-sm">No saved doctors yet.</p>
-            <Link href="/patient/dashboard" className="inline-block mt-3 text-sm font-semibold text-blue-600 hover:underline">
+            <Link href="/patient/dashboard" className="tap-44-y inline-block mt-3 text-sm font-semibold text-blue-600 hover:underline">
               Find a doctor to save
             </Link>
           </div>

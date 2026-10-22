@@ -432,7 +432,7 @@ function PatientNurseContent() {
                 <p className="text-sm text-slate-500 mb-4">Nurses near you who offer this service</p>
                 <div className="flex flex-wrap items-center gap-2 mb-4">
                   {SORTS.map((s) => (
-                    <button key={s.id} onClick={() => setSort(s.id)} className={cn("px-3 py-1.5 rounded-full text-xs font-semibold border", sort === s.id ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200")}>{s.label}</button>
+                    <button key={s.id} onClick={() => setSort(s.id)} className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border", sort === s.id ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200")}>{s.label}</button>
                   ))}
                   <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 ml-auto">
                     <input type="checkbox" checked={femaleOnly} onChange={(e) => setFemaleOnly(e.target.checked)} className="accent-rose-500" />
@@ -519,7 +519,7 @@ function PatientNurseContent() {
                     <div className="grid grid-cols-4 gap-2">
                       {RELATIONS.map((r) => (
                         <button key={r} type="button" onClick={() => { setRelation(r); setDependentId(null); }}
-                          className={cn("py-2 rounded-xl border text-xs font-semibold", relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                          className={cn("min-h-11 py-2 rounded-xl border text-xs font-semibold", relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
                           {r}
                         </button>
                       ))}
@@ -562,7 +562,7 @@ function PatientNurseContent() {
                     <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
                       {PACKAGE_VISIT_OPTIONS.map((n) => (
                         <button key={n} type="button" onClick={() => { setVisits(n); setError(""); }}
-                          className={cn("py-2 rounded-xl border text-sm font-semibold", visits === n ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                          className={cn("min-h-11 py-2 rounded-xl border text-sm font-semibold", visits === n ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
                           {n}
                         </button>
                       ))}
@@ -572,7 +572,7 @@ function PatientNurseContent() {
                         <div className={cn("grid grid-cols-3 gap-2 mt-2", shiftMode && "hidden")}>
                           {PACKAGE_INTERVAL_OPTIONS.map((n) => (
                             <button key={n} type="button" onClick={() => { setIntervalDays(n); setError(""); }}
-                              className={cn("py-2 rounded-xl border text-xs font-semibold", intervalDays === n ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                              className={cn("min-h-11 py-2 rounded-xl border text-xs font-semibold", intervalDays === n ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
                               {intervalLabel(n)}
                             </button>
                           ))}

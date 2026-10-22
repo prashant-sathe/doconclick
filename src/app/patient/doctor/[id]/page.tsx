@@ -76,11 +76,11 @@ function Header() {
   return (
     <header className="safe-top sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="tap-44-y flex items-center gap-2">
           <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-8 h-8 object-contain" />
           <span className="font-extrabold text-slate-900">DocOnClick</span>
         </Link>
-        <Link href={user ? "/patient/dashboard" : `/login?next=${encodeURIComponent(`/patient/doctor/${id}`)}`} className="btn-secondary py-2 px-3.5 text-sm">
+        <Link href={user ? "/patient/dashboard" : `/login?next=${encodeURIComponent(`/patient/doctor/${id}`)}`} className="tap-44-y btn-secondary py-2 px-3.5 text-sm">
           {user ? "My Dashboard" : "Login"}
         </Link>
       </div>
@@ -238,13 +238,13 @@ export default function DoctorProfilePage() {
           {/* Header */}
           <div className="flex items-start gap-4 mb-5">
             {user?.role === "PATIENT" && (
-              <button
+              <button aria-label={saved ? "Remove from saved doctors" : "Save doctor"} aria-pressed={saved}
                 type="button"
                 onClick={toggleSave}
                 disabled={savingBookmark}
                 title={saved ? "Remove from saved doctors" : "Save doctor for later"}
                 className={cn(
-                  "absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors",
+                  "tap-44 absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors",
                   saved
                     ? "bg-blue-50 border-blue-200 text-blue-600"
                     : "bg-white border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-200"

@@ -476,3 +476,50 @@
   pointer-events: none;
 }
 
+
+/* Touch area of at least 44×44px (WCAG 2.5.5 / Apple HIG) for small icon
+   buttons, without changing how they look: an invisible layer centred on the
+   button catches taps around it. The button needs no position of its own —
+   `relative` is set here (absolute/fixed buttons keep theirs). */
+@utility tap-44 {
+  &:not(.absolute):not(.fixed) {
+    position: relative;
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* tap-44 for buttons that sit side by side with no room between them (a
+   segmented control, Save/Cancel): only the height is extended, so one
+   button's touch area never covers its neighbour. Give them a real width of
+   44px (w-11) or wider text instead. */
+@utility tap-44-y {
+  &:not(.absolute):not(.fixed) {
+    position: relative;
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: max(100%, 44px);
+    transform: translateY(-50%);
+  }
+}
+
+/* Leaflet's map zoom buttons are 30px (26px on touch) — 44px for fingers.
+   One class more specific than leaflet.css's own rules, which load later. */
+.leaflet-container.leaflet-touch .leaflet-bar a,
+.leaflet-container .leaflet-bar a {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+}

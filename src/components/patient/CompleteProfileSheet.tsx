@@ -133,7 +133,7 @@ function CompleteProfileSheet({
             <UserCheck className="w-5 h-5 text-blue-600" />
             <h3 className="font-extrabold text-slate-900">Complete your profile</h3>
           </div>
-          <button type="button" onClick={onCancel} disabled={saving} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 flex-shrink-0">
+          <button aria-label="Close" type="button" onClick={onCancel} disabled={saving} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -162,7 +162,7 @@ function CompleteProfileSheet({
                     key={g}
                     type="button"
                     onClick={() => { setGender(g); setError(""); }}
-                    className={`py-2.5 rounded-xl border text-sm font-semibold transition-all ${gender === g ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"}`}
+                    className={`min-h-11 py-2.5 rounded-xl border text-sm font-semibold transition-all ${gender === g ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"}`}
                   >
                     {g}
                   </button>

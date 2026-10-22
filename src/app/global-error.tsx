@@ -14,7 +14,7 @@ export default function GlobalError({
   const retry = unstable_retry ?? reset ?? (() => window.location.reload());
 
   return (
-    <html lang="en">
+    <html lang="en-IN">
       <body
         style={{
           margin: 0,

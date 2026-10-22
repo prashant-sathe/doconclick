@@ -68,7 +68,7 @@ export default function EnableNotificationsPrompt() {
           {!isNative() && isMac() && (
             <button
               onClick={openSystemNotificationSettings}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg text-amber-700 hover:bg-amber-100 mt-2 inline-flex items-center gap-1"
+              className="tap-44 text-xs font-semibold px-3 py-1.5 rounded-lg text-amber-700 hover:bg-amber-100 mt-2 inline-flex items-center gap-1"
             >
               Open Mac notification settings <ExternalLink className="w-3 h-3" />
             </button>
@@ -82,7 +82,7 @@ export default function EnableNotificationsPrompt() {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
         <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full relative">
-          <button onClick={dismiss} className="absolute top-4 right-4 text-slate-300 hover:text-slate-500">
+          <button aria-label="Dismiss" onClick={dismiss} className="tap-44 absolute top-4 right-4 text-slate-300 hover:text-slate-500">
             <X className="w-4 h-4" />
           </button>
           <div className="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center mb-4">
@@ -93,10 +93,10 @@ export default function EnableNotificationsPrompt() {
             Get notified even when this tab isn&apos;t open — new requests, status updates, and messages.
           </p>
           <div className="flex gap-3 mt-5">
-            <button onClick={dismiss} disabled={busy} className="btn-secondary flex-1 disabled:opacity-60">
+            <button onClick={dismiss} disabled={busy} className="min-h-11 btn-secondary flex-1 disabled:opacity-60">
               Not now
             </button>
-            <button onClick={enable} disabled={busy} className="btn-primary flex-1 disabled:opacity-60">
+            <button onClick={enable} disabled={busy} className="min-h-11 btn-primary flex-1 disabled:opacity-60">
               {busy ? "Enabling..." : "Enable"}
             </button>
           </div>
@@ -115,7 +115,7 @@ export default function EnableNotificationsPrompt() {
             Not receiving them? Open Mac settings
           </button>
         )}
-        <button onClick={dismissHint} className="ml-auto text-slate-300 hover:text-slate-500">
+        <button aria-label="Dismiss" onClick={dismissHint} className="ml-auto text-slate-300 hover:text-slate-500">
           <X className="w-3 h-3" />
         </button>
       </div>

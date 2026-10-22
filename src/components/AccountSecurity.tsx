@@ -59,7 +59,7 @@ export function LogoutAllDevices() {
           </button>
         </div>
       ) : (
-        <button type="button" onClick={() => setConfirming(true)} className="btn-secondary py-2 px-3 text-xs mt-3">
+        <button type="button" onClick={() => setConfirming(true)} className="tap-44-y btn-secondary py-2 px-3 text-xs mt-3">
           <LogOut className="w-3.5 h-3.5" /> Log out of all devices
         </button>
       )}
@@ -138,7 +138,7 @@ export function DeleteAccount() {
       {!preview && error && <p className="text-xs text-red-600 mt-2">{error}</p>}
 
       {!preview ? (
-        <button type="button" onClick={open} disabled={loading} className="btn-secondary py-2 px-3 text-xs mt-3 text-red-600">
+        <button type="button" onClick={open} disabled={loading} className="tap-44-y btn-secondary py-2 px-3 text-xs mt-3 text-red-600">
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
           Delete my account
         </button>

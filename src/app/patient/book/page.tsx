@@ -1,4 +1,5 @@
 "use client";
+import { formatAvailability } from "@/lib/availability";
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -480,7 +481,7 @@ function PatientBookInner() {
                   className="input-field pl-10 pr-10"
                 />
                 {search && (
-                  <button
+                  <button aria-label="Clear search"
                     type="button"
                     onClick={() => setSearch("")}
                     className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
@@ -533,7 +534,7 @@ function PatientBookInner() {
                   <span className="font-semibold">{formatDoctorName(selectedDoctor.name)}</span>
                   {selectedDoctor.doctorProfile.isVerified && <VerifiedBadge />}
                 </div>
-                <div className="text-xs mt-0.5">{selectedDoctor.doctorProfile.specialty} · {selectedDoctor.doctorProfile.experience} yrs · {selectedDoctor.doctorProfile.availability}</div>
+                <div className="text-xs mt-0.5">{selectedDoctor.doctorProfile.specialty} · {selectedDoctor.doctorProfile.experience} yrs · {formatAvailability(selectedDoctor.doctorProfile.availability)}</div>
                 <div className="text-xs mt-0.5">Speaks: {selectedDoctor.doctorProfile.languages}</div>
                 {selectedDoctor.doctorProfile.bio && (
                   <div className="text-xs mt-1 text-blue-700/80 line-clamp-2">{selectedDoctor.doctorProfile.bio}</div>
@@ -653,12 +654,12 @@ function PatientBookInner() {
               <label className="input-label mb-2 block">When?</label>
               <div className="grid grid-cols-2 gap-3">
                 <button type="button" onClick={() => setScheduleMode("NOW")}
-                  className={cn("py-2.5 rounded-xl border text-xs font-semibold transition-all",
+                  className={cn("min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all",
                     scheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
                   Book Now
                 </button>
                 <button type="button" onClick={() => setScheduleMode("LATER")}
-                  className={cn("py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5",
+                  className={cn("min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5",
                     scheduleMode === "LATER" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
                   <CalendarClock className="w-3.5 h-3.5" /> Schedule Later
                 </button>
@@ -685,7 +686,7 @@ function PatientBookInner() {
               <div className="grid grid-cols-4 gap-2">
                 {RELATIONS.map((r) => (
                   <button key={r} type="button" onClick={() => { set("relation", r); setDependentId(null); }}
-                    className={cn("py-2 rounded-xl border text-xs font-semibold transition-all",
+                    className={cn("min-h-11 py-2 rounded-xl border text-xs font-semibold transition-all",
                       form.relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                     )}>
                     {r}
