@@ -15,6 +15,7 @@ import { isOverdue, byVisitAsc, byVisitDesc, nextUpcoming } from "@/lib/doctorQu
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import PaymentQrPanel from "@/components/doctor/PaymentQrPanel";
+import PrescriptionViewer from "@/components/doctor/PrescriptionViewer";
 import { OfflineToggle } from "@/components/ProviderAway";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
@@ -670,6 +671,8 @@ export default function DoctorDashboard() {
   const [noShowTarget, setNoShowTarget] = useState<Appointment | null>(null);
   // Unpaid online visit whose pay-by-phone QR is open.
   const [payQrFor, setPayQrFor] = useState<Appointment | null>(null);
+  // Prescription preview / download / WhatsApp for a completed consultation.
+  const [rxFor, setRxFor] = useState<{ id: string; patientId: string; justCompleted?: boolean } | null>(null);
   const [markingNoShow, setMarkingNoShow] = useState(false);
   const [rejectTarget, setRejectTarget] = useState<Appointment | null>(null);
   const [rejecting, setRejecting] = useState(false);
@@ -1564,7 +1567,7 @@ export default function DoctorDashboard() {
                       <CompleteVisitForm
                         appt={a}
                         onCancel={() => setCompletingId(null)}
-                        onDone={() => { setCompletingId(null); loadAppointments(); }}
+                        onDone={() => { setCompletingId(null); loadAppointments(); setRxFor({ id: a.id, patientId: a.patientId, justCompleted: true }); }}
                       />
                     )}
                   </div>
@@ -1606,6 +1609,11 @@ export default function DoctorDashboard() {
                   </div>
                   <div className="flex items-center gap-3">
                     {!isStaff && <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>}
+                    {!isStaff && (
+                      <button type="button" onClick={() => setRxFor({ id: a.id, patientId: a.patientId })} className="w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title="Prescription — view, download, send on WhatsApp" aria-label="Prescription">
+                        <FileText className="w-4 h-4 text-teal-600" />
+                      </button>
+                    )}
                     {/* Readable after completion; open for follow-up questions for a few days. */}
                     <Link href={`/doctor/chat/${a.id}`} className="relative w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title="Chat with patient">
                       <MessageCircle className="w-4 h-4 text-slate-500" />
@@ -1747,7 +1755,11 @@ export default function DoctorDashboard() {
         </div>
       )}
 
-      {/* No-show confirmation */}
+      {rxFor && (
+        <PrescriptionViewer appointmentId={rxFor.id} patientId={rxFor.patientId} justCompleted={rxFor.justCompleted} onClose={() => setRxFor(null)} />
+      )}
+
+      {/* Pay-by-phone QR for an unpaid online visit */}
       {payQrFor && (
         <div className="fixed inset-0 z-[100] bg-slate-900/50 flex items-end sm:items-center justify-center p-4" onClick={() => setPayQrFor(null)}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
@@ -1770,6 +1782,7 @@ export default function DoctorDashboard() {
         </div>
       )}
 
+      {/* No-show confirmation */}
       {noShowTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">

@@ -20,7 +20,8 @@ export async function GET(
   const appointment = await prisma.appointment.findUnique({
     where: { id },
     include: {
-      patient: { select: { name: true, patientProfile: { select: { age: true, gender: true, homeAddress: true } } } },
+      patient: { select: { name: true, mobile: true, patientProfile: { select: { age: true, gender: true, homeAddress: true } } } },
+      clinic: { select: { name: true, address: true } },
       dependent: { select: { age: true, gender: true } },
       doctor: { select: { name: true, doctorProfile: { select: { qualification: true, medRegNo: true, specialty: true, clinicName: true, signatureUrl: true } } } },
       medicines: true,
@@ -47,6 +48,13 @@ export async function GET(
   // account holder's. Dependents have no saved address of their own.
   const forDependent = !!appointment.dependentId;
   const profile = appointment.patient.patientProfile;
+  // Letterhead: the clinic this visit was at — or, for a video/home visit,
+  // the doctor's first clinic, so the paper still says where they practise.
+  const letterheadClinic = appointment.clinic ?? await prisma.clinic.findFirst({
+    where: { doctorId: appointment.doctorId, isActive: true },
+    orderBy: { sortOrder: "asc" },
+    select: { name: true, address: true },
+  });
 
   return NextResponse.json({
     id: appointment.id,
@@ -61,7 +69,13 @@ export async function GET(
     doctorQualification: appointment.doctor.doctorProfile?.qualification ?? null,
     doctorRegNo: appointment.doctor.doctorProfile?.medRegNo ?? null,
     doctorSpecialty: appointment.doctor.doctorProfile?.specialty ?? "General Physician",
-    clinicName: appointment.doctor.doctorProfile?.clinicName ?? null,
+    // A clinic visit is headed by that clinic (name and address together);
+    // otherwise the practice name from the doctor's profile, if set.
+    clinicName: appointment.clinic?.name ?? appointment.doctor.doctorProfile?.clinicName ?? letterheadClinic?.name ?? null,
+    clinicAddress: letterheadClinic?.address ?? null,
+    consultType: appointment.consultType,
+    // So the doctor can send it on WhatsApp — never needed by the patient themselves.
+    ...(isOwnDoctor || isAdmin ? { patientMobile: appointment.patient.mobile } : {}),
     doctorNotes: appointment.doctorNotes,
     doctorSignatureUrl: appointment.doctor.doctorProfile?.signatureUrl ?? null,
     medicines: appointment.medicines.map((m) => ({

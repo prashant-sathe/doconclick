@@ -3,14 +3,14 @@ import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
-  Loader2, ArrowLeft, User, Droplets, AlertTriangle, Pill, Scissors, PhoneCall, CalendarClock, Star, Stethoscope, Paperclip, Users, Home, Building2, Video, Activity,
+  Loader2, ArrowLeft, User, Droplets, AlertTriangle, Pill, Scissors, PhoneCall, CalendarClock, Star, Stethoscope, Paperclip, Users, Home, Building2, Video, Activity, FileText,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import VitalsCharts, { type VitalReadingRow } from "@/components/VitalsCharts";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import { computeBMI, bmiCategoryClasses } from "@/lib/bmi";
-import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
+import PrescriptionViewer from "@/components/doctor/PrescriptionViewer";
 
 interface Medicine {
   id: string;
@@ -97,6 +97,8 @@ function DoctorPatientHistoryInner() {
   const [data, setData] = useState<PatientHistory | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // Consultation whose prescription is open in the viewer.
+  const [rxFor, setRxFor] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/dashboard");
@@ -262,7 +264,9 @@ function DoctorPatientHistoryInner() {
                   {/* The prescription exactly as issued to the patient — same document they download. */}
                   {a.status === "COMPLETED" && (a.medicines.length > 0 || a.tests.length > 0 || !!a.doctorNotes) && (
                     <div className="mb-2">
-                      <PrescriptionDownloadButton appointmentId={a.id} patientId={params.id} />
+                      <button type="button" onClick={() => setRxFor(a.id)} className="btn-secondary py-2 px-3 text-xs">
+                        <FileText className="w-3.5 h-3.5" /> Prescription — view &amp; share
+                      </button>
                     </div>
                   )}
                   {a.review && (
@@ -281,6 +285,7 @@ function DoctorPatientHistoryInner() {
           </div>
         )}
       </div>
+      {rxFor && <PrescriptionViewer appointmentId={rxFor} patientId={params.id} onClose={() => setRxFor(null)} />}
     </div>
   );
 }

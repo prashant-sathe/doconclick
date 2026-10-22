@@ -29,6 +29,9 @@ export interface PrescriptionData {
   doctorRegNo: string | null;
   doctorSpecialty: string;
   clinicName: string | null;
+  clinicAddress?: string | null;
+  consultType?: string;
+  patientMobile?: string;
   doctorNotes: string | null;
   doctorSignatureUrl: string | null;
   medicines: PrescriptionMedicineData[];
@@ -117,6 +120,7 @@ export default function PrescriptionDocument({
     day: "2-digit",
     month: "short",
     year: "numeric",
+    timeZone: "Asia/Kolkata",
   });
 
   return (
@@ -136,23 +140,31 @@ export default function PrescriptionDocument({
       <Watermark />
 
       <div style={{ position: "relative", zIndex: 1 }}>
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", borderBottom: `2px solid ${BORDER}`, paddingBottom: 20, marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: TEAL, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <Stethoscope color="#ffffff" size={20} />
+        {/* Letterhead — the doctor's practice, with DocOnClick as the issuer */}
+        <div style={{ borderBottom: `3px solid ${TEAL}`, paddingBottom: 18, marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 20 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: INK }}>{data.clinicName || formatDoctorName(data.doctorName)}</div>
+              {data.clinicAddress && <div style={{ fontSize: 12, color: MUTED, marginTop: 3 }}>{data.clinicAddress}</div>}
+              <div style={{ fontSize: 13, fontWeight: 700, color: TEAL, marginTop: 8 }}>
+                {formatDoctorName(data.doctorName)}
+                {data.doctorQualification ? <span style={{ fontWeight: 600, color: INK }}>{` · ${data.doctorQualification}`}</span> : null}
+              </div>
+              <div style={{ fontSize: 11, color: MUTED, marginTop: 2 }}>
+                {data.doctorSpecialty}{` · Reg. No. ${data.doctorRegNo || "—"}`}
+              </div>
             </div>
-            <div>
-              <span style={{ fontSize: 20, fontWeight: 800, color: INK }}>DocOnClick</span>
-              {data.clinicName && (
-                <div style={{ fontSize: 12, fontWeight: 600, color: TEAL, marginTop: 2 }}>{data.clinicName}</div>
-              )}
+            <div style={{ textAlign: "right", flexShrink: 0 }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: 1 }}>PRESCRIPTION</div>
+              <div style={{ fontSize: 11, color: MUTED, marginTop: 4 }}>Prescription ID: {rxId}</div>
+              <div style={{ fontSize: 11, color: MUTED }}>Date: {formattedDate}</div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 5, marginTop: 8 }}>
+                <div style={{ width: 18, height: 18, borderRadius: 5, background: TEAL, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Stethoscope color="#ffffff" size={11} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: MUTED }}>via DocOnClick</span>
+              </div>
             </div>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: 1 }}>PRESCRIPTION</div>
-            <div style={{ fontSize: 11, color: MUTED, marginTop: 4 }}>Prescription ID: {rxId}</div>
-            <div style={{ fontSize: 11, color: MUTED }}>Date: {formattedDate}</div>
           </div>
         </div>
 

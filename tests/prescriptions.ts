@@ -143,6 +143,20 @@ async function main() {
     check("doctor: not issued until completed → 400", r.status === 400, `${r.status} ${r.json.error}`);
     r = await call(admin, "GET", `/api/appointments/${open.id}/prescription`);
     check("admin can view at any status", r.status === 200, `${r.status} ${r.json.error ?? ""}`);
+
+    // ── Letterhead + sharing (doctor's preview / WhatsApp) ──
+    check("video visit, doctor has no clinic → no letterhead address, video type", r.json.clinicAddress === null && r.json.consultType === "VIDEO", `${r.json.clinicAddress} ${r.json.consultType}`);
+    const second = await prisma.clinic.create({ data: { doctorId: doctor.id, name: "Rx Second Clinic", address: "2 Second Rd, Pune", lat: 18.5, lng: 73.8, sortOrder: 1 } });
+    const first = await prisma.clinic.create({ data: { doctorId: doctor.id, name: "Rx First Clinic", address: "1 First Rd, Pune", lat: 18.5, lng: 73.8, sortOrder: 0 } });
+    const atClinic = await appt("COMPLETED", { consultType: "CLINIC", clinicId: second.id, completedAt: new Date(), medicines: { create: [{ ...para, instructions: null }] } });
+    r = await call(doctor, "GET", `/api/appointments/${atClinic.id}/prescription`);
+    check("clinic visit → letterhead is that visit's clinic", r.json.clinicName === "Rx Second Clinic" && r.json.clinicAddress === "2 Second Rd, Pune", `${r.json.clinicName} / ${r.json.clinicAddress}`);
+    r = await call(doctor, "GET", `/api/appointments/${forChild.id}/prescription`);
+    check("video visit → the doctor's first clinic", r.json.clinicName === "Rx First Clinic" && r.json.clinicAddress === "1 First Rd, Pune", `${r.json.clinicName} / ${r.json.clinicAddress}`);
+    check("…doctor gets the patient's mobile for WhatsApp, and the reg. no.", r.json.patientMobile === patient.mobile && typeof r.json.doctorRegNo === "string", `${r.json.patientMobile}`);
+    r = await call(patient, "GET", `/api/appointments/${forChild.id}/prescription`);
+    check("…the patient's own copy carries no mobile", r.status === 200 && !("patientMobile" in r.json), JSON.stringify(Object.keys(r.json).filter((k) => /mobile/i.test(k))));
+    await prisma.clinic.deleteMany({ where: { id: { in: [first.id, second.id] } } });
   } finally {
     await prisma.appointment.deleteMany({ where: { OR: [{ patientId: { in: ids } }, { doctorId: { in: ids } }] } });
     await prisma.user.deleteMany({ where: { id: { in: ids } } });
