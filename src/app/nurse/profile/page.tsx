@@ -4,8 +4,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Loader2, CheckCircle2, Circle, ShieldCheck, Clock, XCircle, Ban, Upload, FileText, MapPin,
-  LocateFixed, Save, IndianRupee, Landmark, Stethoscope, LogOut, CreditCard, Lock, LifeBuoy, Bell, FileCheck, ChevronRight,
+  LocateFixed, Save, IndianRupee, Landmark, Stethoscope, LogOut, CreditCard, Lock, LifeBuoy, Bell, FileCheck, ChevronRight, CalendarOff,
 } from "lucide-react";
+import { TimeOffManager } from "@/components/ProviderAway";
 import { useAuth } from "@/components/AuthProvider";
 import { NurseHeader, NurseMobileNav } from "@/components/nurse/NurseNav";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
@@ -500,6 +501,11 @@ function NurseProfileContent() {
             <input type="range" min={1} max={30} value={loc.radius} onChange={(e) => setLoc((l) => ({ ...l, radius: Number(e.target.value) }))} className="w-full accent-rose-500" />
           </div>
           <SaveRow {...locSaver} onSave={saveLocation} />
+        </Section>
+
+        {/* Linked from the dashboard's online/offline card (#time-off). */}
+        <Section title="Time off" icon={CalendarOff} id="time-off">
+          <TimeOffManager />
         </Section>
 
         {/* Linked from Earnings when a payout needs bank details (#bank). */}

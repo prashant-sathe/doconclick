@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { generateSlotsForDate, SLOT_INTERVAL_MINUTES } from "@/lib/clinicAvailability";
 import { isTimedBooking } from "@/lib/doctorSlots";
 import { getBookingHorizonDays, horizonProblem } from "@/lib/bookingLimits";
+import { providerOffOnDate } from "@/lib/timeOff";
 
 // GET /api/doctors/[id]/slots?clinicId=X&date=YYYY-MM-DD
 // Discrete bookable time slots for one of a doctor's clinics on one date —
@@ -33,6 +34,11 @@ export async function GET(
   });
   if (!clinic || clinic.doctorId !== doctorId || !clinic.isActive) {
     return NextResponse.json({ error: "Clinic not found" }, { status: 404 });
+  }
+
+  // A whole day on time off (or today, offline) has nothing to book.
+  if (await providerOffOnDate(doctorId, date)) {
+    return NextResponse.json({ slots: [], away: true });
   }
 
   // Nothing past the booking horizon — the booking route would refuse it.

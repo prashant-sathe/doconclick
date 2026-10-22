@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bookableDoctorWhere } from "@/lib/doctorBookable";
 import { PUBLIC_DOCTOR_PROFILE_SELECT, PUBLIC_CLINIC_SELECT, coarsenBase } from "@/lib/publicDoctor";
+import { publicAvailability } from "@/lib/timeOff";
 
 // GET: A single doctor's public profile (unauthenticated — used by QR/profile links)
 export async function GET(
@@ -24,5 +25,6 @@ export async function GET(
     return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ ...doctor, doctorProfile: doctor.doctorProfile && coarsenBase(doctor.doctorProfile) });
+  const availability = (await publicAvailability([doctor.id]))(doctor.id);
+  return NextResponse.json({ ...doctor, doctorProfile: doctor.doctorProfile && coarsenBase(doctor.doctorProfile), ...availability });
 }

@@ -17,6 +17,7 @@ import { formatDoctorName } from "@/lib/utils";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { cashDueProblem, CASH_DUE_LIMIT_CODE } from "@/lib/duesPayments";
+import { timeOffProblem, TIME_OFF_CODE } from "@/lib/timeOff";
 
 // A busy front desk books a few patients an hour, not dozens a minute.
 const checkLimit = createRateLimiter(30, 10 * 60_000);
@@ -218,6 +219,9 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Enter the address for the home visit.", code: "ADDRESS_REQUIRED" }, { status: 400 });
       }
     }
+
+    const away = await timeOffProblem(doctorId, bookAt ?? new Date(), authUser.role === "STAFF" ? "staff" : "provider");
+    if (away) return NextResponse.json({ error: away, code: TIME_OFF_CODE }, { status: 409 });
 
     if (bookAt) {
       const clash = await doctorSlotProblem({ doctorId, when: bookAt, against: "live", viewer: "doctor" });

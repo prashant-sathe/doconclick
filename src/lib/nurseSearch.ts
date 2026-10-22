@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { haversine, withinSearchRadius } from "@/lib/geo";
 import { isNurseBookable } from "@/lib/providerGuard";
 import { nursesBusyNow } from "@/lib/nurseSchedule";
+import { awayAt } from "@/lib/timeOff";
 
 // Bookable nurses offering one service, nearest first — shared by the
 // patient's nurse page (/api/nurses/search) and the Health Assistant so both
@@ -74,6 +75,20 @@ export async function searchNurses(params: { patientId: string; serviceId: strin
     .filter((n) => withinSearchRadius(n.distanceKm, patientProfile?.searchRadiusKm, false))
     .sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
 
-  const busy = await nursesBusyNow(nurses.map((n) => n.id));
-  return { service, nurses: nurses.map((n) => ({ ...n, busyNow: busy.has(n.id) })), needsLocation: false };
+  const [busy, away] = await Promise.all([nursesBusyNow(nurses.map((n) => n.id)), awayAt(nurses.map((n) => n.id))]);
+  return {
+    service,
+    nurses: nurses.map((n) => {
+      const a = away.get(n.id);
+      // Away right now (time off / offline): still listed, bookable for a
+      // later day — the booking route refuses the days they're off.
+      return {
+        ...n,
+        busyNow: busy.has(n.id),
+        awayNow: !!a,
+        awayUntil: a ? (a.kind === "LEAVE" ? a.endDate : "today") : null,
+      };
+    }),
+    needsLocation: false,
+  };
 }

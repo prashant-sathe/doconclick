@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { NurseHeader, NurseMobileNav } from "@/components/nurse/NurseNav";
+import { OfflineToggle } from "@/components/ProviderAway";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import LoadError from "@/components/LoadError";
 import { useToast } from "@/components/Toast";
@@ -434,6 +435,8 @@ export default function NurseDashboardPage() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
         <h1 className="text-2xl font-extrabold text-slate-900 mb-4">My Visits</h1>
+
+        <OfflineToggle timeOffHref="/nurse/profile#time-off" onChanged={() => { void retryLoad(); }} />
 
         {loadError && <LoadError error={loadError} onRetry={retryLoad} retrying={retrying || profileLoad.reloading} hasData />}
 

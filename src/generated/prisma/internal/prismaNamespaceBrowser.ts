@@ -71,6 +71,7 @@ export const ModelName = {
   Wallet: 'Wallet',
   WalletTransaction: 'WalletTransaction',
   Settlement: 'Settlement',
+  ProviderTimeOff: 'ProviderTimeOff',
   DuesPayment: 'DuesPayment',
   PayoutRequest: 'PayoutRequest',
   DoctorPaymentLog: 'DoctorPaymentLog',
@@ -122,6 +123,7 @@ export const UserScalarFieldEnum = {
   termsAcceptedAt: 'termsAcceptedAt',
   deletedAt: 'deletedAt',
   tokenVersion: 'tokenVersion',
+  offlineUntil: 'offlineUntil',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -513,6 +515,18 @@ export const SettlementScalarFieldEnum = {
 } as const
 
 export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
+
+
+export const ProviderTimeOffScalarFieldEnum = {
+  id: 'id',
+  providerId: 'providerId',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ProviderTimeOffScalarFieldEnum = (typeof ProviderTimeOffScalarFieldEnum)[keyof typeof ProviderTimeOffScalarFieldEnum]
 
 
 export const DuesPaymentScalarFieldEnum = {

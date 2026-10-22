@@ -14,6 +14,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime, formatClinicHours, type NextOpening } from "@/lib/clinicAvailability";
+import ProviderAwayNotice, { type ProviderAvailability } from "@/components/patient/ProviderAwayNotice";
 import { RELATIONS } from "@/lib/relations";
 import { haversine, withinSearchRadius } from "@/lib/geo";
 import { getCurrentPositionCompat } from "@/lib/platform";
@@ -53,7 +54,7 @@ interface Clinic {
   slots: ClinicSlot[];
 }
 
-interface Doctor {
+interface Doctor extends ProviderAvailability {
   id: string;
   name: string;
   clinics: Clinic[];
@@ -250,6 +251,12 @@ function PatientBookInner() {
   );
 
   const selectedDoctor = doctors.find((d) => d.id === form.doctorId);
+  // Away right now (time off / offline): only a later day can be booked.
+  useEffect(() => {
+    // Moving the form off "Book Now" once the doctor's state is known.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (selectedDoctor?.awayNow && scheduleMode === "NOW") setScheduleMode("LATER");
+  }, [selectedDoctor?.awayNow, scheduleMode]);
   const selectedOutOfRange =
     !!selectedDoctor &&
     !radiusOverride &&
@@ -652,9 +659,10 @@ function PatientBookInner() {
             {/* Now vs Schedule later */}
             <div>
               <label className="input-label mb-2 block">When?</label>
+              <ProviderAwayNotice provider={selectedDoctor} />
               <div className="grid grid-cols-2 gap-3">
-                <button type="button" onClick={() => setScheduleMode("NOW")}
-                  className={cn("min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all",
+                <button type="button" onClick={() => setScheduleMode("NOW")} disabled={!!selectedDoctor?.awayNow}
+                  className={cn("min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed",
                     scheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
                   Book Now
                 </button>

@@ -23,6 +23,10 @@ model User {
   // Bumped to revoke every session at once (logout-all, password change,
   // delete, suspend). Sessions carry it as the JWT `tv` claim.
   tokenVersion Int @default(0)
+  // A provider (doctor/nurse) who tapped "Go offline": no new bookings from
+  // anyone until this instant — the end of that IST day, so they're back
+  // tomorrow without remembering to switch it off (src/lib/timeOff.ts).
+  offlineUntil DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -39,6 +43,7 @@ model User {
   settlementsAdmined Settlement[] @relation("AdminSettlements")
   payoutRequests    PayoutRequest[] @relation("DoctorPayoutRequests")
   duesPayments      DuesPayment[]   @relation("DoctorDuesPayments")
+  timeOff           ProviderTimeOff[] @relation("ProviderTimeOff")
   paymentLogs       DoctorPaymentLog[] @relation("DoctorPaymentLogs")
   savedDoctors      SavedDoctor[] @relation("PatientSavedDoctors")
   savedByPatients   SavedDoctor[] @relation("DoctorSavedBy")
@@ -553,6 +558,22 @@ model Settlement {
 // `amount` is a snapshot of what was owed at request time (purely
 // informational — the actual settlement always recomputes live totals,
 // which may have moved on by the time it's fulfilled).
+// Time off for a whole provider (doctor or nurse) — every clinic, video and
+// home visit — over a range of IST calendar days, both ends included. Unlike
+// ClinicLeave (one clinic, one day). No booking can land on these days;
+// adding it cancels and refunds what was already there (src/lib/timeOff.ts).
+model ProviderTimeOff {
+  id         String   @id @default(cuid())
+  providerId String
+  provider   User     @relation("ProviderTimeOff", fields: [providerId], references: [id], onDelete: Cascade)
+  startDate  String   // "YYYY-MM-DD", IST
+  endDate    String   // "YYYY-MM-DD", IST, inclusive
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  @@index([providerId, endDate])
+}
+
 // A doctor paying the platform what they owe — the commission on cash
 // visits they collected, net of online earnings — through Cashfree
 // (/doctor/earnings). The visits it covers are snapshotted when the order is

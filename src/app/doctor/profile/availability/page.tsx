@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, Plus, Trash2, AlertTriangle } from "lucide-react";
+import { Clock, Plus, Trash2, AlertTriangle, CalendarOff } from "lucide-react";
+import { TimeOffManager } from "@/components/ProviderAway";
 import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import { useDoctorProfile, patchDoctorProfile } from "@/lib/useDoctorProfile";
 import {
@@ -149,6 +150,12 @@ export default function AvailabilitySettingsPage() {
       {!perBlock.some(Boolean) && !problem && (
         <p className="text-xs text-slate-500">Patients will see: <span className="font-semibold text-slate-700">{formatAvailability(value)}</span></p>
       )}
+
+      {/* Linked from the dashboard's online/offline card (#time-off). */}
+      <div id="time-off" className="pt-5 mt-2 border-t border-slate-100 scroll-mt-24">
+        <h2 className="text-sm font-bold text-slate-800 mb-1 flex items-center gap-1.5"><CalendarOff className="w-4 h-4 text-slate-400" /> Time off</h2>
+        <TimeOffManager />
+      </div>
     </DoctorProfileSubShell>
   );
 }

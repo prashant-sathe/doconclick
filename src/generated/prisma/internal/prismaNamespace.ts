@@ -417,6 +417,7 @@ export const ModelName = {
   Wallet: 'Wallet',
   WalletTransaction: 'WalletTransaction',
   Settlement: 'Settlement',
+  ProviderTimeOff: 'ProviderTimeOff',
   DuesPayment: 'DuesPayment',
   PayoutRequest: 'PayoutRequest',
   DoctorPaymentLog: 'DoctorPaymentLog',
@@ -454,7 +455,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "duesPayment" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionVersion" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
+    modelProps: "user" | "pushToken" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "providerTimeOff" | "duesPayment" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionVersion" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1935,6 +1936,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SettlementCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SettlementCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProviderTimeOff: {
+      payload: Prisma.$ProviderTimeOffPayload<ExtArgs>
+      fields: Prisma.ProviderTimeOffFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProviderTimeOffFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProviderTimeOffFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload>
+        }
+        findFirst: {
+          args: Prisma.ProviderTimeOffFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProviderTimeOffFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload>
+        }
+        findMany: {
+          args: Prisma.ProviderTimeOffFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload>[]
+        }
+        create: {
+          args: Prisma.ProviderTimeOffCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload>
+        }
+        createMany: {
+          args: Prisma.ProviderTimeOffCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProviderTimeOffCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload>[]
+        }
+        delete: {
+          args: Prisma.ProviderTimeOffDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload>
+        }
+        update: {
+          args: Prisma.ProviderTimeOffUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProviderTimeOffDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProviderTimeOffUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProviderTimeOffUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProviderTimeOffUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderTimeOffPayload>
+        }
+        aggregate: {
+          args: Prisma.ProviderTimeOffAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProviderTimeOff>
+        }
+        groupBy: {
+          args: Prisma.ProviderTimeOffGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderTimeOffGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProviderTimeOffCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderTimeOffCountAggregateOutputType> | number
         }
       }
     }
@@ -3616,6 +3691,7 @@ export const UserScalarFieldEnum = {
   termsAcceptedAt: 'termsAcceptedAt',
   deletedAt: 'deletedAt',
   tokenVersion: 'tokenVersion',
+  offlineUntil: 'offlineUntil',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4007,6 +4083,18 @@ export const SettlementScalarFieldEnum = {
 } as const
 
 export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
+
+
+export const ProviderTimeOffScalarFieldEnum = {
+  id: 'id',
+  providerId: 'providerId',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ProviderTimeOffScalarFieldEnum = (typeof ProviderTimeOffScalarFieldEnum)[keyof typeof ProviderTimeOffScalarFieldEnum]
 
 
 export const DuesPaymentScalarFieldEnum = {
@@ -4617,6 +4705,7 @@ export type GlobalOmitConfig = {
   wallet?: Prisma.WalletOmit
   walletTransaction?: Prisma.WalletTransactionOmit
   settlement?: Prisma.SettlementOmit
+  providerTimeOff?: Prisma.ProviderTimeOffOmit
   duesPayment?: Prisma.DuesPaymentOmit
   payoutRequest?: Prisma.PayoutRequestOmit
   doctorPaymentLog?: Prisma.DoctorPaymentLogOmit

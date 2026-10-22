@@ -142,6 +142,11 @@ export type WalletTransaction = Prisma.WalletTransactionModel
  */
 export type Settlement = Prisma.SettlementModel
 /**
+ * Model ProviderTimeOff
+ * 
+ */
+export type ProviderTimeOff = Prisma.ProviderTimeOffModel
+/**
  * Model DuesPayment
  * 
  */

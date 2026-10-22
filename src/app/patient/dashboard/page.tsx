@@ -18,6 +18,7 @@ import { formatAvailability } from "@/lib/availability";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { isClinicOpenNow, findOpenClinic, findNextOpening, formatSlotTime, formatClinicHours } from "@/lib/clinicAvailability";
+import ProviderAwayNotice, { type ProviderAvailability } from "@/components/patient/ProviderAwayNotice";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { RELATIONS } from "@/lib/relations";
 import { haversine, withinSearchRadius } from "@/lib/geo";
@@ -91,7 +92,7 @@ interface Clinic {
   slots: ClinicSlot[];
 }
 
-interface Doctor {
+interface Doctor extends ProviderAvailability {
   id: string;
   name: string;
   doctorProfile: DoctorProfile | null;
@@ -815,6 +816,12 @@ function PatientDashboardInner() {
   }, [doctors, specialtyFilter, search, doctorFilterState, effectiveRadiusKm, now, colorFor]);
 
   const selectedClinic = selectedDoctor?.clinics.find((c) => c.id === selectedClinicId) ?? null;
+  // Away right now (time off / offline): only a later day can be booked.
+  useEffect(() => {
+    // Moving the form off "Book Now" once the doctor's state is known.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (selectedDoctor?.awayNow && scheduleMode === "NOW") setScheduleMode("LATER");
+  }, [selectedDoctor?.awayNow, scheduleMode]);
 
   // Distance shown in the doctor panel's chip row — follows whichever
   // clinic the patient has selected, not just the doctor's first/legacy
@@ -1495,9 +1502,10 @@ function PatientDashboardInner() {
 
                   {/* Now vs Schedule later */}
                   <label className="input-label mb-2 block">When?</label>
+                  <ProviderAwayNotice provider={selectedDoctor} />
                   <div className="grid grid-cols-2 gap-2 mb-3">
-                    <button type="button" onClick={() => setScheduleMode("NOW")}
-                      className={`min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all ${scheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
+                    <button type="button" onClick={() => setScheduleMode("NOW")} disabled={!!selectedDoctor?.awayNow}
+                      className={`min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed ${scheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
                       Book Now
                     </button>
                     <button type="button" onClick={() => setScheduleMode("LATER")}

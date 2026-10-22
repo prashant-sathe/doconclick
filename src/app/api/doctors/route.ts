@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bookableDoctorWhere } from "@/lib/doctorBookable";
 import { PUBLIC_DOCTOR_PROFILE_SELECT, PUBLIC_CLINIC_SELECT, coarsenBase } from "@/lib/publicDoctor";
+import { publicAvailability } from "@/lib/timeOff";
 
 // GET: List approved doctors for patient portal, optionally filtered by specialty
 export async function GET(req: Request) {
@@ -19,7 +20,8 @@ export async function GET(req: Request) {
       clinics: { where: { isActive: true }, orderBy: { sortOrder: "asc" }, select: PUBLIC_CLINIC_SELECT },
     },
   });
+  const availability = await publicAvailability(doctors.map((d) => d.id));
   return NextResponse.json(
-    doctors.map((d) => ({ ...d, doctorProfile: d.doctorProfile && coarsenBase(d.doctorProfile) }))
+    doctors.map((d) => ({ ...d, doctorProfile: d.doctorProfile && coarsenBase(d.doctorProfile), ...availability(d.id) }))
   );
 }

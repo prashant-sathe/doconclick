@@ -29,6 +29,7 @@ interface ConversationItem {
 }
 
 interface AssistantDoctor {
+  awayNow?: boolean; // time off / offline today
   id: string;
   name: string;
   photoUrl: string | null;
@@ -44,6 +45,7 @@ interface AssistantDoctor {
 }
 
 interface AssistantNurse {
+  awayNow?: boolean;
   id: string;
   name: string;
   photoUrl: string | null;
@@ -217,7 +219,7 @@ function NurseCard({ nurse, service, hasDoctorReferral }: {
   hasDoctorReferral: boolean;
 }) {
   const shift = service.kind === "SHIFT";
-  const available = !shift && isDoctorAvailableNow(nurse.availability) && !nurse.busyNow;
+  const available = !shift && isDoctorAvailableNow(nurse.availability) && !nurse.busyNow && !nurse.awayNow;
   return (
     <div className="bg-white border border-rose-100 rounded-2xl p-4 shadow-sm">
       <div className="flex gap-3">
@@ -240,7 +242,7 @@ function NurseCard({ nurse, service, hasDoctorReferral }: {
             {!shift && (
               <span className={`flex items-center gap-1 font-semibold ${available ? "text-emerald-600" : "text-amber-600"}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${available ? "bg-emerald-500" : "bg-amber-500"}`} />
-                {available ? "Available now" : nurse.busyNow ? "On a visit now" : formatAvailability(nurse.availability)}
+                {available ? "Available now" : nurse.awayNow ? "Away today — book a later day" : nurse.busyNow ? "On a visit now" : formatAvailability(nurse.availability)}
               </span>
             )}
           </div>
@@ -261,7 +263,7 @@ function NurseCard({ nurse, service, hasDoctorReferral }: {
 }
 
 function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
-  const available = isDoctorAvailableNow(doctor.availability);
+  const available = isDoctorAvailableNow(doctor.availability) && !doctor.awayNow;
   const initials = doctor.name
     .replace(/^Dr\.?\s*/i, "")
     .split(" ")
@@ -326,7 +328,7 @@ function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
             )}
             <span className={`flex items-center gap-1 font-semibold ${available ? "text-emerald-600" : "text-amber-600"}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${available ? "bg-emerald-500" : "bg-amber-500"}`} />
-              {available ? "Available now" : doctor.availability}
+              {available ? "Available now" : doctor.awayNow ? "Away today — book a later day" : doctor.availability}
             </span>
           </div>
         </div>

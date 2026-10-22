@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { generateSlotsForDate, todayIsoDateIst, SLOT_INTERVAL_MINUTES, type ClinicSlotLike } from "@/lib/clinicAvailability";
+import { timeOffProblem } from "@/lib/timeOff";
 
 // A timed booking holds the doctor for one slot: [scheduledAt, +SLOT_INTERVAL).
 // A doctor is one person, so the slot is held across ALL their clinics and
@@ -68,6 +69,9 @@ export async function doctorSlotProblem(params: {
   viewer: "patient" | "doctor";
 }): Promise<string | null> {
   const { doctorId, when, excludeAppointmentId, against, viewer } = params;
+  // On time off / offline then — every booking path that picks a time comes through here.
+  const away = await timeOffProblem(doctorId, when, viewer === "patient" ? "patient" : "provider");
+  if (away) return away;
   const window = { gt: new Date(when.getTime() - SLOT_MS), lt: new Date(when.getTime() + SLOT_MS) };
   const nearby = await prisma.appointment.findMany({
     where: {

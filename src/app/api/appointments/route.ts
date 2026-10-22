@@ -12,6 +12,7 @@ import { verifyVisitCoordinates } from "@/lib/visitVerify";
 import { parseBody, appointmentBookingSchema } from "@/lib/schemas";
 import { doctorSlotProblem, snapToClinicGrid, isSlotIndexViolation } from "@/lib/doctorSlots";
 import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, doctorHoursProblem, openRequestsProblem } from "@/lib/bookingLimits";
+import { timeOffProblem, TIME_OFF_CODE } from "@/lib/timeOff";
 
 export async function POST(req: Request) {
   const authUser = await getAuthUser();
@@ -240,6 +241,12 @@ export async function POST(req: Request) {
 
     const tooMany = await openRequestsProblem(authUser.id, doctorId);
     if (tooMany) return NextResponse.json({ error: tooMany, code: "TOO_MANY_REQUESTS" }, { status: 409 });
+
+    // On time off / offline. (A chosen time is checked by doctorSlotProblem below.)
+    if (!bookAt) {
+      const away = await timeOffProblem(doctorId, new Date(), "patient");
+      if (away) return NextResponse.json({ error: away, code: TIME_OFF_CODE }, { status: 409 });
+    }
 
     // A scheduled booking holds the doctor for a slot across all their clinics
     // and consult types. "Now" bookings are exempt: there's no discrete slot

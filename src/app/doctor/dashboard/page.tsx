@@ -15,6 +15,7 @@ import { isOverdue, byVisitAsc, byVisitDesc, nextUpcoming } from "@/lib/doctorQu
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import PaymentQrPanel from "@/components/doctor/PaymentQrPanel";
+import { OfflineToggle } from "@/components/ProviderAway";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
@@ -1072,6 +1073,8 @@ export default function DoctorDashboard() {
             <UserPlus className="w-4 h-4" /> <span className="hidden sm:inline">Walk-in</span>
           </Link>
         </div>
+
+        {!isStaff && <OfflineToggle timeOffHref="/doctor/profile/availability#time-off" onChanged={() => { void loadAppointments(); }} />}
 
         {apptsError && !loadingAppts && <LoadError error={apptsError} onRetry={retryAppointments} retrying={apptsRetrying} hasData />}
 

@@ -9,6 +9,7 @@ import { haversine, withinSearchRadius } from "@/lib/geo";
 import { isClinicOpenNow } from "@/lib/clinicAvailability";
 import { ensureNurseServices } from "@/lib/nurseServices";
 import { searchNurses } from "@/lib/nurseSearch";
+import { awayAt } from "@/lib/timeOff";
 import { readJson } from "@/lib/routeGuards";
 import { parseBody, assistantRequestSchema } from "@/lib/schemas";
 
@@ -212,6 +213,7 @@ async function findDoctors(
     take: 20,
   });
 
+  const away = await awayAt(doctors.map((d) => d.id), now);
   const withDistance = doctors
     .filter((d) => d.doctorProfile)
     .map((d) => {
@@ -237,6 +239,8 @@ async function findDoctors(
         offersHomeVisit: canHomeVisit,
         offersClinic: canClinicVisit,
         offersVideo: profile.offersVideo,
+        // On time off / offline today — can only be booked for a later day.
+        awayNow: away.has(d.id),
       };
     });
 
@@ -245,6 +249,7 @@ async function findDoctors(
   );
 
   inRange.sort((a, b) => {
+    if (a.awayNow !== b.awayNow) return a.awayNow ? 1 : -1;
     if (a.distanceKm == null) return 1;
     if (b.distanceKm == null) return -1;
     return a.distanceKm - b.distanceKm;

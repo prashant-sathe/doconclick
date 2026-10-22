@@ -29,10 +29,17 @@ type Nurse = {
   languages: string; bio: string | null; availability: string; isVerified: boolean; policeVerified: boolean;
   avgRating: number; totalReviews: number; price: number; distanceKm: number | null;
   busyNow?: boolean; // on another visit right now — can still be booked for later
+  awayNow?: boolean; // time off / offline right now (src/lib/timeOff.ts)
+  awayUntil?: string | null; // last day off, or "today"
 };
 
+const awayLabel = (n: Nurse) =>
+  n.awayUntil && n.awayUntil !== "today"
+    ? `On leave until ${new Date(`${n.awayUntil}T00:00:00+05:30`).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short" })}`
+    : "Not taking bookings today";
+
 // "As soon as possible" only makes sense inside working hours and when the nurse isn't mid-visit.
-const canComeNow = (n: Nurse) => isDoctorAvailableNow(n.availability) && !n.busyNow;
+const canComeNow = (n: Nurse) => isDoctorAvailableNow(n.availability) && !n.busyNow && !n.awayNow;
 type Doc = { id: string; title: string; category: string; createdAt: string };
 
 const SORTS = [
@@ -478,7 +485,9 @@ function PatientNurseContent() {
                             {n.totalReviews > 0 && <span className="flex items-center gap-0.5"><Star className="w-3 h-3 fill-amber-400 text-amber-400" />{n.avgRating.toFixed(1)} ({n.totalReviews})</span>}
                             {n.distanceKm != null && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{n.distanceKm} km</span>}
                             {n.policeVerified && <span className="flex items-center gap-0.5 text-emerald-600 font-semibold"><ShieldCheck className="w-3 h-3" />Police verified</span>}
-                            {shiftMode
+                            {n.awayNow
+                              ? <span className="flex items-center gap-0.5 text-amber-600 font-semibold"><Clock className="w-3 h-3" />{awayLabel(n)} — book a later day</span>
+                              : shiftMode
                               ? <span className="flex items-center gap-0.5 text-emerald-600 font-semibold"><Clock className="w-3 h-3" />Takes shifts</span>
                               : !isDoctorAvailableNow(n.availability)
                               ? <span className="flex items-center gap-0.5 text-slate-400"><Clock className="w-3 h-3" />{formatAvailability(n.availability)}</span>
@@ -550,7 +559,9 @@ function PatientNurseContent() {
                     ) : (
                     <p className="text-[11px] text-slate-400 mt-1">
                       Works {formatAvailability(nurse.availability)}
-                      {!isDoctorAvailableNow(nurse.availability)
+                      {nurse.awayNow
+                        ? ` — ${awayLabel(nurse).toLowerCase()}, so pick a later day`
+                        : !isDoctorAvailableNow(nurse.availability)
                         ? " — not working right now, so pick a time"
                         : nurse.busyNow ? " — on another visit right now, so pick a later time" : ""}
                     </p>

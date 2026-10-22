@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { timeOffProblem } from "@/lib/timeOff";
 import { isDoctorAvailableNow, formatAvailability } from "@/lib/availability";
 
 // A nurse is one person travelling between homes — two visits can't overlap.
@@ -59,6 +60,8 @@ export async function nurseSlotProblem(params: {
   checkHours?: boolean;
 }): Promise<string | null> {
   const { nurseId, availability, when, excludeAppointmentId, viewer } = params;
+  const away = await timeOffProblem(nurseId, when, viewer === "patient" ? "patient" : "provider", "nurse");
+  if (away) return away;
   const duration = (params.durationMinutes ?? DEFAULT_VISIT_MIN) + NURSE_TRAVEL_BUFFER_MIN;
 
   if (params.checkHours !== false && !isDoctorAvailableNow(availability, when)) {

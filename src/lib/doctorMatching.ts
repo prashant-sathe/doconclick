@@ -3,6 +3,7 @@ import { bookableDoctorWhere } from "@/lib/doctorBookable";
 import { haversine } from "@/lib/geo";
 import { findOpenClinic } from "@/lib/clinicAvailability";
 import { isDoctorAvailableNow } from "@/lib/availability";
+import { awayAt } from "@/lib/timeOff";
 
 export interface ReassignmentCandidate {
   id: string;
@@ -68,12 +69,15 @@ export async function findReassignmentCandidates(params: {
     },
   });
 
+  // On time off / offline then — never a stand-in.
+  const away = await awayAt(doctors.map((d) => d.id), when);
+
   type Candidate = { id: string; name: string; distanceKm: number | null; clinicId: string | null; fee: number };
   const eligible: Candidate[] = [];
 
   for (const d of doctors) {
     const profile = d.doctorProfile;
-    if (!profile) continue;
+    if (!profile || away.has(d.id)) continue;
 
     const baseLat = profile.lat ?? d.clinics[0]?.lat ?? null;
     const baseLng = profile.lng ?? d.clinics[0]?.lng ?? null;
