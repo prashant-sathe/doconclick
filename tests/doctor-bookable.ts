@@ -24,7 +24,9 @@ async function main() {
   const stamp = String(Date.now()).slice(-8);
   const future = new Date(Date.now() + 30 * DAY);
   const past = new Date(Date.now() - DAY);
-  const base = { status: "APPROVED", isVerified: true, offersVideo: true, videoFee: 300, trialEndsAt: future };
+  // All-week hours: the reschedule below is "now + 2 days", which is a
+  // weekend half the time — outside the column's default Mon–Fri.
+  const base = { status: "APPROVED", isVerified: true, offersVideo: true, videoFee: 300, trialEndsAt: future, availability: "Sun-Sat, 12AM-11:59PM" };
 
   const variants: Record<string, Record<string, unknown>> = {
     bookable: {},

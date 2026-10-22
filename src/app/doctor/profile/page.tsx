@@ -103,7 +103,7 @@ function Status({ done }: { done: boolean }) {
 export default function DoctorProfilePage() {
   const { user, loading: authLoading, logout, refresh } = useAuth();
   const router = useRouter();
-  const { profile, clinicCount, loading } = useDoctorProfile();
+  const { profile, clinicCount, registrationFee, loading } = useDoctorProfile();
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -175,10 +175,15 @@ export default function DoctorProfilePage() {
             <div className="flex items-start gap-2.5 min-w-0">
               <ShieldCheck className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-slate-700 min-w-0">
-                <span className="font-bold text-slate-900">Activate your account.</span> Complete your profile, then pay a one-time <span className="line-through text-slate-400">₹499</span> <span className="font-semibold">₹99</span>.
+                <span className="font-bold text-slate-900">Activate your account.</span>{" "}
+                {registrationFee === 0
+                  ? "Complete your profile, then activate it — it's free right now."
+                  : <>Complete your profile, then pay a one-time {(registrationFee ?? 0) < 499 && <span className="line-through text-slate-400">₹499</span>} <span className="font-semibold">₹{registrationFee ?? "…"}</span>.</>}
               </p>
             </div>
-            <Link href="/doctor/payment" className="btn-primary py-2 px-3.5 text-sm flex-shrink-0"><CreditCard className="w-4 h-4" /> Pay ₹99</Link>
+            <Link href="/doctor/payment" className="btn-primary py-2 px-3.5 text-sm flex-shrink-0">
+              <CreditCard className="w-4 h-4" /> {registrationFee === 0 ? "Activate" : registrationFee != null ? `Pay ₹${registrationFee}` : "Pay"}
+            </Link>
           </div>
         )}
         {registrationFeePaid && !subActive && (

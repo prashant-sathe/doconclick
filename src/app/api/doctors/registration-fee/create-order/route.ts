@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
-import { createCashfreeOrder, DOCTOR_REGISTRATION_FEE } from "@/lib/cashfree";
+import { createCashfreeOrder } from "@/lib/cashfree";
+import { getDoctorRegistrationFee, activateRegistration } from "@/lib/doctorFees";
 import { reserveDoctorFeeCoupon, releaseCouponRedemption } from "@/lib/coupons";
 
 // POST: Creates a real Cashfree order for a doctor's one-time registration fee.
@@ -21,6 +22,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Registration fee already paid" }, { status: 400 });
   }
 
+  // Admin-set in Settings. ₹0 = free: activated here, no gateway order
+  // (Cashfree can't take ₹0).
+  const fee = await getDoctorRegistrationFee();
+  if (fee === 0) {
+    await activateRegistration(profile, { amount: 0, discount: 0, couponCode: null, cashfreePaymentId: null, orderId: null });
+    return NextResponse.json({ paid: true, free: true });
+  }
+
   const { code } = await req.json().catch(() => ({}));
   const orderId = `docreg${authUser.id}_${Date.now()}`;
   const origin = externalOrigin(req, new URL(req.url));
@@ -32,7 +41,7 @@ export async function POST(req: Request) {
         code,
         userId: authUser.id,
         context: "DOCTOR_REGISTRATION",
-        fee: DOCTOR_REGISTRATION_FEE,
+        fee,
         orderId,
         previousOrderId: profile.cashfreeOrderId,
       }),
@@ -43,7 +52,7 @@ export async function POST(req: Request) {
     coupon = reserved;
   }
 
-  const amount = coupon ? coupon.netAmount : DOCTOR_REGISTRATION_FEE;
+  const amount = coupon ? coupon.netAmount : fee;
 
   try {
     const { paymentSessionId } = await createCashfreeOrder({
@@ -58,7 +67,9 @@ export async function POST(req: Request) {
 
     await prisma.doctorProfile.update({
       where: { userId: authUser.id },
-      data: { cashfreeOrderId: orderId },
+      // The webhook checks the payment against this amount, not the
+      // (admin-editable) fee at the time it arrives.
+      data: { cashfreeOrderId: orderId, registrationOrderAmount: amount },
     });
 
     return NextResponse.json({ paymentSessionId });

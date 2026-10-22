@@ -36,7 +36,7 @@ export async function GET() {
         take: 5,
         orderBy: { createdAt: "desc" },
         include: {
-          patient: { select: { name: true } },
+          patient: { select: { name: true, mobile: true } },
           doctor: { select: { name: true } },
         },
       }),

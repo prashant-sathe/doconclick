@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
-import { formatProviderName } from "@/lib/utils";
+import { formatProviderName, nameOrMobile } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { MAX_ADMIN_ADJUSTMENT, ADJUSTMENT_REASON_MIN, ADJUSTMENT_REASON_MAX } from "@/lib/walletLimits";
@@ -129,7 +129,8 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
               {data?.user?.name?.charAt(0) || "P"}
             </div>
             <div>
-              <div className="text-xl font-extrabold text-white">{data ? (data.user?.name || "Name not added") : "Loading…"}</div>
+              {/* No name yet (quick signup): the number is already on the line below. */}
+              <div className="text-xl font-extrabold text-white">{data ? (data.user?.name?.trim() || "(name not set)") : "Loading…"}</div>
               <div className="text-emerald-100 text-sm mt-0.5">{data?.user?.mobile ?? ""}</div>
               <div className="text-white text-2xl font-extrabold mt-2">
                 {data ? `₹${data.balance.toLocaleString("en-IN")}` : "—"}
@@ -278,7 +279,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
           title={`${direction === "CREDIT" ? "Credit" : "Debit"} ₹${amount}?`}
           message={
             <>
-              This will {direction === "CREDIT" ? "add" : "deduct"} ₹{amount} {direction === "CREDIT" ? "to" : "from"} {data?.user?.name || "this patient"}&apos;s wallet
+              This will {direction === "CREDIT" ? "add" : "deduct"} ₹{amount} {direction === "CREDIT" ? "to" : "from"} {data?.user ? nameOrMobile(data.user.name, data.user.mobile) : "this patient"}&apos;s wallet
               {note ? <> with note “{note}”</> : ""} — visible to them immediately in their transaction history. This cannot be undone from here.
             </>
           }
@@ -357,7 +358,7 @@ export default function AdminWallets() {
       flex: 1.2,
       cellRenderer: (p: ICellRendererParams<WalletRow>) => (
         <div className="leading-tight py-1">
-          <div className="font-semibold text-slate-900">{p.data?.name}</div>
+          <div className="font-semibold text-slate-900">{p.data?.name?.trim() || <span className="text-slate-400 font-normal italic">(name not set) · {p.data?.mobile}</span>}</div>
           <div className="text-xs text-slate-400">{p.data?.email ?? "No email"}</div>
         </div>
       ),

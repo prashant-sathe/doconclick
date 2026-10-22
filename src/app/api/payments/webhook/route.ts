@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyCashfreeWebhookSignature, DOCTOR_REGISTRATION_FEE, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
+import { verifyCashfreeWebhookSignature, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
+import { getDoctorRegistrationFee, activateRegistration } from "@/lib/doctorFees";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { WALLET_TOPUP_ORDER_PREFIX } from "@/lib/wallet";
 import { releaseCouponRedemption } from "@/lib/coupons";
@@ -86,12 +87,18 @@ export async function POST(req: Request) {
       console.error("Cashfree webhook: no doctor profile found for order", orderId);
       return NextResponse.json({ ok: true });
     }
+    // Cashfree retries webhooks — a second delivery must not log the
+    // payment (or restart the trial) twice.
+    if (profile.registrationFeePaid) return NextResponse.json({ ok: true });
     const redemption = await prisma.couponRedemption.findUnique({
       where: { orderId },
       include: { coupon: { select: { code: true } } },
     });
     const discount = redemption?.status === "RESERVED" ? redemption.discountAmount : 0;
-    const expected = Math.round((DOCTOR_REGISTRATION_FEE - discount) * 100) / 100;
+    // The amount this order was created for (the fee is admin-editable, so
+    // never "today's fee"); orders from before that was recorded fall back to
+    // the current fee.
+    const expected = profile.registrationOrderAmount ?? Math.round(((await getDoctorRegistrationFee()) - discount) * 100) / 100;
     if (payload.data.order.order_amount !== expected) {
       console.error(
         "Cashfree webhook amount mismatch for doctor registration", profile.id,
@@ -99,39 +106,12 @@ export async function POST(req: Request) {
       );
       return NextResponse.json({ ok: true });
     }
-    const sixMonthsOut = new Date();
-    sixMonthsOut.setMonth(sixMonthsOut.getMonth() + 6);
-    await prisma.$transaction([
-      prisma.doctorProfile.update({
-        where: { id: profile.id },
-        data: {
-          registrationFeePaid: true,
-          registrationFeeStatus: "PAID",
-          cashfreePaymentId: payload.data.payment.cf_payment_id,
-          // First-time-only free trial of patient-access — this only ever
-          // fires once per doctor, at their one and only registration payment.
-          trialEndsAt: sixMonthsOut,
-        },
-      }),
-      prisma.doctorPaymentLog.create({
-        data: {
-          doctorId: profile.userId,
-          type: "REGISTRATION",
-          amount: payload.data.order.order_amount,
-          couponCode: discount > 0 ? redemption?.coupon.code ?? null : null,
-          discountAmount: discount,
-          cashfreePaymentId: payload.data.payment.cf_payment_id,
-        },
-      }),
-      prisma.couponRedemption.updateMany({
-        where: { orderId, status: "RESERVED" },
-        data: { status: "CONFIRMED" },
-      }),
-    ]);
-    void sendPushToUser(profile.userId, {
-      title: "Registration fee received",
-      body: "Your application is now under review.",
-      url: "/doctor/dashboard",
+    await activateRegistration(profile, {
+      amount: payload.data.order.order_amount,
+      discount,
+      couponCode: redemption?.coupon.code ?? null,
+      cashfreePaymentId: payload.data.payment.cf_payment_id,
+      orderId,
     });
     return NextResponse.json({ ok: true });
   }

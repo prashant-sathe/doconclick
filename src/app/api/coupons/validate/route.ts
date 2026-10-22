@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { DOCTOR_REGISTRATION_FEE, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
+import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
+import { getDoctorRegistrationFee } from "@/lib/doctorFees";
 import { normalizeCode, validateCoupon, type CouponContext } from "@/lib/coupons";
 
-const FEE_FOR: Record<string, number> = {
-  DOCTOR_REGISTRATION: DOCTOR_REGISTRATION_FEE,
-  DOCTOR_SUBSCRIPTION: DOCTOR_SUBSCRIPTION_FEE,
-};
 
 // POST: preview-only check of a coupon for a doctor fee. Does NOT reserve a
 // slot — the create-order route re-validates and reserves authoritatively.
@@ -24,7 +21,8 @@ export async function POST(req: Request) {
   if (context !== "DOCTOR_REGISTRATION" && context !== "DOCTOR_SUBSCRIPTION") {
     return NextResponse.json({ error: "Invalid coupon context." }, { status: 400 });
   }
-  const fee = FEE_FOR[context];
+  const fee = context === "DOCTOR_REGISTRATION" ? await getDoctorRegistrationFee() : DOCTOR_SUBSCRIPTION_FEE;
+  if (fee === 0) return NextResponse.json({ error: "There's nothing to pay, so no coupon is needed." }, { status: 400 });
 
   const coupon = await prisma.coupon.findUnique({ where: { code: normalizeCode(code) } });
   if (!coupon) {

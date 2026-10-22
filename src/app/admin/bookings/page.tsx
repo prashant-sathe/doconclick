@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Search, CalendarCheck, Eye, X, FileText, Pill, FlaskConical, Phone, Download } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
-import { cn, formatProviderName } from "@/lib/utils";
+import { cn, formatProviderName, nameOrMobile } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
 import LoadError from "@/components/LoadError";
@@ -11,7 +11,7 @@ import { useLoad } from "@/lib/apiClient";
 
 interface Appointment {
   id: string;
-  patient: { name: string };
+  patient: { name: string; mobile: string };
   providerType?: string;
   doctor: { name: string };
   symptoms: string;
@@ -104,7 +104,7 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
           style={{ background: "linear-gradient(135deg, hsl(213,94%,45%) 0%, hsl(172,76%,40%) 100%)" }}>
           <div>
             <div className="text-xl font-extrabold text-white">
-              {data && (data.relation !== "Self" && data.patientName ? data.patientName : data.patient.name)}
+              {data && (data.relation !== "Self" && data.patientName ? data.patientName : nameOrMobile(data.patient.name, data.patient.mobile))}
             </div>
             <div className="text-blue-100 text-sm mt-0.5">
               {data ? `with ${formatProviderName(data.doctor.name, data.providerType)}` : loading ? "Loading…" : "Booking"}
@@ -139,7 +139,7 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
               </div>
 
               <Section title="Patient" icon={Phone}>
-                <Row label="Name" value={data.relation !== "Self" && data.patientName ? `${data.patientName} (${data.relation} of ${data.patient.name})` : data.patient.name} />
+                <Row label="Name" value={data.relation !== "Self" && data.patientName ? `${data.patientName} (${data.relation} of ${nameOrMobile(data.patient.name, data.patient.mobile)})` : nameOrMobile(data.patient.name, data.patient.mobile)} />
                 <Row label="Mobile" value={data.patient.mobile} />
                 <Row label="Symptoms" value={data.symptoms || "—"} />
               </Section>
@@ -272,6 +272,7 @@ export default function AdminBookings() {
     .filter((b) =>
       search === "" ||
       b.patient.name.toLowerCase().includes(search.toLowerCase()) ||
+      b.patient.mobile.includes(search.trim()) ||
       (b.patientName?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
       b.doctor.name.toLowerCase().includes(search.toLowerCase())
     );
@@ -287,12 +288,12 @@ export default function AdminBookings() {
       cellRenderer: (p: ICellRendererParams<Appointment>) => {
         const b = p.data;
         if (!b) return null;
-        const name = b.relation !== "Self" && b.patientName ? b.patientName : b.patient.name;
+        const name = b.relation !== "Self" && b.patientName ? b.patientName : nameOrMobile(b.patient.name, b.patient.mobile);
         return (
           <div className="leading-tight py-1">
             <div className="font-semibold text-slate-900">{name}</div>
             {b.relation !== "Self" && (
-              <div className="text-xs font-normal text-slate-400">{b.relation} of {b.patient.name}</div>
+              <div className="text-xs font-normal text-slate-400">{b.relation} of {nameOrMobile(b.patient.name, b.patient.mobile)}</div>
             )}
           </div>
         );

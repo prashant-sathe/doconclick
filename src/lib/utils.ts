@@ -29,6 +29,15 @@ export function formatDoctorName(name: string) {
   return `Dr. ${name.replace(/^dr\.?\s*/i, "").trim()}`;
 }
 
+// Quick-signup patients have no name until their first booking (it's ""), so
+// admin screens show who they are by number: "(name not set) · 9876543210".
+export const NAME_NOT_SET = "(name not set)";
+export function nameOrMobile(name: string | null | undefined, mobile?: string | null): string {
+  const clean = (name ?? "").trim();
+  if (clean) return clean;
+  return mobile ? `${NAME_NOT_SET} · ${mobile}` : NAME_NOT_SET;
+}
+
 // Nurse bookings share the Appointment table (doctorId = the nurse), so any
 // screen that lists appointments must not prefix a nurse with "Dr.".
 export function formatProviderName(name: string, providerType?: string | null) {

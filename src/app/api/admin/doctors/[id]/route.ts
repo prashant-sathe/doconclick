@@ -5,7 +5,7 @@ import { safeNum } from "@/lib/adminAuth";
 import { deleteAccount, DeletionBlockedError, accountDeletionPreview } from "@/lib/userDeletion";
 import { accountImpact, impactConfirmationResponse, resolveProviderBookings, type BookingAction } from "@/lib/accountImpact";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
-import { DOCTOR_REGISTRATION_FEE } from "@/lib/cashfree";
+import { getDoctorRegistrationFee, registrationFeeLabel } from "@/lib/doctorFees";
 
 const MAX_REASON_LENGTH = 500;
 
@@ -124,7 +124,9 @@ export async function PATCH(
   const profile = target?.doctorProfile;
   if (!profile) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const feeDue = DOCTOR_REGISTRATION_FEE > 0 && !profile.registrationFeePaid;
+  // Admin-set in Settings; ₹0 means there's nothing to wait for.
+  const registrationFee = await getDoctorRegistrationFee();
+  const feeDue = registrationFee > 0 && !profile.registrationFeePaid;
   const data: { status?: string; isVerified?: boolean } = {};
   let reason = "";
 
@@ -147,7 +149,7 @@ export async function PATCH(
       }
       if (feeDue) {
         return NextResponse.json(
-          { error: `Cannot approve: the doctor hasn't paid the ₹${DOCTOR_REGISTRATION_FEE} registration fee yet.` },
+          { error: `Cannot approve: the doctor hasn't paid the ${registrationFeeLabel(registrationFee)} registration fee yet.` },
           { status: 400 }
         );
       }
@@ -167,7 +169,7 @@ export async function PATCH(
   if (isVerified !== undefined) {
     if (isVerified && feeDue) {
       return NextResponse.json(
-        { error: `Cannot verify: doctor hasn't paid the ₹${DOCTOR_REGISTRATION_FEE} registration fee yet.` },
+        { error: `Cannot verify: doctor hasn't paid the ${registrationFeeLabel(registrationFee)} registration fee yet.` },
         { status: 400 }
       );
     }

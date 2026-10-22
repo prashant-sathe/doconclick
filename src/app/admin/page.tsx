@@ -2,7 +2,7 @@
 import { Users, Stethoscope, HeartPulse, CalendarCheck, IndianRupee, AlertCircle, Clock, TrendingUp } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
-import { cn, formatProviderName } from "@/lib/utils";
+import { cn, formatProviderName, nameOrMobile } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import LoadError from "@/components/LoadError";
@@ -21,7 +21,7 @@ interface Analytics {
   totalPlatformEarnings: number;
   recentAppointments: {
     id: string;
-    patient: { name: string };
+    patient: { name: string; mobile: string };
     providerType?: string;
     doctor: { name: string };
     symptoms: string;
@@ -83,7 +83,7 @@ export default function AdminOverview() {
   }
 
   const columnDefs: ColDef<RecentAppointment>[] = [
-    { headerName: "Patient", field: "patient.name", minWidth: 160, flex: 1, cellClass: "font-medium text-slate-900" },
+    { headerName: "Patient", field: "patient.name", minWidth: 160, flex: 1, cellClass: "font-medium text-slate-900", valueFormatter: (p) => nameOrMobile(p.data?.patient.name, p.data?.patient.mobile) },
     {
       headerName: "Doctor",
       field: "doctor.name",

@@ -36,7 +36,7 @@ export const REPORT_CONFIGS: ReportConfig[] = [
   {
     slug: "doctor-registrations",
     title: "Doctor Registration Payments",
-    description: "Which doctors paid the ₹99 registration fee, when, and who's still pending.",
+    description: "Which doctors paid the registration fee (set in Settings), how much, when, and who's still pending.",
     category: "Doctor Financials",
     endpoint: "/api/admin/reports/doctor-registrations",
     statusFilter: { param: "status", label: "Fee status", options: [{ value: "ALL", label: "All" }, { value: "PAID", label: "Paid" }, { value: "PENDING", label: "Pending" }] },

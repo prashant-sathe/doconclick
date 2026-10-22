@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { AUDIENCES, validateButtons } from "@/lib/announcements";
+import { isOwnUploadUrl } from "@/lib/s3";
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -64,7 +65,12 @@ export async function PATCH(
     data.message = trimmed;
   }
   if ("bannerImageUrl" in body) {
-    data.bannerImageUrl = body.bannerImageUrl ? String(body.bannerImageUrl).trim() : null;
+    const url = body.bannerImageUrl ? String(body.bannerImageUrl).trim() : null;
+    // Shown to every user — only an image uploaded through the announcement form.
+    if (url && !isOwnUploadUrl(url, "announcement-banners")) {
+      return NextResponse.json({ error: "Upload the banner image here — links to other sites aren't allowed." }, { status: 400 });
+    }
+    data.bannerImageUrl = url;
   }
   if (typeof body.audience === "string") {
     if (!AUDIENCES.includes(body.audience)) {
@@ -76,7 +82,7 @@ export async function PATCH(
     const buttons = validateButtons(body.buttons);
     if (buttons === null) {
       return NextResponse.json(
-        { error: "Buttons must have at most 2 entries, each with a label and a valid url" },
+        { error: "Up to 2 buttons, each with a label and a link: a full https:// address, or a page on this site like /patient/wallet." },
         { status: 400 }
       );
     }

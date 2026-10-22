@@ -4,6 +4,7 @@ import { Settings, Info, ShieldCheck, ChevronRight } from "lucide-react";
 import NotificationSettings from "@/components/NotificationSettings";
 import SplashSettings from "@/components/SplashSettings";
 import NurseSettings from "@/components/admin/NurseSettings";
+import DoctorFeeSettings from "@/components/admin/DoctorFeeSettings";
 import BookingSettings from "@/components/admin/BookingSettings";
 
 export default function AdminSettings() {
@@ -45,6 +46,8 @@ export default function AdminSettings() {
         </Link>
 
         <BookingSettings />
+
+        <DoctorFeeSettings />
 
         <NurseSettings />
 

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { isOwnUploadUrl } from "@/lib/s3";
+import { DOCTOR_REGISTRATION_FEE_MAX } from "@/lib/doctorFees";
 import { BOOKING_HORIZON_MIN_DAYS, BOOKING_HORIZON_MAX_DAYS, CHAT_FOLLOW_UP_MIN_DAYS, CHAT_FOLLOW_UP_MAX_DAYS } from "@/lib/bookingHorizon";
 
 async function requireAdmin() {
@@ -67,6 +69,16 @@ export async function PATCH(req: Request) {
     data[key] = Math.round(value);
   }
 
+  // Doctors' one-time registration fee; ₹0 = free (activated without paying).
+  // Orders already open keep the amount they were created for.
+  if (body.doctorRegistrationFee !== undefined) {
+    const value = finiteNumber(body.doctorRegistrationFee);
+    if (value === null || value < 0 || value > DOCTOR_REGISTRATION_FEE_MAX) {
+      return NextResponse.json({ error: "The doctor registration fee must be between ₹0 and ₹1,00,000." }, { status: 400 });
+    }
+    data.doctorRegistrationFee = Math.round(value);
+  }
+
   if (body.bookingHorizonDays !== undefined) {
     const value = finiteNumber(body.bookingHorizonDays);
     if (value === null || !Number.isInteger(value) || value < BOOKING_HORIZON_MIN_DAYS || value > BOOKING_HORIZON_MAX_DAYS) {
@@ -89,8 +101,16 @@ export async function PATCH(req: Request) {
     data.chatFollowUpDays = value;
   }
 
+  // Only an image uploaded through Settings (our bucket, app-splash/) — every
+  // app shows this on launch, so it mustn't point anywhere else.
   if (body.splashImageUrl !== undefined) {
-    data.splashImageUrl = body.splashImageUrl ? String(body.splashImageUrl).trim() : null;
+    if (body.splashImageUrl === null || body.splashImageUrl === "") {
+      data.splashImageUrl = null;
+    } else if (typeof body.splashImageUrl !== "string" || !isOwnUploadUrl(body.splashImageUrl.trim(), "app-splash")) {
+      return NextResponse.json({ error: "Upload the splash image here in Settings — links to other sites aren't allowed." }, { status: 400 });
+    } else {
+      data.splashImageUrl = body.splashImageUrl.trim();
+    }
   }
   if (body.splashFit !== undefined) {
     if (body.splashFit !== "cover" && body.splashFit !== "contain") {

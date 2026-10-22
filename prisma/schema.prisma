@@ -186,6 +186,10 @@ model DoctorProfile {
 
   registrationFeePaid   Boolean @default(false)
   registrationFeeStatus String  @default("PENDING") // PENDING, PAID
+  // What the registration order in cashfreeOrderId was created for (fee −
+  // coupon) — the webhook checks the payment against this, so the admin
+  // changing the fee mid-checkout can't reject a real payment.
+  registrationOrderAmount Float?
   medRegCertUrl         String?
   degreeCertUrl         String?
   kycDocUrl             String?
@@ -751,6 +755,10 @@ model PlatformSettings {
   // registration / no monthly subscription gate.
   nurseCommissionPercent  Float    @default(10)
   nurseRegistrationFee    Float    @default(0)
+  // Doctors' one-time registration fee (₹0 = free: activated without a
+  // payment step) — read by checkout, coupons and the approve gate
+  // (src/lib/doctorFees.ts). The monthly subscription is still a constant.
+  doctorRegistrationFee   Float    @default(99)
   nurseSubscriptionFee    Float    @default(0)
   // One-time: the starter 12h/24h shift services were added to an existing
   // catalogue (so an admin deleting them later doesn't bring them back).

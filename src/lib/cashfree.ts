@@ -1,8 +1,9 @@
 import crypto from "crypto";
 
-// Shared with the webhook handler's amount-match check — keep in one place
-// so the two never drift apart.
-export const DOCTOR_REGISTRATION_FEE = 99;
+// The registration fee is admin-set (PlatformSettings.doctorRegistrationFee,
+// read via src/lib/doctorFees.ts); this is only its default. The subscription
+// fee is shared with the webhook's amount-match check — keep in one place.
+export const DEFAULT_DOCTOR_REGISTRATION_FEE = 99;
 export const DOCTOR_SUBSCRIPTION_FEE = 499;
 
 // CASHFREE_API_BASE points at a local mock in tests (tests/payment-orders.ts)

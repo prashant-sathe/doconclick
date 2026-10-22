@@ -45,6 +45,8 @@ export type DoctorMe = {
   doctorProfile: RawDoctorProfile;
   clinics: unknown[];
   changeRequest: DoctorChangeRequest | null;
+  /** The admin-set one-time registration fee (₹0 = free). */
+  registrationFee: number | null;
 };
 
 /** Loads the signed-in doctor's `/api/doctors/me` once. */
@@ -58,7 +60,7 @@ export function useDoctorProfile() {
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (cancelled) return;
-        setData({ doctorProfile: (d?.doctorProfile ?? {}) as RawDoctorProfile, clinics: d?.clinics ?? [], changeRequest: d?.changeRequest ?? null });
+        setData({ doctorProfile: (d?.doctorProfile ?? {}) as RawDoctorProfile, clinics: d?.clinics ?? [], changeRequest: d?.changeRequest ?? null, registrationFee: typeof d?.registrationFee === "number" ? d.registrationFee : null });
         setLoading(false);
       })
       .catch(() => { if (!cancelled) setLoading(false); });
@@ -69,6 +71,7 @@ export function useDoctorProfile() {
     profile: data?.doctorProfile ?? null,
     clinicCount: data?.clinics.length ?? 0,
     changeRequest: data?.changeRequest ?? null,
+    registrationFee: data?.registrationFee ?? null,
     loading,
   };
 }

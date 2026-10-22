@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isOwnUploadUrl } from "@/lib/s3";
 
 // Public (no auth): the native app shell fetches this before the user is
 // logged in, to render the dynamic splash overlay (see SplashOverlay.tsx).
@@ -8,7 +9,8 @@ export async function GET() {
   const settings = await prisma.platformSettings.findFirst();
   return NextResponse.json({
     splash: {
-      imageUrl: settings?.splashImageUrl ?? null,
+      // Only our own upload — an older value pointing elsewhere is ignored.
+      imageUrl: settings?.splashImageUrl && isOwnUploadUrl(settings.splashImageUrl, "app-splash") ? settings.splashImageUrl : null,
       fit: settings?.splashFit === "contain" ? "contain" : "cover",
       bgColor: settings?.splashBgColor ?? "#F8FAFC",
     },

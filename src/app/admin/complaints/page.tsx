@@ -1,13 +1,13 @@
 "use client";
 import { MessageCircle, CheckCheck, Clock, AlertCircle } from "lucide-react";
-import { cn, formatDoctorName } from "@/lib/utils";
+import { cn, formatDoctorName, nameOrMobile } from "@/lib/utils";
 import LoadError from "@/components/LoadError";
 import { useToast } from "@/components/Toast";
 import { mutate, useLoad } from "@/lib/apiClient";
 
 interface Complaint {
   id: string;
-  user: { name: string; role: string };
+  user: { name: string; mobile: string; role: string };
   subject: string;
   description: string;
   status: string;
@@ -80,7 +80,7 @@ export default function AdminComplaints() {
                       </div>
                       <p className="text-sm text-slate-600 mb-1">{c.description}</p>
                       <div className="text-xs text-slate-400">
-                        By <span className="font-medium text-slate-600">{c.user.role === "DOCTOR" ? formatDoctorName(c.user.name) : c.user.name}</span> · {new Date(c.createdAt).toLocaleDateString("en-IN")}
+                        By <span className="font-medium text-slate-600">{c.user.role === "DOCTOR" ? formatDoctorName(c.user.name) : nameOrMobile(c.user.name, c.user.mobile)}</span> · {new Date(c.createdAt).toLocaleDateString("en-IN")}
                       </div>
                     </div>
                   </div>

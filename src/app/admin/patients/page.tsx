@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
-import { cn, formatProviderName } from "@/lib/utils";
+import { cn, formatProviderName, nameOrMobile } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useAccountImpact } from "@/components/admin/AccountImpactDialog";
@@ -103,7 +103,7 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
               )}
             </div>
             <div>
-              <div className="text-xl font-extrabold text-white">{data ? (data.name || "Name not added") : loading ? "Loading…" : "Patient"}</div>
+              <div className="text-xl font-extrabold text-white">{data ? nameOrMobile(data.name, data.mobile) : loading ? "Loading…" : "Patient"}</div>
               <div className="text-blue-100 text-sm mt-0.5">
                 {prof && prof.age > 0 && prof.gender ? `${prof.age} yrs · ${prof.gender}` : "Patient"}
               </div>
@@ -290,14 +290,14 @@ export default function AdminPatients() {
       (extra) => fetch(`/api/admin/patients/${target.id}`, {
         method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify(extra),
       }),
-      { title: `Before deleting ${target.name || "this patient"}`, actionLabel: "Delete Account" },
+      { title: `Before deleting ${nameOrMobile(target.name, target.mobile)}`, actionLabel: "Delete Account" },
     );
     setDeleting(false);
     if (body) {
       const bookings = body.bookings as { cancelled: number; refundTotal: number } | undefined;
       const wallet = Number(body.walletBalance ?? 0);
       setDeleteNotice(
-        `${target.name || "Patient"} deleted.`
+        `${nameOrMobile(target.name, target.mobile)} deleted.`
           + (bookings?.cancelled ? ` ${bookings.cancelled} booking${bookings.cancelled === 1 ? "" : "s"} cancelled and the providers notified.` : "")
           + (wallet > 0 ? ` ₹${wallet} is left in their wallet — pay it out manually.` : "")
       );
@@ -332,7 +332,7 @@ export default function AdminPatients() {
       flex: 1.2,
       cellRenderer: (p: ICellRendererParams<Patient>) => (
         <div className="leading-tight py-1">
-          <div className="font-semibold text-slate-900">{p.data?.name || <span className="text-slate-400 font-normal italic">Name not added</span>}</div>
+          <div className="font-semibold text-slate-900">{p.data?.name?.trim() || <span className="text-slate-400 font-normal italic">(name not set) · {p.data?.mobile}</span>}</div>
           <div className="text-xs text-slate-400">{p.data?.email ?? "No email"}</div>
         </div>
       ),
@@ -485,7 +485,7 @@ export default function AdminPatients() {
           title="Delete this account?"
           message={
             <>
-              {deleteTarget.name || "This patient"} ({deleteTarget.mobile}) will be permanently blocked from logging in, and their mobile number will be freed for a new registration.
+              {deleteTarget.name?.trim() ? `${deleteTarget.name} (${deleteTarget.mobile})` : nameOrMobile("", deleteTarget.mobile)} will be permanently blocked from logging in, and their mobile number will be freed for a new registration.
               Their past appointment history is kept for the doctors who treated them. This cannot be undone.
             </>
           }

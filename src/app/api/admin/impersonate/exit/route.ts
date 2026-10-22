@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/prisma";
+import { endImpersonation } from "@/lib/impersonation";
 import { verifySession, verifyToken, signToken, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
 
 const COOKIE_NAME = "doconclick_token";
@@ -20,18 +20,7 @@ export async function POST() {
   const currentToken = cookieStore.get(COOKIE_NAME)?.value;
   const currentPayload = currentToken ? verifyToken(currentToken) : null;
 
-  if (currentPayload) {
-    const openLog = await prisma.impersonationLog.findFirst({
-      where: { adminId: impersonatorPayload.id, targetUserId: currentPayload.id, endedAt: null },
-      orderBy: { startedAt: "desc" },
-    });
-    if (openLog) {
-      await prisma.impersonationLog.update({
-        where: { id: openLog.id },
-        data: { endedAt: new Date() },
-      });
-    }
-  }
+  if (currentPayload) await endImpersonation(impersonatorPayload.id, currentPayload.id);
 
   const adminPayload = impersonatorPayload;
 

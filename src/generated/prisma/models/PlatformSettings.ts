@@ -32,6 +32,7 @@ export type PlatformSettingsAvgAggregateOutputType = {
   homeCommissionPercent: number | null
   nurseCommissionPercent: number | null
   nurseRegistrationFee: number | null
+  doctorRegistrationFee: number | null
   nurseSubscriptionFee: number | null
   bookingHorizonDays: number | null
   chatFollowUpDays: number | null
@@ -43,6 +44,7 @@ export type PlatformSettingsSumAggregateOutputType = {
   homeCommissionPercent: number | null
   nurseCommissionPercent: number | null
   nurseRegistrationFee: number | null
+  doctorRegistrationFee: number | null
   nurseSubscriptionFee: number | null
   bookingHorizonDays: number | null
   chatFollowUpDays: number | null
@@ -55,6 +57,7 @@ export type PlatformSettingsMinAggregateOutputType = {
   homeCommissionPercent: number | null
   nurseCommissionPercent: number | null
   nurseRegistrationFee: number | null
+  doctorRegistrationFee: number | null
   nurseSubscriptionFee: number | null
   nurseShiftServicesSeeded: boolean | null
   bookingHorizonDays: number | null
@@ -72,6 +75,7 @@ export type PlatformSettingsMaxAggregateOutputType = {
   homeCommissionPercent: number | null
   nurseCommissionPercent: number | null
   nurseRegistrationFee: number | null
+  doctorRegistrationFee: number | null
   nurseSubscriptionFee: number | null
   nurseShiftServicesSeeded: boolean | null
   bookingHorizonDays: number | null
@@ -89,6 +93,7 @@ export type PlatformSettingsCountAggregateOutputType = {
   homeCommissionPercent: number
   nurseCommissionPercent: number
   nurseRegistrationFee: number
+  doctorRegistrationFee: number
   nurseSubscriptionFee: number
   nurseShiftServicesSeeded: number
   bookingHorizonDays: number
@@ -107,6 +112,7 @@ export type PlatformSettingsAvgAggregateInputType = {
   homeCommissionPercent?: true
   nurseCommissionPercent?: true
   nurseRegistrationFee?: true
+  doctorRegistrationFee?: true
   nurseSubscriptionFee?: true
   bookingHorizonDays?: true
   chatFollowUpDays?: true
@@ -118,6 +124,7 @@ export type PlatformSettingsSumAggregateInputType = {
   homeCommissionPercent?: true
   nurseCommissionPercent?: true
   nurseRegistrationFee?: true
+  doctorRegistrationFee?: true
   nurseSubscriptionFee?: true
   bookingHorizonDays?: true
   chatFollowUpDays?: true
@@ -130,6 +137,7 @@ export type PlatformSettingsMinAggregateInputType = {
   homeCommissionPercent?: true
   nurseCommissionPercent?: true
   nurseRegistrationFee?: true
+  doctorRegistrationFee?: true
   nurseSubscriptionFee?: true
   nurseShiftServicesSeeded?: true
   bookingHorizonDays?: true
@@ -147,6 +155,7 @@ export type PlatformSettingsMaxAggregateInputType = {
   homeCommissionPercent?: true
   nurseCommissionPercent?: true
   nurseRegistrationFee?: true
+  doctorRegistrationFee?: true
   nurseSubscriptionFee?: true
   nurseShiftServicesSeeded?: true
   bookingHorizonDays?: true
@@ -164,6 +173,7 @@ export type PlatformSettingsCountAggregateInputType = {
   homeCommissionPercent?: true
   nurseCommissionPercent?: true
   nurseRegistrationFee?: true
+  doctorRegistrationFee?: true
   nurseSubscriptionFee?: true
   nurseShiftServicesSeeded?: true
   bookingHorizonDays?: true
@@ -268,6 +278,7 @@ export type PlatformSettingsGroupByOutputType = {
   homeCommissionPercent: number
   nurseCommissionPercent: number
   nurseRegistrationFee: number
+  doctorRegistrationFee: number
   nurseSubscriptionFee: number
   nurseShiftServicesSeeded: boolean
   bookingHorizonDays: number
@@ -308,6 +319,7 @@ export type PlatformSettingsWhereInput = {
   homeCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseRegistrationFee?: Prisma.FloatFilter<"PlatformSettings"> | number
+  doctorRegistrationFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseSubscriptionFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseShiftServicesSeeded?: Prisma.BoolFilter<"PlatformSettings"> | boolean
   bookingHorizonDays?: Prisma.IntFilter<"PlatformSettings"> | number
@@ -325,6 +337,7 @@ export type PlatformSettingsOrderByWithRelationInput = {
   homeCommissionPercent?: Prisma.SortOrder
   nurseCommissionPercent?: Prisma.SortOrder
   nurseRegistrationFee?: Prisma.SortOrder
+  doctorRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
@@ -345,6 +358,7 @@ export type PlatformSettingsWhereUniqueInput = Prisma.AtLeast<{
   homeCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseCommissionPercent?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseRegistrationFee?: Prisma.FloatFilter<"PlatformSettings"> | number
+  doctorRegistrationFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseSubscriptionFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseShiftServicesSeeded?: Prisma.BoolFilter<"PlatformSettings"> | boolean
   bookingHorizonDays?: Prisma.IntFilter<"PlatformSettings"> | number
@@ -362,6 +376,7 @@ export type PlatformSettingsOrderByWithAggregationInput = {
   homeCommissionPercent?: Prisma.SortOrder
   nurseCommissionPercent?: Prisma.SortOrder
   nurseRegistrationFee?: Prisma.SortOrder
+  doctorRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
@@ -387,6 +402,7 @@ export type PlatformSettingsScalarWhereWithAggregatesInput = {
   homeCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   nurseCommissionPercent?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   nurseRegistrationFee?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  doctorRegistrationFee?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   nurseSubscriptionFee?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   nurseShiftServicesSeeded?: Prisma.BoolWithAggregatesFilter<"PlatformSettings"> | boolean
   bookingHorizonDays?: Prisma.IntWithAggregatesFilter<"PlatformSettings"> | number
@@ -404,6 +420,7 @@ export type PlatformSettingsCreateInput = {
   homeCommissionPercent?: number
   nurseCommissionPercent?: number
   nurseRegistrationFee?: number
+  doctorRegistrationFee?: number
   nurseSubscriptionFee?: number
   nurseShiftServicesSeeded?: boolean
   bookingHorizonDays?: number
@@ -421,6 +438,7 @@ export type PlatformSettingsUncheckedCreateInput = {
   homeCommissionPercent?: number
   nurseCommissionPercent?: number
   nurseRegistrationFee?: number
+  doctorRegistrationFee?: number
   nurseSubscriptionFee?: number
   nurseShiftServicesSeeded?: boolean
   bookingHorizonDays?: number
@@ -438,6 +456,7 @@ export type PlatformSettingsUpdateInput = {
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  doctorRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -455,6 +474,7 @@ export type PlatformSettingsUncheckedUpdateInput = {
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  doctorRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -472,6 +492,7 @@ export type PlatformSettingsCreateManyInput = {
   homeCommissionPercent?: number
   nurseCommissionPercent?: number
   nurseRegistrationFee?: number
+  doctorRegistrationFee?: number
   nurseSubscriptionFee?: number
   nurseShiftServicesSeeded?: boolean
   bookingHorizonDays?: number
@@ -489,6 +510,7 @@ export type PlatformSettingsUpdateManyMutationInput = {
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  doctorRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -506,6 +528,7 @@ export type PlatformSettingsUncheckedUpdateManyInput = {
   homeCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseCommissionPercent?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  doctorRegistrationFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -523,6 +546,7 @@ export type PlatformSettingsCountOrderByAggregateInput = {
   homeCommissionPercent?: Prisma.SortOrder
   nurseCommissionPercent?: Prisma.SortOrder
   nurseRegistrationFee?: Prisma.SortOrder
+  doctorRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
@@ -539,6 +563,7 @@ export type PlatformSettingsAvgOrderByAggregateInput = {
   homeCommissionPercent?: Prisma.SortOrder
   nurseCommissionPercent?: Prisma.SortOrder
   nurseRegistrationFee?: Prisma.SortOrder
+  doctorRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
@@ -551,6 +576,7 @@ export type PlatformSettingsMaxOrderByAggregateInput = {
   homeCommissionPercent?: Prisma.SortOrder
   nurseCommissionPercent?: Prisma.SortOrder
   nurseRegistrationFee?: Prisma.SortOrder
+  doctorRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
@@ -568,6 +594,7 @@ export type PlatformSettingsMinOrderByAggregateInput = {
   homeCommissionPercent?: Prisma.SortOrder
   nurseCommissionPercent?: Prisma.SortOrder
   nurseRegistrationFee?: Prisma.SortOrder
+  doctorRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
@@ -584,6 +611,7 @@ export type PlatformSettingsSumOrderByAggregateInput = {
   homeCommissionPercent?: Prisma.SortOrder
   nurseCommissionPercent?: Prisma.SortOrder
   nurseRegistrationFee?: Prisma.SortOrder
+  doctorRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
@@ -598,6 +626,7 @@ export type PlatformSettingsSelect<ExtArgs extends runtime.Types.Extensions.Inte
   homeCommissionPercent?: boolean
   nurseCommissionPercent?: boolean
   nurseRegistrationFee?: boolean
+  doctorRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
   bookingHorizonDays?: boolean
@@ -615,6 +644,7 @@ export type PlatformSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   homeCommissionPercent?: boolean
   nurseCommissionPercent?: boolean
   nurseRegistrationFee?: boolean
+  doctorRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
   bookingHorizonDays?: boolean
@@ -632,6 +662,7 @@ export type PlatformSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   homeCommissionPercent?: boolean
   nurseCommissionPercent?: boolean
   nurseRegistrationFee?: boolean
+  doctorRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
   bookingHorizonDays?: boolean
@@ -649,6 +680,7 @@ export type PlatformSettingsSelectScalar = {
   homeCommissionPercent?: boolean
   nurseCommissionPercent?: boolean
   nurseRegistrationFee?: boolean
+  doctorRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
   bookingHorizonDays?: boolean
@@ -659,7 +691,7 @@ export type PlatformSettingsSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "nurseSubscriptionFee" | "nurseShiftServicesSeeded" | "bookingHorizonDays" | "chatFollowUpDays" | "splashImageUrl" | "splashFit" | "splashBgColor" | "updatedAt", ExtArgs["result"]["platformSettings"]>
+export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "doctorRegistrationFee" | "nurseSubscriptionFee" | "nurseShiftServicesSeeded" | "bookingHorizonDays" | "chatFollowUpDays" | "splashImageUrl" | "splashFit" | "splashBgColor" | "updatedAt", ExtArgs["result"]["platformSettings"]>
 
 export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlatformSettings"
@@ -671,6 +703,7 @@ export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.In
     homeCommissionPercent: number
     nurseCommissionPercent: number
     nurseRegistrationFee: number
+    doctorRegistrationFee: number
     nurseSubscriptionFee: number
     nurseShiftServicesSeeded: boolean
     bookingHorizonDays: number
@@ -1108,6 +1141,7 @@ export interface PlatformSettingsFieldRefs {
   readonly homeCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly nurseCommissionPercent: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly nurseRegistrationFee: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly doctorRegistrationFee: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly nurseSubscriptionFee: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly nurseShiftServicesSeeded: Prisma.FieldRef<"PlatformSettings", 'Boolean'>
   readonly bookingHorizonDays: Prisma.FieldRef<"PlatformSettings", 'Int'>

@@ -5,7 +5,8 @@ import { CreditCard, CheckCircle, Loader2, ShieldCheck, Gift, TicketPercent, X }
 import { useAuth } from "@/components/AuthProvider";
 import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 
-const REGISTRATION_FEE = 99;
+// The fee itself is admin-set (Settings) and comes from /api/doctors/me; this
+// is only the "was" price shown struck through when the fee is below it.
 const REGISTRATION_FEE_ORIGINAL = 499;
 const FREE_TRIAL_MONTHS = 6;
 const TRIAL_VALUE = DOCTOR_SUBSCRIPTION_FEE * FREE_TRIAL_MONTHS;
@@ -21,21 +22,29 @@ export default function DoctorPayment() {
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
   const [coupon, setCoupon] = useState<{ code: string; discountAmount: number; netAmount: number } | null>(null);
+  const [fee, setFee] = useState<number | null>(null);
+  const [activatedFree, setActivatedFree] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/payment");
     if (!authLoading && user && user.role !== "DOCTOR") router.push("/login");
   }, [authLoading, user, router]);
 
+  // On the id/role, not the `user` object — AuthProvider re-polls every 30s with a fresh one.
+  const isDoctor = user?.role === "DOCTOR";
   useEffect(() => {
-    if (!user || user.role !== "DOCTOR") return;
+    if (!isDoctor) return;
     fetch("/api/doctors/me")
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => setAlreadyPaid(!!d?.doctorProfile?.registrationFeePaid))
+      .then((d) => {
+        setAlreadyPaid(!!d?.doctorProfile?.registrationFeePaid);
+        setFee(typeof d?.registrationFee === "number" ? d.registrationFee : null);
+      })
       .finally(() => setChecking(false));
-  }, [user]);
+  }, [isDoctor]);
 
-  const payable = coupon ? coupon.netAmount : REGISTRATION_FEE;
+  const free = fee === 0;
+  const payable = coupon ? coupon.netAmount : fee ?? 0;
 
   const applyCoupon = async () => {
     if (!couponInput.trim()) return;
@@ -67,6 +76,13 @@ export default function DoctorPayment() {
       setError(data.error ?? "Could not start payment. Please try again.");
       return;
     }
+    // ₹0 fee: activated on the server, no gateway.
+    if (data.paid) {
+      setPaying(false);
+      setActivatedFree(true);
+      setAlreadyPaid(true);
+      return;
+    }
     const { load } = await import("@cashfreepayments/cashfree-js");
     // See src/app/patient/payment/page.tsx for why this is hardcoded rather
     // than env-driven (NEXT_PUBLIC_ vars are inlined at Docker build time).
@@ -74,7 +90,7 @@ export default function DoctorPayment() {
     cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
   };
 
-  if (authLoading || !user || checking) {
+  if (authLoading || !user || checking || (fee === null && !alreadyPaid)) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
     </div>;
@@ -88,10 +104,14 @@ export default function DoctorPayment() {
             <CreditCard className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900">Registration Fee</h1>
-          <p className="text-slate-500 mt-2">A one-time ₹{REGISTRATION_FEE} fee activates your doctor dashboard.</p>
-          <p className="text-slate-500 mt-2 flex items-center justify-center gap-1.5 text-sm">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" /> Secured by Cashfree
+          <p className="text-slate-500 mt-2">
+            {free ? "Activating your doctor dashboard is free right now." : `A one-time ₹${fee} fee activates your doctor dashboard.`}
           </p>
+          {!free && (
+            <p className="text-slate-500 mt-2 flex items-center justify-center gap-1.5 text-sm">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" /> Secured by Cashfree
+            </p>
+          )}
         </div>
 
         {alreadyPaid ? (
@@ -99,7 +119,7 @@ export default function DoctorPayment() {
             <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
               <CheckCircle className="w-9 h-9 text-emerald-500" />
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Already Paid</h2>
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{activatedFree ? "Account activated" : "Already Paid"}</h2>
             <p className="text-slate-500 mb-8">Your dashboard is unlocked.</p>
             <button onClick={() => router.push("/doctor/dashboard")} className="btn-primary w-full justify-center py-3.5 text-base">
               Go to Dashboard
@@ -111,8 +131,8 @@ export default function DoctorPayment() {
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 text-sm">Registration Fee</span>
                 <span className="flex items-baseline gap-2">
-                  <span className="text-slate-400 text-sm line-through">₹{REGISTRATION_FEE_ORIGINAL}</span>
-                  <span className={`font-extrabold text-xl ${coupon ? "text-slate-400 line-through" : "text-blue-600"}`}>₹{REGISTRATION_FEE}</span>
+                  {(fee ?? 0) < REGISTRATION_FEE_ORIGINAL && <span className="text-slate-400 text-sm line-through">₹{REGISTRATION_FEE_ORIGINAL}</span>}
+                  <span className={`font-extrabold text-xl ${coupon ? "text-slate-400 line-through" : "text-blue-600"}`}>{free ? "Free" : `₹${fee}`}</span>
                 </span>
               </div>
               {coupon && (
@@ -123,7 +143,7 @@ export default function DoctorPayment() {
               )}
             </div>
 
-            <div className="mb-3">
+            <div className={free ? "hidden" : "mb-3"}>
               {coupon ? (
                 <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 text-sm">
                   <span className="flex items-center gap-2 font-semibold text-emerald-700">
@@ -170,7 +190,9 @@ export default function DoctorPayment() {
             )}
 
             <button onClick={pay} disabled={paying} className="btn-primary w-full justify-center py-3.5 text-base">
-              {paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</> : `Pay ₹${payable}`}
+              {free
+                ? (paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Activating…</> : "Activate my account")
+                : paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</> : `Pay ₹${payable}`}
             </button>
           </div>
         )}

@@ -51,7 +51,9 @@ function SidebarContents({ pathname, user, logout, onNavigate }: {
 
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         {navItems.map(({ href, label, icon: Icon }) => {
-          const isActive = pathname === href;
+          // Sub-pages count too (/admin/settings/admins → Settings); Overview
+          // (/admin) only on itself, or it would match every page.
+          const isActive = href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`);
           return (
             <Link
               key={href}

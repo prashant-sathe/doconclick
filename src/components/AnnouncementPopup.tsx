@@ -1,4 +1,5 @@
 "use client";
+import { isInternalPath, isSafeAnnouncementUrl } from "@/lib/announcements";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -76,9 +77,11 @@ export default function AnnouncementPopup({ onAllSeen }: { onAllSeen?: () => voi
 
   const handleButtonClick = (url: string) => {
     dismiss();
-    if (url.startsWith("/")) {
+    // Re-checked here too, for announcements saved before the server did:
+    // "//evil.com" starts with "/" but isn't a path on this site.
+    if (isInternalPath(url)) {
       router.push(url);
-    } else {
+    } else if (isSafeAnnouncementUrl(url)) {
       window.open(url, "_blank", "noopener,noreferrer");
     }
   };

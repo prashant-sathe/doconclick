@@ -27,7 +27,7 @@ export async function GET() {
       paymentMethod: true,
       scheduledAt: true,
       createdAt: true,
-      patient: { select: { name: true } },
+      patient: { select: { name: true, mobile: true } }, // mobile: a quick-signup patient may have no name yet
       doctor: { select: { name: true } },
     },
   });

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getDoctorRegistrationFee } from "@/lib/doctorFees";
 import { availabilityProblem, availabilityFromBlocks, availabilityToBlocks } from "@/lib/availability";
 import { prisma } from "@/lib/prisma";
 import { requireRole, readJson } from "@/lib/routeGuards";
@@ -42,7 +43,8 @@ export async function GET() {
   }
 
   const { changeRequests, ...rest } = doctor;
-  return NextResponse.json({ ...rest, changeRequest: changeRequests[0] ?? null });
+  // The admin-set registration fee, for the activation banner and payment page.
+  return NextResponse.json({ ...rest, changeRequest: changeRequests[0] ?? null, registrationFee: await getDoctorRegistrationFee() });
 }
 
 // Free edits. medRegNo/qualification/specialty are handled separately (they

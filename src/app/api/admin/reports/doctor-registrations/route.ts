@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
-import { DOCTOR_REGISTRATION_FEE } from "@/lib/cashfree";
+import { sumMoney } from "@/lib/money";
 
-// GET: every doctor's ₹99 registration-fee payment status, with the date it was paid.
+// GET: every doctor's registration-fee payment status, with what they paid and when.
 export async function GET(req: Request) {
   const { denied } = await requireAdmin();
   if (denied) return denied;
@@ -41,7 +41,8 @@ export async function GET(req: Request) {
       doctorEmail: p.user.email,
       registeredOn: p.user.createdAt,
       feeStatus: p.registrationFeeStatus,
-      amount: log?.amount ?? (p.registrationFeePaid ? DOCTOR_REGISTRATION_FEE : null),
+      // What was actually paid (the fee is admin-editable, so never assumed).
+      amount: log?.amount ?? null,
       paidAt: log?.createdAt ?? null,
       cashfreePaymentId: log?.cashfreePaymentId ?? p.cashfreePaymentId,
     };
@@ -56,7 +57,7 @@ export async function GET(req: Request) {
       totalDoctors: rows.length,
       paidCount: rows.filter((r) => r.feeStatus === "PAID").length,
       pendingCount: rows.filter((r) => r.feeStatus !== "PAID").length,
-      totalCollected: rows.reduce((sum, r) => sum + (r.feeStatus === "PAID" ? DOCTOR_REGISTRATION_FEE : 0), 0),
+      totalCollected: sumMoney(rows.filter((r) => r.feeStatus === "PAID").map((r) => r.amount ?? 0)),
     },
     rows: filtered,
   });

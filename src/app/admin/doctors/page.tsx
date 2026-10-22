@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
-import { cn, formatDoctorName } from "@/lib/utils";
+import { cn, formatDoctorName, nameOrMobile } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog, { type ConfirmTone } from "@/components/ConfirmDialog";
 import { useAccountImpact, impactResultText } from "@/components/admin/AccountImpactDialog";
@@ -256,7 +256,7 @@ function DoctorDrawer({
     if (!data?.doctorProfile) return false;
     const turningOn = !data.doctorProfile.isVerified;
     if (turningOn && !data.doctorProfile.registrationFeePaid) {
-      setActionError("Doctor hasn't paid the ₹99 registration fee yet.");
+      setActionError("Doctor hasn't paid the registration fee yet.");
       return false;
     }
     setActionError("");
@@ -521,7 +521,7 @@ function DoctorDrawer({
                     {data?.asDoctor.map((a) => (
                       <div key={a.id} className="flex items-center justify-between bg-slate-50 rounded-xl px-4 py-3">
                         <div>
-                          <div className="text-sm font-semibold text-slate-800">{a.patient.name}</div>
+                          <div className="text-sm font-semibold text-slate-800">{nameOrMobile(a.patient.name, a.patient.mobile)}</div>
                           <div className="text-xs text-slate-400">{a.consultType} · {a.symptoms?.slice(0, 40)}</div>
                         </div>
                         <div className="flex flex-col items-end gap-1">

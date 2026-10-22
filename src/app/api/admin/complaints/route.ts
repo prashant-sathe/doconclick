@@ -18,7 +18,7 @@ export async function GET() {
 
   const complaints = await prisma.complaint.findMany({
     orderBy: { createdAt: "desc" },
-    include: { user: { select: { name: true, role: true } } },
+    include: { user: { select: { name: true, mobile: true, role: true } } },
   });
   return NextResponse.json(complaints);
 }
