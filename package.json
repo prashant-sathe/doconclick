@@ -68,7 +68,8 @@
     "test:walk-in": "tsx tests/walk-in.ts",
     "test:dues": "tsx tests/dues-payments.ts",
     "test:time-off": "tsx tests/time-off.ts",
-    "test:complete-consultation": "tsx tests/complete-consultation.ts"
+    "test:complete-consultation": "tsx tests/complete-consultation.ts",
+    "test:unpaid-journey": "tsx tests/unpaid-journey.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

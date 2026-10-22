@@ -475,6 +475,10 @@ model Appointment {
   // src/lib/appointmentReminders.ts), so the periodic sweep never reminds
   // the same appointment twice.
   reminderSentAt DateTime?
+  // Last "please pay" push for an unpaid online visit — sent when the
+  // provider tries to set off, or taps "Remind to pay" (src/lib/payReminder.ts).
+  // Throttled on this, so a patient isn't pushed again within minutes.
+  payReminderSentAt DateTime?
   // Set when the doctor or their front desk (STAFF) booked this on the
   // patient's behalf — a walk-in or phone-in (/doctor/walk-in) — to the id
   // of whoever entered it. Null for everything the patient booked.

@@ -16,6 +16,7 @@ import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import PaymentQrPanel from "@/components/doctor/PaymentQrPanel";
 import PrescriptionViewer from "@/components/doctor/PrescriptionViewer";
+import UnpaidJourneyWarning, { type UnpaidStart } from "@/components/UnpaidJourneyWarning";
 import { OfflineToggle } from "@/components/ProviderAway";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
@@ -887,6 +888,8 @@ export default function DoctorDashboard() {
   // "Start journey" / "Stop journey" both notify the patient — confirm first.
   const [journeyConfirm, setJourneyConfirm] = useState<{ appt: Appointment; action: "start" | "stop" } | null>(null);
   const [journeyError, setJourneyError] = useState<{ id: string; message: string } | null>(null);
+  // Setting off for an unpaid home visit — the server refused and reminded the patient.
+  const [unpaidStart, setUnpaidStart] = useState<UnpaidStart | null>(null);
 
   const sendPosition = (apptId: string, travelStatus: "NOT_STARTED" | "ON_THE_WAY" | "ARRIVED", fallback: string, lat?: number, lng?: number) => {
     return mutate(`/api/appointments/${apptId}/travel`, {
@@ -896,19 +899,30 @@ export default function DoctorDashboard() {
     });
   };
 
-  const startJourney = async (apptId: string) => {
+  const startJourney = async (apptId: string, acknowledgeUnpaid = false) => {
     setStartingJourneyId(apptId);
     setJourneyError(null);
     try {
       const pos = await getCurrentPositionCompat({ enableHighAccuracy: true });
-      // mutate() never throws — the catch below is only for location access.
-      const res = await sendPosition(apptId, "ON_THE_WAY", "Could not start the journey.", pos.coords.latitude, pos.coords.longitude);
-      // The server refuses outside the start window (src/lib/journeyWindow.ts)
-      // — don't start sharing location then.
-      if (!res.ok) {
-        setJourneyError({ id: apptId, message: res.error });
+      const res = await fetch(`/api/appointments/${apptId}/travel`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ travelStatus: "ON_THE_WAY", lat: pos.coords.latitude, lng: pos.coords.longitude, acknowledgeUnpaid }),
+      }).catch(() => null);
+      const body = res ? await res.json().catch(() => ({})) : {};
+      // Unpaid: the patient has been reminded; the doctor decides whether to go.
+      if (res?.status === 409 && body.code === "UNPAID_VISIT") {
+        const a = appointments.find((x) => x.id === apptId);
+        setUnpaidStart({ id: apptId, patientName: a ? patientLabel(a) : "The patient", amount: body.amount, reminderSent: body.reminderSent, reminderSentAt: body.reminderSentAt });
         return;
       }
+      // The server refuses outside the start window (src/lib/journeyWindow.ts)
+      // — don't start sharing location then.
+      if (!res?.ok) {
+        setJourneyError({ id: apptId, message: body.error ?? (res ? "Could not start the journey." : "Network error — check your connection and try again.") });
+        return;
+      }
+      setUnpaidStart(null);
       await journey.track(apptId, { justSent: true });
     } catch {
       setJourneyError({ id: apptId, message: "Location access is needed to share your journey with the patient." });
@@ -1459,7 +1473,13 @@ export default function DoctorDashboard() {
                             </span>
                           )}
                           {!isStaff && a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (
-                            <button onClick={() => setJourneyConfirm({ appt: a, action: "start" })} disabled={startingJourneyId === a.id} className="btn-secondary flex-1 h-11 justify-center text-blue-600 border-blue-200 hover:bg-blue-50">
+                            <button
+                              // Unpaid online: straight to the server, whose refusal (and the
+                              // patient's pay reminder) brings up the unpaid warning instead.
+                              onClick={() => (paymentBlocked ? void startJourney(a.id) : setJourneyConfirm({ appt: a, action: "start" }))}
+                              disabled={startingJourneyId === a.id}
+                              className={cn("btn-secondary flex-1 h-11 justify-center", paymentBlocked ? "text-red-700 border-red-200 hover:bg-red-50" : "text-blue-600 border-blue-200 hover:bg-blue-50")}
+                            >
                               {startingJourneyId === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Car className="w-4 h-4" />} Start Journey
                             </button>
                           )}
@@ -1824,6 +1844,15 @@ export default function DoctorDashboard() {
             else await stopJourney(appt.id);
             setJourneyConfirm(null);
           }}
+        />
+      )}
+
+      {unpaidStart && (
+        <UnpaidJourneyWarning
+          info={unpaidStart}
+          busy={startingJourneyId === unpaidStart.id}
+          onClose={() => setUnpaidStart(null)}
+          onGoAnyway={() => { void startJourney(unpaidStart.id, true); }}
         />
       )}
 

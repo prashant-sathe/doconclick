@@ -4,6 +4,7 @@ import { requireRole, readJson } from "@/lib/routeGuards";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { requireActiveProvider } from "@/lib/providerGuard";
 import { journeyStartProblem } from "@/lib/journeyWindow";
+import { isUnpaidOnline, sendPayReminder, UNPAID_VISIT_CODE } from "@/lib/payReminder";
 
 // NOT_STARTED is "Stop journey" — back from ON_THE_WAY, e.g. started by
 // mistake or turned back.
@@ -44,7 +45,7 @@ export async function PATCH(
 
   const { body, invalid } = await readJson(req);
   if (invalid) return invalid;
-  const { travelStatus, lat, lng } = body;
+  const { travelStatus, lat, lng, acknowledgeUnpaid } = body;
   if (typeof travelStatus !== "string" || !VALID_STATUSES.includes(travelStatus)) {
     return NextResponse.json({ error: "Invalid travel status" }, { status: 400 });
   }
@@ -64,6 +65,26 @@ export async function PATCH(
   if (from === "NOT_STARTED" && travelStatus !== "NOT_STARTED") {
     const problem = journeyStartProblem(appointment);
     if (problem) return NextResponse.json({ error: problem.message, code: problem.code }, { status: 400 });
+  }
+  // Setting off for a visit the patient hasn't paid for: they're reminded to
+  // pay either way, and the provider has to say they're going anyway — the
+  // visit can't be completed until it's paid (PATCH /api/appointments/[id]).
+  let unpaidDue: number | null = null;
+  if (from === "NOT_STARTED" && travelStatus !== "NOT_STARTED" && isUnpaidOnline(appointment)) {
+    const reminder = await sendPayReminder(appointment, authUser.name, "leaving");
+    if (acknowledgeUnpaid !== true) {
+      return NextResponse.json(
+        {
+          error: `The patient hasn't paid ₹${reminder.amount} for this visit yet. You can't complete it until they pay.`,
+          code: UNPAID_VISIT_CODE,
+          amount: reminder.amount,
+          reminderSent: reminder.sent,
+          reminderSentAt: reminder.at,
+        },
+        { status: 409 }
+      );
+    }
+    unpaidDue = reminder.amount;
   }
   const changed = travelStatus !== from;
 
@@ -90,7 +111,7 @@ export async function PATCH(
     if (copy) {
       void sendPushToUser(appointment.patientId, {
         title: copy.title(appointment.providerType === "NURSE" ? "nurse" : "doctor"),
-        body: copy.body(authUser.name),
+        body: copy.body(authUser.name) + (unpaidDue != null && travelStatus === "ON_THE_WAY" ? ` Your ₹${unpaidDue} payment is still pending — please pay before they arrive.` : ""),
         url: `/patient/track/${id}`,
       });
     }

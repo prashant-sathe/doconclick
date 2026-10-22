@@ -4030,6 +4030,7 @@ export const AppointmentScalarFieldEnum = {
   scheduledAt: 'scheduledAt',
   requestedScheduledAt: 'requestedScheduledAt',
   reminderSentAt: 'reminderSentAt',
+  payReminderSentAt: 'payReminderSentAt',
   bookedById: 'bookedById',
   createdAt: 'createdAt'
 } as const

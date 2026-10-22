@@ -9,6 +9,7 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import { NurseHeader, NurseMobileNav } from "@/components/nurse/NurseNav";
 import { OfflineToggle } from "@/components/ProviderAway";
+import UnpaidJourneyWarning, { type UnpaidStart } from "@/components/UnpaidJourneyWarning";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import LoadError from "@/components/LoadError";
 import { useToast } from "@/components/Toast";
@@ -302,6 +303,16 @@ export default function NurseDashboardPage() {
   const [cancelTarget, setCancelTarget] = useState<Visit | null>(null);
   // "Start journey" / "Stop journey" both notify the patient — confirm first.
   const [journeyConfirm, setJourneyConfirm] = useState<{ visit: Visit; action: "start" | "stop" } | null>(null);
+  const [remindingId, setRemindingId] = useState<string | null>(null);
+  const remindToPay = async (v: Visit) => {
+    setRemindingId(v.id);
+    const r = await mutate(`/api/appointments/${v.id}/pay-reminder`, { method: "POST" });
+    setRemindingId(null);
+    if (r.ok) toast.success(`${patientLabel(v)} was reminded to pay.`);
+    else toast.warning(r.error);
+  };
+  // Setting off for an unpaid visit — the server refused and reminded the patient.
+  const [unpaidStart, setUnpaidStart] = useState<UnpaidStart | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/nurse/dashboard");
@@ -342,13 +353,23 @@ export default function NurseDashboardPage() {
   // dialog) — toast it too.
   const fail = (msg: string) => { setError(msg); toast.error(msg); };
 
-  const startJourney = async (id: string) => {
+  const startJourney = async (id: string, acknowledgeUnpaid = false) => {
     setBusyId(id); setError("");
     try {
       const pos = await getCurrentPositionCompat({ enableHighAccuracy: true });
-      // mutate() never throws — the catch below is only for location access.
-      const res = await sendPosition(id, "ON_THE_WAY", "Could not start the journey.", pos.coords.latitude, pos.coords.longitude);
-      if (!res.ok) { fail(res.error); return false; }
+      const res = await fetch(`/api/appointments/${id}/travel`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ travelStatus: "ON_THE_WAY", lat: pos.coords.latitude, lng: pos.coords.longitude, acknowledgeUnpaid }),
+      }).catch(() => null);
+      const body = res ? await res.json().catch(() => ({})) : {};
+      if (res?.status === 409 && body.code === "UNPAID_VISIT") {
+        const v = (visits ?? []).find((x) => x.id === id);
+        setUnpaidStart({ id, patientName: v ? patientLabel(v) : "The patient", amount: body.amount, reminderSent: body.reminderSent, reminderSentAt: body.reminderSentAt });
+        return "unpaid" as const;
+      }
+      if (!res?.ok) { fail(body.error ?? (res ? "Could not start the journey." : "Network error — check your connection and try again.")); return false; }
+      setUnpaidStart(null);
       await journey.track(id, { justSent: true });
       return true;
     } catch {
@@ -573,7 +594,12 @@ export default function NurseDashboardPage() {
                       )}
                       <div className={cn("mt-4 rounded-xl px-3 py-2 text-xs font-semibold flex items-center gap-1.5", paid ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")}>
                         <IndianRupee className="w-3.5 h-3.5" />
-                        {paid ? "Patient has paid" : "Waiting for the patient's payment — you can complete the visit once it's paid"}
+                        <span className="flex-1">{paid ? "Patient has paid" : "Waiting for the patient's payment — you can complete the visit once it's paid"}</span>
+                        {!paid && (
+                          <button type="button" onClick={() => remindToPay(v)} disabled={remindingId === v.id} className="flex-shrink-0 underline font-bold disabled:opacity-60">
+                            {remindingId === v.id ? "Sending…" : "Remind"}
+                          </button>
+                        )}
                       </div>
                       <div className="grid grid-cols-3 gap-2 mt-3">
                         <a href={`tel:${v.patient.mobile}`} className="btn-secondary justify-center py-2 text-xs"><Phone className="w-4 h-4" /> Call</a>
@@ -587,7 +613,13 @@ export default function NurseDashboardPage() {
                       </div>
                       <div className="mt-3">
                         {v.travelStatus === "NOT_STARTED" && (
-                          <button disabled={busy} onClick={() => setJourneyConfirm({ visit: v, action: "start" })} className="btn-primary w-full justify-center py-2.5 text-sm">
+                          <button
+                            disabled={busy}
+                            // Unpaid: straight to the server, whose refusal (and the
+                            // patient's pay reminder) brings up the unpaid warning instead.
+                            onClick={() => (v.paymentStatus === "PAID" ? setJourneyConfirm({ visit: v, action: "start" }) : void startJourney(v.id))}
+                            className={cn("w-full justify-center py-2.5 text-sm", v.paymentStatus === "PAID" ? "btn-primary" : "btn-secondary text-red-700 border-red-200")}
+                          >
                             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Car className="w-4 h-4" />} Start journey
                           </button>
                         )}
@@ -692,10 +724,20 @@ export default function NurseDashboardPage() {
           onCancel={() => setJourneyConfirm(null)}
           onConfirm={async () => {
             const { visit, action } = journeyConfirm;
-            // Stays open on failure so it can be retried.
+            // Stays open on failure so it can be retried (the unpaid warning
+            // takes over from it).
             const ok = action === "start" ? await startJourney(visit.id) : await stopJourney(visit.id);
             if (ok) setJourneyConfirm(null);
           }}
+        />
+      )}
+
+      {unpaidStart && (
+        <UnpaidJourneyWarning
+          info={unpaidStart}
+          busy={busyId === unpaidStart.id}
+          onClose={() => setUnpaidStart(null)}
+          onGoAnyway={() => { void startJourney(unpaidStart.id, true); }}
         />
       )}
 
