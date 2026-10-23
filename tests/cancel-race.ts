@@ -5,12 +5,16 @@
 // Also races a patient cancel against the provider's other status changes
 // (complete / no-show / accept / nurse package accept + decline, #69): the
 // provider's write must never overwrite a cancel that already refunded.
+// P3-20: a receptionist (STAFF) no-show races the same way, the claim
+// re-checks arrived/time on the row, and a ₹0 accept's PAID marking commits
+// with the claim (rolls back with it).
 //
 //   npm run test:cancel-race            (BASE_URL defaults to http://localhost:3000)
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
-import { ALREADY_CLOSED_MESSAGE } from "../src/lib/appointmentCancel";
+import { ALREADY_CLOSED_MESSAGE, AppointmentAlreadyClosedError, claimStatusChange } from "../src/lib/appointmentCancel";
+import { settleIfFreeOnAccept } from "../src/lib/paymentOrders";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
@@ -39,6 +43,10 @@ async function main() {
   });
   const nurse = await prisma.user.create({
     data: { name: "Race Test Nurse", mobile: "9" + stamp, role: "NURSE", nurseProfile: { create: { status: "APPROVED", isVerified: true } } },
+  });
+  // The plan doctor's front desk — queue actions (no-show) but not complete.
+  const staff = await prisma.user.create({
+    data: { name: "Race Test Staff", mobile: "5" + stamp, role: "STAFF", staffAccount: { create: { doctorId: planDoctor.id } } },
   });
   const cookieFor = (u: typeof doctor) =>
     `doconclick_token=${jwt.sign({ id: u.id, name: u.name, role: u.role, mobile: u.mobile }, SECRET)}`;
@@ -98,7 +106,7 @@ async function main() {
 
   // Patient cancel vs provider COMPLETED / NO_SHOW on a paid visit 10 min in
   // the past: exactly one wins, and the final row agrees with the refund.
-  async function closeRace(providerStatus: "COMPLETED" | "NO_SHOW", runs: number) {
+  async function closeRace(providerStatus: "COMPLETED" | "NO_SHOW", runs: number, provider = planDoctor) {
     let bad = 0;
     const seen: string[] = [];
     for (let i = 0; i < runs; i++) {
@@ -111,7 +119,7 @@ async function main() {
       });
       const [p, d] = await Promise.all([
         patch(patient, appt.id, { status: "CANCELLED" }, stagger(i)),
-        patch(planDoctor, appt.id, { status: providerStatus }, providerLead(i)),
+        patch(provider, appt.id, { status: providerStatus }, providerLead(i)),
       ]);
       const row = await prisma.appointment.findUniqueOrThrow({ where: { id: appt.id } });
       const refunds = await prisma.walletTransaction.count({ where: { refundOfAppointmentId: appt.id } });
@@ -122,7 +130,7 @@ async function main() {
         : row.status === providerStatus && refunds === 0;
       if (!oneWinner || !consistent) bad++;
     }
-    check(`patient cancel vs doctor ${providerStatus} ×${runs}`, bad === 0, `${bad} bad; patient/doctor→final: ${seen.join(", ")}`);
+    check(`patient cancel vs ${provider.role === "STAFF" ? "staff" : "doctor"} ${providerStatus} ×${runs}`, bad === 0, `${bad} bad; patient/doctor→final: ${seen.join(", ")}`);
   }
 
   // Patient cancel vs doctor accept on a pending request: both may succeed
@@ -182,6 +190,55 @@ async function main() {
       `${bad} bad; patient/nurse→v1,v2: ${seen.join(", ")}`);
   }
 
+  // The claim's guard: a row that no longer matches what the checks read
+  // (here: not arrived, or the time moved ahead) loses even though its status still matches.
+  async function guardChecks() {
+    const home = await prisma.appointment.create({
+      data: {
+        patientId: patient.id, doctorId: planDoctor.id, symptoms: "race test", consultType: "HOME",
+        status: "SCHEDULED", paymentMethod: "CASH", paymentStatus: "PENDING", amount: FEE, travelStatus: "ON_THE_WAY",
+        scheduledAt: new Date(Date.now() - 10 * 60_000),
+      },
+    });
+    const notArrived = await prisma.$transaction((tx) =>
+      claimStatusChange(tx, home.id, ["SCHEDULED"], { status: "NO_SHOW" }, { travelStatus: "ARRIVED" }))
+      .then(() => "claimed", (e) => (e instanceof AppointmentAlreadyClosedError ? "lost" : String(e)));
+    const notYet = await prisma.$transaction((tx) =>
+      claimStatusChange(tx, home.id, ["SCHEDULED"], { status: "NO_SHOW" }, { scheduledAt: { lte: new Date(Date.now() - 3600_000) } }))
+      .then(() => "claimed", (e) => (e instanceof AppointmentAlreadyClosedError ? "lost" : String(e)));
+    const row = await prisma.appointment.findUniqueOrThrow({ where: { id: home.id } });
+    check("claim guard: not arrived / time not passed → no write", notArrived === "lost" && notYet === "lost" && row.status === "SCHEDULED",
+      `not arrived → ${notArrived}; time not passed → ${notYet}; row ${row.status}`);
+    // Over HTTP: staff no-show of a home visit the doctor hasn't reached.
+    const s = await patch(staff, home.id, { status: "NO_SHOW" });
+    const after = await prisma.appointment.findUniqueOrThrow({ where: { id: home.id } });
+    check("staff NO_SHOW before arrival is refused", s === 400 && after.status === "SCHEDULED", `staff → ${s}; row ${after.status}`);
+
+    // ₹0 accept: the PAID marking runs on the claim's transaction, so if
+    // that transaction fails the visit is neither accepted nor marked paid.
+    const free = await prisma.appointment.create({
+      data: {
+        patientId: patient.id, doctorId: planDoctor.id, symptoms: "race test", consultType: "VIDEO",
+        status: "PENDING_APPROVAL", paymentMethod: "ONLINE", paymentStatus: "PENDING", amount: 0,
+        scheduledAt: new Date(Date.now() + 5 * 86400_000),
+      },
+    });
+    let marked = 0;
+    const rolled = await prisma.$transaction(async (tx) => {
+      const claimed = await claimStatusChange(tx, free.id, ["PENDING_APPROVAL"], { status: "SCHEDULED", acceptedAt: new Date() });
+      marked = (await settleIfFreeOnAccept([claimed], tx)).size;
+      throw new Error("simulated failure after settle");
+    }).then(() => "committed", (e: Error) => e.message);
+    const freeRow = await prisma.appointment.findUniqueOrThrow({ where: { id: free.id } });
+    check("₹0 accept settle rolls back with the claim", marked === 1 && rolled.startsWith("simulated")
+      && freeRow.status === "PENDING_APPROVAL" && freeRow.paymentStatus === "PENDING",
+      `marked ${marked} in tx; tx ${rolled}; row ${freeRow.status}/${freeRow.paymentStatus}`);
+    const ok = await patch(planDoctor, free.id, { status: "SCHEDULED" });
+    const accepted = await prisma.appointment.findUniqueOrThrow({ where: { id: free.id } });
+    check("₹0 accept over HTTP → SCHEDULED + PAID together", ok === 200 && accepted.status === "SCHEDULED" && accepted.paymentStatus === "PAID",
+      `doctor → ${ok}; row ${accepted.status}/${accepted.paymentStatus}`);
+  }
+
   try {
     await race("patient ×8 cancel (SCHEDULED, paid)", "SCHEDULED", Array(PARALLEL).fill(asPatient));
     await race("doctor ×8 cancel (SCHEDULED, paid)", "SCHEDULED", Array(PARALLEL).fill(asDoctorCancel));
@@ -199,14 +256,17 @@ async function main() {
 
     await closeRace("COMPLETED", 6);
     await closeRace("NO_SHOW", 6);
+    await closeRace("NO_SHOW", 6, staff);
     await acceptRace(6);
     await nursePackageRace("SCHEDULED", 6);
     await nursePackageRace("REJECTED", 6);
+    await guardChecks();
     check("provider 409s are all the already-updated error", wrong409 === 0, `${wrong409} other 409(s)`);
   } finally {
-    const ids = [patient.id, doctor.id, planDoctor.id, nurse.id];
+    const ids = [patient.id, doctor.id, planDoctor.id, nurse.id, staff.id];
     await prisma.appointment.deleteMany({ where: { patientId: patient.id } });
     await prisma.nursePackage.deleteMany({ where: { patientId: patient.id } });
+    await prisma.staffProfile.deleteMany({ where: { userId: staff.id } });
     await prisma.notification.deleteMany({ where: { userId: { in: ids } } });
     await prisma.user.deleteMany({ where: { id: { in: ids } } });
     await prisma.$disconnect();

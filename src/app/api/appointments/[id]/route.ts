@@ -1,5 +1,6 @@
 import { randomInt } from "crypto";
 import { NextResponse } from "next/server";
+import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { expireStalePendingRequests } from "@/lib/expireAppointments";
@@ -260,22 +261,26 @@ export const PATCH = withErrorLocale(async function PATCH(
       }
 
       // Every visit is claimed from PENDING_APPROVAL — if the patient
-      // cancelled any of them meanwhile, the whole answer rolls back.
+      // cancelled any of them meanwhile, the whole answer rolls back. An
+      // accept also needs each visit still at the time checked above.
       const now = new Date();
+      let free: Set<string>;
       try {
-        await prisma.$transaction(async (tx) => {
+        free = await prisma.$transaction(async (tx) => {
           for (const g of group) {
             await claimStatusChange(tx, g.id, ["PENDING_APPROVAL"], status === "SCHEDULED"
               ? { status, acceptedAt: now, visitOtp: newVisitCode(), visitOtpAttempts: 0 }
-              : { status, doctorNotes: doctorNotes ?? g.doctorNotes });
+              : { status, doctorNotes: doctorNotes ?? g.doctorNotes },
+            status === "SCHEDULED" ? { scheduledAt: g.scheduledAt } : {});
           }
+          // A ₹0 booking has no payment step — PAID as soon as it's accepted,
+          // in the same transaction so it can't be left accepted but unpaid.
+          return status === "SCHEDULED" ? settleIfFreeOnAccept(group, tx) : new Set<string>();
         });
       } catch (err) {
         if (isAlreadyClosed(err)) return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
         throw err;
       }
-      // A ₹0 booking has no payment step — PAID as soon as it's accepted.
-      const free = status === "SCHEDULED" ? await settleIfFreeOnAccept(group) : new Set<string>();
       const key = group.length > 1
         ? (status === "SCHEDULED" ? "nursePackageAccepted" : "nursePackageDeclined")
         : patientPushKey(status);
@@ -458,31 +463,44 @@ export const PATCH = withErrorLocale(async function PATCH(
 
     // Claimed from the status read above, so a patient cancel (and its
     // wallet refund) that lands first can't be overwritten — the loser 409s
-    // and no push goes out.
+    // and no push goes out. The guard re-checks, on the row itself, what the
+    // checks above read from the snapshot (arrived, paid, time, slot).
+    const claimGuard: Prisma.AppointmentWhereInput = {
+      ...(status === "SCHEDULED" ? { scheduledAt: appointment.scheduledAt } : {}),
+      ...((status === "COMPLETED" || status === "NO_SHOW") && appointment.consultType === "HOME" ? { travelStatus: "ARRIVED" } : {}),
+      ...(status === "COMPLETED" && appointment.paymentMethod === "ONLINE" ? { paymentStatus: "PAID" } : {}),
+      ...(status === "COMPLETED" && appointment.providerType === "NURSE" ? { visitStartedAt: { not: null } } : {}),
+      ...(status === "NO_SHOW" ? { scheduledAt: { lte: new Date() } } : {}),
+    };
     let updated;
+    let free = false;
     try {
-      updated = await prisma.$transaction((tx) => claimStatusChange(tx, id, [appointment.status], {
-        status,
-        // Completed / no-show / declined: any pending new-time request is moot.
-        requestedScheduledAt: null,
-        doctorNotes: doctorNotes ?? appointment.doctorNotes,
-        ...(status === "SCHEDULED" ? { acceptedAt: new Date() } : {}),
-        // Starts the prescription edit window (src/lib/prescriptionLock.ts).
-        ...(status === "COMPLETED" ? { completedAt: new Date() } : {}),
-        // The visit is over (or never happens) — don't keep where the provider was.
-        ...(status !== "SCHEDULED" ? LIVE_LOCATION_CLEARED : {}),
-        // Cash is collected at the visit, so completing it is when it was paid.
-        ...(status === "COMPLETED" && appointment.paymentMethod === "CASH"
-          ? { paymentStatus: "PAID", paidAt: appointment.paidAt ?? new Date() }
-          : {}),
-      }));
+      updated = await prisma.$transaction(async (tx) => {
+        const claimed = await claimStatusChange(tx, id, [appointment.status], {
+          status,
+          // Completed / no-show / declined: any pending new-time request is moot.
+          requestedScheduledAt: null,
+          doctorNotes: doctorNotes ?? appointment.doctorNotes,
+          ...(status === "SCHEDULED" ? { acceptedAt: new Date() } : {}),
+          // Starts the prescription edit window (src/lib/prescriptionLock.ts).
+          ...(status === "COMPLETED" ? { completedAt: new Date() } : {}),
+          // The visit is over (or never happens) — don't keep where the provider was.
+          ...(status !== "SCHEDULED" ? LIVE_LOCATION_CLEARED : {}),
+          // Cash is collected at the visit, so completing it is when it was paid.
+          ...(status === "COMPLETED" && appointment.paymentMethod === "CASH"
+            ? { paymentStatus: "PAID", paidAt: appointment.paidAt ?? new Date() }
+            : {}),
+        }, claimGuard);
+        // A ₹0 booking has no payment step — PAID as soon as it's accepted,
+        // in the same transaction so it can't be left accepted but unpaid.
+        free = status === "SCHEDULED" && (await settleIfFreeOnAccept([claimed], tx)).size > 0;
+        return claimed;
+      });
     } catch (err) {
       if (isSlotIndexViolation(err)) return NextResponse.json({ error: SLOT_TAKEN_MESSAGE }, { status: 409 });
       if (isAlreadyClosed(err)) return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
       throw err;
     }
-    // A ₹0 booking has no payment step — PAID as soon as it's accepted.
-    const free = status === "SCHEDULED" && (await settleIfFreeOnAccept([updated])).size > 0;
     const key = patientPushKey(status);
     if (key) {
       void sendPushToUser(appointment.patientId, {

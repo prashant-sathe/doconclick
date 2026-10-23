@@ -39,6 +39,27 @@ export function totalPayable(appointments: { amount: number; discountAmount: num
   return round2(appointments.reduce((sum, a) => sum + netPayable(a), 0));
 }
 
+// The conditional PAID marking behind settleFreeAppointments, on the caller's
+// transaction. Returns the ids it marked.
+async function markFreePaid(tx: Prisma.TransactionClient, appointmentIds: string[], patientId: string) {
+  const paidIds: string[] = [];
+  for (const id of appointmentIds) {
+    const appt = await tx.appointment.findUnique({ where: { id } });
+    // Only what's genuinely free: re-checked inside the transaction, in case
+    // a coupon was removed since the caller looked.
+    if (!appt || appt.patientId !== patientId || netPayable(appt) !== 0) continue;
+    const marked = await tx.appointment.updateMany({
+      where: { id, status: "SCHEDULED", paymentStatus: { not: "PAID" } },
+      data: { paymentStatus: "PAID", paidAt: appt.paidAt ?? new Date() },
+    });
+    if (marked.count === 1) {
+      paidIds.push(id);
+      await confirmCouponRedemption(tx, { appointmentId: id });
+    }
+  }
+  return paidIds;
+}
+
 /**
  * The zero-amount path: when coupons leave nothing to pay (or the fee is ₹0)
  * there is no gateway order — Cashfree won't create a ₹0 one — so the
@@ -52,23 +73,7 @@ export async function settleFreeAppointments(
   appointmentIds: string[],
   patientId: string,
 ): Promise<Extract<SettleResult, { outcome: "settled" }>> {
-  const paidIds: string[] = [];
-  await prisma.$transaction(async (tx) => {
-    for (const id of appointmentIds) {
-      const appt = await tx.appointment.findUnique({ where: { id } });
-      // Only what's genuinely free: re-checked inside the transaction, in case
-      // a coupon was removed since the caller looked.
-      if (!appt || appt.patientId !== patientId || netPayable(appt) !== 0) continue;
-      const marked = await tx.appointment.updateMany({
-        where: { id, status: "SCHEDULED", paymentStatus: { not: "PAID" } },
-        data: { paymentStatus: "PAID", paidAt: appt.paidAt ?? new Date() },
-      });
-      if (marked.count === 1) {
-        paidIds.push(id);
-        await confirmCouponRedemption(tx, { appointmentId: id });
-      }
-    }
-  });
+  const paidIds = await prisma.$transaction((tx) => markFreePaid(tx, appointmentIds, patientId));
   const paid = paidIds.length
     ? await prisma.appointment.findMany({
         where: { id: { in: paidIds } },
@@ -89,18 +94,23 @@ export async function settleFreeAppointments(
  * so it's marked PAID as soon as it's accepted (BUG-TRACKER #58) — the
  * patient never lands on /patient/payment for it. Call after the rows are
  * SCHEDULED. No "payment received" push: the provider has just accepted it
- * themselves. Returns the ids that were marked PAID.
+ * themselves. Returns the ids that were marked PAID. Pass the accept's own
+ * transaction (`tx`) so the claim and the PAID marking commit together —
+ * otherwise a failure in between leaves a ₹0 visit SCHEDULED but unpaid.
  */
 export async function settleIfFreeOnAccept(
   appointments: { id: string; patientId: string; amount: number; discountAmount: number }[],
+  tx?: Prisma.TransactionClient,
 ): Promise<Set<string>> {
   const free = appointments.filter((a) => netPayable(a) === 0);
   const byPatient = new Map<string, string[]>();
   for (const a of free) byPatient.set(a.patientId, [...(byPatient.get(a.patientId) ?? []), a.id]);
   const paid = new Set<string>();
   for (const [patientId, ids] of byPatient) {
-    const result = await settleFreeAppointments(ids, patientId);
-    for (const p of result.paid) paid.add(p.id);
+    const marked = tx
+      ? await markFreePaid(tx, ids, patientId)
+      : (await settleFreeAppointments(ids, patientId)).paid.map((p) => p.id);
+    for (const id of marked) paid.add(id);
   }
   return paid;
 }

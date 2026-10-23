@@ -16,15 +16,18 @@ export function isAlreadyClosed(err: unknown) {
 }
 
 // A conditional status change that only succeeds for one of several racing
-// requests; the losers abort before touching the wallet.
+// requests; the losers abort before touching the wallet. `guard` adds the
+// other fields a caller's checks depended on (arrived, paid, time passed…),
+// so a change to those since the caller read the row also loses.
 export async function claimStatusChange(
   tx: Prisma.TransactionClient,
   id: string,
   fromStatuses: string[],
-  data: Prisma.AppointmentUpdateManyMutationInput
+  data: Prisma.AppointmentUpdateManyMutationInput,
+  guard: Prisma.AppointmentWhereInput = {}
 ) {
   const { count } = await tx.appointment.updateMany({
-    where: { id, status: { in: fromStatuses } },
+    where: { ...guard, id, status: { in: fromStatuses } },
     data,
   });
   if (count === 0) throw new AppointmentAlreadyClosedError();
