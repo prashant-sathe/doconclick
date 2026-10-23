@@ -8,7 +8,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
 import { isNurseBookable } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
-import { buildVisitSchedule, intervalLabel, isShift, shiftLabel, PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
+import { buildVisitSchedule, isShift, PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
 import { referralProblem, REFERRAL_INACTIVE_CODE } from "@/lib/nurseReferral";
 import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, openRequestsProblem } from "@/lib/bookingLimits";
 
@@ -275,12 +275,16 @@ export async function POST(req: Request) {
 
   const who = dependent ? dependent.name : patient.name;
   void sendPushToUser(nurse.id, {
-    title: created.pkg ? "New visit package request" : "New visit request",
-    body: shift
-      ? `${who} requested ${schedule.length > 1 ? `${schedule.length} × ` : "a "}${shiftLabel(offering.service.durationMinutes)} (${offering.service.name}).`
-      : created.pkg
-        ? `${who} requested ${offering.service.name} — ${schedule.length} visits, ${intervalLabel(intervalDays)}.`
-        : `${who} requested ${offering.service.name}.`,
+    key: shift
+      ? (created.pkg ? "nurseShiftPackageRequest" : "nurseShiftRequest")
+      : created.pkg ? "nursePackageRequest" : "nurseVisitRequest",
+    values: {
+      patient: who,
+      service: offering.service.name,
+      count: schedule.length,
+      hours: Math.round(offering.service.durationMinutes / 60),
+      intervalDays,
+    },
     url: "/nurse/dashboard",
   });
 

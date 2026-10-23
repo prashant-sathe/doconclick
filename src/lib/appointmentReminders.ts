@@ -8,11 +8,6 @@ const REMINDER_LEAD_MS = 60 * 60 * 1000;
 // least one sweep's window, even if one run is briefly delayed.
 const REMINDER_WINDOW_MS = 10 * 60 * 1000;
 
-const CONSULT_TYPE_PATIENT_COPY: Record<string, (doctorName: string) => string> = {
-  HOME: (d) => `${d} is visiting you in about an hour.`,
-  CLINIC: (d) => `Your clinic visit with ${d} is in about an hour.`,
-  VIDEO: (d) => `Your video consultation with ${d} is in about an hour.`,
-};
 
 // Sends the "your appointment is coming up" push to both sides of a
 // SCHEDULED appointment once it's about an hour away, and marks it so a
@@ -51,15 +46,14 @@ export async function sendDueAppointmentReminders() {
   });
 
   for (const a of due) {
-    const patientBody = (CONSULT_TYPE_PATIENT_COPY[a.consultType] ?? CONSULT_TYPE_PATIENT_COPY.CLINIC)(a.doctor.name);
     void sendPushToUser(a.patientId, {
-      title: "Upcoming appointment",
-      body: patientBody,
+      key: "reminderPatient",
+      values: { doctor: a.doctor.name, consultType: a.consultType },
       url: "/patient/appointments",
     });
     void sendPushToUser(a.doctorId, {
-      title: "Upcoming appointment",
-      body: `You have an appointment with ${a.patientName ?? a.patient.name} in about an hour.`,
+      key: "reminderProvider",
+      values: { patient: a.patientName ?? a.patient.name },
       url: a.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
     });
   }

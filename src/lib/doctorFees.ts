@@ -55,8 +55,7 @@ export async function activateRegistration(
       : []),
   ]);
   void sendPushToUser(profile.userId, {
-    title: payment.amount > 0 ? "Registration fee received" : "Account activated",
-    body: "Your application is now under review.",
+    key: payment.amount > 0 ? "registrationFeeReceived" : "accountActivated",
     url: "/doctor/dashboard",
   });
 }

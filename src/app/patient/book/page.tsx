@@ -37,6 +37,8 @@ import DependentPicker from "@/components/patient/DependentPicker";
 import TimeSlotPicker from "@/components/patient/TimeSlotPicker";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useBookingProfileGate } from "@/components/patient/CompleteProfileSheet";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 interface ClinicSlot {
   dayOfWeek: string;
@@ -97,16 +99,11 @@ function nextOpeningLocalInput(opening: NextOpening<unknown>) {
   return local.toISOString().slice(0, 16);
 }
 
-function openingWhenLabel(opening: NextOpening<unknown>) {
-  const day = opening.daysAhead === 0 ? "today" : opening.daysAhead === 1 ? "tomorrow" : opening.dayOfWeek;
-  return `${day} at ${formatSlotTime(opening.fromTime)}`;
-}
-
 const ALL_TYPES = [
-  { id: "CLINIC", label: "Clinic Visit", icon: Building2 },
-  { id: "HOME",   label: "Home Visit",   icon: Home },
-  { id: "VIDEO",  label: "Video Consultation", icon: Video },
-];
+  { id: "CLINIC", icon: Building2 },
+  { id: "HOME",   icon: Home },
+  { id: "VIDEO",  icon: Video },
+] as const;
 
 function defaultConsultType(doctor: Doctor | null | undefined, userPos: [number, number] | null = null): string {
   const profile = doctor?.doctorProfile;
@@ -141,6 +138,19 @@ function PatientBookInner() {
   const followUpOfId = searchParams.get("followUpOf");
   const preselectDoctorId = searchParams.get("doctorId");
   const preselectClinicId = searchParams.get("clinicId");
+  const t = useTranslations("booking.book");
+  const tf = useTranslations("booking.form");
+  const tc = useTranslations("booking.common");
+  const locale = formattingLocale(useLocale());
+  const typeName = (id: string) => tc(`consultType.${id === "HOME" || id === "VIDEO" ? id : "CLINIC"}`);
+  const dayName = (d: string) =>
+    ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].includes(d) ? tc(`days.${d as "Mon"}`) : d;
+  const openingWhenLabel = (opening: NextOpening<unknown>) => {
+    const time = formatSlotTime(opening.fromTime);
+    if (opening.daysAhead === 0) return tf("openingToday", { time });
+    if (opening.daysAhead === 1) return tf("openingTomorrow", { time });
+    return tf("openingOn", { day: dayName(opening.dayOfWeek), time });
+  };
 
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [specialtyFilter, setSpecialtyFilter] = useState("");
@@ -308,18 +318,18 @@ function PatientBookInner() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.id) { router.push("/login"); return; }
-    if (!consentGiven) { setError("Please agree to the consent statement to continue."); return; }
-    if (form.relation !== "Self" && !dependentId) { setError("Please select or add the family member this visit is for."); return; }
+    if (!consentGiven) { setError(tf("errorConsent")); return; }
+    if (form.relation !== "Self" && !dependentId) { setError(tf("errorDependent")); return; }
     if (clinicBookingBlocked) {
       setError(
         scheduleMode === "LATER"
-          ? "The clinic isn't open at the time you picked. Choose a time within the clinic's hours."
-          : "This clinic is closed right now. Switch to Schedule Later and pick a time when it's open."
+          ? tf("errorClinicClosedLater")
+          : tf("errorClinicClosedNow")
       );
       return;
     }
     if (scheduleMode === "LATER" && scheduledAt && new Date(scheduledAt).getTime() <= new Date().getTime()) {
-      setError("Please pick a time in the future.");
+      setError(tf("errorFutureTime"));
       return;
     }
     setError("");
@@ -357,7 +367,7 @@ function PatientBookInner() {
     if (res.ok) { setFee(currentFee); setAppointmentId(data.id); setBooked(true); }
     else if (data.code === "TERMS_REQUIRED") requireTerms(() => setConfirmOpen(true));
     else if (data.code === "PROFILE_INCOMPLETE") profileGate.open(data.missing, () => setConfirmOpen(true));
-    else setError(data.error ?? "Booking failed. Please try again.");
+    else setError(data.error ?? tf("errorBookingFailed"));
   };
 
   if (authLoading) {
@@ -378,40 +388,38 @@ function PatientBookInner() {
               <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto lg:mx-0 mb-5">
                 <Clock className="w-9 h-9 text-amber-500" />
               </div>
-              <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Request Sent!</h2>
-              <p className="text-slate-500 mb-6">Waiting for the doctor to confirm your appointment.</p>
+              <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{tf("requestSent")}</h2>
+              <p className="text-slate-500 mb-6">{t("waitingDoctor")}</p>
               <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3">
-                {fee === 0
-                  ? "This consultation is free — nothing to pay. You'll be notified once it's accepted."
-                  : <>You&apos;ll be notified once accepted — pay online from My Appointments after that.</>}
+                {fee === 0 ? tf("freeNotice") : tf("payLaterNotice")}
               </div>
-              <Link href="/patient/appointments" className="btn-secondary w-full justify-center py-3 mt-3">View My Appointments</Link>
+              <Link href="/patient/appointments" className="btn-secondary w-full justify-center py-3 mt-3">{tc("viewMyAppointments")}</Link>
             </div>
 
             {/* Appointment details summary */}
             <div className="bg-slate-50 p-8 border-t lg:border-t-0 lg:border-l border-slate-100">
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-                <ClipboardList className="w-3.5 h-3.5" /> Appointment Details
+                <ClipboardList className="w-3.5 h-3.5" /> {t("appointmentDetails")}
               </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> ID</span>
+                  <span className="text-slate-500 flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> {tc("id")}</span>
                   <span className="font-mono text-slate-700 text-xs">{appointmentId.slice(0, 14)}…</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Doctor</span>
+                  <span className="text-slate-500">{tc("doctor")}</span>
                   <span className="font-semibold text-slate-800">{selectedDoctor && formatDoctorName(selectedDoctor.name)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Consultation</span>
-                  <span className="font-semibold text-slate-800">{ALL_TYPES.find((t) => t.id === form.consultType)?.label}</span>
+                  <span className="text-slate-500">{tc("consultation")}</span>
+                  <span className="font-semibold text-slate-800">{typeName(form.consultType)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 flex items-center gap-1.5"><CalendarCheck2 className="w-3.5 h-3.5" /> When</span>
-                  <span className="font-semibold text-slate-800">{scheduleMode === "LATER" && scheduledAt ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "Now"}</span>
+                  <span className="text-slate-500 flex items-center gap-1.5"><CalendarCheck2 className="w-3.5 h-3.5" /> {tc("when")}</span>
+                  <span className="font-semibold text-slate-800">{scheduleMode === "LATER" && scheduledAt ? new Date(scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }) : tc("now")}</span>
                 </div>
                 <div className="flex items-center justify-between pt-3 border-t border-slate-200">
-                  <span className="text-slate-500 flex items-center gap-1.5"><IndianRupee className="w-3.5 h-3.5" /> Total</span>
+                  <span className="text-slate-500 flex items-center gap-1.5"><IndianRupee className="w-3.5 h-3.5" /> {tc("total")}</span>
                   <span className="font-extrabold text-slate-900 text-base">₹{fee}</span>
                 </div>
               </div>
@@ -422,7 +430,7 @@ function PatientBookInner() {
     );
   }
 
-  const typeLabel = ALL_TYPES.find((t) => t.id === form.consultType)?.label;
+  const typeLabel = typeName(form.consultType);
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -434,15 +442,15 @@ function PatientBookInner() {
           <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
             <MapPin className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Book Consultation</h1>
-          <p className="text-slate-500 mt-2">Choose your doctor and consultation type.</p>
+          <h1 className="text-3xl font-extrabold text-slate-900">{t("title")}</h1>
+          <p className="text-slate-500 mt-2">{t("subtitle")}</p>
         </div>
 
         {pinnedLocationLabel && (
           <div className="max-w-lg mx-auto lg:max-w-none mb-4 flex items-center gap-2 text-xs bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-4 py-2.5">
             <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="flex-1 min-w-0">Showing doctors near <span className="font-semibold">{pinnedLocationLabel}</span></span>
-            <Link href="/patient/dashboard" className="font-semibold flex-shrink-0 underline">Change</Link>
+            <span className="flex-1 min-w-0">{t.rich("showingNear", { label: pinnedLocationLabel, b: (chunks) => <span className="font-semibold">{chunks}</span> })}</span>
+            <Link href="/patient/dashboard" className="font-semibold flex-shrink-0 underline">{t("change")}</Link>
           </div>
         )}
 
@@ -451,21 +459,25 @@ function PatientBookInner() {
             <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
               <Compass className="w-7 h-7 text-amber-500" />
             </div>
-            <h2 className="text-xl font-extrabold text-slate-900 mb-1.5">Outside your search range</h2>
+            <h2 className="text-xl font-extrabold text-slate-900 mb-1.5">{t("outOfRangeTitle")}</h2>
             <p className="text-sm text-slate-500 mb-6">
-              {formatDoctorName(selectedDoctor.name)} is
-              {(() => { const d = doctorDistance(selectedDoctor); return d != null ? ` about ${d.toFixed(0)} km away` : " far from your saved location"; })()},
-              beyond the {searchRadiusKm} km range you set in your profile.
+              {(() => {
+                const d = doctorDistance(selectedDoctor);
+                const doctor = formatDoctorName(selectedDoctor.name);
+                return d != null
+                  ? t("outOfRangeKm", { doctor, km: d.toFixed(0), range: searchRadiusKm ?? 0 })
+                  : t("outOfRangeUnknown", { doctor, range: searchRadiusKm ?? 0 });
+              })()}
             </p>
             <div className="flex flex-col gap-2.5">
               <button type="button" onClick={() => setRadiusOverride(true)} className="btn-primary w-full justify-center py-3">
-                Book anyway
+                {t("bookAnyway")}
               </button>
               <Link href="/patient/profile" className="btn-secondary w-full justify-center py-3">
-                Change my search range
+                {t("changeRange")}
               </Link>
               <Link href="/patient/dashboard" className="text-sm font-semibold text-blue-600 hover:underline py-1">
-                Find doctors near me
+                {t("findNearMe")}
               </Link>
             </div>
           </div>
@@ -477,18 +489,18 @@ function PatientBookInner() {
           <div className="space-y-5">
             {/* Search + specialty filter */}
             <div>
-              <label className="input-label mb-2 block">Find a Doctor</label>
+              <label className="input-label mb-2 block">{t("findDoctor")}</label>
               <div className="relative mb-3">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search doctor or specialty…"
+                  placeholder={t("searchPlaceholder")}
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); set("doctorId", ""); }}
                   className="input-field pl-10 pr-10"
                 />
                 {search && (
-                  <button aria-label="Clear search"
+                  <button aria-label={t("clearSearch")}
                     type="button"
                     onClick={() => setSearch("")}
                     className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
@@ -507,14 +519,14 @@ function PatientBookInner() {
 
             {/* Consult Type */}
             <div>
-              <label className="input-label mb-2 block">Consultation Type</label>
+              <label className="input-label mb-2 block">{t("consultTypeLabel")}</label>
               <div className={cn("grid gap-3", availableTypes.length === 3 ? "grid-cols-3" : "grid-cols-2")}>
-                {availableTypes.map(({ id, label, icon: Icon }) => (
+                {availableTypes.map(({ id, icon: Icon }) => (
                   <button key={id} type="button" onClick={() => set("consultType", id)}
                     className={cn("relative flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border text-xs font-semibold transition-all",
                       form.consultType === id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                     )}>
-                    <Icon className="w-5 h-5" /> {label}
+                    <Icon className="w-5 h-5" /> {typeName(id)}
                   </button>
                 ))}
               </div>
@@ -522,11 +534,11 @@ function PatientBookInner() {
 
             {/* Doctor Select */}
             <div>
-              <label className="input-label">Select Doctor</label>
+              <label className="input-label">{t("selectDoctor")}</label>
               <select required className="input-field" value={form.doctorId} onChange={(e) => {
                 selectDoctor(doctors.find((d) => d.id === e.target.value));
               }}>
-                <option value="">— Choose a doctor —</option>
+                <option value="">{t("chooseDoctor")}</option>
                 {visibleDoctors.map((d) => (
                   <option key={d.id} value={d.id}>
                     {formatDoctorName(d.name)} — {d.doctorProfile?.specialty} (₹{feeForConsultType(d.doctorProfile, form.consultType)})
@@ -541,18 +553,18 @@ function PatientBookInner() {
                   <span className="font-semibold">{formatDoctorName(selectedDoctor.name)}</span>
                   {selectedDoctor.doctorProfile.isVerified && <VerifiedBadge />}
                 </div>
-                <div className="text-xs mt-0.5">{selectedDoctor.doctorProfile.specialty} · {selectedDoctor.doctorProfile.experience} yrs · {formatAvailability(selectedDoctor.doctorProfile.availability)}</div>
-                <div className="text-xs mt-0.5">Speaks: {selectedDoctor.doctorProfile.languages}</div>
+                <div className="text-xs mt-0.5">{selectedDoctor.doctorProfile.specialty} · {t("experience", { years: selectedDoctor.doctorProfile.experience })} · {formatAvailability(selectedDoctor.doctorProfile.availability)}</div>
+                <div className="text-xs mt-0.5">{t("speaks", { languages: selectedDoctor.doctorProfile.languages })}</div>
                 {selectedDoctor.doctorProfile.bio && (
                   <div className="text-xs mt-1 text-blue-700/80 line-clamp-2">{selectedDoctor.doctorProfile.bio}</div>
                 )}
                 <div className="mt-1.5">
                   <RatingStars avgRating={selectedDoctor.doctorProfile.avgRating} totalReviews={selectedDoctor.doctorProfile.totalReviews} />
                 </div>
-                <div className="text-xs mt-1.5 font-bold">Fee: ₹{currentFee}</div>
+                <div className="text-xs mt-1.5 font-bold">{t("fee", { fee: currentFee })}</div>
                 {form.consultType === "HOME" && distance != null && (
                   <div className="text-xs mt-1 flex items-center gap-1 text-blue-600 font-semibold">
-                    <Clock className="w-3.5 h-3.5" /> Arrives in ~{estimateArrivalMinutes(distance)} min ({distance.toFixed(1)} km)
+                    <Clock className="w-3.5 h-3.5" /> {t("arrivesInKm", { min: estimateArrivalMinutes(distance), km: distance.toFixed(1) })}
                   </div>
                 )}
               </div>
@@ -564,9 +576,9 @@ function PatientBookInner() {
                 <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1 text-xs text-red-800">
                   <p className="font-semibold">
-                    {selectedDoctor && formatDoctorName(selectedDoctor.name)} is {distance?.toFixed(1)} km away — too far for a home visit right now.
+                    {selectedDoctor && tf("homeTooFar", { doctor: formatDoctorName(selectedDoctor.name), km: distance?.toFixed(1) ?? "" })}
                   </p>
-                  <p className="mt-0.5">They only offer home visits within {homeVisitRadiusKm} km. Try Clinic Visit or Video Consultation instead.</p>
+                  <p className="mt-0.5">{tf("homeRadius", { radius: homeVisitRadiusKm ?? 0 })}</p>
                 </div>
               </div>
             )}
@@ -574,7 +586,7 @@ function PatientBookInner() {
             {/* Clinic location (only for Clinic Visit, when the doctor has clinics) */}
             {form.consultType === "CLINIC" && selectedDoctor && selectedDoctor.clinics.length > 0 && (
               <div>
-                <label className="input-label">Choose Clinic</label>
+                <label className="input-label">{tf("chooseClinic")}</label>
                 <select
                   required
                   className="input-field"
@@ -583,7 +595,9 @@ function PatientBookInner() {
                 >
                   {selectedDoctor.clinics.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.name} — {isClinicOpenNow(c.slots, effectiveBookingTime) ? "Open" : "Closed"} {scheduleMode === "LATER" ? "at that time" : "now"}
+                      {isClinicOpenNow(c.slots, effectiveBookingTime)
+                        ? tf(scheduleMode === "LATER" ? "clinicOpenThen" : "clinicOpenNow", { name: c.name })
+                        : tf(scheduleMode === "LATER" ? "clinicClosedThen" : "clinicClosedNow", { name: c.name })}
                     </option>
                   ))}
                 </select>
@@ -598,12 +612,12 @@ function PatientBookInner() {
                   return (
                     <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                       <p className="text-xs font-semibold text-slate-600 flex items-center gap-1.5 mb-1.5">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" /> Clinic hours
+                        <Clock className="w-3.5 h-3.5 text-slate-400" /> {tf("clinicHours")}
                       </p>
                       <ul className="space-y-0.5">
                         {hours.map((h) => (
                           <li key={h.dayOfWeek} className="text-xs text-slate-600 flex justify-between gap-3">
-                            <span className="font-medium text-slate-500">{h.label}</span>
+                            <span className="font-medium text-slate-500">{dayName(h.dayOfWeek)}</span>
                             <span className="text-right">{h.ranges.join(", ")}</span>
                           </li>
                         ))}
@@ -620,7 +634,7 @@ function PatientBookInner() {
                       <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1 text-xs text-red-800">
                         <p className="font-semibold">
-                          Not available at this clinic {scheduleMode === "LATER" ? "at the selected time" : "right now"} — booking is disabled here.
+                          {tf(scheduleMode === "LATER" ? "notAvailableHereLater" : "notAvailableHereNow")}
                         </p>
                         {openClinic && (
                           <button
@@ -628,12 +642,12 @@ function PatientBookInner() {
                             onClick={() => set("clinicId", openClinic.id)}
                             className="underline font-bold mt-0.5 block"
                           >
-                            {scheduleMode === "LATER" ? "Available at that time" : "Currently available"} at {openClinic.name} — switch &amp; book here instead
+                            {t(scheduleMode === "LATER" ? "switchClinicLater" : "switchClinicNow", { clinic: openClinic.name })}
                           </button>
                         )}
                         {nextHere && (
                           <p className="mt-1.5 pt-1.5 border-t border-red-200">
-                            Want an appointment at {selectedClinic.name}?{" "}
+                            {tf("wantAppointmentAt", { clinic: selectedClinic.name })}{" "}
                             <button
                               type="button"
                               onClick={() => {
@@ -642,12 +656,12 @@ function PatientBookInner() {
                               }}
                               className="underline font-bold"
                             >
-                              Schedule it for {openingWhenLabel(nextHere)}
+                              {tf("scheduleItFor", { when: openingWhenLabel(nextHere) })}
                             </button>
                           </p>
                         )}
                         {!openClinic && !nextHere && (
-                          <p className="mt-0.5">No clinic is available {scheduleMode === "LATER" ? "at the selected time" : "right now"} — please pick a different time or clinic.</p>
+                          <p className="mt-0.5">{tf(scheduleMode === "LATER" ? "noClinicLater" : "noClinicNow")}</p>
                         )}
                       </div>
                     </div>
@@ -658,18 +672,18 @@ function PatientBookInner() {
 
             {/* Now vs Schedule later */}
             <div>
-              <label className="input-label mb-2 block">When?</label>
+              <label className="input-label mb-2 block">{tf("when")}</label>
               <ProviderAwayNotice provider={selectedDoctor} />
               <div className="grid grid-cols-2 gap-3">
                 <button type="button" onClick={() => setScheduleMode("NOW")} disabled={!!selectedDoctor?.awayNow}
                   className={cn("min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed",
                     scheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
-                  Book Now
+                  {tf("bookNow")}
                 </button>
                 <button type="button" onClick={() => setScheduleMode("LATER")}
                   className={cn("min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5",
                     scheduleMode === "LATER" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
-                  <CalendarClock className="w-3.5 h-3.5" /> Schedule Later
+                  <CalendarClock className="w-3.5 h-3.5" /> {tf("scheduleLater")}
                 </button>
               </div>
               {scheduleMode === "LATER" && (
@@ -690,14 +704,14 @@ function PatientBookInner() {
             </div>
 
             <div>
-              <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />Who is this for?</label>
+              <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />{tf("whoFor")}</label>
               <div className="grid grid-cols-4 gap-2">
                 {RELATIONS.map((r) => (
                   <button key={r} type="button" onClick={() => { set("relation", r); setDependentId(null); }}
                     className={cn("min-h-11 py-2 rounded-xl border text-xs font-semibold transition-all",
                       form.relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                     )}>
-                    {r}
+                    {tc(`relation.${r}`)}
                   </button>
                 ))}
               </div>
@@ -709,16 +723,16 @@ function PatientBookInner() {
             </div>
 
             <div>
-              <label className="input-label">Symptoms / Reason</label>
+              <label className="input-label">{tf("symptoms")}</label>
               <textarea required rows={3} className="input-field resize-none"
-                placeholder="Describe your symptoms briefly…"
+                placeholder={tf("symptomsPlaceholder")}
                 value={form.symptoms} onChange={(e) => set("symptoms", e.target.value)} />
             </div>
 
             <div>
-              <label className="input-label"><AlertTriangle className="inline w-3.5 h-3.5 mr-1 text-amber-500" />Any Known Allergies?</label>
+              <label className="input-label"><AlertTriangle className="inline w-3.5 h-3.5 mr-1 text-amber-500" />{tf("allergies")}</label>
               <textarea rows={2} className="input-field resize-none"
-                placeholder="e.g. Penicillin, Sulfa drugs — leave blank if none"
+                placeholder={tf("allergiesPlaceholder")}
                 value={form.allergies} onChange={(e) => set("allergies", e.target.value)} />
             </div>
 
@@ -728,7 +742,7 @@ function PatientBookInner() {
                 className="w-4 h-4 mt-0.5 accent-blue-500 flex-shrink-0" />
               <span className="text-xs text-slate-600 flex items-start gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
-                I confirm the information above is accurate and I consent to this doctor accessing my medical profile and treating me for this consultation.
+                {tf("consent")}
               </span>
             </label>
 
@@ -741,7 +755,7 @@ function PatientBookInner() {
 
             {/* Submit lives here on mobile; the sticky summary card has its own on lg: */}
             <button type="submit" disabled={loading || !consentGiven || clinicBookingBlocked || homeVisitBlocked} className="btn-primary w-full justify-center py-3.5 text-base lg:hidden">
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : `Confirm Booking (₹${currentFee})`}
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("booking")}</> : t("confirmBookingFee", { fee: currentFee })}
             </button>
           </div>
         </div>
@@ -749,7 +763,7 @@ function PatientBookInner() {
         {/* Sticky booking summary (desktop only) */}
         <div className="hidden lg:block lg:sticky lg:top-24 mt-6 lg:mt-0">
           <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-6">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Booking Summary</h3>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">{t("summaryTitle")}</h3>
 
             {selectedDoctor?.doctorProfile ? (
               <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
@@ -778,36 +792,36 @@ function PatientBookInner() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-slate-400 mb-4 pb-4 border-b border-slate-100">Select a doctor to see your booking summary.</p>
+              <p className="text-sm text-slate-400 mb-4 pb-4 border-b border-slate-100">{t("summaryEmpty")}</p>
             )}
 
             <div className="space-y-2.5 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-slate-500">Consultation</span>
+                <span className="text-slate-500">{tc("consultation")}</span>
                 <span className="font-semibold text-slate-800">{typeLabel}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 flex items-center gap-1.5"><CalendarCheck2 className="w-3.5 h-3.5" /> When</span>
-                <span className="font-semibold text-slate-800">{scheduleMode === "LATER" ? "Scheduled" : "Now"}</span>
+                <span className="text-slate-500 flex items-center gap-1.5"><CalendarCheck2 className="w-3.5 h-3.5" /> {tc("when")}</span>
+                <span className="font-semibold text-slate-800">{scheduleMode === "LATER" ? t("scheduled") : tc("now")}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-500">Payment</span>
-                <span className="font-semibold text-slate-800">Online</span>
+                <span className="text-slate-500">{tc("payment")}</span>
+                <span className="font-semibold text-slate-800">{t("online")}</span>
               </div>
               {form.consultType === "HOME" && distance != null && (
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Arrival</span>
-                  <span className="font-semibold text-slate-800">~{estimateArrivalMinutes(distance)} min</span>
+                  <span className="text-slate-500 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {t("arrival")}</span>
+                  <span className="font-semibold text-slate-800">{t("arrivalMin", { min: estimateArrivalMinutes(distance) })}</span>
                 </div>
               )}
               <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                <span className="text-slate-500 flex items-center gap-1.5"><IndianRupee className="w-3.5 h-3.5" /> Total</span>
+                <span className="text-slate-500 flex items-center gap-1.5"><IndianRupee className="w-3.5 h-3.5" /> {tc("total")}</span>
                 <span className="font-extrabold text-slate-900 text-lg">₹{currentFee}</span>
               </div>
             </div>
 
             <button type="submit" disabled={loading || !consentGiven || clinicBookingBlocked || homeVisitBlocked} className="btn-primary w-full justify-center py-3.5 text-base mt-5">
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : "Confirm Booking"}
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("booking")}</> : t("confirmBooking")}
             </button>
           </div>
         </div>
@@ -820,40 +834,40 @@ function PatientBookInner() {
         <ConfirmDialog
           icon={CalendarCheck2}
           tone="primary"
-          title="Confirm this booking?"
-          confirmLabel={`Confirm (₹${currentFee})`}
-          busyLabel="Booking…"
-          cancelLabel="Go back"
+          title={tf("confirmTitle")}
+          confirmLabel={tf("confirmWithFee", { fee: currentFee })}
+          busyLabel={tc("booking")}
+          cancelLabel={tf("goBack")}
           busy={loading}
           onCancel={() => setConfirmOpen(false)}
           onConfirm={confirmAndBook}
           message={
             <div className="space-y-1.5">
               <div className="flex justify-between gap-3">
-                <span>Doctor</span>
+                <span>{tc("doctor")}</span>
                 <span className="font-semibold text-slate-700 text-right">{formatDoctorName(selectedDoctor.name)}</span>
               </div>
               <div className="flex justify-between gap-3">
-                <span>Consultation</span>
+                <span>{tc("consultation")}</span>
                 <span className="font-semibold text-slate-700 text-right">{typeLabel}</span>
               </div>
               {form.consultType === "CLINIC" && selectedClinic && (
                 <div className="flex justify-between gap-3">
-                  <span>Clinic</span>
+                  <span>{tc("clinic")}</span>
                   <span className="font-semibold text-slate-700 text-right">{selectedClinic.name}</span>
                 </div>
               )}
               <div className="flex justify-between gap-3">
-                <span>When</span>
+                <span>{tc("when")}</span>
                 <span className="font-semibold text-slate-700 text-right">
                   {scheduleMode === "LATER" && scheduledAt
-                    ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })
-                    : "Now"}
+                    ? new Date(scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })
+                    : tc("now")}
                 </span>
               </div>
               <div className="flex justify-between gap-3">
-                <span>Payment</span>
-                <span className="font-semibold text-slate-700 text-right">Online, after the doctor accepts</span>
+                <span>{tc("payment")}</span>
+                <span className="font-semibold text-slate-700 text-right">{tf("paymentAfterAccept")}</span>
               </div>
             </div>
           }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
-import { LOCKED_FIELDS, LOCKED_FIELD_LABELS, type FieldChanges } from "@/lib/doctorProfileLock";
+import { LOCKED_FIELDS, type FieldChanges } from "@/lib/doctorProfileLock";
 
 const MAX_NOTE = 500;
 
@@ -59,10 +59,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ error: "This request was just reviewed by someone else. Please refresh." }, { status: 409 });
   }
 
-  const fields = LOCKED_FIELDS.filter((f) => changes[f]).map((f) => LOCKED_FIELD_LABELS[f].toLowerCase()).join(", ");
+  // The changed fields, as a translated list: "registration number, specialty".
+  // The first comes from fragments.lockedField, the rest from
+  // fragments.lockedFieldNext (which carries the ", " separator).
+  const changed = LOCKED_FIELDS.filter((f) => changes[f]);
+  const parts = Object.fromEntries(
+    LOCKED_FIELDS.map((_, i) => [`field${i + 1}`, changed[i] ? { key: `fragments.${i === 0 ? "lockedField" : "lockedFieldNext"}.${changed[i]}` } : null]),
+  );
   void sendPushToUser(id, action === "APPROVE"
-    ? { title: "Profile change approved", body: `Your new ${fields} ${fields.includes(",") ? "are" : "is"} now live on your profile.`, url: "/doctor/profile/professional" }
-    : { title: "Profile change not approved", body: `Your requested ${fields} change wasn't approved. Reason: ${note}`, url: "/doctor/profile/professional" });
+    ? { key: "profileChangeApproved", values: { count: changed.length }, parts, url: "/doctor/profile/professional" }
+    : { key: "profileChangeRejected", values: { count: changed.length, note }, parts, url: "/doctor/profile/professional" });
 
   return NextResponse.json(updated);
 }

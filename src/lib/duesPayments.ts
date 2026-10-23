@@ -101,14 +101,13 @@ export async function settleDuesPayment(payment: { orderId: string; amount: numb
 export function notifyDuesSettled(result: DuesSettleResult) {
   if (result.outcome === "settled") {
     void sendPushToUser(result.doctorId, {
-      title: "Platform fee paid",
-      body: `₹${result.amount.toLocaleString("en-IN")} received — your cash visits are settled.`,
+      key: "duesPaid",
+      values: { amount: result.amount },
       url: "/doctor/earnings",
     });
   } else if (result.outcome === "review") {
     void sendPushToUser(result.doctorId, {
-      title: "Payment received",
-      body: "We got your platform-fee payment. Your visits changed while it was processing, so the admin will match it up shortly.",
+      key: "duesNeedsReview",
       url: "/doctor/earnings",
     });
   }

@@ -9,22 +9,23 @@ import { cn, formatDoctorName } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
 import { useAnnouncementNotifications } from "@/hooks/useAnnouncementNotifications";
 import NotificationToast from "@/components/doctor/NotificationToast";
+import { useTranslations } from "next-intl";
 
 const NAV = [
-  { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/doctor/earnings", label: "Earnings", icon: IndianRupee },
-  { href: "/doctor/clinics", label: "Clinics", icon: Building2 },
-  { href: "/doctor/support", label: "Support", icon: Sparkles },
-  { href: "/doctor/profile", label: "Profile", icon: UserCircle },
-];
+  { href: "/doctor/dashboard", label: "dashboard", icon: LayoutDashboard },
+  { href: "/doctor/earnings", label: "earnings", icon: IndianRupee },
+  { href: "/doctor/clinics", label: "clinics", icon: Building2 },
+  { href: "/doctor/support", label: "support", icon: Sparkles },
+  { href: "/doctor/profile", label: "profile", icon: UserCircle },
+] as const;
 
 // Staff accounts only ever see the queue and the walk-in desk — no
 // earnings/profile/clinic-edit access, so a direct logout instead of routing
 // through the doctor-only Profile page.
 const STAFF_NAV = [
-  { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/doctor/walk-in", label: "Walk-in", icon: UserPlus },
-];
+  { href: "/doctor/dashboard", label: "dashboard", icon: LayoutDashboard },
+  { href: "/doctor/walk-in", label: "walkIn", icon: UserPlus },
+] as const;
 
 function patientLabelFor(r: { patientName: string | null; relation: string; patient: { name: string } }): string {
   return r.relation !== "Self" && r.patientName ? r.patientName : r.patient.name;
@@ -32,11 +33,12 @@ function patientLabelFor(r: { patientName: string | null; relation: string; pati
 
 export default function DoctorHeader() {
   const { user, logout } = useAuth();
+  const t = useTranslations("nav");
   const pathname = usePathname();
   const router = useRouter();
   const [bellOpen, setBellOpen] = useState(false);
   const isStaff = user?.role === "STAFF";
-  const nav = isStaff ? STAFF_NAV : NAV;
+  const nav: readonly { href: string; label: (typeof NAV)[number]["label"] | (typeof STAFF_NAV)[number]["label"]; icon: typeof LayoutDashboard }[] = isStaff ? STAFF_NAV : NAV;
   const { pendingRequests, hasUnseen: requestsUnseen, activeToast, dismissToast, markSeen } = useDoctorNotifications(user?.id);
   const { announcements, hasUnseen: announcementsUnseen, markSeen: markAnnouncementsSeen } = useAnnouncementNotifications(user?.id);
   const hasUnseen = requestsUnseen || announcementsUnseen;
@@ -78,7 +80,7 @@ export default function DoctorHeader() {
               ) : (
                 <Icon className="w-4 h-4" />
               )}
-              {label}
+              {t(`doctor.${label}`)}
               {href === "/doctor/support" && (
                 <span className="text-[9px] font-extrabold tracking-wide text-white gradient-primary rounded-full px-1.5 py-[1px] leading-none">
                   AI
@@ -90,13 +92,13 @@ export default function DoctorHeader() {
 
         <div className="flex items-center gap-3 flex-shrink-0">
           <span className="text-sm text-slate-500 hidden xl:inline">
-            Hi, <strong className="text-slate-800">{user && (isStaff ? user.name : formatDoctorName(user.name))}</strong>
+            {user && t.rich("header.hi", { name: isStaff ? user.name : formatDoctorName(user.name), strong: (c) => <strong className="text-slate-800">{c}</strong> })}
           </span>
 
           {isStaff && (
             <button
               onClick={logout}
-              title="Sign out"
+              title={t("header.signOut")}
               className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
             >
               <LogOut className="w-4 h-4" />
@@ -106,7 +108,7 @@ export default function DoctorHeader() {
           <div className="relative">
             <button
               onClick={toggleBell}
-              title="Notifications"
+              title={t("header.notifications")}
               className="relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
             >
               <Bell className={cn("w-4 h-4", hasUnseen && "animate-bell-ring")} />
@@ -120,10 +122,10 @@ export default function DoctorHeader() {
                 <div className="fixed inset-0 z-30" onClick={() => setBellOpen(false)} />
                 <div className="absolute right-0 top-full mt-2 w-80 max-w-[90vw] bg-white rounded-2xl border border-slate-100 shadow-xl z-40 overflow-hidden">
                   <div className="px-4 py-3 border-b border-slate-100">
-                    <h3 className="text-sm font-bold text-slate-800">Pending Requests</h3>
+                    <h3 className="text-sm font-bold text-slate-800">{t("header.pendingRequests")}</h3>
                   </div>
                   {pendingRequests.length === 0 ? (
-                    <p className="text-sm text-slate-400 text-center py-8">No pending requests.</p>
+                    <p className="text-sm text-slate-400 text-center py-8">{t("header.noPendingRequests")}</p>
                   ) : (
                     <div className="divide-y divide-slate-50 max-h-80 overflow-y-auto">
                       {pendingRequests.slice(0, 5).map((r) => (
@@ -142,10 +144,10 @@ export default function DoctorHeader() {
                     </div>
                   )}
                   <div className="px-4 py-3 border-b border-t border-slate-100">
-                    <h3 className="text-sm font-bold text-slate-800">Announcements</h3>
+                    <h3 className="text-sm font-bold text-slate-800">{t("header.announcements")}</h3>
                   </div>
                   {announcements.length === 0 ? (
-                    <p className="text-sm text-slate-400 text-center py-6">No announcements yet.</p>
+                    <p className="text-sm text-slate-400 text-center py-6">{t("header.noAnnouncements")}</p>
                   ) : (
                     <div className="divide-y divide-slate-50">
                       {announcements.slice(0, 5).map((a) => (
@@ -170,7 +172,7 @@ export default function DoctorHeader() {
                     onClick={() => setBellOpen(false)}
                     className="block text-center text-xs font-semibold text-teal-600 hover:bg-teal-50 py-2.5 border-t border-slate-100"
                   >
-                    View all in Dashboard
+                    {t("header.viewAllInDashboard")}
                   </Link>
                 </div>
               </>

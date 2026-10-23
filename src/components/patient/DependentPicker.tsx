@@ -3,6 +3,14 @@ import { useEffect, useState } from "react";
 import { Trash2, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CHRONIC_OPTIONS, BLOOD_GROUPS } from "@/lib/medicalOptions";
+import { RELATIONS } from "@/lib/relations";
+import { useTranslations } from "next-intl";
+
+// Display labels for the stored (English) chronic-condition values.
+const CHRONIC_KEY = {
+  Diabetes: "diabetes", Hypertension: "hypertension", Asthma: "asthma", "Heart Disease": "heartDisease",
+  Thyroid: "thyroid", Arthritis: "arthritis", COPD: "copd", Other: "other", None: "none",
+} as const;
 
 export interface Dependent {
   id: string;
@@ -37,6 +45,13 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
   selectedId: string | null;
   onSelect: (id: string | null) => void;
 }) {
+  const t = useTranslations("booking.dependents");
+  const tc = useTranslations("booking.common");
+  const relationLabel = (RELATIONS as readonly string[]).includes(relation)
+    ? tc(`relation.${relation as (typeof RELATIONS)[number]}`)
+    : relation;
+  const chronicLabel = (o: string) =>
+    o in CHRONIC_KEY ? tc(`chronic.${CHRONIC_KEY[o as keyof typeof CHRONIC_KEY]}`) : o;
   const [dependents, setDependents] = useState<Dependent[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -107,7 +122,7 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
   };
 
   const saveNew = async () => {
-    if (!form.name.trim()) { setError("Please enter a name."); return; }
+    if (!form.name.trim()) { setError(t("errorName")); return; }
     setSaving(true);
     setError("");
     const serializedChronic = form.chronicDiseases
@@ -122,7 +137,7 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
     });
     const data = await res.json();
     setSaving(false);
-    if (!res.ok) { setError(data.error ?? "Could not save."); return; }
+    if (!res.ok) { setError(data.error ?? t("errorSave")); return; }
     if (editingId) {
       setDependents((d) => d.map((x) => (x.id === data.id ? data : x)));
     } else {
@@ -145,7 +160,7 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
     }
   };
 
-  if (loading) return <p className="text-xs text-slate-400">Loading saved family members…</p>;
+  if (loading) return <p className="text-xs text-slate-400">{t("loading")}</p>;
 
   return (
     <div className="space-y-3">
@@ -168,20 +183,20 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button type="button" onClick={() => deleteDependent(d.id)} disabled={deletingId === d.id}
                     className="tap-44-y text-xs font-semibold text-red-600 px-2 py-2 rounded-lg hover:bg-red-50">
-                    {deletingId === d.id ? "…" : "Delete"}
+                    {deletingId === d.id ? "…" : t("delete")}
                   </button>
                   <button type="button" onClick={() => setConfirmDeleteId(null)}
                     className="tap-44-y text-xs font-semibold text-slate-400 px-2 py-2 rounded-lg hover:bg-slate-100">
-                    Cancel
+                    {tc("cancel")}
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-1 flex-shrink-0">
-                  <button type="button" onClick={() => startEdit(d)} aria-label={`Edit ${d.name}`}
+                  <button type="button" onClick={() => startEdit(d)} aria-label={t("editName", { name: d.name })}
                     className="p-2.5 rounded-lg text-slate-300 hover:text-blue-500 hover:bg-blue-50 transition-colors">
                     <Pencil className="w-4 h-4" />
                   </button>
-                  <button type="button" onClick={() => setConfirmDeleteId(d.id)} aria-label={`Delete ${d.name}`}
+                  <button type="button" onClick={() => setConfirmDeleteId(d.id)} aria-label={t("deleteName", { name: d.name })}
                     className="p-2.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -190,81 +205,81 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
             </div>
           ))}
           <button type="button" onClick={() => { setForm(EMPTY_FORM); setAdding(true); onSelect(null); }} className="text-xs text-blue-600 font-semibold hover:underline">
-            + Add another {relation.toLowerCase()}
+            {t("addAnother", { relation: relationLabel.toLowerCase() })}
           </button>
         </div>
       )}
 
       {showAddForm && (
         <div className="border border-slate-200 rounded-xl p-4 space-y-3 bg-slate-50/50">
-          <input required className="input-field" placeholder={`${relation}'s name`} value={form.name} onChange={(e) => set("name", e.target.value)} />
+          <input required className="input-field" placeholder={t("namePlaceholder", { relation: relationLabel })} value={form.name} onChange={(e) => set("name", e.target.value)} />
           <div className="grid grid-cols-2 gap-3">
-            <input className="input-field" type="number" placeholder="Age" value={form.age} onChange={(e) => set("age", e.target.value)} />
+            <input className="input-field" type="number" placeholder={t("age")} value={form.age} onChange={(e) => set("age", e.target.value)} />
             <select className="input-field" value={form.gender} onChange={(e) => set("gender", e.target.value)}>
-              <option value="">Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
+              <option value="">{t("gender")}</option>
+              <option value="Male">{tc("gender.Male")}</option>
+              <option value="Female">{tc("gender.Female")}</option>
+              <option value="Other">{tc("gender.Other")}</option>
             </select>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <select className="input-field" value={form.bloodGroup} onChange={(e) => set("bloodGroup", e.target.value)}>
-              <option value="">Blood Group</option>
+              <option value="">{t("bloodGroup")}</option>
               {BLOOD_GROUPS.map((g) => <option key={g}>{g}</option>)}
             </select>
-            <input className="input-field" type="number" placeholder="Height (cm)" value={form.height} onChange={(e) => set("height", e.target.value)} />
-            <input className="input-field" type="number" placeholder="Weight (kg)" value={form.weight} onChange={(e) => set("weight", e.target.value)} />
+            <input className="input-field" type="number" placeholder={t("height")} value={form.height} onChange={(e) => set("height", e.target.value)} />
+            <input className="input-field" type="number" placeholder={t("weight")} value={form.weight} onChange={(e) => set("weight", e.target.value)} />
           </div>
           <div>
-            <label className="input-label">Chronic Conditions</label>
+            <label className="input-label">{t("chronic")}</label>
             <div className="flex flex-wrap gap-2 mt-1">
               {CHRONIC_OPTIONS.map((o) => (
                 <button key={o} type="button" onClick={() => toggleChronic(o)}
                   className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
                     form.chronicDiseases.includes(o) ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                   )}>
-                  {o}
+                  {chronicLabel(o)}
                 </button>
               ))}
             </div>
             {form.chronicDiseases.includes("Other") && (
               <input
                 className="input-field mt-2"
-                placeholder="Please specify"
+                placeholder={t("specify")}
                 value={form.otherChronicText}
                 onChange={(e) => set("otherChronicText", e.target.value)}
               />
             )}
           </div>
           <div>
-            <label className="input-label">Known Allergies</label>
-            <textarea className="input-field resize-none" rows={2} placeholder="e.g. Penicillin, Dust, Peanuts (or 'None')" value={form.allergies} onChange={(e) => set("allergies", e.target.value)} />
+            <label className="input-label">{t("allergies")}</label>
+            <textarea className="input-field resize-none" rows={2} placeholder={t("allergiesPlaceholder")} value={form.allergies} onChange={(e) => set("allergies", e.target.value)} />
           </div>
           <div>
-            <label className="input-label">Current Medications</label>
-            <textarea className="input-field resize-none" rows={2} placeholder="e.g. Metformin 500mg" value={form.medications} onChange={(e) => set("medications", e.target.value)} />
+            <label className="input-label">{t("medications")}</label>
+            <textarea className="input-field resize-none" rows={2} placeholder={t("medicationsPlaceholder")} value={form.medications} onChange={(e) => set("medications", e.target.value)} />
           </div>
           <div>
-            <label className="input-label">Previous Surgeries</label>
-            <textarea className="input-field resize-none" rows={2} placeholder="e.g. Appendectomy 2018" value={form.surgeries} onChange={(e) => set("surgeries", e.target.value)} />
+            <label className="input-label">{t("surgeries")}</label>
+            <textarea className="input-field resize-none" rows={2} placeholder={t("surgeriesPlaceholder")} value={form.surgeries} onChange={(e) => set("surgeries", e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="input-label">Emergency Contact Name</label>
-              <input className="input-field" placeholder="e.g. Priya Sharma" value={form.emergencyContactName} onChange={(e) => set("emergencyContactName", e.target.value)} />
+              <label className="input-label">{t("emergencyName")}</label>
+              <input className="input-field" placeholder={t("emergencyNamePlaceholder")} value={form.emergencyContactName} onChange={(e) => set("emergencyContactName", e.target.value)} />
             </div>
             <div>
-              <label className="input-label">Emergency Contact Phone</label>
+              <label className="input-label">{t("emergencyPhone")}</label>
               <input className="input-field" placeholder="9800000000" value={form.emergencyContactPhone} onChange={(e) => set("emergencyContactPhone", e.target.value)} />
             </div>
           </div>
           {error && <p className="text-xs text-red-600">{error}</p>}
           <div className="flex gap-2">
             {(matching.length > 0 || editingId) && (
-              <button type="button" onClick={cancelForm} className="btn-secondary py-2 px-3 text-xs flex-1">Cancel</button>
+              <button type="button" onClick={cancelForm} className="btn-secondary py-2 px-3 text-xs flex-1">{tc("cancel")}</button>
             )}
             <button type="button" onClick={saveNew} disabled={saving} className="btn-primary py-2 px-3 text-xs flex-1">
-              {saving ? "Saving…" : editingId ? "Save Changes" : `Save ${relation}'s Details`}
+              {saving ? tc("saving") : editingId ? t("saveChanges") : t("saveDetails", { relation: relationLabel })}
             </button>
           </div>
         </div>

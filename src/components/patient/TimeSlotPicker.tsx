@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { todayIsoDateIst } from "@/lib/clinicAvailability";
+import { useTranslations } from "next-intl";
 
 interface TimeSlot {
   time: string; // "HH:MM"
@@ -26,6 +27,7 @@ export default function TimeSlotPicker({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const t = useTranslations("booking.slots");
   const [date, setDate] = useState(() => (value ? value.slice(0, 10) : ""));
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
@@ -63,9 +65,9 @@ export default function TimeSlotPicker({
             <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
           </div>
         ) : error ? (
-          <p className="text-xs text-red-500 text-center py-3">Couldn&apos;t load slots. Try picking the date again.</p>
+          <p className="text-xs text-red-500 text-center py-3">{t("loadError")}</p>
         ) : slots.length === 0 ? (
-          <p className="text-xs text-slate-400 text-center py-3">No open slots on this date — try another day.</p>
+          <p className="text-xs text-slate-400 text-center py-3">{t("noSlots")}</p>
         ) : (
           <div className="border border-slate-100 rounded-xl p-2">
             <div className="grid grid-cols-3 gap-2 max-h-52 overflow-y-auto pr-0.5">

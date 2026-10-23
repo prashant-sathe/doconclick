@@ -3,6 +3,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Clock, Loader2, Wallet } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const POLL_INTERVAL_MS = 2000;
 const POLL_TIMEOUT_MS = 20000;
@@ -15,6 +16,8 @@ type VerifyResult = { paymentStatus: "PAID" | "CREDITED" | "PENDING"; creditedAm
 function ReturnContent() {
   const searchParams = useSearchParams();
   const apptId = searchParams.get("apptId");
+  const t = useTranslations("booking.paymentReturn");
+  const tc = useTranslations("booking.common");
   const [status, setStatus] = useState<"checking" | "paid" | "credited" | "pending" | "error">(apptId ? "checking" : "error");
   const [creditedAmount, setCreditedAmount] = useState<number | null>(null);
   const startedAt = useRef<number>(0);
@@ -70,8 +73,8 @@ function ReturnContent() {
     return (
       <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
         <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto mb-5" />
-        <h2 className="text-xl font-extrabold text-slate-900 mb-2">Confirming your payment…</h2>
-        <p className="text-slate-500">This usually takes just a few seconds.</p>
+        <h2 className="text-xl font-extrabold text-slate-900 mb-2">{t("confirming")}</h2>
+        <p className="text-slate-500">{t("fewSeconds")}</p>
       </div>
     );
   }
@@ -82,9 +85,9 @@ function ReturnContent() {
         <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-emerald-500" />
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Payment Successful!</h2>
-        <p className="text-slate-500 mb-8">Your doctor will be notified.</p>
-        <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">My Appointments</Link>
+        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{t("success")}</h2>
+        <p className="text-slate-500 mb-8">{t("doctorNotified")}</p>
+        <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">{tc("myAppointments")}</Link>
       </div>
     );
   }
@@ -95,15 +98,13 @@ function ReturnContent() {
         <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-5">
           <Wallet className="w-9 h-9 text-blue-500" />
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Payment Credited to Wallet</h2>
+        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{t("creditedTitle")}</h2>
         <p className="text-slate-500 mb-8">
-          We received your payment, but couldn&apos;t apply it to this appointment — it may have been cancelled or
-          already paid. {creditedAmount != null ? `₹${creditedAmount}` : "The amount"} has been added to your wallet,
-          and you can use it for any booking.
+          {creditedAmount != null ? t("creditedBodyAmount", { amount: creditedAmount }) : t("creditedBodyUnknown")}
         </p>
         <div className="flex flex-col gap-2">
-          <Link href="/patient/wallet" className="btn-secondary w-full justify-center py-3">View Wallet</Link>
-          <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">My Appointments</Link>
+          <Link href="/patient/wallet" className="btn-secondary w-full justify-center py-3">{t("viewWallet")}</Link>
+          <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">{tc("myAppointments")}</Link>
         </div>
       </div>
     );
@@ -115,18 +116,17 @@ function ReturnContent() {
         <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-5">
           <Clock className="w-9 h-9 text-amber-500" />
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Still Confirming</h2>
+        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{t("stillTitle")}</h2>
         <p className="text-slate-500 mb-8">
-          We haven&apos;t received confirmation yet — this can occasionally take a minute. Check My Appointments
-          shortly, or try paying again if it doesn&apos;t update.
+          {t("stillBody")}
         </p>
         <div className="flex flex-col gap-2">
           {apptId && (
             <Link href={`/patient/payment?apptId=${apptId}`} className="btn-secondary w-full justify-center py-3">
-              Try Again
+              {t("tryAgain")}
             </Link>
           )}
-          <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">My Appointments</Link>
+          <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">{tc("myAppointments")}</Link>
         </div>
       </div>
     );
@@ -134,16 +134,17 @@ function ReturnContent() {
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
-      <p className="text-slate-500 mb-8">Something went wrong checking your payment status.</p>
-      <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">My Appointments</Link>
+      <p className="text-slate-500 mb-8">{t("error")}</p>
+      <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">{tc("myAppointments")}</Link>
     </div>
   );
 }
 
 export default function PaymentReturn() {
+  const tc = useTranslations("booking.common");
   return (
     <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
-      <Suspense fallback={<div className="bg-white rounded-2xl p-8 text-center text-slate-400">Loading…</div>}>
+      <Suspense fallback={<div className="bg-white rounded-2xl p-8 text-center text-slate-400">{tc("loading")}</div>}>
         <ReturnContent />
       </Suspense>
     </div>

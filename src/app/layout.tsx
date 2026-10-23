@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { DEFAULT_APP_LANGUAGE, HTML_LANG_SCRIPT } from "@/lib/appLanguage";
-import { Inter } from "next/font/google";
+import { Inter, Noto_Sans_Devanagari } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
@@ -11,6 +12,8 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+// Hindi and Marathi (Devanagari) — Inter has no Devanagari glyphs.
+const devanagari = Noto_Sans_Devanagari({ subsets: ["devanagari"], variable: "--font-deva", weight: ["400", "500", "600", "700", "800"] });
 
 // viewportFit: "cover" lets content draw under the status bar/notch inside
 // the native app shell, so env(safe-area-inset-*) below actually activates.
@@ -60,21 +63,25 @@ const ORGANIZATION_JSON_LD = {
 // (see CASHFREE_ENV note in .env.production.example).
 const GA_MEASUREMENT_ID = "G-2PCQ0FEJ62";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The saved language (cookie, mirrors User.language — src/i18n/request.ts).
+  // Reading it renders pages per request; they run proxy.ts's auth check on
+  // every request anyway.
+  const locale = await getLocale();
+  const messages = await getMessages();
   return (
     // suppressHydrationWarning: the Capacitor native shell injects
     // --safe-area-inset-* as an inline style on <html> before React
     // hydrates, which otherwise mismatches the SSR output and made
     // hydration fail silently app-wide inside the Android WebView.
-    // lang: the UI's language (en-IN), or a saved preference applied by the
-    // inline script below before paint (src/lib/appLanguage.ts).
-    <html lang={DEFAULT_APP_LANGUAGE} className={inter.variable} suppressHydrationWarning>
+    // lang: the user's language (src/lib/appLanguage.ts) — screen readers
+    // pick a voice by it.
+    <html lang={locale} className={`${inter.variable} ${devanagari.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: HTML_LANG_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }}
@@ -82,13 +89,15 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <SplashOverlay />
-        <ToastProvider>
-          <AuthProvider>
-            <NativeBootstrap />
-            <OfflineBanner />
-            {children}
-          </AuthProvider>
-        </ToastProvider>
+        <NextIntlClientProvider locale={locale} messages={messages} timeZone="Asia/Kolkata">
+          <ToastProvider>
+            <AuthProvider>
+              <NativeBootstrap />
+              <OfflineBanner />
+              {children}
+            </AuthProvider>
+          </ToastProvider>
+        </NextIntlClientProvider>
       </body>
       <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
     </html>

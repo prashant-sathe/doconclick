@@ -1,4 +1,5 @@
 "use client";
+import LanguageSwitch from "@/components/LanguageSwitch";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -252,6 +253,8 @@ export default function PatientProfilePage() {
           <Row href="/patient/profile/notifications" tint="bg-amber-50 text-amber-500" icon={<Bell className="w-4 h-4" />}
             title="Notifications" />
         </Group>
+
+        <LanguageSwitch />
 
         <Group label="Account">
           <Row href="/patient/wallet" tint="bg-emerald-50 text-emerald-600" icon={<WalletIcon className="w-4 h-4" />}

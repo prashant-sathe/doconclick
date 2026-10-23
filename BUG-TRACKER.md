@@ -127,7 +127,7 @@
 
 | Sr. | Feature | Side | Claude Code command | Status |
 |---|---|---|---|---|
-| F7 | **हिंदी + मराठी (देवनागरी) UI** आणि push texts | 🌐 All | `Add i18n (en, hi, mr in Devanagari) with a language switch in profile for patient, doctor and nurse apps, starting with navigation, booking flow and push texts. Propose the library first (must work with Next 16 + Capacitor).` | ⬜ |
+| F7 | **हिंदी + मराठी (देवनागरी) UI** आणि push texts | 🌐 All | `Add i18n (en, hi, mr in Devanagari) with a language switch in profile for patient, doctor and nurse apps, starting with navigation, booking flow and push texts. Propose the library first (must work with Next 16 + Capacitor).` | 🟡 Phase 1 (uncommitted, 2026-10-23) — next-intl, profile + login वर भाषा switch, navigation, patient booking flow आणि सगळे push texts (en/hi/mr). `test:i18n`. बाकी: इतर screens, hi/mr native review. |
 | F8 | Notification inbox (app मधली history) | 🌐 All | `Add an in-app notification inbox storing every push sent (Notification model + list page + unread badge) for all roles.` | ⬜ |
 | F9 | Family Members screen (profile मध्ये) | 👤 Patient | `Add /patient/profile/family to list/add/edit/delete dependents, following the ProfileSubShell pattern.` | ⬜ |
 | F10 | Refund to original payment method आणि cancellation policy | 👤 Patient, 🛠️ Admin | `Add wallet "refund to source" via Cashfree refunds API (mock in tests) and a configurable cancellation window / late-cancel fee in PlatformSettings.` | ⬜ |

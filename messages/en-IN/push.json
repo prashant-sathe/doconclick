@@ -1,0 +1,326 @@
+{
+  "apptConfirmed": {
+    "title": "Appointment confirmed!",
+    "body": "{doctor} accepted your request.{free, select, yes { Nothing to pay — you're all set.} other {}}"
+  },
+  "apptDeclined": {
+    "title": "Request declined",
+    "body": "{doctor} was unable to accept your request."
+  },
+  "apptCompleted": {
+    "title": "Consultation completed",
+    "body": "Your visit with {doctor} is complete."
+  },
+  "apptCancelled": {
+    "title": "Appointment cancelled",
+    "body": "Your appointment with {doctor} was cancelled."
+  },
+  "apptNoShow": {
+    "title": "Marked as a no-show",
+    "body": "You were marked as a no-show for your appointment with {doctor}."
+  },
+  "nursePackageAccepted": {
+    "title": "Appointment confirmed!",
+    "body": "{doctor} accepted your {count}-visit package.{free, select, yes { Nothing to pay — you're all set.} other {}}"
+  },
+  "nursePackageDeclined": {
+    "title": "Request declined",
+    "body": "{doctor} couldn't accept your {count}-visit package."
+  },
+  "rescheduleAccepted": {
+    "title": "New time confirmed",
+    "body": "{doctor} confirmed your new time: {when, date, medium}, {when, time, short}."
+  },
+  "rescheduleDeclined": {
+    "title": "New time not available",
+    "body": "{doctor} couldn't make the new time — your appointment stays on {when, date, medium}, {when, time, short}."
+  },
+  "rescheduleDeclinedRefunded": {
+    "title": "Request declined",
+    "body": "{doctor} couldn't accommodate your new requested time. ₹{amount} was refunded to your wallet."
+  },
+  "rescheduleWithdrawn": {
+    "title": "Reschedule request withdrawn",
+    "body": "{patient} kept their original time ({when, date, medium}, {when, time, short})."
+  },
+  "rescheduleRequested": {
+    "title": "Reschedule requested",
+    "body": "{patient} asked to move their appointment to {when, date, medium}, {when, time, short} — accept the new time or keep the original."
+  },
+  "rescheduleRequestUpdated": {
+    "title": "Requested time updated",
+    "body": "{patient} updated their requested appointment time."
+  },
+  "reassignedRequestToDoctor": {
+    "title": "New appointment request",
+    "body": "{named, select, yes {{patient}} other {A patient}} needs a {consultType, select, HOME {home} VIDEO {video} other {clinic}} consultation."
+  },
+  "apptReassigned": {
+    "title": "Your appointment was reassigned",
+    "body": "{doctor} had an emergency and couldn't continue with your appointment. We found you Dr. {newDoctor} nearby and {paid, select, yes {credited ₹{amount} back to your wallet — pay again once they accept.} other {sent them your request.}}"
+  },
+  "apptCancelledNoReplacement": {
+    "title": "Appointment cancelled",
+    "body": "{doctor} had an emergency and couldn't continue with your appointment. We couldn't find another {providerType, select, NURSE {nurse} other {doctor}} nearby right now — {paid, select, yes {₹{amount} has been credited to your wallet. Please book again.} other {please book again.}}"
+  },
+  "apptCancelledByPatient": {
+    "title": "Appointment cancelled",
+    "body": "{paid, select, yes {{patient} cancelled their appointment. ₹{amount} was refunded to their wallet.} other {{patient} cancelled their appointment request.}}"
+  },
+  "nurseReferralRecommended": {
+    "title": "Home nursing care recommended",
+    "body": "{doctor} recommended {service} at home. Tap to book a nurse — your doctor's prescription is attached."
+  },
+  "travelOnTheWay": {
+    "title": "Your {providerType, select, NURSE {nurse} other {doctor}} is on the way!",
+    "body": "{provider} has started the journey to you.{due, select, yes { Your ₹{amount} payment is still pending — please pay before they arrive.} other {}}"
+  },
+  "travelArrived": {
+    "title": "Your {providerType, select, NURSE {nurse} other {doctor}} has arrived!",
+    "body": "{provider} is here for your visit."
+  },
+  "travelStopped": {
+    "title": "Your {providerType, select, NURSE {nurse} other {doctor}} has stopped the journey",
+    "body": "{provider} isn't on the way right now — they'll start again before your visit, or contact you."
+  },
+  "vitalsCriticalPatient": {
+    "title": "⚠ Urgent: {patient}'s vitals need attention",
+    "body": "{alerts}. Nurse {nurse} recorded this just now — contact your doctor."
+  },
+  "vitalsCriticalDoctor": {
+    "title": "⚠ Critical vitals: {patient}",
+    "body": "{alerts} ({summary}) — recorded by Nurse {nurse} on the visit you referred."
+  },
+  "chatNewMessage": {
+    "title": "New message from {sender}",
+    "body": "{hasText, select, yes {{text}} other {Sent a file}}"
+  },
+  "videoStarted": {
+    "title": "Video consultation started",
+    "body": "{name} has joined the video consultation."
+  },
+  "visitStartedWithoutCode": {
+    "title": "Visit started without your code",
+    "body": "{nurse} started the visit without the code: \"{reason}\". If this wasn't you, contact support."
+  },
+  "adminVisitStartedWithoutCode": {
+    "title": "Nurse visit started without code",
+    "body": "{nurse} → {patient}: {reason}"
+  },
+  "visitStarted": {
+    "title": "Your nurse visit has started",
+    "body": "{nurse} verified your code and started the visit."
+  },
+  "walkInBookedPatient": {
+    "title": "Appointment booked",
+    "body": "{doctor} booked a {consultType, select, HOME {home visit} VIDEO {video consultation} other {clinic visit}} for {forDependent, select, yes {{label}} other {you}} {scheduled, select, yes {on {when, date, medium}, {when, time, short}} other {today}}.{payNow, select, yes { Pay ₹{amount} in the app or with the link from the clinic.} other {}}"
+  },
+  "walkInBookedDoctor": {
+    "title": "Walk-in booked",
+    "body": "{staff} booked {label} for a {consultType, select, HOME {home visit} VIDEO {video consultation} other {clinic visit}} {scheduled, select, yes {on {when, date, medium}, {when, time, short}} other {now}}."
+  },
+  "nurseApplicationApproved": {
+    "title": "Application approved",
+    "body": "Your nurse application has been approved — patients can now book you."
+  },
+  "nurseApplicationRejected": {
+    "title": "Application not approved",
+    "body": "Your nurse application was not approved this time."
+  },
+  "accountSuspended": {
+    "title": "Account suspended",
+    "body": "Your account has been suspended by the admin."
+  },
+  "doctorApplicationApproved": {
+    "title": "Application approved",
+    "body": "Your doctor application has been approved."
+  },
+  "doctorApplicationRejected": {
+    "title": "Application not approved",
+    "body": "Your doctor application was not approved this time."
+  },
+  "doctorApplicationRejectedReason": {
+    "title": "Application not approved",
+    "body": "Your doctor application was not approved this time. Reason: {reason}"
+  },
+  "doctorVerified": {
+    "title": "You're verified!",
+    "body": "Your profile is now visible to patients."
+  },
+  "complaintUpdate": {
+    "title": "Complaint update",
+    "body": "Your complaint \"{subject}\" {status, select, OPEN {was reopened} IN_PROGRESS {is being looked into} other {has been resolved}}."
+  },
+  "profileChangeApproved": {
+    "title": "Profile change approved",
+    "body": "Your new {field1}{field2}{field3} {count, plural, one {is} other {are}} now live on your profile."
+  },
+  "profileChangeRejected": {
+    "title": "Profile change not approved",
+    "body": "Your requested {field1}{field2}{field3} change wasn't approved. Reason: {note}"
+  },
+  "walletAdminCredited": {
+    "title": "Wallet credited",
+    "body": "An admin added ₹{amount} to your wallet. New balance ₹{balance}. See your wallet history for details."
+  },
+  "walletAdminDebited": {
+    "title": "Wallet debited",
+    "body": "An admin deducted ₹{amount} from your wallet. New balance ₹{balance}. See your wallet history for details."
+  },
+  "fragments": {
+    "lockedField": {
+      "medRegNo": "registration number",
+      "qualification": "qualification",
+      "specialty": "specialty"
+    },
+    "lockedFieldNext": {
+      "medRegNo": ", registration number",
+      "qualification": ", qualification",
+      "specialty": ", specialty"
+    }
+  },
+  "nurseVisitRequest": {
+    "title": "New visit request",
+    "body": "{patient} requested {service}."
+  },
+  "nursePackageRequest": {
+    "title": "New visit package request",
+    "body": "{patient} requested {service} — {count} visits, {intervalDays, plural, =1 {every day} other {every # days}}."
+  },
+  "nurseShiftRequest": {
+    "title": "New visit request",
+    "body": "{patient} requested {count, plural, =1 {a } other {# × }}{hours}-hour shift ({service})."
+  },
+  "nurseShiftPackageRequest": {
+    "title": "New visit package request",
+    "body": "{patient} requested {count, plural, =1 {a } other {# × }}{hours}-hour shift ({service})."
+  },
+  "adminDoctorRegistered": {
+    "title": "New doctor registration",
+    "body": "{name} registered and is awaiting verification."
+  },
+  "adminNurseRegistered": {
+    "title": "New nurse registration",
+    "body": "{name} registered and is awaiting verification."
+  },
+  "bankDetailsChanged": {
+    "title": "Bank details changed",
+    "body": "Your payouts will now go to account {account}. If you didn't make this change, contact support right away."
+  },
+  "bankDetailsRemoved": {
+    "title": "Bank details changed",
+    "body": "Your bank details were removed. If you didn't make this change, contact support right away."
+  },
+  "apptCancelledClinicClosed": {
+    "title": "Appointment cancelled",
+    "body": "{doctor} is no longer seeing patients at {clinic}, so your appointment on {when, date, ::EEEdMMM}, {when, time, short} was cancelled.{refunded, select, yes { ₹{amount} was refunded to your wallet.} other {}} Please book again."
+  },
+  "apptCancelledClinicLeave": {
+    "title": "Appointment cancelled",
+    "body": "{doctor} won't be at {clinic} on {when, date, ::EEEdMMM}{hasReason, select, yes { ({reason})} other {}}, so your {when, time, short} appointment was cancelled.{refunded, select, yes { ₹{amount} was refunded to your wallet.} other {}} Please book another day."
+  },
+  "walletPaidAppointment": {
+    "title": "Wallet debited",
+    "body": "{count, plural, =1 {₹{amount} deducted for your appointment.} other {₹{amount} deducted for your {count}-visit package.}} New balance ₹{balance}."
+  },
+  "paymentReceivedNurse": {
+    "title": "Payment received",
+    "body": "{count, plural, =1 {{patient} paid for the {hasService, select, yes {{service}} other {home}} visit — you can complete it once you're done.} other {{patient} paid for all {count} {hasService, select, yes {{service}} other {home}} visits.}}"
+  },
+  "paymentReceivedDoctor": {
+    "title": "Payment received",
+    "body": "Payment received for your consultation with {patient}."
+  },
+  "reviewReceived": {
+    "title": "New review",
+    "body": "{patient} left a {rating}★ review."
+  },
+  "walletTopupFailed": {
+    "title": "Wallet top-up failed",
+    "body": "Your top-up of ₹{amount} didn't go through. No amount was deducted."
+  },
+  "walletTopupSuccess": {
+    "title": "Wallet top-up successful",
+    "body": "₹{amount} added to your wallet. New balance ₹{balance}."
+  },
+  "subscriptionRenewed": {
+    "title": "Subscription renewed",
+    "body": "Your subscription is active."
+  },
+  "registrationFeeReceived": {
+    "title": "Registration fee received",
+    "body": "Your application is now under review."
+  },
+  "apptRequested": {
+    "title": "New appointment request",
+    "body": "{patient} requested a {consultType, select, HOME {home} VIDEO {video} other {clinic}} consultation."
+  },
+  "apptCancelledProviderAway": {
+    "title": "Appointment cancelled",
+    "body": "{provider} is {away, select, LEAVE {on leave {sameDay, select, yes {{from, date, ::dMMM}} other {{from, date, ::dMMM} – {to, date, ::dMMM}}}} other {not available for the rest of today}}, so your {hasService, select, yes {{service}} other {appointment}} on {when, date, ::EEEdMMM}, {when, time, short} was cancelled.{refunded, select, yes { ₹{amount} was refunded to your wallet.} other {}} Please book another time."
+  },
+  "rescheduleDeclinedProviderAway": {
+    "title": "New time not available",
+    "body": "{provider} is {away, select, LEAVE {on leave {sameDay, select, yes {{from, date, ::dMMM}} other {{from, date, ::dMMM} – {to, date, ::dMMM}}}} other {not available for the rest of today}}, so your visit stays on {when, date, ::EEEdMMM}, {when, time, short}."
+  },
+  "reminderPatient": {
+    "title": "Upcoming appointment",
+    "body": "{consultType, select, HOME {{doctor} is visiting you in about an hour.} VIDEO {Your video consultation with {doctor} is in about an hour.} other {Your clinic visit with {doctor} is in about an hour.}}"
+  },
+  "reminderProvider": {
+    "title": "Upcoming appointment",
+    "body": "You have an appointment with {patient} in about an hour."
+  },
+  "apptExpired": {
+    "title": "No response from {providerType, select, NURSE {nurse} other {doctor}}",
+    "body": "{refunded, select, yes {{doctor} didn't confirm your new time. ₹{amount} was refunded to your wallet.} other {{doctor} didn't respond in time.}}"
+  },
+  "rescheduleExpired": {
+    "title": "New time wasn't confirmed",
+    "body": "{doctor} didn't confirm your requested time, so your appointment stays on {when, date, medium}, {when, time, short}."
+  },
+  "payReminderLeaving": {
+    "title": "Payment pending for your visit",
+    "body": "{provider} is about to leave for your {hasService, select, yes {{service}} other {home}} visit. Please pay ₹{amount} now so the visit can go ahead."
+  },
+  "payReminderManual": {
+    "title": "Payment pending for your visit",
+    "body": "Please pay ₹{amount} for your {hasService, select, yes {{service}} other {home}} visit with {provider} — it's confirmed, and payment is the last step."
+  },
+  "apptCancelledProviderRemoved": {
+    "title": "Appointment cancelled",
+    "body": "{provider} is no longer available on DocOnClick, so your appointment on {when, date, ::EEEdMMM}, {when, time, short} was cancelled.{refunded, select, yes { ₹{amount} was refunded to your wallet.} other {}} Please book again."
+  },
+  "apptReassignedProviderRemoved": {
+    "title": "Your appointment was reassigned",
+    "body": "{provider} is no longer available on DocOnClick, so we've sent your {when, date, ::EEEdMMM}, {when, time, short} appointment to {newDoctor} nearby.{refunded, select, yes { ₹{amount} was credited back to your wallet — pay again once they accept.} other {}}"
+  },
+  "paymentCredited": {
+    "title": "Payment credited to wallet",
+    "body": "Your payment couldn't be applied to the appointment, so ₹{amount} was credited to your wallet. New balance ₹{balance}."
+  },
+  "paymentPartlyCredited": {
+    "title": "Payment credited to wallet",
+    "body": "Part of your payment couldn't be applied, so ₹{amount} was credited to your wallet. New balance ₹{balance}."
+  },
+  "accountActivated": {
+    "title": "Account activated",
+    "body": "Your application is now under review."
+  },
+  "duesPaid": {
+    "title": "Platform fee paid",
+    "body": "₹{amount} received — your cash visits are settled."
+  },
+  "duesNeedsReview": {
+    "title": "Payment received",
+    "body": "We got your platform-fee payment. Your visits changed while it was processing, so the admin will match it up shortly."
+  },
+  "apptCancelledPatientDeleted": {
+    "title": "Appointment cancelled",
+    "body": "{patient} closed their DocOnClick account, so their appointment on {when, date, medium}, {when, time, short} was cancelled."
+  },
+  "apptCancelledProviderDeleted": {
+    "title": "Appointment cancelled",
+    "body": "{provider} is no longer on DocOnClick, so your appointment on {when, date, medium}, {when, time, short} was cancelled. {refunded, select, yes {₹{amount} was refunded to your wallet — please book again.} other {Please book again.}}"
+  }
+}

@@ -77,8 +77,8 @@ export async function GET(
   if (firstJoin > 0) {
     const otherPartyId = isPatient ? appointment.doctorId : appointment.patientId;
     void sendPushToUser(otherPartyId, {
-      title: "Video consultation started",
-      body: `${authUser.name} has joined the video consultation.`,
+      key: "videoStarted",
+      values: { name: authUser.name },
       url: isPatient ? `/doctor/video/${id}` : `/patient/video/${id}`,
     });
   }

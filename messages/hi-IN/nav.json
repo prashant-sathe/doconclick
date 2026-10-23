@@ -1,0 +1,66 @@
+{
+  "patient": {
+    "findDoctor": "डॉक्टर खोजें",
+    "bookNurse": "नर्स बुक करें",
+    "askAi": "AI से पूछें",
+    "appointments": "अपॉइंटमेंट",
+    "saved": "सेव किए",
+    "profile": "प्रोफ़ाइल",
+    "tabDoctors": "डॉक्टर",
+    "tabNurse": "नर्स",
+    "tabAssistant": "सहायक"
+  },
+  "doctor": {
+    "dashboard": "डैशबोर्ड",
+    "earnings": "कमाई",
+    "clinics": "क्लिनिक",
+    "support": "सहायता",
+    "profile": "प्रोफ़ाइल",
+    "walkIn": "वॉक-इन"
+  },
+  "nurse": {
+    "visits": "विज़िट",
+    "earnings": "कमाई",
+    "profile": "प्रोफ़ाइल",
+    "visitRequests": "विज़िट अनुरोध"
+  },
+  "header": {
+    "hi": "नमस्ते, <strong>{name}</strong>",
+    "there": "जी",
+    "home": "DocOnClick होम",
+    "wallet": "वॉलेट",
+    "walletBalance": "वॉलेट, बैलेंस ₹{balance}",
+    "notifications": "सूचनाएँ",
+    "notificationsNew": "सूचनाएँ (नई)",
+    "signOut": "साइन आउट",
+    "appointmentUpdates": "अपॉइंटमेंट अपडेट",
+    "noUpdates": "अभी कोई अपडेट नहीं।",
+    "walletSection": "वॉलेट",
+    "noWalletActivity": "अभी वॉलेट में कोई लेन-देन नहीं।",
+    "topUpFailed": "टॉप-अप विफल",
+    "walletAmount": "₹{amount}",
+    "walletAmountBalance": "₹{amount} · बैलेंस ₹{balance}",
+    "announcements": "घोषणाएँ",
+    "noAnnouncements": "अभी कोई घोषणा नहीं।",
+    "viewAllAppointments": "सभी अपॉइंटमेंट देखें",
+    "pendingRequests": "लंबित अनुरोध",
+    "noPendingRequests": "कोई लंबित अनुरोध नहीं।",
+    "viewAllInDashboard": "डैशबोर्ड में सब देखें"
+  },
+  "walletEvent": {
+    "TOPUP": "वॉलेट में पैसे जोड़े गए",
+    "BOOKING_PAYMENT": "वॉलेट से भुगतान",
+    "ADMIN_CREDIT": "एडमिन ने जमा किए",
+    "ADMIN_DEBIT": "एडमिन ने काटे",
+    "REASSIGNMENT_CREDIT": "रद्द अपॉइंटमेंट का रिफ़ंड"
+  },
+  "apptEvent": {
+    "SCHEDULED": "पक्का",
+    "ON_THE_WAY": "रास्ते में",
+    "ARRIVED": "पहुँच गए",
+    "COMPLETED": "पूरा",
+    "CANCELLED": "रद्द",
+    "REJECTED": "अस्वीकार",
+    "EXPIRED": "डॉक्टर व्यस्त थे"
+  }
+}

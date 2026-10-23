@@ -59,13 +59,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       omit: { visitOtp: true },
     });
     void sendPushToUser(appt.patientId, {
-      title: "Visit started without your code",
-      body: `${authUser.name} started the visit without the code: "${reason.slice(0, 80)}". If this wasn't you, contact support.`,
+      key: "visitStartedWithoutCode",
+      values: { nurse: authUser.name, reason: reason.slice(0, 80) },
       url: "/patient/appointments",
     });
     void sendPushToAdmins({
-      title: "Nurse visit started without code",
-      body: `${authUser.name} → ${appt.patient.name}: ${reason.slice(0, 100)}`,
+      key: "adminVisitStartedWithoutCode",
+      values: { nurse: authUser.name, patient: appt.patient.name, reason: reason.slice(0, 100) },
       url: "/admin/bookings",
     });
     return NextResponse.json(updated);
@@ -117,8 +117,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
   const updated = await prisma.appointment.findUnique({ where: { id }, omit: { visitOtp: true } });
   void sendPushToUser(appt.patientId, {
-    title: "Your nurse visit has started",
-    body: `${authUser.name} verified your code and started the visit.`,
+    key: "visitStarted",
+    values: { nurse: authUser.name },
     url: "/patient/appointments",
   });
   return NextResponse.json(updated);

@@ -91,9 +91,6 @@ export function impactConfirmationResponse(
   );
 }
 
-const fmtWhen = (d: Date) =>
-  d.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
-
 // Handles a doctor's or nurse's future live bookings after they've been
 // taken off the platform (suspended/rejected, or before deletion): re-reads
 // them — so a booking that slipped in after the review is handled too —
@@ -109,14 +106,11 @@ export async function resolveProviderBookings(
   if (rows.length === 0) return { cancelled: 0, reassigned: 0, refundTotal: 0 };
 
   const providerName = role === "NURSE" ? rows[0].doctor.name : formatDoctorName(rows[0].doctor.name);
-  const gone = `${providerName} is no longer available on DocOnClick`;
   const note = (id: string) => `Refund for appointment ${id}, cancelled because the ${role === "NURSE" ? "nurse" : "doctor"} was ${reason} by the admin`;
   const cancelledPush = (patientId: string, when: Date, refund: number) =>
     void sendPushToUser(patientId, {
-      title: "Appointment cancelled",
-      body: `${gone}, so your appointment on ${fmtWhen(when)} was cancelled.`
-        + (refund > 0 ? ` ₹${refund} was refunded to your wallet.` : "")
-        + " Please book again.",
+      key: "apptCancelledProviderRemoved",
+      values: { provider: providerName, when, refunded: refund > 0 ? "yes" : "no", amount: refund },
       url: "/patient/appointments",
     });
 
@@ -151,14 +145,19 @@ export async function resolveProviderBookings(
     if (result.reassigned && result.candidate) {
       reassigned++;
       void sendPushToUser(result.candidate.id, {
-        title: "New appointment request",
-        body: `${row.patientName ?? row.patient.name} needs a ${row.consultType.toLowerCase()} consultation.`,
+        key: "reassignedRequestToDoctor",
+        values: { patient: row.patientName ?? row.patient.name, named: "yes", consultType: row.consultType },
         url: "/doctor/dashboard",
       });
       void sendPushToUser(row.patientId, {
-        title: "Your appointment was reassigned",
-        body: `${gone}, so we've sent your ${fmtWhen(row.scheduledAt)} appointment to ${formatDoctorName(result.candidate.name)} nearby.`
-          + (result.refund > 0 ? ` ₹${result.refund} was credited back to your wallet — pay again once they accept.` : ""),
+        key: "apptReassignedProviderRemoved",
+        values: {
+          provider: providerName,
+          when: row.scheduledAt,
+          newDoctor: formatDoctorName(result.candidate.name),
+          refunded: result.refund > 0 ? "yes" : "no",
+          amount: result.refund,
+        },
         url: "/patient/appointments",
       });
     } else {

@@ -116,8 +116,9 @@ export async function POST(
   const recipientIsDoctor = appointment!.patientId === authUser.id;
   const recipientId = recipientIsDoctor ? appointment!.doctorId : appointment!.patientId;
   void sendPushToUser(recipientId, {
-    title: `New message from ${authUser.name}`,
-    body: message.text ? message.text.slice(0, 120) : "Sent a file",
+    // The message text itself is the user's own words — passed through as-is.
+    key: "chatNewMessage",
+    values: { sender: authUser.name, hasText: message.text ? "yes" : "no", text: message.text ? message.text.slice(0, 120) : "" },
     url: recipientIsDoctor
       ? `/${appointment!.providerType === "NURSE" ? "nurse" : "doctor"}/chat/${id}`
       : `/patient/chat/${id}`,

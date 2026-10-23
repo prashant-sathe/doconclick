@@ -1,0 +1,66 @@
+{
+  "patient": {
+    "findDoctor": "डॉक्टर शोधा",
+    "bookNurse": "नर्स बुक करा",
+    "askAi": "AI ला विचारा",
+    "appointments": "अपॉइंटमेंट्स",
+    "saved": "सेव्ह केलेले",
+    "profile": "प्रोफाइल",
+    "tabDoctors": "डॉक्टर",
+    "tabNurse": "नर्स",
+    "tabAssistant": "सहाय्यक"
+  },
+  "doctor": {
+    "dashboard": "डॅशबोर्ड",
+    "earnings": "कमाई",
+    "clinics": "क्लिनिक",
+    "support": "मदत",
+    "profile": "प्रोफाइल",
+    "walkIn": "वॉक-इन"
+  },
+  "nurse": {
+    "visits": "व्हिजिट्स",
+    "earnings": "कमाई",
+    "profile": "प्रोफाइल",
+    "visitRequests": "व्हिजिट विनंत्या"
+  },
+  "header": {
+    "hi": "नमस्कार, <strong>{name}</strong>",
+    "there": "मित्रा",
+    "home": "DocOnClick होम",
+    "wallet": "वॉलेट",
+    "walletBalance": "वॉलेट, शिल्लक ₹{balance}",
+    "notifications": "सूचना",
+    "notificationsNew": "सूचना (नवीन)",
+    "signOut": "साइन आउट",
+    "appointmentUpdates": "अपॉइंटमेंट अपडेट्स",
+    "noUpdates": "अजून कोणतेही अपडेट नाहीत.",
+    "walletSection": "वॉलेट",
+    "noWalletActivity": "अजून वॉलेटमध्ये कोणताही व्यवहार नाही.",
+    "topUpFailed": "टॉप-अप अयशस्वी",
+    "walletAmount": "₹{amount}",
+    "walletAmountBalance": "₹{amount} · शिल्लक ₹{balance}",
+    "announcements": "घोषणा",
+    "noAnnouncements": "अजून कोणतीही घोषणा नाही.",
+    "viewAllAppointments": "सर्व अपॉइंटमेंट्स पहा",
+    "pendingRequests": "प्रलंबित विनंत्या",
+    "noPendingRequests": "कोणतीही प्रलंबित विनंती नाही.",
+    "viewAllInDashboard": "डॅशबोर्डमध्ये सर्व पहा"
+  },
+  "walletEvent": {
+    "TOPUP": "वॉलेटमध्ये पैसे जमा",
+    "BOOKING_PAYMENT": "वॉलेटमधून पेमेंट",
+    "ADMIN_CREDIT": "ॲडमिनने जमा केले",
+    "ADMIN_DEBIT": "ॲडमिनने वजा केले",
+    "REASSIGNMENT_CREDIT": "रद्द अपॉइंटमेंटचा परतावा"
+  },
+  "apptEvent": {
+    "SCHEDULED": "निश्चित",
+    "ON_THE_WAY": "वाटेत",
+    "ARRIVED": "पोहोचले",
+    "COMPLETED": "पूर्ण",
+    "CANCELLED": "रद्द",
+    "REJECTED": "नाकारले",
+    "EXPIRED": "डॉक्टर व्यस्त होते"
+  }
+}

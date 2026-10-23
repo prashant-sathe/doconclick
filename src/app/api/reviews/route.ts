@@ -59,8 +59,8 @@ export async function POST(req: Request) {
   });
 
   void sendPushToUser(appointment.doctorId, {
-    title: "New review",
-    body: `${authUser.name} left a ${ratingNum}★ review.`,
+    key: "reviewReceived",
+    values: { patient: authUser.name, rating: ratingNum },
     url: appointment.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
   });
 

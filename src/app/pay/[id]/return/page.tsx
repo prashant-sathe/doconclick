@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { CheckCircle, Clock, Loader2, Wallet } from "lucide-react";
 import { PayShell, Card, type GuestBill } from "../shell";
+import { useTranslations } from "next-intl";
 
 const POLL_INTERVAL_MS = 2000;
 const POLL_TIMEOUT_MS = 20000;
@@ -14,6 +15,8 @@ const VERIFY_AFTER_MS = 6000;
 function ReturnContent() {
   const { id } = useParams<{ id: string }>();
   const token = useSearchParams().get("t") ?? "";
+  const t = useTranslations("booking.payLinkReturn");
+  const tr = useTranslations("booking.paymentReturn");
   const [status, setStatus] = useState<"checking" | "paid" | "credited" | "pending" | "error">(token ? "checking" : "error");
   const [credited, setCredited] = useState<number | null>(null);
   const startedAt = useRef(0);
@@ -57,8 +60,8 @@ function ReturnContent() {
     return (
       <Card>
         <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto mb-5" />
-        <h1 className="text-xl font-extrabold text-slate-900 mb-2">Confirming your payment…</h1>
-        <p className="text-slate-500">This usually takes just a few seconds.</p>
+        <h1 className="text-xl font-extrabold text-slate-900 mb-2">{tr("confirming")}</h1>
+        <p className="text-slate-500">{tr("fewSeconds")}</p>
       </Card>
     );
   }
@@ -68,8 +71,8 @@ function ReturnContent() {
         <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-emerald-500" />
         </div>
-        <h1 className="text-2xl font-extrabold text-slate-900 mb-2">Payment successful</h1>
-        <p className="text-slate-500">The clinic can see it&apos;s paid. You can close this page.</p>
+        <h1 className="text-2xl font-extrabold text-slate-900 mb-2">{t("success")}</h1>
+        <p className="text-slate-500">{t("successBody")}</p>
       </Card>
     );
   }
@@ -79,10 +82,9 @@ function ReturnContent() {
         <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-5">
           <Wallet className="w-9 h-9 text-blue-500" />
         </div>
-        <h1 className="text-2xl font-extrabold text-slate-900 mb-2">Payment kept as credit</h1>
+        <h1 className="text-2xl font-extrabold text-slate-900 mb-2">{t("creditTitle")}</h1>
         <p className="text-slate-500">
-          We received {credited != null ? `₹${credited}` : "your payment"}, but this appointment had changed (it may have been
-          cancelled or already paid), so it was added to your DocOnClick wallet. Sign up in the app with this mobile number to use it, or ask the clinic.
+          {credited != null ? t("creditBodyAmount", { amount: credited }) : t("creditBodyUnknown")}
         </p>
       </Card>
     );
@@ -93,15 +95,15 @@ function ReturnContent() {
         <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-5">
           <Clock className="w-9 h-9 text-amber-500" />
         </div>
-        <h1 className="text-2xl font-extrabold text-slate-900 mb-2">Still confirming</h1>
+        <h1 className="text-2xl font-extrabold text-slate-900 mb-2">{t("stillTitle")}</h1>
         <p className="text-slate-500 mb-6">
-          We haven&apos;t heard back from the bank yet — this can take a minute. If money left your account, don&apos;t pay again; the clinic will see it once it&apos;s confirmed.
+          {t("stillBody")}
         </p>
-        <Link href={`/pay/${encodeURIComponent(id)}?t=${encodeURIComponent(token)}`} className="btn-secondary w-full justify-center py-3">Check again</Link>
+        <Link href={`/pay/${encodeURIComponent(id)}?t=${encodeURIComponent(token)}`} className="btn-secondary w-full justify-center py-3">{t("checkAgain")}</Link>
       </Card>
     );
   }
-  return <Card><p className="text-slate-600">This payment link isn&apos;t valid any more. Ask the clinic for a new one.</p></Card>;
+  return <Card><p className="text-slate-600">{t("invalid")}</p></Card>;
 }
 
 export default function GuestPayReturnPage() {

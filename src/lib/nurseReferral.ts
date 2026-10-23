@@ -18,8 +18,8 @@ export function referralProblem(sourceStatus: string): string | null {
 /** The patient push when a referral becomes bookable. */
 export function referralPushCopy(doctorName: string, serviceName: string) {
   return {
-    title: "Home nursing care recommended",
-    body: `${doctorName} recommended ${serviceName} at home. Tap to book a nurse — your doctor's prescription is attached.`,
+    key: "nurseReferralRecommended" as const,
+    values: { doctor: doctorName, service: serviceName },
     url: "/patient/appointments",
   };
 }

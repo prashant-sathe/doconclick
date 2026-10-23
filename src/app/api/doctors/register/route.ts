@@ -46,8 +46,8 @@ export async function POST(req: Request) {
     });
 
     void sendPushToAdmins({
-      title: "New doctor registration",
-      body: `${name} registered and is awaiting verification.`,
+      key: "adminDoctorRegistered",
+      values: { name },
       url: "/admin/doctors",
     });
 

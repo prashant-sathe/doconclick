@@ -1,0 +1,326 @@
+{
+  "apptConfirmed": {
+    "title": "अपॉइंटमेंट कन्फ़र्म हो गया!",
+    "body": "{doctor} ने आपका अनुरोध स्वीकार कर लिया है।{free, select, yes { कोई भुगतान नहीं करना है — सब तैयार है।} other {}}"
+  },
+  "apptDeclined": {
+    "title": "अनुरोध अस्वीकार हुआ",
+    "body": "{doctor} आपका अनुरोध स्वीकार नहीं कर पाए।"
+  },
+  "apptCompleted": {
+    "title": "कंसल्टेशन पूरा हुआ",
+    "body": "{doctor} के साथ आपकी विज़िट पूरी हो गई है।"
+  },
+  "apptCancelled": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "{doctor} के साथ आपका अपॉइंटमेंट रद्द कर दिया गया है।"
+  },
+  "apptNoShow": {
+    "title": "नो-शो दर्ज किया गया",
+    "body": "{doctor} के साथ आपके अपॉइंटमेंट के लिए आपको नो-शो (अनुपस्थित) दर्ज किया गया है।"
+  },
+  "nursePackageAccepted": {
+    "title": "अपॉइंटमेंट कन्फ़र्म हो गया!",
+    "body": "{doctor} ने आपका {count}-विज़िट पैकेज स्वीकार कर लिया है।{free, select, yes { कोई भुगतान नहीं करना है — सब तैयार है।} other {}}"
+  },
+  "nursePackageDeclined": {
+    "title": "अनुरोध अस्वीकार हुआ",
+    "body": "{doctor} आपका {count}-विज़िट पैकेज स्वीकार नहीं कर पाए।"
+  },
+  "rescheduleAccepted": {
+    "title": "नया समय कन्फ़र्म हुआ",
+    "body": "{doctor} ने आपका नया समय कन्फ़र्म कर दिया है: {when, date, medium}, {when, time, short}।"
+  },
+  "rescheduleDeclined": {
+    "title": "नया समय उपलब्ध नहीं",
+    "body": "{doctor} नए समय पर उपलब्ध नहीं हैं — आपका अपॉइंटमेंट {when, date, medium}, {when, time, short} पर ही रहेगा।"
+  },
+  "rescheduleDeclinedRefunded": {
+    "title": "अनुरोध अस्वीकार हुआ",
+    "body": "{doctor} आपके अनुरोधित नए समय पर उपलब्ध नहीं हो पाए। ₹{amount} आपके वॉलेट में वापस कर दिए गए हैं।"
+  },
+  "rescheduleWithdrawn": {
+    "title": "समय बदलने का अनुरोध वापस लिया गया",
+    "body": "{patient} ने अपना मूल समय ({when, date, medium}, {when, time, short}) ही रखा है।"
+  },
+  "rescheduleRequested": {
+    "title": "समय बदलने का अनुरोध",
+    "body": "{patient} अपना अपॉइंटमेंट {when, date, medium}, {when, time, short} पर करना चाहते हैं — नया समय स्वीकार करें या मूल समय रखें।"
+  },
+  "rescheduleRequestUpdated": {
+    "title": "अनुरोधित समय अपडेट हुआ",
+    "body": "{patient} ने अपने अपॉइंटमेंट का अनुरोधित समय बदल दिया है।"
+  },
+  "reassignedRequestToDoctor": {
+    "title": "नया अपॉइंटमेंट अनुरोध",
+    "body": "{named, select, yes {{patient}} other {एक मरीज़}} को {consultType, select, HOME {होम विज़िट} VIDEO {वीडियो} other {क्लिनिक}} कंसल्टेशन चाहिए।"
+  },
+  "apptReassigned": {
+    "title": "आपका अपॉइंटमेंट दूसरे डॉक्टर को सौंपा गया",
+    "body": "{doctor} को अचानक इमरजेंसी आ गई और वे आपका अपॉइंटमेंट जारी नहीं रख सके। हमने आपके पास Dr. {newDoctor} को ढूँढ़ा है और {paid, select, yes {₹{amount} आपके वॉलेट में वापस जमा कर दिए हैं — उनके स्वीकार करने के बाद दोबारा भुगतान करें।} other {आपका अनुरोध उन्हें भेज दिया है।}}"
+  },
+  "apptCancelledNoReplacement": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "{doctor} को अचानक इमरजेंसी आ गई और वे आपका अपॉइंटमेंट जारी नहीं रख सके। अभी आपके पास कोई दूसरा {providerType, select, NURSE {नर्स} other {डॉक्टर}} नहीं मिला — {paid, select, yes {₹{amount} आपके वॉलेट में जमा कर दिए गए हैं। कृपया दोबारा बुक करें।} other {कृपया दोबारा बुक करें।}}"
+  },
+  "apptCancelledByPatient": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "{paid, select, yes {{patient} ने अपना अपॉइंटमेंट रद्द कर दिया। ₹{amount} उनके वॉलेट में वापस कर दिए गए हैं।} other {{patient} ने अपना अपॉइंटमेंट अनुरोध रद्द कर दिया।}}"
+  },
+  "nurseReferralRecommended": {
+    "title": "घर पर नर्सिंग केयर की सलाह",
+    "body": "{doctor} ने घर पर {service} की सलाह दी है। नर्स बुक करने के लिए टैप करें — आपके डॉक्टर का प्रिस्क्रिप्शन साथ में जुड़ा है।"
+  },
+  "travelOnTheWay": {
+    "title": "{providerType, select, NURSE {आपकी नर्स} other {आपके डॉक्टर}} रास्ते में हैं!",
+    "body": "{provider} आपके पास आने के लिए निकल चुके हैं।{due, select, yes { आपका ₹{amount} का भुगतान अभी बाकी है — कृपया उनके पहुँचने से पहले भुगतान करें।} other {}}"
+  },
+  "travelArrived": {
+    "title": "{providerType, select, NURSE {आपकी नर्स} other {आपके डॉक्टर}} पहुँच गए हैं!",
+    "body": "{provider} आपकी विज़िट के लिए आ गए हैं।"
+  },
+  "travelStopped": {
+    "title": "{providerType, select, NURSE {आपकी नर्स} other {आपके डॉक्टर}} ने यात्रा रोक दी है",
+    "body": "{provider} अभी रास्ते में नहीं हैं — वे आपकी विज़िट से पहले फिर से निकलेंगे, या आपसे संपर्क करेंगे।"
+  },
+  "vitalsCriticalPatient": {
+    "title": "⚠ ज़रूरी: {patient} के वाइटल्स पर तुरंत ध्यान दें",
+    "body": "{alerts}। नर्स {nurse} ने अभी-अभी यह दर्ज किया है — अपने डॉक्टर से संपर्क करें।"
+  },
+  "vitalsCriticalDoctor": {
+    "title": "⚠ गंभीर वाइटल्स: {patient}",
+    "body": "{alerts} ({summary}) — आपके द्वारा रेफ़र की गई विज़िट पर नर्स {nurse} ने दर्ज किया।"
+  },
+  "chatNewMessage": {
+    "title": "{sender} का नया मैसेज",
+    "body": "{hasText, select, yes {{text}} other {एक फ़ाइल भेजी}}"
+  },
+  "videoStarted": {
+    "title": "वीडियो कंसल्टेशन शुरू हुआ",
+    "body": "{name} वीडियो कंसल्टेशन में जुड़ गए हैं।"
+  },
+  "visitStartedWithoutCode": {
+    "title": "आपके कोड के बिना विज़िट शुरू हुई",
+    "body": "{nurse} ने कोड के बिना विज़िट शुरू की: \"{reason}\"। अगर यह आपकी जानकारी में नहीं है, तो सपोर्ट से संपर्क करें।"
+  },
+  "adminVisitStartedWithoutCode": {
+    "title": "नर्स विज़िट कोड के बिना शुरू हुई",
+    "body": "{nurse} → {patient}: {reason}"
+  },
+  "visitStarted": {
+    "title": "आपकी नर्स विज़िट शुरू हो गई है",
+    "body": "{nurse} ने आपका कोड वेरिफ़ाई करके विज़िट शुरू कर दी है।"
+  },
+  "walkInBookedPatient": {
+    "title": "अपॉइंटमेंट बुक हुआ",
+    "body": "{doctor} ने {forDependent, select, yes {{label} के लिए} other {आपके लिए}} {scheduled, select, yes {{when, date, medium}, {when, time, short} को} other {आज}} {consultType, select, HOME {होम विज़िट} VIDEO {वीडियो कंसल्टेशन} other {क्लिनिक विज़िट}} बुक की है।{payNow, select, yes { ₹{amount} का भुगतान ऐप में या क्लिनिक से मिले लिंक से करें।} other {}}"
+  },
+  "walkInBookedDoctor": {
+    "title": "वॉक-इन बुक हुआ",
+    "body": "{staff} ने {label} के लिए {scheduled, select, yes {{when, date, medium}, {when, time, short} को} other {अभी}} {consultType, select, HOME {होम विज़िट} VIDEO {वीडियो कंसल्टेशन} other {क्लिनिक विज़िट}} बुक की है।"
+  },
+  "nurseApplicationApproved": {
+    "title": "आवेदन स्वीकृत हुआ",
+    "body": "आपका नर्स आवेदन स्वीकृत हो गया है — अब मरीज़ आपको बुक कर सकते हैं।"
+  },
+  "nurseApplicationRejected": {
+    "title": "आवेदन स्वीकृत नहीं हुआ",
+    "body": "इस बार आपका नर्स आवेदन स्वीकृत नहीं हुआ।"
+  },
+  "accountSuspended": {
+    "title": "अकाउंट निलंबित",
+    "body": "एडमिन ने आपका अकाउंट निलंबित कर दिया है।"
+  },
+  "doctorApplicationApproved": {
+    "title": "आवेदन स्वीकृत हुआ",
+    "body": "आपका डॉक्टर आवेदन स्वीकृत हो गया है।"
+  },
+  "doctorApplicationRejected": {
+    "title": "आवेदन स्वीकृत नहीं हुआ",
+    "body": "इस बार आपका डॉक्टर आवेदन स्वीकृत नहीं हुआ।"
+  },
+  "doctorApplicationRejectedReason": {
+    "title": "आवेदन स्वीकृत नहीं हुआ",
+    "body": "इस बार आपका डॉक्टर आवेदन स्वीकृत नहीं हुआ। कारण: {reason}"
+  },
+  "doctorVerified": {
+    "title": "आप वेरिफ़ाइड हैं!",
+    "body": "आपकी प्रोफ़ाइल अब मरीज़ों को दिखाई दे रही है।"
+  },
+  "complaintUpdate": {
+    "title": "शिकायत अपडेट",
+    "body": "आपकी शिकायत \"{subject}\" {status, select, OPEN {फिर से खोली गई है} IN_PROGRESS {पर काम चल रहा है} other {का समाधान हो गया है}}।"
+  },
+  "profileChangeApproved": {
+    "title": "प्रोफ़ाइल बदलाव स्वीकृत",
+    "body": "आपका नया {field1}{field2}{field3} अब आपकी प्रोफ़ाइल पर लाइव है।"
+  },
+  "profileChangeRejected": {
+    "title": "प्रोफ़ाइल बदलाव स्वीकृत नहीं हुआ",
+    "body": "आपके {field1}{field2}{field3} बदलने का अनुरोध स्वीकृत नहीं हुआ। कारण: {note}"
+  },
+  "walletAdminCredited": {
+    "title": "वॉलेट में राशि जमा हुई",
+    "body": "एडमिन ने आपके वॉलेट में ₹{amount} जोड़े हैं। नया बैलेंस ₹{balance}। जानकारी के लिए वॉलेट हिस्ट्री देखें।"
+  },
+  "walletAdminDebited": {
+    "title": "वॉलेट से राशि कटी",
+    "body": "एडमिन ने आपके वॉलेट से ₹{amount} काटे हैं। नया बैलेंस ₹{balance}। जानकारी के लिए वॉलेट हिस्ट्री देखें।"
+  },
+  "fragments": {
+    "lockedField": {
+      "medRegNo": "रजिस्ट्रेशन नंबर",
+      "qualification": "योग्यता",
+      "specialty": "विशेषज्ञता"
+    },
+    "lockedFieldNext": {
+      "medRegNo": ", रजिस्ट्रेशन नंबर",
+      "qualification": ", योग्यता",
+      "specialty": ", विशेषज्ञता"
+    }
+  },
+  "nurseVisitRequest": {
+    "title": "नया विज़िट अनुरोध",
+    "body": "{patient} ने {service} का अनुरोध किया है।"
+  },
+  "nursePackageRequest": {
+    "title": "नया विज़िट पैकेज अनुरोध",
+    "body": "{patient} ने {service} का अनुरोध किया है — {count} विज़िट, {intervalDays, plural, =1 {रोज़} other {हर # दिन में}}।"
+  },
+  "nurseShiftRequest": {
+    "title": "नया विज़िट अनुरोध",
+    "body": "{patient} ने {count, plural, =1 {एक } other {# × }}{hours} घंटे की शिफ़्ट ({service}) का अनुरोध किया है।"
+  },
+  "nurseShiftPackageRequest": {
+    "title": "नया विज़िट पैकेज अनुरोध",
+    "body": "{patient} ने {count, plural, =1 {एक } other {# × }}{hours} घंटे की शिफ़्ट ({service}) का अनुरोध किया है।"
+  },
+  "adminDoctorRegistered": {
+    "title": "नए डॉक्टर का रजिस्ट्रेशन",
+    "body": "{name} ने रजिस्टर किया है और वेरिफ़िकेशन का इंतज़ार कर रहे हैं।"
+  },
+  "adminNurseRegistered": {
+    "title": "नई नर्स का रजिस्ट्रेशन",
+    "body": "{name} ने रजिस्टर किया है और वेरिफ़िकेशन का इंतज़ार कर रहे हैं।"
+  },
+  "bankDetailsChanged": {
+    "title": "बैंक विवरण बदला गया",
+    "body": "अब आपके पेआउट खाता {account} में जाएँगे। अगर यह बदलाव आपने नहीं किया है, तो तुरंत सपोर्ट से संपर्क करें।"
+  },
+  "bankDetailsRemoved": {
+    "title": "बैंक विवरण बदला गया",
+    "body": "आपके बैंक विवरण हटा दिए गए हैं। अगर यह बदलाव आपने नहीं किया है, तो तुरंत सपोर्ट से संपर्क करें।"
+  },
+  "apptCancelledClinicClosed": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "{doctor} अब {clinic} में मरीज़ नहीं देख रहे हैं, इसलिए {when, date, ::EEEdMMM}, {when, time, short} का आपका अपॉइंटमेंट रद्द कर दिया गया है।{refunded, select, yes { ₹{amount} आपके वॉलेट में वापस कर दिए गए हैं।} other {}} कृपया दोबारा बुक करें।"
+  },
+  "apptCancelledClinicLeave": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "{doctor} {when, date, ::EEEdMMM} को {clinic} में उपलब्ध नहीं होंगे{hasReason, select, yes { ({reason})} other {}}, इसलिए {when, time, short} का आपका अपॉइंटमेंट रद्द कर दिया गया है।{refunded, select, yes { ₹{amount} आपके वॉलेट में वापस कर दिए गए हैं।} other {}} कृपया किसी दूसरे दिन बुक करें।"
+  },
+  "walletPaidAppointment": {
+    "title": "वॉलेट से राशि कटी",
+    "body": "{count, plural, =1 {आपके अपॉइंटमेंट के लिए ₹{amount} काटे गए।} other {आपके {count}-विज़िट पैकेज के लिए ₹{amount} काटे गए।}} नया बैलेंस ₹{balance}।"
+  },
+  "paymentReceivedNurse": {
+    "title": "भुगतान मिल गया",
+    "body": "{count, plural, =1 {{patient} ने {hasService, select, yes {{service}} other {होम}} विज़िट का भुगतान कर दिया है — विज़िट ख़त्म होने के बाद आप इसे पूरा मार्क कर सकते हैं।} other {{patient} ने सभी {count} {hasService, select, yes {{service}} other {होम}} विज़िट का भुगतान कर दिया है।}}"
+  },
+  "paymentReceivedDoctor": {
+    "title": "भुगतान मिल गया",
+    "body": "{patient} के साथ आपके कंसल्टेशन का भुगतान मिल गया है।"
+  },
+  "reviewReceived": {
+    "title": "नया रिव्यू",
+    "body": "{patient} ने {rating}★ रिव्यू दिया है।"
+  },
+  "walletTopupFailed": {
+    "title": "वॉलेट टॉप-अप असफल",
+    "body": "₹{amount} का आपका टॉप-अप नहीं हो पाया। कोई राशि नहीं कटी है।"
+  },
+  "walletTopupSuccess": {
+    "title": "वॉलेट टॉप-अप सफल",
+    "body": "₹{amount} आपके वॉलेट में जोड़ दिए गए हैं। नया बैलेंस ₹{balance}।"
+  },
+  "subscriptionRenewed": {
+    "title": "सब्सक्रिप्शन रिन्यू हुआ",
+    "body": "आपका सब्सक्रिप्शन सक्रिय है।"
+  },
+  "registrationFeeReceived": {
+    "title": "रजिस्ट्रेशन फ़ीस मिल गई",
+    "body": "आपके आवेदन की अब समीक्षा की जा रही है।"
+  },
+  "apptRequested": {
+    "title": "नया अपॉइंटमेंट अनुरोध",
+    "body": "{patient} ने {consultType, select, HOME {होम विज़िट} VIDEO {वीडियो} other {क्लिनिक}} कंसल्टेशन का अनुरोध किया है।"
+  },
+  "apptCancelledProviderAway": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "{provider} {away, select, LEAVE {{sameDay, select, yes {{from, date, ::dMMM}} other {{from, date, ::dMMM} – {to, date, ::dMMM}}} छुट्टी पर हैं} other {आज दिन भर उपलब्ध नहीं हैं}}, इसलिए {when, date, ::EEEdMMM}, {when, time, short} का आपका {hasService, select, yes {{service}} other {अपॉइंटमेंट}} रद्द कर दिया गया है।{refunded, select, yes { ₹{amount} आपके वॉलेट में वापस कर दिए गए हैं।} other {}} कृपया किसी दूसरे समय बुक करें।"
+  },
+  "rescheduleDeclinedProviderAway": {
+    "title": "नया समय उपलब्ध नहीं",
+    "body": "{provider} {away, select, LEAVE {{sameDay, select, yes {{from, date, ::dMMM}} other {{from, date, ::dMMM} – {to, date, ::dMMM}}} छुट्टी पर हैं} other {आज दिन भर उपलब्ध नहीं हैं}}, इसलिए आपकी विज़िट {when, date, ::EEEdMMM}, {when, time, short} पर ही रहेगी।"
+  },
+  "reminderPatient": {
+    "title": "आने वाला अपॉइंटमेंट",
+    "body": "{consultType, select, HOME {{doctor} लगभग एक घंटे में आपके पास विज़िट के लिए आ रहे हैं।} VIDEO {{doctor} के साथ आपका वीडियो कंसल्टेशन लगभग एक घंटे में है।} other {{doctor} के साथ आपकी क्लिनिक विज़िट लगभग एक घंटे में है।}}"
+  },
+  "reminderProvider": {
+    "title": "आने वाला अपॉइंटमेंट",
+    "body": "लगभग एक घंटे में {patient} के साथ आपका अपॉइंटमेंट है।"
+  },
+  "apptExpired": {
+    "title": "{providerType, select, NURSE {नर्स} other {डॉक्टर}} से कोई जवाब नहीं",
+    "body": "{refunded, select, yes {{doctor} ने आपका नया समय कन्फ़र्म नहीं किया। ₹{amount} आपके वॉलेट में वापस कर दिए गए हैं।} other {{doctor} ने समय पर जवाब नहीं दिया।}}"
+  },
+  "rescheduleExpired": {
+    "title": "नया समय कन्फ़र्म नहीं हुआ",
+    "body": "{doctor} ने आपका अनुरोधित समय कन्फ़र्म नहीं किया, इसलिए आपका अपॉइंटमेंट {when, date, medium}, {when, time, short} पर ही रहेगा।"
+  },
+  "payReminderLeaving": {
+    "title": "आपकी विज़िट का भुगतान बाकी है",
+    "body": "{provider} आपकी {hasService, select, yes {{service}} other {होम}} विज़िट के लिए निकलने वाले हैं। विज़िट हो सके, इसके लिए कृपया अभी ₹{amount} का भुगतान करें।"
+  },
+  "payReminderManual": {
+    "title": "आपकी विज़िट का भुगतान बाकी है",
+    "body": "कृपया {provider} के साथ अपनी {hasService, select, yes {{service}} other {होम}} विज़िट के लिए ₹{amount} का भुगतान करें — विज़िट कन्फ़र्म है, बस भुगतान बाकी है।"
+  },
+  "apptCancelledProviderRemoved": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "{provider} अब DocOnClick पर उपलब्ध नहीं हैं, इसलिए {when, date, ::EEEdMMM}, {when, time, short} का आपका अपॉइंटमेंट रद्द कर दिया गया है।{refunded, select, yes { ₹{amount} आपके वॉलेट में वापस कर दिए गए हैं।} other {}} कृपया दोबारा बुक करें।"
+  },
+  "apptReassignedProviderRemoved": {
+    "title": "आपका अपॉइंटमेंट दूसरे डॉक्टर को सौंपा गया",
+    "body": "{provider} अब DocOnClick पर उपलब्ध नहीं हैं, इसलिए हमने {when, date, ::EEEdMMM}, {when, time, short} का आपका अपॉइंटमेंट पास के {newDoctor} को भेज दिया है।{refunded, select, yes { ₹{amount} आपके वॉलेट में वापस जमा कर दिए गए हैं — उनके स्वीकार करने के बाद दोबारा भुगतान करें।} other {}}"
+  },
+  "paymentCredited": {
+    "title": "भुगतान वॉलेट में जमा हुआ",
+    "body": "आपका भुगतान अपॉइंटमेंट पर लागू नहीं हो सका, इसलिए ₹{amount} आपके वॉलेट में जमा कर दिए गए हैं। नया बैलेंस ₹{balance}।"
+  },
+  "paymentPartlyCredited": {
+    "title": "भुगतान वॉलेट में जमा हुआ",
+    "body": "आपके भुगतान का कुछ हिस्सा लागू नहीं हो सका, इसलिए ₹{amount} आपके वॉलेट में जमा कर दिए गए हैं। नया बैलेंस ₹{balance}।"
+  },
+  "accountActivated": {
+    "title": "अकाउंट सक्रिय हुआ",
+    "body": "आपके आवेदन की अब समीक्षा की जा रही है।"
+  },
+  "duesPaid": {
+    "title": "प्लेटफ़ॉर्म फ़ीस का भुगतान हुआ",
+    "body": "₹{amount} मिल गए — आपकी कैश विज़िट का हिसाब पूरा हो गया है।"
+  },
+  "duesNeedsReview": {
+    "title": "भुगतान मिल गया",
+    "body": "हमें आपकी प्लेटफ़ॉर्म फ़ीस का भुगतान मिल गया है। प्रोसेसिंग के दौरान आपकी विज़िट में बदलाव हुआ, इसलिए एडमिन जल्द ही इसका मिलान करेंगे।"
+  },
+  "apptCancelledPatientDeleted": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "{patient} ने अपना DocOnClick अकाउंट बंद कर दिया है, इसलिए {when, date, medium}, {when, time, short} का उनका अपॉइंटमेंट रद्द कर दिया गया है।"
+  },
+  "apptCancelledProviderDeleted": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "{provider} अब DocOnClick पर नहीं हैं, इसलिए {when, date, medium}, {when, time, short} का आपका अपॉइंटमेंट रद्द कर दिया गया है। {refunded, select, yes {₹{amount} आपके वॉलेट में वापस कर दिए गए हैं — कृपया दोबारा बुक करें।} other {कृपया दोबारा बुक करें।}}"
+  }
+}

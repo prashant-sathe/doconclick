@@ -46,7 +46,7 @@ export async function GET() {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { termsAcceptedAt: true, password: true },
+    select: { termsAcceptedAt: true, password: true, language: true },
   });
 
   return NextResponse.json({
@@ -55,6 +55,7 @@ export async function GET() {
     // Google-only accounts have none; the security pages then offer
     // "verify with Google to set one" instead of asking for a current password.
     hasPassword: !!dbUser?.password,
+    language: dbUser?.language ?? null,
     impersonatedBy: impersonator ? { name: impersonator.name, role: impersonator.role } : null,
   });
 }

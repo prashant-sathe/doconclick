@@ -5,6 +5,7 @@ import { LogOut, Loader2, ShieldAlert, FileCheck } from "lucide-react";
 import { unlockAudio } from "@/lib/playNotificationSound";
 import { listenForForegroundPush } from "@/lib/pushClient";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
+import { isAppLanguage, languageFromCookieHeader, setLanguageCookie, DEFAULT_APP_LANGUAGE } from "@/lib/appLanguage";
 import LegalContent from "@/components/LegalContent";
 import { TERMS_OF_SERVICE, PRIVACY_POLICY, LEGAL_LAST_UPDATED } from "@/lib/legalContent";
 
@@ -21,6 +22,7 @@ type AuthUser = {
   mobile: string;
   termsAcceptedAt?: string | null;
   hasPassword?: boolean;
+  language?: string | null;
 };
 
 type ImpersonatedBy = {
@@ -80,6 +82,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSuspendedMessage(data.suspendedMessage ?? "Your account has been suspended.");
       } else if (res.ok) {
         setUser(data);
+        // Keep the account's language and this device's in step. A language
+        // picked on the sign-in page (cookie) is adopted by an account still
+        // on the default; otherwise the account's wins (switched on another
+        // phone) and the page re-renders in it.
+        const deviceLang = languageFromCookieHeader(document.cookie);
+        if (isAppLanguage(data.language) && deviceLang !== data.language) {
+          if (deviceLang && data.language === DEFAULT_APP_LANGUAGE) {
+            void fetch("/api/auth/language", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ language: deviceLang }) });
+          } else {
+            setLanguageCookie(data.language);
+            router.refresh();
+          }
+        }
         setImpersonatedBy(data.impersonatedBy ?? null);
         setSuspended(false);
       } else {
@@ -94,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   const acceptTerms = async () => {
     setAcceptingTerms(true);

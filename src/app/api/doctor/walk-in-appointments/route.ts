@@ -348,18 +348,26 @@ export async function POST(req: Request) {
     }
 
     const label = dependent?.name ?? holderName;
-    const when = bookAt?.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
+    // `scheduled` "no" = a walk-in for right now ("today" / "now" in the copy).
+    const timing = { consultType, scheduled: bookAt ? "yes" : "no", when: bookAt ?? new Date() };
     if (!patientCreated) {
       void sendPushToUser(appointment.patientId, {
-        title: "Appointment booked",
-        body: `${formatDoctorName(doctor.name)} booked a ${TYPE_LABEL[consultType]} for ${dependent ? label : "you"} ${bookAt ? `on ${when}` : "today"}.${payment ? ` Pay ₹${amount} in the app or with the link from the clinic.` : ""}`,
+        key: "walkInBookedPatient",
+        values: {
+          ...timing,
+          doctor: formatDoctorName(doctor.name),
+          forDependent: dependent ? "yes" : "no",
+          label,
+          payNow: payment ? "yes" : "no",
+          amount,
+        },
         url: "/patient/appointments",
       });
     }
     if (authUser.role === "STAFF") {
       void sendPushToUser(doctorId, {
-        title: "Walk-in booked",
-        body: `${authUser.name} booked ${label} for a ${TYPE_LABEL[consultType]} ${bookAt ? `on ${when}` : "now"}.`,
+        key: "walkInBookedDoctor",
+        values: { ...timing, staff: authUser.name, label },
         url: "/doctor/dashboard",
       });
     }

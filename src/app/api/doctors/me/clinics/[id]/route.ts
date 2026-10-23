@@ -33,9 +33,6 @@ function openClinicBookings(clinicId: string) {
   });
 }
 
-const fmtWhen = (d: Date) =>
-  d.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
-
 // Deactivating or deleting a clinic with open bookings needs the doctor to
 // confirm (409 CLINIC_HAS_BOOKINGS lists them); confirming cancels them —
 // refunded to the patient's wallet or coupon freed, through the shared
@@ -79,10 +76,8 @@ async function closeClinic<T>(
 
   for (const { cancelled, refund } of out.cancelled) {
     void sendPushToUser(cancelled.patientId, {
-      title: "Appointment cancelled",
-      body: `${doctorName} is no longer seeing patients at ${clinic.name}, so your appointment on ${fmtWhen(cancelled.scheduledAt)} was cancelled.`
-        + (refund > 0 ? ` ₹${refund} was refunded to your wallet.` : "")
-        + " Please book again.",
+      key: "apptCancelledClinicClosed",
+      values: { doctor: doctorName, clinic: clinic.name, when: cancelled.scheduledAt, refunded: refund > 0 ? "yes" : "no", amount: refund },
       url: "/patient/appointments",
     });
   }

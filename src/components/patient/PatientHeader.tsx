@@ -9,35 +9,23 @@ import { cn, formatProviderName } from "@/lib/utils";
 import { usePatientNotifications } from "@/hooks/usePatientNotifications";
 import { useWalletNotifications } from "@/hooks/useWalletNotifications";
 import { useAnnouncementNotifications } from "@/hooks/useAnnouncementNotifications";
+import { useTranslations } from "next-intl";
 import PatientNotificationToast from "@/components/patient/PatientNotificationToast";
 import WalletNotificationToast from "@/components/patient/WalletNotificationToast";
 
-const WALLET_EVENT_LABEL: Record<string, string> = {
-  TOPUP: "Wallet topped up",
-  BOOKING_PAYMENT: "Wallet debited",
-  ADMIN_CREDIT: "Credited by admin",
-  ADMIN_DEBIT: "Debited by admin",
-  REASSIGNMENT_CREDIT: "Cancelled appointment refunded",
-};
+// Labels are message keys (messages/<locale>/nav.json).
+const WALLET_EVENTS = ["TOPUP", "BOOKING_PAYMENT", "ADMIN_CREDIT", "ADMIN_DEBIT", "REASSIGNMENT_CREDIT"] as const;
+const APPT_EVENTS = ["SCHEDULED", "ON_THE_WAY", "ARRIVED", "COMPLETED", "CANCELLED", "REJECTED", "EXPIRED"] as const;
+const isOneOf = <T extends string>(list: readonly T[], v: string): v is T => (list as readonly string[]).includes(v);
 
 const NAV = [
-  { href: "/patient/dashboard", label: "Find a Doctor" },
-  { href: "/patient/nurse", label: "Book a Nurse", icon: HeartPulse },
-  { href: "/patient/assistant", label: "Ask AI", icon: Sparkles },
-  { href: "/patient/appointments", label: "Appointments", icon: CalendarCheck2 },
-  { href: "/patient/saved", label: "Saved", icon: Bookmark },
-  { href: "/patient/profile", label: "Profile", icon: UserCircle },
-];
-
-const STATUS_LABEL: Record<string, string> = {
-  SCHEDULED: "Confirmed",
-  ON_THE_WAY: "On the way",
-  ARRIVED: "Arrived",
-  COMPLETED: "Completed",
-  CANCELLED: "Cancelled",
-  REJECTED: "Declined",
-  EXPIRED: "Doctor was busy",
-};
+  { href: "/patient/dashboard", label: "findDoctor" },
+  { href: "/patient/nurse", label: "bookNurse", icon: HeartPulse },
+  { href: "/patient/assistant", label: "askAi", icon: Sparkles },
+  { href: "/patient/appointments", label: "appointments", icon: CalendarCheck2 },
+  { href: "/patient/saved", label: "saved", icon: Bookmark },
+  { href: "/patient/profile", label: "profile", icon: UserCircle },
+] as const;
 
 const STATUS_DOT: Record<string, string> = {
   SCHEDULED: "bg-emerald-500",
@@ -51,6 +39,7 @@ const STATUS_DOT: Record<string, string> = {
 
 export default function PatientHeader() {
   const { user } = useAuth();
+  const t = useTranslations("nav");
   const pathname = usePathname();
   const router = useRouter();
   const [bellOpen, setBellOpen] = useState(false);
@@ -79,7 +68,7 @@ export default function PatientHeader() {
       style={{ top: "var(--imp-banner-h, 0px)" }}
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-        <Link href="/patient/dashboard" aria-label="DocOnClick home" className="tap-44-y flex items-center flex-shrink-0">
+        <Link href="/patient/dashboard" aria-label={t("header.home")} className="tap-44-y flex items-center flex-shrink-0">
           <Image src="/logo.png" alt="DocOnClick" width={431} height={102} className="h-7 sm:h-8 w-auto object-contain" />
         </Link>
 
@@ -87,7 +76,7 @@ export default function PatientHeader() {
             PatientMobileNav handles navigation (tablet portrait can't fit
             the full row without overflowing the header off-screen). */}
         <nav className="hidden lg:flex items-center gap-1">
-          {NAV.map(({ href, label, icon: Icon }) => (
+          {NAV.map(({ href, label, ...rest }) => { const Icon = "icon" in rest ? rest.icon : null; return (
             <Link
               key={href}
               href={href}
@@ -97,19 +86,19 @@ export default function PatientHeader() {
               )}
             >
               {Icon && <Icon className="w-4 h-4" />}
-              {label}
+              {t(`patient.${label}`)}
             </Link>
-          ))}
+          ); })}
         </nav>
 
         <div className="flex items-center gap-3 flex-shrink-0">
           <span className="text-sm text-slate-500 hidden xl:inline">
-            Hi, <strong className="text-slate-800">{user?.name || "there"}</strong>
+            {t.rich("header.hi", { name: user?.name || t("header.there"), strong: (c) => <strong className="text-slate-800">{c}</strong> })}
           </span>
 
           <Link
             href="/patient/wallet"
-            aria-label={balance != null ? `Wallet, balance ₹${balance.toLocaleString("en-IN")}` : "Wallet"}
+            aria-label={balance != null ? t("header.walletBalance", { balance: balance.toLocaleString("en-IN") }) : t("header.wallet")}
             className="tap-44-y flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition-colors"
           >
             <WalletIcon className="w-3.5 h-3.5" />
@@ -119,8 +108,8 @@ export default function PatientHeader() {
           <div className="relative">
             <button
               onClick={toggleBell}
-              title="Notifications"
-              aria-label={hasUnseen ? "Notifications (new)" : "Notifications"}
+              title={t("header.notifications")}
+              aria-label={hasUnseen ? t("header.notificationsNew") : t("header.notifications")}
               className="tap-44 relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
             >
               <Bell className={cn("w-4 h-4", hasUnseen && "animate-bell-ring")} />
@@ -134,10 +123,10 @@ export default function PatientHeader() {
                 <div className="fixed inset-0 z-30" onClick={() => setBellOpen(false)} />
                 <div className="absolute right-0 top-full mt-2 w-80 max-w-[90vw] bg-white rounded-2xl border border-slate-100 shadow-xl z-40 overflow-hidden max-h-[28rem] overflow-y-auto">
                   <div className="px-4 py-3 border-b border-slate-100 sticky top-0 bg-white">
-                    <h3 className="text-sm font-bold text-slate-800">Appointment Updates</h3>
+                    <h3 className="text-sm font-bold text-slate-800">{t("header.appointmentUpdates")}</h3>
                   </div>
                   {notableAppointments.length === 0 ? (
-                    <p className="text-sm text-slate-400 text-center py-6">No updates yet.</p>
+                    <p className="text-sm text-slate-400 text-center py-6">{t("header.noUpdates")}</p>
                   ) : (
                     <div className="divide-y divide-slate-50">
                       {notableAppointments.slice(0, 5).map((a) => (
@@ -149,7 +138,7 @@ export default function PatientHeader() {
                           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[a.event] ?? "bg-slate-300"}`} />
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-slate-800 truncate">{formatProviderName(a.doctor.name, a.providerType)}</p>
-                            <p className="text-xs text-slate-400 mt-0.5">{STATUS_LABEL[a.event] ?? a.event} · {a.consultType}</p>
+                            <p className="text-xs text-slate-400 mt-0.5">{isOneOf(APPT_EVENTS, a.event) ? t(`apptEvent.${a.event}`) : a.event} · {a.consultType}</p>
                           </div>
                         </button>
                       ))}
@@ -157,24 +146,24 @@ export default function PatientHeader() {
                   )}
 
                   <div className="px-4 py-3 border-b border-t border-slate-100 sticky top-0 bg-white">
-                    <h3 className="text-sm font-bold text-slate-800">Wallet</h3>
+                    <h3 className="text-sm font-bold text-slate-800">{t("header.walletSection")}</h3>
                   </div>
                   {walletTransactions.length === 0 ? (
-                    <p className="text-sm text-slate-400 text-center py-6">No wallet activity yet.</p>
+                    <p className="text-sm text-slate-400 text-center py-6">{t("header.noWalletActivity")}</p>
                   ) : (
                     <div className="divide-y divide-slate-50">
-                      {walletTransactions.slice(0, 5).map((t) => (
+                      {walletTransactions.slice(0, 5).map((tx) => (
                         <button
-                          key={t.id}
+                          key={tx.id}
                           onClick={() => { setBellOpen(false); router.push("/patient/wallet"); }}
                           className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors flex items-center gap-2.5"
                         >
-                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${t.status === "FAILED" ? "bg-red-500" : "bg-emerald-500"}`} />
+                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${tx.status === "FAILED" ? "bg-red-500" : "bg-emerald-500"}`} />
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-slate-800 truncate">
-                              {t.status === "FAILED" ? "Top-up failed" : (WALLET_EVENT_LABEL[t.type] ?? t.type)}
+                              {tx.status === "FAILED" ? t("header.topUpFailed") : isOneOf(WALLET_EVENTS, tx.type) ? t(`walletEvent.${tx.type}`) : tx.type}
                             </p>
-                            <p className="text-xs text-slate-400 mt-0.5">₹{t.amount}{t.balanceAfter != null ? ` · Balance ₹${t.balanceAfter}` : ""}</p>
+                            <p className="text-xs text-slate-400 mt-0.5">{tx.balanceAfter != null ? t("header.walletAmountBalance", { amount: tx.amount, balance: tx.balanceAfter }) : t("header.walletAmount", { amount: tx.amount })}</p>
                           </div>
                         </button>
                       ))}
@@ -182,10 +171,10 @@ export default function PatientHeader() {
                   )}
 
                   <div className="px-4 py-3 border-b border-t border-slate-100 sticky top-0 bg-white">
-                    <h3 className="text-sm font-bold text-slate-800">Announcements</h3>
+                    <h3 className="text-sm font-bold text-slate-800">{t("header.announcements")}</h3>
                   </div>
                   {announcements.length === 0 ? (
-                    <p className="text-sm text-slate-400 text-center py-6">No announcements yet.</p>
+                    <p className="text-sm text-slate-400 text-center py-6">{t("header.noAnnouncements")}</p>
                   ) : (
                     <div className="divide-y divide-slate-50">
                       {announcements.slice(0, 5).map((a) => (
@@ -210,7 +199,7 @@ export default function PatientHeader() {
                     onClick={() => setBellOpen(false)}
                     className="block text-center text-xs font-semibold text-blue-600 hover:bg-blue-50 py-2.5 border-t border-slate-100"
                   >
-                    View all appointments
+                    {t("header.viewAllAppointments")}
                   </Link>
                 </div>
               </>

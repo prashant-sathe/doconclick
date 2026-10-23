@@ -69,7 +69,8 @@
     "test:dues": "tsx tests/dues-payments.ts",
     "test:time-off": "tsx tests/time-off.ts",
     "test:complete-consultation": "tsx tests/complete-consultation.ts",
-    "test:unpaid-journey": "tsx tests/unpaid-journey.ts"
+    "test:unpaid-journey": "tsx tests/unpaid-journey.ts",
+    "test:i18n": "tsx tests/i18n.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -115,6 +116,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^1.27.0",
     "next": "16.2.12",
+    "next-intl": "^4.14.9",
     "openai": "^7.5.0",
     "pg": "^8.22.0",
     "prisma": "^7.9.0",
@@ -124,6 +126,7 @@
     "react-easy-crop": "^6.2.3",
     "react-leaflet": "^5.0.0",
     "tailwind-merge": "^3.6.0",
+    "use-intl": "^4.14.9",
     "zod": "^4.6.7"
   },
   "devDependencies": {

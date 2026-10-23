@@ -202,24 +202,19 @@ export async function deleteAccount(userId: string, role: string) {
   };
 }
 
-const fmtIST = (d: Date) =>
-  d.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
-
 function notifyCancelled(a: Cancelled, name: string, role: string) {
   if (role === "PATIENT") {
     void sendPushToUser(a.doctorId, {
-      title: "Appointment cancelled",
-      body: `${name} closed their DocOnClick account, so their appointment on ${fmtIST(a.scheduledAt)} was cancelled.`,
+      key: "apptCancelledPatientDeleted",
+      values: { patient: name, when: a.scheduledAt },
       url: a.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
     });
     return;
   }
   const who = role === "NURSE" ? name : `Dr. ${name}`;
   void sendPushToUser(a.patientId, {
-    title: "Appointment cancelled",
-    body: a.refund > 0
-      ? `${who} is no longer on DocOnClick, so your appointment on ${fmtIST(a.scheduledAt)} was cancelled. ₹${a.refund} was refunded to your wallet — please book again.`
-      : `${who} is no longer on DocOnClick, so your appointment on ${fmtIST(a.scheduledAt)} was cancelled. Please book again.`,
+    key: "apptCancelledProviderDeleted",
+    values: { provider: who, when: a.scheduledAt, refunded: a.refund > 0 ? "yes" : "no", amount: a.refund },
     url: "/patient/appointments",
   });
 }

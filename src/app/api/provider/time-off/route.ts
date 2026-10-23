@@ -53,6 +53,7 @@ export async function POST(req: Request) {
     end: range.end,
     confirmBookingIds,
     describe: `on leave ${rangeLabel(range.startDate, range.endDate)}`,
+    leave: { start: range.start, end: range.end, sameDay: range.startDate === range.endDate },
     write: (tx) => tx.providerTimeOff.create({ data: { providerId: authUser.id, startDate: range.startDate, endDate: range.endDate, reason } }),
   });
   if (out instanceof NextResponse) return out;

@@ -5,18 +5,20 @@ import { usePathname } from "next/navigation";
 import { MapPin, CalendarCheck2, UserCircle, Bookmark, Sparkles, HeartPulse } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { computeCompleteness } from "@/lib/profileCompleteness";
+import { useTranslations } from "next-intl";
 
 const TABS = [
-  { href: "/patient/dashboard", label: "Doctors", icon: MapPin },
-  { href: "/patient/nurse", label: "Nurse", icon: HeartPulse },
-  { href: "/patient/assistant", label: "Assistant", icon: Sparkles },
-  { href: "/patient/appointments", label: "Appointments", icon: CalendarCheck2 },
-  { href: "/patient/saved", label: "Saved", icon: Bookmark },
-  { href: "/patient/profile", label: "Profile", icon: UserCircle },
-];
+  { href: "/patient/dashboard", label: "tabDoctors", icon: MapPin },
+  { href: "/patient/nurse", label: "tabNurse", icon: HeartPulse },
+  { href: "/patient/assistant", label: "tabAssistant", icon: Sparkles },
+  { href: "/patient/appointments", label: "appointments", icon: CalendarCheck2 },
+  { href: "/patient/saved", label: "saved", icon: Bookmark },
+  { href: "/patient/profile", label: "profile", icon: UserCircle },
+] as const;
 
 export default function PatientMobileNav() {
   const pathname = usePathname();
+  const t = useTranslations("nav.patient");
   const [profileIncomplete, setProfileIncomplete] = useState(false);
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export default function PatientMobileNav() {
                 <span className="absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-red-500 border border-white" />
               )}
             </span>
-            {label}
+            {t(label)}
           </Link>
         );
       })}

@@ -54,12 +54,11 @@ export async function sendPayReminder(appt: Appt, providerName: string, reason: 
     return { sent: false, at: row?.payReminderSentAt ?? null, amount };
   }
   const who = formatProviderName(providerName, appt.providerType);
-  const what = appt.providerType === "NURSE" ? `${appt.serviceName ?? "home"} visit` : "home visit";
+  // "{service} visit" for a nurse's named service, else "home visit".
+  const service = appt.providerType === "NURSE" ? appt.serviceName ?? "" : "";
   void sendPushToUser(appt.patientId, {
-    title: "Payment pending for your visit",
-    body: reason === "leaving"
-      ? `${who} is about to leave for your ${what}. Please pay ₹${amount} now so the visit can go ahead.`
-      : `Please pay ₹${amount} for your ${what} with ${who} — it's confirmed, and payment is the last step.`,
+    key: reason === "leaving" ? "payReminderLeaving" : "payReminderManual",
+    values: { provider: who, amount, hasService: service ? "yes" : "no", service },
     url: `/patient/payment?apptId=${appt.id}`,
   });
   return { sent: true, at: now, amount };

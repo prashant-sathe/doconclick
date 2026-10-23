@@ -302,10 +302,8 @@ export function notifySettlement(result: SettleResult) {
 
   if (credited) {
     void sendPushToUser(patientId, {
-      title: "Payment credited to wallet",
-      body: paid.length > 0
-        ? `Part of your payment couldn't be applied, so ₹${credited.amount} was credited to your wallet. New balance ₹${credited.balance}.`
-        : `Your payment couldn't be applied to the appointment, so ₹${credited.amount} was credited to your wallet. New balance ₹${credited.balance}.`,
+      key: paid.length > 0 ? "paymentPartlyCredited" : "paymentCredited",
+      values: { amount: credited.amount, balance: credited.balance },
       url: "/patient/wallet",
     });
   }
@@ -313,12 +311,13 @@ export function notifySettlement(result: SettleResult) {
   const first = paid[0];
   if (first) {
     void sendPushToUser(first.doctorId, {
-      title: "Payment received",
-      body: first.providerType === "NURSE"
-        ? paid.length > 1
-          ? `${first.patientName} paid for all ${paid.length} ${first.serviceName ?? "home"} visits.`
-          : `${first.patientName} paid for the ${first.serviceName ?? "home"} visit — you can complete it once you're done.`
-        : `Payment received for your consultation with ${first.patientName}.`,
+      key: first.providerType === "NURSE" ? "paymentReceivedNurse" : "paymentReceivedDoctor",
+      values: {
+        patient: first.patientName,
+        count: paid.length,
+        hasService: first.serviceName ? "yes" : "no",
+        service: first.serviceName ?? "",
+      },
       url: first.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
     });
   }

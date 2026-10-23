@@ -1,28 +1,45 @@
-// The language of the page for <html lang> (BUG-TRACKER #63) — what screen
-// readers pick a voice by, and what browsers' translate offers start from.
-// The UI is written in English (en-IN) today, so that's the default; a saved
-// preference (cookie `doconclick_lang`) switches it, for pages that are
-// translated. It's deliberately not taken from the device/browser language:
-// English text read out with a Marathi voice is worse than the right label.
-//
-// Applied before first paint by HTML_LANG_SCRIPT in the root layout (no
-// cookies() there, which would make every page dynamic), and live by
-// setAppLanguage().
+// The app's language — UI and push texts (next-intl, src/i18n). One of
+// en-IN / hi-IN / mr-IN (Marathi and Hindi in Devanagari). Stored on
+// User.language (pushes read it there) and mirrored to the `doconclick_lang`
+// cookie, which the server renders each page in (src/i18n/request.ts). It's
+// deliberately not taken from the device/browser language — a new user
+// starts in English and picks theirs in Profile (or on the sign-in page).
 
 export const APP_LANGUAGES = ["en-IN", "hi-IN", "mr-IN"] as const;
 export type AppLanguage = (typeof APP_LANGUAGES)[number];
 export const DEFAULT_APP_LANGUAGE: AppLanguage = "en-IN";
 export const APP_LANGUAGE_COOKIE = "doconclick_lang";
 
+/** Each language in its own script — how a user recognises theirs. */
+export const APP_LANGUAGE_LABELS: Record<AppLanguage, string> = {
+  "en-IN": "English",
+  "hi-IN": "हिन्दी",
+  "mr-IN": "मराठी",
+};
+
 export function isAppLanguage(v: unknown): v is AppLanguage {
   return typeof v === "string" && (APP_LANGUAGES as readonly string[]).includes(v);
 }
 
-/** Saves the preference and updates <html lang> right away. */
-export function setAppLanguage(lang: AppLanguage) {
+/** The cookie's value in a document.cookie / Cookie header string. */
+export function languageFromCookieHeader(cookieHeader: string | null | undefined): AppLanguage | null {
+  const m = (cookieHeader ?? "").match(new RegExp(`(?:^|; )${APP_LANGUAGE_COOKIE}=([^;]+)`));
+  const v = m ? decodeURIComponent(m[1]) : null;
+  return isAppLanguage(v) ? v : null;
+}
+
+/** Client: saves the cookie and updates <html lang>; re-render with router.refresh(). */
+export function setLanguageCookie(lang: AppLanguage) {
   document.cookie = `${APP_LANGUAGE_COOKIE}=${lang}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
   document.documentElement.lang = lang;
 }
 
-/** Inline <head> script: the saved language (if it's one we support) before the page paints. */
-export const HTML_LANG_SCRIPT = `(function(){try{var m=document.cookie.match(/(?:^|; )${APP_LANGUAGE_COOKIE}=([^;]+)/);var l=m&&decodeURIComponent(m[1]);if(${JSON.stringify(APP_LANGUAGES)}.indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}})();`;
+/**
+ * The locale to format dates/numbers with. Marathi's default numbering is
+ * Devanagari digits (३:०० PM) — but amounts, mobiles and slot times are in
+ * Latin digits everywhere else in the app, as in most Marathi consumer apps,
+ * so Marathi formats with Latin digits too. Hindi's default already is.
+ */
+export function formattingLocale(lang: string): string {
+  return lang === "mr-IN" ? "mr-IN-u-nu-latn" : lang;
+}

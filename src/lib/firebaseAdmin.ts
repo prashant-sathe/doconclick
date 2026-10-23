@@ -1,6 +1,9 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getMessaging } from "firebase-admin/messaging";
+import { createTranslator } from "use-intl/core";
 import { prisma } from "@/lib/prisma";
+import { loadMessages, type Messages } from "@/i18n/messages";
+import { DEFAULT_APP_LANGUAGE, isAppLanguage, formattingLocale, type AppLanguage } from "@/lib/appLanguage";
 
 function getMessagingClient() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -22,11 +25,48 @@ function getMessagingClient() {
 // FCM caps sendEachForMulticast at 500 tokens per call.
 const FCM_BATCH_SIZE = 500;
 
-export async function sendPushToUsers(
-  userIds: string[],
-  payload: { title: string; body: string; url: string }
-): Promise<void> {
+// A push is either fixed text, or a message key in messages/<locale>/push.json
+// (`key.title` + `key.body`, ICU, with `values`) — built in each recipient's
+// own User.language. Values may themselves be push keys' sub-messages: pass
+// `parts: { name: "push.some.part" }` to translate a fragment per language and
+// interpolate it as {name}.
+type PushKey = keyof Messages["push"];
+type PushValues = Record<string, string | number | Date>;
+export type PushPayload =
+  | { title: string; body: string; url: string }
+  | { key: PushKey; values?: PushValues; parts?: Record<string, { key: string; values?: PushValues } | null>; url: string };
+
+async function textFor(payload: Extract<PushPayload, { key: PushKey }>, locale: AppLanguage) {
+  const messages = await loadMessages(locale);
+  // Messages are looked up by `messages`; `locale` here only drives formatting.
+  const t = createTranslator({ locale: formattingLocale(locale) as AppLanguage, messages, namespace: "push", timeZone: "Asia/Kolkata" });
+  const tr = t as unknown as (k: string, v?: PushValues) => string;
+  const parts: PushValues = {};
+  for (const [name, part] of Object.entries(payload.parts ?? {})) parts[name] = part ? tr(part.key, part.values) : "";
+  const values = { ...(payload.values ?? {}), ...parts };
+  return { title: tr(`${payload.key}.title`, values), body: tr(`${payload.key}.body`, values).replace(/\s+/g, " ").trim() };
+}
+
+export async function sendPushToUsers(userIds: string[], payload: PushPayload): Promise<void> {
   if (userIds.length === 0) return;
+  if ("key" in payload) {
+    try {
+      const users = await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, language: true } });
+      const byLang = new Map<AppLanguage, string[]>();
+      for (const u of users) {
+        const lang = isAppLanguage(u.language) ? u.language : DEFAULT_APP_LANGUAGE;
+        byLang.set(lang, [...(byLang.get(lang) ?? []), u.id]);
+      }
+      for (const [lang, ids] of byLang) await deliver(ids, { ...(await textFor(payload, lang)), url: payload.url });
+    } catch (err) {
+      console.error("sendPushToUsers (localized) failed:", err);
+    }
+    return;
+  }
+  return deliver(userIds, payload);
+}
+
+async function deliver(userIds: string[], payload: { title: string; body: string; url: string }): Promise<void> {
   try {
     const tokens = await prisma.pushToken.findMany({ where: { userId: { in: userIds } } });
     if (tokens.length === 0) return;
@@ -66,14 +106,11 @@ export async function sendPushToUsers(
   }
 }
 
-export function sendPushToUser(
-  userId: string,
-  payload: { title: string; body: string; url: string }
-): Promise<void> {
+export function sendPushToUser(userId: string, payload: PushPayload): Promise<void> {
   return sendPushToUsers([userId], payload);
 }
 
-export async function sendPushToAdmins(payload: { title: string; body: string; url: string }): Promise<void> {
+export async function sendPushToAdmins(payload: PushPayload): Promise<void> {
   const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { id: true } });
   return sendPushToUsers(admins.map((a) => a.id), payload);
 }

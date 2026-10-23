@@ -1,4 +1,5 @@
 "use client";
+import LanguageSwitch from "@/components/LanguageSwitch";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -197,6 +198,10 @@ export default function LoginPageClient() {
           <Link href="/" className="btn-ghost gap-1.5 text-sm">← Home</Link>
         </div>
       )}
+      {/* Before signing in: the choice is kept and adopted by the account. */}
+      <div className="fixed right-4 z-10" style={{ top: "calc(1rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}>
+        <LanguageSwitch compact />
+      </div>
       <Suspense fallback={<div className="text-slate-400">Loading…</div>}>
         <LoginForm />
       </Suspense>

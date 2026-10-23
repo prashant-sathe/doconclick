@@ -49,6 +49,8 @@ import { readPatientLocation, writePatientLocation } from "@/lib/patientLocation
 import { computeCompleteness } from "@/lib/profileCompleteness";
 import { useResync } from "@/hooks/useResync";
 import PullToRefresh from "@/components/PullToRefresh";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface DoctorProfile {
@@ -179,9 +181,9 @@ function makeMarkerTooltipHtml(opts: {
 
 // ── CONSULT TYPE OPTIONS ───────────────────────────────────────────────────
 const ALL_TYPES = [
-  { id: "HOME", label: "Home Visit", icon: Home },
-  { id: "CLINIC", label: "Clinic Visit", icon: Building2 },
-  { id: "VIDEO", label: "Video Consultation", icon: Video },
+  { id: "HOME", icon: Home },
+  { id: "CLINIC", icon: Building2 },
+  { id: "VIDEO", icon: Video },
 ];
 
 function defaultConsultType(doctor: Doctor | null | undefined): string {
@@ -305,6 +307,20 @@ function PatientDashboardInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { specialties, colorFor } = useSpecialties();
+  // Booking sheet strings (the map/list/doctor card aren't translated yet).
+  const tb = useTranslations("booking.dashboardSheet");
+  const tf = useTranslations("booking.form");
+  const tc = useTranslations("booking.common");
+  const locale = formattingLocale(useLocale());
+  const typeName = (id: string) => tc(`consultType.${id === "HOME" || id === "VIDEO" ? id : "CLINIC"}`);
+  const dayName = (d: string) =>
+    ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].includes(d) ? tc(`days.${d as "Mon"}`) : d;
+  const nextOpeningLabel = (next: { daysAhead: number; dayOfWeek: string; fromTime: string }) => {
+    const time = formatSlotTime(next.fromTime);
+    if (next.daysAhead === 0) return tf("openingToday", { time });
+    if (next.daysAhead === 1) return tf("openingTomorrow", { time });
+    return tf("openingOn", { day: dayName(next.dayOfWeek), time });
+  };
 
   // State
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -908,13 +924,13 @@ function PatientDashboardInner() {
     if (clinicBookingBlocked) {
       setBookingError(
         scheduleMode === "LATER"
-          ? "The clinic isn't open at the time you picked. Choose a time within the clinic's hours."
-          : "This clinic is closed right now. Switch to Schedule Later and pick a time when it's open."
+          ? tf("errorClinicClosedLater")
+          : tf("errorClinicClosedNow")
       );
       return;
     }
     if (scheduleMode === "LATER" && scheduledAt && new Date(scheduledAt).getTime() <= new Date().getTime()) {
-      setBookingError("Please pick a time in the future.");
+      setBookingError(tf("errorFutureTime"));
       return;
     }
     setBookingError("");
@@ -956,7 +972,7 @@ function PatientDashboardInner() {
     if (res.ok) setBooked({ id: data.id, fee });
     else if (data.code === "TERMS_REQUIRED") requireTerms(() => setConfirmBookingOpen(true));
     else if (data.code === "PROFILE_INCOMPLETE") profileGate.open(data.missing, () => setConfirmBookingOpen(true));
-    else setBookingError(data.error ?? "Booking failed. Please try again.");
+    else setBookingError(data.error ?? tf("errorBookingFailed"));
   };
 
   const fee = feeForConsultType(selectedDoctor?.doctorProfile, consultType);
@@ -1304,7 +1320,7 @@ function PatientDashboardInner() {
             </div>
 
             {/* Close */}
-            <button aria-label="Close"
+            <button aria-label={tc("close")}
               onClick={() => { setPanelOpen(false); setBookingOpen(false); }}
               className="tap-44 absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 transition-colors"
             >
@@ -1319,35 +1335,33 @@ function PatientDashboardInner() {
                     <Clock className="w-9 h-9 text-amber-500" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-extrabold text-slate-900">Request Sent!</h3>
+                    <h3 className="text-xl font-extrabold text-slate-900">{tf("requestSent")}</h3>
                     <p className="text-slate-500 text-sm mt-1">
-                      Waiting for {formatDoctorName(selectedDoctor.name)} to confirm your {consultType === "HOME" ? "home visit" : "appointment"}.
+                      {tb("waitingFor", { doctor: formatDoctorName(selectedDoctor.name), type: consultType === "HOME" ? "HOME" : "OTHER" })}
                     </p>
-                    <p className="text-xs text-slate-400 font-mono mt-2">ID: {booked.id.slice(0, 14)}…</p>
+                    <p className="text-xs text-slate-400 font-mono mt-2">{tb("idShort", { id: booked.id.slice(0, 14) })}</p>
                   </div>
                   <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 w-full">
-                    {booked.fee === 0
-                      ? "This consultation is free — nothing to pay. You'll be notified once it's accepted."
-                      : <>You&apos;ll be notified once accepted — pay online from My Appointments after that.</>}
+                    {booked.fee === 0 ? tf("freeNotice") : tf("payLaterNotice")}
                   </div>
                   <button
                     onClick={() => router.push("/patient/appointments")}
                     className="btn-secondary w-full justify-center py-3"
                   >
-                    View My Appointments
+                    {tc("viewMyAppointments")}
                   </button>
                 </div>
               ) : bookingOpen ? (
                 /* ── BOOKING FORM ──────────────────────────────────── */
                 <div className="pb-6">
-                  <h3 className="text-lg font-extrabold text-slate-900 mb-1">Confirm Booking</h3>
+                  <h3 className="text-lg font-extrabold text-slate-900 mb-1">{tb("title")}</h3>
                   <p className="text-sm text-slate-500 mb-4">
                     {formatDoctorName(selectedDoctor.name)} · {selectedDoctor.doctorProfile.specialty}
                   </p>
 
                   {/* Consult type */}
                   <div className={`grid gap-2 mb-4 ${availableTypes.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
-                    {availableTypes.map(({ id, label, icon: Icon }) => (
+                    {availableTypes.map(({ id, icon: Icon }) => (
                       <button
                         key={id}
                         type="button"
@@ -1359,7 +1373,7 @@ function PatientDashboardInner() {
                         }`}
                       >
                         <Icon className="w-4 h-4" />
-                        {label}
+                        {typeName(id)}
                       </button>
                     ))}
                   </div>
@@ -1369,11 +1383,11 @@ function PatientDashboardInner() {
                     <IndianRupee className="w-4 h-4 text-blue-600" />
                     <span className="text-sm font-bold text-blue-700">{fee}</span>
                     <span className="text-xs text-blue-500">
-                      {consultType === "HOME" ? "Home Visit Fee" : consultType === "CLINIC" ? "Clinic Consultation Fee" : "Video Consultation Fee"}
+                      {consultType === "HOME" ? tb("feeHome") : consultType === "CLINIC" ? tb("feeClinic") : tb("feeVideo")}
                     </span>
                     {consultType === "HOME" && eta != null && (
                       <span className="text-xs text-blue-600 font-semibold ml-auto flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" /> Arrives in ~{eta} min
+                        <Clock className="w-3.5 h-3.5" /> {tf("arrivesIn", { min: eta })}
                       </span>
                     )}
                   </div>
@@ -1384,10 +1398,10 @@ function PatientDashboardInner() {
                       <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-semibold text-red-800">
-                          {formatDoctorName(selectedDoctor.name)} is {homeVisitDistanceKm?.toFixed(1)} km away — too far for a home visit right now.
+                          {tf("homeTooFar", { doctor: formatDoctorName(selectedDoctor.name), km: homeVisitDistanceKm?.toFixed(1) ?? "" })}
                         </p>
                         <p className="text-xs text-red-700 mt-0.5">
-                          They only offer home visits within {homeVisitRadiusKm} km. Try Clinic Visit or Video Consultation instead.
+                          {tf("homeRadius", { radius: homeVisitRadiusKm ?? 0 })}
                         </p>
                       </div>
                     </div>
@@ -1398,7 +1412,7 @@ function PatientDashboardInner() {
                     <div className="mb-4">
                       {selectedDoctor.clinics.length > 1 && (
                         <div className="mb-2">
-                          <label className="input-label">Choose Clinic</label>
+                          <label className="input-label">{tf("chooseClinic")}</label>
                           <select
                             className="input-field"
                             value={selectedClinicId ?? ""}
@@ -1406,7 +1420,9 @@ function PatientDashboardInner() {
                           >
                             {selectedDoctor.clinics.map((c) => (
                               <option key={c.id} value={c.id}>
-                                {c.name} — {isClinicOpenNow(c.slots, effectiveBookingTime) ? "Open" : "Closed"} {scheduleMode === "LATER" ? "at that time" : "now"}
+                                {isClinicOpenNow(c.slots, effectiveBookingTime)
+                                  ? tf(scheduleMode === "LATER" ? "clinicOpenThen" : "clinicOpenNow", { name: c.name })
+                                  : tf(scheduleMode === "LATER" ? "clinicClosedThen" : "clinicClosedNow", { name: c.name })}
                               </option>
                             ))}
                           </select>
@@ -1428,12 +1444,12 @@ function PatientDashboardInner() {
                         return (
                           <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 mb-2">
                             <p className="text-xs font-semibold text-slate-600 flex items-center gap-1.5 mb-1.5">
-                              <Clock className="w-3.5 h-3.5 text-slate-400" /> Clinic hours
+                              <Clock className="w-3.5 h-3.5 text-slate-400" /> {tf("clinicHours")}
                             </p>
                             <ul className="space-y-0.5">
                               {hours.map((h) => (
                                 <li key={h.dayOfWeek} className="text-xs text-slate-600 flex justify-between gap-3">
-                                  <span className="font-medium text-slate-500">{h.label}</span>
+                                  <span className="font-medium text-slate-500">{dayName(h.dayOfWeek)}</span>
                                   <span className="text-right">{h.ranges.join(", ")}</span>
                                 </li>
                               ))}
@@ -1452,24 +1468,24 @@ function PatientDashboardInner() {
                             <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                             <div className="min-w-0 flex-1">
                               <p className="text-xs font-semibold text-red-800">
-                                Not available at this clinic {scheduleMode === "LATER" ? "at the selected time" : "right now"} — booking is disabled here.
+                                {tf(scheduleMode === "LATER" ? "notAvailableHereLater" : "notAvailableHereNow")}
                               </p>
                               {openClinic ? (
                                 <>
                                   <p className="text-xs text-red-700 mt-0.5">
-                                    {scheduleMode === "LATER" ? "Available at that time" : "Currently available"} at {openClinic.name} — {openClinic.address}
+                                    {tb(scheduleMode === "LATER" ? "availableAtLater" : "availableAtNow", { clinic: openClinic.name, address: openClinic.address })}
                                   </p>
                                   <button
                                     type="button"
                                     onClick={() => setSelectedClinicId(openClinic.id)}
                                     className="text-xs font-bold text-red-800 underline mt-1"
                                   >
-                                    Switch &amp; book here instead
+                                    {tb("switchHere")}
                                   </button>
                                 </>
                               ) : (
                                 <p className="text-xs text-red-700 mt-0.5">
-                                  No clinic is available {scheduleMode === "LATER" ? "at the selected time" : "right now"} — please pick a different time or clinic.
+                                  {tf(scheduleMode === "LATER" ? "noClinicLater" : "noClinicNow")}
                                 </p>
                               )}
 
@@ -1479,7 +1495,7 @@ function PatientDashboardInner() {
                                 if (!nextHere) return null;
                                 return (
                                   <p className="text-xs text-red-700 mt-1.5 pt-1.5 border-t border-red-200">
-                                    Want an appointment at {selectedClinic.name}?{" "}
+                                    {tf("wantAppointmentAt", { clinic: selectedClinic.name })}{" "}
                                     <button
                                       type="button"
                                       onClick={() => {
@@ -1488,7 +1504,7 @@ function PatientDashboardInner() {
                                       }}
                                       className="font-bold text-red-800 underline"
                                     >
-                                      Schedule it for {formatNextOpeningText(nextHere)}
+                                      {tf("scheduleItFor", { when: nextOpeningLabel(nextHere) })}
                                     </button>
                                   </p>
                                 );
@@ -1501,16 +1517,16 @@ function PatientDashboardInner() {
                   )}
 
                   {/* Now vs Schedule later */}
-                  <label className="input-label mb-2 block">When?</label>
+                  <label className="input-label mb-2 block">{tf("when")}</label>
                   <ProviderAwayNotice provider={selectedDoctor} />
                   <div className="grid grid-cols-2 gap-2 mb-3">
                     <button type="button" onClick={() => setScheduleMode("NOW")} disabled={!!selectedDoctor?.awayNow}
                       className={`min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed ${scheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
-                      Book Now
+                      {tf("bookNow")}
                     </button>
                     <button type="button" onClick={() => setScheduleMode("LATER")}
                       className={`min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${scheduleMode === "LATER" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
-                      <CalendarClock className="w-3.5 h-3.5" /> Schedule Later
+                      <CalendarClock className="w-3.5 h-3.5" /> {tf("scheduleLater")}
                     </button>
                   </div>
                   {scheduleMode === "LATER" && (
@@ -1535,12 +1551,12 @@ function PatientDashboardInner() {
                   )}
 
                   {/* Who is this for */}
-                  <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />Who is this for?</label>
+                  <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />{tf("whoFor")}</label>
                   <div className="grid grid-cols-4 gap-2 mb-3">
                     {RELATIONS.map((r) => (
                       <button key={r} type="button" onClick={() => { setRelation(r); setDependentId(null); }}
                         className={`min-h-11 py-2 rounded-xl border text-xs font-semibold transition-all ${relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500"}`}>
-                        {r}
+                        {tc(`relation.${r}`)}
                       </button>
                     ))}
                   </div>
@@ -1551,21 +1567,21 @@ function PatientDashboardInner() {
                   )}
 
                   {/* Symptoms */}
-                  <label className="input-label">Symptoms / Reason</label>
+                  <label className="input-label">{tf("symptoms")}</label>
                   <textarea
                     rows={3}
                     className="input-field resize-none mb-4"
-                    placeholder="Describe your symptoms briefly…"
+                    placeholder={tf("symptomsPlaceholder")}
                     value={symptoms}
                     onChange={(e) => setSymptoms(e.target.value)}
                   />
 
                   {/* Allergies */}
-                  <label className="input-label"><AlertTriangle className="inline w-3.5 h-3.5 mr-1 text-amber-500" />Any Known Allergies?</label>
+                  <label className="input-label"><AlertTriangle className="inline w-3.5 h-3.5 mr-1 text-amber-500" />{tf("allergies")}</label>
                   <textarea
                     rows={2}
                     className="input-field resize-none mb-4"
-                    placeholder="e.g. Penicillin, Sulfa drugs — leave blank if none"
+                    placeholder={tf("allergiesPlaceholder")}
                     value={allergies}
                     onChange={(e) => setAllergies(e.target.value)}
                   />
@@ -1576,7 +1592,7 @@ function PatientDashboardInner() {
                       className="w-4 h-4 mt-0.5 accent-blue-500 flex-shrink-0" />
                     <span className="text-xs text-slate-600 flex items-start gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
-                      I confirm the information above is accurate and I consent to this doctor accessing my medical profile and treating me for this consultation.
+                      {tf("consent")}
                     </span>
                   </label>
 
@@ -1588,14 +1604,14 @@ function PatientDashboardInner() {
                       onClick={() => setBookingOpen(false)}
                       className="btn-secondary flex-1 justify-center py-3"
                     >
-                      Back
+                      {tc("back")}
                     </button>
                     <button
                       onClick={submitBooking}
                       disabled={booking || !symptoms.trim() || !consentGiven || (scheduleMode === "LATER" && !scheduledAt) || (relation !== "Self" && !dependentId) || clinicBookingBlocked || homeVisitBlocked}
                       className="btn-primary flex-1 justify-center py-3"
                     >
-                      {booking ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : `Confirm ₹${fee}`}
+                      {booking ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("booking")}</> : tb("confirmFee", { fee })}
                     </button>
                   </div>
                 </div>
@@ -1851,7 +1867,7 @@ function PatientDashboardInner() {
                             disabled={!clinicAvailable}
                             className={cn(baseClass, classFor(clinicAvailable))}
                           >
-                            <Building2 className="w-4 h-4" /> Book Clinic Visit
+                            <Building2 className="w-4 h-4" /> {tb("bookClinic")}
                           </button>
                         )}
                         {offersVideo && (
@@ -1860,7 +1876,7 @@ function PatientDashboardInner() {
                             onClick={() => { setConsultType("VIDEO"); setScheduleMode("NOW"); setScheduledAt(""); setBookingOpen(true); }}
                             className={cn(baseClass, availableClass)}
                           >
-                            <Video className="w-4 h-4" /> Book Video Consultation
+                            <Video className="w-4 h-4" /> {tb("bookVideo")}
                           </button>
                         )}
                         {offersHome && (
@@ -1870,7 +1886,7 @@ function PatientDashboardInner() {
                             disabled={!homeAvailable}
                             className={cn(baseClass, classFor(homeAvailable))}
                           >
-                            <Home className="w-4 h-4" /> Book Home Visit
+                            <Home className="w-4 h-4" /> {tb("bookHome")}
                           </button>
                         )}
                       </div>
@@ -1888,40 +1904,40 @@ function PatientDashboardInner() {
         <ConfirmDialog
           icon={CalendarCheck2}
           tone="primary"
-          title="Confirm this booking?"
-          confirmLabel={`Confirm (₹${fee})`}
-          busyLabel="Booking…"
-          cancelLabel="Go back"
+          title={tf("confirmTitle")}
+          confirmLabel={tf("confirmWithFee", { fee })}
+          busyLabel={tc("booking")}
+          cancelLabel={tf("goBack")}
           busy={booking}
           onCancel={() => setConfirmBookingOpen(false)}
           onConfirm={confirmAndBook}
           message={
             <div className="space-y-1.5">
               <div className="flex justify-between gap-3">
-                <span>Doctor</span>
+                <span>{tc("doctor")}</span>
                 <span className="font-semibold text-slate-700 text-right">{formatDoctorName(selectedDoctor.name)}</span>
               </div>
               <div className="flex justify-between gap-3">
-                <span>Consultation</span>
-                <span className="font-semibold text-slate-700 text-right">{ALL_TYPES.find((t) => t.id === consultType)?.label}</span>
+                <span>{tc("consultation")}</span>
+                <span className="font-semibold text-slate-700 text-right">{typeName(consultType)}</span>
               </div>
               {consultType === "CLINIC" && selectedClinic && (
                 <div className="flex justify-between gap-3">
-                  <span>Clinic</span>
+                  <span>{tc("clinic")}</span>
                   <span className="font-semibold text-slate-700 text-right">{selectedClinic.name}</span>
                 </div>
               )}
               <div className="flex justify-between gap-3">
-                <span>When</span>
+                <span>{tc("when")}</span>
                 <span className="font-semibold text-slate-700 text-right">
                   {scheduleMode === "LATER" && scheduledAt
-                    ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })
-                    : "Now"}
+                    ? new Date(scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })
+                    : tc("now")}
                 </span>
               </div>
               <div className="flex justify-between gap-3">
-                <span>Payment</span>
-                <span className="font-semibold text-slate-700 text-right">Online, after the doctor accepts</span>
+                <span>{tc("payment")}</span>
+                <span className="font-semibold text-slate-700 text-right">{tf("paymentAfterAccept")}</span>
               </div>
             </div>
           }

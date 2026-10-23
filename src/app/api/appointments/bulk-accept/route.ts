@@ -60,8 +60,8 @@ export async function POST() {
   const free = await settleIfFreeOnAccept(accepted);
   for (const a of accepted) {
     void sendPushToUser(a.patientId, {
-      title: "Appointment confirmed!",
-      body: `${doctorName} accepted your request.${free.has(a.id) ? " Nothing to pay — you're all set." : ""}`,
+      key: "apptConfirmed",
+      values: { doctor: doctorName, free: free.has(a.id) ? "yes" : "no" },
       url: "/patient/appointments",
     });
   }

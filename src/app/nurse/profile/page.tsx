@@ -1,4 +1,5 @@
 "use client";
+import LanguageSwitch from "@/components/LanguageSwitch";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -502,6 +503,8 @@ function NurseProfileContent() {
           </div>
           <SaveRow {...locSaver} onSave={saveLocation} />
         </Section>
+
+        <LanguageSwitch />
 
         {/* Linked from the dashboard's online/offline card (#time-off). */}
         <Section title="Time off" icon={CalendarOff} id="time-off">

@@ -1,0 +1,8 @@
+{
+  "language": {
+    "title": "Language",
+    "hint": "App screens and notifications will be shown in this language.",
+    "saved": "Language changed.",
+    "failed": "Couldn't change the language. Please try again."
+  }
+}

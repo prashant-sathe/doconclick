@@ -301,8 +301,8 @@ export async function POST(req: Request) {
     });
 
     void sendPushToUser(doctorId, {
-      title: "New appointment request",
-      body: `${appointment.patientName ?? appointment.patient.name} requested a ${consultType.toLowerCase()} consultation.`,
+      key: "apptRequested",
+      values: { patient: appointment.patientName ?? appointment.patient.name, consultType },
       url: "/doctor/dashboard",
     });
 

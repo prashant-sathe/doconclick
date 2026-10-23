@@ -10,11 +10,12 @@ import { isUnpaidOnline, sendPayReminder, UNPAID_VISIT_CODE } from "@/lib/payRem
 // mistake or turned back.
 const VALID_STATUSES = ["NOT_STARTED", "ON_THE_WAY", "ARRIVED"];
 
-const TRAVEL_PUSH_COPY: Record<string, { title: (provider: string) => string; body: (name: string) => string }> = {
-  ON_THE_WAY: { title: (p) => `Your ${p} is on the way!`, body: (d) => `${d} has started the journey to you.` },
-  ARRIVED: { title: (p) => `Your ${p} has arrived!`, body: (d) => `${d} is here for your visit.` },
-  NOT_STARTED: { title: (p) => `Your ${p} has stopped the journey`, body: (d) => `${d} isn't on the way right now — they'll start again before your visit, or contact you.` },
-};
+// Patient push per travel status (messages/<locale>/push.json).
+const TRAVEL_PUSH_KEY = {
+  ON_THE_WAY: "travelOnTheWay",
+  ARRIVED: "travelArrived",
+  NOT_STARTED: "travelStopped",
+} as const;
 
 // A finite number (or numeric string) within ±max.
 const isCoord = (v: unknown, max: number) =>
@@ -107,11 +108,16 @@ export async function PATCH(
       return NextResponse.json({ error: "This visit just changed — refresh and try again." }, { status: 409 });
     }
     const updated = await prisma.appointment.findUniqueOrThrow({ where: { id } });
-    const copy = changed ? TRAVEL_PUSH_COPY[travelStatus] : undefined;
-    if (copy) {
+    const key = changed && travelStatus in TRAVEL_PUSH_KEY ? TRAVEL_PUSH_KEY[travelStatus as keyof typeof TRAVEL_PUSH_KEY] : undefined;
+    if (key) {
       void sendPushToUser(appointment.patientId, {
-        title: copy.title(appointment.providerType === "NURSE" ? "nurse" : "doctor"),
-        body: copy.body(authUser.name) + (unpaidDue != null && travelStatus === "ON_THE_WAY" ? ` Your ₹${unpaidDue} payment is still pending — please pay before they arrive.` : ""),
+        key,
+        values: {
+          providerType: appointment.providerType,
+          provider: authUser.name,
+          due: unpaidDue != null && travelStatus === "ON_THE_WAY" ? "yes" : "no",
+          amount: unpaidDue ?? 0,
+        },
         url: `/patient/track/${id}`,
       });
     }

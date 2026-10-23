@@ -11,9 +11,6 @@ import { formatProviderName } from "@/lib/utils";
 
 export const AWAY_HAS_BOOKINGS_CODE = "AWAY_HAS_BOOKINGS";
 
-const fmtWhen = (d: Date) =>
-  d.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
-
 /**
  * Shared by time off and "Go offline": the first call answers 409 with the
  * live bookings [start, end] would cancel; the provider confirms by sending
@@ -31,9 +28,11 @@ export async function goAway<T>(params: {
   confirmBookingIds: unknown;
   /** "on leave 3 Nov – 5 Nov" / "offline today" — for the patient's push. */
   describe: string;
+  /** Time off's IST day range, for the patient's (localized) push; absent = "offline today". */
+  leave?: { start: Date; end: Date; sameDay: boolean };
   write: (tx: Prisma.TransactionClient) => Promise<T>;
 }): Promise<NextResponse | { result: T; cancelled: number; refundTotal: number; kept: number }> {
-  const { provider, start, end, confirmBookingIds, describe, write } = params;
+  const { provider, start, end, confirmBookingIds, describe, leave, write } = params;
   const { affected, kept } = await bookingsDuring(provider.id, start, end);
   if (needsBookingConfirmation(affected, confirmBookingIds)) {
     return NextResponse.json(
@@ -73,19 +72,32 @@ export async function goAway<T>(params: {
   }
 
   const name = formatProviderName(provider.name, provider.role === "NURSE" ? "NURSE" : "DOCTOR");
+  // {away} reads "on leave 3 Nov – 5 Nov" / "not available for the rest of today".
+  const awayValues = {
+    provider: name,
+    away: leave ? "LEAVE" : "OFFLINE",
+    from: leave?.start ?? start,
+    to: leave?.end ?? end,
+    sameDay: leave?.sameDay ? "yes" : "no",
+  };
   for (const { cancelled, refund } of out.cancelled) {
     void sendPushToUser(cancelled.patientId, {
-      title: "Appointment cancelled",
-      body: `${name} is ${describe}, so your ${cancelled.serviceName ?? "appointment"} on ${fmtWhen(cancelled.scheduledAt)} was cancelled.`
-        + (refund > 0 ? ` ₹${refund} was refunded to your wallet.` : "")
-        + " Please book another time.",
+      key: "apptCancelledProviderAway",
+      values: {
+        ...awayValues,
+        hasService: cancelled.serviceName ? "yes" : "no",
+        service: cancelled.serviceName ?? "",
+        when: cancelled.scheduledAt,
+        refunded: refund > 0 ? "yes" : "no",
+        amount: refund,
+      },
       url: "/patient/appointments",
     });
   }
   for (const r of out.declined) {
     void sendPushToUser(r.patientId, {
-      title: "New time not available",
-      body: `${name} is ${describe}, so your visit stays on ${fmtWhen(r.scheduledAt)}.`,
+      key: "rescheduleDeclinedProviderAway",
+      values: { ...awayValues, when: r.scheduledAt },
       url: "/patient/appointments",
     });
   }

@@ -1,0 +1,66 @@
+{
+  "patient": {
+    "findDoctor": "Find a Doctor",
+    "bookNurse": "Book a Nurse",
+    "askAi": "Ask AI",
+    "appointments": "Appointments",
+    "saved": "Saved",
+    "profile": "Profile",
+    "tabDoctors": "Doctors",
+    "tabNurse": "Nurse",
+    "tabAssistant": "Assistant"
+  },
+  "doctor": {
+    "dashboard": "Dashboard",
+    "earnings": "Earnings",
+    "clinics": "Clinics",
+    "support": "Support",
+    "profile": "Profile",
+    "walkIn": "Walk-in"
+  },
+  "nurse": {
+    "visits": "Visits",
+    "earnings": "Earnings",
+    "profile": "Profile",
+    "visitRequests": "Visit requests"
+  },
+  "header": {
+    "hi": "Hi, <strong>{name}</strong>",
+    "there": "there",
+    "home": "DocOnClick home",
+    "wallet": "Wallet",
+    "walletBalance": "Wallet, balance ₹{balance}",
+    "notifications": "Notifications",
+    "notificationsNew": "Notifications (new)",
+    "signOut": "Sign out",
+    "appointmentUpdates": "Appointment Updates",
+    "noUpdates": "No updates yet.",
+    "walletSection": "Wallet",
+    "noWalletActivity": "No wallet activity yet.",
+    "topUpFailed": "Top-up failed",
+    "walletAmount": "₹{amount}",
+    "walletAmountBalance": "₹{amount} · Balance ₹{balance}",
+    "announcements": "Announcements",
+    "noAnnouncements": "No announcements yet.",
+    "viewAllAppointments": "View all appointments",
+    "pendingRequests": "Pending Requests",
+    "noPendingRequests": "No pending requests.",
+    "viewAllInDashboard": "View all in Dashboard"
+  },
+  "walletEvent": {
+    "TOPUP": "Wallet topped up",
+    "BOOKING_PAYMENT": "Wallet debited",
+    "ADMIN_CREDIT": "Credited by admin",
+    "ADMIN_DEBIT": "Debited by admin",
+    "REASSIGNMENT_CREDIT": "Cancelled appointment refunded"
+  },
+  "apptEvent": {
+    "SCHEDULED": "Confirmed",
+    "ON_THE_WAY": "On the way",
+    "ARRIVED": "Arrived",
+    "COMPLETED": "Completed",
+    "CANCELLED": "Cancelled",
+    "REJECTED": "Declined",
+    "EXPIRED": "Doctor was busy"
+  }
+}

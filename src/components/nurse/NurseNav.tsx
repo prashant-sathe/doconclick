@@ -7,17 +7,19 @@ import { useAuth } from "@/components/AuthProvider";
 import { cn, formatProviderName } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
 import NotificationToast from "@/components/doctor/NotificationToast";
+import { useTranslations } from "next-intl";
 
 const NAV = [
-  { href: "/nurse/dashboard", label: "Visits", icon: LayoutDashboard },
-  { href: "/nurse/earnings", label: "Earnings", icon: IndianRupee },
-  { href: "/nurse/profile", label: "Profile", icon: UserCircle },
-];
+  { href: "/nurse/dashboard", label: "visits", icon: LayoutDashboard },
+  { href: "/nurse/earnings", label: "earnings", icon: IndianRupee },
+  { href: "/nurse/profile", label: "profile", icon: UserCircle },
+] as const;
 
 // Same shell pattern as DoctorHeader/DoctorMobileNav: desktop nav from lg,
 // fixed bottom tab bar below that (pages use `pb-24 lg:pb-10`).
 export function NurseHeader() {
   const { user, logout } = useAuth();
+  const t = useTranslations("nav");
   const pathname = usePathname();
   const router = useRouter();
   // Same poll + toast + ringing alert doctors get — a request expires in
@@ -45,18 +47,18 @@ export function NurseHeader() {
               )}
             >
               <Icon className="w-4 h-4" />
-              {label}
+              {t(`nurse.${label}`)}
             </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-3 flex-shrink-0">
           <span className="text-sm text-slate-500 hidden xl:inline">
-            Hi, <strong className="text-slate-800">{user && formatProviderName(user.name, "NURSE")}</strong>
+            {user && t.rich("header.hi", { name: formatProviderName(user.name, "NURSE"), strong: (c) => <strong className="text-slate-800">{c}</strong> })}
           </span>
           <button
             onClick={() => { markSeen(); router.push("/nurse/dashboard"); }}
-            title="Visit requests"
+            title={t("nurse.visitRequests")}
             className="relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
           >
             <Bell className={cn("w-4 h-4", hasUnseen && "animate-bell-ring")} />
@@ -68,7 +70,7 @@ export function NurseHeader() {
           </button>
           <button
             onClick={logout}
-            title="Sign out"
+            title={t("header.signOut")}
             className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
           >
             <LogOut className="w-4 h-4" />
@@ -82,6 +84,7 @@ export function NurseHeader() {
 
 export function NurseMobileNav() {
   const pathname = usePathname();
+  const t = useTranslations("nav.nurse");
   return (
     <nav className="safe-bottom lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-xl border-t border-slate-200 flex items-stretch">
       {NAV.map(({ href, label, icon: Icon }) => (
@@ -94,7 +97,7 @@ export function NurseMobileNav() {
           )}
         >
           <Icon className="w-5 h-5" />
-          {label}
+          {t(label)}
         </Link>
       ))}
     </nav>

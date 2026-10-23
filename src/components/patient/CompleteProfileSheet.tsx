@@ -5,6 +5,7 @@ import { User, Calendar, X, Loader2, UserCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { patchPatientProfile } from "@/lib/usePatientProfile";
 import { nameError } from "@/lib/validation";
+import { useTranslations } from "next-intl";
 import { GENDERS, ageFromDob, isValidAge, missingProfileFields, type MissingProfileField } from "@/lib/bookingProfile";
 
 // Quick signup only asks for mobile + password, so the first booking is
@@ -73,6 +74,8 @@ function CompleteProfileSheet({
   onCancel: () => void;
   onSaved: () => void;
 }) {
+  const t = useTranslations("booking.completeProfile");
+  const tc = useTranslations("booking.common");
   const needName = missing.includes("name");
   const needAge = missing.includes("age");
   const needGender = missing.includes("gender");
@@ -93,10 +96,10 @@ function CompleteProfileSheet({
       if (err) { setError(err); return; }
     }
     if (needAge && (!dob || new Date(dob) > new Date() || !isValidAge(age))) {
-      setError("Enter a valid date of birth.");
+      setError(t("errorDob"));
       return;
     }
-    if (needGender && !gender) { setError("Select a gender."); return; }
+    if (needGender && !gender) { setError(t("errorGender")); return; }
 
     setSaving(true);
     try {
@@ -106,7 +109,7 @@ function CompleteProfileSheet({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name: name.trim() }),
         });
-        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? "Could not save your name.");
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? t("errorName"));
       }
       if (needAge || needGender) {
         await patchPatientProfile({
@@ -116,7 +119,7 @@ function CompleteProfileSheet({
       }
       onSaved();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save. Please try again.");
+      setError(err instanceof Error ? err.message : t("errorSave"));
       setSaving(false);
     }
   };
@@ -131,31 +134,31 @@ function CompleteProfileSheet({
         <div className="flex items-start justify-between gap-3 mb-1">
           <div className="flex items-center gap-2">
             <UserCheck className="w-5 h-5 text-blue-600" />
-            <h3 className="font-extrabold text-slate-900">Complete your profile</h3>
+            <h3 className="font-extrabold text-slate-900">{t("title")}</h3>
           </div>
-          <button aria-label="Close" type="button" onClick={onCancel} disabled={saving} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 flex-shrink-0">
+          <button aria-label={tc("close")} type="button" onClick={onCancel} disabled={saving} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-sm text-slate-500 mb-5">The doctor needs these details for your consultation. You only have to do this once.</p>
+        <p className="text-sm text-slate-500 mb-5">{t("intro")}</p>
 
         <div className="space-y-4">
           {needName && (
             <div>
-              <label className="input-label"><User className="inline w-3.5 h-3.5 mr-1" />Full Name</label>
-              <input autoFocus autoComplete="name" className="input-field" placeholder="John Doe" value={name} onChange={(e) => { setName(e.target.value); setError(""); }} />
+              <label className="input-label"><User className="inline w-3.5 h-3.5 mr-1" />{t("fullName")}</label>
+              <input autoFocus autoComplete="name" className="input-field" placeholder={t("namePlaceholder")} value={name} onChange={(e) => { setName(e.target.value); setError(""); }} />
             </div>
           )}
           {needAge && (
             <div>
-              <label className="input-label"><Calendar className="inline w-3.5 h-3.5 mr-1" />Date of Birth</label>
+              <label className="input-label"><Calendar className="inline w-3.5 h-3.5 mr-1" />{t("dob")}</label>
               <input type="date" max={new Date().toISOString().slice(0, 10)} className="input-field" value={dob} onChange={(e) => { setDob(e.target.value); setError(""); }} />
-              {age != null && isValidAge(age) && <p className="text-xs text-slate-400 mt-1">Age: {age} years</p>}
+              {age != null && isValidAge(age) && <p className="text-xs text-slate-400 mt-1">{t("age", { age })}</p>}
             </div>
           )}
           {needGender && (
             <div>
-              <label className="input-label">Gender</label>
+              <label className="input-label">{t("gender")}</label>
               <div className="grid grid-cols-3 gap-2">
                 {GENDERS.map((g) => (
                   <button
@@ -164,7 +167,7 @@ function CompleteProfileSheet({
                     onClick={() => { setGender(g); setError(""); }}
                     className={`min-h-11 py-2.5 rounded-xl border text-sm font-semibold transition-all ${gender === g ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"}`}
                   >
-                    {g}
+                    {tc(`gender.${g}`)}
                   </button>
                 ))}
               </div>
@@ -175,7 +178,7 @@ function CompleteProfileSheet({
         {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mt-4">{error}</div>}
 
         <button type="submit" disabled={saving} className="btn-primary w-full justify-center py-3 mt-5">
-          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : "Save & Continue"}
+          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("saving")}</> : t("saveContinue")}
         </button>
       </form>
     </div>,

@@ -7,11 +7,11 @@ import { deleteAccount, DeletionBlockedError, accountDeletionPreview } from "@/l
 import { accountImpact, impactConfirmationResponse, resolveProviderBookings } from "@/lib/accountImpact";
 import { nurseApprovalChecklist } from "@/lib/nurseApproval";
 
-const STATUS_PUSH_COPY: Record<string, { title: string; body: string }> = {
-  APPROVED: { title: "Application approved", body: "Your nurse application has been approved — patients can now book you." },
-  REJECTED: { title: "Application not approved", body: "Your nurse application was not approved this time." },
-  SUSPENDED: { title: "Account suspended", body: "Your account has been suspended by the admin." },
-};
+const STATUS_PUSH_KEY = {
+  APPROVED: "nurseApplicationApproved",
+  REJECTED: "nurseApplicationRejected",
+  SUSPENDED: "accountSuspended",
+} as const;
 
 // GET: one nurse in full, with recent visits and stats.
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -100,8 +100,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   // Sign them out everywhere; they can log back in, and then see the
   // suspended notice instead of a session that keeps working as before.
   if (statusChanged && data.status === "SUSPENDED") await revokeSessions(id);
-  if (statusChanged && data.status && STATUS_PUSH_COPY[data.status]) {
-    void sendPushToUser(id, { ...STATUS_PUSH_COPY[data.status], url: "/nurse/dashboard" });
+  if (statusChanged && data.status && data.status in STATUS_PUSH_KEY) {
+    void sendPushToUser(id, { key: STATUS_PUSH_KEY[data.status as keyof typeof STATUS_PUSH_KEY], url: "/nurse/dashboard" });
   }
   const bookings = leavingApproved ? await resolveProviderBookings(id, "NURSE", "CANCEL", "suspended") : null;
   return NextResponse.json({ ...updated, bookings });

@@ -1,5 +1,7 @@
 "use client";
 import { CalendarOff } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 export type ProviderAvailability = {
   awayNow?: boolean;
@@ -7,14 +9,16 @@ export type ProviderAvailability = {
   timeOff?: { startDate: string; endDate: string }[];
 };
 
-const day = (ymd: string) =>
-  new Date(`${ymd}T00:00:00+05:30`).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short" });
-const range = (a: string, b: string) => (a === b ? day(a) : `${day(a)} – ${day(b)}`);
+const day = (ymd: string, locale: string) =>
+  new Date(`${ymd}T00:00:00+05:30`).toLocaleDateString(locale, { timeZone: "Asia/Kolkata", day: "numeric", month: "short" });
+const range = (a: string, b: string, locale: string) => (a === b ? day(a, locale) : `${day(a, locale)} – ${day(b, locale)}`);
 
 // On the booking forms: the provider is away right now (so "Book Now" is
 // off), and/or which upcoming days are blocked (src/lib/timeOff.ts). The
 // booking API refuses those days regardless; this just says so up front.
 export default function ProviderAwayNotice({ provider, who = "doctor" }: { provider: ProviderAvailability | null | undefined; who?: "doctor" | "nurse" }) {
+  const t = useTranslations("booking.away");
+  const locale = formattingLocale(useLocale());
   if (!provider) return null;
   const upcoming = (provider.timeOff ?? []).slice(0, 3);
   if (!provider.awayNow && upcoming.length === 0) return null;
@@ -25,13 +29,13 @@ export default function ProviderAwayNotice({ provider, who = "doctor" }: { provi
         {provider.awayNow && (
           <p className="font-semibold">
             {provider.awayUntil === "today" || !provider.awayUntil
-              ? `This ${who} isn't taking bookings for the rest of today — schedule a later day.`
-              : `This ${who} is on leave until ${day(provider.awayUntil)} — schedule a day after that.`}
+              ? t("awayToday", { who })
+              : t("onLeave", { who, date: day(provider.awayUntil, locale) })}
           </p>
         )}
         {upcoming.length > 0 && (
           <p className={provider.awayNow ? "mt-0.5" : ""}>
-            Not available: {upcoming.map((t) => range(t.startDate, t.endDate)).join(", ")}
+            {t("notAvailable", { ranges: upcoming.map((o) => range(o.startDate, o.endDate, locale)).join(", ") })}
           </p>
         )}
       </div>

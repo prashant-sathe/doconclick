@@ -89,24 +89,23 @@ export async function expireStalePendingRequests() {
 
   for (const a of stale) {
     if (!expiredIds.has(a.id)) continue;
-    const provider = a.providerType === "NURSE" ? "nurse" : "doctor";
     // A package's sibling visits expire (and refund) along with this one.
     const refunded = [...refundedById].reduce(
       (sum, [id, amt]) => (id === a.id || (a.packageId && siblingPackage.get(id) === a.packageId) ? sum + amt : sum),
       0,
     );
     void sendPushToUser(a.patientId, {
-      title: `No response from ${provider}`,
-      body: refunded > 0
-        ? `${a.doctor.name} didn't confirm your new time. ₹${Math.round(refunded * 100) / 100} was refunded to your wallet.`
-        : `${a.doctor.name} didn't respond in time.`,
+      key: "apptExpired",
+      values: {
+        providerType: a.providerType,
+        doctor: a.doctor.name,
+        refunded: refunded > 0 ? "yes" : "no",
+        amount: Math.round(refunded * 100) / 100,
+      },
       url: refunded > 0 ? "/patient/wallet" : "/patient/appointments",
     });
   }
 }
-
-const fmtIST = (d: Date) =>
-  d.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
 
 // A patient's request to move an accepted appointment lapses once either the
 // requested or the original time has passed unanswered — the booking simply
@@ -129,8 +128,8 @@ async function lapseStaleRescheduleRequests() {
     });
     if (count === 0) continue;
     void sendPushToUser(a.patientId, {
-      title: "New time wasn't confirmed",
-      body: `${a.doctor.name} didn't confirm your requested time, so your appointment stays on ${fmtIST(a.scheduledAt)}.`,
+      key: "rescheduleExpired",
+      values: { doctor: a.doctor.name, when: a.scheduledAt },
       url: "/patient/appointments",
     });
   }

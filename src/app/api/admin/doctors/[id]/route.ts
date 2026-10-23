@@ -9,11 +9,11 @@ import { getDoctorRegistrationFee, registrationFeeLabel } from "@/lib/doctorFees
 
 const MAX_REASON_LENGTH = 500;
 
-const STATUS_PUSH_COPY: Record<string, { title: string; body: string }> = {
-  APPROVED: { title: "Application approved", body: "Your doctor application has been approved." },
-  REJECTED: { title: "Application not approved", body: "Your doctor application was not approved this time." },
-  SUSPENDED: { title: "Account suspended", body: "Your account has been suspended by the admin." },
-};
+const STATUS_PUSH_KEY = {
+  APPROVED: "doctorApplicationApproved",
+  REJECTED: "doctorApplicationRejected",
+  SUSPENDED: "accountSuspended",
+} as const;
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -206,20 +206,12 @@ export async function PATCH(
   if (statusChanged && data.status === "SUSPENDED") await revokeSessions(id);
 
   if (statusChanged && data.status === "REJECTED") {
-    void sendPushToUser(id, {
-      title: STATUS_PUSH_COPY.REJECTED.title,
-      body: `${STATUS_PUSH_COPY.REJECTED.body} Reason: ${reason}`,
-      url: "/doctor/dashboard",
-    });
-  } else if (statusChanged && data.status && STATUS_PUSH_COPY[data.status]) {
-    void sendPushToUser(id, { ...STATUS_PUSH_COPY[data.status], url: "/doctor/dashboard" });
+    void sendPushToUser(id, { key: "doctorApplicationRejectedReason", values: { reason }, url: "/doctor/dashboard" });
+  } else if (statusChanged && data.status && data.status in STATUS_PUSH_KEY) {
+    void sendPushToUser(id, { key: STATUS_PUSH_KEY[data.status as keyof typeof STATUS_PUSH_KEY], url: "/doctor/dashboard" });
   }
   if (data.isVerified === true && !profile.isVerified) {
-    void sendPushToUser(id, {
-      title: "You're verified!",
-      body: "Your profile is now visible to patients.",
-      url: "/doctor/dashboard",
-    });
+    void sendPushToUser(id, { key: "doctorVerified", url: "/doctor/dashboard" });
   }
 
   // Now hidden from new bookings, so handle the ones they had (re-read, in

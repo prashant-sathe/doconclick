@@ -235,10 +235,9 @@ export async function PATCH(req: Request) {
 
   if (bankChanged) {
     void sendPushToUser(authUser.id, {
-      title: "Bank details changed",
-      body: bankLast4
-        ? `Your payouts will now go to account ${maskAccount(bankLast4)}. If you didn't make this change, contact support right away.`
-        : "Your bank details were removed. If you didn't make this change, contact support right away.",
+      ...(bankLast4
+        ? { key: "bankDetailsChanged" as const, values: { account: maskAccount(bankLast4) } }
+        : { key: "bankDetailsRemoved" as const }),
       url: "/doctor/profile/bank",
     });
   }

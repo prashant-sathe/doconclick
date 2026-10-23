@@ -19,21 +19,19 @@ import { referralPushCopy } from "@/lib/nurseReferral";
 import { settleIfFreeOnAccept } from "@/lib/paymentOrders";
 import { GATEWAY_OMIT, LIVE_LOCATION_CLEARED, withLiveLocationOnlyWhileLive } from "@/lib/appointmentView";
 
-const PATIENT_PUSH_COPY: Record<string, { title: string; body: (doctorName: string) => string; url: string }> = {
-  SCHEDULED: { title: "Appointment confirmed!", body: (d) => `${d} accepted your request.`, url: "/patient/appointments" },
-  REJECTED: { title: "Request declined", body: (d) => `${d} was unable to accept your request.`, url: "/patient/appointments" },
-  COMPLETED: { title: "Consultation completed", body: (d) => `Your visit with ${d} is complete.`, url: "/patient/appointments" },
-  CANCELLED: { title: "Appointment cancelled", body: (d) => `Your appointment with ${d} was cancelled.`, url: "/patient/appointments" },
-  NO_SHOW: { title: "Marked as a no-show", body: (d) => `You were marked as a no-show for your appointment with ${d}.`, url: "/patient/appointments" },
-};
-
-// Added to the "confirmed" push when a ₹0 booking is marked PAID on accept.
-const NOTHING_TO_PAY = " Nothing to pay — you're all set.";
+// Patient push per new status (messages/<locale>/push.json). The confirmed
+// copy adds "Nothing to pay" when `free` is "yes" (a ₹0 booking marked PAID on accept).
+const PATIENT_PUSH_KEY = {
+  SCHEDULED: "apptConfirmed",
+  REJECTED: "apptDeclined",
+  COMPLETED: "apptCompleted",
+  CANCELLED: "apptCancelled",
+  NO_SHOW: "apptNoShow",
+} as const;
+const patientPushKey = (status: string) =>
+  status in PATIENT_PUSH_KEY ? PATIENT_PUSH_KEY[status as keyof typeof PATIENT_PUSH_KEY] : null;
 
 const SLOT_TAKEN_MESSAGE = "That time was just taken. Please pick a different slot.";
-
-const fmtIST = (d: Date) =>
-  d.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
 
 // Valid status transitions a doctor may make, keyed by the appointment's current status
 const DOCTOR_TRANSITIONS: Record<string, string[]> = {
@@ -209,8 +207,8 @@ export async function PATCH(
         return NextResponse.json({ error: "This request was already answered or changed. Please refresh." }, { status: 409 });
       }
       void sendPushToUser(appointment.patientId, reschedule === "ACCEPT"
-        ? { title: "New time confirmed", body: `${actingDoctorName} confirmed your new time: ${fmtIST(requested)}.`, url: "/patient/appointments" }
-        : { title: "New time not available", body: `${actingDoctorName} couldn't make the new time — your appointment stays on ${fmtIST(appointment.scheduledAt)}.`, url: "/patient/appointments" });
+        ? { key: "rescheduleAccepted", values: { doctor: actingDoctorName, when: requested }, url: "/patient/appointments" }
+        : { key: "rescheduleDeclined", values: { doctor: actingDoctorName, when: appointment.scheduledAt }, url: "/patient/appointments" });
       const updated = await prisma.appointment.findUniqueOrThrow({ where: { id } });
       return NextResponse.json(withoutVisitCode(updated));
     }
@@ -271,14 +269,18 @@ export async function PATCH(
       );
       // A ₹0 booking has no payment step — PAID as soon as it's accepted.
       const free = status === "SCHEDULED" ? await settleIfFreeOnAccept(group) : new Set<string>();
-      const copy = PATIENT_PUSH_COPY[status];
-      if (copy) {
+      const key = group.length > 1
+        ? (status === "SCHEDULED" ? "nursePackageAccepted" : "nursePackageDeclined")
+        : patientPushKey(status);
+      if (key) {
         void sendPushToUser(appointment.patientId, {
-          title: copy.title,
-          body: (group.length > 1
-            ? `${actingDoctorName} ${status === "SCHEDULED" ? "accepted" : "couldn't accept"} your ${group.length}-visit package.`
-            : copy.body(actingDoctorName)) + (free.size > 0 && free.size === group.length ? NOTHING_TO_PAY : ""),
-          url: copy.url,
+          key,
+          values: {
+            doctor: actingDoctorName,
+            count: group.length,
+            free: free.size > 0 && free.size === group.length ? "yes" : "no",
+          },
+          url: "/patient/appointments",
         });
       }
       const { visitOtp: _hidden, ...updated } = await prisma.appointment.findUniqueOrThrow({ where: { id } });
@@ -351,23 +353,19 @@ export async function PATCH(
 
       if (reassigned && candidate) {
         void sendPushToUser(candidate.id, {
-          title: "New appointment request",
-          body: `${appointment.patientName ?? "A patient"} needs a ${appointment.consultType.toLowerCase()} consultation.`,
+          key: "reassignedRequestToDoctor",
+          values: { patient: appointment.patientName ?? "", named: appointment.patientName ? "yes" : "no", consultType: appointment.consultType },
           url: "/doctor/dashboard",
         });
         void sendPushToUser(appointment.patientId, {
-          title: "Your appointment was reassigned",
-          body: wasPaid
-            ? `${actingDoctorName} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and credited ₹${refundAmount} back to your wallet — pay again once they accept.`
-            : `${actingDoctorName} had an emergency and couldn't continue with your appointment. We found you Dr. ${candidate.name} nearby and sent them your request.`,
+          key: "apptReassigned",
+          values: { doctor: actingDoctorName, newDoctor: candidate.name, paid: wasPaid ? "yes" : "no", amount: refundAmount },
           url: "/patient/appointments",
         });
       } else {
         void sendPushToUser(appointment.patientId, {
-          title: "Appointment cancelled",
-          body: wasPaid
-            ? `${actingDoctorName} had an emergency and couldn't continue with your appointment. We couldn't find another ${providerWord} nearby right now — ₹${refundAmount} has been credited to your wallet. Please book again.`
-            : `${actingDoctorName} had an emergency and couldn't continue with your appointment. We couldn't find another ${providerWord} nearby right now — please book again.`,
+          key: "apptCancelledNoReplacement",
+          values: { doctor: actingDoctorName, providerType: appointment.providerType, paid: wasPaid ? "yes" : "no", amount: refundAmount },
           url: "/patient/appointments",
         });
       }
@@ -405,8 +403,8 @@ export async function PATCH(
         throw err;
       }
       void sendPushToUser(appointment.patientId, {
-        title: "Request declined",
-        body: `${actingDoctorName} couldn't accommodate your new requested time. ₹${refundAmount} was refunded to your wallet.`,
+        key: "rescheduleDeclinedRefunded",
+        values: { doctor: actingDoctorName, amount: refundAmount },
         url: "/patient/appointments",
       });
       return NextResponse.json(withoutVisitCode(updated));
@@ -447,12 +445,12 @@ export async function PATCH(
     });
     // A ₹0 booking has no payment step — PAID as soon as it's accepted.
     const free = status === "SCHEDULED" && (await settleIfFreeOnAccept([updated])).size > 0;
-    const copy = PATIENT_PUSH_COPY[status];
-    if (copy) {
+    const key = patientPushKey(status);
+    if (key) {
       void sendPushToUser(appointment.patientId, {
-        title: copy.title,
-        body: copy.body(actingDoctorName) + (free ? NOTHING_TO_PAY : ""),
-        url: copy.url,
+        key,
+        values: { doctor: actingDoctorName, free: free ? "yes" : "no" },
+        url: "/patient/appointments",
       });
     }
     // Nurse care the doctor added during the consultation becomes bookable
@@ -478,8 +476,8 @@ export async function PATCH(
         return NextResponse.json({ error: "There's no pending reschedule request to withdraw." }, { status: 409 });
       }
       void sendPushToUser(appointment.doctorId, {
-        title: "Reschedule request withdrawn",
-        body: `${authUser.name} kept their original time (${fmtIST(appointment.scheduledAt)}).`,
+        key: "rescheduleWithdrawn",
+        values: { patient: authUser.name, when: appointment.scheduledAt },
         url: providerDashboard,
       });
       return NextResponse.json(await prisma.appointment.findUniqueOrThrow({ where: { id } }));
@@ -592,13 +590,9 @@ export async function PATCH(
         return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
       }
 
-      void sendPushToUser(appointment.doctorId, {
-        title: isRequest ? "Reschedule requested" : "Requested time updated",
-        body: isRequest
-          ? `${authUser.name} asked to move their appointment to ${fmtIST(when)} — accept the new time or keep the original.`
-          : `${authUser.name} updated their requested appointment time.`,
-        url: providerDashboard,
-      });
+      void sendPushToUser(appointment.doctorId, isRequest
+        ? { key: "rescheduleRequested", values: { patient: authUser.name, when }, url: providerDashboard }
+        : { key: "rescheduleRequestUpdated", values: { patient: authUser.name }, url: providerDashboard });
       return NextResponse.json(await prisma.appointment.findUniqueOrThrow({ where: { id } }));
     }
 
@@ -633,10 +627,8 @@ export async function PATCH(
     const { cancelled: updated, wasPaid, refund: refundAmount } = result;
 
     void sendPushToUser(appointment.doctorId, {
-      title: "Appointment cancelled",
-      body: wasPaid
-        ? `${authUser.name} cancelled their appointment. ₹${refundAmount} was refunded to their wallet.`
-        : `${authUser.name} cancelled their appointment request.`,
+      key: "apptCancelledByPatient",
+      values: { patient: authUser.name, paid: wasPaid ? "yes" : "no", amount: refundAmount },
       url: providerDashboard,
     });
     return NextResponse.json(updated);

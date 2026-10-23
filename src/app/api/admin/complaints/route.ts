@@ -5,12 +5,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { readJson } from "@/lib/routeGuards";
 
 const STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED"];
-// How a status reads in the patient's push ("Your complaint "X" …").
-const STATUS_PHRASE: Record<string, string> = {
-  OPEN: "was reopened",
-  IN_PROGRESS: "is being looked into",
-  RESOLVED: "has been resolved",
-};
+// How each status reads in the patient's push: messages/<locale>/push.json complaintUpdate.
 
 export async function GET() {
   const { denied } = await requireAdmin();
@@ -56,8 +51,8 @@ export async function PATCH(req: Request) {
   // No user-facing complaint page exists yet (only admin GET/PATCH) — the
   // push still surfaces the update even without a page to deep-link into.
   void sendPushToUser(updated.userId, {
-    title: "Complaint update",
-    body: `Your complaint "${updated.subject}" ${STATUS_PHRASE[status]}.`,
+    key: "complaintUpdate",
+    values: { subject: updated.subject, status },
     url: "/",
   });
 

@@ -142,7 +142,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
 
   const doctorName = formatDoctorName(authUser.name);
-  void sendPushToUser(appt.patientId, { title: "Consultation completed", body: `Your visit with ${doctorName} is complete.`, url: "/patient/appointments" });
+  void sendPushToUser(appt.patientId, { key: "apptCompleted", values: { doctor: doctorName }, url: "/patient/appointments" });
   // Nurse care recommended here is bookable from now on (src/lib/nurseReferral.ts).
   const referralName = completed.referralGiven?.service.name;
   if (referralName) void sendPushToUser(appt.patientId, referralPushCopy(authUser.name, referralName));

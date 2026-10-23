@@ -60,15 +60,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const who = appt.patientName ?? appt.patient.name;
     const what = alerts.filter((a) => a.level === "CRITICAL").map((a) => a.message).join("; ");
     void sendPushToUser(appt.patientId, {
-      title: `⚠ Urgent: ${who}'s vitals need attention`,
-      body: `${what}. Nurse ${authUser.name} recorded this just now — contact your doctor.`,
+      key: "vitalsCriticalPatient",
+      values: { patient: who, alerts: what, nurse: authUser.name },
       url: "/patient/profile/vitals",
     });
     const doctorId = appt.nurseReferral?.appointment.doctorId;
     if (doctorId) {
       void sendPushToUser(doctorId, {
-        title: `⚠ Critical vitals: ${who}`,
-        body: `${what} (${vitalsSummary(parsed.data)}) — recorded by Nurse ${authUser.name} on the visit you referred.`,
+        key: "vitalsCriticalDoctor",
+        values: { patient: who, alerts: what, summary: vitalsSummary(parsed.data), nurse: authUser.name },
         url: `/doctor/patients/${appt.patientId}${appt.dependentId ? `?dependentId=${appt.dependentId}` : ""}`,
       });
     }

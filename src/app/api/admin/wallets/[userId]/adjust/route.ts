@@ -110,8 +110,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ userId:
   // The reason is an internal note as much as a patient-facing one — the push
   // says what happened and where to read the detail, not the admin's wording.
   void sendPushToUser(userId, {
-    title: direction === "CREDIT" ? "Wallet credited" : "Wallet debited",
-    body: `An admin ${direction === "CREDIT" ? "added" : "deducted"} ₹${amount} ${direction === "CREDIT" ? "to" : "from"} your wallet. New balance ₹${result.balance}. See your wallet history for details.`,
+    key: direction === "CREDIT" ? "walletAdminCredited" : "walletAdminDebited",
+    values: { amount, balance: result.balance },
     url: "/patient/wallet",
   });
 

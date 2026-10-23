@@ -1,4 +1,5 @@
 "use client";
+import LanguageSwitch from "@/components/LanguageSwitch";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -237,6 +238,8 @@ export default function DoctorProfilePage() {
           <Row href="/doctor/profile/qr" tint="bg-teal-50 text-teal-600" icon={<QrCode className="w-4 h-4" />}
             title="Booking QR Code" />
         </Group>
+
+        <LanguageSwitch />
 
         <Group label="Account">
           <Row href="/doctor/profile/notifications" tint="bg-amber-50 text-amber-500" icon={<Bell className="w-4 h-4" />}

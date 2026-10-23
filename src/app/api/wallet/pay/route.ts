@@ -104,19 +104,18 @@ export async function POST(req: Request) {
     });
 
     void sendPushToUser(authUser.id, {
-      title: "Wallet debited",
-      body: result.count > 1
-        ? `₹${result.payable} deducted for your ${result.count}-visit package. New balance ₹${result.wallet.balance}.`
-        : `₹${result.payable} deducted for your appointment. New balance ₹${result.wallet.balance}.`,
+      key: "walletPaidAppointment",
+      values: { amount: result.payable, count: result.count, balance: result.wallet.balance },
       url: "/patient/wallet",
     });
     void sendPushToUser(appointment.doctorId, {
-      title: "Payment received",
-      body: appointment.providerType === "NURSE"
-        ? result.count > 1
-          ? `${authUser.name} paid for all ${result.count} ${appointment.serviceName ?? "home"} visits.`
-          : `${authUser.name} paid for the ${appointment.serviceName ?? "home"} visit — you can complete it once you're done.`
-        : `Payment received for your consultation with ${authUser.name}.`,
+      key: appointment.providerType === "NURSE" ? "paymentReceivedNurse" : "paymentReceivedDoctor",
+      values: {
+        patient: authUser.name,
+        count: result.count,
+        hasService: appointment.serviceName ? "yes" : "no",
+        service: appointment.serviceName ?? "",
+      },
       url: appointment.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
     });
 

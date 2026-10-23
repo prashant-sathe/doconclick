@@ -124,6 +124,7 @@ export const UserScalarFieldEnum = {
   deletedAt: 'deletedAt',
   tokenVersion: 'tokenVersion',
   offlineUntil: 'offlineUntil',
+  language: 'language',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -59,8 +59,8 @@ export async function POST(req: Request) {
       if (txn) {
         await prisma.walletTransaction.update({ where: { id: txn.id }, data: { status: "FAILED" } });
         void sendPushToUser(txn.wallet.userId, {
-          title: "Wallet top-up failed",
-          body: `Your top-up of ₹${txn.amount} didn't go through. No amount was deducted.`,
+          key: "walletTopupFailed",
+          values: { amount: txn.amount },
           url: "/patient/wallet",
         });
       }
@@ -181,11 +181,7 @@ export async function POST(req: Request) {
         data: { status: "CONFIRMED" },
       }),
     ]);
-    void sendPushToUser(profile.userId, {
-      title: "Subscription renewed",
-      body: "Your subscription is active.",
-      url: "/doctor/dashboard",
-    });
+    void sendPushToUser(profile.userId, { key: "subscriptionRenewed", url: "/doctor/dashboard" });
     return NextResponse.json({ ok: true });
   }
 
@@ -230,8 +226,8 @@ export async function POST(req: Request) {
       }),
     ]);
     void sendPushToUser(profile.userId, isRegistration
-      ? { title: "Registration fee received", body: "Your application is now under review.", url: "/nurse/profile" }
-      : { title: "Subscription renewed", body: "Your subscription is active.", url: "/nurse/dashboard" });
+      ? { key: "registrationFeeReceived", url: "/nurse/profile" }
+      : { key: "subscriptionRenewed", url: "/nurse/dashboard" });
     return NextResponse.json({ ok: true });
   }
 
@@ -269,8 +265,8 @@ export async function POST(req: Request) {
     });
 
     void sendPushToUser(txn.wallet.userId, {
-      title: "Wallet top-up successful",
-      body: `₹${txn.amount} added to your wallet. New balance ₹${wallet.balance}.`,
+      key: "walletTopupSuccess",
+      values: { amount: txn.amount, balance: wallet.balance },
       url: "/patient/wallet",
     });
     return NextResponse.json({ ok: true });

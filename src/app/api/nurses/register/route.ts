@@ -48,8 +48,8 @@ export async function POST(req: Request) {
     });
 
     void sendPushToAdmins({
-      title: "New nurse registration",
-      body: `${name} registered and is awaiting verification.`,
+      key: "adminNurseRegistered",
+      values: { name },
       url: "/admin/nurses",
     });
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CreditCard, Loader2, ShieldCheck, CheckCircle, Wallet, TicketPercent, X } from "lucide-react";
 import { formatProviderName } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { useTranslations } from "next-intl";
 
 interface AppointmentSummary {
   id: string;
@@ -25,6 +26,8 @@ interface AppointmentSummary {
 function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => void }) {
   const searchParams = useSearchParams();
   const apptId = searchParams.get("apptId");
+  const t = useTranslations("booking.payment");
+  const tc = useTranslations("booking.common");
 
   const [appt, setAppt] = useState<AppointmentSummary | null>(null);
   const [loading, setLoading] = useState(!!apptId);
@@ -42,7 +45,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
     if (!apptId) return;
     fetch(`/api/appointments/${apptId}`)
       .then(async (r) => {
-        if (!r.ok) { setError((await r.json().catch(() => ({}))).error ?? "Could not load this appointment."); return; }
+        if (!r.ok) { setError((await r.json().catch(() => ({}))).error ?? t("errorLoad")); return; }
         setAppt(await r.json());
       })
       .finally(() => setLoading(false));
@@ -50,10 +53,10 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
       .then((r) => r.json())
       .then((d) => setWalletBalance(d.balance ?? 0))
       .catch(() => {});
-  }, [apptId]);
+  }, [apptId, t]);
 
   const pay = async () => {
-    if (!apptId) { setError("Missing appointment reference."); return; }
+    if (!apptId) { setError(t("errorMissingRef")); return; }
     setPaying(true);
     setError("");
     const res = await fetch("/api/payments/create-order", {
@@ -64,7 +67,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       setPaying(false);
-      setError(data.error ?? "Could not start payment. Please try again.");
+      setError(data.error ?? tc("startPaymentFailed"));
       return;
     }
     // Nothing to pay (a 100% coupon): the server confirmed the booking itself,
@@ -105,7 +108,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
     const data = await res.json().catch(() => ({}));
     setApplyingCoupon(false);
     if (!res.ok) {
-      setCouponError(data.error ?? "Could not apply that coupon.");
+      setCouponError(data.error ?? t("errorCoupon"));
       return;
     }
     setAppt((a) => (a ? { ...a, discountAmount: data.discountAmount, couponCode: data.coupon.code } : a));
@@ -126,7 +129,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
   };
 
   const payWithWallet = async () => {
-    if (!apptId) { setError("Missing appointment reference."); return; }
+    if (!apptId) { setError(t("errorMissingRef")); return; }
     setPayingWallet(true);
     setError("");
     const res = await fetch("/api/wallet/pay", {
@@ -137,7 +140,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       setPayingWallet(false);
-      setError(data.error ?? "Could not pay with wallet. Please try again.");
+      setError(data.error ?? t("errorWallet"));
       return;
     }
     // Direct, synchronous result — no external redirect, so flip straight to
@@ -147,14 +150,14 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
   };
 
   if (loading) {
-    return <div className="bg-white rounded-2xl p-8 text-center text-slate-400">Loading…</div>;
+    return <div className="bg-white rounded-2xl p-8 text-center text-slate-400">{tc("loading")}</div>;
   }
 
   if (!apptId || !appt) {
     return (
       <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-md w-full text-center">
-        <p className="text-slate-500">{error || "Appointment not found."}</p>
-        <Link href="/patient/appointments" className="btn-secondary w-full justify-center mt-5">My Appointments</Link>
+        <p className="text-slate-500">{error || t("notFound")}</p>
+        <Link href="/patient/appointments" className="btn-secondary w-full justify-center mt-5">{tc("myAppointments")}</Link>
       </div>
     );
   }
@@ -165,18 +168,20 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
         <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-emerald-500" />
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{free || justPaid?.amount === 0 ? "Booking confirmed" : justPaid ? "Payment successful" : "Already Paid"}</h2>
+        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{free || justPaid?.amount === 0 ? t("bookingConfirmed") : justPaid ? t("paymentSuccessful") : t("alreadyPaid")}</h2>
         <p className="text-slate-500 mb-8">
           {free || justPaid?.amount === 0
             // A ₹0 booking is confirmed on accept (or here) — there was never anything to pay.
             ? appt.discountAmount > 0
-              ? "Your coupon covered the full fee — nothing was charged."
-              : "This consultation is free — there's nothing to pay."
+              ? t("couponCovered")
+              : t("freeNothing")
             : justPaid
-              ? `₹${justPaid.amount} paid from your wallet${justPaid.visits > 1 ? ` for all ${justPaid.visits} visits` : ""}.`
-              : "This appointment has already been paid for."}
+              ? justPaid.visits > 1
+                ? t("paidFromWalletAll", { amount: justPaid.amount, visits: justPaid.visits })
+                : t("paidFromWallet", { amount: justPaid.amount })
+              : t("alreadyPaidBody")}
         </p>
-        <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">My Appointments</Link>
+        <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">{tc("myAppointments")}</Link>
       </div>
     );
   }
@@ -189,10 +194,10 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
       <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-md w-full text-center">
         <p className="text-slate-500">
           {pendingApproval
-            ? `Payment opens once the ${appt.providerType === "NURSE" ? "nurse" : "doctor"} accepts your appointment.`
-            : "This appointment is no longer active, so there's nothing to pay."}
+            ? t("pendingApproval", { who: appt.providerType === "NURSE" ? "nurse" : "doctor" })
+            : tc("noLongerActive")}
         </p>
-        <Link href="/patient/appointments" className="btn-secondary w-full justify-center mt-5">My Appointments</Link>
+        <Link href="/patient/appointments" className="btn-secondary w-full justify-center mt-5">{tc("myAppointments")}</Link>
       </div>
     );
   }
@@ -201,23 +206,23 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
     <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-md w-full">
       <div className="bg-slate-50 rounded-xl p-4 mb-4">
         <div className="flex justify-between text-sm">
-          <span className="text-slate-500">{appt.providerType === "NURSE" ? "Nurse visit" : "Consultation"} with {formatProviderName(appt.doctor.name, appt.providerType)}</span>
-          <span className="text-slate-700">₹{appt.amount}{isPackage ? " / visit" : ""}</span>
+          <span className="text-slate-500">{t(appt.providerType === "NURSE" ? "nurseVisitWith" : "consultationWith", { name: formatProviderName(appt.doctor.name, appt.providerType) })}</span>
+          <span className="text-slate-700">{isPackage ? t("perVisit", { amount: appt.amount }) : `₹${appt.amount}`}</span>
         </div>
         {isPackage && (
           <div className="flex justify-between text-sm mt-1.5">
-            <span className="text-slate-500">{appt.serviceName ?? "Visits"} package</span>
-            <span className="text-slate-700">× {appt.package!.unpaidCount} visits</span>
+            <span className="text-slate-500">{t("packageLabel", { service: appt.serviceName ?? t("visitsDefault") })}</span>
+            <span className="text-slate-700">{t("timesVisits", { count: appt.package!.unpaidCount })}</span>
           </div>
         )}
         {appt.discountAmount > 0 && (
           <div className="flex justify-between text-sm mt-1.5 text-emerald-600">
-            <span>Coupon {appt.couponCode}</span>
+            <span>{t("coupon", { code: appt.couponCode ?? "" })}</span>
             <span>−₹{appt.discountAmount}</span>
           </div>
         )}
         <div className="flex justify-between font-bold pt-2 mt-2 border-t border-slate-200 text-base">
-          <span className="text-slate-900">{appt.discountAmount > 0 ? "You pay" : "Amount"}</span>
+          <span className="text-slate-900">{appt.discountAmount > 0 ? t("youPay") : tc("amount")}</span>
           <span className="text-blue-600">₹{netPayable}</span>
         </div>
       </div>
@@ -228,13 +233,13 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
         {appt.couponCode ? (
           <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 text-sm">
             <span className="flex items-center gap-2 font-semibold text-emerald-700">
-              <TicketPercent className="w-4 h-4" /> {appt.couponCode} applied
+              <TicketPercent className="w-4 h-4" /> {t("couponApplied", { code: appt.couponCode })}
             </span>
             <button
               onClick={removeCoupon}
               disabled={applyingCoupon}
               className="text-emerald-700 hover:text-emerald-900 disabled:opacity-50"
-              aria-label="Remove coupon"
+              aria-label={t("removeCoupon")}
             >
               <X className="w-4 h-4" />
             </button>
@@ -243,7 +248,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
           <div className="flex gap-2">
             <input
               className="input-field flex-1 uppercase"
-              placeholder="Coupon code"
+              placeholder={t("couponPlaceholder")}
               value={couponInput}
               onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
               onKeyDown={(e) => { if (e.key === "Enter") applyCoupon(); }}
@@ -253,7 +258,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
               disabled={applyingCoupon || !couponInput.trim()}
               className="btn-secondary px-4 disabled:opacity-60"
             >
-              {applyingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+              {applyingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : t("apply")}
             </button>
           </div>
         )}
@@ -277,19 +282,21 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
               className="btn-secondary w-full justify-center py-3.5 text-base gap-1.5 disabled:opacity-60"
             >
               {payingWallet ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Paying from wallet…</>
+                <><Loader2 className="w-4 h-4 animate-spin" /> {t("payingWallet")}</>
               ) : walletBalance == null ? (
-                <><Wallet className="w-4 h-4" /> Pay ₹{netPayable} via Wallet</>
+                <><Wallet className="w-4 h-4" /> {t("payViaWallet", { amount: netPayable })}</>
               ) : canPayWithWallet ? (
-                <><Wallet className="w-4 h-4" /> Pay ₹{netPayable} via Wallet (Balance ₹{walletBalance})</>
+                <><Wallet className="w-4 h-4" /> {t("payViaWalletBalance", { amount: netPayable, balance: walletBalance })}</>
               ) : (
-                <><Wallet className="w-4 h-4" /> Insufficient wallet balance</>
+                <><Wallet className="w-4 h-4" /> {t("insufficient")}</>
               )}
             </button>
             {walletBalance != null && !canPayWithWallet && (
               <p className="text-xs text-slate-400 text-center mt-1.5">
-                You need ₹{Math.ceil(netPayable - walletBalance)} more —{" "}
-                <Link href="/patient/wallet" className="text-blue-600 font-semibold hover:underline">top up your wallet</Link>.
+                {t.rich("needMore", {
+                  amount: Math.ceil(netPayable - walletBalance),
+                  link: (chunks) => <Link href="/patient/wallet" className="text-blue-600 font-semibold hover:underline">{chunks}</Link>,
+                })}
               </p>
             )}
           </div>
@@ -298,19 +305,19 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
 
       <button onClick={pay} disabled={paying || payingWallet} className="btn-primary w-full justify-center py-3.5 text-base">
         {netPayable === 0
-          ? (paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Confirming…</> : "Confirm booking — nothing to pay")
+          ? (paying ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("confirming")}</> : t("confirmNothing"))
           : paying
-            ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</>
-            : `Pay ₹${netPayable} via Cashfree`}
+            ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("redirecting")}</>
+            : t("payViaCashfree", { amount: netPayable })}
       </button>
 
       {confirmWalletPay && (
         <ConfirmDialog
           icon={Wallet}
-          title={`Pay ₹${netPayable} from your wallet?`}
-          message={`This deducts ₹${netPayable} from your wallet balance right now to confirm your consultation with ${formatProviderName(appt.doctor.name, appt.providerType)}.`}
-          confirmLabel="Pay Now"
-          busyLabel="Paying…"
+          title={t("walletConfirmTitle", { amount: netPayable })}
+          message={t("walletConfirmBody", { amount: netPayable, name: formatProviderName(appt.doctor.name, appt.providerType) })}
+          confirmLabel={t("payNow")}
+          busyLabel={t("paying")}
           tone="primary"
           busy={payingWallet}
           onCancel={() => setConfirmWalletPay(false)}
@@ -326,25 +333,27 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
 
 export default function PatientPayment() {
   const [free, setFree] = useState(false);
+  const t = useTranslations("booking.payment");
+  const tc = useTranslations("booking.common");
   return (
     <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       <div className="fixed top-[calc(1.25rem_+_var(--safe-area-inset-top,env(safe-area-inset-top)))] left-6">
-        <Link href="/patient/appointments" className="btn-ghost gap-1.5 text-sm">← Back</Link>
+        <Link href="/patient/appointments" className="btn-ghost gap-1.5 text-sm">{t("back")}</Link>
       </div>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
             {free ? <CheckCircle className="w-7 h-7 text-white" /> : <CreditCard className="w-7 h-7 text-white" />}
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900">{free ? "Confirm Booking" : "Complete Payment"}</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900">{free ? t("titleConfirm") : t("titlePay")}</h1>
           {/* No gateway for ₹0 — don't mention one. */}
           {!free && (
             <p className="text-slate-500 mt-2 flex items-center justify-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" /> Secured by Cashfree
+              <ShieldCheck className="w-4 h-4 text-emerald-500" /> {tc("securedByCashfree")}
             </p>
           )}
         </div>
-        <Suspense fallback={<div className="bg-white rounded-2xl p-8 text-center text-slate-400">Loading…</div>}>
+        <Suspense fallback={<div className="bg-white rounded-2xl p-8 text-center text-slate-400">{tc("loading")}</div>}>
           <PaymentContent onFreeChange={setFree} />
         </Suspense>
       </div>

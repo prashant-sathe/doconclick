@@ -52,8 +52,6 @@ function istDayBounds(date: unknown): { start: Date; end: Date } | null {
   return { start, end: new Date(start.getTime() + DAY_MS) };
 }
 
-const fmtTime = (d: Date) => d.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit" });
-const fmtDay = (d: Date) => d.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short" });
 
 // POST { date, reason?, confirmBookingIds? }: mark a leave day for one of the
 // logged-in doctor's clinics. The date must be real and today or later (IST).
@@ -136,10 +134,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const doctorName = formatDoctorName(authUser.name);
   for (const { cancelled, refund } of result.cancelled) {
     void sendPushToUser(cancelled.patientId, {
-      title: "Appointment cancelled",
-      body: `${doctorName} won't be at ${clinic.name} on ${fmtDay(cancelled.scheduledAt)}${reason ? ` (${reason})` : ""}, so your ${fmtTime(cancelled.scheduledAt)} appointment was cancelled.`
-        + (refund > 0 ? ` ₹${refund} was refunded to your wallet.` : "")
-        + " Please book another day.",
+      key: "apptCancelledClinicLeave",
+      values: {
+        doctor: doctorName,
+        clinic: clinic.name,
+        when: cancelled.scheduledAt,
+        hasReason: reason ? "yes" : "no",
+        reason: reason ?? "",
+        refunded: refund > 0 ? "yes" : "no",
+        amount: refund,
+      },
       url: "/patient/appointments",
     });
   }

@@ -6,27 +6,29 @@ import { LayoutDashboard, IndianRupee, Building2, UserCircle, Sparkles, UserPlus
 import { cn } from "@/lib/utils";
 import { computeDoctorCompleteness } from "@/lib/doctorProfileCompleteness";
 import { useAuth } from "@/components/AuthProvider";
+import { useTranslations } from "next-intl";
 
 const TABS = [
-  { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/doctor/earnings", label: "Earnings", icon: IndianRupee },
-  { href: "/doctor/clinics", label: "Clinics", icon: Building2 },
-  { href: "/doctor/support", label: "Support", icon: Sparkles },
-  { href: "/doctor/profile", label: "Profile", icon: UserCircle },
-];
+  { href: "/doctor/dashboard", label: "dashboard", icon: LayoutDashboard },
+  { href: "/doctor/earnings", label: "earnings", icon: IndianRupee },
+  { href: "/doctor/clinics", label: "clinics", icon: Building2 },
+  { href: "/doctor/support", label: "support", icon: Sparkles },
+  { href: "/doctor/profile", label: "profile", icon: UserCircle },
+] as const;
 
 // Staff only manages the queue and books walk-ins — no
 // earnings/clinics-edit/support-AI/profile.
 const STAFF_TABS = [
-  { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/doctor/walk-in", label: "Walk-in", icon: UserPlus },
-];
+  { href: "/doctor/dashboard", label: "dashboard", icon: LayoutDashboard },
+  { href: "/doctor/walk-in", label: "walkIn", icon: UserPlus },
+] as const;
 
 export default function DoctorMobileNav() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const t = useTranslations("nav.doctor");
   const isStaff = user?.role === "STAFF";
-  const tabs = isStaff ? STAFF_TABS : TABS;
+  const tabs: readonly { href: string; label: (typeof TABS)[number]["label"] | (typeof STAFF_TABS)[number]["label"]; icon: typeof LayoutDashboard }[] = isStaff ? STAFF_TABS : TABS;
   const [profileIncomplete, setProfileIncomplete] = useState(false);
 
   useEffect(() => {
@@ -71,13 +73,13 @@ export default function DoctorMobileNav() {
             </span>
             {href === "/doctor/support" ? (
               <span className="flex items-center gap-1">
-                {label}
+                {t(label)}
                 <span className="text-[7px] font-extrabold tracking-wide text-white gradient-primary rounded-full px-1 py-[1px] leading-none">
                   AI
                 </span>
               </span>
             ) : (
-              label
+              t(label)
             )}
           </Link>
         );
