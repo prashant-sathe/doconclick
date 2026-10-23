@@ -122,14 +122,15 @@ export const GET = withErrorLocale(async function GET(req: Request) {
     // Vitals nurses recorded for these patients in the last 30 days — so at
     // the next consultation the doctor sees what happened in between. Only
     // for people the doctor currently has care access to (accepted visit, or
-    // completed within the window — src/lib/careAccess.ts), never for a
-    // pending, declined or long-past booking.
+    // completed within the window; a desk-made walk-in only once completed —
+    // src/lib/careAccess.ts), never for a pending, declined or long-past
+    // booking.
     // Judged on every visit with the person, not just this page/view of them.
     const person = (a: { patientId: string; dependentId: string | null }) => `${a.patientId}|${a.dependentId ?? ""}`;
     const allVisits = appointments.length
       ? await prisma.appointment.findMany({
           where: { doctorId: scope.doctorId, patientId: { in: [...new Set(appointments.map((a) => a.patientId))] } },
-          select: { patientId: true, dependentId: true, status: true, scheduledAt: true },
+          select: { patientId: true, dependentId: true, status: true, scheduledAt: true, bookedById: true },
         })
       : [];
     const visitsByPerson = new Map<string, typeof allVisits>();

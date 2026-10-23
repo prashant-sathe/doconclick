@@ -3,7 +3,9 @@
 // lookup (/api/doctor/patients/lookup), not copied onto the booking, and not
 // in the doctor/desk queue (/api/appointments/me). Only a patient who booked
 // the doctor themselves (accepted or held) or was actually seen is "known"
-// (src/lib/knownPatient.ts).
+// (src/lib/knownPatient.ts). #82: the same rule for the doctor's
+// patient-history page and vitals (src/lib/careAccess.ts) — a desk-made
+// walk-in opens them only once COMPLETED.
 //
 // Runs against an already running server (BASE_URL, default
 // http://localhost:3000) — cash/clinic walk-ins only, so no payment gateway.
@@ -53,7 +55,7 @@ async function main() {
     },
   };
   const profile = (address: string) => ({
-    create: { age: 33, gender: "Female", homeAddress: address, landmark: "Near temple", pinCode: "411038", allergies: "Penicillin", lat: 18.5, lng: 73.8, dependents: { create: { name: "मुलगी", relation: "Daughter", age: 6, gender: "Female" } } },
+    create: { age: 33, gender: "Female", homeAddress: address, landmark: "Near temple", pinCode: "411038", allergies: "Penicillin", chronicDiseases: "Diabetes", emergencyContactName: "Secret Contact", emergencyContactPhone: "9000000001", lat: 18.5, lng: 73.8, dependents: { create: { name: "मुलगी", relation: "Daughter", age: 6, gender: "Female" } } },
   });
 
   try {
@@ -83,8 +85,21 @@ async function main() {
     let f = await feed(desk);
     const fr = f.find((a) => a.id === a1);
     check("desk queue row: no patientProfile, no allergies, no visit (clinic)", !!fr && !("patientProfile" in fr.patient) && fr.allergies === null && fr.visit === null, JSON.stringify(fr?.patient));
-    r = await call(doctor, "PATCH", `/api/appointments/${a1}`, { status: "CANCELLED" });
-    check("cancel it → 200", r.status === 200, `${r.status} ${r.json.error ?? ""}`);
+    // #82: the scheduled walk-in doesn't open the doctor's history / vitals view.
+    const history = (pid: string) => call(doctor, "GET", `/api/doctors/patients/${pid}`);
+    const vitals = (pid: string) => call(doctor, "GET", `/api/vitals?patientId=${pid}`);
+    const leaks = (j: J) => /Penicillin|Diabetes|Secret Contact|9000000001/.test(JSON.stringify(j));
+    r = await history(stranger.id);
+    check("#82 doctor history of the walk-in stranger (still SCHEDULED) → 403 NO_CARE_ACCESS, nothing leaked", r.status === 403 && r.json.code === "NO_CARE_ACCESS" && !leaks(r.json), `${r.status} ${r.json.code ?? ""}`);
+    r = await vitals(stranger.id);
+    check("#82 …and vitals → 403", r.status === 403 && r.json.code === "NO_CARE_ACCESS", `${r.status} ${r.json.code ?? ""}`);
+    // The doctor booking the walk-in themselves (not via the desk) is the same.
+    r = await walkIn(doctor, { mobile: stranger.mobile, allergies: null });
+    const aDoc = String((r.json.appointment as J)?.id);
+    const hd = await history(stranger.id);
+    check("#82 doctor's own walk-in booking → history still 403", r.status === 200 && hd.status === 403 && !leaks(hd.json), `${r.status} ${hd.status}`);
+    // Cancel via prisma, not the API — a doctor cancel would try to reassign (#70) and push to real doctors.
+    await prisma.appointment.updateMany({ where: { id: { in: [a1, aDoc] } }, data: { status: "CANCELLED" } });
     p = await lookup(desk, stranger.mobile);
     check("lookup after walk-in + cancel → still hidden (address, allergies, family)", hidden(p), JSON.stringify(p));
     p = await lookup(doctor, stranger.mobile);
@@ -122,6 +137,17 @@ async function main() {
     await prisma.appointment.update({ where: { id: a1 }, data: { status: "COMPLETED" } });
     p = await lookup(desk, stranger.mobile);
     check("a walk-in that reached COMPLETED (actually seen) → known", p.known === true && p.homeAddress === "Flat 12, Secret Society, Kothrud", `${p.known}`);
+    // Clear the other (desk-made, still scheduled) walk-ins so only the completed one counts.
+    await prisma.appointment.updateMany({ where: { patientId: stranger.id, doctorId: doctor.id, status: "SCHEDULED" }, data: { status: "CANCELLED" } });
+    r = await history(stranger.id);
+    check("#82 completed walk-in → doctor history 200 with medical info", r.status === 200 && leaks(r.json), `${r.status} ${r.json.error ?? ""}`);
+    r = await vitals(stranger.id);
+    check("#82 …and vitals → 200", r.status === 200, `${r.status} ${r.json.error ?? ""}`);
+    // A self-booked accepted visit still opens history straight away.
+    await prisma.appointment.update({ where: { id: own.id }, data: { status: "SCHEDULED" } });
+    r = await history(ownPatient.id);
+    check("#82 patient's own accepted booking → history 200", r.status === 200, `${r.status} ${r.json.error ?? ""}`);
+    await prisma.appointment.update({ where: { id: own.id }, data: { status: "CANCELLED" } });
     r = await walkIn(desk, { mobile: stranger.mobile, allergies: null });
     const row3 = await prisma.appointment.findUnique({ where: { id: String((r.json.appointment as J)?.id) } });
     check("…and then profile allergies are reused for the next walk-in", r.status === 200 && row3?.allergies === "Penicillin", `${r.status} ${row3?.allergies}`);

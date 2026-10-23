@@ -268,6 +268,7 @@
   "familyMemberNotFound": "Family member not found",
   "careAccessNotAccepted": "You can see this patient's history only after you've accepted a visit with them.",
   "careAccessEnded": "Access to this patient's history ended {days} days after your last visit ({date}). It reopens if they book with you again and you accept.",
+  "careAccessWalkInPending": "For a walk-in you booked, the patient's history opens once you complete the consultation.",
   "staffNotFound": "Staff account not found",
   "staffRateLimited": "Too many staff accounts tried in a short time — please wait a while and try again.",
   "walkInDoctorNotFound": "Doctor account not found.",

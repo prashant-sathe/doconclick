@@ -1,6 +1,7 @@
 // Care access (BUG-TRACKER #33): a provider sees a patient's history and
 // vitals only with a SCHEDULED visit, or a COMPLETED one within the window
-// (src/lib/careAccess.ts) — never via a pending/declined/cancelled booking.
+// (src/lib/careAccess.ts) — never via a pending/declined/cancelled booking,
+// and (#82) a walk-in the doctor's desk booked counts only once COMPLETED.
 // Pure checks, then API checks against a live dev server and the DB in .env,
 // throwaway users only.
 //
@@ -39,6 +40,12 @@ async function main() {
   check("completed inside the window → access", hasCareAccess([v("COMPLETED", daysAgo(CARE_ACCESS_WINDOW_DAYS - 1))]), "true");
   check("completed past the window → no access", !hasCareAccess([v("COMPLETED", daysAgo(CARE_ACCESS_WINDOW_DAYS + 1))]), "false");
   check("old completed + new scheduled → access", hasCareAccess([v("COMPLETED", daysAgo(200)), v("SCHEDULED", daysAgo(-3))]), "true");
+  const desk = (status: string, at: Date) => ({ status, scheduledAt: at, bookedById: "desk" });
+  check("desk-made walk-in still scheduled → no access", !hasCareAccess([desk("SCHEDULED", daysAgo(0))]), "false");
+  check("desk-made walk-in completed inside the window → access", hasCareAccess([desk("COMPLETED", daysAgo(1))]), "true");
+  check("desk-made walk-in completed past the window → no access", !hasCareAccess([desk("COMPLETED", daysAgo(CARE_ACCESS_WINDOW_DAYS + 1))]), "false");
+  check("lapsed visit + new desk-made walk-in → no access", !hasCareAccess([v("COMPLETED", daysAgo(200)), desk("SCHEDULED", daysAgo(0))]), "false");
+  check("self-booked accepted + desk-made walk-in → access", hasCareAccess([v("SCHEDULED", daysAgo(-1)), desk("SCHEDULED", daysAgo(0))]), "true");
 
   // ── API ──
   const stamp = String(Date.now()).slice(-8);
@@ -61,6 +68,9 @@ async function main() {
   const recent = await patientOf("Access Recent");
   const lapsed = await patientOf("Access Lapsed");
   const returning = await patientOf("Access Returning");
+  const walkIn = await patientOf("Access WalkIn");
+  const walkInDone = await patientOf("Access WalkIn Done");
+  const walkInOwn = await patientOf("Access WalkIn Own");
   const parentProfile = await prisma.patientProfile.findUniqueOrThrow({ where: { userId: scheduled.id } });
   const child = await prisma.patientDependent.create({ data: { patientProfileId: parentProfile.id, name: "Access Child", relation: "Son" } });
 
@@ -75,10 +85,15 @@ async function main() {
   await appt(doctor.id, lapsed.id, "COMPLETED", daysAgo(CARE_ACCESS_WINDOW_DAYS + 10));
   await appt(doctor.id, returning.id, "COMPLETED", daysAgo(200));
   await appt(doctor.id, returning.id, "SCHEDULED", daysAgo(-5));
+  // #82: walk-ins the doctor's desk booked (bookedById set).
+  await appt(doctor.id, walkIn.id, "SCHEDULED", daysAgo(0), { consultType: "CLINIC", bookedById: doctor.id });
+  await appt(doctor.id, walkInDone.id, "COMPLETED", daysAgo(1), { consultType: "CLINIC", bookedById: doctor.id });
+  await appt(doctor.id, walkInOwn.id, "SCHEDULED", daysAgo(0), { consultType: "CLINIC", bookedById: doctor.id });
+  await appt(doctor.id, walkInOwn.id, "SCHEDULED", daysAgo(-2));
   await appt(nurse.id, pending.id, "PENDING_APPROVAL", daysAgo(-1), { providerType: "NURSE", consultType: "HOME" });
   await appt(nurse.id, scheduled.id, "SCHEDULED", daysAgo(-1), { providerType: "NURSE", consultType: "HOME" });
   // A recent reading for every patient, so the dashboard check can tell who gets one.
-  for (const p of [pending, declined, scheduled, recent, lapsed, returning]) {
+  for (const p of [pending, declined, scheduled, recent, lapsed, returning, walkIn, walkInDone, walkInOwn]) {
     await prisma.vitalReading.create({ data: { patientId: p.id, recordedById: nurse.id, pulse: 80, recordedAt: daysAgo(1) } });
   }
 
@@ -93,6 +108,9 @@ async function main() {
       ["completed 30 days ago", recent, true],
       [`completed ${CARE_ACCESS_WINDOW_DAYS + 10} days ago`, lapsed, false],
       ["lapsed but booked again and accepted", returning, true],
+      ["desk-made walk-in still scheduled", walkIn, false],
+      ["desk-made walk-in completed", walkInDone, true],
+      ["desk-made walk-in + own accepted booking", walkInOwn, true],
     ] as const) {
       const h = await history(p);
       check(`history: ${label} → ${ok ? 200 : 403}`, h.status === (ok ? 200 : 403), `${h.status} ${err(h.json)}`);
@@ -101,6 +119,9 @@ async function main() {
     }
     const lapsedMsg = err((await history(lapsed)).json);
     check("lapsed access explains the window", lapsedMsg.includes(`${CARE_ACCESS_WINDOW_DAYS} days after your last visit`), lapsedMsg);
+
+    const walkInMsg = (await history(walkIn)).json as { error?: string; code?: string };
+    check("scheduled walk-in explains it opens on completion", walkInMsg.code === "NO_CARE_ACCESS" && (walkInMsg.error ?? "").includes("once you complete the consultation"), JSON.stringify(walkInMsg));
 
     const dep = await history(scheduled, child.id);
     check("parent's visit doesn't open the child's history", dep.status === 403, `${dep.status} ${err(dep.json)}`);
@@ -121,6 +142,8 @@ async function main() {
     check("dashboard: no vitals on a pending request", vitalsFor(pending).every((x) => !x), JSON.stringify(vitalsFor(pending)));
     check("dashboard: no vitals for declined / lapsed", [...vitalsFor(declined), ...vitalsFor(lapsed)].every((x) => !x), "hidden");
     check("dashboard: vitals shown for accepted / recent", vitalsFor(scheduled).every(Boolean) && vitalsFor(recent).every(Boolean), "shown");
+    check("dashboard: no vitals on a scheduled desk-made walk-in", vitalsFor(walkIn).length > 0 && vitalsFor(walkIn).every((x) => !x), JSON.stringify(vitalsFor(walkIn)));
+    check("dashboard: vitals on a walk-in with the patient's own accepted booking", vitalsFor(walkInOwn).length > 0 && vitalsFor(walkInOwn).every(Boolean), JSON.stringify(vitalsFor(walkInOwn)));
   } finally {
     await prisma.vitalReading.deleteMany({ where: { recordedById: nurse.id } });
     await prisma.appointment.deleteMany({ where: { OR: [{ patientId: { in: ids } }, { doctorId: { in: ids } }] } });
