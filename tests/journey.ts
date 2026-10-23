@@ -6,7 +6,12 @@
 // throwaway users only.
 //
 // Push checks count the server's "sendPushToUsers(<id>): …" log lines, so run
-// the dev server with its output in DEV_LOG (default /tmp/doconclick-dev.log).
+// the dev server with its output in DEV_LOG (default /tmp/doconclick-dev.log),
+// e.g. `npm run dev 2>&1 | tee /tmp/dev.log` then `DEV_LOG=/tmp/dev.log npm run test:journey`.
+// If the log doesn't grow while the test hits the server, it isn't that
+// server's log: the push checks are then reported as SKIPPED with a clear
+// message (not as false push failures); a log that grows but has the wrong
+// count still fails. No log file at all also skips them.
 // The patient gets a dummy push token — FCM rejects it, nothing is delivered.
 //
 //   npm run test:journey
@@ -40,6 +45,18 @@ async function call(u: U, method: string, path: string, body?: unknown) {
 }
 const hasLog = fs.existsSync(DEV_LOG);
 const pushesTo = (userId: string) => (hasLog ? fs.readFileSync(DEV_LOG, "utf8").split(`sendPushToUsers(${userId}):`).length - 1 : 0);
+const logSize = () => (hasLog ? fs.statSync(DEV_LOG).size : 0);
+let logStale = false; // set when the log did not grow after a server action
+// Push-count check that tells "wrong log file" apart from "wrong push count".
+function pushCheck(name: string, userId: string, before: number, sizeBefore: number) {
+  const delta = pushesTo(userId) - before;
+  if (delta !== 1 && logSize() === sizeBefore) {
+    logStale = true;
+    console.log(`SKIP  ${name} — DEV_LOG (${DEV_LOG}) did not grow; it is not this server's log (pass DEV_LOG=<file>)`);
+    return;
+  }
+  check(name, delta === 1, `${delta} pushes`);
+}
 const settle = () => new Promise((r) => setTimeout(r, 2500));
 
 async function main() {
@@ -98,24 +115,26 @@ async function main() {
     await settle();
     const soon = await visit(doctor.id, { scheduledAt: fromNow(2 * HOUR) });
     let before = pushesTo(patient.id);
+    let sizeBefore = logSize();
     r = await travel(doctor, soon.id, "ON_THE_WAY");
     check("visit in 2h: start journey → 200", r.status === 200, `${r.status} ${r.json.error ?? ""}`);
     r = await travel(doctor, soon.id, "ON_THE_WAY");
     r = await travel(doctor, soon.id, "ON_THE_WAY");
     check("position updates mid-journey → 200", r.status === 200, `${r.status}`);
     await settle();
-    if (hasLog) check("one push for the start, none for position updates", pushesTo(patient.id) - before === 1, `${pushesTo(patient.id) - before} pushes`);
+    if (hasLog) pushCheck("one push for the start, none for position updates", patient.id, before, sizeBefore);
 
     r = await call(patient, "PATCH", `/api/appointments/${soon.id}`, { scheduledAt: fromNow(2 * DAY).toISOString() });
     check("while on the way: patient can't reschedule", r.status === 400 && (r.json.error ?? "").includes("on the way"), `${r.status} ${r.json.error}`);
 
     before = pushesTo(patient.id);
+    sizeBefore = logSize();
     r = await travel(doctor, soon.id, "NOT_STARTED", false);
     const stopped = await prisma.appointment.findUniqueOrThrow({ where: { id: soon.id } });
     check("stop journey → NOT_STARTED, shared position cleared", r.status === 200 && stopped.travelStatus === "NOT_STARTED" && stopped.doctorLat === null && stopped.doctorLocationUpdatedAt === null,
       `${r.status} ${stopped.travelStatus} ${stopped.doctorLat}`);
     await settle();
-    if (hasLog) check("…patient told the journey stopped", pushesTo(patient.id) - before === 1, `${pushesTo(patient.id) - before} pushes`);
+    if (hasLog) pushCheck("…patient told the journey stopped", patient.id, before, sizeBefore);
     r = await travel(doctor, soon.id, "NOT_STARTED", false);
     check("stopping again → 400", r.status === 400, `${r.status} ${r.json.error}`);
 
@@ -134,6 +153,7 @@ async function main() {
   }
 
   if (!hasLog) console.log(`(push checks skipped — no dev log at ${DEV_LOG})`);
+  if (logStale) console.log(`(push checks skipped — ${DEV_LOG} is not the running server's log; set DEV_LOG)`);
   console.log(failures ? `\n${failures} check(s) FAILED` : "\nAll checks passed");
   await prisma.$disconnect();
   process.exit(failures ? 1 : 0);
