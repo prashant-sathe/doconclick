@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/components/AuthProvider";
 import { useResync } from "@/hooks/useResync";
 import { errorMessage } from "@/lib/apiClient";
@@ -26,6 +27,7 @@ const FeedContext = createContext<FeedContextType | null>(null);
 
 export function AppointmentFeedProvider({ roles, children }: { roles: string[]; children: React.ReactNode }) {
   const { user } = useAuth();
+  const t = useTranslations("shared.feed");
   // On the id/role, not the `user` object — AuthProvider re-polls every 30s with a fresh one.
   const userId = user?.id ?? null;
   const enabled = !!userId && roles.includes(user?.role ?? "");
@@ -40,15 +42,15 @@ export function AppointmentFeedProvider({ roles, children }: { roles: string[]; 
     try {
       const res = await fetch("/api/appointments/me?view=active");
       if (seq.current !== mine) return;
-      if (!res.ok) { setError(await errorMessage(res, "Couldn't load your appointments.")); return; }
+      if (!res.ok) { setError(await errorMessage(res, t("loadFailed"))); return; }
       const data = (await res.json()) as unknown[];
       if (seq.current !== mine) return;
       setItems(data);
       setError(null);
     } catch {
-      if (seq.current === mine) setError("Network error — check your connection and try again.");
+      if (seq.current === mine) setError(t("networkError"));
     }
-  }, [enabled]);
+  }, [enabled, t]);
 
   useEffect(() => {
     // A different user (or signed out): drop the last one's list.
@@ -84,6 +86,7 @@ type HistoryPage<T> = { items: T[]; nextCursor: string | null; counts: Record<st
 export type HistoryQuery = { q?: string; status?: string; consultType?: string; clinicId?: string; from?: string; to?: string };
 
 export function useAppointmentHistory<T extends { id: string }>(enabled: boolean, { pageSize = 20, query }: { pageSize?: number; query?: HistoryQuery } = {}) {
+  const t = useTranslations("shared.feed");
   // Search / filters run on the server, over the whole history.
   const queryKey = JSON.stringify(Object.entries(query ?? {}).filter(([, v]) => v).sort());
   const [items, setItems] = useState<T[] | null>(null);
@@ -99,10 +102,10 @@ export function useAppointmentHistory<T extends { id: string }>(enabled: boolean
     for (const [k, v] of JSON.parse(queryKey) as [string, string][]) qs.set(k, v);
     if (cursor) qs.set("cursor", cursor);
     const res = await fetch(`/api/appointments/me?${qs}`);
-    if (!res.ok) throw new Error(await errorMessage(res, "Couldn't load past appointments."));
+    if (!res.ok) throw new Error(await errorMessage(res, t("historyLoadFailed")));
     return res.json();
   };
-  const failure = (e: unknown) => (e instanceof TypeError ? "Network error — check your connection and try again." : (e as Error).message);
+  const failure = (e: unknown) => (e instanceof TypeError ? t("networkError") : (e as Error).message);
 
   /** Re-fetch from the top, as many pages as were showing (after a mutation). */
   const refresh = useCallback(async () => {

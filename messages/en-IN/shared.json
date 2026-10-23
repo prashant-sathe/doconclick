@@ -168,5 +168,10 @@
     "loadMore": "Load more",
     "loadFailed": "Couldn't load notifications.",
     "new": "New"
+  },
+  "feed": {
+    "loadFailed": "Couldn't load your appointments.",
+    "historyLoadFailed": "Couldn't load past appointments.",
+    "networkError": "Network error — check your connection and try again."
   }
 }
