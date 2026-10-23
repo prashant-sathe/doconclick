@@ -7,6 +7,7 @@ import NurseSettings from "@/components/admin/NurseSettings";
 import DoctorFeeSettings from "@/components/admin/DoctorFeeSettings";
 import CashDueSettings from "@/components/admin/CashDueSettings";
 import BookingSettings from "@/components/admin/BookingSettings";
+import ReceiptSettings from "@/components/admin/ReceiptSettings";
 
 export default function AdminSettings() {
   return (
@@ -51,6 +52,8 @@ export default function AdminSettings() {
         <DoctorFeeSettings />
 
         <CashDueSettings />
+
+        <ReceiptSettings />
 
         <NurseSettings />
 

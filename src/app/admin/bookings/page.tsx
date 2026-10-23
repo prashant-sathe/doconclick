@@ -6,6 +6,7 @@ import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-
 import { cn, formatProviderName, nameOrMobile } from "@/lib/utils";
 import { brandGridTheme } from "@/lib/agGridTheme";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
+import ReceiptDownloadButton from "@/components/patient/ReceiptDownloadButton";
 import LoadError from "@/components/LoadError";
 import { useLoad } from "@/lib/apiClient";
 
@@ -62,6 +63,7 @@ interface AppointmentDetail extends Appointment {
     name: string; mobile: string; email: string | null;
     patientProfile: { age: number; gender: string; homeAddress: string | null } | null;
   };
+  paymentStatus: string;
   doctorNotes: string | null;
   prescriptionUrl: string | null;
   medicines: Medicine[];
@@ -136,6 +138,7 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
                 <span className={TYPE_BADGE[data.consultType] ?? "badge badge-gray"}>{data.consultType}</span>
                 <span className="text-sm text-slate-500">₹{data.amount}</span>
                 <span className="text-xs text-slate-400">{new Date(data.createdAt).toLocaleDateString("en-IN")}</span>
+                {data.paymentStatus === "PAID" && <span className="ml-auto"><ReceiptDownloadButton kind="appointment" id={data.id} compact /></span>}
               </div>
 
               <Section title="Patient" icon={Phone}>

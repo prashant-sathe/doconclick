@@ -493,5 +493,8 @@
   "fieldInvalidMobileGeneric": "{field} सही 10 अंकों का भारतीय मोबाइल नंबर होना चाहिए।",
   "fieldNotPhoneGeneric": "{field} एक फ़ोन नंबर होना चाहिए।",
   "fieldRangeGeneric": "{field} {min} से {max} {unit} के बीच होना चाहिए।",
-  "fieldNotNumberGeneric": "{field} एक संख्या होनी चाहिए।"
+  "fieldNotNumberGeneric": "{field} एक संख्या होनी चाहिए।",
+  "receiptAppointmentUnpaid": "अपॉइंटमेंट का भुगतान होने के बाद ही रसीद मिलेगी।",
+  "topupNotFound": "टॉप-अप नहीं मिला",
+  "receiptTopupPending": "टॉप-अप सफल होने के बाद ही रसीद मिलेगी।"
 }

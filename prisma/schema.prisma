@@ -851,6 +851,14 @@ model PlatformSettings {
   // earnings) before new cash bookings from their side are refused until
   // they pay it (src/lib/duesPayments.ts). ₹0 = no limit.
   cashDueLimit            Float    @default(2000)
+  // Supplier block printed on patient receipts (appointment payments and
+  // wallet top-ups — src/lib/receipts.ts). Unset name falls back to
+  // "DocOnClick"; GSTIN / address are left off the receipt while unset.
+  // receiptTaxNote overrides the default GST line on appointment receipts.
+  receiptLegalName        String?
+  receiptAddress          String?
+  receiptGstin            String?
+  receiptTaxNote          String?
   // Mobile app splash: admin uploads an image that the native shell shows over
   // the WebView while it boots (the real native splash is baked into the app
   // binary and can't change without a store update — this is the dynamic layer

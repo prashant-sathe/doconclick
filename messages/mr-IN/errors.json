@@ -493,5 +493,8 @@
   "fieldInvalidMobileGeneric": "{field} साठी योग्य 10 अंकी भारतीय मोबाइल नंबर टाका.",
   "fieldNotPhoneGeneric": "{field} साठी फोन नंबरच टाका.",
   "fieldRangeGeneric": "{field} {min} ते {max} {unit} दरम्यान असावे.",
-  "fieldNotNumberGeneric": "{field} साठी आकडाच टाका."
+  "fieldNotNumberGeneric": "{field} साठी आकडाच टाका.",
+  "receiptAppointmentUnpaid": "अपॉइंटमेंटचे पेमेंट झाल्यावरच पावती मिळेल.",
+  "topupNotFound": "टॉप-अप सापडले नाही",
+  "receiptTopupPending": "टॉप-अप यशस्वी झाल्यावरच पावती मिळेल."
 }

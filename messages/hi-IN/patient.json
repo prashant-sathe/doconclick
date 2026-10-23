@@ -14,6 +14,12 @@
     "download": "प्रिस्क्रिप्शन डाउनलोड करें",
     "failed": "PDF नहीं बन सका"
   },
+  "receiptDownload": {
+    "generating": "बन रही है…",
+    "download": "रसीद डाउनलोड करें",
+    "short": "रसीद",
+    "failed": "रसीद नहीं बन सकी"
+  },
   "appointmentToast": {
     "SCHEDULED": {
       "title": "अपॉइंटमेंट कन्फ़र्म हो गया!",

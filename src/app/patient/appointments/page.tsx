@@ -10,6 +10,7 @@ import { cn, formatDoctorName, formatProviderName } from "@/lib/utils";
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
+import ReceiptDownloadButton from "@/components/patient/ReceiptDownloadButton";
 import { downloadOrShareUrl } from "@/lib/nativeDownload";
 import { isNative } from "@/lib/platform";
 import { playMessageChime } from "@/lib/playNotificationSound";
@@ -542,6 +543,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         {a.status === "COMPLETED" && a.providerType !== "NURSE" && (a.medicines.length > 0 || !!a.doctorNotes) && (
           <PrescriptionDownloadButton appointmentId={a.id} patientId={patientId} />
         )}
+        {a.paymentStatus === "PAID" && <ReceiptDownloadButton kind="appointment" id={a.id} />}
         {a.status === "COMPLETED" && !a.review && (
           <button onClick={() => onReview(a.id)} className="tap-44-y btn-secondary py-2 px-3 text-xs">
             <Star className="w-3.5 h-3.5" /> {t("leaveReview")}

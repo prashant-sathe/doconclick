@@ -14,6 +14,9 @@ async function requireAdmin() {
   return null;
 }
 
+// 2-digit state code, PAN, entity number, "Z", checksum character.
+const GSTIN_RE = /^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+
 // Only a real JSON number counts. Number() would quietly turn "" / null (and
 // NaN, which JSON.stringify sends as null) into 0 — i.e. a blank field would
 // zero out a live commission or fee.
@@ -109,6 +112,30 @@ export async function PATCH(req: Request) {
       );
     }
     data.chatFollowUpDays = value;
+  }
+
+  // Supplier block on patient receipts (src/lib/receipts.ts). Blank clears a
+  // field (name → "DocOnClick", tax note → the default GST line).
+  for (const [key, max] of [["receiptLegalName", 120], ["receiptAddress", 300], ["receiptTaxNote", 400]] as const) {
+    if (body[key] === undefined) continue;
+    if (body[key] !== null && typeof body[key] !== "string") {
+      return NextResponse.json({ error: "Receipt details must be text." }, { status: 400 });
+    }
+    const value = (body[key] ?? "").trim();
+    if (value.length > max) {
+      return NextResponse.json({ error: `Receipt details are too long (max ${max} characters).` }, { status: 400 });
+    }
+    data[key] = value || null;
+  }
+  if (body.receiptGstin !== undefined) {
+    if (body.receiptGstin !== null && typeof body.receiptGstin !== "string") {
+      return NextResponse.json({ error: "Enter a valid 15-character GSTIN, e.g. 27ABCDE1234F1Z5." }, { status: 400 });
+    }
+    const gstin = (body.receiptGstin ?? "").trim().toUpperCase();
+    if (gstin && !GSTIN_RE.test(gstin)) {
+      return NextResponse.json({ error: "Enter a valid 15-character GSTIN, e.g. 27ABCDE1234F1Z5." }, { status: 400 });
+    }
+    data.receiptGstin = gstin || null;
   }
 
   // Only an image uploaded through Settings (our bucket, app-splash/) — every

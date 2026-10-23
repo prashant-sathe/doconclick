@@ -7,6 +7,7 @@ export interface WalletTransaction {
   amount: number;
   balanceAfter: number | null;
   note: string | null;
+  appointmentId: string | null; // BOOKING_PAYMENT rows
   createdAt: string;
 }
 

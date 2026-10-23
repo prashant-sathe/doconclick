@@ -14,6 +14,12 @@
     "download": "प्रिस्क्रिप्शन डाउनलोड करा",
     "failed": "PDF तयार करता आले नाही"
   },
+  "receiptDownload": {
+    "generating": "तयार होत आहे…",
+    "download": "पावती डाउनलोड करा",
+    "short": "पावती",
+    "failed": "पावती तयार करता आली नाही"
+  },
   "appointmentToast": {
     "SCHEDULED": {
       "title": "अपॉइंटमेंट निश्चित झाली!",

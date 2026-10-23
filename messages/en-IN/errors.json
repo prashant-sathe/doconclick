@@ -493,5 +493,8 @@
   "fieldInvalidMobileGeneric": "{field} must be a valid 10-digit Indian mobile number.",
   "fieldNotPhoneGeneric": "{field} must be a phone number.",
   "fieldRangeGeneric": "{field} must be between {min} and {max} {unit}.",
-  "fieldNotNumberGeneric": "{field} must be a number."
+  "fieldNotNumberGeneric": "{field} must be a number.",
+  "receiptAppointmentUnpaid": "A receipt is available once the appointment is paid.",
+  "topupNotFound": "Top-up not found",
+  "receiptTopupPending": "A receipt is available once the top-up succeeds."
 }

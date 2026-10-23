@@ -65,6 +65,10 @@ export type PlatformSettingsMinAggregateOutputType = {
   bookingHorizonDays: number | null
   chatFollowUpDays: number | null
   cashDueLimit: number | null
+  receiptLegalName: string | null
+  receiptAddress: string | null
+  receiptGstin: string | null
+  receiptTaxNote: string | null
   splashImageUrl: string | null
   splashFit: string | null
   splashBgColor: string | null
@@ -84,6 +88,10 @@ export type PlatformSettingsMaxAggregateOutputType = {
   bookingHorizonDays: number | null
   chatFollowUpDays: number | null
   cashDueLimit: number | null
+  receiptLegalName: string | null
+  receiptAddress: string | null
+  receiptGstin: string | null
+  receiptTaxNote: string | null
   splashImageUrl: string | null
   splashFit: string | null
   splashBgColor: string | null
@@ -103,6 +111,10 @@ export type PlatformSettingsCountAggregateOutputType = {
   bookingHorizonDays: number
   chatFollowUpDays: number
   cashDueLimit: number
+  receiptLegalName: number
+  receiptAddress: number
+  receiptGstin: number
+  receiptTaxNote: number
   splashImageUrl: number
   splashFit: number
   splashBgColor: number
@@ -150,6 +162,10 @@ export type PlatformSettingsMinAggregateInputType = {
   bookingHorizonDays?: true
   chatFollowUpDays?: true
   cashDueLimit?: true
+  receiptLegalName?: true
+  receiptAddress?: true
+  receiptGstin?: true
+  receiptTaxNote?: true
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
@@ -169,6 +185,10 @@ export type PlatformSettingsMaxAggregateInputType = {
   bookingHorizonDays?: true
   chatFollowUpDays?: true
   cashDueLimit?: true
+  receiptLegalName?: true
+  receiptAddress?: true
+  receiptGstin?: true
+  receiptTaxNote?: true
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
@@ -188,6 +208,10 @@ export type PlatformSettingsCountAggregateInputType = {
   bookingHorizonDays?: true
   chatFollowUpDays?: true
   cashDueLimit?: true
+  receiptLegalName?: true
+  receiptAddress?: true
+  receiptGstin?: true
+  receiptTaxNote?: true
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
@@ -294,6 +318,10 @@ export type PlatformSettingsGroupByOutputType = {
   bookingHorizonDays: number
   chatFollowUpDays: number
   cashDueLimit: number
+  receiptLegalName: string | null
+  receiptAddress: string | null
+  receiptGstin: string | null
+  receiptTaxNote: string | null
   splashImageUrl: string | null
   splashFit: string
   splashBgColor: string
@@ -336,6 +364,10 @@ export type PlatformSettingsWhereInput = {
   bookingHorizonDays?: Prisma.IntFilter<"PlatformSettings"> | number
   chatFollowUpDays?: Prisma.IntFilter<"PlatformSettings"> | number
   cashDueLimit?: Prisma.FloatFilter<"PlatformSettings"> | number
+  receiptLegalName?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
+  receiptAddress?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
+  receiptGstin?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
+  receiptTaxNote?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
   splashImageUrl?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringFilter<"PlatformSettings"> | string
@@ -355,6 +387,10 @@ export type PlatformSettingsOrderByWithRelationInput = {
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
+  receiptLegalName?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptGstin?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptTaxNote?: Prisma.SortOrderInput | Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -377,6 +413,10 @@ export type PlatformSettingsWhereUniqueInput = Prisma.AtLeast<{
   bookingHorizonDays?: Prisma.IntFilter<"PlatformSettings"> | number
   chatFollowUpDays?: Prisma.IntFilter<"PlatformSettings"> | number
   cashDueLimit?: Prisma.FloatFilter<"PlatformSettings"> | number
+  receiptLegalName?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
+  receiptAddress?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
+  receiptGstin?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
+  receiptTaxNote?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
   splashImageUrl?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringFilter<"PlatformSettings"> | string
@@ -396,6 +436,10 @@ export type PlatformSettingsOrderByWithAggregationInput = {
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
+  receiptLegalName?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptGstin?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptTaxNote?: Prisma.SortOrderInput | Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -423,6 +467,10 @@ export type PlatformSettingsScalarWhereWithAggregatesInput = {
   bookingHorizonDays?: Prisma.IntWithAggregatesFilter<"PlatformSettings"> | number
   chatFollowUpDays?: Prisma.IntWithAggregatesFilter<"PlatformSettings"> | number
   cashDueLimit?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  receiptLegalName?: Prisma.StringNullableWithAggregatesFilter<"PlatformSettings"> | string | null
+  receiptAddress?: Prisma.StringNullableWithAggregatesFilter<"PlatformSettings"> | string | null
+  receiptGstin?: Prisma.StringNullableWithAggregatesFilter<"PlatformSettings"> | string | null
+  receiptTaxNote?: Prisma.StringNullableWithAggregatesFilter<"PlatformSettings"> | string | null
   splashImageUrl?: Prisma.StringNullableWithAggregatesFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
@@ -442,6 +490,10 @@ export type PlatformSettingsCreateInput = {
   bookingHorizonDays?: number
   chatFollowUpDays?: number
   cashDueLimit?: number
+  receiptLegalName?: string | null
+  receiptAddress?: string | null
+  receiptGstin?: string | null
+  receiptTaxNote?: string | null
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
@@ -461,6 +513,10 @@ export type PlatformSettingsUncheckedCreateInput = {
   bookingHorizonDays?: number
   chatFollowUpDays?: number
   cashDueLimit?: number
+  receiptLegalName?: string | null
+  receiptAddress?: string | null
+  receiptGstin?: string | null
+  receiptTaxNote?: string | null
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
@@ -480,6 +536,10 @@ export type PlatformSettingsUpdateInput = {
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   chatFollowUpDays?: Prisma.IntFieldUpdateOperationsInput | number
   cashDueLimit?: Prisma.FloatFieldUpdateOperationsInput | number
+  receiptLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptGstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptTaxNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -499,6 +559,10 @@ export type PlatformSettingsUncheckedUpdateInput = {
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   chatFollowUpDays?: Prisma.IntFieldUpdateOperationsInput | number
   cashDueLimit?: Prisma.FloatFieldUpdateOperationsInput | number
+  receiptLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptGstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptTaxNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -518,6 +582,10 @@ export type PlatformSettingsCreateManyInput = {
   bookingHorizonDays?: number
   chatFollowUpDays?: number
   cashDueLimit?: number
+  receiptLegalName?: string | null
+  receiptAddress?: string | null
+  receiptGstin?: string | null
+  receiptTaxNote?: string | null
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
@@ -537,6 +605,10 @@ export type PlatformSettingsUpdateManyMutationInput = {
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   chatFollowUpDays?: Prisma.IntFieldUpdateOperationsInput | number
   cashDueLimit?: Prisma.FloatFieldUpdateOperationsInput | number
+  receiptLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptGstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptTaxNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -556,6 +628,10 @@ export type PlatformSettingsUncheckedUpdateManyInput = {
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   chatFollowUpDays?: Prisma.IntFieldUpdateOperationsInput | number
   cashDueLimit?: Prisma.FloatFieldUpdateOperationsInput | number
+  receiptLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptGstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptTaxNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -575,6 +651,10 @@ export type PlatformSettingsCountOrderByAggregateInput = {
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
+  receiptLegalName?: Prisma.SortOrder
+  receiptAddress?: Prisma.SortOrder
+  receiptGstin?: Prisma.SortOrder
+  receiptTaxNote?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -607,6 +687,10 @@ export type PlatformSettingsMaxOrderByAggregateInput = {
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
+  receiptLegalName?: Prisma.SortOrder
+  receiptAddress?: Prisma.SortOrder
+  receiptGstin?: Prisma.SortOrder
+  receiptTaxNote?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -626,6 +710,10 @@ export type PlatformSettingsMinOrderByAggregateInput = {
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
+  receiptLegalName?: Prisma.SortOrder
+  receiptAddress?: Prisma.SortOrder
+  receiptGstin?: Prisma.SortOrder
+  receiptTaxNote?: Prisma.SortOrder
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
@@ -660,6 +748,10 @@ export type PlatformSettingsSelect<ExtArgs extends runtime.Types.Extensions.Inte
   bookingHorizonDays?: boolean
   chatFollowUpDays?: boolean
   cashDueLimit?: boolean
+  receiptLegalName?: boolean
+  receiptAddress?: boolean
+  receiptGstin?: boolean
+  receiptTaxNote?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
@@ -679,6 +771,10 @@ export type PlatformSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   bookingHorizonDays?: boolean
   chatFollowUpDays?: boolean
   cashDueLimit?: boolean
+  receiptLegalName?: boolean
+  receiptAddress?: boolean
+  receiptGstin?: boolean
+  receiptTaxNote?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
@@ -698,6 +794,10 @@ export type PlatformSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   bookingHorizonDays?: boolean
   chatFollowUpDays?: boolean
   cashDueLimit?: boolean
+  receiptLegalName?: boolean
+  receiptAddress?: boolean
+  receiptGstin?: boolean
+  receiptTaxNote?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
@@ -717,13 +817,17 @@ export type PlatformSettingsSelectScalar = {
   bookingHorizonDays?: boolean
   chatFollowUpDays?: boolean
   cashDueLimit?: boolean
+  receiptLegalName?: boolean
+  receiptAddress?: boolean
+  receiptGstin?: boolean
+  receiptTaxNote?: boolean
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
   updatedAt?: boolean
 }
 
-export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "doctorRegistrationFee" | "nurseSubscriptionFee" | "nurseShiftServicesSeeded" | "bookingHorizonDays" | "chatFollowUpDays" | "cashDueLimit" | "splashImageUrl" | "splashFit" | "splashBgColor" | "updatedAt", ExtArgs["result"]["platformSettings"]>
+export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "doctorRegistrationFee" | "nurseSubscriptionFee" | "nurseShiftServicesSeeded" | "bookingHorizonDays" | "chatFollowUpDays" | "cashDueLimit" | "receiptLegalName" | "receiptAddress" | "receiptGstin" | "receiptTaxNote" | "splashImageUrl" | "splashFit" | "splashBgColor" | "updatedAt", ExtArgs["result"]["platformSettings"]>
 
 export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlatformSettings"
@@ -741,6 +845,10 @@ export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.In
     bookingHorizonDays: number
     chatFollowUpDays: number
     cashDueLimit: number
+    receiptLegalName: string | null
+    receiptAddress: string | null
+    receiptGstin: string | null
+    receiptTaxNote: string | null
     splashImageUrl: string | null
     splashFit: string
     splashBgColor: string
@@ -1180,6 +1288,10 @@ export interface PlatformSettingsFieldRefs {
   readonly bookingHorizonDays: Prisma.FieldRef<"PlatformSettings", 'Int'>
   readonly chatFollowUpDays: Prisma.FieldRef<"PlatformSettings", 'Int'>
   readonly cashDueLimit: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly receiptLegalName: Prisma.FieldRef<"PlatformSettings", 'String'>
+  readonly receiptAddress: Prisma.FieldRef<"PlatformSettings", 'String'>
+  readonly receiptGstin: Prisma.FieldRef<"PlatformSettings", 'String'>
+  readonly receiptTaxNote: Prisma.FieldRef<"PlatformSettings", 'String'>
   readonly splashImageUrl: Prisma.FieldRef<"PlatformSettings", 'String'>
   readonly splashFit: Prisma.FieldRef<"PlatformSettings", 'String'>
   readonly splashBgColor: Prisma.FieldRef<"PlatformSettings", 'String'>

@@ -4,6 +4,7 @@ import { Loader2, Plus, Wallet, ArrowDownCircle, ArrowUpCircle, ShieldCheck } fr
 import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import WalletTopUpModal from "@/components/patient/WalletTopUpModal";
+import ReceiptDownloadButton from "@/components/patient/ReceiptDownloadButton";
 import { useWallet } from "@/hooks/useWallet";
 import { useLocale, useTranslations } from "next-intl";
 import { formattingLocale } from "@/lib/appLanguage";
@@ -69,9 +70,16 @@ export default function WalletPage() {
                         {txn.note && ` · ${txn.note}`}
                       </p>
                     </div>
-                    <span className={`text-sm font-bold flex-shrink-0 ${txn.status === "FAILED" ? "text-slate-300 line-through" : isCredit ? "text-emerald-600" : "text-slate-700"}`}>
-                      {isCredit ? "+" : "−"}₹{txn.amount}
-                    </span>
+                    <div className="flex flex-col items-end flex-shrink-0">
+                      <span className={`text-sm font-bold ${txn.status === "FAILED" ? "text-slate-300 line-through" : isCredit ? "text-emerald-600" : "text-slate-700"}`}>
+                        {isCredit ? "+" : "−"}₹{txn.amount}
+                      </span>
+                      {/* Top-ups get their own receipt; a booking payment links to that visit's. */}
+                      {txn.status === "SUCCESS" && txn.type === "TOPUP" && <ReceiptDownloadButton kind="wallet" id={txn.id} compact />}
+                      {txn.status === "SUCCESS" && txn.type === "BOOKING_PAYMENT" && txn.appointmentId && (
+                        <ReceiptDownloadButton kind="appointment" id={txn.appointmentId} compact />
+                      )}
+                    </div>
                   </div>
                 );
               })}
