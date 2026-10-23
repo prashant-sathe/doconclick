@@ -6,6 +6,7 @@ import { verifyUpload } from "@/lib/fileSniff";
 import { slugify } from "@/lib/utils";
 import { requireActiveNurse } from "@/lib/providerGuard";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { notifyAdminNurseReReview } from "@/lib/nurseReReview";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -47,6 +48,20 @@ async function lockedResponse(userId: string, type: string) {
     );
   }
   return null;
+}
+
+// Replacing or removing a verification document of an APPROVED nurse sends
+// her back to PENDING for re-review (the photo is free to change).
+async function saveDoc(userId: string, name: string, type: string, url: string | null) {
+  const field = DOC_FIELD[type];
+  const before = (await prisma.nurseProfile.findUnique({ where: { userId } })) as Record<string, unknown> | null;
+  const reReview = type !== "photo" && before?.status === "APPROVED" && !!before[field];
+  const updated = await prisma.nurseProfile.update({
+    where: { userId },
+    data: { [field]: url, ...(reReview ? { status: "PENDING" } : {}) },
+  });
+  if (reReview) notifyAdminNurseReReview(name);
+  return updated;
 }
 
 // POST: nurse uploads a verification document or profile photo.
@@ -95,10 +110,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     console.error("Nurse document upload to S3 failed:", err);
     return NextResponse.json({ error: "Couldn't upload this file. Please try again." }, { status: 500 });
   }
-  const updated = await prisma.nurseProfile.update({
-    where: { userId: authUser.id },
-    data: { [DOC_FIELD[type]]: url },
-  });
+  const updated = await saveDoc(authUser.id, authUser.name, type, url);
   return NextResponse.json(updated);
 });
 
@@ -114,9 +126,6 @@ export const DELETE = withErrorLocale(async function DELETE(req: Request) {
   const locked = await lockedResponse(authUser.id, type);
   if (locked) return locked;
 
-  const updated = await prisma.nurseProfile.update({
-    where: { userId: authUser.id },
-    data: { [DOC_FIELD[type]]: null },
-  });
+  const updated = await saveDoc(authUser.id, authUser.name, type, null);
   return NextResponse.json(updated);
 });

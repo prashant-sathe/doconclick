@@ -114,6 +114,47 @@ async function main() {
     check("…approve → 200 APPROVED", r.status === 200 && r.json.status === "APPROVED", `${r.status} ${r.json.error ?? r.json.status}`);
     r = await approve();
     check("re-saving an approved nurse doesn't re-run the checks", r.status === 200, `${r.status}`);
+
+    // ── P2-33: an approved nurse can't quietly change what was approved ──
+    const as = (method: string, path: string, body: unknown) =>
+      fetch(`${BASE}${path}`, { method, headers: { Cookie: cookieFor({ ...nurse, role: "NURSE" } as U), "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const statusNow = async () => (await prisma.nurseProfile.findUniqueOrThrow({ where: { userId: nurse.id } })).status;
+    const reapprove = async () => { await setDocs({ ...complete, status: "APPROVED", isVerified: false }); };
+
+    let res = await as("PATCH", "/api/nurses/me", { bio: "Updated bio", radius: 12 });
+    check("approved nurse edits bio/radius → 200, stays APPROVED", res.status === 200 && (await statusNow()) === "APPROVED", `${res.status} ${await statusNow()}`);
+    res = await as("PATCH", "/api/nurses/me", { lat: 18.5205, lng: 73.8505 });
+    check("base moved <2 km → 200, stays APPROVED", res.status === 200 && (await statusNow()) === "APPROVED", `${res.status} ${await statusNow()}`);
+    res = await as("PATCH", "/api/nurses/me", { lat: 18.62, lng: 73.95 });
+    check("base moved >2 km → 200, back to PENDING", res.status === 200 && (await statusNow()) === "PENDING", `${res.status} ${await statusNow()}`);
+    await reapprove();
+    res = await as("PATCH", "/api/nurses/me", { councilRegNo: "FAKE-9999" });
+    check("approved nurse changes councilRegNo → PENDING", res.status === 200 && (await statusNow()) === "PENDING", `${res.status} ${await statusNow()}`);
+    await reapprove();
+    res = await as("PATCH", "/api/nurses/me", { councilRegNo: complete.councilRegNo });
+    check("same councilRegNo re-saved → stays APPROVED", res.status === 200 && (await statusNow()) === "APPROVED", `${res.status} ${await statusNow()}`);
+    res = await as("DELETE", "/api/nurses/me/documents", { type: "photo" });
+    check("approved nurse removes the photo → stays APPROVED", res.status === 200 && (await statusNow()) === "APPROVED", `${res.status} ${await statusNow()}`);
+    res = await as("DELETE", "/api/nurses/me/documents", { type: "degreeCert" });
+    const afterDel = await prisma.nurseProfile.findUniqueOrThrow({ where: { userId: nurse.id } });
+    check("approved nurse deletes degreeCert → PENDING", res.status === 200 && afterDel.status === "PENDING" && afterDel.degreeCertUrl === null, `${res.status} ${afterDel.status}`);
+
+    // ── Admin: isVerified needs APPROVED + a ready checklist ──
+    const verify = async (body: unknown) => {
+      const rv = await fetch(`${BASE}/api/admin/nurses/${nurse.id}`, { method: "PATCH", headers: { Cookie: cookieFor(admin), "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      return rv.status;
+    };
+    await setDocs({ ...complete, status: "PENDING", isVerified: false });
+    let st = await verify({ isVerified: true });
+    check("PENDING nurse isVerified:true → 400", st === 400 && !(await prisma.nurseProfile.findUniqueOrThrow({ where: { userId: nurse.id } })).isVerified, `${st}`);
+    await setDocs({ ...complete, status: "APPROVED", degreeCertUrl: null });
+    st = await verify({ isVerified: true });
+    check("APPROVED but checklist incomplete → 400", st === 400, `${st}`);
+    await setDocs({ ...complete, status: "APPROVED" });
+    st = await verify({ isVerified: true });
+    check("APPROVED + checklist ready → 200 verified", st === 200 && (await prisma.nurseProfile.findUniqueOrThrow({ where: { userId: nurse.id } })).isVerified, `${st}`);
+    res = await as("PATCH", "/api/nurses/me", { councilRegNo: "OTHER-1234" });
+    check("verified nurse changing councilRegNo → still 403", res.status === 403, `${res.status}`);
   } finally {
     await prisma.user.deleteMany({ where: { id: { in: ids } } });
     const s3 = new S3Client({ region: process.env.AWS_REGION!, credentials: { accessKeyId: process.env.AWS_ACCESS_KEY_ID!, secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY! } });

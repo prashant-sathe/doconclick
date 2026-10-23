@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { requireActiveNurse, isNurseBookable } from "@/lib/providerGuard";
 import { parseBody, definedOnly, nurseProfilePatchSchema } from "@/lib/schemas";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { RE_REVIEW_FIELDS, baseLocationMovedFar, notifyAdminNurseReReview } from "@/lib/nurseReReview";
 
 // GET: the logged-in nurse's own profile, offered services, and the
 // admin-set fees (so the client knows whether a payment step applies).
@@ -70,8 +71,18 @@ export const PATCH = withErrorLocale(async function PATCH(req: Request) {
     );
   }
 
+  // Approved nurse changing credentials or moving her base far → back to
+  // PENDING for re-review (and the admin is told).
+  const changed = (k: string) => k in data && data[k] !== (profile as Record<string, unknown>)[k];
+  const reReview =
+    profile.status === "APPROVED" &&
+    (RE_REVIEW_FIELDS.some(changed) ||
+      baseLocationMovedFar(profile, { lat: data.lat as number | null | undefined, lng: data.lng as number | null | undefined }));
+  if (reReview) data.status = "PENDING";
+
   try {
     const updated = await prisma.nurseProfile.update({ where: { userId: authUser.id }, data });
+    if (reReview) notifyAdminNurseReReview(authUser.name);
     return NextResponse.json(updated);
   } catch (err: unknown) {
     if (err && typeof err === "object" && "code" in err && err.code === "P2002") {

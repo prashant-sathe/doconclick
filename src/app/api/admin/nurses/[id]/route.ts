@@ -80,7 +80,24 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
     data.status = status;
   }
-  if (isVerified !== undefined) data.isVerified = Boolean(isVerified);
+  if (isVerified !== undefined) {
+    // "Credentials verified" locks her documents — only for an approved nurse
+    // whose checklist is complete.
+    if (Boolean(isVerified)) {
+      if ((data.status ?? profile.status) !== "APPROVED") {
+        return NextResponse.json({ error: "Approve the nurse before marking her credentials verified." }, { status: 400 });
+      }
+      const checklist = await nurseApprovalChecklist(profile);
+      if (!checklist.ready) {
+        const missing = checklist.items.filter((i) => !i.ok).map((i) => `${i.label} (${i.problem})`);
+        return NextResponse.json(
+          { error: `Cannot verify yet: ${missing.join("; ")}.`, code: "APPROVAL_CHECKLIST", checklist },
+          { status: 400 }
+        );
+      }
+    }
+    data.isVerified = Boolean(isVerified);
+  }
   if (Object.keys(data).length === 0) return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
 
   const statusChanged = data.status !== undefined && data.status !== profile.status;
