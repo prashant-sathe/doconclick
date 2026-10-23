@@ -8,10 +8,13 @@ import {
   Loader2, CheckCircle2, XCircle, Paperclip, IndianRupee,
   Navigation, Plus, Trash2, History, ThumbsUp, ThumbsDown, Inbox,
   Car, MapPinCheck, AlertTriangle, MessageCircle, Search, X, FileText,
-  MoreHorizontal, UserX, CalendarClock, ChevronDown, HeartPulse, UserPlus, QrCode,
+  MoreHorizontal, UserX, CalendarClock, ChevronDown, HeartPulse, UserPlus, QrCode, Phone,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { isOverdue, byVisitAsc, byVisitDesc, nextUpcoming } from "@/lib/doctorQueue";
+import {
+  isOverdue, byVisitAsc, byVisitDesc, nextUpcoming, matchesQueueFilters, matchesPatientSearch, contactLinks, hasActiveFilters,
+  DEFAULT_QUEUE_FILTERS, QUEUE_RANGES, QUEUE_TYPES, QUEUE_STATUSES, type QueueFilters,
+} from "@/lib/doctorQueue";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import PaymentQrPanel from "@/components/doctor/PaymentQrPanel";
@@ -81,6 +84,8 @@ interface Appointment {
   unreadMessageCount: number;
   // Set when the doctor or front desk booked it (/doctor/walk-in).
   bookedById: string | null;
+  clinicId: string | null;
+  clinic: { name: string } | null;
   patient: {
     name: string;
     mobile: string;
@@ -641,6 +646,25 @@ function visitAddressText(v: VisitLocation) {
 }
 
 // The home-visit address line on a request/visit card, tappable for directions.
+// Call / WhatsApp the account holder — hidden unless it's a real mobile number.
+function ContactLinks({ mobile }: { mobile: string }) {
+  const t = useTranslations("doctor.dashboard");
+  const links = contactLinks(mobile);
+  if (!links) return null;
+  const pill = "inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] font-bold transition-colors";
+  return (
+    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+      <span className="text-xs text-slate-400 tabular-nums">{mobile}</span>
+      <a href={links.tel} className={cn(pill, "border-slate-200 text-slate-600 hover:bg-slate-50")} title={t("callTitle", { mobile })}>
+        <Phone className="w-3 h-3" /> {t("call")}
+      </a>
+      <a href={links.whatsapp} target="_blank" rel="noopener noreferrer" className={cn(pill, "border-emerald-200 text-emerald-700 hover:bg-emerald-50")} title={t("whatsappTitle", { mobile })}>
+        <MessageCircle className="w-3 h-3" /> {t("whatsapp")}
+      </a>
+    </div>
+  );
+}
+
 function VisitAddressLine({ visit }: { visit: VisitLocation | null }) {
   const t = useTranslations("doctor.dashboard");
   const url = visitNavUrl(visit);
@@ -675,6 +699,7 @@ export default function DoctorDashboard() {
   const past = useAppointmentHistory<Appointment>(user?.role === "DOCTOR" || user?.role === "STAFF");
   const appointments = useMemo(() => mergeAppointments(feed.items, past.items), [feed.items, past.items]);
   const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState<QueueFilters>(DEFAULT_QUEUE_FILTERS);
   // True until the first successful load; a failed (re)load sets apptsError
   // and keeps whatever was last loaded.
   const loadingAppts = feed.items === null;
@@ -992,8 +1017,13 @@ export default function DoctorDashboard() {
   }
 
   const profile = doctor?.doctorProfile;
-  const matchesSearch = (a: Appointment) =>
-    patientLabel(a).toLowerCase().includes(search.trim().toLowerCase());
+  // The search box (name or mobile) plus the date / type / clinic / status filters.
+  const filtersOn = hasActiveFilters(filters);
+  const matchesSearch = (a: Appointment) => matchesPatientSearch(a, search) && matchesQueueFilters(a, filters, now);
+  const showSection = (status: string) => filters.status === "ALL" || filters.status === status;
+  // Clinics this doctor has visits at — the filter only shows with two or more.
+  const clinicOptions = [...new Map(appointments.filter((a) => a.clinicId && a.clinic).map((a) => [a.clinicId as string, a.clinic!.name])).entries()]
+    .sort((x, y) => x[1].localeCompare(y[1]));
   const completedAll = appointments.filter((a) => a.status === "COMPLETED");
   // The queue (pending, upcoming) runs soonest-first; history newest-first.
   const pending = appointments.filter((a) => a.status === "PENDING_APPROVAL" && matchesSearch(a)).sort(byVisitAsc);
@@ -1032,6 +1062,13 @@ export default function DoctorDashboard() {
   // list first if the target is hidden behind "Load more".
   const jumpToCard = (id: string) => {
     const idx = upcoming.findIndex((a) => a.id === id);
+    // Hidden by the search or a filter: clear them, and show the whole list
+    // since its position in it isn't known yet.
+    if (idx === -1 && !pending.some((a) => a.id === id)) {
+      setSearch("");
+      setFilters(DEFAULT_QUEUE_FILTERS);
+      setUpcomingExpanded(true);
+    }
     if (idx >= PAGE_SIZE && !upcomingExpanded) setUpcomingExpanded(true);
     window.setTimeout(() => {
       cardRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1175,13 +1212,13 @@ export default function DoctorDashboard() {
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
                       {homeNotArrived ? (
-                        <button onClick={() => { setSearch(""); jumpToCard(a.id); }} className="btn-secondary py-1.5 px-3 text-xs">
+                        <button onClick={() => jumpToCard(a.id)} className="btn-secondary py-1.5 px-3 text-xs">
                           {t("openVisit")}
                         </button>
                       ) : (
                         <>
                           {!isStaff && !unpaidOnline && (
-                            <button onClick={() => { setSearch(""); setCompletingId(a.id); jumpToCard(a.id); }} className="btn-primary py-1.5 px-3 text-xs">
+                            <button onClick={() => { setCompletingId(a.id); jumpToCard(a.id); }} className="btn-primary py-1.5 px-3 text-xs">
                               <CheckCircle2 className="w-3.5 h-3.5" /> {t("complete")}
                             </button>
                           )}
@@ -1284,7 +1321,7 @@ export default function DoctorDashboard() {
         </div>
 
         {/* Search */}
-        <div className="relative mb-6">
+        <div className="relative mb-3">
           <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
@@ -1305,7 +1342,69 @@ export default function DoctorDashboard() {
           )}
         </div>
 
+        {/* Filters — date range chips, then type / clinic / status */}
+        <div className="mb-6">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1" role="group" aria-label={t("filters.label")}>
+            {QUEUE_RANGES.map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setFilters((f) => ({ ...f, range: r }))}
+                aria-pressed={filters.range === r}
+                className={cn(
+                  "tap-44-y flex-shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors",
+                  filters.range === r ? "bg-teal-600 border-teal-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                )}
+              >
+                {t(`filters.range.${r}`)}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2 mt-2 flex-wrap items-center">
+            <select
+              aria-label={t("filters.type")}
+              className="input-field w-auto py-1.5 pl-3 pr-8 text-xs"
+              value={filters.type}
+              onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value as QueueFilters["type"] }))}
+            >
+              {QUEUE_TYPES.map((ty) => (
+                <option key={ty} value={ty}>{ty === "ALL" ? t("filters.allTypes") : tc("typeShort", { type: ty })}</option>
+              ))}
+            </select>
+            {clinicOptions.length > 1 && (
+              <select
+                aria-label={t("filters.clinic")}
+                className="input-field w-auto max-w-[12rem] py-1.5 pl-3 pr-8 text-xs"
+                value={filters.clinicId}
+                onChange={(e) => setFilters((f) => ({ ...f, clinicId: e.target.value }))}
+              >
+                <option value="ALL">{t("filters.allClinics")}</option>
+                {clinicOptions.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+              </select>
+            )}
+            <select
+              aria-label={t("filters.status")}
+              className="input-field w-auto py-1.5 pl-3 pr-8 text-xs"
+              value={filters.status}
+              onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value as QueueFilters["status"] }))}
+            >
+              {QUEUE_STATUSES.map((st) => <option key={st} value={st}>{t(`filters.statusOption.${st}`)}</option>)}
+            </select>
+            {filtersOn && (
+              <button type="button" onClick={() => setFilters(DEFAULT_QUEUE_FILTERS)} className="text-xs font-semibold text-teal-600 hover:underline px-1">
+                {t("filters.clear")}
+              </button>
+            )}
+          </div>
+          {/* A history-only status with nothing loaded would otherwise leave a blank page. */}
+          {filtersOn && !loadingAppts && ["COMPLETED", "CANCELLED", "NO_SHOW"].includes(filters.status)
+            && completed.length + cancelled.length + noShow.length === 0 && (
+            <p className="text-sm text-slate-400 text-center py-8">{t("filters.nothingMatches")}</p>
+          )}
+        </div>
+
         {/* Pending Requests */}
+        {showSection("PENDING_APPROVAL") && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center gap-2">
@@ -1326,7 +1425,7 @@ export default function DoctorDashboard() {
             ) : loadingAppts ? (
               <div className="p-6 space-y-3">{[...Array(2)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
             ) : pending.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-10">{search ? t("noPendingMatch") : t("noPending")}</p>
+              <p className="text-sm text-slate-400 text-center py-10">{search || filtersOn ? t("noPendingMatch") : t("noPending")}</p>
             ) : (
               pending.map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
@@ -1359,6 +1458,7 @@ export default function DoctorDashboard() {
                           </div>
                         )}
                         <VisitAddressLine visit={a.visit} />
+                        <ContactLinks mobile={a.patient.mobile} />
                         {respondError?.id === a.id && (
                           <div className="text-xs text-red-600 mt-1">{respondError.message}</div>
                         )}
@@ -1379,7 +1479,10 @@ export default function DoctorDashboard() {
           </div>
         </div>
 
+        )}
+
         {/* Upcoming Appointments */}
+        {showSection("SCHEDULED") && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
             <CalendarCheck className="w-5 h-5 text-teal-500" />
@@ -1394,7 +1497,7 @@ export default function DoctorDashboard() {
                 {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}
               </div>
             ) : upcoming.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-10">{search ? t("noUpcomingMatch") : t("noUpcoming")}</p>
+              <p className="text-sm text-slate-400 text-center py-10">{search || filtersOn ? t("noUpcomingMatch") : t("noUpcoming")}</p>
             ) : (
               (upcomingExpanded ? upcoming : upcoming.slice(0, PAGE_SIZE)).map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
@@ -1447,6 +1550,7 @@ export default function DoctorDashboard() {
                               </div>
                             )}
                             <VisitAddressLine visit={a.visit} />
+                            <ContactLinks mobile={a.patient.mobile} />
                             <div className={`text-xs mt-1 flex items-center gap-1 flex-wrap ${paymentBlocked ? "text-amber-600 font-semibold" : "text-slate-400"}`}>
                               <IndianRupee className="w-3 h-3" /> {a.amount} · {
                                 a.paymentMethod === "ONLINE"
@@ -1627,6 +1731,8 @@ export default function DoctorDashboard() {
           )}
         </div>
 
+        )}
+
         {/* Recent Completed */}
         {completed.length > 0 && (
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
@@ -1743,6 +1849,8 @@ export default function DoctorDashboard() {
                     <div className="text-xs text-slate-400">
                       {new Date(a.scheduledAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {tc("typeShort", { type: a.consultType })}
                     </div>
+                    {/* A no-show is worth a call to rebook. */}
+                    <ContactLinks mobile={a.patient.mobile} />
                   </div>
                   <span className="badge badge-warning">{t("noShowBadge")}</span>
                 </div>

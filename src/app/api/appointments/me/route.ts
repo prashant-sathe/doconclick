@@ -113,6 +113,8 @@ export const GET = withErrorLocale(async function GET(req: Request) {
         },
         // So a cancelled consultation can show its (now void) referral for removal.
         referralGiven: { select: { id: true, service: { select: { name: true } } } },
+        // The dashboard's clinic filter.
+        clinic: { select: { name: true } },
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });

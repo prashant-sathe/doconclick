@@ -53,19 +53,19 @@
     "onlyDoctorCompletes": "सिर्फ़ डॉक्टर ही विज़िट को पूरा मार्क कर सकते हैं।",
     "timeline": "आज की टाइमलाइन",
     "noAppointmentsToday": "आज कोई अपॉइंटमेंट नहीं है।",
-    "searchPlaceholder": "मरीज़ के नाम से खोजें…",
+    "searchPlaceholder": "मरीज़ के नाम या मोबाइल से खोजें…",
     "clearSearch": "खोज साफ़ करें",
     "pendingRequests": "बाकी अनुरोध",
     "newCount": "{count} नए",
     "acceptAllCount": "सभी स्वीकार करें ({count})",
-    "noPendingMatch": "आपकी खोज से कोई बाकी अनुरोध नहीं मिला।",
+    "noPendingMatch": "आपकी खोज या फ़िल्टर से कोई बाकी अनुरोध नहीं मिला।",
     "noPending": "कोई बाकी अनुरोध नहीं है।",
     "allergies": "एलर्जी: {list}",
     "reject": "अस्वीकार करें",
     "accept": "स्वीकार करें",
     "upcomingAppointments": "आने वाले अपॉइंटमेंट",
     "couldntLoad": "अपॉइंटमेंट लोड नहीं हो सके।",
-    "noUpcomingMatch": "आपकी खोज से कोई आने वाला अपॉइंटमेंट नहीं मिला।",
+    "noUpcomingMatch": "आपकी खोज या फ़िल्टर से कोई आने वाला अपॉइंटमेंट नहीं मिला।",
     "noUpcoming": "कोई आने वाला अपॉइंटमेंट नहीं है।",
     "paidOnline": "ऑनलाइन पेमेंट हो गया",
     "paymentPending": "पेमेंट बाकी है",
@@ -151,6 +151,34 @@
       "keep": "अनुरोध रखें",
       "confirm": "अनुरोध अस्वीकार करें",
       "busy": "अस्वीकार हो रहा है…"
+    },
+    "call": "कॉल",
+    "whatsapp": "WhatsApp",
+    "callTitle": "{mobile} पर कॉल करें",
+    "whatsappTitle": "{mobile} पर WhatsApp करें",
+    "filters": {
+      "label": "फ़िल्टर",
+      "range": {
+        "ALL": "सभी तारीखें",
+        "TODAY": "आज",
+        "TOMORROW": "कल",
+        "WEEK": "अगले 7 दिन"
+      },
+      "type": "प्रकार",
+      "allTypes": "सभी प्रकार",
+      "clinic": "क्लिनिक",
+      "allClinics": "सभी क्लिनिक",
+      "status": "स्थिति",
+      "statusOption": {
+        "ALL": "सभी स्थितियाँ",
+        "PENDING_APPROVAL": "बाकी अनुरोध",
+        "SCHEDULED": "आने वाले",
+        "COMPLETED": "पूरे हुए",
+        "CANCELLED": "रद्द",
+        "NO_SHOW": "नहीं आए"
+      },
+      "clear": "फ़िल्टर हटाएँ",
+      "nothingMatches": "इन फ़िल्टर से कुछ नहीं मिला।"
     }
   },
   "completeVisit": {
