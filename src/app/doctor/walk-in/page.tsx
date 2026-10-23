@@ -111,6 +111,9 @@ export default function WalkInBookingPage() {
   const [duplicate, setDuplicate] = useState<string | null>(null);
   const [booked, setBooked] = useState<Booked | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
+  // In-flight guard: `submitting` state updates too late to stop a double-tap
+  // from sending two bookings (BUG-TRACKER #73).
+  const inFlight = useRef(false);
 
   // Defaults once the doctor's setup is known.
   useEffect(() => {
@@ -212,6 +215,8 @@ export default function WalkInBookingPage() {
   // Plain function — the React Compiler memoizes it.
   const submit = async (force = false) => {
     if (problem || !consultType) { setFormError(problem); return; }
+    if (inFlight.current) return;
+    inFlight.current = true;
     setSubmitting(true);
     setFormError(null);
     let res: Response;
@@ -240,11 +245,13 @@ export default function WalkInBookingPage() {
         }),
       });
     } catch {
+      inFlight.current = false;
       setSubmitting(false);
       setFormError(t("networkError"));
       return;
     }
     const d = await res.json().catch(() => ({}));
+    inFlight.current = false;
     setSubmitting(false);
     if (!res.ok) {
       if (d.code === "DUPLICATE_BOOKING") { setDuplicate(d.error); return; }

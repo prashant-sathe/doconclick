@@ -133,6 +133,7 @@ async function main() {
     return s;
   };
   const desk = await mkStaff(doctor.id);
+  const desk2 = await mkStaff(doctor.id);
   const otherDesk = await mkStaff(other.id);
   const expiredDesk = await mkStaff(expired.id);
   const revokedDesk = await mkStaff(doctor.id, false);
@@ -141,7 +142,10 @@ async function main() {
   const nurse = await mk({ name: "Some Nurse", role: "NURSE", nurseProfile: { create: { status: "APPROVED" } } });
   const newMobile = mob();
   const newMobile2 = mob();
-  const createdIds = async () => (await prisma.user.findMany({ where: { mobile: { in: [newMobile, newMobile2] } }, select: { id: true } })).map((u) => u.id);
+  const newMobile3 = mob();
+  const createdIds = async () => (await prisma.user.findMany({ where: { mobile: { in: [newMobile, newMobile2, newMobile3] } }, select: { id: true } })).map((u) => u.id);
+  const racer = await mk({ name: "Race Patient", role: "PATIENT", password: "x", patientProfile: { create: { age: 30, gender: "Male" } } });
+  const spaced = (m: string) => `+91 ${m.slice(0, 5)} ${m.slice(5)}`;
 
   const book = (as: U, body: Record<string, unknown>) =>
     call(as, "POST", "/api/doctor/walk-in-appointments", { consultType: "CLINIC", clinicId: clinic.id, symptoms: "Fever since 2 days", paymentMethod: "CASH", consentGiven: true, ...body });
@@ -202,6 +206,23 @@ async function main() {
     check("same person again → 409 DUPLICATE_BOOKING", r.status === 409 && r.json.code === "DUPLICATE_BOOKING", `${r.status} ${r.json.error}`);
     r = await book(desk, { mobile: newMobile, force: true, consultType: "VIDEO", clinicId: null });
     check("…with force → 200 (a video consult, ₹300)", r.status === 200 && (await appt((r.json.appointment as J).id)).amount === 300, `${r.status} ${r.json.error ?? ""}`);
+
+    // ── #73: parallel bookings for one person (double-tap, or desk + doctor at once) ──
+    const race = async (body: Record<string, unknown>) => {
+      const rs = await Promise.all([desk, desk2, doctor].map((u) => book(u, { symptoms: "ताप आणि खोकला", ...body })));
+      return { ok: rs.filter((x) => x.status === 200).length, dup: rs.filter((x) => x.status === 409).length, rs };
+    };
+    let rc = await race({ mobile: spaced(racer.mobile) });
+    let made = await prisma.appointment.count({ where: { patientId: racer.id, doctorId: doctor.id } });
+    check("3 parallel POSTs, existing patient → 1×200 + 2×409 DUPLICATE_BOOKING, 1 appointment", rc.ok === 1 && rc.dup === 2 && rc.rs.every((x) => x.status === 200 || x.json.code === "DUPLICATE_BOOKING") && made === 1, `${rc.rs.map((x) => `${x.status}/${x.json.code ?? ""}`).join(" ")} appts=${made}`);
+    rc = await race({ mobile: racer.mobile, newDependent: { name: "Aarav", relation: "Son" } });
+    made = await prisma.appointment.count({ where: { patientId: racer.id, doctorId: doctor.id } });
+    const aarav = await prisma.patientDependent.count({ where: { patientProfile: { userId: racer.id } } });
+    check("…same new family member typed at once → 1×200 + 2×409, one dependent", rc.ok === 1 && rc.dup === 2 && made === 2 && aarav === 1, `${rc.rs.map((x) => `${x.status}/${x.json.code ?? ""}`).join(" ")} appts=${made} deps=${aarav}`);
+    rc = await race({ mobile: spaced(newMobile3), name: "Race New", age: 22, gender: "Female" });
+    const newRacers = await prisma.user.findMany({ where: { mobile: newMobile3 }, select: { id: true } });
+    made = await prisma.appointment.count({ where: { patientId: { in: newRacers.map((u) => u.id) } } });
+    check("…a brand-new number booked at once → 1×200 + 2×409, one account, one appointment", rc.ok === 1 && rc.dup === 2 && newRacers.length === 1 && made === 1, `${rc.rs.map((x) => `${x.status}/${x.json.code ?? ""}`).join(" ")} users=${newRacers.length} appts=${made}`);
 
     // ── Several clinics: must pick one ──
     r = await book(desk, { mobile: newMobile2, name: "Second New", age: 50, gender: "Female", clinicId: null });

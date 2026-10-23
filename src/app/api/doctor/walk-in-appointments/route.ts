@@ -235,35 +235,6 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       if (clash) return NextResponse.json({ error: clash, code: "SLOT_TAKEN" }, { status: 409 });
     }
 
-    // Same person already has a live booking with this doctor — usually a
-    // double entry at the desk. The form confirms and resends with `force`.
-    // (A family member added just now has no bookings yet.)
-    if (existing && !newDependent && !input.force) {
-      const live = await prisma.appointment.findFirst({
-        where: {
-          doctorId,
-          patientId: existing.id,
-          dependentId: dependent?.id ?? null,
-          status: { in: ["PENDING_APPROVAL", "SCHEDULED"] },
-        },
-        orderBy: { scheduledAt: "asc" },
-        select: { id: true, scheduledAt: true, createdAt: true, status: true, consultType: true },
-      });
-      if (live) {
-        const at = isTimedBooking(live)
-          ? `on ${live.scheduledAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" })}`
-          : `in the queue (added ${live.createdAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" })})`;
-        return NextResponse.json(
-          {
-            error: `${dependent?.name ?? holderName} already has a ${live.status === "SCHEDULED" ? "confirmed" : "pending"} ${TYPE_LABEL[live.consultType] ?? "visit"} ${at}. Book another one anyway?`,
-            code: "DUPLICATE_BOOKING",
-            existingAppointmentId: live.id,
-          },
-          { status: 409 }
-        );
-      }
-    }
-
     if (input.paymentMethod === "CASH") {
       const due = await cashDueProblem(doctorId, authUser.role === "STAFF" ? "staff" : "doctor");
       if (due) return NextResponse.json({ error: due.message, code: CASH_DUE_LIMIT_CODE }, { status: 403 });
@@ -274,7 +245,58 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     const amount = consultType === "HOME" ? profile.homeVisitFee : consultType === "VIDEO" ? profile.videoFee : profile.consultFee;
     const platformFee = (amount * commissionPercentForConsultType(settings, consultType)) / 100;
 
-    const { appointment, patientCreated } = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
+      // Serialise bookings for this patient with this doctor (BUG-TRACKER #73):
+      // a double-tap, or the desk and the doctor booking at once, queue on this
+      // transaction-scoped lock so the later ones see the first one's rows.
+      // Keyed per patient (the number for a brand-new one), covering all their
+      // family members — a new family member's id doesn't exist yet.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`walk-in:${doctorId}:${existing?.id ?? input.mobile}`}))`;
+
+      // A family member typed in by name may have just been added by the
+      // booking we waited for — reuse it, so the duplicate check below applies.
+      if (newDependent && existing?.patientProfile) {
+        const name = newDependent.name.trim().toLowerCase();
+        const saved = await tx.patientDependent.findMany({
+          where: { patientProfileId: existing.patientProfile.id },
+          select: { id: true, name: true, relation: true, allergies: true },
+        });
+        const match = saved.find((d) => d.name.trim().toLowerCase() === name);
+        if (match) { dependent = match; newDependent = null; }
+      }
+
+      // Same person already has a live booking with this doctor — usually a
+      // double entry at the desk. The form confirms and resends with `force`.
+      // (A family member added just now has no bookings yet.)
+      if (existing && !newDependent && !input.force) {
+        const live = await tx.appointment.findFirst({
+          where: {
+            doctorId,
+            patientId: existing.id,
+            dependentId: dependent?.id ?? null,
+            status: { in: ["PENDING_APPROVAL", "SCHEDULED"] },
+          },
+          orderBy: { scheduledAt: "asc" },
+          select: { id: true, scheduledAt: true, createdAt: true, status: true, consultType: true },
+        });
+        if (live) {
+          const at = isTimedBooking(live)
+            ? `on ${live.scheduledAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" })}`
+            : `in the queue (added ${live.createdAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" })})`;
+          return {
+            ok: false as const,
+            response: NextResponse.json(
+              {
+                error: `${dependent?.name ?? holderName} already has a ${live.status === "SCHEDULED" ? "confirmed" : "pending"} ${TYPE_LABEL[live.consultType] ?? "visit"} ${at}. Book another one anyway?`,
+                code: "DUPLICATE_BOOKING",
+                existingAppointmentId: live.id,
+              },
+              { status: 409 }
+            ),
+          };
+        }
+      }
+
       let patientId: string;
       let patientProfileId: string;
       let patientCreated = false;
@@ -341,8 +363,10 @@ export const POST = withErrorLocale(async function POST(req: Request) {
           ...(bookAt ? { scheduledAt: bookAt } : {}),
         },
       });
-      return { appointment, patientCreated };
+      return { ok: true as const, appointment, patientCreated };
     });
+    if (!result.ok) return result.response;
+    const { appointment, patientCreated } = result;
 
     // A ₹0 fee has nothing to collect — paid as soon as it's booked, same as
     // accepting a free request. (A cash visit is marked paid on completion.)
