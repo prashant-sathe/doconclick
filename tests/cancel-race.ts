@@ -2,11 +2,15 @@
 // refund it exactly once. Runs against a live dev server (npm run dev) and
 // the DB in .env, using throwaway users that are deleted afterwards — no
 // push tokens, no doctor profile (so no reassignment to a real doctor).
+// Also races a patient cancel against the provider's other status changes
+// (complete / no-show / accept / nurse package accept + decline, #69): the
+// provider's write must never overwrite a cancel that already refunded.
 //
 //   npm run test:cancel-race            (BASE_URL defaults to http://localhost:3000)
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
+import { ALREADY_CLOSED_MESSAGE } from "../src/lib/appointmentCancel";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
@@ -25,6 +29,17 @@ async function main() {
   const stamp = String(Date.now()).slice(-9);
   const doctor = await prisma.user.create({ data: { name: "Race Test Doctor", mobile: "7" + stamp, role: "DOCTOR" } });
   const patient = await prisma.user.create({ data: { name: "Race Test Patient", mobile: "6" + stamp, role: "PATIENT" } });
+  // Completing / accepting needs an active plan; the doctor with no profile
+  // above is kept for the cancel races (no reassignment).
+  const planDoctor = await prisma.user.create({
+    data: {
+      name: "Race Test Plan Doctor", mobile: "8" + stamp, role: "DOCTOR",
+      doctorProfile: { create: { status: "APPROVED", isVerified: true, registrationFeePaid: true, trialEndsAt: new Date(Date.now() + 30 * 86400_000) } },
+    },
+  });
+  const nurse = await prisma.user.create({
+    data: { name: "Race Test Nurse", mobile: "9" + stamp, role: "NURSE", nurseProfile: { create: { status: "APPROVED", isVerified: true } } },
+  });
   const cookieFor = (u: typeof doctor) =>
     `doconclick_token=${jwt.sign({ id: u.id, name: u.name, role: u.role, mobile: u.mobile }, SECRET)}`;
   const asPatient: Actor = { cookie: cookieFor(patient), body: { status: "CANCELLED" } };
@@ -60,6 +75,113 @@ async function main() {
       `responses ${tally}; wallet +₹${credited}; refund rows ${refundRows}`);
   }
 
+  // A provider that loses the race must get the "already updated" 409, not
+  // some other error that happens to share the status code.
+  let wrong409 = 0;
+  const patch = async (u: typeof doctor, apptId: string, body: object, delayMs = 0) => {
+    if (delayMs) await new Promise((r) => setTimeout(r, delayMs));
+    const r = await fetch(`${BASE}/api/appointments/${apptId}`, {
+      method: "PATCH",
+      headers: { cookie: cookieFor(u), "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const { error } = await r.json() as { error?: string };
+    if (r.status === 409 && u.id !== patient.id && error !== ALREADY_CLOSED_MESSAGE) {
+      wrong409++;
+      console.log(`  unexpected 409: ${error}`);
+    }
+    return r.status;
+  };
+  // Alternate who gets a head start so both orders are exercised.
+  const stagger = (i: number) => (i % 3 === 0 ? 0 : i % 3 === 1 ? 30 : 0);
+  const providerLead = (i: number) => (i % 3 === 2 ? 30 : 0);
+
+  // Patient cancel vs provider COMPLETED / NO_SHOW on a paid visit 10 min in
+  // the past: exactly one wins, and the final row agrees with the refund.
+  async function closeRace(providerStatus: "COMPLETED" | "NO_SHOW", runs: number) {
+    let bad = 0;
+    const seen: string[] = [];
+    for (let i = 0; i < runs; i++) {
+      const appt = await prisma.appointment.create({
+        data: {
+          patientId: patient.id, doctorId: planDoctor.id, symptoms: "race test", consultType: "VIDEO",
+          status: "SCHEDULED", paymentMethod: "ONLINE", paymentStatus: "PAID", amount: FEE, paidAt: new Date(),
+          scheduledAt: new Date(Date.now() - 10 * 60_000),
+        },
+      });
+      const [p, d] = await Promise.all([
+        patch(patient, appt.id, { status: "CANCELLED" }, stagger(i)),
+        patch(planDoctor, appt.id, { status: providerStatus }, providerLead(i)),
+      ]);
+      const row = await prisma.appointment.findUniqueOrThrow({ where: { id: appt.id } });
+      const refunds = await prisma.walletTransaction.count({ where: { refundOfAppointmentId: appt.id } });
+      seen.push(`${p}/${d}→${row.status}${refunds ? "+refund" : ""}`);
+      const oneWinner = [p, d].filter((s) => s === 200).length === 1 && [p, d].every((s) => [200, 400, 409].includes(s));
+      const consistent = p === 200
+        ? row.status === "CANCELLED" && refunds === 1
+        : row.status === providerStatus && refunds === 0;
+      if (!oneWinner || !consistent) bad++;
+    }
+    check(`patient cancel vs doctor ${providerStatus} ×${runs}`, bad === 0, `${bad} bad; patient/doctor→final: ${seen.join(", ")}`);
+  }
+
+  // Patient cancel vs doctor accept on a pending request: both may succeed
+  // (accept, then cancel) but a 200 cancel must leave the row CANCELLED.
+  async function acceptRace(runs: number) {
+    let bad = 0;
+    const seen: string[] = [];
+    for (let i = 0; i < runs; i++) {
+      const appt = await prisma.appointment.create({
+        data: {
+          patientId: patient.id, doctorId: planDoctor.id, symptoms: "race test", consultType: "VIDEO",
+          status: "PENDING_APPROVAL", paymentMethod: "ONLINE", paymentStatus: "PENDING", amount: FEE,
+          scheduledAt: new Date(Date.now() + 2 * 86400_000 + i * 3600_000),
+        },
+      });
+      const [p, d] = await Promise.all([
+        patch(patient, appt.id, { status: "CANCELLED" }, stagger(i)),
+        patch(planDoctor, appt.id, { status: "SCHEDULED" }, providerLead(i)),
+      ]);
+      const row = await prisma.appointment.findUniqueOrThrow({ where: { id: appt.id } });
+      seen.push(`${p}/${d}→${row.status}`);
+      const ok = p === 200 ? row.status === "CANCELLED" : d === 200 && row.status === "SCHEDULED";
+      if (!ok || ![200, 400, 409].includes(p) || ![200, 400, 409].includes(d)) bad++;
+    }
+    check(`patient cancel vs doctor accept ×${runs}`, bad === 0, `${bad} bad; patient/doctor→final: ${seen.join(", ")}`);
+  }
+
+  // Nurse answers a 2-visit package while the patient cancels visit 2: a
+  // 200 cancel must leave visit 2 CANCELLED, and a 409 nurse answer must
+  // leave visit 1 untouched (the group update rolls back as a whole).
+  async function nursePackageRace(answer: "SCHEDULED" | "REJECTED", runs: number) {
+    let bad = 0;
+    const seen: string[] = [];
+    for (let i = 0; i < runs; i++) {
+      const pkg = await prisma.nursePackage.create({ data: { patientId: patient.id, nurseId: nurse.id, serviceId: "race-test", visits: 2 } });
+      const base = Date.now() + 3 * 86400_000 + i * 6 * 3600_000;
+      const [v1, v2] = await Promise.all([1, 2].map((n) => prisma.appointment.create({
+        data: {
+          patientId: patient.id, doctorId: nurse.id, providerType: "NURSE", symptoms: "race test", consultType: "HOME",
+          status: "PENDING_APPROVAL", paymentMethod: "ONLINE", paymentStatus: "PENDING", amount: FEE,
+          packageId: pkg.id, packageIndex: n, scheduledAt: new Date(base + (n - 1) * 86400_000),
+        },
+      })));
+      const [p, d] = await Promise.all([
+        patch(patient, v2.id, { status: "CANCELLED" }, stagger(i)),
+        patch(nurse, v1.id, { status: answer }, providerLead(i)),
+      ]);
+      const r1 = await prisma.appointment.findUniqueOrThrow({ where: { id: v1.id } });
+      const r2 = await prisma.appointment.findUniqueOrThrow({ where: { id: v2.id } });
+      seen.push(`${p}/${d}→${r1.status},${r2.status}`);
+      const ok = (p !== 200 || r2.status === "CANCELLED")
+        && (d === 200 ? r1.status === answer : r1.status === "PENDING_APPROVAL")
+        && [200, 400, 409].includes(p) && [200, 400, 409].includes(d);
+      if (!ok) bad++;
+    }
+    check(`patient cancel vs nurse package ${answer === "SCHEDULED" ? "accept" : "decline"} ×${runs}`, bad === 0,
+      `${bad} bad; patient/nurse→v1,v2: ${seen.join(", ")}`);
+  }
+
   try {
     await race("patient ×8 cancel (SCHEDULED, paid)", "SCHEDULED", Array(PARALLEL).fill(asPatient));
     await race("doctor ×8 cancel (SCHEDULED, paid)", "SCHEDULED", Array(PARALLEL).fill(asDoctorCancel));
@@ -74,10 +196,19 @@ async function main() {
       .create({ data: { walletId: wallet.id, type: "CANCELLATION_REFUND", amount: FEE, refundOfAppointmentId: appt.id } })
       .then(() => "created", (e: { code?: string }) => e.code ?? "error");
     check("second refund row for the same appointment", dup === "P2002", `insert → ${dup}`);
+
+    await closeRace("COMPLETED", 6);
+    await closeRace("NO_SHOW", 6);
+    await acceptRace(6);
+    await nursePackageRace("SCHEDULED", 6);
+    await nursePackageRace("REJECTED", 6);
+    check("provider 409s are all the already-updated error", wrong409 === 0, `${wrong409} other 409(s)`);
   } finally {
+    const ids = [patient.id, doctor.id, planDoctor.id, nurse.id];
     await prisma.appointment.deleteMany({ where: { patientId: patient.id } });
-    await prisma.user.delete({ where: { id: patient.id } });
-    await prisma.user.delete({ where: { id: doctor.id } });
+    await prisma.nursePackage.deleteMany({ where: { patientId: patient.id } });
+    await prisma.notification.deleteMany({ where: { userId: { in: ids } } });
+    await prisma.user.deleteMany({ where: { id: { in: ids } } });
     await prisma.$disconnect();
   }
   if (failures) {

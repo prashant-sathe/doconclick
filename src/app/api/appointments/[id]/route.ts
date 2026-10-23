@@ -259,15 +259,21 @@ export const PATCH = withErrorLocale(async function PATCH(
         }
       }
 
+      // Every visit is claimed from PENDING_APPROVAL — if the patient
+      // cancelled any of them meanwhile, the whole answer rolls back.
       const now = new Date();
-      await prisma.$transaction(
-        group.map((g) => prisma.appointment.update({
-          where: { id: g.id },
-          data: status === "SCHEDULED"
-            ? { status, acceptedAt: now, visitOtp: newVisitCode(), visitOtpAttempts: 0 }
-            : { status, doctorNotes: doctorNotes ?? g.doctorNotes },
-        }))
-      );
+      try {
+        await prisma.$transaction(async (tx) => {
+          for (const g of group) {
+            await claimStatusChange(tx, g.id, ["PENDING_APPROVAL"], status === "SCHEDULED"
+              ? { status, acceptedAt: now, visitOtp: newVisitCode(), visitOtpAttempts: 0 }
+              : { status, doctorNotes: doctorNotes ?? g.doctorNotes });
+          }
+        });
+      } catch (err) {
+        if (isAlreadyClosed(err)) return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
+        throw err;
+      }
       // A ₹0 booking has no payment step — PAID as soon as it's accepted.
       const free = status === "SCHEDULED" ? await settleIfFreeOnAccept(group) : new Set<string>();
       const key = group.length > 1
@@ -426,9 +432,12 @@ export const PATCH = withErrorLocale(async function PATCH(
       if (problem) return NextResponse.json({ error: problem }, { status: 409 });
     }
 
-    const updated = await prisma.appointment.update({
-      where: { id },
-      data: {
+    // Claimed from the status read above, so a patient cancel (and its
+    // wallet refund) that lands first can't be overwritten — the loser 409s
+    // and no push goes out.
+    let updated;
+    try {
+      updated = await prisma.$transaction((tx) => claimStatusChange(tx, id, [appointment.status], {
         status,
         // Completed / no-show / declined: any pending new-time request is moot.
         requestedScheduledAt: null,
@@ -442,8 +451,12 @@ export const PATCH = withErrorLocale(async function PATCH(
         ...(status === "COMPLETED" && appointment.paymentMethod === "CASH"
           ? { paymentStatus: "PAID", paidAt: appointment.paidAt ?? new Date() }
           : {}),
-      },
-    });
+      }));
+    } catch (err) {
+      if (isSlotIndexViolation(err)) return NextResponse.json({ error: SLOT_TAKEN_MESSAGE }, { status: 409 });
+      if (isAlreadyClosed(err)) return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
+      throw err;
+    }
     // A ₹0 booking has no payment step — PAID as soon as it's accepted.
     const free = status === "SCHEDULED" && (await settleIfFreeOnAccept([updated])).size > 0;
     const key = patientPushKey(status);
