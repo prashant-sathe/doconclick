@@ -6,8 +6,9 @@ import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 
-// Shared chrome for a single profile-settings screen: a "‹ Profile" back link,
-// a title, the section's card, and a Save button.
+// Shared chrome for a single profile-settings screen: a "‹ Profile" back link
+// (or `backHref`/`backLabel` for a screen nested under another section), a
+// title, the section's card, a Save button, and an optional `footer` below it.
 export default function ProfileSubShell({
   title,
   description,
@@ -19,6 +20,9 @@ export default function ProfileSubShell({
   dirty,
   error,
   onSave,
+  backHref = "/patient/profile",
+  backLabel,
+  footer,
   children,
 }: {
   title: string;
@@ -31,6 +35,9 @@ export default function ProfileSubShell({
   dirty?: boolean;
   error?: string;
   onSave?: () => void;
+  backHref?: string;
+  backLabel?: string;
+  footer?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const t = useTranslations("patientAccount.shell");
@@ -40,8 +47,8 @@ export default function ProfileSubShell({
       <PatientMobileNav />
 
       <div className="max-w-xl mx-auto py-6 px-4 sm:px-6">
-        <Link href="/patient/profile" className="tap-44-y btn-ghost gap-1 text-sm -ml-2 mb-3">
-          <ChevronLeft className="w-4 h-4" /> {t("backToProfile")}
+        <Link href={backHref} className="tap-44-y btn-ghost gap-1 text-sm -ml-2 mb-3">
+          <ChevronLeft className="w-4 h-4" /> {backLabel ?? t("backToProfile")}
         </Link>
         <div className="flex items-center gap-3">
           {icon && (
@@ -81,6 +88,8 @@ export default function ProfileSubShell({
                 : <><Save className="w-4 h-4" /> {t("save")}</>}
           </button>
         )}
+
+        {!loading && footer}
       </div>
     </div>
   );

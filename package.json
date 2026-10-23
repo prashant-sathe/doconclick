@@ -72,6 +72,7 @@
     "test:unpaid-journey": "tsx tests/unpaid-journey.ts",
     "test:i18n": "tsx tests/i18n.ts",
     "test:inbox": "tsx tests/notification-inbox.ts",
+    "test:family": "tsx tests/family-members.ts",
     "test:i18n-errors": "tsx tests/i18n-errors.ts",
     "i18n:errors": "tsx scripts/i18n-errors.ts"
   },

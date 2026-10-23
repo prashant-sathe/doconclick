@@ -202,7 +202,8 @@
     "saveChanges": "Save Changes",
     "saveDetails": "Save {relation}'s Details",
     "errorName": "Please enter a name.",
-    "errorSave": "Could not save."
+    "errorSave": "Could not save.",
+    "name": "Name"
   },
   "payment": {
     "back": "← Back",

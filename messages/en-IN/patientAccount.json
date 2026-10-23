@@ -40,7 +40,8 @@
     "terms": "Terms & Privacy Policy",
     "km": "{km} km",
     "anyDistance": "Any distance",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "family": "Family Members"
   },
   "personal": {
     "title": "Personal & Medical Info",
@@ -88,6 +89,31 @@
     "namePlaceholder": "e.g. Priya Sharma",
     "mobile": "Mobile Number",
     "errMobile": "Enter a valid 10-digit mobile number."
+  },
+  "family": {
+    "title": "Family Members",
+    "description": "People you book for. Doctors see their medical details, not yours.",
+    "empty": "No family members yet.",
+    "emptyHint": "Add your parents, spouse or children to book for them faster.",
+    "add": "Add family member",
+    "addTitle": "Add Family Member",
+    "addDescription": "Save their details once and pick them when you book.",
+    "editTitle": "Edit Family Member",
+    "relation": "Relation",
+    "relationPlaceholder": "How are they related to you?",
+    "errRelation": "Choose how they're related to you.",
+    "namePlaceholder": "Full name",
+    "age": "{age} yrs",
+    "loadFailed": "Couldn't load family members.",
+    "notFound": "This family member doesn't exist or was deleted.",
+    "backToList": "Back to family members",
+    "delete": "Delete family member",
+    "deleteTitle": "Delete {name}?",
+    "deleteMessage": "Their saved details will be removed. Past appointments stay in your history.",
+    "deleteVitals": "{count, plural, one {# vitals reading} other {# vitals readings}} recorded for them will also be deleted.",
+    "deleteConfirm": "Delete",
+    "deleting": "Deleting…",
+    "deleteFailed": "Couldn't delete. Please try again."
   },
   "notifications": {
     "title": "Notifications",

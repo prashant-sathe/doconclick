@@ -220,18 +220,15 @@ const dependentFields = {
   emergencyContactPhone: optionalMobile("Emergency contact phone").optional(),
 };
 
-export const dependentUpdateSchema = z.object(dependentFields, BODY_ERROR);
-
-export const dependentCreateSchema = z.object(
-  {
-    ...dependentFields,
-    relation: z.enum(
-      RELATIONS.filter((r) => r !== "Self") as [string, ...string[]],
-      { error: "Invalid relation." },
-    ),
-  },
-  BODY_ERROR,
+const dependentRelation = z.enum(
+  RELATIONS.filter((r) => r !== "Self") as [string, ...string[]],
+  { error: "Invalid relation." },
 );
+
+/** `relation` optional on update: booking's picker resends the same one; the Family screen can change it. */
+export const dependentUpdateSchema = z.object({ ...dependentFields, relation: dependentRelation.optional() }, BODY_ERROR);
+
+export const dependentCreateSchema = z.object({ ...dependentFields, relation: dependentRelation }, BODY_ERROR);
 
 /** Absent optional fields clear the column, matching the form's full-replace save. */
 export function dependentData(d: z.output<typeof dependentUpdateSchema>) {

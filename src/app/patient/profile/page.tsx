@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Loader2, MapPin, HeartPulse, PhoneCall, Compass, Bell, Wallet as WalletIcon,
-  LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2, Lock, FileCheck, FolderHeart, Activity,
+  LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2, Lock, FileCheck, FolderHeart, Activity, Users,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -162,11 +162,21 @@ export default function PatientProfilePage() {
   const router = useRouter();
   const t = useTranslations("patientAccount.hub");
   const { profile, loading, setProfile } = usePatientProfile();
+  const [familyCount, setFamilyCount] = useState<number | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/patient/profile");
     if (!authLoading && user && user.role !== "PATIENT") router.push("/login");
   }, [authLoading, user, router]);
+
+  const userId = user?.role === "PATIENT" ? user.id : undefined;
+  useEffect(() => {
+    if (!userId) return;
+    fetch("/api/patients/me/dependents")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (Array.isArray(d)) setFamilyCount(d.length); })
+      .catch(() => {});
+  }, [userId]);
 
   if (authLoading || loading || !user) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">
@@ -243,6 +253,9 @@ export default function PatientProfilePage() {
             title={t("address")} trailing={<StatusPill done={addressDone} total={2} />} />
           <Row href="/patient/profile/emergency" tint="bg-emerald-50 text-emerald-600" icon={<PhoneCall className="w-4 h-4" />}
             title={t("emergency")} trailing={<StatusPill done={emergencyDone ? 1 : 0} total={1} />} />
+          <Row href="/patient/profile/family" tint="bg-violet-50 text-violet-600" icon={<Users className="w-4 h-4" />}
+            title={t("family")}
+            trailing={familyCount ? <span className="text-xs font-semibold text-slate-400 flex-shrink-0">{familyCount}</span> : undefined} />
           <Row href="/patient/profile/documents" tint="bg-rose-50 text-rose-600" icon={<FolderHeart className="w-4 h-4" />}
             title={t("documents")} />
           <Row href="/patient/profile/vitals" tint="bg-rose-50 text-rose-500" icon={<Activity className="w-4 h-4" />}

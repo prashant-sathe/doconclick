@@ -202,7 +202,8 @@
     "saveChanges": "बदलाव सेव करें",
     "saveDetails": "{relation} की जानकारी सेव करें",
     "errorName": "कृपया नाम डालें।",
-    "errorSave": "सेव नहीं हो सका।"
+    "errorSave": "सेव नहीं हो सका।",
+    "name": "नाम"
   },
   "payment": {
     "back": "← वापस",
