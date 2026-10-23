@@ -68,7 +68,7 @@ export function matchesQueueFilters(a: FilterAppt, f: QueueFilters, now: Date | 
 
 // The last 10 digits of whatever was typed — "+91 98765 43210", "098765…" all
 // search the same number.
-function searchDigits(q: string): string {
+export function searchDigits(q: string): string {
   const d = q.replace(/\D/g, "").replace(/^0+/, ""); // a leading 0 is the trunk prefix
   return d.length > 10 ? d.slice(-10) : d;
 }

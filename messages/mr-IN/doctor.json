@@ -181,7 +181,8 @@
         "NO_SHOW": "न आलेले"
       },
       "clear": "फिल्टर काढा",
-      "nothingMatches": "या फिल्टरशी काहीही जुळत नाही."
+      "nothingMatches": "या फिल्टरशी काहीही जुळत नाही.",
+      "searching": "शोधत आहे…"
     }
   },
   "completeVisit": {

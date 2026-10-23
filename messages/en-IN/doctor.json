@@ -181,7 +181,8 @@
         "NO_SHOW": "No-shows"
       },
       "clear": "Clear filters",
-      "nothingMatches": "Nothing matches these filters."
+      "nothingMatches": "Nothing matches these filters.",
+      "searching": "Searching…"
     }
   },
   "completeVisit": {

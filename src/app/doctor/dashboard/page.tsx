@@ -695,10 +695,23 @@ export default function DoctorDashboard() {
   // header's request bell reads the same one — src/components/AppointmentFeed.tsx);
   // older history is paged in on demand.
   const feed = useAppointmentFeed<Appointment>();
-  const past = useAppointmentHistory<Appointment>(user?.role === "DOCTOR" || user?.role === "STAFF");
-  const appointments = useMemo(() => mergeAppointments(feed.items, past.items), [feed.items, past.items]);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<QueueFilters>(DEFAULT_QUEUE_FILTERS);
+  // The search and filters also go to the server (debounced), so an old visit
+  // beyond the loaded pages is still found (BUG-TRACKER P2-29).
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearch(search.trim()), 300);
+    return () => clearTimeout(id);
+  }, [search]);
+  const historyQuery = useMemo(() => ({
+    q: debouncedSearch,
+    status: ["COMPLETED", "CANCELLED", "NO_SHOW"].includes(filters.status) ? filters.status : undefined,
+    consultType: filters.type !== "ALL" ? filters.type : undefined,
+    clinicId: filters.clinicId !== "ALL" ? filters.clinicId : undefined,
+  }), [debouncedSearch, filters.status, filters.type, filters.clinicId]);
+  const past = useAppointmentHistory<Appointment>(user?.role === "DOCTOR" || user?.role === "STAFF", { query: historyQuery });
+  const appointments = useMemo(() => mergeAppointments(feed.items, past.items), [feed.items, past.items]);
   // True until the first successful load; a failed (re)load sets apptsError
   // and keeps whatever was last loaded.
   const loadingAppts = feed.items === null;
@@ -1399,6 +1412,10 @@ export default function DoctorDashboard() {
           {filtersOn && !loadingAppts && ["COMPLETED", "CANCELLED", "NO_SHOW"].includes(filters.status)
             && completed.length + cancelled.length + noShow.length === 0 && (
             <p className="text-sm text-slate-400 text-center py-8">{t("filters.nothingMatches")}</p>
+          )}
+          {/* Searching runs on the server; show it's still looking. */}
+          {search.trim() !== debouncedSearch && (
+            <p className="text-xs text-slate-400 text-center py-2">{t("filters.searching")}</p>
           )}
         </div>
 

@@ -81,7 +81,11 @@ export function useAppointmentFeed<T>() {
 type HistoryPage<T> = { items: T[]; nextCursor: string | null; counts: Record<string, number> };
 
 /** Finished appointments, newest first, a page at a time (?view=history). */
-export function useAppointmentHistory<T extends { id: string }>(enabled: boolean, { pageSize = 20 }: { pageSize?: number } = {}) {
+export type HistoryQuery = { q?: string; status?: string; consultType?: string; clinicId?: string; from?: string; to?: string };
+
+export function useAppointmentHistory<T extends { id: string }>(enabled: boolean, { pageSize = 20, query }: { pageSize?: number; query?: HistoryQuery } = {}) {
+  // Search / filters run on the server, over the whole history.
+  const queryKey = JSON.stringify(Object.entries(query ?? {}).filter(([, v]) => v).sort());
   const [items, setItems] = useState<T[] | null>(null);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [counts, setCounts] = useState<Record<string, number>>({});
@@ -92,6 +96,7 @@ export function useAppointmentHistory<T extends { id: string }>(enabled: boolean
 
   const fetchPage = async (cursor: string | null): Promise<HistoryPage<T>> => {
     const qs = new URLSearchParams({ view: "history", limit: String(pageSize) });
+    for (const [k, v] of JSON.parse(queryKey) as [string, string][]) qs.set(k, v);
     if (cursor) qs.set("cursor", cursor);
     const res = await fetch(`/api/appointments/me?${qs}`);
     if (!res.ok) throw new Error(await errorMessage(res, "Couldn't load past appointments."));
@@ -122,7 +127,7 @@ export function useAppointmentHistory<T extends { id: string }>(enabled: boolean
     }
     // fetchPage only reads pageSize.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, pageSize]);
+  }, [enabled, pageSize, queryKey]);
 
   const loadMore = useCallback(async () => {
     if (!nextCursor || loadingMore) return;
@@ -146,7 +151,7 @@ export function useAppointmentHistory<T extends { id: string }>(enabled: boolean
       setLoadingMore(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nextCursor, loadingMore, pageSize]);
+  }, [nextCursor, loadingMore, pageSize, queryKey]);
 
   useEffect(() => {
     loaded.current = 0;

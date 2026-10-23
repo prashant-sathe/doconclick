@@ -181,7 +181,8 @@
         "NO_SHOW": "नहीं आए"
       },
       "clear": "फ़िल्टर हटाएँ",
-      "nothingMatches": "इन फ़िल्टर से कुछ नहीं मिला।"
+      "nothingMatches": "इन फ़िल्टर से कुछ नहीं मिला।",
+      "searching": "खोज रहे हैं…"
     }
   },
   "completeVisit": {

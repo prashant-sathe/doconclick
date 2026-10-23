@@ -101,8 +101,45 @@ async function main() {
       `${atClinic?.clinic?.name} / ${list[0].patient.mobile}`);
     const active = (await (await fetch(`${BASE}/api/appointments/me?view=active`, { headers: { Cookie: cookie } })).json()) as { symptoms: string }[];
     check("the dashboard's live feed holds next week's visits (tomorrow/week views filter it)", active.some((a) => a.symptoms === "+72h"), `${active.length} rows`);
+
+    // ── Server-side history search (P2-29): >20 finished visits, find the oldest ──
+    const old = await prisma.user.create({ data: { name: "Zubin Oldtimer", mobile: `1${stamp}7`, role: "PATIENT" } });
+    try {
+      await prisma.appointment.create({
+        data: { patientId: old.id, doctorId: doctor.id, symptoms: "oldest", consultType: "VIDEO", status: "COMPLETED", scheduledAt: new Date(Date.now() - 900 * 24 * HOUR) },
+      });
+      for (let i = 0; i < 25; i++) {
+        await prisma.appointment.create({
+          data: { patientId: patient.id, doctorId: doctor.id, symptoms: `h${i}`, consultType: i % 2 ? "CLINIC" : "VIDEO", clinicId: i % 2 ? clinic.id : null, status: i % 5 === 0 ? "CANCELLED" : "COMPLETED", scheduledAt: new Date(Date.now() - (i + 2) * 24 * HOUR) },
+        });
+      }
+      const hist = async (qs: string) => (await fetch(`${BASE}/api/appointments/me?view=history&${qs}`, { headers: { Cookie: cookie } })).json() as Promise<{ items: { symptoms: string }[]; nextCursor: string | null; error?: string }>;
+      const firstPage = await hist("limit=20");
+      check("history page 1 doesn't hold the oldest visit", firstPage.items.length === 20 && !firstPage.items.some((a) => a.symptoms === "oldest") && !!firstPage.nextCursor, `${firstPage.items.length} rows`);
+      const byMobile = await hist(`q=${encodeURIComponent(`+91 ${old.mobile}`)}`);
+      check("searching the oldest patient's mobile finds it", byMobile.items.length === 1 && byMobile.items[0].symptoms === "oldest", `${byMobile.items.length}`);
+      const byName = await hist("q=zubin");
+      check("name search is case-insensitive", byName.items.length === 1, `${byName.items.length}`);
+      const shortDigits = await hist("q=12");
+      check("fewer than 3 digits don't search the mobile", shortDigits.items.length === 0, `${shortDigits.items.length}`);
+      const cancelledOnly = await hist("status=CANCELLED&limit=50");
+      check("status filter on the server", cancelledOnly.items.length === 5, `${cancelledOnly.items.length}`);
+      const clinicOnly = await hist(`consultType=CLINIC&clinicId=${clinic.id}&limit=50`);
+      check("type + clinic filters on the server", clinicOnly.items.length === 12, `${clinicOnly.items.length}`);
+      const day = new Date(Date.now() - 900 * 24 * HOUR).toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+      const byDate = await hist(`from=${day}&to=${day}`);
+      check("from / to are IST days", byDate.items.length === 1 && byDate.items[0].symptoms === "oldest", `${byDate.items.length}`);
+      const paged = await hist(`q=${patient.mobile}&limit=10`);
+      check("a search pages with a cursor", paged.items.length === 10 && !!paged.nextCursor, `${paged.items.length}`);
+      const badType = await fetch(`${BASE}/api/appointments/me?view=history&consultType=XX`, { headers: { Cookie: cookie } });
+      const badDate = await fetch(`${BASE}/api/appointments/me?view=history&from=2026-02-31`, { headers: { Cookie: cookie } });
+      check("bad consultType / date → 400", badType.status === 400 && badDate.status === 400, `${badType.status}/${badDate.status}`);
+    } finally {
+      await prisma.user.deleteMany({ where: { id: old.id } }).catch(() => {});
+    }
   } finally {
     await prisma.appointment.deleteMany({ where: { doctorId: doctor.id } });
+    await prisma.user.deleteMany({ where: { id: { in: [(await prisma.user.findFirst({ where: { mobile: `1${stamp}7` } }))?.id ?? ""] } } });
     await prisma.clinic.deleteMany({ where: { doctorId: doctor.id } });
     await prisma.user.deleteMany({ where: { id: { in: [doctor.id, patient.id] } } });
   }

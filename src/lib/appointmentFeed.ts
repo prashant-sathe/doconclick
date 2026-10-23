@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getChatFollowUpDays } from "@/lib/chatAccess";
+import { isValidYmd, istStartOfDay, istEndOfDay } from "@/lib/istDate";
+import { searchDigits } from "@/lib/doctorQueue";
 
 // Views of /api/appointments/me (BUG-TRACKER #55):
 //   ?view=active   — what the 5s poll needs: every live booking (pending,
@@ -13,7 +15,10 @@ import { getChatFollowUpDays } from "@/lib/chatAccess";
 //   ?view=history  — finished bookings, newest first, a page at a time:
 //                    { items, nextCursor, counts }. &limit= (1–50, default
 //                    20), &cursor= (the last page's nextCursor), &status=
-//                    COMPLETED,CANCELLED… to narrow it.
+//                    COMPLETED,CANCELLED… to narrow it. Also &q= (patient
+//                    name, or mobile once 3+ digits), &consultType=,
+//                    &clinicId=, &from= / &to= (IST dates, YYYY-MM-DD) — the
+//                    search runs on the whole history, not just loaded pages.
 //   (no view)      — everything, as before (earnings pages). Not for polling.
 
 export const LIVE_STATUSES = ["PENDING_APPROVAL", "SCHEDULED"];
@@ -25,7 +30,11 @@ const MAX_LIMIT = 50;
 export type FeedView =
   | { kind: "all" }
   | { kind: "active"; recentDays: number }
-  | { kind: "history"; limit: number; cursor: string | null; statuses: string[] };
+  | { kind: "history"; limit: number; cursor: string | null; statuses: string[]; filter: HistoryFilter };
+
+export type HistoryFilter = { q: string; consultType: string | null; clinicId: string | null; from: string | null; to: string | null };
+
+const CONSULT_TYPES = ["CLINIC", "HOME", "VIDEO"];
 
 export async function parseFeedView(url: string): Promise<{ view: FeedView } | { response: NextResponse }> {
   const p = new URL(url).searchParams;
@@ -44,13 +53,45 @@ export async function parseFeedView(url: string): Promise<{ view: FeedView } | {
   if (statuses.length === 0 || statuses.some((s) => !FINISHED_STATUSES.includes(s))) {
     return { response: NextResponse.json({ error: `status must be one or more of ${FINISHED_STATUSES.join(", ")}` }, { status: 400 }) };
   }
-  return { view: { kind: "history", limit, cursor: p.get("cursor") || null, statuses } };
+  const consultType = p.get("consultType") || null;
+  if (consultType && !CONSULT_TYPES.includes(consultType)) {
+    return { response: NextResponse.json({ error: `consultType must be one of ${CONSULT_TYPES.join(", ")}` }, { status: 400 }) };
+  }
+  const from = p.get("from") || null;
+  const to = p.get("to") || null;
+  if ((from && !isValidYmd(from)) || (to && !isValidYmd(to))) {
+    return { response: NextResponse.json({ error: "from / to must be dates written YYYY-MM-DD" }, { status: 400 }) };
+  }
+  const filter: HistoryFilter = { q: (p.get("q") ?? "").trim().slice(0, 100), consultType, clinicId: p.get("clinicId") || null, from, to };
+  return { view: { kind: "history", limit, cursor: p.get("cursor") || null, statuses, filter } };
+}
+
+/** Search + filters of the history view. Name = the visit's patient or the
+ *  account holder; digits search the mobile once there are three (as the
+ *  dashboard's matchesPatientSearch does). */
+export function historyFilterWhere(f: HistoryFilter): Prisma.AppointmentWhereInput[] {
+  const out: Prisma.AppointmentWhereInput[] = [];
+  if (f.q) {
+    const or: Prisma.AppointmentWhereInput[] = [
+      { patientName: { contains: f.q, mode: "insensitive" } },
+      { patient: { name: { contains: f.q, mode: "insensitive" } } },
+    ];
+    const digits = searchDigits(f.q);
+    if (digits.length >= 3 && /^[\d\s+()-]+$/.test(f.q)) or.push({ patient: { mobile: { contains: digits } } });
+    out.push({ OR: or });
+  }
+  if (f.consultType) out.push({ consultType: f.consultType });
+  if (f.clinicId) out.push({ clinicId: f.clinicId });
+  if (f.from || f.to) {
+    out.push({ scheduledAt: { ...(f.from ? { gte: istStartOfDay(f.from) } : {}), ...(f.to ? { lte: istEndOfDay(f.to) } : {}) } });
+  }
+  return out;
 }
 
 /** The view's filter, ANDed with the caller's ownership filter. */
 export function feedWhere(owner: Prisma.AppointmentWhereInput, view: FeedView): Prisma.AppointmentWhereInput {
   if (view.kind === "all") return owner;
-  if (view.kind === "history") return { AND: [owner, { status: { in: view.statuses } }] };
+  if (view.kind === "history") return { AND: [owner, { status: { in: view.statuses } }, ...historyFilterWhere(view.filter)] };
   const since = new Date(Date.now() - view.recentDays * 24 * 60 * 60 * 1000);
   return {
     AND: [owner, { OR: [{ status: { in: LIVE_STATUSES } }, { scheduledAt: { gte: since } }, { completedAt: { gte: since } }] }],
