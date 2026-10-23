@@ -53,10 +53,10 @@ async function main() {
 
     // ── Add ──
     r = await call(patient, "POST", base, { relation: "Mother", name: "Asha Patil", age: "68", gender: "Female", bloodGroup: "B+", chronicDiseases: "Diabetes,Knee pain", emergencyContactPhone: "+91 98765 43210" });
-    const mother = r.json as J & { id: string };
+    const mother = r.json as unknown as J & { id: string };
     check("add mother → 200 with fields parsed", r.status === 200 && mother.age === 68 && mother.relation === "Mother" && mother.chronicDiseases === "Diabetes,Knee pain" && mother.emergencyContactPhone === "9876543210", `${r.status} age ${mother.age} phone ${mother.emergencyContactPhone}`);
     r = await call(patient, "POST", base, { relation: "Son", name: "Rohan" });
-    const son = r.json as J & { id: string };
+    const son = r.json as unknown as J & { id: string };
     check("add son with only a name → 200", r.status === 200 && son.age === null, `${r.status}`);
     r = await call(patient, "POST", base, { name: "Rohan" });
     check("add without relation → 400", r.status === 400, `${r.status} ${r.json.error}`);

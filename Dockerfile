@@ -47,7 +47,11 @@ ENV NEXT_PUBLIC_FIREBASE_APP_ID=$NEXT_PUBLIC_FIREBASE_APP_ID
 ENV NEXT_PUBLIC_FIREBASE_VAPID_KEY=$NEXT_PUBLIC_FIREBASE_VAPID_KEY
 ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
 ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID_IOS=$NEXT_PUBLIC_GOOGLE_CLIENT_ID_IOS
-RUN npm run build
+# The "Running TypeScript" step needs ~1.2 GB of heap (more since next-intl
+# started checking every t() key) — above Node's default limit on the EC2
+# instance (~970 MB), where it ran out of memory. Scoped to this step only;
+# NODE_OPTIONS reaches Next's type-check worker too.
+RUN NODE_OPTIONS=--max-old-space-size=2048 npm run build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
