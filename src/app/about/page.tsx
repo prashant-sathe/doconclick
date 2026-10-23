@@ -32,7 +32,7 @@ export default function AboutPage() {
             Building Accessible Healthcare for Every Indian
           </h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            We started with a simple belief: no one should have to wait hours in a crowded clinic when they're sick. DocOnClick was born to change that.
+            We started with a simple belief: no one should have to wait hours in a crowded clinic when they&apos;re sick. DocOnClick was born to change that.
           </p>
         </div>
         <div className="relative h-16">
@@ -55,7 +55,7 @@ export default function AboutPage() {
                 Our founder saw the same problem from close up: patients struggling to access doctors, and good doctors struggling to reach patients who need them most.
               </p>
               <p className="text-slate-600 leading-relaxed mb-5">
-                DocOnClick bridges that gap. We've built a platform that makes it as easy to book a doctor as it is to order food — with the trust, safety, and professionalism that healthcare demands.
+                DocOnClick bridges that gap. We&apos;ve built a platform that makes it as easy to book a doctor as it is to order food — with the trust, safety, and professionalism that healthcare demands.
               </p>
               <p className="text-slate-600 leading-relaxed">
                 We are just getting started, and our mission is clear: make quality healthcare accessible to every Indian.

@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored / generated native build output and agent scratch files.
+    "ios/**/build/**",
+    "android/**/build/**",
+    ".pipeline/**",
   ]),
 ]);
 

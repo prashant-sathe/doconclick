@@ -69,6 +69,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
       .then((d) => { setData(d); setLoading(false); });
   }, [userId]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- load() sets loading/data state; fetch-on-mount
   useEffect(() => { load(); }, [load]);
 
   // Same rules as the route (POST .../adjust), so the admin hears about them
@@ -344,6 +345,7 @@ export default function AdminWallets() {
       });
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- load() sets loading/data state; fetch-on-mount
   useEffect(() => { load(); }, [load]);
 
   const filtered = rows.filter(

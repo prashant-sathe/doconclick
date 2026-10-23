@@ -48,6 +48,7 @@ export default function ReportDetailPage() {
     }
   }, [config, from, to, status]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- load() sets loading/data state; fetch-on-mount
   useEffect(() => { load(); }, [load]);
 
   if (!config) {

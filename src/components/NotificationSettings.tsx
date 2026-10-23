@@ -30,6 +30,7 @@ export default function NotificationSettings() {
 
   useEffect(() => {
     const ok = isPushSupported();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- push support is client-only; detect after mount
     setSupported(ok);
     if (!ok) return;
     getPushPermissionState().then(setPermission);

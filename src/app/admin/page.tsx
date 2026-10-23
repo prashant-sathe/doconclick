@@ -125,7 +125,7 @@ export default function AdminOverview() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900">Dashboard Overview</h1>
-          <p className="text-slate-500 text-sm mt-1">Welcome back, Admin. Here's what's happening today.</p>
+          <p className="text-slate-500 text-sm mt-1">Welcome back, Admin. Here&apos;s what&apos;s happening today.</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-slate-500 bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm">
           <Clock className="w-4 h-4" />

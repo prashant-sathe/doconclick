@@ -116,6 +116,7 @@ export default function DoctorProfilePage() {
   }, [authLoading, user, router]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync local photo state from loaded profile
     if (profile?.photoUrl !== undefined) setPhotoUrl(profile?.photoUrl ?? null);
   }, [profile]);
 

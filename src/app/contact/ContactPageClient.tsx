@@ -29,7 +29,7 @@ export default function ContactPageClient() {
             <MessageCircle className="w-4 h-4" /> Get In Touch
           </div>
           <h1 className="text-5xl font-extrabold text-white mb-4">Contact Us</h1>
-          <p className="text-xl text-blue-100 max-w-xl mx-auto">We're here to help — patients, doctors, and partners. Reach out and we'll respond within 24 hours.</p>
+          <p className="text-xl text-blue-100 max-w-xl mx-auto">We&apos;re here to help — patients, doctors, and partners. Reach out and we&apos;ll respond within 24 hours.</p>
         </div>
         <div className="relative h-16">
           <svg viewBox="0 0 1440 64" fill="none" className="absolute bottom-0 w-full" preserveAspectRatio="none">
@@ -45,7 +45,7 @@ export default function ContactPageClient() {
             {/* Contact info */}
             <div className="lg:col-span-2 space-y-6">
               <div>
-                <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Let's talk</h2>
+                <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Let&apos;s talk</h2>
                 <p className="text-slate-500 text-sm leading-relaxed">Whether you have a question about our services, pricing, or need technical support — our team is ready to answer all your questions.</p>
               </div>
               {[
@@ -108,7 +108,7 @@ export default function ContactPageClient() {
                     <form onSubmit={submit} className="space-y-5">
                       {/* Query type */}
                       <div>
-                        <label className="input-label">I'm a…</label>
+                        <label className="input-label">I&apos;m a…</label>
                         <div className="grid grid-cols-3 gap-3">
                           {[
                             { id: "general", label: "Patient / Public" },

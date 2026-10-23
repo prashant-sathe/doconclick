@@ -151,6 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial auth fetch on mount; refresh() sets user state
     refresh();
     const interval = setInterval(refresh, SUSPENSION_RECHECK_MS);
     return () => clearInterval(interval);

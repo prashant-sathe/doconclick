@@ -529,6 +529,7 @@ export default function HealthAssistantPage() {
     if (!storageKey) return;
     try {
       const raw = sessionStorage.getItem(storageKey);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- restore chat from sessionStorage (client-only, avoids hydration mismatch)
       if (raw) setItems(JSON.parse(raw));
     } catch {
       // corrupted/unavailable storage — start with an empty conversation

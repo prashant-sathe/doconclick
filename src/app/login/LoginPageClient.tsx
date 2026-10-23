@@ -198,6 +198,7 @@ export default function LoginPageClient() {
   // correct it after mount, once hydration has safely committed.
   const tc = useTranslations("auth.common");
   const [native, setNative] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- isNative() is client-only; must run after mount to avoid hydration mismatch
   useEffect(() => setNative(isNative()), []);
 
   return (
