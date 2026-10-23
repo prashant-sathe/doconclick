@@ -270,6 +270,7 @@ export default function DoctorSupportPage() {
   const [error, setError] = useState<string | null>(null);
   const [openTicketCount, setOpenTicketCount] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const userId = user?.id;
   const storageKey = user ? `doconclick:doctor-support-chat:${user.id}` : null;
 
   useEffect(() => {
@@ -279,14 +280,14 @@ export default function DoctorSupportPage() {
   // Lets "My Tickets" carry a signal of its own, instead of being a dead link
   // the doctor has to click through just to check whether anything's pending.
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     fetch("/api/doctor/complaints")
       .then((r) => (r.ok ? r.json() : []))
       .then((tickets: { status: string }[]) => {
         setOpenTicketCount(tickets.filter((t) => t.status === "OPEN" || t.status === "IN_PROGRESS").length);
       })
       .catch(() => {});
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
     if (!storageKey) return;

@@ -29,13 +29,16 @@ export default function PatientChatPage() {
     if (!authLoading && user && user.role !== "PATIENT") router.push("/login");
   }, [authLoading, user, router, params.id]);
 
+  // Keyed on the id: AuthProvider hands out a fresh `user` object every re-check.
+  const userId = user?.id;
+  const userRole = user?.role;
   useEffect(() => {
-    if (!user || user.role !== "PATIENT") return;
+    if (!userId || userRole !== "PATIENT") return;
     fetch(`/api/appointments/${params.id}`).then(async (r) => {
       if (!r.ok) { setError((await r.json().catch(() => ({}))).error ?? t("couldNotLoad")); return; }
       setAppt(await r.json());
     });
-  }, [user, params.id, t]);
+  }, [userId, userRole, params.id, t]);
 
   if (authLoading || !user) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">

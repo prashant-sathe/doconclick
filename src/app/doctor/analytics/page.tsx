@@ -51,8 +51,11 @@ export default function DoctorAnalytics() {
     if (!authLoading && user && user.role !== "DOCTOR") router.push("/login");
   }, [authLoading, user, router]);
 
+  // Keyed on the id: AuthProvider hands out a fresh `user` object every re-check.
+  const userId = user?.id;
+  const userRole = user?.role;
   useEffect(() => {
-    if (!user || user.role !== "DOCTOR") return;
+    if (!userId || userRole !== "DOCTOR") return;
     fetch("/api/doctors/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
@@ -66,7 +69,7 @@ export default function DoctorAnalytics() {
           });
       })
       .catch(() => setLoading(false));
-  }, [user, router]);
+  }, [userId, userRole, router]);
 
   if (authLoading || loading || !user || !data) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">

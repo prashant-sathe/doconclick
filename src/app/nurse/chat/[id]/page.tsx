@@ -36,13 +36,16 @@ export default function NurseChatPage() {
     if (!authLoading && user && user.role !== "NURSE") router.push("/login");
   }, [authLoading, user, router, params.id]);
 
+  // Keyed on the id: AuthProvider hands out a fresh `user` object every re-check.
+  const userId = user?.id;
+  const userRole = user?.role;
   useEffect(() => {
-    if (!user || user.role !== "NURSE") return;
+    if (!userId || userRole !== "NURSE") return;
     fetch(`/api/appointments/${params.id}`).then(async (r) => {
       if (!r.ok) { setError((await r.json().catch(() => ({}))).error ?? t("loadFailed")); return; }
       setAppt(await r.json());
     });
-  }, [user, params.id, t]);
+  }, [userId, userRole, params.id, t]);
 
   if (authLoading || !user) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">

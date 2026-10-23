@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, IndianRupee, TrendingUp, CreditCard, Send, CheckCircle2 } from "lucide-react";
@@ -7,31 +7,38 @@ import { useAuth } from "@/components/AuthProvider";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import DuesPayCard from "@/components/doctor/DuesPayCard";
+import LoadError from "@/components/LoadError";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { sumMoney } from "@/lib/money";
-import { istDayKey, istMonthKey, shiftMonthKey, addDaysYmd, mondayIndex } from "@/lib/istDate";
 import { useLocale, useTranslations } from "next-intl";
 import { formattingLocale } from "@/lib/appLanguage";
 
 const CONSULT_TYPES = ["CLINIC", "HOME", "VIDEO"] as const;
 const isConsultType = (s: string): s is (typeof CONSULT_TYPES)[number] => (CONSULT_TYPES as readonly string[]).includes(s);
 
-interface Appointment {
+// One row of GET /api/doctor/earnings — only what the list shows.
+interface Transaction {
   id: string;
-  status: string;
   consultType: string;
   amount: number;
   platformFee: number;
   paymentMethod: string;
-  paymentStatus: string;
   scheduledAt: string;
-  settlementId: string | null;
   patientName: string | null;
   relation: string;
   patient: { name: string };
 }
 
-function patientLabel(a: Appointment): string {
+interface EarningsSummary {
+  total: number;
+  thisMonth: number;
+  lastMonth: number;
+  days: { key: string; value: number }[];
+  transactions: Transaction[];
+  hasMore: boolean;
+}
+
+function patientLabel(a: Transaction): string {
   return a.relation !== "Self" && a.patientName ? a.patientName : a.patient.name;
 }
 
@@ -69,39 +76,86 @@ export default function DoctorEarnings() {
   const locale = formattingLocale(useLocale());
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [summary, setSummary] = useState<EarningsSummary | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [moreError, setMoreError] = useState(false);
   const [settlements, setSettlements] = useState<SettlementRecord[]>([]);
   const [payoutRequests, setPayoutRequests] = useState<PayoutRequestRecord[]>([]);
   const [dues, setDues] = useState<Dues | null>(null);
   const [bankOnFile, setBankOnFile] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(10);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [retrying, setRetrying] = useState(false);
   const [requestingPayout, setRequestingPayout] = useState(false);
   const [payoutError, setPayoutError] = useState("");
   // Blocks a second tap before the disabled state renders (BUG-TRACKER #72).
   const payoutInFlight = useRef(false);
+  const tLoad = useTranslations("shared.loadError");
+
+  // A failed fetch is an error card with Retry — never ₹0 and never a redirect.
+  // Only a successful /api/doctors/me saying "not paid / no plan" redirects.
+  const load = useCallback(async () => {
+    try {
+      const meRes = await fetch("/api/doctors/me");
+      if (!meRes.ok) throw new Error("profile");
+      const d = await meRes.json();
+      if (!d?.doctorProfile?.registrationFeePaid) { router.push("/doctor/profile"); return; }
+      if (!hasActiveDoctorSubscription(d.doctorProfile)) { router.push("/doctor/subscribe"); return; }
+      const [eRes, sRes, pRes] = await Promise.all([
+        fetch("/api/doctor/earnings"),
+        fetch("/api/doctor/settlements"),
+        fetch("/api/doctor/payout-requests"),
+      ]);
+      if (!eRes.ok || !sRes.ok || !pRes.ok) throw new Error("earnings");
+      const [e, settled, payouts] = await Promise.all([eRes.json(), sRes.json(), pRes.json()]);
+      setSummary(e);
+      setTransactions(e.transactions);
+      setHasMore(e.hasMore);
+      setSettlements(settled);
+      setPayoutRequests(payouts?.requests ?? []);
+      setDues(payouts?.dues ?? null);
+      setBankOnFile(payouts?.bankDetailsOnFile ?? true);
+      setLoadFailed(false);
+    } catch {
+      setLoadFailed(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+
+  // Keyed on the id, not the `user` object: AuthProvider hands out a fresh
+  // object on every re-check, which would refetch all of this every 30s.
+  const userId = user?.id;
+  const userRole = user?.role;
   useEffect(() => {
-    if (!user || user.role !== "DOCTOR") return;
-    fetch("/api/doctors/me")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (!d?.doctorProfile?.registrationFeePaid) { router.push("/doctor/profile"); return; }
-        if (!hasActiveDoctorSubscription(d.doctorProfile)) { router.push("/doctor/subscribe"); return; }
-        return Promise.all([
-          fetch("/api/appointments/me").then((r) => (r.ok ? r.json() : [])),
-          fetch("/api/doctor/settlements").then((r) => (r.ok ? r.json() : [])),
-          fetch("/api/doctor/payout-requests").then((r) => (r.ok ? r.json() : null)),
-        ]).then(([appts, settled, payouts]) => {
-          setAppointments(appts);
-          setSettlements(settled);
-          setPayoutRequests(payouts?.requests ?? []);
-          setDues(payouts?.dues ?? null);
-          setBankOnFile(payouts?.bankDetailsOnFile ?? true);
-          setLoading(false);
-        });
-      })
-      .catch(() => setLoading(false));
-  }, [user, router]);
+    if (!userId || userRole !== "DOCTOR") return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- load() is the fetch-on-mount
+    void load();
+  }, [userId, userRole, load]);
+
+  const retry = async () => {
+    setRetrying(true);
+    await load();
+    setRetrying(false);
+  };
+
+  const loadMore = async () => {
+    setLoadingMore(true);
+    setMoreError(false);
+    try {
+      const res = await fetch(`/api/doctor/earnings?skip=${transactions.length}`);
+      if (!res.ok) throw new Error("more");
+      const e: EarningsSummary = await res.json();
+      setTransactions((cur) => [...cur, ...e.transactions]);
+      setHasMore(e.hasMore);
+    } catch {
+      setMoreError(true);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   if (authLoading || loading || !user) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">
@@ -109,21 +163,22 @@ export default function DoctorEarnings() {
     </div>;
   }
 
-  const completed = appointments.filter((a) => a.status === "COMPLETED" && a.paymentStatus === "PAID");
-  // Summed in paise so ₹ figures don't drift (src/lib/money.ts).
-  const net = (a: Appointment) => sumMoney([a.amount, -a.platformFee]);
-  const total = (rows: Appointment[]) => sumMoney(rows.map(net));
+  if (loadFailed && !summary) {
+    return (
+      <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
+        <DoctorHeader />
+        <DoctorMobileNav />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+          <LoadError error={tLoad("generic")} onRetry={retry} retrying={retrying} />
+        </div>
+      </div>
+    );
+  }
 
-  // Months, weeks and days are IST calendar days (src/lib/istDate.ts), not the device's.
-  const now = new Date();
-  const thisMonthKey = istMonthKey(now);
-  const lastMonthKey = shiftMonthKey(thisMonthKey, -1);
-  const thisMonth = completed.filter((a) => istMonthKey(a.scheduledAt) === thisMonthKey);
-  const lastMonth = completed.filter((a) => istMonthKey(a.scheduledAt) === lastMonthKey);
-
-  const totalEarnings = total(completed);
-  const thisMonthEarnings = total(thisMonth);
-  const lastMonthEarnings = total(lastMonth);
+  const net = (a: Transaction) => sumMoney([a.amount, -a.platformFee]);
+  const totalEarnings = summary?.total ?? 0;
+  const thisMonthEarnings = summary?.thisMonth ?? 0;
+  const lastMonthEarnings = summary?.lastMonth ?? 0;
   const netPayout = dues?.netAmount ?? 0;
   const openPayoutRequest = payoutRequests.find((r) => r.status === "PENDING") ?? null;
 
@@ -147,20 +202,14 @@ export default function DoctorEarnings() {
     }
   };
 
-  // Last 7 days bar breakdown
-  const todayKey = istDayKey(now);
-  const weekStartKey = addDaysYmd(todayKey, -mondayIndex(todayKey)); // Monday as start
-  const days = [...Array(7)].map((_, i) => {
-    const dayKey = addDaysYmd(weekStartKey, i);
-    const dayEarnings = total(completed.filter((a) => istDayKey(a.scheduledAt) === dayKey));
-    const [y, m, dd] = dayKey.split("-").map(Number);
+  // Last 7 days bar breakdown (Monday first; IST days computed by the server)
+  const days = (summary?.days ?? []).map((d) => {
+    const [y, m, dd] = d.key.split("-").map(Number);
     const label = new Date(Date.UTC(y, m - 1, dd)).toLocaleDateString(locale, { weekday: "short", timeZone: "UTC" });
-    return { key: dayKey, label, value: dayEarnings };
+    return { key: d.key, label, value: d.value };
   });
   const maxDay = Math.max(1, ...days.map((d) => d.value));
-
-  const recentAll = [...completed].sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
-  const recent = recentAll.slice(0, visibleCount);
+  const recent = transactions;
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -312,12 +361,14 @@ export default function DoctorEarnings() {
               ))}
             </div>
           )}
-          {visibleCount < recentAll.length && (
+          {moreError && <p className="text-xs text-red-600 text-center py-2 border-t border-slate-100">{tLoad("generic")}</p>}
+          {hasMore && (
             <button
-              onClick={() => setVisibleCount((v) => v + 10)}
-              className="w-full py-3 border-t border-slate-100 text-xs font-semibold text-teal-600 hover:bg-teal-50 transition-colors"
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="w-full py-3 border-t border-slate-100 text-xs font-semibold text-teal-600 hover:bg-teal-50 transition-colors disabled:opacity-60"
             >
-              {t("loadMore", { count: Math.min(10, recentAll.length - visibleCount) })}
+              {loadingMore ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t("loadMore", { count: 10 })}
             </button>
           )}
         </div>

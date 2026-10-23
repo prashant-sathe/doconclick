@@ -111,6 +111,8 @@ function DoctorPatientHistoryInner() {
   }, [authLoading, user, router]);
 
   const [vitals, setVitals] = useState<VitalReadingRow[] | null>(null);
+  const userId = user?.id;
+  const userRole = user?.role;
   useEffect(() => {
     if (!user?.id || user.role !== "DOCTOR") return;
     fetch(`/api/vitals?patientId=${params.id}${dependentId ? `&dependentId=${dependentId}` : ""}&limit=120`)
@@ -120,7 +122,7 @@ function DoctorPatientHistoryInner() {
   }, [user?.id, user?.role, params.id, dependentId]);
 
   useEffect(() => {
-    if (!user || user.role !== "DOCTOR") return;
+    if (!userId || userRole !== "DOCTOR") return;
     const url = dependentId
       ? `/api/doctors/patients/${params.id}?dependentId=${dependentId}`
       : `/api/doctors/patients/${params.id}`;
@@ -130,7 +132,7 @@ function DoctorPatientHistoryInner() {
         setData(await r.json());
       })
       .finally(() => setLoading(false));
-  }, [user, params.id, dependentId, t]);
+  }, [userId, userRole, params.id, dependentId, t]);
 
   if (authLoading || loading || !user) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">

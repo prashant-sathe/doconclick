@@ -25,7 +25,8 @@
   },
   "loadError": {
     "retry": "Retry",
-    "showingLast": "Showing the last loaded data."
+    "showingLast": "Showing the last loaded data.",
+    "generic": "Couldn't load this page. Check your connection and try again."
   },
   "offline": {
     "message": "No internet connection — some things won't work until you're back online."
