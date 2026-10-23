@@ -16,15 +16,6 @@ const VALUES = [
   { icon: TrendingUp,title: "Continuous Innovation", desc: "We never stop improving. AI, predictive health, digital prescriptions — we're building the future." },
 ];
 
-const MILESTONES = [
-  { year: "2022", event: "DocOnClick founded in Mumbai" },
-  { year: "2022", event: "Launched pilot with 20 doctors in Mumbai" },
-  { year: "2023", event: "Expanded to Delhi, Bengaluru, Pune" },
-  { year: "2023", event: "Crossed 10,000 successful consultations" },
-  { year: "2024", event: "1,000+ verified doctors onboarded" },
-  { year: "2025", event: "50,000+ patients. ₹5Cr+ earned by doctors" },
-];
-
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
@@ -38,7 +29,7 @@ export default function AboutPage() {
             <Globe className="w-4 h-4" /> Our Story
           </div>
           <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 max-w-3xl mx-auto">
-            Building India's Most Trusted Healthcare Platform
+            Building Accessible Healthcare for Every Indian
           </h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
             We started with a simple belief: no one should have to wait hours in a crowded clinic when they're sick. DocOnClick was born to change that.
@@ -61,21 +52,21 @@ export default function AboutPage() {
                 Healthcare that comes <span className="gradient-text">to you</span>
               </h2>
               <p className="text-slate-600 leading-relaxed mb-5">
-                In 2022, our founders — a cardiologist and a tech entrepreneur — saw the same problem from different sides: patients struggling to access doctors, and good doctors struggling to reach patients who need them most.
+                Our founder saw the same problem from close up: patients struggling to access doctors, and good doctors struggling to reach patients who need them most.
               </p>
               <p className="text-slate-600 leading-relaxed mb-5">
                 DocOnClick bridges that gap. We've built a platform that makes it as easy to book a doctor as it is to order food — with the trust, safety, and professionalism that healthcare demands.
               </p>
               <p className="text-slate-600 leading-relaxed">
-                Today, we operate across 10+ cities, with 1,200+ verified doctors and have powered 50,000+ consultations. Our mission remains unchanged: make quality healthcare accessible to every Indian.
+                We are just getting started, and our mission is clear: make quality healthcare accessible to every Indian.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-5">
               {[
-                { icon: Users,       value: "50,000+", label: "Patients Served",   bg: "bg-blue-600" },
-                { icon: Stethoscope, value: "1,200+",  label: "Verified Doctors",  bg: "bg-teal-500" },
-                { icon: Globe,       value: "10+",     label: "Cities Active",     bg: "bg-purple-600" },
-                { icon: Award,       value: "4.9/5",   label: "Patient Rating",    bg: "bg-amber-500" },
+                { icon: Stethoscope, value: "Clinic",   label: "In-person visits",      bg: "bg-blue-600" },
+                { icon: Users,       value: "Home",     label: "Doctor & nurse visits", bg: "bg-teal-500" },
+                { icon: Globe,       value: "Video",    label: "Online consultations",  bg: "bg-purple-600" },
+                { icon: Award,       value: "3",        label: "Languages supported",   bg: "bg-amber-500" },
               ].map(({ icon: Icon, value, label, bg }) => (
                 <div key={label} className={`${bg} rounded-2xl p-8 text-white card-hover`}>
                   <Icon className="w-8 h-8 mb-3 opacity-80" />
@@ -126,33 +117,6 @@ export default function AboutPage() {
                 <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Timeline */}
-      <section className="py-20 bg-white">
-        <div className="mx-auto max-w-4xl px-6">
-          <div className="text-center mb-14">
-            <div className="section-tag mx-auto mb-4">Our Journey</div>
-            <h2 className="text-4xl font-extrabold text-slate-900 mb-4">From an Idea to <span className="gradient-text">50,000 Lives Touched</span></h2>
-          </div>
-          <div className="relative">
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-blue-100" />
-            <div className="space-y-8">
-              {MILESTONES.map(({ year, event }, i) => (
-                <div key={i} className="flex items-start gap-8 animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s`, opacity: 0 }}>
-                  <div className="relative flex-shrink-0">
-                    <div className="w-16 h-16 rounded-full gradient-primary flex items-center justify-center shadow-lg">
-                      <span className="text-white text-xs font-bold">{year}</span>
-                    </div>
-                  </div>
-                  <div className="stat-card flex-1 mt-3">
-                    <p className="text-slate-700 font-medium">{event}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>

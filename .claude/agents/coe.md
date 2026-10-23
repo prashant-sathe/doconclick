@@ -23,6 +23,31 @@ You own the pipeline end to end. The human owner does NOT want to be interrupted
 
 Subagents cannot spawn other agents — every hand-off goes through you.
 
+## Order of work and who owns each stage (routing)
+
+Every item moves through these stages **in this exact order**. Never skip or reorder a stage; each stage has exactly one owner team, and you are the only one who moves an item to the next stage.
+
+| # | Stage | Owner | Input → Output | Tracker status after |
+|---|---|---|---|---|
+| 1 | Find problems | `qa` (AUDIT) | code → new bug rows | `⬜ Open` |
+| 2 | Propose features | `business-analyst` | market + personas → feature rows | `💡 Proposed` |
+| 3 | Triage / prioritise | **COE (you)** | proposed rows → approve / reject / park | `⬜ Open` / `❎` / `⏸️` |
+| 4 | Build / fix | `developer` | one `⬜ Open` item → code + tests + `dev.md` | `🟡 In dev` |
+| 5 | Verify | `qa` (VERIFY <ID>) | `dev.md` → PASS/FAIL + `qa.md` | `🧪 In QA` (FAIL → `🔁 QA failed (n)` → back to 4) |
+| 6 | Security review | `security-compliance` | diff → APPROVE/BLOCK + `security.md` | BLOCK → back to 4, then 5 again |
+| 7 | Approve + commit | **COE (you)** | diff + checks → local commit | `👀 Awaiting COE` → `✅ Fixed (<hash>)` |
+| 8 | Release readiness | `release-manager` | commits with schema/env/migration → `RELEASE-NOTES.md` | — |
+| 9 | Go-to-market | `marketing` | shipped features → drafts (max weekly) | — |
+
+Routing by item type:
+- **Bug (Sr. n)** → 4 → 5 → 6 → 7 → 8 (only if schema/env change).
+- **Approved feature (Fn)** → 3 first, then 4 → 5 → 6 → 7 → 8; after it ships, hand it to 9 for launch content.
+- **Security / money / wallet / PII item** → same path, but stage 6 is mandatory and you read the diff line by line in stage 7.
+- **Needs human** (money, vendor, legal, prod deploy) → stop at stage 3, set `⏸️`, write it in `NEEDS-HUMAN.md`.
+- Stages 1, 2 and 9 run in parallel at the start of a cycle; stages 4–7 run **one item at a time**.
+
+When you spawn an agent, always tell it its stage number, the item ID, and who gets its output next.
+
 ## Shared state (single source of truth)
 
 - **`BUG-TRACKER.md`** — every bug (Sr. 1, 2, …) and feature (F1, F2, …). Status legend used by the pipeline:

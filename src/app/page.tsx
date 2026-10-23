@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  Heart, ArrowRight, Star, CheckCircle2, Home as HomeIcon, Video, Building2, Shield, Clock, MapPin, Stethoscope, Brain, Bone, Baby, Eye, Ear, Pill, Zap, Users, CalendarCheck, Award, TrendingUp, HeartPulse,
+  Heart, ArrowRight, CheckCircle2, Home as HomeIcon, Video, Building2, Shield, Clock, MapPin, Stethoscope, Brain, Bone, Baby, Eye, Ear, Pill, Zap, Users, CalendarCheck, Award, TrendingUp, HeartPulse,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -57,20 +57,39 @@ const HOW_STEPS = [
   { n: "04", title: "Get Treated",        desc: "Your doctor arrives or connects on time. Pay securely online." },
 ];
 
-// ── Testimonials ───────────────────────────────────────────────
-const TESTIMONIALS = [
-  { name: "Anita Sharma", role: "Patient, Mumbai", rating: 5, text: "Booked a home visit for my elderly mother at 10pm. Doctor arrived within 45 mins. Absolutely incredible service." },
-  { name: "Rahul Mehta",  role: "Patient, Pune",   rating: 5, text: "Had a video consultation for my child's fever. Doctor prescribed medicine, sent it to the pharmacy — all in 20 minutes!" },
-  { name: "Priya K.",     role: "Patient, Delhi",  rating: 5, text: "The convenience of having a cardiologist visit my home instead of waiting 3 hours at the clinic was life-changing." },
+// ── Highlights (feature-based; no unverified numbers) ──────────
+const STATS = [
+  { value: "3 Ways", label: "Clinic, home or video", icon: Stethoscope },
+  { value: "Verified", label: "Doctors checked by our team", icon: Shield },
+  { value: "Secure", label: "Online payments", icon: CheckCircle2 },
+  { value: "Multilingual", label: "English, Hindi & Marathi", icon: Users },
 ];
 
-// ── Stats ──────────────────────────────────────────────────────
-const STATS = [
-  { value: "50,000+", label: "Happy Patients",   icon: Users },
-  { value: "1,200+",  label: "Verified Doctors", icon: Stethoscope },
-  { value: "98%",     label: "Satisfaction Rate", icon: Star },
-  { value: "15 min",  label: "Avg Response Time", icon: Clock },
-];
+type PublicStats = { doctors: number | null; consultations: number | null; rating: number | null };
+
+// Real counters, shown only for figures the API says are big enough to show.
+function RealCounters() {
+  const [stats, setStats] = useState<PublicStats | null>(null);
+  useEffect(() => {
+    fetch("/api/public-stats").then((r) => (r.ok ? r.json() : null)).then(setStats).catch(() => {});
+  }, []);
+  const items = [
+    stats?.doctors != null && { value: `${stats.doctors}+`, label: "Verified Doctors" },
+    stats?.consultations != null && { value: `${stats.consultations}+`, label: "Consultations Done" },
+    stats?.rating != null && { value: `${stats.rating}★`, label: "Average Rating" },
+  ].filter(Boolean) as { value: string; label: string }[];
+  if (items.length === 0) return null;
+  return (
+    <div className="mt-6 flex flex-wrap justify-center gap-6">
+      {items.map(({ value, label }) => (
+        <div key={label} className="stat-card text-center px-8">
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-1 whitespace-nowrap">{value}</div>
+          <div className="text-sm text-slate-500">{label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function Home() {
   return (
@@ -87,12 +106,12 @@ export default function Home() {
         <div className="absolute bottom-0 left-10 w-60 h-60 rounded-full bg-blue-400/20 blur-3xl" />
 
         <div className="mx-auto max-w-7xl px-6 relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[88vh]">
+          <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[70vh]">
             {/* Left */}
             <div className="animate-fade-in-up">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold text-white mb-6 backdrop-blur-sm border border-white/20">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Trusted by 50,000+ patients across India
+                Clinic, home &amp; video care in one app
               </div>
               <h1 className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-2">
                 Your Health,
@@ -113,7 +132,7 @@ export default function Home() {
               </div>
               {/* Trust pills */}
               <div className="flex flex-wrap gap-3">
-                {["✓ Verified Doctors", "✓ 24/7 Available", "✓ Instant Booking", "✓ Secure Payments"].map(t => (
+                {["✓ Verified Doctors", "✓ Instant Booking", "✓ Secure Payments"].map(t => (
                   <span key={t} className="text-xs font-semibold text-blue-100 bg-white/10 rounded-full px-3 py-1.5 backdrop-blur">{t}</span>
                 ))}
               </div>
@@ -141,23 +160,6 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Live stats card */}
-              <div className="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-xs sm:max-w-sm lg:w-72 animate-float" style={{ animationDelay: "0.5s" }}>
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-slate-700 font-bold text-sm">Live Activity</p>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                </div>
-                {[
-                  { label: "Doctors online now", value: "247", color: "text-emerald-600" },
-                  { label: "Appointments today", value: "1,832", color: "text-blue-600" },
-                  { label: "Avg wait time", value: "< 15 min", color: "text-purple-600" },
-                ].map(({ label, value, color }) => (
-                  <div key={label} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
-                    <span className="text-xs text-slate-500">{label}</span>
-                    <span className={`text-sm font-bold ${color}`}>{value}</span>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
@@ -179,11 +181,12 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-3">
                   <Icon className="w-6 h-6 text-white" />
                 </div>
-                <div className="text-3xl font-extrabold text-slate-900 mb-1">{value}</div>
+                <div className="text-xl sm:text-3xl font-extrabold text-slate-900 mb-1">{value}</div>
                 <div className="text-sm text-slate-500">{label}</div>
               </div>
             ))}
           </div>
+          <RealCounters />
         </div>
       </section>
 
@@ -195,7 +198,7 @@ export default function Home() {
             <h2 className="text-4xl font-extrabold text-slate-900 mb-4">
               Specialists for <span className="gradient-text">Every Need</span>
             </h2>
-            <p className="text-slate-500 max-w-xl mx-auto">Find the right doctor across 25+ medical specialties. All verified, all available.</p>
+            <p className="text-slate-500 max-w-xl mx-auto">Find the right doctor across medical specialties. All doctors are verified by our team.</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
             {SPECIALTIES.map(({ icon: Icon, label, color, bg }) => (
@@ -223,7 +226,7 @@ export default function Home() {
             <h2 className="text-4xl font-extrabold text-slate-900 mb-4">
               How <span className="gradient-text">DocOnClick</span> Works
             </h2>
-            <p className="text-slate-500 max-w-xl mx-auto">From registration to treatment in under 5 minutes.</p>
+            <p className="text-slate-500 max-w-xl mx-auto">Book your visit in just a few minutes.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {HOW_STEPS.map(({ n, title, desc }, i) => (
@@ -251,9 +254,9 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: HomeIcon,  color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", title: "Home Visit", desc: "A verified doctor visits you at your home. Perfect for elderly patients, post-surgery care, and urgent situations.", perks: ["Doctor arrives in 30-90 min", "Real-time tracking", "No travel needed"] },
+              { icon: HomeIcon,  color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", title: "Home Visit", desc: "A verified doctor visits you at your home. Ideal for elderly patients and post-surgery care. For emergencies, call 108 or go to the nearest hospital.", perks: ["Live tracking after booking", "Real-time tracking", "No travel needed"] },
               { icon: Video,     color: "text-blue-600",    bg: "bg-blue-50",    border: "border-blue-100",    title: "Video Consultation", desc: "Consult top specialists from the comfort of your home via HD video. Get prescriptions and follow-ups online.", perks: ["Instant connection", "HD video consultation", "Digital prescription"] },
-              { icon: Building2, color: "text-purple-600",  bg: "bg-purple-50",  border: "border-purple-100",  title: "Clinic Visit",  desc: "Book a confirmed slot at the doctor's clinic — zero waiting time. Walk in exactly when your appointment is.", perks: ["Zero waiting time", "Confirmed slot", "In-person examination"] },
+              { icon: Building2, color: "text-purple-600",  bg: "bg-purple-50",  border: "border-purple-100",  title: "Clinic Visit",  desc: "Book a confirmed slot at the doctor's clinic and walk in at your appointment time.", perks: ["Confirmed time slot", "Confirmed slot", "In-person examination"] },
             ].map(({ icon: Icon, color, bg, border, title, desc, perks }) => (
               <div key={title} className={`stat-card card-hover border ${border}`}>
                 <div className={`w-14 h-14 rounded-2xl ${bg} flex items-center justify-center mb-5`}>
@@ -274,39 +277,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ────────────────────────────────────────── */}
-      <section className="py-20 bg-white">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-14">
-            <div className="section-tag mx-auto mb-4">Patient Stories</div>
-            <h2 className="text-4xl font-extrabold text-slate-900 mb-4">
-              Loved by <span className="gradient-text">Thousands</span>
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {TESTIMONIALS.map(({ name, role, rating, text }, i) => (
-              <div key={name} className="stat-card card-hover animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s`, opacity: 0 }}>
-                <div className="flex mb-4">
-                  {[...Array(rating)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 text-amber-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-slate-600 text-sm leading-relaxed mb-5 italic">"{text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-sm font-bold">{name.charAt(0)}</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-slate-900 text-sm">{name}</div>
-                    <div className="text-xs text-slate-400">{role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── WHY TRUST US ───────────────────────────────────────── */}
       <section className="py-20 gradient-surface">
         <div className="mx-auto max-w-7xl px-6">
@@ -317,14 +287,14 @@ export default function Home() {
                 Healthcare you can <span className="gradient-text">Trust</span>
               </h2>
               <p className="text-slate-500 mb-8 leading-relaxed">
-                Every doctor on DocOnClick goes through a rigorous 5-step verification process — degree verification, registration check, identity verification, background check, and in-person credential review.
+                Every doctor on DocOnClick is reviewed by our admin team — identity, medical registration number and documents are checked before they go live.
               </p>
               <div className="space-y-4">
                 {[
-                  { icon: Shield, title: "5-Step Doctor Verification", desc: "Every doctor's credentials, registration, and identity are verified before they go live." },
+                  { icon: Shield, title: "Verified Doctors", desc: "Identity, registration number and documents are checked by our team before a doctor goes live." },
                   { icon: Award,  title: "Only Qualified Specialists",  desc: "We list only MBBS, MD, MS and DNB qualified professionals." },
-                  { icon: Clock,  title: "24/7 Availability",           desc: "Doctors are available around the clock, so you can book whenever you need to." },
-                  { icon: TrendingUp, title: "Real-time Monitoring",    desc: "Patient feedback is monitored continuously. Ratings below 4.0 are investigated." },
+                  { icon: Clock,  title: "Book Anytime",                desc: "Browse doctors and book a slot whenever it suits you." },
+                  { icon: TrendingUp, title: "E-prescriptions & Receipts", desc: "Get your prescription and payment receipt digitally after your visit." },
                 ].map(({ icon: Icon, title, desc }) => (
                   <div key={title} className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -340,10 +310,10 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-5">
               {[
-                { value: "100%", label: "Verified Doctors", color: "bg-blue-600" },
-                { value: "50K+", label: "Consultations Done", color: "bg-teal-500" },
-                { value: "4.9★", label: "Average Rating", color: "bg-amber-500" },
-                { value: "30min", label: "Max Response Time", color: "bg-purple-600" },
+                { value: "Clinic", label: "In-person visits", color: "bg-blue-600" },
+                { value: "Home", label: "Doctor at your door", color: "bg-teal-500" },
+                { value: "Video", label: "Consult from anywhere", color: "bg-amber-500" },
+                { value: "3", label: "Languages supported", color: "bg-purple-600" },
               ].map(({ value, label, color }) => (
                 <div key={label} className={`${color} rounded-2xl p-8 text-white text-center card-hover`}>
                   <div className="text-4xl font-extrabold mb-2">{value}</div>
@@ -367,7 +337,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { title: "For Patients", icon: Heart, color: "text-blue-500", bg: "bg-blue-50", desc: "Register in 2 minutes. Book your first consultation today.", cta: "Register as Patient", href: "/patient/register" },
-              { title: "For Doctors", icon: Stethoscope, color: "text-teal-500", bg: "bg-teal-50", desc: "Join 1,200+ verified doctors. Grow your practice with DocOnClick.", cta: "Join as Doctor", href: "/doctor/register" },
+              { title: "For Doctors", icon: Stethoscope, color: "text-teal-500", bg: "bg-teal-50", desc: "Become a founding doctor on DocOnClick and grow your practice.", cta: "Join as Doctor", href: "/doctor/register" },
               { title: "For Nurses", icon: HeartPulse, color: "text-rose-500", bg: "bg-rose-50", desc: "Registered nurse? Get home-visit bookings near you — injections, dressing, IV, elderly care.", cta: "Join as Nurse", href: "/nurse/register" },
             ].map(({ title, icon: Icon, color, bg, desc, cta, href }) => (
               <div key={title} className="stat-card card-hover border border-slate-100 group">

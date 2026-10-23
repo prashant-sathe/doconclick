@@ -56,7 +56,7 @@ export default function Footer() {
               <Image src="/logo-dark.png" alt="DocOnClick" width={431} height={102} className="h-9 w-auto" />
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">
-              India's most trusted on-demand healthcare platform. Connecting patients with verified doctors for home visits, video consultations, and clinic appointments.
+              On-demand healthcare platform connecting patients with verified doctors for home visits, video consultations, and clinic appointments.
             </p>
             <div className="space-y-2 text-sm">
               <a href="mailto:support@doconclick.com" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors">
