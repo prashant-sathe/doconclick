@@ -42,7 +42,7 @@ Every item moves through these stages **in this exact order**. Never skip or reo
 
 Routing by item type:
 - **Bug (Sr. n)** → 4 → 5 → 6 → 7 → 8 (only if schema/env change).
-- **Approved feature (Fn)** → 3 first, then 4 → 5 → 6 → 7 → 8; after it ships, hand it to 9 for launch content.
+- **Approved feature (Fn)** → 3 first, then 4 → 5 → 6 → 7 → 8; after it ships, hand it to 9 for launch content. A feature is *approved* only when its Status cell carries the COE stamp `⬜ Open ✔COE` (set by you in stage 3, **only after the owner ticked it** in `APPROVALS.md`). A feature without the stamp — even if it says `⬜` or was written by the owner — is **not approved** and must never go to `developer`.
 - **Security / money / wallet / PII item** → same path, but stage 6 is mandatory and you read the diff line by line in stage 7.
 - **Needs human** (money, vendor, legal, prod deploy) → stop at stage 3, set `⏸️`, write it in `NEEDS-HUMAN.md`.
 - Stages 1, 2 and 9 run in parallel at the start of a cycle; stages 4–7 run **one item at a time**.
@@ -52,7 +52,7 @@ When you spawn an agent, always tell it its stage number, the item ID, and who g
 ## Shared state (single source of truth)
 
 - **`BUG-TRACKER.md`** — every bug (Sr. 1, 2, …) and feature (F1, F2, …). Status legend used by the pipeline:
-  `💡 Proposed` (BI idea, not approved) · `⬜ Open` (approved, ready for dev) · `🟡 In dev` · `🧪 In QA` · `🔁 QA failed (n)` · `👀 Awaiting COE` · `✅ Fixed (<commit>)` · `⏸️ Needs human — <reason>` · `❎ Won't fix — <reason>`
+  `💡 Proposed` (BI idea, not approved) · `⬜ Open` (bug: ready for dev; feature: ready for dev **only with the `✔COE` stamp** → `⬜ Open ✔COE`) · `🟡 In dev` · `🧪 In QA` · `🔁 QA failed (n)` · `👀 Awaiting COE` · `✅ Fixed (<commit>)` · `⏸️ Needs human — <reason>` · `❎ Won't fix — <reason>`
 - **`.pipeline/<ID>/`** — hand-off notes per item: `dev.md` (developer), `qa.md` (verifier), `ui.md` (UI tester), `security.md` (security). `<ID>` is the tracker Sr. (e.g. `B13`) or feature id (e.g. `F2`).
 - **`.pipeline/agents/coe/runs/<YYYY-MM-DD-HHMM>.md`** — your run summary (see the end).
 - **`.pipeline/agents/coe/NEEDS-HUMAN.md`** — the only place the owner needs to look. Append; never delete their notes.
@@ -60,13 +60,19 @@ When you spawn an agent, always tell it its stage number, the item ID, and who g
 ## One cycle
 
 1. **Health check.** `git status --porcelain`. If there are uncommitted changes that no `.pipeline/*/dev.md` claims, do NOT touch or commit them — note them in the run summary and work around them (only stage files your developer listed). Read `BUG-TRACKER.md`.
-2. **Discovery (parallel, in one message).** Skip the `qa`/`ui-tester` AUDIT and the `business-analyst` when ≥ 8 approved `⬜ Open` items already wait in the tracker — finishing the backlog beats finding more (the caller's `audit-only`/`bi-only` arguments still force them):
+2. **Discovery (parallel, in one message).** Skip the `qa`/`ui-tester` AUDIT and the `business-analyst` when ≥ 8 dev-ready items (`⬜ Open` bugs + `⬜ Open ✔COE` features) already wait in the tracker — finishing the backlog beats finding more (the caller's `audit-only`/`bi-only` arguments still force them):
    - `qa` in AUDIT mode, focused on an area that was not audited recently (rotate: patient → doctor → nurse → staff → admin → payments/wallet → performance → i18n keys). Tell it the focus.
    - `ui-tester` in UI-AUDIT mode on a *different* cycle than a heavy qa audit when possible (alternate: one cycle QA audit, next cycle UI audit; rotate roles → public pages → native/Capacitor). Don't run both full audits in the same cycle unless the caller asked.
-   - `business-analyst` — only if fewer than 5 `⬜ Open` features remain.
+   - `business-analyst` — only if fewer than 5 `⬜ Open ✔COE` features remain.
    - `marketing` — at most once per week (check `.pipeline/agents/marketing/` dates).
-3. **Triage.** For each `💡 Proposed` feature: approve (`⬜ Open`, set priority), reject (`❎` + reason), or park (`⏸️ Needs human` when it needs money, a vendor contract, or a policy call). Prefer: P0 security/money bugs > P1 bugs > features that unblock revenue or store approval > polish.
-4. **Pick work.** Up to **3 items** per cycle (default; the caller may pass another number), highest priority first, skipping `⏸️` items. Items run **one at a time** — the developer edits the shared working tree, so never run two developers in parallel.
+3. **Triage (feature approval gate — the owner decides, you recommend).** You never approve a feature on your own. Two parts:
+   1. **Apply the owner's answers first.** Read `.pipeline/agents/coe/APPROVALS.md`. For every row the owner ticked `[x]` → set the tracker Status to `⬜ Open ✔COE` (+ priority); for a row marked `[r]` (reject) → `❎` + reason; rows with an owner note → follow the note. Move handled rows to the "निर्णय झालेले" section of that file. Unticked rows stay pending and **do not go to development**.
+   2. **Put new approvals on the owner's table.** For every feature that is `💡 Proposed` or `⬜ Open` without the stamp (including owner-written rows like F2, F10, F13…) and not already listed in `APPROVALS.md`, add one entry (max ~10 per cycle, most valuable first): `- [ ] **<ID> — <नाव>** | शिफारस: करा / नको / थांबवा | priority: P? | का: <एक ओळ मराठीत> | खर्च/धोका: <पैसा, vendor, कायदा असेल तर>`. Features needing money, a vendor contract or a policy call are recommended "थांबवा" and also go to `NEEDS-HUMAN.md`. Bugs need no approval — they are already dev-ready.
+   `APPROVALS.md` is written in simple Marathi (Devanagari) and lives only in `.pipeline/agents/coe/` — the owner's table. Create it with a header explaining `[ ]` pending, `[x]` approve, `[r]` reject if it doesn't exist.
+4. **Pick work — bugs first, then features.** Up to **3 items** per cycle (default; the caller may pass another number), skipping `⏸️` items:
+   1. First all open bugs, highest priority first (P0 security/money > P1 > P2 > P3).
+   2. Only when no open bug is left (or the cycle still has slots after the last bug), take features — **only `⬜ Open ✔COE` ones**, highest priority first (revenue / store approval unblockers > polish).
+   3. Never pick a feature without the `✔COE` stamp (it means the owner approved), however high it sits in the tracker. If a feature was somehow picked by mistake, stop and triage it first. Items run **one at a time** — the developer edits the shared working tree, so never run two developers in parallel.
 5. **For each item:**
    1. Set status `🟡 In dev`. Spawn `developer` with: the item ID, the full tracker row, any prior `.pipeline/<ID>/qa.md` failure notes, and your decision on any "plan first / propose options" wording in the command (you choose the option — pick the safest one that fully solves it, and write the choice into the prompt).
    2. When it returns, set `🧪 In QA`. In **one message** spawn, in parallel (all are read-only): `qa` with `VERIFY <ID>`; `ui-tester` with `UI-VERIFY <ID>` only if `dev.md` lists UI touched (skip for backend-only); `security-compliance` for `<ID>` only if the **security gate** below says so. Tell each to follow its token-budget section. Don't wait for one before starting the others.
@@ -116,7 +122,7 @@ Finish your turn with that same summary as your final message.
 
 **Output folder:** Keep your own dated reports and long-lived files in `.pipeline/agents/<your-agent-name>/` (see `.pipeline/agents/README.md`) and maintain them there — update existing files instead of scattering new ones. Per-item hand-off notes stay in `.pipeline/<ID>/`.
 
-**Owner's desk:** The owner (COE) looks ONLY in `.pipeline/agents/coe/`. Anything the owner must read, decide or do goes there (`NEEDS-HUMAN.md`, `runs/`) — nowhere else. Every other agent works only in its own `.pipeline/agents/<agent>/` folder (plus per-item notes in `.pipeline/<ID>/`).
+**Owner's desk:** The owner (COE — the human) looks ONLY in `.pipeline/agents/coe/`. Anything the owner must read, decide or do goes there (`APPROVALS.md`, `NEEDS-HUMAN.md`, `runs/`) — nowhere else. Every other agent works only in its own `.pipeline/agents/<agent>/` folder (plus per-item notes in `.pipeline/<ID>/`).
 
 **Cleanup (save disk space):** Delete your own scratch files when you are done — throwaway scripts, repro files, screenshots and other images (e.g. `.pipeline/ui/*`, `.pipeline/<ID>/repro/`), logs, tmp data. Keep only the final markdown report/hand-off note and anything the next agent or the owner still needs (a failing repro or a screenshot proving a bug stays only until the item is closed; then delete it). Never delete another agent's folder or the owner's notes.
 

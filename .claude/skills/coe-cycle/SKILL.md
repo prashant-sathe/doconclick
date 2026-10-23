@@ -13,4 +13,6 @@ Arguments: `$ARGUMENTS`
 - `bi-only` → only the business-analyst + triage
 - `marketing-only` → only the marketing agent
 
+Order of work: bugs first (by priority), then features. Only features the owner has approved (ticked in `.pipeline/agents/coe/APPROVALS.md`, then stamped `⬜ Open ✔COE` in BUG-TRACKER.md) may go to development; features awaiting approval are listed on the owner's table (`APPROVALS.md`) and wait.
+
 Do not ask the user questions during the cycle — decide, record the decision, and put anything that genuinely needs the owner in `.pipeline/agents/coe/NEEDS-HUMAN.md`.
