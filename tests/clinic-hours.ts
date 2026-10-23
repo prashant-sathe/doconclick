@@ -8,7 +8,7 @@ import fs from "fs";
 import { parse } from "dotenv";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
-import { isClinicOpenNow, generateSlotsForDate, findNextOpening, validateSlotInput } from "../src/lib/clinicAvailability";
+import { isClinicOpenNow, generateSlotsForDate, findNextOpening, validateSlotInput, bookingFitsHours } from "../src/lib/clinicAvailability";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
@@ -50,6 +50,14 @@ async function main() {
   const next = findNextOpening([{ slots: legacyOvernight }], ist(MON, 12));
   check("next opening for a legacy overnight clinic", next?.dayOfWeek === "Mon" && next.fromTime === "20:00", JSON.stringify(next && { d: next.dayOfWeek, t: next.fromTime }));
 
+  // Booked time vs hours (P2-28)
+  const satHours = [{ dayOfWeek: "Sat", fromTime: "10:00", toTime: "13:00" }];
+  const SAT = "2026-10-24";
+  check("booking inside hours fits", bookingFitsHours(satHours, ist(SAT, 10)) && bookingFitsHours(satHours, ist(SAT, 12, 50)), "fits");
+  check("off-grid booking inside hours fits", bookingFitsHours(satHours, ist(SAT, 10, 7)), "fits");
+  check("booking at/after closing doesn't fit", !bookingFitsHours(satHours, ist(SAT, 13)) && !bookingFitsHours(satHours, ist(SAT, 9, 50)), "outside");
+  check("booking on a removed weekday doesn't fit", !bookingFitsHours([{ dayOfWeek: "Mon", fromTime: "10:00", toTime: "13:00" }], ist(SAT, 10)), "outside");
+
   // ── Validating hours ──
   const bad: [string, unknown][] = [
     ["empty", []],
@@ -90,6 +98,7 @@ async function main() {
     });
     return { status: res.status, json: await res.json().catch(() => ({})) };
   };
+  let patientId: string | undefined;
   try {
     // Fees
     for (const [label, body] of [
@@ -163,7 +172,72 @@ async function main() {
     const body = await slotsRes.json().catch(() => ({}));
     const times = JSON.stringify(body);
     check("slots API offers the overnight tail on Tuesday", slotsRes.status === 200 && times.includes("01:00") && !times.includes("03:00"), `${slotsRes.status} ${times.slice(0, 120)}`);
+
+    // ── Changing hours with open bookings (P2-28) ──
+    const patient = await prisma.user.create({
+      data: { name: "Hours Patient", mobile: `6${stamp}7`, role: "PATIENT", patientProfile: { create: { age: 30, gender: "Male" } } },
+    });
+    patientId = patient.id;
+    const hc = await prisma.clinic.create({
+      data: { doctorId: doctor.id, name: "Hours Change Clinic", address: "3 Test Rd", lat: 18.5, lng: 73.8,
+        slots: { create: [{ dayOfWeek: "Sat", fromTime: "10:00", toTime: "13:00" }, { dayOfWeek: "Sun", fromTime: "10:00", toTime: "13:00" }] } },
+    });
+    const nextDow = (dow: number) => {
+      const d = new Date(Date.now() + 5.5 * 3600_000);
+      do d.setUTCDate(d.getUTCDate() + 1); while (d.getUTCDay() !== dow);
+      d.setUTCDate(d.getUTCDate() + 7);
+      return d.toISOString().slice(0, 10);
+    };
+    const satDate = nextDow(6), sunDate = nextDow(0);
+    const mk = (when: Date, extra: Record<string, unknown> = {}) =>
+      prisma.appointment.create({
+        data: { patientId: patient.id, doctorId: doctor.id, clinicId: hc.id, symptoms: "t", consultType: "CLINIC", amount: 500,
+          status: "SCHEDULED", scheduledAt: when, ...extra } as never,
+      });
+    const satPaid = await mk(ist(satDate, 10), { paymentMethod: "ONLINE", paymentStatus: "PAID", discountAmount: 100 });
+    const satUnpaid = await mk(ist(satDate, 11));
+    const sunOk = await mk(ist(sunDate, 11));
+    const hours = (days: string[], extra: Record<string, unknown> = {}) =>
+      clinic({ name: "Hours Change Clinic", slots: days.map((dayOfWeek) => ({ dayOfWeek, fromTime: "10:00", toTime: "13:00" })), ...extra });
+    const satRows = async () => (await prisma.clinicSlot.findMany({ where: { clinicId: hc.id } })).map((x) => x.dayOfWeek).sort().join();
+
+    r = await call("PATCH", `/api/doctors/me/clinics/${hc.id}`, hours(["Sat", "Sun", "Mon"]));
+    check("adding a day with bookings goes through", r.status === 200 && !r.json.cancelledBookings, `${r.status}`);
+    r = await call("PATCH", `/api/doctors/me/clinics/${hc.id}`, hours(["Sun"]));
+    const listed = ((r.json.bookings ?? []) as { id: string; refund: number }[]);
+    check("removing Saturday asks to confirm", r.status === 409 && r.json.code === "CLINIC_HOURS_HAVE_BOOKINGS", `${r.status} ${r.json.code}`);
+    check("lists only the Saturday bookings", listed.map((b) => b.id).sort().join() === [satPaid.id, satUnpaid.id].sort().join() && listed.find((b) => b.id === satPaid.id)?.refund === 400, `${listed.length} listed`);
+    check("nothing saved yet", (await satRows()) === "Mon,Sat,Sun", await satRows());
+    r = await call("PATCH", `/api/doctors/me/clinics/${hc.id}`, hours(["Sun"], { hoursAction: "cancel", confirmBookingIds: [satPaid.id] }));
+    check("partial confirmation asks again", r.status === 409, `${r.status}`);
+    r = await call("PATCH", `/api/doctors/me/clinics/${hc.id}`, hours(["Sun"], { hoursAction: "cancel" }));
+    check("cancel without ids asks again", r.status === 409, `${r.status}`);
+
+    r = await call("PATCH", `/api/doctors/me/clinics/${hc.id}`, hours(["Sun"], { hoursAction: "keep" }));
+    const afterKeep = await prisma.appointment.findMany({ where: { id: { in: [satPaid.id, satUnpaid.id] } }, select: { status: true } });
+    check("keep: hours saved, bookings untouched", r.status === 200 && r.json.keptBookings === 2 && (await satRows()) === "Sun" && afterKeep.every((a) => a.status === "SCHEDULED"), `${r.status} ${await satRows()}`);
+
+    // Hours are now Sun only and the Saturday bookings remain: a later unrelated edit shouldn't re-ask.
+    r = await call("PATCH", `/api/doctors/me/clinics/${hc.id}`, hours(["Sun"], { name: "Renamed" }));
+    check("unchanged hours never re-ask", r.status === 200, `${r.status}`);
+
+    r = await call("PATCH", `/api/doctors/me/clinics/${hc.id}`, hours(["Sun", "Sat"]));
+    r = await call("PATCH", `/api/doctors/me/clinics/${hc.id}`, hours(["Sun"]));
+    check("changing hours again asks again", r.status === 409, `${r.status}`);
+    r = await call("PATCH", `/api/doctors/me/clinics/${hc.id}`, hours(["Sun"], { hoursAction: "cancel", confirmBookingIds: [satPaid.id, satUnpaid.id] }));
+    const st = Object.fromEntries((await prisma.appointment.findMany({ where: { id: { in: [satPaid.id, satUnpaid.id, sunOk.id] } }, select: { id: true, status: true } })).map((a) => [a.id, a.status]));
+    check("cancel: bookings cancelled, other day untouched", r.status === 200 && r.json.cancelledBookings === 2 && r.json.refundTotal === 400
+      && st[satPaid.id] === "CANCELLED" && st[satUnpaid.id] === "CANCELLED" && st[sunOk.id] === "SCHEDULED", `${r.status} ${JSON.stringify(st)}`);
+    const wallet = await prisma.wallet.findUnique({ where: { userId: patient.id } });
+    check("paid booking refunded to wallet", wallet?.balance === 400, `balance ${wallet?.balance}`);
+    check("hours saved with the cancel", (await satRows()) === "Sun", await satRows());
   } finally {
+    if (patientId) {
+      await prisma.walletTransaction.deleteMany({ where: { wallet: { userId: patientId } } });
+      await prisma.wallet.deleteMany({ where: { userId: patientId } });
+      await prisma.appointment.deleteMany({ where: { patientId } });
+      await prisma.user.deleteMany({ where: { id: patientId } });
+    }
     await prisma.user.deleteMany({ where: { id: doctor.id } });
   }
 

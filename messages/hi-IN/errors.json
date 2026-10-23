@@ -499,5 +499,6 @@
   "fieldNotNumberGeneric": "{field} एक संख्या होनी चाहिए।",
   "receiptAppointmentUnpaid": "अपॉइंटमेंट का भुगतान होने के बाद ही रसीद मिलेगी।",
   "topupNotFound": "टॉप-अप नहीं मिला",
-  "receiptTopupPending": "टॉप-अप सफल होने के बाद ही रसीद मिलेगी।"
+  "receiptTopupPending": "टॉप-अप सफल होने के बाद ही रसीद मिलेगी।",
+  "somePatientsHaveBookingsOutsideThe": "कुछ मरीज़ों की बुकिंग नए समय से बाहर है। उन बुकिंग को रखें, या रद्द करके रिफ़ंड करें।"
 }

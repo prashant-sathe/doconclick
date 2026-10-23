@@ -260,6 +260,16 @@ export function generateSlotsForDate(
   return result;
 }
 
+// Whether a booked start time still lies inside the given weekly hours (leave
+// days are ignored — those are handled by the leave flow). The time is floored
+// to the 10-minute grid first, so an off-grid legacy booking isn't flagged.
+export function bookingFitsHours(slots: ClinicSlotLike[], when: Date): boolean {
+  const ist = new Date(when.getTime() + 5.5 * 60 * 60 * 1000).toISOString(); // IST wall clock, as UTC fields
+  const minutes = Number(ist.slice(11, 13)) * 60 + Number(ist.slice(14, 16));
+  const time = minutesToHHMM(Math.floor(minutes / SLOT_INTERVAL_MINUTES) * SLOT_INTERVAL_MINUTES);
+  return generateSlotsForDate(slots, ist.slice(0, 10), new Date(0)).some((s) => s.time === time);
+}
+
 const minutesToHHMM = (t: number) => `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
 
 // "14:05" → "2:05 PM"

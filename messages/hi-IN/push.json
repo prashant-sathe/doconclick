@@ -219,6 +219,10 @@
     "title": "अपॉइंटमेंट रद्द हुआ",
     "body": "{doctor} अब {clinic} में मरीज़ नहीं देख रहे हैं, इसलिए {when, date, ::EEEdMMM}, {when, time, short} का आपका अपॉइंटमेंट रद्द कर दिया गया है।{refunded, select, yes { ₹{amount} आपके वॉलेट में वापस कर दिए गए हैं।} other {}} कृपया दोबारा बुक करें।"
   },
+  "apptCancelledClinicHours": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "{doctor} ने {clinic} के समय बदल दिए हैं, इसलिए {when, date, ::EEEdMMM}, {when, time, short} का आपका अपॉइंटमेंट रद्द कर दिया गया है।{refunded, select, yes { ₹{amount} आपके वॉलेट में वापस कर दिए गए हैं।} other {}} कृपया दोबारा बुक करें।"
+  },
   "apptCancelledClinicLeave": {
     "title": "अपॉइंटमेंट रद्द हुआ",
     "body": "{doctor} {when, date, ::EEEdMMM} को {clinic} में उपलब्ध नहीं होंगे{hasReason, select, yes { ({reason})} other {}}, इसलिए {when, time, short} का आपका अपॉइंटमेंट रद्द कर दिया गया है।{refunded, select, yes { ₹{amount} आपके वॉलेट में वापस कर दिए गए हैं।} other {}} कृपया किसी दूसरे दिन बुक करें।"

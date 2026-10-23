@@ -219,6 +219,10 @@
     "title": "Appointment cancelled",
     "body": "{doctor} is no longer seeing patients at {clinic}, so your appointment on {when, date, ::EEEdMMM}, {when, time, short} was cancelled.{refunded, select, yes { ₹{amount} was refunded to your wallet.} other {}} Please book again."
   },
+  "apptCancelledClinicHours": {
+    "title": "Appointment cancelled",
+    "body": "{doctor} changed the hours at {clinic}, so your appointment on {when, date, ::EEEdMMM}, {when, time, short} was cancelled.{refunded, select, yes { ₹{amount} was refunded to your wallet.} other {}} Please book again."
+  },
   "apptCancelledClinicLeave": {
     "title": "Appointment cancelled",
     "body": "{doctor} won't be at {clinic} on {when, date, ::EEEdMMM}{hasReason, select, yes { ({reason})} other {}}, so your {when, time, short} appointment was cancelled.{refunded, select, yes { ₹{amount} was refunded to your wallet.} other {}} Please book another day."

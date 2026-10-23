@@ -10,6 +10,8 @@ import {
   needsBookingConfirmation, affectedBookingSummary, BOOKINGS_CHANGED_MESSAGE,
 } from "@/lib/appointmentCancel";
 import { validateClinicInput } from "@/lib/clinicInput";
+import { bookingFitsHours, type ClinicSlotLike } from "@/lib/clinicAvailability";
+import { isTimedBooking } from "@/lib/doctorSlots";
 import { withErrorLocale } from "@/lib/apiErrors";
 
 
@@ -32,6 +34,21 @@ function openClinicBookings(clinicId: string) {
     orderBy: { scheduledAt: "asc" },
     include: { patient: { select: { name: true } } },
   });
+}
+
+const slotKey = (slots: ClinicSlotLike[]) =>
+  slots.map((s) => `${s.dayOfWeek} ${s.fromTime}-${s.toTime}`).sort().join("|");
+
+// Timed bookings (scheduled from now on, or still pending a chosen time) that
+// the new weekly hours no longer cover. "Book now" requests have no chosen
+// time, so hours don't strand them.
+async function bookingsOutsideNewHours(clinicId: string, slots: ClinicSlotLike[]) {
+  const open = await prisma.appointment.findMany({
+    where: { clinicId, status: { in: ["SCHEDULED", "PENDING_APPROVAL"] }, scheduledAt: { gte: new Date() } },
+    orderBy: { scheduledAt: "asc" },
+    include: { patient: { select: { name: true } } },
+  });
+  return open.filter((a) => isTimedBooking(a) && !bookingFitsHours(slots, a.scheduledAt));
 }
 
 // Deactivating or deleting a clinic with open bookings needs the doctor to
@@ -141,7 +158,54 @@ export const PATCH = withErrorLocale(async function PATCH(req: Request, { params
     return NextResponse.json({ ...closed.result, cancelledBookings: closed.cancelledBookings, refundTotal: closed.refundTotal });
   }
 
-  return NextResponse.json(await prisma.$transaction(save));
+  // Changing the weekly hours can strand booked visits (e.g. Saturday removed).
+  // Ask first (409 CLINIC_HOURS_HAVE_BOOKINGS); the doctor then either keeps
+  // them (hoursAction "keep" — the visits stay as booked) or confirms
+  // (hoursAction "cancel" + their ids) to cancel + refund + push, in the same
+  // transaction as the save.
+  const oldSlots = await prisma.clinicSlot.findMany({ where: { clinicId: id } });
+  const stranded = slotKey(oldSlots) === slotKey(body.slots) ? [] : await bookingsOutsideNewHours(id, body.slots);
+  if (stranded.length > 0 && raw.hoursAction !== "keep") {
+    if (raw.hoursAction !== "cancel" || needsBookingConfirmation(stranded, raw.confirmBookingIds)) {
+      return NextResponse.json(
+        {
+          error: "Some patients have bookings outside the new hours. Keep those bookings, or cancel and refund them.",
+          code: "CLINIC_HOURS_HAVE_BOOKINGS",
+          bookings: stranded.map(affectedBookingSummary),
+        },
+        { status: 409 }
+      );
+    }
+    let out;
+    try {
+      out = await prisma.$transaction(async (tx) => {
+        const cancelled = await cancelManyAndRefund(tx, stranded.map((a) => a.id), {
+          data: { doctorNotes: "Cancelled: the doctor changed this clinic's hours" },
+          note: (apptId) => `Refund for appointment ${apptId}, cancelled because the clinic hours changed`,
+        });
+        return { saved: await save(tx), cancelled };
+      }, { timeout: 30_000 });
+    } catch (err) {
+      if (isAlreadyClosed(err) || isTransientConflict(err)) {
+        return NextResponse.json({ error: BOOKINGS_CHANGED_MESSAGE }, { status: 409 });
+      }
+      throw err;
+    }
+    for (const { cancelled, refund } of out.cancelled) {
+      void sendPushToUser(cancelled.patientId, {
+        key: "apptCancelledClinicHours",
+        values: { doctor: formatDoctorName(authUser.name), clinic: existing.name, when: cancelled.scheduledAt, refunded: refund > 0 ? "yes" : "no", amount: refund },
+        url: "/patient/appointments",
+      });
+    }
+    return NextResponse.json({
+      ...out.saved,
+      cancelledBookings: out.cancelled.length,
+      refundTotal: out.cancelled.reduce((sum, c) => sum + c.refund, 0),
+    });
+  }
+
+  return NextResponse.json({ ...(await prisma.$transaction(save)), keptBookings: stranded.length });
 });
 
 // DELETE { confirmBookingIds? }: remove one of the logged-in doctor's

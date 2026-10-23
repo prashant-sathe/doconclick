@@ -522,6 +522,9 @@ export default function DoctorClinicsPage() {
   const [deleteBookings, setDeleteBookings] = useState<AffectedBooking[] | null>(null);
   const [deleteError, setDeleteError] = useState("");
   const [pageNotice, setPageNotice] = useState("");
+  // Set when saved hours would leave booked visits uncovered (409 CLINIC_HOURS_HAVE_BOOKINGS).
+  const [hoursIdx, setHoursIdx] = useState<number | null>(null);
+  const [hoursBookings, setHoursBookings] = useState<AffectedBooking[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/doctor/clinics");
@@ -598,8 +601,11 @@ export default function DoctorClinicsPage() {
     else deleteClinic(idx);
   };
 
-  const saveClinic = async (idx: number) => {
+  // hoursAction answers a 409 CLINIC_HOURS_HAVE_BOOKINGS: "keep" saves and
+  // leaves those bookings as booked, "cancel" (with their ids) cancels + refunds them.
+  const saveClinic = async (idx: number, hoursAction?: "keep" | "cancel", confirmBookingIds?: string[]) => {
     const clinic = clinics[idx];
+    setPageNotice("");
     updateAt(idx, { ...clinic, saving: true, error: "" });
 
     const slots: Slot[] = clinic.slotGroups.flatMap((g) =>
@@ -608,6 +614,7 @@ export default function DoctorClinicsPage() {
     const payload = {
       name: clinic.name.trim(), address: clinic.address.trim(),
       photoUrl: clinic.photoUrl, lat: clinic.lat, lng: clinic.lng, slots,
+      ...(hoursAction ? { hoursAction, confirmBookingIds } : {}),
     };
 
     const res = clinic.id
@@ -619,10 +626,20 @@ export default function DoctorClinicsPage() {
         });
 
     if (res.ok) {
-      const saved: ClinicApiShape = await res.json();
+      const saved: ClinicApiShape & { cancelledBookings?: number; refundTotal?: number; keptBookings?: number } = await res.json();
       updateAt(idx, { ...clinic, id: saved.id, saving: false, saved: true, error: "" });
+      setHoursIdx(null);
+      if (saved.cancelledBookings) setPageNotice(cancelledNotice(saved.cancelledBookings, saved.refundTotal ?? 0));
+      else if (saved.keptBookings) setPageNotice(t("hoursKept", { count: saved.keptBookings }));
     } else {
       const err = await res.json().catch(() => ({}));
+      if (res.status === 409 && err.code === "CLINIC_HOURS_HAVE_BOOKINGS") {
+        updateAt(idx, { ...clinic, saving: false, saved: false, error: "" });
+        setHoursBookings(err.bookings);
+        setHoursIdx(idx);
+        return;
+      }
+      setHoursIdx(null);
       updateAt(idx, { ...clinic, saving: false, saved: false, error: err.error ?? t("saveFailed") });
     }
   };
@@ -682,6 +699,30 @@ export default function DoctorClinicsPage() {
           </Link>
         </div>
       </div>
+
+      {hoursIdx !== null && clinics[hoursIdx] && (
+        <ConfirmDialog
+          icon={Clock}
+          title={t("hoursConfirmTitle", { count: hoursBookings.length })}
+          message={
+            <>
+              <p>{t("hoursConfirmBody")}</p>
+              <AffectedBookingList bookings={hoursBookings} showDate />
+              <button type="button" disabled={clinics[hoursIdx].saving}
+                onClick={() => saveClinic(hoursIdx, "keep")}
+                className="btn-secondary w-full justify-center mt-4 text-xs disabled:opacity-60">
+                {t("hoursKeep")}
+              </button>
+            </>
+          }
+          confirmLabel={t("hoursCancel")}
+          busyLabel={t("cancelling")}
+          tone="danger"
+          busy={clinics[hoursIdx].saving}
+          onCancel={() => setHoursIdx(null)}
+          onConfirm={() => saveClinic(hoursIdx, "cancel", hoursBookings.map((b) => b.id))}
+        />
+      )}
 
       {deleteIdx !== null && (
         <ConfirmDialog
