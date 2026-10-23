@@ -120,5 +120,8 @@
   "fieldInvalidMobileGeneric": "{field}: English word/label inserted by the code — form field label",
   "fieldNotPhoneGeneric": "{field}: English word/label inserted by the code — form field label",
   "fieldRangeGeneric": "{field}: English word/label inserted by the code — form field label; {unit}: English unit, e.g. 'cm', 'kg'",
-  "fieldNotNumberGeneric": "{field}: English word/label inserted by the code — form field label"
+  "fieldNotNumberGeneric": "{field}: English word/label inserted by the code — form field label",
+  "feedLimitInvalid": "{max}: the largest page size allowed",
+  "feedStatusInvalid": "{statuses}: comma-separated English status codes, e.g. COMPLETED, CANCELLED (stay English)",
+  "feedConsultTypeInvalid": "{types}: comma-separated English consult type codes: CLINIC, HOME, VIDEO (stay English)"
 }

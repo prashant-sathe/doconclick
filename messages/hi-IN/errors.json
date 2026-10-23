@@ -501,5 +501,10 @@
   "receiptAppointmentUnpaid": "अपॉइंटमेंट का भुगतान होने के बाद ही रसीद मिलेगी।",
   "topupNotFound": "टॉप-अप नहीं मिला",
   "receiptTopupPending": "टॉप-अप सफल होने के बाद ही रसीद मिलेगी।",
-  "somePatientsHaveBookingsOutsideThe": "कुछ मरीज़ों की बुकिंग नए समय से बाहर है। उन बुकिंग को रखें, या रद्द करके रिफ़ंड करें।"
+  "somePatientsHaveBookingsOutsideThe": "कुछ मरीज़ों की बुकिंग नए समय से बाहर है। उन बुकिंग को रखें, या रद्द करके रिफ़ंड करें।",
+  "feedViewInvalid": "view का मान 'active' या 'history' होना चाहिए",
+  "feedLimitInvalid": "limit 1 से {max} के बीच की पूरी संख्या होनी चाहिए",
+  "feedStatusInvalid": "status इनमें से एक या अधिक होना चाहिए: {statuses}",
+  "feedConsultTypeInvalid": "consultType इनमें से एक होना चाहिए: {types}",
+  "feedDateInvalid": "from / to तारीखें YYYY-MM-DD रूप में लिखी होनी चाहिए"
 }

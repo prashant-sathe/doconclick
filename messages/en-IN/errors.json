@@ -501,5 +501,10 @@
   "receiptAppointmentUnpaid": "A receipt is available once the appointment is paid.",
   "topupNotFound": "Top-up not found",
   "receiptTopupPending": "A receipt is available once the top-up succeeds.",
-  "somePatientsHaveBookingsOutsideThe": "Some patients have bookings outside the new hours. Keep those bookings, or cancel and refund them."
+  "somePatientsHaveBookingsOutsideThe": "Some patients have bookings outside the new hours. Keep those bookings, or cancel and refund them.",
+  "feedViewInvalid": "view must be 'active' or 'history'",
+  "feedLimitInvalid": "limit must be a whole number from 1 to {max}",
+  "feedStatusInvalid": "status must be one or more of {statuses}",
+  "feedConsultTypeInvalid": "consultType must be one of {types}",
+  "feedDateInvalid": "from / to must be dates written YYYY-MM-DD"
 }
