@@ -112,6 +112,8 @@ async function main() {
     check("GET [id] on the way: position for the track page", (g.json as Row).doctorLat === 18.51, `${(g.json as Row).doctorLat}`);
     const docMe = (await call(doctor, "GET", "/api/appointments/me")).json as Row[];
     check("doctor /me: no gateway ids, no visit code; settlement state kept", docMe.length >= 3 && docMe.every((a) => !has(a, "cashfreeOrderId") && !has(a, "cashfreePaymentId") && !has(a, "visitOtp") && has(a, "settlementId")), `${docMe.length} rows`);
+    // #71: the queue never carries the patient's saved profile address.
+    check("…no patientProfile (home address/lat/lng) on any row", docMe.every((a) => !has(a.patient, "patientProfile")), JSON.stringify(docMe[0]?.patient));
 
     // ── Finishing / cancelling wipes the stored position ──
     const toComplete = await appt({ consultType: "VIDEO", ...live });

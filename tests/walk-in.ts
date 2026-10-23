@@ -215,9 +215,19 @@ async function main() {
     const deps = await prisma.patientDependent.findMany({ where: { patientProfile: { userId: regular.id } } });
     check("family member typed again by name → reuses the saved one", r.status === 200 && deps.length === 1 && riyaAppt.dependentId === deps[0].id && riyaAppt.patientName === "Riya" && riyaAppt.relation === "Daughter", `${r.status} deps=${deps.length}`);
     check("…and never renames the account holder", (await prisma.user.findUniqueOrThrow({ where: { id: regular.id } })).name === "Regular Patient", "name kept");
+    // #71: a booking the desk made itself doesn't make a stranger "known".
     r = await call(desk, "GET", `/api/doctor/patients/lookup?mobile=${regular.mobile}`);
     p = r.json.patient as Record<string, unknown>;
-    check("once booked, lookup shows the family, allergies and address", p.known === true && (p.dependents as unknown[]).length === 1 && p.allergies === "Penicillin" && p.homeAddress === "12 MG Road, Pune", JSON.stringify({ known: p.known, deps: (p.dependents as unknown[]).length }));
+    check("a desk-made walk-in alone keeps the address, allergies and family hidden", p.known === false && p.homeAddress === null && p.allergies === null && (p.dependents as unknown[]).length === 0, JSON.stringify({ known: p.known, addr: p.homeAddress }));
+    r = await call(desk, "GET", "/api/appointments/me?view=active");
+    const riyaRow = (Array.isArray(r.json) ? r.json : []) as { id: string; patient: Record<string, unknown> }[];
+    const riyaFeed = riyaRow.find((a) => a.id === riyaAppt.id);
+    check("…and the desk's queue carries no saved profile address", !!riyaFeed && !("patientProfile" in riyaFeed.patient), JSON.stringify(riyaFeed?.patient));
+    // The patient booked this doctor themselves once, and was seen.
+    await prisma.appointment.create({ data: { patientId: regular.id, doctorId: doctor.id, symptoms: "Earlier own visit", status: "COMPLETED", paymentMethod: "CASH", amount: 500, scheduledAt: new Date(Date.now() - 20 * DAY) } });
+    r = await call(desk, "GET", `/api/doctor/patients/lookup?mobile=${regular.mobile}`);
+    p = r.json.patient as Record<string, unknown>;
+    check("once seen after booking themselves, lookup shows the family, allergies and address", p.known === true && (p.dependents as unknown[]).length === 1 && p.allergies === "Penicillin" && p.homeAddress === "12 MG Road, Pune", JSON.stringify({ known: p.known, deps: (p.dependents as unknown[]).length }));
     r = await book(desk, { mobile: regular.mobile, dependentId: deps[0].id });
     check("booking Riya again → DUPLICATE_BOOKING", r.status === 409 && r.json.code === "DUPLICATE_BOOKING", `${r.status}`);
     r = await book(desk, { mobile: regular.mobile, dependentId: "not-theirs" });

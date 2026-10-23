@@ -108,6 +108,7 @@ export const GET = withErrorLocale(async function GET(req: Request) {
           select: {
             name: true,
             mobile: true,
+            // Read only for the HOME-visit fallback below — never sent.
             patientProfile: { select: { lat: true, lng: true, homeAddress: true, landmark: true, pinCode: true } },
           },
         },
@@ -157,13 +158,18 @@ export const GET = withErrorLocale(async function GET(req: Request) {
       recentVitals.filter((v) => v.patientId === patientId && v.dependentId === dependentId).length;
 
     return feedResponse(owner, view,
-      appointments.map(({ _count, ...a }) => ({
+      appointments.map(({ _count, patient: { patientProfile, ...patient }, ...a }) => ({
         ...a,
+        // The saved home address never rides along on the queue: a desk could
+        // otherwise book any number and read where that person lives.
+        patient,
         amount: safeNum(a.amount),
         platformFee: safeNum(a.platformFee),
         unreadMessageCount: _count.messages,
-        // Where to go for a HOME visit: the booking's snapshot (profile for older rows).
-        visit: visitLocation(a, a.patient.patientProfile),
+        // Where to go for a HOME visit: the booking's snapshot. Only an older
+        // row the patient booked themselves (asking the doctor to come home)
+        // falls back to their profile address; a desk-made booking never does.
+        visit: visitLocation(a, a.bookedById ? null : patientProfile),
         latestVitals: latestFor(a.patientId, a.dependentId),
         recentVitalsCount: countFor(a.patientId, a.dependentId),
       }))

@@ -5,6 +5,7 @@ import { resolveDoctorScope } from "@/lib/staffGuard";
 import { normalizeMobile, MOBILE_REGEX } from "@/lib/validation";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { isKnownPatient } from "@/lib/knownPatient";
 
 // A front desk looks up a handful of patients an hour; this stops anyone
 // walking the number space to find out who has an account.
@@ -58,8 +59,8 @@ export const GET = withErrorLocale(async function GET(req: Request) {
     );
   }
 
-  const [booked, visits, last] = await Promise.all([
-    prisma.appointment.count({ where: { doctorId: scope.doctorId, patientId: user.id } }),
+  const [known, visits, last] = await Promise.all([
+    isKnownPatient(scope.doctorId, user.id),
     prisma.appointment.count({ where: { doctorId: scope.doctorId, patientId: user.id, status: "COMPLETED" } }),
     prisma.appointment.findFirst({
       where: { doctorId: scope.doctorId, patientId: user.id, status: "COMPLETED" },
@@ -68,11 +69,11 @@ export const GET = withErrorLocale(async function GET(req: Request) {
     }),
   ]);
   const p = user.patientProfile;
-  // Only someone who has booked this doctor before is "their" patient: for
-  // anyone else a mobile number reveals just the name (to confirm it's the
-  // right person), not their address, allergies or family. A new family
-  // member typed in for them is matched to an existing one by name.
-  const known = booked > 0;
+  // Only someone who booked this doctor themselves, or was actually seen, is
+  // "their" patient (src/lib/knownPatient.ts): for anyone else a mobile
+  // number reveals just the name (to confirm it's the right person), not
+  // their address, allergies or family. A new family member typed in for
+  // them is matched to an existing one by name.
   return NextResponse.json({
     exists: true,
     mobile,

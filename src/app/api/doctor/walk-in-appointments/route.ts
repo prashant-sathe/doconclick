@@ -19,6 +19,7 @@ import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { cashDueProblem, CASH_DUE_LIMIT_CODE } from "@/lib/duesPayments";
 import { timeOffProblem, TIME_OFF_CODE } from "@/lib/timeOff";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { isKnownPatient } from "@/lib/knownPatient";
 
 // A busy front desk books a few patients an hour, not dozens a minute.
 const checkLimit = createRateLimiter(30, 10 * 60_000);
@@ -143,6 +144,10 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       );
     }
 
+    // The saved address, allergies and family are only the desk's to reuse
+    // for someone already the doctor's patient — same rule as the lookup.
+    const known = !!existing && (await isKnownPatient(doctorId, existing.id));
+
     // Who the visit is for.
     let dependent: { id: string; name: string; relation: string; allergies: string | null } | null = null;
     let newDependent = input.newDependent ?? null;
@@ -211,9 +216,10 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     if (consultType === "HOME") {
       visit = input.visit
         ? { visitAddress: input.visit.address, visitLandmark: input.visit.landmark, visitPinCode: input.visit.pinCode, visitLat: null, visitLng: null }
-        : snapshotFromProfile(existing?.patientProfile);
-      // Saved coordinates only belong to the saved address.
-      if (input.visit && existing?.patientProfile?.homeAddress?.trim() === input.visit.address.trim()) {
+        : snapshotFromProfile(known ? existing?.patientProfile : null);
+      // Saved coordinates only belong to the saved address (and are only
+      // reused for a known patient, so they can't confirm a guessed address).
+      if (known && input.visit && existing?.patientProfile?.homeAddress?.trim() === input.visit.address.trim()) {
         visit = { ...visit, visitLat: existing.patientProfile.lat, visitLng: existing.patientProfile.lng };
       }
       if (!visit.visitAddress) {
@@ -311,7 +317,8 @@ export const POST = withErrorLocale(async function POST(req: Request) {
         });
       }
 
-      const allergies = input.allergies ?? dependent?.allergies ?? (dependent ? null : existing?.patientProfile?.allergies ?? null);
+      const allergies = input.allergies
+        ?? (known ? dependent?.allergies ?? (dependent ? null : existing?.patientProfile?.allergies ?? null) : null);
       const appointment = await tx.appointment.create({
         data: {
           patientId,

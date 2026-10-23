@@ -89,7 +89,6 @@ interface Appointment {
   patient: {
     name: string;
     mobile: string;
-    patientProfile: { lat: number | null; lng: number | null; homeAddress: string | null } | null;
   };
   // HOME only: the address snapshotted at booking (profile for older rows).
   visit: VisitLocation | null;
