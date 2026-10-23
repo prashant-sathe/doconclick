@@ -45,7 +45,9 @@
     "viewAllAppointments": "View all appointments",
     "pendingRequests": "Pending Requests",
     "noPendingRequests": "No pending requests.",
-    "viewAllInDashboard": "View all in Dashboard"
+    "viewAllInDashboard": "View all in Dashboard",
+    "inbox": "Inbox",
+    "inboxUnread": "Inbox, {count} unread"
   },
   "walletEvent": {
     "TOPUP": "Wallet topped up",

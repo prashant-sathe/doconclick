@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isNative, nativePlatform } from "@/lib/platform";
+import { notifyInboxChanged } from "@/lib/inbox";
 
 // Matches .gradient-surface / the splash background. Nearly every screen
 // renders a light header, so the status bar wants dark icons on a light
@@ -131,6 +132,11 @@ export function NativeBootstrap() {
           },
         );
         cleanups.push(() => tapListener.remove());
+
+        // A push that arrives while the app is open is already in the inbox
+        // — refresh the unread badge now rather than on its next poll.
+        const receivedListener = await FirebaseMessaging.addListener("notificationReceived", () => notifyInboxChanged());
+        cleanups.push(() => receivedListener.remove());
       } catch {
         /* ignore */
       }

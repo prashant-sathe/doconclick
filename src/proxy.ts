@@ -18,9 +18,9 @@ const PUBLIC: RegExp[] = [
 // signed-out visitor before the page's own redirect kicks in.
 const PROTECTED: { pattern: RegExp; roles: string[] }[] = [
   { pattern: /^\/admin(\/|$)/, roles: ["ADMIN"] },
-  // A receptionist (STAFF) works the doctor's queue, books walk-ins and
-  // chats with patients.
-  { pattern: /^\/doctor\/(dashboard|chat|walk-in)(\/|$)/, roles: ["DOCTOR", "STAFF"] },
+  // A receptionist (STAFF) works the doctor's queue, books walk-ins,
+  // chats with patients and reads their own notification inbox.
+  { pattern: /^\/doctor\/(dashboard|chat|walk-in|inbox)(\/|$)/, roles: ["DOCTOR", "STAFF"] },
   { pattern: /^\/doctor(\/|$)/, roles: ["DOCTOR"] },
   { pattern: /^\/patient(\/|$)/, roles: ["PATIENT"] },
   { pattern: /^\/nurse(\/|$)/, roles: ["NURSE"] },

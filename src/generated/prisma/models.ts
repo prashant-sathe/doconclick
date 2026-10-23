@@ -10,6 +10,7 @@
  */
 export type * from './models/User'
 export type * from './models/PushToken'
+export type * from './models/Notification'
 export type * from './models/SavedDoctor'
 export type * from './models/PatientProfile'
 export type * from './models/PatientDependent'

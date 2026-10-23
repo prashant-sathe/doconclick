@@ -9,6 +9,7 @@ import { cn, formatDoctorName } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
 import { useAnnouncementNotifications } from "@/hooks/useAnnouncementNotifications";
 import NotificationToast from "@/components/doctor/NotificationToast";
+import InboxButton from "@/components/InboxButton";
 import { useTranslations } from "next-intl";
 
 const NAV = [
@@ -104,6 +105,8 @@ export default function DoctorHeader() {
               <LogOut className="w-4 h-4" />
             </button>
           )}
+
+          <InboxButton />
 
           <div className="relative">
             <button

@@ -45,7 +45,9 @@
     "viewAllAppointments": "सर्व अपॉइंटमेंट्स पहा",
     "pendingRequests": "प्रलंबित विनंत्या",
     "noPendingRequests": "कोणतीही प्रलंबित विनंती नाही.",
-    "viewAllInDashboard": "डॅशबोर्डमध्ये सर्व पहा"
+    "viewAllInDashboard": "डॅशबोर्डमध्ये सर्व पहा",
+    "inbox": "इनबॉक्स",
+    "inboxUnread": "इनबॉक्स, {count} न वाचलेल्या"
   },
   "walletEvent": {
     "TOPUP": "वॉलेटमध्ये पैसे जमा",

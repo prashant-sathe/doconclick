@@ -7,13 +7,16 @@ import {
   LayoutDashboard, Stethoscope, Users, CalendarCheck,
   DollarSign, MessageCircle, Settings, Tag,
   LogOut, ChevronRight, FileBarChart, Wallet, Megaphone, TicketPercent,
-  Menu, X, HeartPulse, ClipboardList,
+  Menu, X, HeartPulse, ClipboardList, Inbox,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
+import InboxButton from "@/components/InboxButton";
+import { useInboxUnread } from "@/hooks/useInboxUnread";
 
 const navItems = [
   { href: "/admin",            label: "Overview",    icon: LayoutDashboard },
+  { href: "/admin/inbox",      label: "Notifications", icon: Inbox },
   { href: "/admin/doctors",    label: "Doctors",     icon: Stethoscope },
   { href: "/admin/specialties", label: "Specialties", icon: Tag },
   { href: "/admin/nurses",     label: "Nurses",      icon: HeartPulse },
@@ -31,11 +34,12 @@ const navItems = [
 
 // Shared nav list markup — used by both the always-visible desktop rail and
 // the slide-in mobile/tablet drawer, so the two never drift apart.
-function SidebarContents({ pathname, user, logout, onNavigate }: {
+function SidebarContents({ pathname, user, logout, onNavigate, inboxUnread }: {
   pathname: string;
   user: { name?: string; mobile?: string } | null;
   logout: () => void;
   onNavigate?: () => void;
+  inboxUnread: number;
 }) {
   return (
     <>
@@ -63,6 +67,11 @@ function SidebarContents({ pathname, user, logout, onNavigate }: {
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
               <span className="flex-1">{label}</span>
+              {href === "/admin/inbox" && inboxUnread > 0 && (
+                <span className="min-w-5 h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                  {inboxUnread > 99 ? "99+" : inboxUnread}
+                </span>
+              )}
               {isActive && <ChevronRight className="w-3.5 h-3.5 opacity-50" />}
             </Link>
           );
@@ -105,6 +114,7 @@ export default function AdminSidebar() {
   // Closed by the drawer's own Link taps (onNavigate) and by its backdrop —
   // no effect syncing this to the route is needed for that common path.
   const [mobileOpen, setMobileOpen] = useState(false);
+  const inboxUnread = useInboxUnread(user?.id);
 
   return (
     <>
@@ -121,7 +131,8 @@ export default function AdminSidebar() {
           <Menu className="w-5 h-5" />
         </button>
         <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-6 h-6 object-contain flex-shrink-0" />
-        <span className="font-bold text-slate-900 text-sm truncate">Admin Panel</span>
+        <span className="font-bold text-slate-900 text-sm truncate flex-1">Admin Panel</span>
+        <InboxButton />
       </header>
 
       {/* ── Desktop rail — unchanged, just gated behind lg: ─────────────── */}
@@ -129,7 +140,7 @@ export default function AdminSidebar() {
         className="hidden lg:flex w-64 fixed left-0 flex-col border-r border-slate-200/70 bg-slate-50/80 backdrop-blur-xl z-40"
         style={{ top: "var(--imp-banner-h, 0px)", height: "calc(100vh - var(--imp-banner-h, 0px))" }}
       >
-        <SidebarContents pathname={pathname} user={user} logout={logout} />
+        <SidebarContents pathname={pathname} user={user} logout={logout} inboxUnread={inboxUnread} />
       </aside>
 
       {/* ── Mobile/tablet drawer ─────────────────────────────────────── */}
@@ -149,6 +160,7 @@ export default function AdminSidebar() {
               user={user}
               logout={() => { setMobileOpen(false); logout(); }}
               onNavigate={() => setMobileOpen(false)}
+              inboxUnread={inboxUnread}
             />
           </aside>
         </div>

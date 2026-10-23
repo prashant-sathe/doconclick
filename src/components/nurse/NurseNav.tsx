@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { cn, formatProviderName } from "@/lib/utils";
 import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
 import NotificationToast from "@/components/doctor/NotificationToast";
+import InboxButton from "@/components/InboxButton";
 import { useTranslations } from "next-intl";
 
 const NAV = [
@@ -56,6 +57,7 @@ export function NurseHeader() {
           <span className="text-sm text-slate-500 hidden xl:inline">
             {user && t.rich("header.hi", { name: formatProviderName(user.name, "NURSE"), strong: (c) => <strong className="text-slate-800">{c}</strong> })}
           </span>
+          <InboxButton />
           <button
             onClick={() => { markSeen(); router.push("/nurse/dashboard"); }}
             title={t("nurse.visitRequests")}

@@ -31,6 +31,7 @@
   "Missing push token",
   "Invalid push token",
   "ids must be a non-empty array",
+  "ids must be a non-empty array of up to 200 ids",
   "medicines must be an array",
   "tests must be an array",
   "clinicId and date (YYYY-MM-DD) are required",

@@ -1,6 +1,7 @@
 import { deleteToken, getToken, onMessage } from "firebase/messaging";
 import { getMessagingInstance } from "@/lib/firebaseClient";
 import { isNative, nativePlatform } from "@/lib/platform";
+import { notifyInboxChanged } from "@/lib/inbox";
 
 const SUBSCRIBED_KEY = "doconclick_push_subscribed";
 const NATIVE_TOKEN_KEY = "doconclick_native_push_token";
@@ -137,6 +138,7 @@ export async function listenForForegroundPush(): Promise<void> {
     const body = payload.notification?.body;
     const url = payload.fcmOptions?.link ?? "/";
     registration.showNotification(title, { body, data: { url, source: "doconclick-foreground" } });
+    notifyInboxChanged();
   });
 }
 

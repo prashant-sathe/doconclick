@@ -53,6 +53,7 @@ model User {
   savedByPatients   SavedDoctor[] @relation("DoctorSavedBy")
   clinics           Clinic[]      @relation("DoctorClinics")
   pushTokens        PushToken[]
+  notifications     Notification[]
   wallet            Wallet?
   walletTransactionsAdjusted WalletTransaction[] @relation("WalletAdjustedBy")
   announcementsCreated   Announcement[]          @relation("AnnouncementsCreated")
@@ -79,6 +80,25 @@ model PushToken {
   token     String   @unique
   userAgent String?
   createdAt DateTime @default(now())
+}
+
+// The in-app inbox: one row per recipient for every push sent
+// (sendPushToUsers in src/lib/firebaseAdmin.ts), written whether or not the
+// user has a push token — so someone who never enabled push still sees it.
+// Text is stored as rendered in the recipient's language at send time.
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  url       String
+  kind      String?   // messages/<locale>/push.json key; null for fixed-text pushes
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
 }
 
 model SavedDoctor {

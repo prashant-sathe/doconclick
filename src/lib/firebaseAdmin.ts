@@ -49,24 +49,40 @@ async function textFor(payload: Extract<PushPayload, { key: PushKey }>, locale: 
 
 export async function sendPushToUsers(userIds: string[], payload: PushPayload): Promise<void> {
   if (userIds.length === 0) return;
-  if ("key" in payload) {
-    try {
-      const users = await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, language: true } });
-      const byLang = new Map<AppLanguage, string[]>();
-      for (const u of users) {
-        const lang = isAppLanguage(u.language) ? u.language : DEFAULT_APP_LANGUAGE;
-        byLang.set(lang, [...(byLang.get(lang) ?? []), u.id]);
-      }
-      for (const [lang, ids] of byLang) await deliver(ids, { ...(await textFor(payload, lang)), url: payload.url });
-    } catch (err) {
-      console.error("sendPushToUsers (localized) failed:", err);
+  try {
+    // Looked up even for fixed text: the inbox rows need real user ids (a
+    // stale id would fail the whole createMany on its foreign key).
+    const users = await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, language: true } });
+    if (!("key" in payload)) {
+      await deliver(users.map((u) => u.id), payload, null);
+      return;
     }
-    return;
+    const byLang = new Map<AppLanguage, string[]>();
+    for (const u of users) {
+      const lang = isAppLanguage(u.language) ? u.language : DEFAULT_APP_LANGUAGE;
+      byLang.set(lang, [...(byLang.get(lang) ?? []), u.id]);
+    }
+    for (const [lang, ids] of byLang) await deliver(ids, { ...(await textFor(payload, lang)), url: payload.url }, payload.key);
+  } catch (err) {
+    console.error("sendPushToUsers failed:", err);
   }
-  return deliver(userIds, payload);
 }
 
-async function deliver(userIds: string[], payload: { title: string; body: string; url: string }): Promise<void> {
+// Every push also lands in each recipient's in-app inbox (Notification) —
+// before the token lookup, so users without push enabled still get it.
+async function recordInInbox(userIds: string[], payload: { title: string; body: string; url: string }, kind: string | null) {
+  try {
+    await prisma.notification.createMany({
+      data: userIds.map((userId) => ({ userId, title: payload.title, body: payload.body, url: payload.url, kind })),
+    });
+  } catch (err) {
+    console.error("recordInInbox failed:", err);
+  }
+}
+
+async function deliver(userIds: string[], payload: { title: string; body: string; url: string }, kind: string | null): Promise<void> {
+  if (userIds.length === 0) return;
+  await recordInInbox(userIds, payload, kind);
   try {
     const tokens = await prisma.pushToken.findMany({ where: { userId: { in: userIds } } });
     if (tokens.length === 0) return;

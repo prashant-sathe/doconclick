@@ -12,6 +12,7 @@ import { useAnnouncementNotifications } from "@/hooks/useAnnouncementNotificatio
 import { useTranslations } from "next-intl";
 import PatientNotificationToast from "@/components/patient/PatientNotificationToast";
 import WalletNotificationToast from "@/components/patient/WalletNotificationToast";
+import InboxButton from "@/components/InboxButton";
 
 // Labels are message keys (messages/<locale>/nav.json).
 const WALLET_EVENTS = ["TOPUP", "BOOKING_PAYMENT", "ADMIN_CREDIT", "ADMIN_DEBIT", "REASSIGNMENT_CREDIT"] as const;
@@ -104,6 +105,8 @@ export default function PatientHeader() {
             <WalletIcon className="w-3.5 h-3.5" />
             <span>{balance != null ? `₹${balance.toLocaleString("en-IN")}` : "—"}</span>
           </Link>
+
+          <InboxButton />
 
           <div className="relative">
             <button

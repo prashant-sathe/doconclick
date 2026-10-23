@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   PushToken: 'PushToken',
+  Notification: 'Notification',
   SavedDoctor: 'SavedDoctor',
   PatientProfile: 'PatientProfile',
   PatientDependent: 'PatientDependent',
@@ -141,6 +142,20 @@ export const PushTokenScalarFieldEnum = {
 } as const
 
 export type PushTokenScalarFieldEnum = (typeof PushTokenScalarFieldEnum)[keyof typeof PushTokenScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  body: 'body',
+  url: 'url',
+  kind: 'kind',
+  readAt: 'readAt',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const SavedDoctorScalarFieldEnum = {

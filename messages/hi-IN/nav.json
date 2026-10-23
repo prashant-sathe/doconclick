@@ -45,7 +45,9 @@
     "viewAllAppointments": "सभी अपॉइंटमेंट देखें",
     "pendingRequests": "लंबित अनुरोध",
     "noPendingRequests": "कोई लंबित अनुरोध नहीं।",
-    "viewAllInDashboard": "डैशबोर्ड में सब देखें"
+    "viewAllInDashboard": "डैशबोर्ड में सब देखें",
+    "inbox": "इनबॉक्स",
+    "inboxUnread": "इनबॉक्स, {count} अपठित"
   },
   "walletEvent": {
     "TOPUP": "वॉलेट में पैसे जोड़े गए",

@@ -40,7 +40,7 @@ function pagesUnder(area: string): string[] {
 }
 
 const PUBLIC = new Set(["/patient/register", "/doctor/register", "/patient/doctor/x1"]);
-const STAFF_OK = (p: string) => /^\/doctor\/(dashboard|chat|walk-in)(\/|$)/.test(p);
+const STAFF_OK = (p: string) => /^\/doctor\/(dashboard|chat|walk-in|inbox)(\/|$)/.test(p);
 
 type U = { id: string; name: string; role: string; mobile: string; tokenVersion: number };
 async function visit(p: string, as: U | null) {

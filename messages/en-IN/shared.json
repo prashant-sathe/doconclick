@@ -155,5 +155,17 @@
     "cameraOff": "Turn camera off",
     "cameraOn": "Turn camera on",
     "endCall": "End call"
+  },
+  "inbox": {
+    "title": "Notifications",
+    "subtitle": "Every alert we've sent you, in one place.",
+    "unread": "{count} unread",
+    "allRead": "You're all caught up.",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications yet.",
+    "emptyHint": "Booking updates, payments and reminders will show up here.",
+    "loadMore": "Load more",
+    "loadFailed": "Couldn't load notifications.",
+    "new": "New"
   }
 }

@@ -28,6 +28,11 @@ export type User = Prisma.UserModel
  */
 export type PushToken = Prisma.PushTokenModel
 /**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
  * Model SavedDoctor
  * 
  */
