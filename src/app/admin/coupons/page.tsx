@@ -36,6 +36,8 @@ const APPLIES_LABEL: Record<string, string> = {
   APPOINTMENT: "Consultations",
   DOCTOR_REGISTRATION: "Doctor reg.",
   DOCTOR_SUBSCRIPTION: "Doctor plan",
+  NURSE_REGISTRATION: "Nurse reg.",
+  NURSE_SUBSCRIPTION: "Nurse plan",
 };
 
 function appliesLabel(c: CouponRow): string {
@@ -101,7 +103,7 @@ export default function AdminCoupons() {
                     {discountLabel(c)}
                     {` · ${appliesLabel(c)}`}
                     {c.minAmount > 0 && ` · min ₹${c.minAmount}`}
-                    {c.consultTypes && ` · ${c.consultTypes}`}
+                    {c.consultTypes && ` · ${c.consultTypes.split(",").map((t) => t[0] + t.slice(1).toLowerCase()).join(", ")}`}
                     {" · "}{windowLabel(c)}
                   </div>
                 </div>

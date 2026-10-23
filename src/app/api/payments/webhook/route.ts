@@ -69,8 +69,8 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     if (failedOrderId?.startsWith(DUES_ORDER_PREFIX)) {
       await prisma.duesPayment.updateMany({ where: { orderId: failedOrderId, status: "CREATED" }, data: { status: "FAILED" } });
     }
-    // Free any coupon slot a doctor reserved for this failed fee payment.
-    if (failedOrderId && (failedOrderId.startsWith("docreg") || failedOrderId.startsWith("docsub"))) {
+    // Free any coupon slot a doctor or nurse reserved for this failed fee payment.
+    if (failedOrderId && ["docreg", "docsub", NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX].some((p) => failedOrderId.startsWith(p))) {
       await prisma.$transaction((tx) => releaseCouponRedemption(tx, { orderId: failedOrderId })).catch(() => {});
     }
     return NextResponse.json({ ok: true });
@@ -204,6 +204,13 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       );
       return NextResponse.json({ ok: true });
     }
+    // The order was created for the coupon-discounted amount (checked above);
+    // this only records which coupon, and confirms its slot.
+    const redemption = await prisma.couponRedemption.findUnique({
+      where: { orderId },
+      include: { coupon: { select: { code: true } } },
+    });
+    const discount = redemption?.status === "RESERVED" ? redemption.discountAmount : 0;
     const now = Date.now();
     const currentPaidUntil = profile.subscriptionPaidUntil ? new Date(profile.subscriptionPaidUntil).getTime() : 0;
     const paidUntil = new Date(Math.max(now, currentPaidUntil));
@@ -222,8 +229,14 @@ export const POST = withErrorLocale(async function POST(req: Request) {
           nurseId: profile.userId,
           type: isRegistration ? "REGISTRATION" : "SUBSCRIPTION",
           amount: payload.data.order.order_amount,
+          couponCode: discount > 0 ? redemption?.coupon.code ?? null : null,
+          discountAmount: discount,
           cashfreePaymentId: payload.data.payment.cf_payment_id,
         },
+      }),
+      prisma.couponRedemption.updateMany({
+        where: { orderId, status: "RESERVED" },
+        data: { status: "CONFIRMED" },
       }),
     ]);
     void sendPushToUser(profile.userId, isRegistration

@@ -3,15 +3,31 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 import { getDoctorRegistrationFee } from "@/lib/doctorFees";
-import { normalizeCode, validateCoupon, type CouponContext } from "@/lib/coupons";
+import { getNurseFees } from "@/lib/nurseFees";
+import { normalizeCode, validateCoupon, type FeeCouponContext } from "@/lib/coupons";
 import { withErrorLocale } from "@/lib/apiErrors";
 
 
-// POST: preview-only check of a coupon for a doctor fee. Does NOT reserve a
-// slot — the create-order route re-validates and reserves authoritatively.
+// The fee contexts each role can preview a coupon for.
+const ROLE_CONTEXTS: Record<string, FeeCouponContext[]> = {
+  DOCTOR: ["DOCTOR_REGISTRATION", "DOCTOR_SUBSCRIPTION"],
+  NURSE: ["NURSE_REGISTRATION", "NURSE_SUBSCRIPTION"],
+};
+
+async function feeFor(context: FeeCouponContext): Promise<number> {
+  if (context === "DOCTOR_REGISTRATION") return getDoctorRegistrationFee();
+  if (context === "DOCTOR_SUBSCRIPTION") return DOCTOR_SUBSCRIPTION_FEE;
+  const nurse = await getNurseFees();
+  return context === "NURSE_REGISTRATION" ? nurse.registrationFee : nurse.subscriptionFee;
+}
+
+// POST: preview-only check of a coupon for a doctor or nurse fee. Does NOT
+// reserve a slot — the create-order / fee-order route re-validates and
+// reserves authoritatively.
 export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
-  if (!authUser || authUser.role !== "DOCTOR") {
+  const allowed = authUser ? ROLE_CONTEXTS[authUser.role] : undefined;
+  if (!authUser || !allowed) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
@@ -19,10 +35,10 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   if (typeof code !== "string" || !code.trim()) {
     return NextResponse.json({ error: "Enter a coupon code." }, { status: 400 });
   }
-  if (context !== "DOCTOR_REGISTRATION" && context !== "DOCTOR_SUBSCRIPTION") {
+  if (!allowed.includes(context)) {
     return NextResponse.json({ error: "Invalid coupon context." }, { status: 400 });
   }
-  const fee = context === "DOCTOR_REGISTRATION" ? await getDoctorRegistrationFee() : DOCTOR_SUBSCRIPTION_FEE;
+  const fee = await feeFor(context);
   if (fee === 0) return NextResponse.json({ error: "There's nothing to pay, so no coupon is needed." }, { status: 400 });
 
   const coupon = await prisma.coupon.findUnique({ where: { code: normalizeCode(code) } });
@@ -36,7 +52,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
 
   const result = validateCoupon({
     coupon,
-    context: context as CouponContext,
+    context,
     baseAmount: fee,
     redemptionCountForUser,
   });

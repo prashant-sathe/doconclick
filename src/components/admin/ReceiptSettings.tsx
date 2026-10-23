@@ -76,7 +76,7 @@ export default function ReceiptSettings() {
             <label className="input-label" htmlFor="receipt-tax-note">GST note on appointment receipts</label>
             <textarea
               id="receipt-tax-note"
-              rows={2}
+              rows={3}
               className="input-field"
               placeholder="Healthcare services (SAC 9993) are exempt from GST; no GST has been charged."
               value={fields.receiptTaxNote}

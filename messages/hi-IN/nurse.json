@@ -219,7 +219,14 @@
       "activeUntil": "{date} तक सक्रिय",
       "notActive": "सक्रिय नहीं",
       "renew": "नवीनीकरण करें",
-      "startFailed": "भुगतान शुरू नहीं हो सका।"
+      "startFailed": "भुगतान शुरू नहीं हो सका।",
+      "couponForRegistration": "रजिस्ट्रेशन फीस के लिए कूपन कोड",
+      "couponForSubscription": "प्लान के लिए कूपन कोड",
+      "apply": "लगाएँ",
+      "couponOff": "{code} — ₹{amount} की छूट",
+      "removeCoupon": "कूपन हटाएँ",
+      "couponFailed": "यह कूपन नहीं लग सका।",
+      "firstMonth": "इस महीने ₹{amount}"
     },
     "details": {
       "title": "पेशेवर जानकारी",

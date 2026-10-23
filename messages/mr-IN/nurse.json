@@ -219,7 +219,14 @@
       "activeUntil": "{date} पर्यंत सक्रिय",
       "notActive": "सक्रिय नाही",
       "renew": "नूतनीकरण करा",
-      "startFailed": "पेमेंट सुरू करता आले नाही."
+      "startFailed": "पेमेंट सुरू करता आले नाही.",
+      "couponForRegistration": "नोंदणी फीसाठी कूपन कोड",
+      "couponForSubscription": "प्लॅनसाठी कूपन कोड",
+      "apply": "लावा",
+      "couponOff": "{code} — ₹{amount} सूट",
+      "removeCoupon": "कूपन काढा",
+      "couponFailed": "हा कूपन लावता आला नाही.",
+      "firstMonth": "या महिन्यात ₹{amount}"
     },
     "details": {
       "title": "व्यावसायिक माहिती",

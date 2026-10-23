@@ -362,7 +362,9 @@ model NursePaymentLog {
   nurseId           String
   nurse             User     @relation("NursePaymentLogs", fields: [nurseId], references: [id])
   type              String   // REGISTRATION, SUBSCRIPTION
-  amount            Float
+  amount            Float    // amount actually charged (after any coupon discount)
+  couponCode        String?
+  discountAmount    Float    @default(0)
   cashfreePaymentId String?
   createdAt         DateTime @default(now())
 }
@@ -881,7 +883,8 @@ model Coupon {
   maxDiscount    Float?    // cap in rupees, only meaningful for PERCENT
   minAmount      Float    @default(0) // minimum base amount to qualify
   // What this coupon can be used for — CSV of APPOINTMENT, DOCTOR_REGISTRATION,
-  // DOCTOR_SUBSCRIPTION. Empty/null is treated as APPOINTMENT only.
+  // DOCTOR_SUBSCRIPTION, NURSE_REGISTRATION, NURSE_SUBSCRIPTION. Empty/null
+  // is treated as APPOINTMENT only.
   appliesTo      String   @default("APPOINTMENT")
   consultTypes   String?  // CSV of CLINIC,VIDEO,HOME — null/empty means all (APPOINTMENT only)
   maxRedemptions Int?     // total cap across all users — null means unlimited
@@ -910,8 +913,8 @@ model CouponRedemption {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   // Exactly one of these identifies what the coupon was used on:
   //  - appointmentId for a patient booking payment (kind APPOINTMENT)
-  //  - orderId (the Cashfree order id) for a doctor registration/subscription fee
-  kind          String   @default("APPOINTMENT") // APPOINTMENT, DOCTOR_REGISTRATION, DOCTOR_SUBSCRIPTION
+  //  - orderId (the Cashfree order id) for a doctor/nurse registration/subscription fee
+  kind          String   @default("APPOINTMENT") // APPOINTMENT, DOCTOR_REGISTRATION, DOCTOR_SUBSCRIPTION, NURSE_REGISTRATION, NURSE_SUBSCRIPTION
   appointmentId String?  @unique
   appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   orderId       String?  @unique

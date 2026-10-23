@@ -216,6 +216,8 @@
   "couponOnlyBookings": "This coupon can only be used for consultation bookings.",
   "couponOnlyRegistration": "This coupon can only be used for the doctor registration fee.",
   "couponOnlyRenewals": "This coupon can only be used for doctor plan renewals.",
+  "couponOnlyNurseRegistration": "This coupon can only be used for the nurse registration fee.",
+  "couponOnlyNurseRenewals": "This coupon can only be used for nurse plan renewals.",
   "couponOnlyOther": "This coupon can only be used for other payments.",
   "couponNotYetActive": "This coupon isn't active yet.",
   "couponExpired": "This coupon has expired.",

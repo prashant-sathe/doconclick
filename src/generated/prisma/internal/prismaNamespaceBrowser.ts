@@ -390,6 +390,8 @@ export const NursePaymentLogScalarFieldEnum = {
   nurseId: 'nurseId',
   type: 'type',
   amount: 'amount',
+  couponCode: 'couponCode',
+  discountAmount: 'discountAmount',
   cashfreePaymentId: 'cashfreePaymentId',
   createdAt: 'createdAt'
 } as const

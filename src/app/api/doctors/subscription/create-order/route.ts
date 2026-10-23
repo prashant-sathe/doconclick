@@ -4,7 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
 import { createCashfreeOrder, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
-import { reserveDoctorFeeCoupon, releaseCouponRedemption } from "@/lib/coupons";
+import { reserveFeeCoupon, releaseCouponRedemption } from "@/lib/coupons";
 import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: Creates a real Cashfree order to renew a doctor's monthly
@@ -34,7 +34,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   let coupon: { couponCode: string; discountAmount: number; netAmount: number } | null = null;
   if (typeof code === "string" && code.trim()) {
     const reserved = await prisma.$transaction((tx) =>
-      reserveDoctorFeeCoupon(tx, {
+      reserveFeeCoupon(tx, {
         code,
         userId: authUser.id,
         context: "DOCTOR_SUBSCRIPTION",

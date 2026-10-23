@@ -219,7 +219,14 @@
       "activeUntil": "active until {date}",
       "notActive": "not active",
       "renew": "Renew",
-      "startFailed": "Could not start payment."
+      "startFailed": "Could not start payment.",
+      "couponForRegistration": "Coupon code for the registration fee",
+      "couponForSubscription": "Coupon code for the plan",
+      "apply": "Apply",
+      "couponOff": "{code} — ₹{amount} off",
+      "removeCoupon": "Remove coupon",
+      "couponFailed": "Could not apply that coupon.",
+      "firstMonth": "₹{amount} this month"
     },
     "details": {
       "title": "Professional details",

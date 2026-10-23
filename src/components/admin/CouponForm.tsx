@@ -10,6 +10,8 @@ const APPLIES_TO = [
   { value: "APPOINTMENT", label: "Consultations" },
   { value: "DOCTOR_REGISTRATION", label: "Doctor registration" },
   { value: "DOCTOR_SUBSCRIPTION", label: "Doctor plan" },
+  { value: "NURSE_REGISTRATION", label: "Nurse registration" },
+  { value: "NURSE_SUBSCRIPTION", label: "Nurse plan" },
 ] as const;
 
 export interface CouponData {
@@ -124,7 +126,7 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
   };
 
   return (
-    <div className="p-8 max-w-2xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-2xl">
       <Link href="/admin/coupons" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 mb-4">
         <ArrowLeft className="w-4 h-4" /> Back to Coupons
       </Link>
@@ -212,13 +214,14 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
 
         <div>
           <label className="input-label">Applies to</label>
-          <div className="flex gap-2">
+          {/* Five options don't fit one row on a phone — wrap into a grid. */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {APPLIES_TO.map((o) => (
               <button
                 key={o.value}
                 type="button"
                 onClick={() => toggleApplies(o.value)}
-                className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-colors ${
+                className={`py-2 px-2 rounded-xl text-xs font-semibold leading-tight border transition-colors ${
                   appliesTo.includes(o.value)
                     ? "bg-blue-600 text-white border-blue-600"
                     : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
@@ -277,7 +280,7 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="input-label">Starts (optional)</label>
             <input

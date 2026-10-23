@@ -5,8 +5,10 @@ type PrismaClientOrTx = typeof prisma | Prisma.TransactionClient;
 
 export const DISCOUNT_TYPES = ["PERCENT", "FLAT"] as const;
 export const COUPON_CONSULT_TYPES = ["CLINIC", "VIDEO", "HOME"] as const;
-export const COUPON_APPLIES_TO = ["APPOINTMENT", "DOCTOR_REGISTRATION", "DOCTOR_SUBSCRIPTION"] as const;
+export const COUPON_APPLIES_TO = ["APPOINTMENT", "DOCTOR_REGISTRATION", "DOCTOR_SUBSCRIPTION", "NURSE_REGISTRATION", "NURSE_SUBSCRIPTION"] as const;
 export type CouponContext = (typeof COUPON_APPLIES_TO)[number];
+/** Provider fees paid through a Cashfree order (redemption keyed on orderId). */
+export type FeeCouponContext = Exclude<CouponContext, "APPOINTMENT">;
 
 /**
  * Largest rupee amount a FLAT discount (or a PERCENT coupon's max-discount
@@ -28,6 +30,8 @@ const CONTEXT_LABEL: Record<string, string> = {
   APPOINTMENT: "consultation bookings",
   DOCTOR_REGISTRATION: "the doctor registration fee",
   DOCTOR_SUBSCRIPTION: "doctor plan renewals",
+  NURSE_REGISTRATION: "the nurse registration fee",
+  NURSE_SUBSCRIPTION: "nurse plan renewals",
 };
 
 export function normalizeCode(raw: string): string {
@@ -211,7 +215,7 @@ export function parseCouponInput(
       : String(body.appliesTo ?? "").split(",");
     const values = raw.map((v) => String(v).trim().toUpperCase()).filter(Boolean);
     if (values.some((v) => !COUPON_APPLIES_TO.includes(v as CouponContext))) {
-      return { error: "“Applies to” must be APPOINTMENT, DOCTOR_REGISTRATION or DOCTOR_SUBSCRIPTION." };
+      return { error: "“Applies to” must be APPOINTMENT, DOCTOR_REGISTRATION, DOCTOR_SUBSCRIPTION, NURSE_REGISTRATION or NURSE_SUBSCRIPTION." };
     }
     data.appliesTo = (values.length ? values : ["APPOINTMENT"]).join(",");
   }
@@ -309,7 +313,7 @@ export function validateCouponConfig(
 }
 
 // Identifies a single redemption: a patient booking (appointmentId) or a
-// doctor fee Cashfree order (orderId).
+// doctor/nurse fee Cashfree order (orderId).
 type RedemptionSelector = { appointmentId: string } | { orderId: string };
 
 /**
@@ -353,17 +357,17 @@ export async function reserveCoupon(
 }
 
 /**
- * Full server-side flow for attaching a coupon to a doctor fee payment:
+ * Full server-side flow for attaching a coupon to a doctor or nurse fee payment:
  * validate → release any stale reservation from a previous checkout attempt →
  * atomically reserve. Returns the discounted amount to charge. Call inside a
  * transaction, after the Cashfree order has been created for `netAmount`.
  */
-export async function reserveDoctorFeeCoupon(
+export async function reserveFeeCoupon(
   tx: Prisma.TransactionClient,
   args: {
     code: string;
     userId: string;
-    context: "DOCTOR_REGISTRATION" | "DOCTOR_SUBSCRIPTION";
+    context: FeeCouponContext;
     fee: number;
     orderId: string;
     previousOrderId?: string | null;

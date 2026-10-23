@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import {
   Loader2, CheckCircle2, Circle, ShieldCheck, Clock, XCircle, Ban, Upload, FileText, MapPin,
-  LocateFixed, Save, IndianRupee, Landmark, Stethoscope, LogOut, CreditCard, Lock, LifeBuoy, Bell, FileCheck, ChevronRight, CalendarOff,
+  LocateFixed, Save, IndianRupee, Landmark, Stethoscope, LogOut, CreditCard, Lock, LifeBuoy, Bell, FileCheck, ChevronRight, CalendarOff, TicketPercent, X,
 } from "lucide-react";
 import { TimeOffManager } from "@/components/ProviderAway";
 import { useAuth } from "@/components/AuthProvider";
@@ -140,6 +140,12 @@ function NurseProfileContent() {
   const [paying, setPaying] = useState<string | null>(null);
   const [now] = useState(() => Date.now());
   const [payError, setPayError] = useState("");
+  // A coupon previewed for the fee due now (registration first, then the
+  // plan) — the fee-order route re-checks and reserves it at checkout.
+  const [coupon, setCoupon] = useState<{ kind: "REGISTRATION" | "SUBSCRIPTION"; code: string; discountAmount: number; netAmount: number } | null>(null);
+  const [couponInput, setCouponInput] = useState("");
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState("");
 
   const detailsSaver = useSaver();
   const servicesSaver = useSaver();
@@ -200,6 +206,11 @@ function NurseProfileContent() {
   const subActive = !!p.subscriptionPaidUntil && new Date(p.subscriptionPaidUntil).getTime() > now;
   const needsRegFee = me.fees.registrationFee > 0 && !p.registrationFeePaid;
   const needsSub = me.fees.subscriptionFee > 0 && !subActive;
+  // The fee a coupon would go on: registration until it's paid, then the plan.
+  const couponKind: "REGISTRATION" | "SUBSCRIPTION" | null = needsRegFee ? "REGISTRATION" : me.fees.subscriptionFee > 0 ? "SUBSCRIPTION" : null;
+  const activeCoupon = coupon && coupon.kind === couponKind ? coupon : null;
+  const feeLabel = (kind: "REGISTRATION" | "SUBSCRIPTION", fee: number) =>
+    activeCoupon?.kind === kind ? `₹${activeCoupon.netAmount}` : `₹${fee}`;
 
   const saveDetails = () => {
     if (hours.days.length === 0) {
@@ -275,10 +286,25 @@ function NurseProfileContent() {
     load();
   };
 
+  const applyCoupon = async (kind: "REGISTRATION" | "SUBSCRIPTION") => {
+    if (!couponInput.trim()) return;
+    setApplyingCoupon(true); setCouponError("");
+    const res = await fetch("/api/coupons/validate", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: couponInput.trim(), context: kind === "REGISTRATION" ? "NURSE_REGISTRATION" : "NURSE_SUBSCRIPTION" }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setApplyingCoupon(false);
+    if (!res.ok) { setCouponError(data.error ?? t("fees.couponFailed")); return; }
+    setCoupon({ kind, code: data.code, discountAmount: data.discountAmount, netAmount: data.netAmount });
+    setCouponInput("");
+  };
+
   const pay = async (kind: "REGISTRATION" | "SUBSCRIPTION") => {
     setPaying(kind); setPayError("");
+    const code = coupon?.kind === kind ? coupon.code : undefined;
     const res = await fetch("/api/nurses/fee-order", {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind }),
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, code }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) { setPaying(null); setPayError(data.error ?? t("fees.startFailed")); return; }
@@ -342,10 +368,13 @@ function NurseProfileContent() {
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div>
                   <p className="text-sm font-semibold text-slate-800">{t("fees.registration")}</p>
-                  <p className="text-xs text-slate-500">₹{me.fees.registrationFee}</p>
+                  <p className="text-xs text-slate-500">
+                    {activeCoupon?.kind === "REGISTRATION" && <span className="line-through mr-1.5">₹{me.fees.registrationFee}</span>}
+                    {feeLabel("REGISTRATION", me.fees.registrationFee)}
+                  </p>
                 </div>
                 <button onClick={() => pay("REGISTRATION")} disabled={!!paying} className="btn-primary py-2 px-4 text-sm">
-                  {paying === "REGISTRATION" ? <Loader2 className="w-4 h-4 animate-spin" /> : t("fees.pay", { amount: me.fees.registrationFee })}
+                  {paying === "REGISTRATION" ? <Loader2 className="w-4 h-4 animate-spin" /> : t("fees.pay", { amount: activeCoupon?.kind === "REGISTRATION" ? activeCoupon.netAmount : me.fees.registrationFee })}
                 </button>
               </div>
             )}
@@ -354,13 +383,42 @@ function NurseProfileContent() {
                 <div>
                   <p className="text-sm font-semibold text-slate-800">{t("fees.subscription")}</p>
                   <p className="text-xs text-slate-500">
-                    {t("fees.perMonth", { amount: me.fees.subscriptionFee })} ·{" "}
+                    {activeCoupon?.kind === "SUBSCRIPTION" && <span className="line-through mr-1.5">₹{me.fees.subscriptionFee}</span>}
+                    {activeCoupon?.kind === "SUBSCRIPTION" ? t("fees.firstMonth", { amount: activeCoupon.netAmount }) : t("fees.perMonth", { amount: me.fees.subscriptionFee })} ·{" "}
                     {subActive ? t("fees.activeUntil", { date: new Date(p.subscriptionPaidUntil!).toLocaleDateString(locale, { timeZone: "Asia/Kolkata" }) }) : t("fees.notActive")}
                   </p>
                 </div>
                 <button onClick={() => pay("SUBSCRIPTION")} disabled={!!paying || needsRegFee} className="btn-secondary py-2 px-4 text-sm">
-                  {paying === "SUBSCRIPTION" ? <Loader2 className="w-4 h-4 animate-spin" /> : subActive ? t("fees.renew") : t("fees.pay", { amount: me.fees.subscriptionFee })}
+                  {paying === "SUBSCRIPTION" ? <Loader2 className="w-4 h-4 animate-spin" /> : subActive && !activeCoupon ? t("fees.renew") : t("fees.pay", { amount: activeCoupon?.kind === "SUBSCRIPTION" ? activeCoupon.netAmount : me.fees.subscriptionFee })}
                 </button>
+              </div>
+            )}
+            {couponKind && (
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                {activeCoupon ? (
+                  <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+                    <span className="flex items-center gap-1.5 font-semibold">
+                      <TicketPercent className="w-4 h-4" /> {t("fees.couponOff", { code: activeCoupon.code, amount: activeCoupon.discountAmount })}
+                    </span>
+                    <button onClick={() => setCoupon(null)} className="text-emerald-700 hover:text-emerald-900" aria-label={t("fees.removeCoupon")}>
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      className="input-field flex-1 uppercase"
+                      placeholder={t(couponKind === "REGISTRATION" ? "fees.couponForRegistration" : "fees.couponForSubscription")}
+                      value={couponInput}
+                      onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
+                      onKeyDown={(e) => { if (e.key === "Enter") applyCoupon(couponKind); }}
+                    />
+                    <button onClick={() => applyCoupon(couponKind)} disabled={applyingCoupon || !couponInput.trim()} className="btn-secondary px-4 disabled:opacity-60">
+                      {applyingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : t("fees.apply")}
+                    </button>
+                  </div>
+                )}
+                {couponError && <p className="text-xs text-red-500 mt-1.5">{couponError}</p>}
               </div>
             )}
             {payError && <p className="text-sm text-red-600 mt-3">{payError}</p>}
