@@ -43,3 +43,21 @@ export function setLanguageCookie(lang: AppLanguage) {
 export function formattingLocale(lang: string): string {
   return lang === "mr-IN" ? "mr-IN-u-nu-latn" : lang;
 }
+
+/**
+ * The locale next-intl runs in: the user's language, except that Marathi
+ * carries the Latin-digits extension (formattingLocale) so ICU plurals (#),
+ * {n, number} and {d, date} in messages print 12, not १२ — matching amounts
+ * and slot times. useLocale() returns this; compare with baseLanguage().
+ */
+export type UiLocale = AppLanguage | "mr-IN-u-nu-latn";
+
+export function uiLocale(lang: AppLanguage): UiLocale {
+  return formattingLocale(lang) as UiLocale;
+}
+
+/** The plain language of a UI locale (drops any -u-… extension). */
+export function baseLanguage(locale: string): AppLanguage {
+  const base = locale.split("-u-")[0];
+  return isAppLanguage(base) ? base : DEFAULT_APP_LANGUAGE;
+}

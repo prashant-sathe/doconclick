@@ -36,8 +36,10 @@ import { useJourneyTracker } from "@/components/JourneyTracker";
 import { useAppointmentFeed, useAppointmentHistory, mergeAppointments } from "@/components/AppointmentFeed";
 import PullToRefresh from "@/components/PullToRefresh";
 import { compressImage } from "@/lib/compressImage";
-import { PACKAGE_VISIT_OPTIONS, PACKAGE_INTERVAL_OPTIONS, intervalLabel } from "@/lib/nursePackage";
+import { PACKAGE_VISIT_OPTIONS, PACKAGE_INTERVAL_OPTIONS } from "@/lib/nursePackage";
 import { vitalsSummary, type VitalsInput } from "@/lib/vitals";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 interface DoctorProfile {
   specialty: string;
@@ -113,6 +115,16 @@ interface TestRow {
 
 const TYPE_ICON: Record<string, React.ElementType> = { HOME: Home, CLINIC: Building2, VIDEO: Video };
 
+// FREQUENCY_OPTIONS / DURATION_OPTIONS values are what's saved on the
+// prescription (and printed on it) — only the dropdown labels are translated.
+const FREQUENCY_KEY: Record<string, "onceDaily" | "twiceDaily" | "thriceDaily" | "fourTimesDaily" | "beforeMeals" | "afterMeals" | "atBedtime" | "asNeeded" | "other"> = {
+  "Once daily": "onceDaily", "Twice daily": "twiceDaily", "Thrice daily": "thriceDaily", "Four times daily": "fourTimesDaily",
+  "Before meals": "beforeMeals", "After meals": "afterMeals", "At bedtime": "atBedtime", "As needed": "asNeeded", Other: "other",
+};
+const DURATION_KEY: Record<string, "days3" | "days5" | "days7" | "days10" | "weeks2" | "month1" | "other"> = {
+  "3 days": "days3", "5 days": "days5", "7 days": "days7", "10 days": "days10", "2 weeks": "weeks2", "1 month": "month1", Other: "other",
+};
+
 function patientLabel(a: Appointment): string {
   return a.relation !== "Self" && a.patientName ? a.patientName : a.patient.name;
 }
@@ -146,11 +158,13 @@ function historyHref(a: Appointment): string {
 // What nurses recorded since the doctor last saw this patient — one tap to
 // the full trend on the patient's history page.
 function VitalsChip({ a }: { a: Appointment }) {
+  const t = useTranslations("doctor.dashboard");
+  const locale = formattingLocale(useLocale());
   const v = a.latestVitals;
   if (!v) return null;
   const critical = v.alertLevel === "CRITICAL";
   const warn = v.alertLevel === "WARNING";
-  const when = new Date(v.recordedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
+  const when = new Date(v.recordedAt).toLocaleDateString(locale, { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
   return (
     <Link
       href={historyHref(a)}
@@ -160,8 +174,8 @@ function VitalsChip({ a }: { a: Appointment }) {
       )}
     >
       {critical || warn ? <AlertTriangle className="w-3 h-3" /> : <HeartPulse className="w-3 h-3 text-rose-500" />}
-      Nurse vitals {when}: {vitalsSummary(v)}
-      {(a.recentVitalsCount ?? 0) > 1 && <span className="font-normal opacity-80">· {a.recentVitalsCount} readings</span>}
+      {t("vitals", { when, summary: vitalsSummary(v) })}
+      {(a.recentVitalsCount ?? 0) > 1 && <span className="font-normal opacity-80">{t("readings", { count: a.recentVitalsCount ?? 0 })}</span>}
     </Link>
   );
 }
@@ -261,6 +275,8 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   onDone: () => void;
   onCancel: () => void;
 }) {
+  const t = useTranslations("doctor.completeVisit");
+  const tc = useTranslations("doctor.common");
   const draftKey = draftKeyFor(appt.id);
   const [notes, setNotes] = useState(() => {
     const draft = loadDraft(appt.id).notes;
@@ -279,7 +295,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   const [confirmed, setConfirmed] = useState(() => loadDraft(appt.id).confirmed === true);
   // Doctor -> nurse referral: "this patient needs nurse care at home".
   const [nurseCare, setNurseCare] = useState<NurseCareDraft>(() => ({ ...EMPTY_NURSE_CARE, ...(loadDraft(appt.id).nurseCare ?? {}) }));
-  const servicesLoad = useLoad<{ id: string; name: string; requiresPrescription: boolean }[]>("/api/nurse-services", { fallback: "Couldn't load nurse services." });
+  const servicesLoad = useLoad<{ id: string; name: string; requiresPrescription: boolean }[]>("/api/nurse-services", { fallback: t("servicesLoadFailed") });
   const nurseServices = servicesLoad.data ?? [];
   const [referralError, setReferralError] = useState("");
   const [submitError, setSubmitError] = useState("");
@@ -288,7 +304,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   const [confirmingCancel, setConfirmingCancel] = useState(false);
 
   const hasMedicines = medicines.some((m) => m.name.trim());
-  const hasTests = tests.some((t) => t.name.trim());
+  const hasTests = tests.some((row) => row.name.trim());
   const hasPrescriptionItems = hasMedicines || hasTests;
 
   useEffect(() => {
@@ -332,7 +348,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
   const submit = async () => {
     if (!hasPrescriptionItems || !confirmed) return;
-    if (nurseCare.on && !nurseCare.serviceId) { setReferralError("Pick the nurse service the patient needs."); setConfirmingComplete(false); return; }
+    if (nurseCare.on && !nurseCare.serviceId) { setReferralError(t("pickNurseService")); setConfirmingComplete(false); return; }
     setConfirmingComplete(false);
     setBusy(true);
     setFileError("");
@@ -349,8 +365,8 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
           instructions: m.instructions,
         }));
       const validTests = tests
-        .filter((t) => t.name.trim())
-        .map((t) => ({ name: t.name, instructions: t.instructions }));
+        .filter((row) => row.name.trim())
+        .map((row) => ({ name: row.name, instructions: row.instructions }));
       // One call saves notes, prescription, files and referral and closes the
       // visit — all or nothing (POST /api/appointments/[id]/complete), so a
       // refusal (unpaid, not arrived) leaves nothing half-saved to retry over.
@@ -379,7 +395,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       const res = await fetch(`/api/appointments/${appt.id}/complete`, { method: "POST", body: form });
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { error?: string; code?: string };
-        const message = body.error ?? "Could not mark this consultation complete.";
+        const message = body.error ?? t("completeFailed");
         if (body.code === "INVALID_FILE") setFileError(message);
         else if (body.code === "INVALID_REFERRAL") setReferralError(message);
         else setSubmitError(message);
@@ -388,7 +404,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       clearDraft();
       onDone();
     } catch {
-      setSubmitError("Network error — please check your connection and try again.");
+      setSubmitError(t("networkError"));
     } finally {
       setBusy(false);
     }
@@ -399,40 +415,40 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       <textarea
         rows={2}
         className="input-field resize-none"
-        placeholder="Consultation notes / diagnosis (optional)…"
+        placeholder={t("notesPlaceholder")}
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
       />
 
       <div>
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Prescription</p>
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t("prescription")}</p>
         <div className="space-y-2">
           {medicines.map((m, i) => (
             <div key={i} className="bg-white rounded-lg border border-slate-200 p-2.5 grid grid-cols-2 sm:grid-cols-5 gap-1.5 items-center">
-              <input className="input-field text-xs py-1.5 col-span-2 sm:col-span-1" placeholder="Medicine name" value={m.name} onChange={(e) => setMed(i, "name", e.target.value)} />
-              <input className="input-field text-xs py-1.5" placeholder="Dosage" value={m.dosage} onChange={(e) => setMed(i, "dosage", e.target.value)} />
+              <input className="input-field text-xs py-1.5 col-span-2 sm:col-span-1" placeholder={t("medicineName")} value={m.name} onChange={(e) => setMed(i, "name", e.target.value)} />
+              <input className="input-field text-xs py-1.5" placeholder={t("dosage")} value={m.dosage} onChange={(e) => setMed(i, "dosage", e.target.value)} />
               <div className="space-y-1">
                 <select className="input-field text-xs py-1.5" value={m.frequency} onChange={(e) => setMed(i, "frequency", e.target.value)}>
-                  <option value="">Frequency</option>
-                  {FREQUENCY_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+                  <option value="">{t("frequency")}</option>
+                  {FREQUENCY_OPTIONS.map((o) => <option key={o} value={o}>{FREQUENCY_KEY[o] ? t(`frequencyOption.${FREQUENCY_KEY[o]}`) : o}</option>)}
                 </select>
                 {m.frequency === "Other" && (
-                  <input className="input-field text-xs py-1.5" placeholder="Specify frequency" value={m.frequencyOther} onChange={(e) => setMed(i, "frequencyOther", e.target.value)} />
+                  <input className="input-field text-xs py-1.5" placeholder={t("specifyFrequency")} value={m.frequencyOther} onChange={(e) => setMed(i, "frequencyOther", e.target.value)} />
                 )}
               </div>
               <div className="space-y-1">
                 <select className="input-field text-xs py-1.5" value={m.duration} onChange={(e) => setMed(i, "duration", e.target.value)}>
-                  <option value="">Duration</option>
-                  {DURATION_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+                  <option value="">{t("duration")}</option>
+                  {DURATION_OPTIONS.map((o) => <option key={o} value={o}>{DURATION_KEY[o] ? t(`durationOption.${DURATION_KEY[o]}`) : o}</option>)}
                 </select>
                 {m.duration === "Other" && (
-                  <input className="input-field text-xs py-1.5" placeholder="Specify duration" value={m.durationOther} onChange={(e) => setMed(i, "durationOther", e.target.value)} />
+                  <input className="input-field text-xs py-1.5" placeholder={t("specifyDuration")} value={m.durationOther} onChange={(e) => setMed(i, "durationOther", e.target.value)} />
                 )}
               </div>
               <div className="flex gap-1.5">
-                <input className="input-field text-xs py-1.5 flex-1" placeholder="Instructions" value={m.instructions} onChange={(e) => setMed(i, "instructions", e.target.value)} />
+                <input className="input-field text-xs py-1.5 flex-1" placeholder={t("instructions")} value={m.instructions} onChange={(e) => setMed(i, "instructions", e.target.value)} />
                 {medicines.length > 1 && (
-                  <button type="button" onClick={() => removeRow(i)} className="text-red-400 hover:text-red-600 flex-shrink-0">
+                  <button type="button" onClick={() => removeRow(i)} className="text-red-400 hover:text-red-600 flex-shrink-0" aria-label={t("removeRow")}>
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 )}
@@ -441,29 +457,29 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
           ))}
         </div>
         <button type="button" onClick={addRow} className="mt-2 text-xs text-teal-600 font-semibold flex items-center gap-1 hover:underline">
-          <Plus className="w-3.5 h-3.5" /> Add medicine
+          <Plus className="w-3.5 h-3.5" /> {t("addMedicine")}
         </button>
       </div>
 
       <div>
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Recommended Tests</p>
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t("recommendedTests")}</p>
         <datalist id="test-suggestions">
           {TEST_SUGGESTIONS.map((o) => <option key={o} value={o} />)}
         </datalist>
         <div className="space-y-2">
-          {tests.map((t, i) => (
+          {tests.map((row, i) => (
             <div key={i} className="bg-white rounded-lg border border-slate-200 p-2.5 grid grid-cols-1 sm:grid-cols-3 gap-1.5 items-center">
               <input
                 className="input-field text-xs py-1.5 sm:col-span-1"
-                placeholder="Test name (e.g. CBC, X-Ray Chest)"
+                placeholder={t("testName")}
                 list="test-suggestions"
-                value={t.name}
+                value={row.name}
                 onChange={(e) => setTest(i, "name", e.target.value)}
               />
               <div className="flex gap-1.5 sm:col-span-2">
-                <input className="input-field text-xs py-1.5 flex-1" placeholder="Instructions (e.g. fasting required, optional)" value={t.instructions} onChange={(e) => setTest(i, "instructions", e.target.value)} />
+                <input className="input-field text-xs py-1.5 flex-1" placeholder={t("testInstructions")} value={row.instructions} onChange={(e) => setTest(i, "instructions", e.target.value)} />
                 {tests.length > 1 && (
-                  <button type="button" onClick={() => removeTestRow(i)} className="text-red-400 hover:text-red-600 flex-shrink-0">
+                  <button type="button" onClick={() => removeTestRow(i)} className="text-red-400 hover:text-red-600 flex-shrink-0" aria-label={t("removeRow")}>
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 )}
@@ -472,35 +488,35 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
           ))}
         </div>
         <button type="button" onClick={addTestRow} className="mt-2 text-xs text-teal-600 font-semibold flex items-center gap-1 hover:underline">
-          <Plus className="w-3.5 h-3.5" /> Add test
+          <Plus className="w-3.5 h-3.5" /> {t("addTest")}
         </button>
       </div>
 
       <div className="rounded-xl border border-rose-100 bg-white p-3">
         <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer">
           <input type="checkbox" className="w-4 h-4 accent-rose-500" checked={nurseCare.on} onChange={(e) => { setNurseCare((c) => ({ ...c, on: e.target.checked })); setReferralError(""); }} />
-          <HeartPulse className="w-4 h-4 text-rose-500" /> Patient needs a nurse at home (optional)
+          <HeartPulse className="w-4 h-4 text-rose-500" /> {t("needsNurse")}
         </label>
-        <p className="text-[11px] text-slate-500 mt-1 ml-6">The patient gets a one-tap &ldquo;Book a nurse&rdquo; with this prescription attached &mdash; no upload needed.</p>
+        <p className="text-[11px] text-slate-500 mt-1 ml-6">{t("needsNurseHint")}</p>
         {nurseCare.on && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
             <select className="input-field text-xs py-1.5 sm:col-span-3" value={nurseCare.serviceId} onChange={(e) => { setNurseCare((c) => ({ ...c, serviceId: e.target.value })); setReferralError(""); }}>
-              <option value="">Nurse service…</option>
+              <option value="">{t("nurseService")}</option>
               {nurseServices.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
             {servicesLoad.error && (
               <p className="text-xs text-red-500 sm:col-span-3">
                 {servicesLoad.error}{" "}
-                <button type="button" onClick={servicesLoad.reload} disabled={servicesLoad.reloading} className="font-semibold underline disabled:opacity-60">Retry</button>
+                <button type="button" onClick={servicesLoad.reload} disabled={servicesLoad.reloading} className="font-semibold underline disabled:opacity-60">{tc("retry")}</button>
               </p>
             )}
             <select className="input-field text-xs py-1.5" value={nurseCare.visits} onChange={(e) => setNurseCare((c) => ({ ...c, visits: Number(e.target.value) }))}>
-              {PACKAGE_VISIT_OPTIONS.map((n) => <option key={n} value={n}>{n} visit{n === 1 ? "" : "s"}</option>)}
+              {PACKAGE_VISIT_OPTIONS.map((n) => <option key={n} value={n}>{t("visits", { n })}</option>)}
             </select>
             <select className="input-field text-xs py-1.5" value={nurseCare.intervalDays} disabled={nurseCare.visits === 1} onChange={(e) => setNurseCare((c) => ({ ...c, intervalDays: Number(e.target.value) }))}>
-              {PACKAGE_INTERVAL_OPTIONS.map((n) => <option key={n} value={n}>{intervalLabel(n)}</option>)}
+              {PACKAGE_INTERVAL_OPTIONS.map((n) => <option key={n} value={n}>{t("interval", { n })}</option>)}
             </select>
-            <input className="input-field text-xs py-1.5" placeholder="Instructions for the nurse" value={nurseCare.instructions} onChange={(e) => setNurseCare((c) => ({ ...c, instructions: e.target.value }))} />
+            <input className="input-field text-xs py-1.5" placeholder={t("nurseInstructions")} value={nurseCare.instructions} onChange={(e) => setNurseCare((c) => ({ ...c, instructions: e.target.value }))} />
           </div>
         )}
         {referralError && <p className="text-xs text-red-500 mt-2">{referralError}</p>}
@@ -515,7 +531,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
             className="w-4 h-4 mt-0.5 accent-teal-600 flex-shrink-0"
           />
           <span className="text-xs text-slate-700">
-            I confirm that the medicines and tests listed above are exactly what I am prescribing and recommending to this patient, and I take responsibility for their accuracy.
+            {t("confirmText")}
           </span>
         </label>
       )}
@@ -523,7 +539,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       <div>
         <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer">
           <Paperclip className="w-3.5 h-3.5" />
-          Attach reports/scans (PDF/JPG/PNG, optional, multiple allowed)
+          {t("attach")}
           <input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple className="hidden"
             onChange={(e) => addFiles(e.target.files)} />
         </label>
@@ -532,7 +548,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
             {files.map((f, i) => (
               <li key={i} className="flex items-center justify-between gap-2 bg-white rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs text-slate-600">
                 <span className="truncate">{f.name}</span>
-                <button type="button" onClick={() => removeFile(i)} className="text-slate-400 hover:text-red-500 flex-shrink-0">
+                <button type="button" onClick={() => removeFile(i)} className="text-slate-400 hover:text-red-500 flex-shrink-0" aria-label={t("removeFile")}>
                   <X className="w-3.5 h-3.5" />
                 </button>
               </li>
@@ -543,14 +559,14 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       </div>
       {submitError && <p className="text-xs text-red-500">{submitError}</p>}
       <div className="flex gap-2">
-        <button onClick={() => setConfirmingCancel(true)} className="btn-secondary py-1.5 px-3 text-xs flex-1 justify-center">Cancel</button>
+        <button onClick={() => setConfirmingCancel(true)} className="btn-secondary py-1.5 px-3 text-xs flex-1 justify-center">{t("cancel")}</button>
         <button
           onClick={() => setConfirmingComplete(true)}
           disabled={busy || !hasPrescriptionItems || !confirmed}
-          title={!hasPrescriptionItems ? "Please add at least one medicine or test before completing" : !confirmed ? "Please confirm the medicines and tests above first" : undefined}
+          title={!hasPrescriptionItems ? t("needItems") : !confirmed ? t("needConfirm") : undefined}
           className="btn-primary py-1.5 px-3 text-xs flex-1 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Mark Complete"}
+          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : t("markComplete")}
         </button>
       </div>
 
@@ -559,20 +575,20 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <XCircle className="w-5 h-5 text-red-600" />
-              <h3 className="font-bold text-slate-800">Discard this prescription?</h3>
+              <h3 className="font-bold text-slate-800">{t("discardTitle")}</h3>
             </div>
             <p className="text-sm text-slate-500 mb-5">
-              Any medicines, tests, and notes you&apos;ve entered here will be lost.
+              {t("discardBody")}
             </p>
             <div className="flex gap-3">
               <button onClick={() => setConfirmingCancel(false)} className="btn-secondary flex-1">
-                Keep Editing
+                {t("keepEditing")}
               </button>
               <button
                 onClick={() => { clearDraft(); onCancel(); }}
                 className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
               >
-                Discard
+                {t("discard")}
               </button>
             </div>
           </div>
@@ -584,21 +600,21 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <CheckCircle2 className="w-5 h-5 text-teal-600" />
-              <h3 className="font-bold text-slate-800">Complete this consultation?</h3>
+              <h3 className="font-bold text-slate-800">{t("completeTitle")}</h3>
             </div>
             <p className="text-sm text-slate-500 mb-5">
-              This saves the prescription and closes the appointment. {patientLabel(appt)} will be able to view it right away — this cannot be undone.
+              {t("completeBody", { name: patientLabel(appt) })}
             </p>
             <div className="flex gap-3">
               <button onClick={() => setConfirmingComplete(false)} className="btn-secondary flex-1">
-                Go Back
+                {t("goBack")}
               </button>
               <button
                 onClick={submit}
                 disabled={busy}
                 className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Mark Complete"}
+                {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : t("markComplete")}
               </button>
             </div>
           </div>
@@ -626,6 +642,7 @@ function visitAddressText(v: VisitLocation) {
 
 // The home-visit address line on a request/visit card, tappable for directions.
 function VisitAddressLine({ visit }: { visit: VisitLocation | null }) {
+  const t = useTranslations("doctor.dashboard");
   const url = visitNavUrl(visit);
   if (!visit || !url) return null;
   return (
@@ -636,13 +653,16 @@ function VisitAddressLine({ visit }: { visit: VisitLocation | null }) {
       className="flex items-start gap-1 text-xs text-blue-600 font-semibold mt-1 hover:underline"
     >
       <Navigation className="w-3 h-3 mt-0.5 flex-shrink-0" />
-      <span>{visit.address ? visitAddressText(visit) : "View patient location"}</span>
+      <span>{visit.address ? visitAddressText(visit) : t("viewPatientLocation")}</span>
     </a>
   );
 }
 
 export default function DoctorDashboard() {
   const router = useRouter();
+  const t = useTranslations("doctor.dashboard");
+  const tc = useTranslations("doctor.common");
+  const locale = formattingLocale(useLocale());
   const { user, loading: authLoading } = useAuth();
   const isStaff = user?.role === "STAFF";
   const [doctor, setDoctor] = useState<DoctorMe | null>(null);
@@ -714,7 +734,7 @@ export default function DoctorDashboard() {
   const loadDoctor = useCallback(async () => {
     try {
       const res = await fetch("/api/doctors/me");
-      if (!res.ok) { setBootError(await errorMessage(res, "Couldn't load your profile.")); return; }
+      if (!res.ok) { setBootError(await errorMessage(res, t("profileLoadFailed"))); return; }
       const d: DoctorMe = await res.json();
       setDoctor(d);
       setBootError(null);
@@ -724,9 +744,9 @@ export default function DoctorDashboard() {
         router.push("/doctor/subscribe");
       }
     } catch {
-      setBootError("Network error — check your connection and try again.");
+      setBootError(tc("networkError"));
     }
-  }, [router]);
+  }, [router, t, tc]);
 
   useEffect(() => {
     if (!user || user.role !== "DOCTOR") return;
@@ -745,7 +765,7 @@ export default function DoctorDashboard() {
       // 403/404 = no assignment any more (signed out below, like a revoked
       // one). Anything else is a failed load, not a revocation — retryable.
       if (!res.ok && res.status !== 403 && res.status !== 404) {
-        setBootError(await errorMessage(res, "Couldn't load your account."));
+        setBootError(await errorMessage(res, t("accountLoadFailed")));
         return;
       }
       const d: { active: boolean; doctorName: string } | null = res.ok ? await res.json() : null;
@@ -760,9 +780,9 @@ export default function DoctorDashboard() {
       setStaffActive(true);
       setStaffDoctorName(d.doctorName);
     } catch {
-      setBootError("Network error — check your connection and try again.");
+      setBootError(tc("networkError"));
     }
-  }, [router]);
+  }, [router, t, tc]);
 
   useEffect(() => {
     if (!user || user.role !== "STAFF") return;
@@ -781,7 +801,7 @@ export default function DoctorDashboard() {
   const [removingReferral, setRemovingReferral] = useState<string | null>(null);
   const removeReferral = async (appointmentId: string) => {
     setRemovingReferral(appointmentId);
-    const res = await mutate(`/api/appointments/${appointmentId}/nurse-referral`, { method: "DELETE", fallback: "Could not remove the nurse referral." });
+    const res = await mutate(`/api/appointments/${appointmentId}/nurse-referral`, { method: "DELETE", fallback: t("removeReferralFailed") });
     if (res.ok) {
       void loadAppointments();
     } else {
@@ -823,7 +843,7 @@ export default function DoctorDashboard() {
   const respond = async (id: string, status: "SCHEDULED" | "REJECTED") => {
     setRespondingId(id);
     setRespondError(null);
-    const res = await mutate(`/api/appointments/${id}`, { method: "PATCH", body: { status }, fallback: "Could not update this request." });
+    const res = await mutate(`/api/appointments/${id}`, { method: "PATCH", body: { status }, fallback: t("updateRequestFailed") });
     setRespondingId(null);
     // Shown inline on the request's card.
     if (!res.ok) setRespondError({ id, message: res.error });
@@ -841,7 +861,7 @@ export default function DoctorDashboard() {
   const confirmCancel = async () => {
     if (!cancelTarget) return;
     setCancelling(true);
-    const res = await mutate(`/api/appointments/${cancelTarget.id}`, { method: "PATCH", body: { status: "CANCELLED" }, fallback: "Could not cancel this appointment." });
+    const res = await mutate(`/api/appointments/${cancelTarget.id}`, { method: "PATCH", body: { status: "CANCELLED" }, fallback: t("cancelFailed") });
     setCancelling(false);
     // Failed: the dialog stays open for a retry.
     if (!res.ok) { toast.error(res.error); return; }
@@ -856,13 +876,13 @@ export default function DoctorDashboard() {
       const res = await fetch("/api/appointments/bulk-accept", { method: "POST" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setBulkNotice(data.error ?? "Could not accept the requests.");
+        setBulkNotice(data.error ?? t("bulkAcceptFailed"));
       } else if (data.skipped?.length) {
         // Requests that overlap a slot already confirmed stay pending for a manual decision.
-        setBulkNotice(`Accepted ${data.count}. ${data.skipped.length} left pending because ${data.skipped.length === 1 ? "it overlaps" : "they overlap"} a confirmed appointment.`);
+        setBulkNotice(t("bulkPartial", { count: data.count, skipped: data.skipped.length }));
       }
     } catch {
-      setBulkNotice("Network error — please try again.");
+      setBulkNotice(t("networkErrorRetry"));
     } finally {
       setBulkAccepting(false);
       setConfirmingBulkAccept(false);
@@ -873,7 +893,7 @@ export default function DoctorDashboard() {
   const confirmNoShow = async () => {
     if (!noShowTarget) return;
     setMarkingNoShow(true);
-    const res = await mutate(`/api/appointments/${noShowTarget.id}`, { method: "PATCH", body: { status: "NO_SHOW" }, fallback: "Could not mark this appointment as a no-show." });
+    const res = await mutate(`/api/appointments/${noShowTarget.id}`, { method: "PATCH", body: { status: "NO_SHOW" }, fallback: t("noShowFailed") });
     setMarkingNoShow(false);
     if (!res.ok) { toast.error(res.error); return; }
     setNoShowTarget(null);
@@ -913,19 +933,19 @@ export default function DoctorDashboard() {
       // Unpaid: the patient has been reminded; the doctor decides whether to go.
       if (res?.status === 409 && body.code === "UNPAID_VISIT") {
         const a = appointments.find((x) => x.id === apptId);
-        setUnpaidStart({ id: apptId, patientName: a ? patientLabel(a) : "The patient", amount: body.amount, reminderSent: body.reminderSent, reminderSentAt: body.reminderSentAt });
+        setUnpaidStart({ id: apptId, patientName: a ? patientLabel(a) : t("thePatient"), amount: body.amount, reminderSent: body.reminderSent, reminderSentAt: body.reminderSentAt });
         return;
       }
       // The server refuses outside the start window (src/lib/journeyWindow.ts)
       // — don't start sharing location then.
       if (!res?.ok) {
-        setJourneyError({ id: apptId, message: body.error ?? (res ? "Could not start the journey." : "Network error — check your connection and try again.") });
+        setJourneyError({ id: apptId, message: body.error ?? (res ? t("startJourneyFailed") : tc("networkError")) });
         return;
       }
       setUnpaidStart(null);
       await journey.track(apptId, { justSent: true });
     } catch {
-      setJourneyError({ id: apptId, message: "Location access is needed to share your journey with the patient." });
+      setJourneyError({ id: apptId, message: t("locationNeeded") });
     } finally {
       setStartingJourneyId(null);
       loadAppointments();
@@ -936,7 +956,7 @@ export default function DoctorDashboard() {
   const stopJourney = async (apptId: string) => {
     setJourneyError(null);
     await journey.stop();
-    const res = await sendPosition(apptId, "NOT_STARTED", "Could not stop the journey.");
+    const res = await sendPosition(apptId, "NOT_STARTED", t("stopJourneyFailed"));
     if (!res.ok) setJourneyError({ id: apptId, message: res.error });
     loadAppointments();
   };
@@ -944,7 +964,7 @@ export default function DoctorDashboard() {
   const markArrived = async (apptId: string) => {
     setJourneyError(null);
     await journey.stop();
-    const res = await sendPosition(apptId, "ARRIVED", "Could not mark you as arrived.");
+    const res = await sendPosition(apptId, "ARRIVED", t("arrivedFailed"));
     if (!res.ok) setJourneyError({ id: apptId, message: res.error });
     loadAppointments();
   };
@@ -1029,11 +1049,12 @@ export default function DoctorDashboard() {
   // "in 41576 min" is meaningless for anything beyond a same-day appointment —
   // scale the unit up as the gap grows instead of always showing raw minutes.
   const formatTimeUntil = (mins: number): string => {
-    if (mins < 60) return `${mins} min`;
-    if (mins < 24 * 60) return `${Math.round(mins / 60)} hr`;
-    const days = Math.round(mins / (24 * 60));
-    return `${days} day${days === 1 ? "" : "s"}`;
+    if (mins < 60) return t("inMinutes", { n: mins });
+    if (mins < 24 * 60) return t("inHours", { n: Math.round(mins / 60) });
+    return t("inDays", { n: Math.round(mins / (24 * 60)) });
   };
+  const hourLabel = (h: number) =>
+    new Intl.DateTimeFormat(locale, { hour: "numeric", hour12: true, timeZone: "UTC" }).format(Date.UTC(2026, 0, 1, h));
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -1051,18 +1072,18 @@ export default function DoctorDashboard() {
               {isStaff ? user.name : formatDoctorName(doctor?.name ?? user.name)}
             </h1>
             {isStaff ? (
-              <p className="text-slate-500 text-sm truncate">Front desk · {staffDoctorName ?? "—"}</p>
+              <p className="text-slate-500 text-sm truncate">{t("frontDesk", { doctor: staffDoctorName ?? "—" })}</p>
             ) : (
               <p className="text-slate-500 text-sm truncate">
-                {profile?.specialty ?? "Specialty pending"} · {profile?.qualification ?? "—"} ·{" "}
+                {profile?.specialty ?? t("specialtyPending")} · {profile?.qualification ?? "—"} ·{" "}
                 <span className="text-amber-500 font-semibold inline-flex items-center gap-0.5">
                   <Star className="w-3.5 h-3.5 fill-current" /> {(profile?.avgRating ?? 0).toFixed(1)}
                 </span>
               </p>
             )}
           </div>
-          <Link href="/doctor/walk-in" className="btn-primary ml-auto flex-shrink-0 py-2.5 px-3.5 text-sm" title="Book a walk-in or phone-in patient">
-            <UserPlus className="w-4 h-4" /> <span className="hidden sm:inline">Walk-in</span>
+          <Link href="/doctor/walk-in" className="btn-primary ml-auto flex-shrink-0 py-2.5 px-3.5 text-sm" title={t("walkInTitle")}>
+            <UserPlus className="w-4 h-4" /> <span className="hidden sm:inline">{t("walkIn")}</span>
           </Link>
         </div>
 
@@ -1077,42 +1098,45 @@ export default function DoctorDashboard() {
         <div className="gradient-hero rounded-2xl p-5 mb-6 text-white shadow-lg">
           <div className="flex items-center justify-between mb-2.5">
             <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">
-              Today · {new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Kolkata" })}
+              {t("today", { date: new Date().toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Kolkata" }) })}
             </span>
             <span className="text-[11px] font-bold bg-white/15 rounded-full px-2.5 py-1 flex-shrink-0">
-              {todayUpcoming.length} appointment{todayUpcoming.length === 1 ? "" : "s"} today
+              {t("todayCount", { count: todayUpcoming.length })}
             </span>
           </div>
           {nextAppt ? (
             <>
               <p className="text-[15px] font-bold leading-snug">
-                Next: {patientLabel(nextAppt)} · {isToday(nextAppt.scheduledAt)
-                  ? new Date(nextAppt.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })
-                  : new Date(nextAppt.scheduledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}
+                {t("next", {
+                  name: patientLabel(nextAppt),
+                  time: isToday(nextAppt.scheduledAt)
+                    ? new Date(nextAppt.scheduledAt).toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })
+                    : new Date(nextAppt.scheduledAt).toLocaleString(locale, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" }),
+                })}
               </p>
               <p className="text-[12.5px] text-white/75 mt-0.5">
-                {nextAppt.consultType === "HOME" ? "Home visit" : nextAppt.consultType === "VIDEO" ? "Video consultation" : "Clinic visit"}
-                {minutesTo(nextAppt.scheduledAt) > 0 ? ` · in ${formatTimeUntil(minutesTo(nextAppt.scheduledAt))}` : " · due now"}
+                {tc("typeLong", { type: nextAppt.consultType })}
+                {" · "}{minutesTo(nextAppt.scheduledAt) > 0 ? formatTimeUntil(minutesTo(nextAppt.scheduledAt)) : t("dueNow")}
               </p>
             </>
           ) : (
-            <p className="text-[15px] font-bold">No more appointments scheduled today</p>
+            <p className="text-[15px] font-bold">{t("noMoreToday")}</p>
           )}
           <div className="h-px bg-white/15 my-3.5" />
           <div className={cn("grid gap-2", isStaff ? "grid-cols-1" : "grid-cols-3")}>
             {!isStaff && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Earnings Today</p>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">{t("earningsToday")}</p>
                 <p className="text-[15px] font-extrabold mt-0.5">₹{todayEarnings.toLocaleString("en-IN")}</p>
               </div>
             )}
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Total Consultations</p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">{t("totalConsultations")}</p>
               <p className="text-[15px] font-extrabold mt-0.5">{Math.max(past.counts.COMPLETED ?? 0, completedAll.length)}</p>
             </div>
             {!isStaff && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">Rating</p>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-white/65">{t("rating")}</p>
                 <p className="text-[15px] font-extrabold mt-0.5">{(profile?.avgRating ?? 0).toFixed(1)} / 5</p>
               </div>
             )}
@@ -1128,10 +1152,10 @@ export default function DoctorDashboard() {
               <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
               <div>
                 <p className="font-bold text-amber-900 text-sm">
-                  {overdue.length} past appointment{overdue.length === 1 ? "" : "s"} still open
+                  {t("overdueTitle", { count: overdue.length })}
                 </p>
                 <p className="text-xs text-amber-800 mt-0.5">
-                  Mark each one complete or a no-show so your schedule and earnings stay accurate.
+                  {t("overdueHint")}
                 </p>
               </div>
             </div>
@@ -1144,30 +1168,30 @@ export default function DoctorDashboard() {
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-800 truncate">{patientLabel(a)}</p>
                       <p className="text-xs text-slate-500">
-                        {new Date(a.scheduledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}
-                        {" · "}{a.consultType === "HOME" ? "Home visit" : a.consultType === "VIDEO" ? "Video" : "Clinic"}
-                        {homeNotArrived ? (isStaff ? " · doctor hasn't arrived" : " · mark arrived first") : unpaidOnline ? " · not paid yet" : ""}
+                        {new Date(a.scheduledAt).toLocaleString(locale, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}
+                        {" · "}{tc("typeShort", { type: a.consultType })}
+                        {homeNotArrived ? ` · ${isStaff ? t("doctorNotArrived") : t("markArrivedFirst")}` : unpaidOnline ? ` · ${t("notPaidYet")}` : ""}
                       </p>
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
                       {homeNotArrived ? (
                         <button onClick={() => { setSearch(""); jumpToCard(a.id); }} className="btn-secondary py-1.5 px-3 text-xs">
-                          Open visit
+                          {t("openVisit")}
                         </button>
                       ) : (
                         <>
                           {!isStaff && !unpaidOnline && (
                             <button onClick={() => { setSearch(""); setCompletingId(a.id); jumpToCard(a.id); }} className="btn-primary py-1.5 px-3 text-xs">
-                              <CheckCircle2 className="w-3.5 h-3.5" /> Complete
+                              <CheckCircle2 className="w-3.5 h-3.5" /> {t("complete")}
                             </button>
                           )}
                           {unpaidOnline && (
                             <button onClick={() => setPayQrFor(a)} className="btn-secondary py-1.5 px-3 text-xs text-amber-700 border-amber-200">
-                              <QrCode className="w-3.5 h-3.5" /> Pay QR
+                              <QrCode className="w-3.5 h-3.5" /> {t("payQr")}
                             </button>
                           )}
                           <button onClick={() => setNoShowTarget(a)} className="btn-secondary py-1.5 px-3 text-xs text-amber-700 border-amber-200">
-                            <UserX className="w-3.5 h-3.5" /> No-show
+                            <UserX className="w-3.5 h-3.5" /> {t("noShow")}
                           </button>
                         </>
                       )}
@@ -1177,9 +1201,9 @@ export default function DoctorDashboard() {
               })}
             </ul>
             {overdue.length > 5 && (
-              <p className="text-xs text-amber-800 mt-2">…and {overdue.length - 5} more at the top of Upcoming Appointments.</p>
+              <p className="text-xs text-amber-800 mt-2">{t("overdueMore", { count: overdue.length - 5 })}</p>
             )}
-            {isStaff && <p className="text-xs text-amber-800 mt-2">Only the doctor can mark a visit complete.</p>}
+            {isStaff && <p className="text-xs text-amber-800 mt-2">{t("onlyDoctorCompletes")}</p>}
           </div>
         )}
 
@@ -1195,21 +1219,21 @@ export default function DoctorDashboard() {
           >
             <div className="flex items-center gap-2">
               <CalendarClock className="w-5 h-5 text-indigo-500" />
-              <h2 className="font-bold text-slate-800">Today&apos;s Timeline</h2>
+              <h2 className="font-bold text-slate-800">{t("timeline")}</h2>
             </div>
             <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform", timelineOpen && "rotate-180")} />
           </button>
           {timelineOpen && (
             <div className="p-4">
               {timelineItems.length === 0 ? (
-                <p className="text-sm text-slate-400 text-center py-8">No appointments scheduled today.</p>
+                <p className="text-sm text-slate-400 text-center py-8">{t("noAppointmentsToday")}</p>
               ) : (
                 <div className="overflow-y-auto" style={{ maxHeight: 420 }}>
                   <div className="relative" style={{ height: timelineTotalHeight }}>
                     {timelineHours.map((h) => (
                       <div key={h} className="absolute left-0 right-0 flex items-start" style={{ top: (h - timelineStartHour) * TIMELINE_HOUR_HEIGHT }}>
                         <span className="flex-shrink-0 text-[10px] font-semibold text-slate-400 -translate-y-1/2" style={{ width: TIMELINE_LABEL_WIDTH }}>
-                          {h === 0 ? "12 AM" : h < 12 ? `${h} AM` : h === 12 ? "12 PM" : `${h - 12} PM`}
+                          {hourLabel(h)}
                         </span>
                         <div className="flex-1 border-t border-slate-100" />
                       </div>
@@ -1247,7 +1271,7 @@ export default function DoctorDashboard() {
                             <span className="truncate">{patientLabel(a)}</span>
                           </div>
                           <div className={cn("text-[10px] truncate", isPending ? "text-amber-600" : "text-teal-600")}>
-                            {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}
+                            {new Date(a.scheduledAt).toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}
                           </div>
                         </button>
                       );
@@ -1265,7 +1289,7 @@ export default function DoctorDashboard() {
           <input
             type="text"
             className="input-field pl-10 pr-10"
-            placeholder="Search by patient name…"
+            placeholder={t("searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -1274,6 +1298,7 @@ export default function DoctorDashboard() {
               type="button"
               onClick={() => setSearch("")}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              aria-label={t("clearSearch")}
             >
               <X className="w-4 h-4" />
             </button>
@@ -1285,12 +1310,12 @@ export default function DoctorDashboard() {
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center gap-2">
               <Inbox className="w-5 h-5 text-amber-500" />
-              <h2 className="font-bold text-slate-800">Pending Requests</h2>
-              {pending.length > 0 && <span className="badge badge-warning">{pending.length} new</span>}
+              <h2 className="font-bold text-slate-800">{t("pendingRequests")}</h2>
+              {pending.length > 0 && <span className="badge badge-warning">{t("newCount", { count: pending.length })}</span>}
             </div>
             {pending.length > 1 && (
               <button onClick={() => setConfirmingBulkAccept(true)} className="btn-secondary py-1.5 px-3 text-xs gap-1">
-                <ThumbsUp className="w-3.5 h-3.5" /> Accept All ({pending.length})
+                <ThumbsUp className="w-3.5 h-3.5" /> {t("acceptAllCount", { count: pending.length })}
               </button>
             )}
           </div>
@@ -1301,7 +1326,7 @@ export default function DoctorDashboard() {
             ) : loadingAppts ? (
               <div className="p-6 space-y-3">{[...Array(2)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
             ) : pending.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-10">{search ? "No pending requests match your search." : "No pending requests."}</p>
+              <p className="text-sm text-slate-400 text-center py-10">{search ? t("noPendingMatch") : t("noPending")}</p>
             ) : (
               pending.map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
@@ -1319,18 +1344,18 @@ export default function DoctorDashboard() {
                         <div className="font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
                           {patientLabel(a)}
                           {a.relation !== "Self" && (
-                            <span className="badge badge-gray text-[10px]">{a.relation} of {a.patient.name}</span>
+                            <span className="badge badge-gray text-[10px]">{tc("relationOf", { relation: a.relation, name: a.patient.name })}</span>
                           )}
                         </div>
                         <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
                           <Clock className="w-3 h-3" />
-                          {new Date(a.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })} · {a.consultType}
+                          {new Date(a.scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })} · {tc("typeShort", { type: a.consultType })}
                         </div>
                         <div className="text-sm text-slate-600 mt-0.5">{a.symptoms}</div>
                         <VitalsChip a={a} />
                         {a.allergies && (
                           <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
-                            <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}
+                            <AlertTriangle className="w-3 h-3 flex-shrink-0" /> {t("allergies", { list: a.allergies })}
                           </div>
                         )}
                         <VisitAddressLine visit={a.visit} />
@@ -1341,10 +1366,10 @@ export default function DoctorDashboard() {
                     </div>
                     <div className="flex gap-2.5 mt-3">
                       <button onClick={() => setRejectTarget(a)} disabled={respondingId === a.id} className="btn-secondary flex-1 justify-center text-red-500 border-red-200 hover:bg-red-50">
-                        <ThumbsDown className="w-4 h-4" /> Reject
+                        <ThumbsDown className="w-4 h-4" /> {t("reject")}
                       </button>
                       <button onClick={() => setAcceptTarget(a)} disabled={respondingId === a.id} className="btn-primary flex-[1.4] justify-center">
-                        {respondingId === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <ThumbsUp className="w-4 h-4" />} Accept
+                        {respondingId === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <ThumbsUp className="w-4 h-4" />} {t("accept")}
                       </button>
                     </div>
                   </div>
@@ -1358,18 +1383,18 @@ export default function DoctorDashboard() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
             <CalendarCheck className="w-5 h-5 text-teal-500" />
-            <h2 className="font-bold text-slate-800">Upcoming Appointments</h2>
+            <h2 className="font-bold text-slate-800">{t("upcomingAppointments")}</h2>
           </div>
           <div className="divide-y divide-slate-50">
             {loadingAppts && apptsError ? (
               // The Retry card is in Pending Requests above.
-              <p className="text-sm text-slate-400 text-center py-10">Couldn&apos;t load appointments.</p>
+              <p className="text-sm text-slate-400 text-center py-10">{t("couldntLoad")}</p>
             ) : loadingAppts ? (
               <div className="p-6 space-y-3">
                 {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}
               </div>
             ) : upcoming.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-10">{search ? "No upcoming appointments match your search." : "No upcoming appointments."}</p>
+              <p className="text-sm text-slate-400 text-center py-10">{search ? t("noUpcomingMatch") : t("noUpcoming")}</p>
             ) : (
               (upcomingExpanded ? upcoming : upcoming.slice(0, PAGE_SIZE)).map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
@@ -1389,15 +1414,15 @@ export default function DoctorDashboard() {
                     <div className="flex gap-3">
                       <div className="w-11 flex-shrink-0 pt-0.5 text-right">
                         <div className="text-[13px] font-bold text-slate-700 leading-tight">
-                          {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).replace(/\s?[AP]M$/i, "")}
+                          {new Date(a.scheduledAt).toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).replace(/\s?[AP]M$/i, "")}
                         </div>
                         <div className="text-[10px] font-semibold text-slate-400 leading-tight">
-                          {new Date(a.scheduledAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).match(/[AP]M$/i)?.[0]}
+                          {new Date(a.scheduledAt).toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).match(/[AP]M$/i)?.[0]}
                         </div>
                         {/* Any other day needs its date — the list now spans past and future. */}
                         {!isToday(a.scheduledAt) && (
                           <div className="text-[10px] font-semibold text-slate-500 leading-tight mt-0.5">
-                            {new Date(a.scheduledAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" })}
+                            {new Date(a.scheduledAt).toLocaleDateString(locale, { day: "numeric", month: "short", timeZone: "Asia/Kolkata" })}
                           </div>
                         )}
                       </div>
@@ -1410,48 +1435,48 @@ export default function DoctorDashboard() {
                             <div className="font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
                               {patientLabel(a)}
                               {a.relation !== "Self" && (
-                                <span className="badge badge-gray text-[10px]">{a.relation} of {a.patient.name}</span>
+                                <span className="badge badge-gray text-[10px]">{tc("relationOf", { relation: a.relation, name: a.patient.name })}</span>
                               )}
                             </div>
-                            <div className="text-xs text-slate-400 mt-0.5">{a.consultType === "HOME" ? "Home visit" : a.consultType === "VIDEO" ? "Video consultation" : "Clinic visit"}</div>
+                            <div className="text-xs text-slate-400 mt-0.5">{tc("typeLong", { type: a.consultType })}</div>
                             <div className="text-sm text-slate-600 mt-0.5">{a.symptoms}</div>
                             <VitalsChip a={a} />
                             {a.allergies && (
                               <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
-                                <AlertTriangle className="w-3 h-3 flex-shrink-0" /> Allergies: {a.allergies}
+                                <AlertTriangle className="w-3 h-3 flex-shrink-0" /> {t("allergies", { list: a.allergies })}
                               </div>
                             )}
                             <VisitAddressLine visit={a.visit} />
                             <div className={`text-xs mt-1 flex items-center gap-1 flex-wrap ${paymentBlocked ? "text-amber-600 font-semibold" : "text-slate-400"}`}>
                               <IndianRupee className="w-3 h-3" /> {a.amount} · {
                                 a.paymentMethod === "ONLINE"
-                                  ? (a.paymentStatus === "PAID" ? "Paid Online" : "Payment Pending")
-                                  : a.paymentStatus === "PAID" ? "Paid in Cash" : "Cash Payment"
+                                  ? (a.paymentStatus === "PAID" ? t("paidOnline") : t("paymentPending"))
+                                  : a.paymentStatus === "PAID" ? t("paidCash") : t("cashPayment")
                               }
-                              {a.bookedById && <span className="badge badge-gray text-[10px] ml-1">Walk-in</span>}
+                              {a.bookedById && <span className="badge badge-gray text-[10px] ml-1">{t("walkInBadge")}</span>}
                               {paymentBlocked && a.status === "SCHEDULED" && (
                                 <button
                                   type="button"
                                   onClick={() => setPayQrFor(a)}
                                   className="ml-1 inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-bold text-amber-700 hover:bg-amber-100"
                                 >
-                                  <QrCode className="w-3 h-3" /> Pay QR
+                                  <QrCode className="w-3 h-3" /> {t("payQr")}
                                 </button>
                               )}
                             </div>
                             {a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
                               <div className="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold mt-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Sharing live location with patient
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> {t("sharingLocation")}
                               </div>
                             )}
                             {a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
                               <div className="inline-flex items-center gap-1 text-xs text-slate-500 font-semibold mt-1">
-                                <MapPinCheck className="w-3 h-3" /> Marked arrived
+                                <MapPinCheck className="w-3 h-3" /> {t("markedArrived")}
                               </div>
                             )}
                             {isOverdue(a, now) && (
                               <div className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-0.5 font-semibold mt-1 ml-1">
-                                <AlertTriangle className="w-3 h-3" /> Past — mark complete or no-show
+                                <AlertTriangle className="w-3 h-3" /> {t("pastOverdue")}
                               </div>
                             )}
                           </div>
@@ -1469,7 +1494,7 @@ export default function DoctorDashboard() {
                           {isStaff && a.consultType === "HOME" && (
                             <span className="flex-1 h-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm font-semibold flex items-center justify-center gap-1.5">
                               <Car className="w-4 h-4" />
-                              {a.travelStatus === "ARRIVED" ? "Doctor has arrived" : a.travelStatus === "ON_THE_WAY" ? "Doctor is on the way" : "Doctor hasn't left yet"}
+                              {a.travelStatus === "ARRIVED" ? t("doctorArrived") : a.travelStatus === "ON_THE_WAY" ? t("doctorOnWay") : t("doctorNotLeft")}
                             </span>
                           )}
                           {!isStaff && a.consultType === "HOME" && a.travelStatus === "NOT_STARTED" && (
@@ -1480,43 +1505,43 @@ export default function DoctorDashboard() {
                               disabled={startingJourneyId === a.id}
                               className={cn("btn-secondary flex-1 h-11 justify-center", paymentBlocked ? "text-red-700 border-red-200 hover:bg-red-50" : "text-blue-600 border-blue-200 hover:bg-blue-50")}
                             >
-                              {startingJourneyId === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Car className="w-4 h-4" />} Start Journey
+                              {startingJourneyId === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Car className="w-4 h-4" />} {t("startJourney")}
                             </button>
                           )}
                           {!isStaff && a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
                             <button onClick={() => markArrived(a.id)} className="btn-secondary flex-1 h-11 justify-center text-emerald-600 border-emerald-200 hover:bg-emerald-50">
-                              <MapPinCheck className="w-4 h-4" /> Mark Arrived
+                              <MapPinCheck className="w-4 h-4" /> {t("markArrived")}
                             </button>
                           )}
                           {!isStaff && a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
-                            <button onClick={() => setJourneyConfirm({ appt: a, action: "stop" })} className="btn-secondary h-11 px-3 justify-center text-slate-500 text-xs" title="Stop sharing your journey">
-                              Stop
+                            <button onClick={() => setJourneyConfirm({ appt: a, action: "stop" })} className="btn-secondary h-11 px-3 justify-center text-slate-500 text-xs" title={t("stopTitle")}>
+                              {t("stop")}
                             </button>
                           )}
                           {!isStaff && a.consultType === "VIDEO" && a.paymentStatus === "PAID" && (
                             unlockSec > 0 ? (
                               <span className="flex-1 h-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm font-semibold flex items-center justify-center gap-1.5 opacity-70">
-                                <Loader2 className="w-4 h-4 animate-spin" /> Unlocking in {unlockSec}s
+                                <Loader2 className="w-4 h-4 animate-spin" /> {t("unlockingIn", { seconds: unlockSec })}
                               </span>
                             ) : (
                               <Link href={`/doctor/video/${a.id}`} className="btn-primary flex-1 h-11 justify-center">
-                                <Video className="w-4 h-4" /> Join Video Consultation
+                                <Video className="w-4 h-4" /> {t("joinVideo")}
                               </Link>
                             )
                           )}
                           {readyToComplete && !isStaff && (
                             paymentBlocked ? (
-                              <span className="flex-1 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm font-semibold flex items-center justify-center gap-1.5" title="Waiting for the patient to pay before this can be marked complete">
-                                <Clock className="w-4 h-4" /> Awaiting Payment
+                              <span className="flex-1 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm font-semibold flex items-center justify-center gap-1.5" title={t("awaitingPaymentTitle")}>
+                                <Clock className="w-4 h-4" /> {t("awaitingPayment")}
                               </span>
                             ) : (
                               <button onClick={() => setCompletingId(completingId === a.id ? null : a.id)} className="btn-primary flex-1 h-11 justify-center">
-                                <FileText className="w-4 h-4" /> Start Prescription
+                                <FileText className="w-4 h-4" /> {t("startPrescription")}
                               </button>
                             )
                           )}
 
-                          <Link href={`/doctor/chat/${a.id}`} className="relative w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center flex-shrink-0 hover:bg-slate-50 transition-colors" title="Chat with patient">
+                          <Link href={`/doctor/chat/${a.id}`} className="relative w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center flex-shrink-0 hover:bg-slate-50 transition-colors" title={t("chatWithPatient")}>
                             <MessageCircle className="w-4 h-4 text-slate-500" />
                             {a.unreadMessageCount > 0 && (
                               <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
@@ -1533,7 +1558,7 @@ export default function DoctorDashboard() {
                                 setOpenMenu({ id: a.id, top: rect.bottom + 8, right: window.innerWidth - rect.right });
                               }}
                               className="w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors"
-                              title="More actions"
+                              title={t("moreActions")}
                             >
                               <MoreHorizontal className="w-4 h-4 text-slate-500" />
                             </button>
@@ -1546,7 +1571,7 @@ export default function DoctorDashboard() {
                                 >
                                   {!isStaff && (
                                     <Link href={historyHref(a)} onClick={() => setOpenMenu(null)} className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                                      <History className="w-4 h-4 text-slate-400" /> Patient history
+                                      <History className="w-4 h-4 text-slate-400" /> {t("patientHistory")}
                                     </Link>
                                   )}
                                   {visitUrl && !isStaff && (
@@ -1557,7 +1582,7 @@ export default function DoctorDashboard() {
                                       onClick={() => setOpenMenu(null)}
                                       className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                                     >
-                                      <Navigation className="w-4 h-4 text-slate-400" /> Navigate to patient
+                                      <Navigation className="w-4 h-4 text-slate-400" /> {t("navigateToPatient")}
                                     </a>
                                   )}
                                   {canMarkNoShow(a, now) && (
@@ -1565,14 +1590,14 @@ export default function DoctorDashboard() {
                                       onClick={() => { setOpenMenu(null); setNoShowTarget(a); }}
                                       className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-amber-600 hover:bg-amber-50 text-left"
                                     >
-                                      <UserX className="w-4 h-4" /> Mark as no-show
+                                      <UserX className="w-4 h-4" /> {t("markNoShow")}
                                     </button>
                                   )}
                                   <button
                                     onClick={() => { setOpenMenu(null); setCancelTarget(a); }}
                                     className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 text-left"
                                   >
-                                    <XCircle className="w-4 h-4" /> Cancel appointment
+                                    <XCircle className="w-4 h-4" /> {t("cancelAppointment")}
                                   </button>
                                 </div>
                               </>,
@@ -1597,7 +1622,7 @@ export default function DoctorDashboard() {
           </div>
           {!upcomingExpanded && upcoming.length > PAGE_SIZE && (
             <button onClick={() => setUpcomingExpanded(true)} className="w-full py-3 text-xs font-semibold text-teal-600 hover:bg-teal-50 border-t border-slate-100 transition-colors">
-              Load {upcoming.length - PAGE_SIZE} more
+              {t("loadMore", { count: upcoming.length - PAGE_SIZE })}
             </button>
           )}
         </div>
@@ -1607,7 +1632,7 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-              <h2 className="font-bold text-slate-800">Recent Completed Consultations</h2>
+              <h2 className="font-bold text-slate-800">{t("recentCompleted")}</h2>
             </div>
             <div className="divide-y divide-slate-50">
               {(completedExpanded ? completed : completed.slice(0, PAGE_SIZE)).map((a) => (
@@ -1621,21 +1646,21 @@ export default function DoctorDashboard() {
                       </Link>
                     )}
                     {a.relation !== "Self" && (
-                      <span className="badge badge-gray text-[10px] ml-1.5">{a.relation} of {a.patient.name}</span>
+                      <span className="badge badge-gray text-[10px] ml-1.5">{tc("relationOf", { relation: a.relation, name: a.patient.name })}</span>
                     )}
                     <div className="text-xs text-slate-400">
-                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {a.consultType}
+                      {new Date(a.scheduledAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {tc("typeShort", { type: a.consultType })}
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     {!isStaff && <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>}
                     {!isStaff && (
-                      <button type="button" onClick={() => setRxFor({ id: a.id, patientId: a.patientId })} className="w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title="Prescription — view, download, send on WhatsApp" aria-label="Prescription">
+                      <button type="button" onClick={() => setRxFor({ id: a.id, patientId: a.patientId })} className="w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("prescriptionTitle")} aria-label={t("prescription")}>
                         <FileText className="w-4 h-4 text-teal-600" />
                       </button>
                     )}
                     {/* Readable after completion; open for follow-up questions for a few days. */}
-                    <Link href={`/doctor/chat/${a.id}`} className="relative w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title="Chat with patient">
+                    <Link href={`/doctor/chat/${a.id}`} className="relative w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("chatWithPatient")}>
                       <MessageCircle className="w-4 h-4 text-slate-500" />
                       {a.unreadMessageCount > 0 && (
                         <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
@@ -1649,7 +1674,7 @@ export default function DoctorDashboard() {
             </div>
             {!completedExpanded && completed.length > PAGE_SIZE && (
               <button onClick={() => setCompletedExpanded(true)} className="w-full py-3 text-xs font-semibold text-teal-600 hover:bg-teal-50 border-t border-slate-100 transition-colors">
-                Load {completed.length - PAGE_SIZE} more
+                {t("loadMore", { count: completed.length - PAGE_SIZE })}
               </button>
             )}
           </div>
@@ -1660,7 +1685,7 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
               <XCircle className="w-5 h-5 text-red-400" />
-              <h2 className="font-bold text-slate-800">Cancelled Appointments</h2>
+              <h2 className="font-bold text-slate-800">{t("cancelledAppointments")}</h2>
             </div>
             <div className="divide-y divide-slate-50">
               {(cancelledExpanded ? cancelled : cancelled.slice(0, PAGE_SIZE)).map((a) => (
@@ -1668,14 +1693,14 @@ export default function DoctorDashboard() {
                   <div>
                     <span className="font-semibold text-slate-500 text-sm">{patientLabel(a)}</span>
                     {a.relation !== "Self" && (
-                      <span className="badge badge-gray text-[10px] ml-1.5">{a.relation} of {a.patient.name}</span>
+                      <span className="badge badge-gray text-[10px] ml-1.5">{tc("relationOf", { relation: a.relation, name: a.patient.name })}</span>
                     )}
                     <div className="text-xs text-slate-400">
-                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {a.consultType}
+                      {new Date(a.scheduledAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {tc("typeShort", { type: a.consultType })}
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1.5">
-                    <span className="badge badge-danger">Cancelled</span>
+                    <span className="badge badge-danger">{t("cancelledBadge")}</span>
                     {/* A referral on a cancelled consultation is void (src/lib/nurseReferral.ts) — let the doctor clear it. */}
                     {a.referralGiven && !isStaff && (
                       <button
@@ -1683,9 +1708,9 @@ export default function DoctorDashboard() {
                         onClick={() => removeReferral(a.id)}
                         disabled={removingReferral === a.id}
                         className="text-[11px] font-semibold text-red-500 hover:underline disabled:opacity-50"
-                        title={`Nurse referral for ${a.referralGiven.service.name} — no longer valid`}
+                        title={t("referralInvalid", { service: a.referralGiven.service.name })}
                       >
-                        {removingReferral === a.id ? "Removing…" : `Remove nurse referral (${a.referralGiven.service.name})`}
+                        {removingReferral === a.id ? t("removing") : t("removeReferral", { service: a.referralGiven.service.name })}
                       </button>
                     )}
                   </div>
@@ -1694,7 +1719,7 @@ export default function DoctorDashboard() {
             </div>
             {!cancelledExpanded && cancelled.length > PAGE_SIZE && (
               <button onClick={() => setCancelledExpanded(true)} className="w-full py-3 text-xs font-semibold text-teal-600 hover:bg-teal-50 border-t border-slate-100 transition-colors">
-                Load {cancelled.length - PAGE_SIZE} more
+                {t("loadMore", { count: cancelled.length - PAGE_SIZE })}
               </button>
             )}
           </div>
@@ -1705,7 +1730,7 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
               <UserX className="w-5 h-5 text-amber-500" />
-              <h2 className="font-bold text-slate-800">Patient No-Shows</h2>
+              <h2 className="font-bold text-slate-800">{t("patientNoShows")}</h2>
             </div>
             <div className="divide-y divide-slate-50">
               {(noShowExpanded ? noShow : noShow.slice(0, PAGE_SIZE)).map((a) => (
@@ -1713,19 +1738,19 @@ export default function DoctorDashboard() {
                   <div>
                     <span className="font-semibold text-slate-500 text-sm">{patientLabel(a)}</span>
                     {a.relation !== "Self" && (
-                      <span className="badge badge-gray text-[10px] ml-1.5">{a.relation} of {a.patient.name}</span>
+                      <span className="badge badge-gray text-[10px] ml-1.5">{tc("relationOf", { relation: a.relation, name: a.patient.name })}</span>
                     )}
                     <div className="text-xs text-slate-400">
-                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {a.consultType}
+                      {new Date(a.scheduledAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {tc("typeShort", { type: a.consultType })}
                     </div>
                   </div>
-                  <span className="badge badge-warning">No-Show</span>
+                  <span className="badge badge-warning">{t("noShowBadge")}</span>
                 </div>
               ))}
             </div>
             {!noShowExpanded && noShow.length > PAGE_SIZE && (
               <button onClick={() => setNoShowExpanded(true)} className="w-full py-3 text-xs font-semibold text-teal-600 hover:bg-teal-50 border-t border-slate-100 transition-colors">
-                Load {noShow.length - PAGE_SIZE} more
+                {t("loadMore", { count: noShow.length - PAGE_SIZE })}
               </button>
             )}
           </div>
@@ -1741,7 +1766,7 @@ export default function DoctorDashboard() {
             disabled={past.loadingMore}
             className="btn-secondary w-full py-2.5 text-sm mb-6"
           >
-            {past.loadingMore ? <Loader2 className="w-4 h-4 animate-spin" /> : "Load older history"}
+            {past.loadingMore ? <Loader2 className="w-4 h-4 animate-spin" /> : t("loadOlder")}
           </button>
         )}
       </PullToRefresh>
@@ -1752,23 +1777,23 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <XCircle className="w-5 h-5 text-red-600" />
-              <h3 className="font-bold text-slate-800">Cancel this appointment?</h3>
+              <h3 className="font-bold text-slate-800">{t("cancelDialog.title")}</h3>
             </div>
             <p className={cn("text-sm text-slate-500", isLateCancellation(cancelTarget) ? "mb-3" : "mb-5")}>
-              {patientLabel(cancelTarget)}&apos;s appointment on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })} will be cancelled. This cannot be undone.
+              {t("cancelDialog.body", { name: patientLabel(cancelTarget), when: new Date(cancelTarget.scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) })}
             </p>
             {isLateCancellation(cancelTarget) && (
               <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-5 flex items-start gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-                <span>You accepted this appointment more than 10 minutes ago. Cancelling this late may lead to a penalty on your account in the future.</span>
+                <span>{t("cancelDialog.late")}</span>
               </div>
             )}
             <div className="flex gap-3">
               <button onClick={() => setCancelTarget(null)} className="btn-secondary flex-1">
-                Keep Appointment
+                {t("cancelDialog.keep")}
               </button>
               <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                {cancelling ? "Cancelling…" : "Cancel Appointment"}
+                {cancelling ? t("cancelDialog.busy") : t("cancelDialog.confirm")}
               </button>
             </div>
           </div>
@@ -1786,9 +1811,9 @@ export default function DoctorDashboard() {
             <div className="flex items-start justify-between gap-3 mb-4">
               <div className="min-w-0">
                 <p className="font-bold text-slate-900 truncate">{patientLabel(payQrFor)}</p>
-                <p className="text-xs text-slate-500">Pay on their phone — no sign-in needed</p>
+                <p className="text-xs text-slate-500">{t("payQrDialog.subtitle")}</p>
               </div>
-              <button type="button" onClick={() => setPayQrFor(null)} className="text-slate-400 hover:text-slate-700" aria-label="Close"><X className="w-5 h-5" /></button>
+              <button type="button" onClick={() => setPayQrFor(null)} className="text-slate-400 hover:text-slate-700" aria-label={tc("close")}><X className="w-5 h-5" /></button>
             </div>
             <PaymentQrPanel
               appointmentId={payQrFor.id}
@@ -1808,17 +1833,17 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <UserX className="w-5 h-5 text-amber-600" />
-              <h3 className="font-bold text-slate-800">Mark as no-show?</h3>
+              <h3 className="font-bold text-slate-800">{t("noShowDialog.title")}</h3>
             </div>
             <p className="text-sm text-slate-500 mb-5">
-              This means {patientLabel(noShowTarget)} didn&apos;t show up for their appointment on {new Date(noShowTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}. Unlike cancelling, this won&apos;t count against your cancellation record and no refund is issued — this cannot be undone.
+              {t("noShowDialog.body", { name: patientLabel(noShowTarget), when: new Date(noShowTarget.scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) })}
             </p>
             <div className="flex gap-3">
               <button onClick={() => setNoShowTarget(null)} className="btn-secondary flex-1">
-                Go Back
+                {t("goBack")}
               </button>
               <button onClick={confirmNoShow} disabled={markingNoShow} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                {markingNoShow ? "Marking…" : "Mark No-Show"}
+                {markingNoShow ? t("noShowDialog.busy") : t("noShowDialog.confirm")}
               </button>
             </div>
           </div>
@@ -1830,12 +1855,10 @@ export default function DoctorDashboard() {
         <ConfirmDialog
           icon={Car}
           tone={journeyConfirm.action === "start" ? "primary" : "warning"}
-          title={journeyConfirm.action === "start" ? `Start your journey to ${patientLabel(journeyConfirm.appt)}?` : "Stop the journey?"}
-          message={journeyConfirm.action === "start"
-            ? "The patient will be told you're on the way and can follow your live location until you arrive."
-            : "Your live location stops being shared and the patient is told you're not on the way right now. You can start again later."}
-          confirmLabel={journeyConfirm.action === "start" ? "Start Journey" : "Stop Journey"}
-          busyLabel={journeyConfirm.action === "start" ? "Starting…" : "Stopping…"}
+          title={journeyConfirm.action === "start" ? t("journeyDialog.startTitle", { name: patientLabel(journeyConfirm.appt) }) : t("journeyDialog.stopTitle")}
+          message={journeyConfirm.action === "start" ? t("journeyDialog.startMessage") : t("journeyDialog.stopMessage")}
+          confirmLabel={journeyConfirm.action === "start" ? t("journeyDialog.startLabel") : t("journeyDialog.stopLabel")}
+          busyLabel={journeyConfirm.action === "start" ? t("journeyDialog.starting") : t("journeyDialog.stopping")}
           busy={startingJourneyId === journeyConfirm.appt.id}
           onCancel={() => setJourneyConfirm(null)}
           onConfirm={async () => {
@@ -1860,10 +1883,10 @@ export default function DoctorDashboard() {
       {confirmingBulkAccept && (
         <ConfirmDialog
           icon={ThumbsUp}
-          title={`Accept all ${pending.length} pending requests?`}
-          message="Every patient will be confirmed and notified immediately. If you need to back out of any of them later, cancelling may carry a late-cancellation penalty."
-          confirmLabel="Accept All"
-          busyLabel="Accepting…"
+          title={t("bulkDialog.title", { count: pending.length })}
+          message={t("bulkDialog.message")}
+          confirmLabel={t("bulkDialog.confirm")}
+          busyLabel={t("bulkDialog.busy")}
           tone="success"
           busy={bulkAccepting}
           onCancel={() => setConfirmingBulkAccept(false)}
@@ -1875,10 +1898,10 @@ export default function DoctorDashboard() {
       {acceptTarget && (
         <ConfirmDialog
           icon={ThumbsUp}
-          title={`Accept ${patientLabel(acceptTarget)}'s request?`}
-          message={`This confirms your ${acceptTarget.consultType.toLowerCase()} consultation with them. They'll be notified immediately. If you need to back out later, cancelling may carry a late-cancellation penalty.`}
-          confirmLabel="Accept"
-          busyLabel="Accepting…"
+          title={t("acceptDialog.title", { name: patientLabel(acceptTarget) })}
+          message={t("acceptDialog.message", { type: acceptTarget.consultType })}
+          confirmLabel={t("acceptDialog.confirm")}
+          busyLabel={t("acceptDialog.busy")}
           tone="success"
           busy={respondingId === acceptTarget.id}
           onCancel={() => setAcceptTarget(null)}
@@ -1896,17 +1919,17 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <ThumbsDown className="w-5 h-5 text-red-600" />
-              <h3 className="font-bold text-slate-800">Reject this request?</h3>
+              <h3 className="font-bold text-slate-800">{t("rejectDialog.title")}</h3>
             </div>
             <p className="text-sm text-slate-500 mb-5">
-              {patientLabel(rejectTarget)}&apos;s request will be declined. They&apos;ll need to book again with another doctor. This cannot be undone.
+              {t("rejectDialog.body", { name: patientLabel(rejectTarget) })}
             </p>
             <div className="flex gap-3">
               <button onClick={() => setRejectTarget(null)} className="btn-secondary flex-1">
-                Keep Request
+                {t("rejectDialog.keep")}
               </button>
               <button onClick={confirmReject} disabled={rejecting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                {rejecting ? "Rejecting…" : "Reject Request"}
+                {rejecting ? t("rejectDialog.busy") : t("rejectDialog.confirm")}
               </button>
             </div>
           </div>

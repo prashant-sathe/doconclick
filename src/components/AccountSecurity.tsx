@@ -3,18 +3,20 @@ import { useState } from "react";
 import Link from "next/link";
 import { LogOut, Loader2, ShieldCheck, Trash2, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import { useTranslations } from "next-intl";
 
 // Shown on the Change Password screens in place of the form for Google-only
 // accounts: there's no current password to confirm, so setting one goes
 // through the forgot-password flow's Google re-verification instead.
 export function SetPasswordViaGoogle() {
+  const t = useTranslations("shared.security");
   return (
     <div className="flex items-start gap-2.5 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600">
       <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5 text-slate-400" />
       <p>
-        You sign in with Google, so this account has no password yet.{" "}
+        {t("googleNoPassword")}{" "}
         <Link href="/forgot-password" className="font-semibold text-blue-600 hover:underline">
-          Verify with Google to set one →
+          {t("verifyToSet")}
         </Link>
       </p>
     </div>
@@ -24,6 +26,7 @@ export function SetPasswordViaGoogle() {
 // Revokes every session for this account, this device included. Unstyled
 // container — the caller places it in its own card or section.
 export function LogoutAllDevices() {
+  const t = useTranslations("shared.security");
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -34,7 +37,7 @@ export function LogoutAllDevices() {
     const res = await fetch("/api/auth/logout-all", { method: "POST" });
     if (!res.ok) {
       setBusy(false);
-      setError((await res.json().catch(() => ({}))).error ?? "Could not sign out other devices.");
+      setError((await res.json().catch(() => ({}))).error ?? t("logoutAllFailed"));
       return;
     }
     // A full navigation, so no in-memory auth state survives.
@@ -43,24 +46,24 @@ export function LogoutAllDevices() {
 
   return (
     <div>
-      <p className="font-bold text-slate-800 text-sm">Log out of all devices</p>
+      <p className="font-bold text-slate-800 text-sm">{t("logoutAllTitle")}</p>
       <p className="text-xs text-slate-500 mt-1">
-        Signs this account out everywhere — phones, tablets and browsers, including this one. Use it if you lost a device or think someone else is signed in.
+        {t("logoutAllBody")}
       </p>
       {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
       {confirming ? (
         <div className="flex gap-2 mt-3">
           <button type="button" onClick={() => setConfirming(false)} disabled={busy} className="btn-secondary py-2 px-3 text-xs">
-            Cancel
+            {t("cancel")}
           </button>
           <button type="button" onClick={run} disabled={busy} className="btn-danger py-2 px-3 text-xs">
             {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LogOut className="w-3.5 h-3.5" />}
-            Yes, log out everywhere
+            {t("logoutAllConfirm")}
           </button>
         </div>
       ) : (
         <button type="button" onClick={() => setConfirming(true)} className="tap-44-y btn-secondary py-2 px-3 text-xs mt-3">
-          <LogOut className="w-3.5 h-3.5" /> Log out of all devices
+          <LogOut className="w-3.5 h-3.5" /> {t("logoutAllTitle")}
         </button>
       )}
     </div>
@@ -82,6 +85,7 @@ const CONFIRM_WORD = "DELETE";
 // container, like LogoutAllDevices.
 export function DeleteAccount() {
   const { user } = useAuth();
+  const t = useTranslations("shared.security");
   const [preview, setPreview] = useState<DeletionPreview | null>(null);
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
@@ -90,7 +94,7 @@ export function DeleteAccount() {
   const [error, setError] = useState("");
 
   const isPatient = user?.role === "PATIENT";
-  const otherParty = isPatient ? "doctor or nurse" : "patient";
+  const otherParty = isPatient ? "provider" : "patient";
 
   const open = async () => {
     setLoading(true);
@@ -98,7 +102,7 @@ export function DeleteAccount() {
     const res = await fetch("/api/auth/account", { cache: "no-store" });
     setLoading(false);
     if (!res.ok) {
-      setError((await res.json().catch(() => ({}))).error ?? "Could not load your account details.");
+      setError((await res.json().catch(() => ({}))).error ?? t("loadFailed"));
       return;
     }
     setPreview(await res.json());
@@ -121,7 +125,7 @@ export function DeleteAccount() {
     });
     if (!res.ok) {
       setBusy(false);
-      setError((await res.json().catch(() => ({}))).error ?? "Could not delete your account.");
+      setError((await res.json().catch(() => ({}))).error ?? t("deleteFailed"));
       return;
     }
     // A full navigation, so no in-memory auth state survives.
@@ -130,17 +134,17 @@ export function DeleteAccount() {
 
   return (
     <div>
-      <p className="font-bold text-red-600 text-sm">Delete my account</p>
+      <p className="font-bold text-red-600 text-sm">{t("deleteTitle")}</p>
       <p className="text-xs text-slate-500 mt-1">
-        Permanently removes your account and personal details. This can&apos;t be undone.{" "}
-        <Link href="/data-deletion" className="font-semibold text-blue-600 hover:underline">What gets deleted →</Link>
+        {t("deleteBody")}{" "}
+        <Link href="/data-deletion" className="font-semibold text-blue-600 hover:underline">{t("whatGetsDeleted")}</Link>
       </p>
       {!preview && error && <p className="text-xs text-red-600 mt-2">{error}</p>}
 
       {!preview ? (
         <button type="button" onClick={open} disabled={loading} className="tap-44-y btn-secondary py-2 px-3 text-xs mt-3 text-red-600">
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-          Delete my account
+          {t("deleteTitle")}
         </button>
       ) : (
         <div className="mt-3 rounded-xl border border-red-200 bg-red-50/60 p-4 space-y-3">
@@ -149,27 +153,29 @@ export function DeleteAccount() {
             <ul className="space-y-1.5">
               <li>
                 {preview.openBookings === 0
-                  ? "You have no open bookings."
-                  : `Your ${preview.openBookings} open booking${preview.openBookings === 1 ? "" : "s"} will be cancelled and the ${otherParty} notified.`}
+                  ? t("noOpenBookings")
+                  : t("openBookingsCancelled", { count: preview.openBookings, party: otherParty })}
                 {preview.refundTotal > 0 &&
-                  (isPatient
-                    ? ` ₹${preview.refundTotal} already paid will be refunded to your wallet.`
-                    : ` Patients will get ₹${preview.refundTotal} refunded to their wallets.`)}
+                  ` ${isPatient
+                    ? t("refundToWallet", { amount: preview.refundTotal })
+                    : t("refundToPatients", { amount: preview.refundTotal })}`}
               </li>
               {isPatient && preview.walletBalanceAfter > 0 && (
                 <li>
-                  Your wallet will hold ₹{preview.walletBalanceAfter}, which you can&apos;t use once the account is deleted.
-                  Email{" "}
-                  <a href="mailto:support@doconclick.com?subject=Wallet%20balance%20before%20account%20deletion" className="font-semibold text-blue-600 hover:underline">
-                    support@doconclick.com
-                  </a>{" "}
-                  before deleting if you want it paid back.
+                  {t.rich("walletLeft", {
+                    amount: preview.walletBalanceAfter,
+                    email: (chunks) => (
+                      <a href="mailto:support@doconclick.com?subject=Wallet%20balance%20before%20account%20deletion" className="font-semibold text-blue-600 hover:underline">
+                        {chunks}
+                      </a>
+                    ),
+                  })}
                 </li>
               )}
               {!isPatient && (
-                <li>Earnings not yet settled are paid out as usual. Request a payout first if you&apos;re owed money.</li>
+                <li>{t("providerEarnings")}</li>
               )}
-              <li>Completed visit records and payment history are kept, as the law requires.</li>
+              <li>{t("recordsKept")}</li>
             </ul>
           </div>
 
@@ -180,18 +186,18 @@ export function DeleteAccount() {
           ) : (
             <>
               <div>
-                <label className="input-label">Password</label>
+                <label className="input-label">{t("password")}</label>
                 <input
                   type="password"
                   autoComplete="current-password"
                   className="input-field"
-                  placeholder="Your current password"
+                  placeholder={t("currentPassword")}
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError(""); }}
                 />
               </div>
               <div>
-                <label className="input-label">Type {CONFIRM_WORD} to confirm</label>
+                <label className="input-label">{t("typeToConfirm", { word: CONFIRM_WORD })}</label>
                 <input
                   type="text"
                   autoCapitalize="characters"
@@ -208,7 +214,7 @@ export function DeleteAccount() {
           {error && <p className="text-xs text-red-600">{error}</p>}
           <div className="flex gap-2">
             <button type="button" onClick={close} disabled={busy} className="btn-secondary py-2 px-3 text-xs">
-              Cancel
+              {t("cancel")}
             </button>
             {!preview.blocker && user?.hasPassword !== false && (
               <button
@@ -218,7 +224,7 @@ export function DeleteAccount() {
                 className="btn-danger py-2 px-3 text-xs"
               >
                 {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                Permanently delete
+                {t("permanentlyDelete")}
               </button>
             )}
           </div>

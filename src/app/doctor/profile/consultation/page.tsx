@@ -5,8 +5,10 @@ import { Building2, Home, Video, MapPin, IndianRupee } from "lucide-react";
 import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import { useDoctorProfile, patchDoctorProfile } from "@/lib/useDoctorProfile";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export default function ConsultationSettingsPage() {
+  const t = useTranslations("doctorAccount.consultation");
   const router = useRouter();
   const { profile, loading } = useDoctorProfile();
 
@@ -53,7 +55,7 @@ export default function ConsultationSettingsPage() {
       setDirty(false);
       setTimeout(() => router.push("/doctor/profile"), 600);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not save.");
+      setError(e instanceof Error ? e.message : t("saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -79,8 +81,8 @@ export default function ConsultationSettingsPage() {
 
   return (
     <DoctorProfileSubShell
-      title="Consultation & Fees"
-      description="What you offer, what you charge, and how far you travel for home visits."
+      title={t("title")}
+      description={t("description")}
       icon={<IndianRupee className="w-5 h-5" />}
       tint="bg-emerald-50 text-emerald-600"
       loading={loading}
@@ -92,28 +94,28 @@ export default function ConsultationSettingsPage() {
     >
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="input-label">Clinic Consultation Fee (₹)</label>
+          <label className="input-label">{t("clinicFee")}</label>
           <input type="number" min={0} inputMode="numeric" className="input-field" placeholder="500" value={form.consultFee} onChange={(e) => set({ consultFee: e.target.value })} />
         </div>
         <div>
-          <label className="input-label">Video Consultation Fee (₹)</label>
+          <label className="input-label">{t("videoFee")}</label>
           <input type="number" min={0} inputMode="numeric" className="input-field" placeholder="400" value={form.videoFee} onChange={(e) => set({ videoFee: e.target.value })} />
         </div>
         <div>
-          <label className="input-label">Home Visit Fee (₹)</label>
+          <label className="input-label">{t("homeFee")}</label>
           <input type="number" min={0} inputMode="numeric" className="input-field" placeholder="800" value={form.homeVisitFee} onChange={(e) => set({ homeVisitFee: e.target.value })} />
         </div>
       </div>
 
       <div className="space-y-2">
-        {toggleRow(Building2, "Offer Clinic Visits", "offersClinic")}
-        {toggleRow(Home, "Offer Home Visits", "offersHomeVisit")}
-        {toggleRow(Video, "Offer Video Consultations", "offersVideo")}
+        {toggleRow(Building2, t("offerClinic"), "offersClinic")}
+        {toggleRow(Home, t("offerHome"), "offersHomeVisit")}
+        {toggleRow(Video, t("offerVideo"), "offersVideo")}
       </div>
 
       <div className={cn(!form.offersHomeVisit && "opacity-50")}>
         <label className="input-label mb-2 flex items-center justify-between">
-          <span><MapPin className="inline w-3.5 h-3.5 mr-1" />Home Visit Radius</span>
+          <span><MapPin className="inline w-3.5 h-3.5 mr-1" />{t("radius")}</span>
           <span className="text-teal-600 font-bold">{form.radius} km</span>
         </label>
         <input type="range" min={5} max={20} step={1} value={form.radius}
@@ -122,7 +124,7 @@ export default function ConsultationSettingsPage() {
           className="w-full accent-teal-500 disabled:cursor-not-allowed" />
         <div className="flex justify-between text-[10px] text-slate-400 mt-1"><span>5 km</span><span>20 km</span></div>
         {!form.offersHomeVisit && (
-          <p className="text-xs text-slate-400 mt-1.5">Turn on &quot;Offer Home Visits&quot; to set your service radius.</p>
+          <p className="text-xs text-slate-400 mt-1.5">{t("radiusHint")}</p>
         )}
       </div>
     </DoctorProfileSubShell>

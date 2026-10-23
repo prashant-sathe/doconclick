@@ -10,6 +10,7 @@ import { ArrowLeft, Car, MapPinCheck, Clock, Navigation, Loader2 } from "lucide-
 import { useAuth } from "@/components/AuthProvider";
 import { estimateArrivalMinutes } from "@/lib/eta";
 import { formatProviderName } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface TrackedAppointment {
   id: string;
@@ -39,6 +40,7 @@ export default function PatientTrackDoctor() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const t = useTranslations("patientAccount.track");
   const [appt, setAppt] = useState<TrackedAppointment | null>(null);
   const [error, setError] = useState("");
   const [patientPos, setPatientPos] = useState<[number, number] | null>(null);
@@ -63,10 +65,10 @@ export default function PatientTrackDoctor() {
   const load = useCallback(() => {
     fetch(`/api/appointments/${params.id}`)
       .then(async (r) => {
-        if (!r.ok) { setError((await r.json()).error ?? "Could not load this appointment."); return; }
+        if (!r.ok) { setError((await r.json()).error ?? t("couldNotLoad")); return; }
         setAppt(await r.json());
       });
-  }, [params.id]);
+  }, [params.id, t]);
 
   useEffect(() => {
     if (!user || user.role !== "PATIENT") return;
@@ -137,7 +139,7 @@ export default function PatientTrackDoctor() {
 
       <div className="absolute top-[calc(1rem_+_var(--safe-area-inset-top,env(safe-area-inset-top)))] left-4 z-20">
         <Link href="/patient/appointments" className="glass-card rounded-xl px-3 py-2 flex items-center gap-1.5 text-sm font-semibold text-slate-700 shadow-lg">
-          <ArrowLeft className="w-4 h-4" /> Back
+          <ArrowLeft className="w-4 h-4" /> {t("back")}
         </Link>
       </div>
 
@@ -152,7 +154,7 @@ export default function PatientTrackDoctor() {
       ) : appt.doctorLat == null ? (
         <div className="absolute inset-0 z-30 flex items-center justify-center p-6">
           <div className="glass-card rounded-2xl p-6 text-center text-slate-500 max-w-sm">
-            Waiting for {formatProviderName(appt.doctor.name, appt.providerType)} to start their journey…
+            {t("waiting", { name: formatProviderName(appt.doctor.name, appt.providerType) })}
           </div>
         </div>
       ) : (
@@ -168,20 +170,20 @@ export default function PatientTrackDoctor() {
               </div>
             </div>
             {appt.travelStatus === "ARRIVED" ? (
-              <p className="text-sm font-semibold text-emerald-600">Your {appt.providerType === "NURSE" ? "nurse" : "doctor"} has arrived.</p>
+              <p className="text-sm font-semibold text-emerald-600">{t("arrived", { type: appt.providerType === "NURSE" ? "NURSE" : "DOCTOR" })}</p>
             ) : (
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-1.5 text-slate-600">
-                  <Navigation className="w-3.5 h-3.5 text-blue-500" /> {distance?.toFixed(1)} km away
+                  <Navigation className="w-3.5 h-3.5 text-blue-500" /> {t("kmAway", { km: distance?.toFixed(1) ?? "" })}
                 </span>
                 <span className="flex items-center gap-1.5 font-bold text-teal-600">
-                  <Clock className="w-3.5 h-3.5" /> ~{eta} min
+                  <Clock className="w-3.5 h-3.5" /> {t("eta", { min: eta ?? "" })}
                 </span>
               </div>
             )}
             {appt.providerType === "NURSE" && appt.visitOtp && !appt.visitStartedAt && (
               <div className="mt-3 rounded-xl bg-rose-50 border border-rose-200 px-3 py-2 flex items-center justify-between gap-3">
-                <span className="text-xs text-rose-700">Tell the nurse this code at the door</span>
+                <span className="text-xs text-rose-700">{t("otp")}</span>
                 <span className="text-xl font-extrabold tracking-[0.3em] text-rose-700">{appt.visitOtp}</span>
               </div>
             )}

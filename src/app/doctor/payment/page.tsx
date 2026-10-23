@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CreditCard, CheckCircle, Loader2, ShieldCheck, Gift, TicketPercent, X } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import { useTranslations } from "next-intl";
 import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 
 // The fee itself is admin-set (Settings) and comes from /api/doctors/me; this
@@ -12,6 +13,7 @@ const FREE_TRIAL_MONTHS = 6;
 const TRIAL_VALUE = DOCTOR_SUBSCRIPTION_FEE * FREE_TRIAL_MONTHS;
 
 export default function DoctorPayment() {
+  const t = useTranslations("doctorAccount.pay");
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [paying, setPaying] = useState(false);
@@ -57,7 +59,7 @@ export default function DoctorPayment() {
     });
     const data = await res.json().catch(() => ({}));
     setApplyingCoupon(false);
-    if (!res.ok) { setCouponError(data.error ?? "Could not apply that coupon."); return; }
+    if (!res.ok) { setCouponError(data.error ?? t("couponFailed")); return; }
     setCoupon({ code: data.code, discountAmount: data.discountAmount, netAmount: data.netAmount });
     setCouponInput("");
   };
@@ -73,7 +75,7 @@ export default function DoctorPayment() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       setPaying(false);
-      setError(data.error ?? "Could not start payment. Please try again.");
+      setError(data.error ?? t("startFailed"));
       return;
     }
     // ₹0 fee: activated on the server, no gateway.
@@ -103,13 +105,13 @@ export default function DoctorPayment() {
           <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
             <CreditCard className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Registration Fee</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900">{t("registrationFee")}</h1>
           <p className="text-slate-500 mt-2">
-            {free ? "Activating your doctor dashboard is free right now." : `A one-time ₹${fee} fee activates your doctor dashboard.`}
+            {free ? t("activationFree") : t("oneTimeFee", { amount: fee ?? 0 })}
           </p>
           {!free && (
             <p className="text-slate-500 mt-2 flex items-center justify-center gap-1.5 text-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" /> Secured by Cashfree
+              <ShieldCheck className="w-4 h-4 text-emerald-500" /> {t("securedByCashfree")}
             </p>
           )}
         </div>
@@ -119,25 +121,25 @@ export default function DoctorPayment() {
             <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
               <CheckCircle className="w-9 h-9 text-emerald-500" />
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{activatedFree ? "Account activated" : "Already Paid"}</h2>
-            <p className="text-slate-500 mb-8">Your dashboard is unlocked.</p>
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{activatedFree ? t("accountActivated") : t("alreadyPaid")}</h2>
+            <p className="text-slate-500 mb-8">{t("dashboardUnlocked")}</p>
             <button onClick={() => router.push("/doctor/dashboard")} className="btn-primary w-full justify-center py-3.5 text-base">
-              Go to Dashboard
+              {t("goToDashboard")}
             </button>
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
             <div className="bg-slate-50 rounded-xl p-4 mb-3">
               <div className="flex justify-between items-center">
-                <span className="text-slate-500 text-sm">Registration Fee</span>
+                <span className="text-slate-500 text-sm">{t("registrationFee")}</span>
                 <span className="flex items-baseline gap-2">
                   {(fee ?? 0) < REGISTRATION_FEE_ORIGINAL && <span className="text-slate-400 text-sm line-through">₹{REGISTRATION_FEE_ORIGINAL}</span>}
-                  <span className={`font-extrabold text-xl ${coupon ? "text-slate-400 line-through" : "text-blue-600"}`}>{free ? "Free" : `₹${fee}`}</span>
+                  <span className={`font-extrabold text-xl ${coupon ? "text-slate-400 line-through" : "text-blue-600"}`}>{free ? t("free") : `₹${fee}`}</span>
                 </span>
               </div>
               {coupon && (
                 <div className="flex justify-between items-center pt-2 mt-2 border-t border-slate-200">
-                  <span className="text-sm font-semibold text-slate-900">You pay</span>
+                  <span className="text-sm font-semibold text-slate-900">{t("youPay")}</span>
                   <span className="font-extrabold text-blue-600 text-xl">₹{coupon.netAmount}</span>
                 </div>
               )}
@@ -147,9 +149,9 @@ export default function DoctorPayment() {
               {coupon ? (
                 <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 text-sm">
                   <span className="flex items-center gap-2 font-semibold text-emerald-700">
-                    <TicketPercent className="w-4 h-4" /> {coupon.code} — ₹{coupon.discountAmount} off
+                    <TicketPercent className="w-4 h-4" /> {t("couponOff", { code: coupon.code, amount: coupon.discountAmount })}
                   </span>
-                  <button onClick={() => setCoupon(null)} className="text-emerald-700 hover:text-emerald-900" aria-label="Remove coupon">
+                  <button onClick={() => setCoupon(null)} className="text-emerald-700 hover:text-emerald-900" aria-label={t("removeCoupon")}>
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -157,13 +159,13 @@ export default function DoctorPayment() {
                 <div className="flex gap-2">
                   <input
                     className="input-field flex-1 uppercase"
-                    placeholder="Coupon code"
+                    placeholder={t("couponCode")}
                     value={couponInput}
                     onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
                     onKeyDown={(e) => { if (e.key === "Enter") applyCoupon(); }}
                   />
                   <button onClick={applyCoupon} disabled={applyingCoupon || !couponInput.trim()} className="btn-secondary px-4 disabled:opacity-60">
-                    {applyingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+                    {applyingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : t("apply")}
                   </button>
                 </div>
               )}
@@ -174,10 +176,10 @@ export default function DoctorPayment() {
               <Gift className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
               <div className="min-w-0">
                 <p className="text-sm font-bold text-emerald-700">
-                  {FREE_TRIAL_MONTHS} months of patient access — free
+                  {t("trialTitle", { months: FREE_TRIAL_MONTHS })}
                 </p>
                 <p className="text-xs text-emerald-600/80 mt-0.5">
-                  Normally ₹{DOCTOR_SUBSCRIPTION_FEE}/month, you save <span className="font-bold">₹{TRIAL_VALUE.toLocaleString("en-IN")}</span> by registering now.
+                  {t.rich("trialSave", { fee: DOCTOR_SUBSCRIPTION_FEE, value: TRIAL_VALUE.toLocaleString("en-IN"), b: (c) => <span className="font-bold">{c}</span> })}
                 </p>
               </div>
             </div>
@@ -191,8 +193,8 @@ export default function DoctorPayment() {
 
             <button onClick={pay} disabled={paying} className="btn-primary w-full justify-center py-3.5 text-base">
               {free
-                ? (paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Activating…</> : "Activate my account")
-                : paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</> : `Pay ₹${payable}`}
+                ? (paying ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("activating")}</> : t("activateMyAccount"))
+                : paying ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("redirecting")}</> : t("payAmount", { amount: payable })}
             </button>
           </div>
         )}

@@ -1,0 +1,159 @@
+{
+  "auth": {
+    "termsTitle": "Terms of Service and Privacy Policy",
+    "termsPrompted": "Please accept these to continue booking.",
+    "lastUpdated": "Last updated {date}",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "acceptTerms": "I accept the Terms of Service",
+    "acceptPrivacy": "I accept the Privacy Policy",
+    "termsSaveFailed": "Could not save your acceptance. Please try again.",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "close": "Close",
+    "signOut": "Sign Out",
+    "termsNotAcceptedTitle": "Terms not accepted",
+    "termsNotAcceptedBody": "This user hasn't accepted the Terms of Service and Privacy Policy yet, so they can't book. They need to accept them from their own login.",
+    "suspendedTitle": "Account Suspended",
+    "suspendedDefault": "Your account has been suspended.",
+    "signOutTitle": "Sign out?",
+    "signOutBody": "You'll need to log in again to access your account."
+  },
+  "confirmDialog": {
+    "cancel": "Cancel",
+    "working": "Working…"
+  },
+  "loadError": {
+    "retry": "Retry",
+    "showingLast": "Showing the last loaded data."
+  },
+  "offline": {
+    "message": "No internet connection — some things won't work until you're back online."
+  },
+  "push": {
+    "settingsTitle": "Push Notifications",
+    "notSupported": "Not supported in this browser.",
+    "blockedTitle": "Notifications are blocked",
+    "blockedNative": "Notifications are turned off for this app. Enable them from your phone's Settings → Apps → DocOnClick → Notifications.",
+    "blockedBrowser": "You've blocked notifications for this site in your browser. Allow them from your browser's site settings, then reload this page.",
+    "blockedMac": "If they still don't show up, your Mac's system notification settings may also be blocking them.",
+    "openMacSettings": "Open Mac notification settings",
+    "promptTitle": "Turn on notifications",
+    "promptBody": "Get notified even when this tab isn't open — new requests, status updates and messages.",
+    "notNow": "Not now",
+    "enable": "Enable",
+    "enabling": "Enabling…",
+    "dismiss": "Dismiss",
+    "onHint": "Notifications are on.",
+    "notReceiving": "Not receiving them? Open Mac settings",
+    "checking": "Checking status…",
+    "on": "Notifications are on",
+    "off": "Notifications are off",
+    "turnOff": "Turn off",
+    "confirmOffTitle": "Turn off notifications?",
+    "confirmOffBody": "This turns off push notifications on every device you're signed in on, not just this one — you'll need to re-enable it separately on each device.",
+    "confirmOff": "Turn Off",
+    "turningOff": "Turning off…"
+  },
+  "security": {
+    "googleNoPassword": "You sign in with Google, so this account has no password yet.",
+    "verifyToSet": "Verify with Google to set one →",
+    "logoutAllTitle": "Log out of all devices",
+    "logoutAllBody": "Signs this account out everywhere — phones, tablets and browsers, including this one. Use it if you lost a device or think someone else is signed in.",
+    "logoutAllConfirm": "Yes, log out everywhere",
+    "logoutAllFailed": "Could not sign out other devices.",
+    "cancel": "Cancel",
+    "deleteTitle": "Delete my account",
+    "deleteBody": "Permanently removes your account and personal details. This can't be undone.",
+    "whatGetsDeleted": "What gets deleted →",
+    "loadFailed": "Could not load your account details.",
+    "deleteFailed": "Could not delete your account.",
+    "noOpenBookings": "You have no open bookings.",
+    "openBookingsCancelled": "{count, plural, one {Your # open booking will be cancelled and the {party, select, patient {patient} other {doctor or nurse}} notified.} other {Your # open bookings will be cancelled and the {party, select, patient {patient} other {doctor or nurse}} notified.}}",
+    "refundToWallet": "₹{amount} already paid will be refunded to your wallet.",
+    "refundToPatients": "Patients will get ₹{amount} refunded to their wallets.",
+    "walletLeft": "Your wallet will hold ₹{amount}, which you can't use once the account is deleted. Email <email>support@doconclick.com</email> before deleting if you want it paid back.",
+    "providerEarnings": "Earnings not yet settled are paid out as usual. Request a payout first if you're owed money.",
+    "recordsKept": "Completed visit records and payment history are kept, as the law requires.",
+    "password": "Password",
+    "currentPassword": "Your current password",
+    "typeToConfirm": "Type {word} to confirm",
+    "permanentlyDelete": "Permanently delete"
+  },
+  "editableName": {
+    "editName": "Edit name",
+    "saveName": "Save name",
+    "save": "Save",
+    "cancelEditing": "Cancel editing",
+    "cancel": "Cancel",
+    "failed": "Could not update name."
+  },
+  "imageCrop": {
+    "title": "Crop photo",
+    "close": "Close",
+    "zoom": "Zoom",
+    "cancel": "Cancel",
+    "usePhoto": "Use Photo",
+    "failed": "Could not crop this image. Please try another photo."
+  },
+  "announcement": {
+    "close": "Close announcement"
+  },
+  "locationPicker": {
+    "hint": "Tap the map or drag the pin to fine-tune your exact location."
+  },
+  "reschedule": {
+    "asked": "Patient asked to move this to {when}",
+    "keepOriginal": "Keep original",
+    "acceptNewTime": "Accept new time",
+    "failed": "Could not answer this request.",
+    "networkError": "Network error — please try again."
+  },
+  "requestToast": {
+    "newVisit": "New visit request",
+    "newAppointment": "New appointment request"
+  },
+  "chat": {
+    "loadFailed": "Could not load chat.",
+    "refreshFailed": "Couldn't refresh the chat — retrying…",
+    "networkError": "Network error — check your connection.",
+    "retry": "Retry",
+    "empty": "No messages yet. Say hello!",
+    "emptyClosed": "No messages in this chat.",
+    "readOnly": "This chat is read-only.",
+    "openUntil": "Follow-up chat open until {when}",
+    "placeholder": "Type a message…",
+    "send": "Send message",
+    "attach": "Attach a file",
+    "attachHint": "Attach a medical report (PDF/JPG/PNG, under 5MB)",
+    "attachment": "Attachment",
+    "openImage": "Open image {name}",
+    "dismiss": "Dismiss",
+    "close": "Close",
+    "sendFailed": "Could not send message.",
+    "sendOffline": "Message not sent — check your connection and try again.",
+    "fileTooBig": "File must be under 5MB.",
+    "uploadFailed": "Could not upload file.",
+    "sendFileFailed": "Could not send file.",
+    "uploadRetry": "Could not upload that file. Please try again.",
+    "downloadFailed": "Could not download that attachment.",
+    "sendFileTitle": "Send this file?",
+    "sendFileImageBody": "It'll be sent to the other person right away — there's no way to unsend it once it's delivered.",
+    "sendFileBody": "<file>{name}</file> will be sent to the other person right away — there's no way to unsend it once it's delivered.",
+    "sendConfirm": "Send",
+    "sending": "Sending…"
+  },
+  "videoCall": {
+    "connecting": "Connecting…",
+    "waiting": "Waiting for the other participant to join…",
+    "startFailed": "Could not start the video consultation.",
+    "ended": "The call has ended — the time for this video consultation is over.",
+    "extendFailed": "Couldn't extend the call — it may end in a few minutes.",
+    "extendOffline": "Couldn't extend the call — it may end in a few minutes. Check your connection.",
+    "mute": "Mute microphone",
+    "unmute": "Unmute microphone",
+    "cameraOff": "Turn camera off",
+    "cameraOn": "Turn camera on",
+    "endCall": "End call"
+  }
+}

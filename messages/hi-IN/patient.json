@@ -1,0 +1,345 @@
+{
+  "specialtyFilter": {
+    "all": "सभी"
+  },
+  "badges": {
+    "verified": "वेरिफ़ाइड"
+  },
+  "rating": {
+    "noReviews": "अभी कोई रिव्यू नहीं",
+    "summary": "{rating} ({count} रिव्यू)"
+  },
+  "prescriptionDownload": {
+    "generating": "बन रहा है…",
+    "download": "प्रिस्क्रिप्शन डाउनलोड करें",
+    "failed": "PDF नहीं बन सका"
+  },
+  "appointmentToast": {
+    "SCHEDULED": {
+      "title": "अपॉइंटमेंट कन्फ़र्म हो गया!",
+      "message": "{name} ने आपकी रिक्वेस्ट स्वीकार कर ली।"
+    },
+    "ON_THE_WAY": {
+      "title": "आपके {provider, select, NURSE {नर्स} other {डॉक्टर}} रास्ते में हैं!",
+      "message": "{name} आपके पास आने के लिए निकल चुके हैं।"
+    },
+    "ARRIVED": {
+      "title": "आपके {provider, select, NURSE {नर्स} other {डॉक्टर}} पहुँच गए हैं!",
+      "message": "{name} आपकी विज़िट के लिए आ गए हैं।"
+    },
+    "REJECTED": {
+      "title": "रिक्वेस्ट अस्वीकार हुई",
+      "message": "{name} आपकी रिक्वेस्ट स्वीकार नहीं कर सके।"
+    },
+    "EXPIRED": {
+      "title": "{provider, select, NURSE {नर्स} other {डॉक्टर}} की ओर से कोई जवाब नहीं",
+      "message": "{name} ने समय पर जवाब नहीं दिया।"
+    },
+    "COMPLETED": {
+      "title": "कंसल्टेशन पूरा हुआ",
+      "message": "{name} के साथ आपका कंसल्टेशन पूरा हो गया है।"
+    },
+    "CANCELLED": {
+      "title": "अपॉइंटमेंट रद्द हुआ",
+      "message": "{name} के साथ आपका अपॉइंटमेंट रद्द कर दिया गया।"
+    }
+  },
+  "walletToast": {
+    "TOPUP": {
+      "title": "वॉलेट टॉप-अप हो गया!",
+      "message": "₹{amount} जोड़े गए। नया बैलेंस ₹{balance}।"
+    },
+    "BOOKING_PAYMENT": {
+      "title": "वॉलेट से पैसे कटे",
+      "message": "अपॉइंटमेंट के लिए ₹{amount} का भुगतान हुआ। नया बैलेंस ₹{balance}।"
+    },
+    "ADMIN_CREDIT": {
+      "title": "एडमिन ने वॉलेट में पैसे जोड़े",
+      "message": "₹{amount} जोड़े गए।{note} नया बैलेंस ₹{balance}।"
+    },
+    "ADMIN_DEBIT": {
+      "title": "एडमिन ने वॉलेट से पैसे काटे",
+      "message": "₹{amount} काटे गए।{note} नया बैलेंस ₹{balance}।"
+    },
+    "REASSIGNMENT_CREDIT": {
+      "title": "अपॉइंटमेंट रद्द — पैसे वापस",
+      "message": "₹{amount} आपके वॉलेट में जमा किए गए। नया बैलेंस ₹{balance}।"
+    },
+    "FAILED": {
+      "title": "वॉलेट टॉप-अप नहीं हुआ",
+      "message": "₹{amount} का आपका टॉप-अप पूरा नहीं हो सका।"
+    }
+  },
+  "doctorFilters": {
+    "trigger": "फ़िल्टर",
+    "title": "फ़िल्टर और क्रम",
+    "close": "फ़िल्टर बंद करें",
+    "speaks": "बोलने वाली भाषा",
+    "any": "कोई भी",
+    "experience": "अनुभव",
+    "yearsPlus": "{years}+ साल",
+    "maxFee": "अधिकतम क्लिनिक फ़ीस",
+    "sortBy": "क्रम",
+    "sort": {
+      "distance": "सबसे पास",
+      "rating": "सबसे अच्छी रेटिंग",
+      "experience": "सबसे अनुभवी",
+      "feeLowToHigh": "सबसे कम फ़ीस"
+    },
+    "reset": "रीसेट करें",
+    "showResults": "नतीजे दिखाएँ"
+  },
+  "saved": {
+    "title": "सेव किए गए डॉक्टर",
+    "subtitle": "जिन डॉक्टरों को आपने बाद में फिर से बुक करने के लिए सेव किया है।",
+    "distancesFrom": "दूरी <b>{place}</b> से दिखाई गई है",
+    "change": "बदलें",
+    "empty": "अभी तक कोई डॉक्टर सेव नहीं किया।",
+    "findToSave": "सेव करने के लिए डॉक्टर ढूँढें",
+    "kmAway": "{km} किमी दूर",
+    "bookAgain": "फिर से बुक करें",
+    "unavailableHint": "यह डॉक्टर अभी बुकिंग के लिए उपलब्ध नहीं हैं",
+    "unavailable": "उपलब्ध नहीं",
+    "remove": "हटाएँ",
+    "allOutOfRange": "आपके सभी सेव किए गए डॉक्टर आपकी {km} किमी की सर्च रेंज से बाहर हैं।",
+    "outOfRangeToggle": "{count} सेव किए गए डॉक्टर आपकी {km} किमी रेंज से बाहर"
+  },
+  "common": {
+    "dismiss": "हटाएँ",
+    "yrsExp": "{years} साल का अनुभव",
+    "openNow": "अभी खुला है",
+    "closedNow": "अभी बंद है",
+    "kmAway": "{km} किमी दूर",
+    "consultType": {
+      "CLINIC": "क्लिनिक विज़िट",
+      "VIDEO": "वीडियो कंसल्टेशन",
+      "HOME": "होम विज़िट"
+    },
+    "days": {
+      "Mon": "सोम",
+      "Tue": "मंगल",
+      "Wed": "बुध",
+      "Thu": "गुरु",
+      "Fri": "शुक्र",
+      "Sat": "शनि",
+      "Sun": "रवि"
+    },
+    "when": {
+      "today": "आज {time}",
+      "tomorrow": "कल {time}",
+      "on": "{day} {time}"
+    },
+    "relation": {
+      "Self": "स्वयं",
+      "Spouse": "पति/पत्नी",
+      "Son": "बेटा",
+      "Daughter": "बेटी",
+      "Father": "पिता",
+      "Mother": "माँ",
+      "Other": "अन्य"
+    },
+    "everyDays": "{count, plural, one {हर दिन} other {हर # दिन में}}"
+  },
+  "doctorProfile": {
+    "myDashboard": "मेरा डैशबोर्ड",
+    "login": "लॉग इन",
+    "notFoundTitle": "डॉक्टर नहीं मिले",
+    "notFoundBody": "यह प्रोफ़ाइल लिंक गलत है या अब उपलब्ध नहीं है।",
+    "outOfRangeKm": "{doctor} लगभग {km} किमी दूर हैं, जो आपकी <profile>प्रोफ़ाइल</profile> में सेट {range} किमी की सर्च रेंज से बाहर है। आप फिर भी बुक कर सकते हैं।",
+    "outOfRangeUnknown": "{doctor} आपके इलाके से बाहर हैं, जो आपकी <profile>प्रोफ़ाइल</profile> में सेट {range} किमी की सर्च रेंज से बाहर है। आप फिर भी बुक कर सकते हैं।",
+    "clinicPhotoOf": "{name} — क्लिनिक की फ़ोटो",
+    "clinicPhoto": "क्लिनिक की फ़ोटो",
+    "unsave": "सेव किए गए डॉक्टरों से हटाएँ",
+    "save": "डॉक्टर सेव करें",
+    "saveForLater": "डॉक्टर को बाद के लिए सेव करें",
+    "ourClinics": "हमारे क्लिनिक",
+    "opens": "{when} खुलेगा",
+    "closedOpens": "अभी बंद · {when} खुलेगा",
+    "closedScheduleLater": "अभी बंद · बाद के लिए शेड्यूल करें",
+    "outsideHomeRange": "होम विज़िट रेंज से बाहर",
+    "recentReviews": "हाल के रिव्यू",
+    "bookAppointment": "अपॉइंटमेंट बुक करें"
+  },
+  "appointments": {
+    "title": "मेरे अपॉइंटमेंट",
+    "subtitle": "अपनी रिक्वेस्ट, आने वाले अपॉइंटमेंट और पिछले कंसल्टेशन देखें।",
+    "pendingHeading": "पेंडिंग रिक्वेस्ट ({count})",
+    "upcomingHeading": "आने वाले ({count})",
+    "pastHeading": "पिछले ({count})",
+    "loadMore": "{count} और दिखाएँ",
+    "loading": "लोड हो रहा है…",
+    "noUpcoming": "कोई आने वाला अपॉइंटमेंट नहीं है।",
+    "bookOneNow": "अभी बुक करें →",
+    "noPast": "अभी तक कोई पिछला अपॉइंटमेंट नहीं।",
+    "status": {
+      "PENDING_APPROVAL": "{provider, select, NURSE {नर्स} other {डॉक्टर}} के जवाब का इंतज़ार",
+      "SCHEDULED": "कन्फ़र्म",
+      "COMPLETED": "पूरा हुआ",
+      "CANCELLED": "रद्द",
+      "REJECTED": "अस्वीकार",
+      "EXPIRED": "{provider, select, NURSE {नर्स} other {डॉक्टर}} व्यस्त थे",
+      "NO_SHOW": "छूट गया (नहीं आए)"
+    },
+    "errors": {
+      "withdraw": "रिक्वेस्ट वापस नहीं ली जा सकी।",
+      "network": "नेटवर्क की समस्या — कृपया फिर से कोशिश करें।",
+      "reschedule": "यह अपॉइंटमेंट रीशेड्यूल नहीं हो सका। कृपया फिर से कोशिश करें।",
+      "cancel": "यह अपॉइंटमेंट रद्द नहीं हो सका। कृपया फिर से कोशिश करें।"
+    },
+    "review": {
+      "title": "रिव्यू दें",
+      "close": "बंद करें",
+      "rateStars": "{count} स्टार दें",
+      "placeholder": "अपना अनुभव बताएँ (वैकल्पिक)…",
+      "submitting": "भेजा जा रहा है…",
+      "submit": "रिव्यू भेजें",
+      "failed": "रिव्यू नहीं भेजा जा सका।"
+    },
+    "card": {
+      "nurseVisit": "नर्स विज़िट · {service}",
+      "forPatient": "{name} ({relation}) के लिए",
+      "shiftEnds": "{hours} घंटे की शिफ़्ट · खत्म {end}",
+      "packageVisit": "{total} में से विज़िट {index} · {interval}",
+      "visitCode": "विज़िट कोड",
+      "visitCodeHint": "नर्स के आने पर उन्हें यह कोड बताएँ — तभी वे विज़िट शुरू कर पाएँगी। घर पर किसी और के लिए बुक किया है? उन्हें यह कोड भेज दें, या फ़ोन पर नर्स को बता दें।",
+      "vitals": "वाइटल्स: {summary}",
+      "seeTrend": "ट्रेंड देखें →",
+      "startedWithoutCode": "आपके कोड के बिना शुरू किया गया: “{note}”। अगर यह आप नहीं थे, तो हेल्प और सपोर्ट से संपर्क करें।",
+      "reassignedToYou": "{from} को इमरजेंसी आ गई और वे आपका अपॉइंटमेंट जारी नहीं रख सके, इसलिए हमने आपको {to} के पास भेज दिया है।",
+      "waitingConfirmScheduled": "{provider} के आपका शेड्यूल किया गया अपॉइंटमेंट कन्फ़र्म करने का इंतज़ार है।",
+      "waitingAccept": "{provider} के यह रिक्वेस्ट स्वीकार करने का इंतज़ार है।",
+      "timeLeft": "{time} बाकी",
+      "expiring": "समय खत्म हो रहा है…",
+      "reassignedAway": "{from} को इमरजेंसी आ गई और वे यह अपॉइंटमेंट जारी नहीं रख सके, इसलिए हमने आपको {to} के पास भेज दिया है — अपनी पेंडिंग रिक्वेस्ट देखें।",
+      "rejected": "{provider} यह रिक्वेस्ट स्वीकार नहीं कर सके। कोई पेमेंट नहीं लिया गया।",
+      "expired": "{provider} ने समय पर जवाब नहीं दिया, शायद वे अभी बहुत व्यस्त हैं। कोई पेमेंट नहीं लिया गया — फिर से बुक करें या दूसरा डॉक्टर चुनें।",
+      "providersClinic": "{provider} का क्लिनिक",
+      "directions": "रास्ता देखें",
+      "onTheWay": "{provider} रास्ते में हैं",
+      "trackLive": "लाइव ट्रैक करें",
+      "arrived": "{provider} पहुँच गए हैं।",
+      "nothingToPay": "कुछ भी भुगतान नहीं करना है — {provider} के साथ अपनी बुकिंग कन्फ़र्म करें।",
+      "paymentPending": "पेमेंट बाकी है — {provider} के साथ अपना कंसल्टेशन कन्फ़र्म करने के लिए ₹{amount} का भुगतान करें।",
+      "paymentPendingCoupon": "पेमेंट बाकी है — {provider} के साथ अपना कंसल्टेशन कन्फ़र्म करने के लिए ₹{amount} ({coupon} लागू) का भुगतान करें।",
+      "online": "ऑनलाइन",
+      "cash": "कैश",
+      "paymentStatus": {
+        "PENDING": "बाकी",
+        "PAID": "भुगतान हुआ",
+        "CREDITED": "जमा हुआ"
+      },
+      "notes": "{provider, select, NURSE {नर्स के नोट्स} other {डॉक्टर के नोट्स}}:",
+      "prescription": "प्रिस्क्रिप्शन",
+      "recommendsNurse": "{provider} घर पर नर्स की देखभाल की सलाह देते हैं",
+      "visits": "{count} विज़िट",
+      "nurseBooked": "नर्स बुक हो गई",
+      "bookNurse": "नर्स बुक करें",
+      "newTimeRequested": "नए समय की रिक्वेस्ट: {time}",
+      "newTimeWaiting": "{provider} के कन्फ़र्म करने का इंतज़ार है। तब तक आपका मौजूदा समय बुक रहेगा।",
+      "withdrawing": "वापस लिया जा रहा है…",
+      "keepCurrentTime": "मेरा मौजूदा समय ही रखें",
+      "reschedule": "रीशेड्यूल करें",
+      "cancelAppointment": "अपॉइंटमेंट रद्द करें",
+      "cancelRequest": "रिक्वेस्ट रद्द करें",
+      "confirm": "कन्फ़र्म करें",
+      "payNow": "अभी पेमेंट करें",
+      "videoAfterPayment": "पेमेंट के बाद वीडियो कॉल शुरू होगी",
+      "chat": "चैट",
+      "unlockingIn": "{seconds} सेकंड में खुलेगा",
+      "joinVideo": "वीडियो कंसल्टेशन में जुड़ें",
+      "fileN": "फ़ाइल {n}",
+      "viewAttachment": "अटैच की गई फ़ाइल देखें",
+      "leaveReview": "रिव्यू दें",
+      "youRated": "आपने {rating}/5 रेटिंग दी",
+      "followUpUnavailableHint": "यह डॉक्टर अभी बुकिंग नहीं ले रहे हैं",
+      "followUpUnavailable": "फ़ॉलो-अप उपलब्ध नहीं",
+      "bookAgain": "फिर से बुक करें",
+      "bookFollowUp": "फ़ॉलो-अप बुक करें"
+    },
+    "cancelDialog": {
+      "titleAppointment": "यह अपॉइंटमेंट रद्द करें?",
+      "titleRequest": "यह रिक्वेस्ट रद्द करें?",
+      "body": "{time} को {provider} के साथ आपका {kind, select, appointment {अपॉइंटमेंट} other {रिक्वेस्ट}} रद्द कर दिया जाएगा। इसे वापस नहीं किया जा सकता।",
+      "refund": "₹{amount} आपके वॉलेट में वापस जमा किए जाएँगे।",
+      "keepAppointment": "अपॉइंटमेंट रखें",
+      "keepRequest": "रिक्वेस्ट रखें",
+      "cancelling": "रद्द हो रहा है…",
+      "confirm": "रद्द करें"
+    },
+    "rescheduleDialog": {
+      "title": "अपॉइंटमेंट रीशेड्यूल करें",
+      "body": "{provider} के साथ अपने {kind, select, appointment {अपॉइंटमेंट} other {रिक्वेस्ट}} के लिए नया समय चुनें।",
+      "needsConfirm": "{provider} को नया समय कन्फ़र्म करना होगा। तब तक आपकी मौजूदा बुकिंग ({time}) जैसी है वैसी रहेगी।",
+      "needsConfirmReplaces": "{provider} को नया समय कन्फ़र्म करना होगा। तब तक आपकी मौजूदा बुकिंग ({time}) जैसी है वैसी रहेगी, और यह आपकी पिछली रिक्वेस्ट की जगह ले लेगा।",
+      "cancel": "रद्द करें",
+      "saving": "सेव हो रहा है…",
+      "confirm": "नया समय कन्फ़र्म करें"
+    }
+  },
+  "dashboard": {
+    "listYears": "{years} साल",
+    "listOpen": "खुला",
+    "listClosed": "बंद",
+    "openNow": "अभी खुला है",
+    "closed": "बंद",
+    "setYourLocation": "अपनी लोकेशन सेट करें",
+    "yourLocationChange": "आपकी लोकेशन · बदलें",
+    "completeProfile": "अपनी प्रोफ़ाइल पूरी करें",
+    "profilePercent": "प्रोफ़ाइल {percent}%",
+    "healthAssistant": "हेल्थ असिस्टेंट",
+    "askAi": "AI से पूछें",
+    "myAppointments": "मेरे अपॉइंटमेंट",
+    "profile": "प्रोफ़ाइल",
+    "searchPlaceholder": "डॉक्टर या स्पेशलिटी खोजें…",
+    "clearSearch": "खोज साफ़ करें",
+    "mapView": "मैप व्यू",
+    "listView": "लिस्ट व्यू",
+    "refreshAria": "डॉक्टर और लोकेशन रिफ़्रेश करें",
+    "refreshTitle": "डॉक्टर और लोकेशन रिफ़्रेश करें",
+    "showingAllClinics": "सभी क्लिनिक दिखाए जा रहे हैं।",
+    "limitTo": "{km} किमी तक सीमित करें",
+    "showingWithin": "{km} किमी के अंदर के क्लिनिक दिखाए जा रहे हैं।",
+    "change": "बदलें",
+    "useMyLocation": "मेरी लोकेशन इस्तेमाल करें",
+    "showingFallback": "पुणे दिखाया जा रहा है — <link>अपनी लोकेशन सेट करें</link>",
+    "nearest": "सबसे पास: <b>{name}</b>",
+    "checkingSession": "सेशन जाँचा जा रहा है…",
+    "findingLocation": "आपकी लोकेशन ढूँढी जा रही है…",
+    "noDoctorsNearby": "आस-पास कोई डॉक्टर नहीं मिला।",
+    "specialties": "स्पेशलिटी",
+    "tapPinToBook": "बुक करने के लिए पिन पर टैप करें",
+    "clinicsNearby": "आस-पास {count} क्लिनिक",
+    "clinicPhotoOf": "{name} — क्लिनिक की फ़ोटो",
+    "clinicPhoto": "क्लिनिक की फ़ोटो",
+    "unsave": "सेव किए गए डॉक्टरों से हटाएँ",
+    "save": "डॉक्टर सेव करें",
+    "saveForLater": "डॉक्टर को बाद के लिए सेव करें",
+    "availableNow": "अभी उपलब्ध",
+    "opens": "{when} खुलेगा",
+    "closedOpens": "अभी बंद · {when} खुलेगा",
+    "closedScheduleLater": "अभी बंद · बाद के लिए शेड्यूल करें",
+    "arrivalMin": "लगभग {min} मिनट में पहुँचेंगे",
+    "outsideHomeRange": "होम विज़िट रेंज से बाहर",
+    "recentReviews": "हाल के रिव्यू",
+    "noClinicsWithinOf": "{place} से {km} किमी के अंदर कोई क्लिनिक नहीं।",
+    "noClinicsWithinHere": "यहाँ से {km} किमी के अंदर कोई क्लिनिक नहीं।",
+    "showAll": "सभी दिखाएँ",
+    "tapPinHint": "जानकारी देखने के लिए डॉक्टर के पिन पर टैप करें",
+    "picker": {
+      "title": "लोकेशन चुनें",
+      "close": "बंद करें",
+      "showingNear": "<b>{place}</b> के पास के डॉक्टर दिखाए जा रहे हैं। किसी दूसरे शहर में किसी के लिए बुक कर रहे हैं? उनका इलाका यहाँ सेट करें।",
+      "hint": "किसी इलाके को खोजें और वहाँ के डॉक्टर देखें — जैसे किसी दूसरे शहर में रहने वाले रिश्तेदार के लिए बुक करते समय।",
+      "placeholder": "शहर, इलाका या सोसाइटी खोजें…",
+      "pickOnMap": "मैप पर सही जगह चुनें",
+      "locating": "लोकेशन ढूँढी जा रही है…",
+      "useCurrent": "मेरी मौजूदा लोकेशन इस्तेमाल करें"
+    },
+    "pick": {
+      "moveMap": "मैप को उस जगह पर ले जाएँ",
+      "cancel": "रद्द करें",
+      "setting": "सेट हो रहा है…",
+      "confirm": "यह लोकेशन सेट करें"
+    }
+  }
+}

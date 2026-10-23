@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   UserPlus, Phone, Loader2, Building2, Home, Video, Banknote, QrCode, CheckCircle2,
   AlertTriangle, Users, Plus, CalendarClock, Clock, UserCheck, ArrowLeft,
@@ -18,6 +18,8 @@ import { normalizeMobile, isValidMobile } from "@/lib/validation";
 import { todayIsoDateIst } from "@/lib/clinicAvailability";
 import { addDaysYmd } from "@/lib/istDate";
 import { cn, formatDoctorName } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 type VisitType = "CLINIC" | "HOME" | "VIDEO";
 
@@ -58,20 +60,26 @@ interface Booked {
   free?: boolean;
 }
 
-const TYPE_META: Record<VisitType, { label: string; icon: React.ElementType }> = {
-  CLINIC: { label: "Clinic visit", icon: Building2 },
-  HOME: { label: "Home visit", icon: Home },
-  VIDEO: { label: "Video", icon: Video },
+// Labels are message keys (doctorAccount.walkIn.type).
+const TYPE_META: Record<VisitType, { icon: React.ElementType }> = {
+  CLINIC: { icon: Building2 },
+  HOME: { icon: Home },
+  VIDEO: { icon: Video },
 };
 
-const fmtWhen = (iso: string) =>
-  new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
-
 export default function WalkInBookingPage() {
+  const t = useTranslations("doctorAccount.walkIn");
+  const tRel = useTranslations("booking.common.relation");
+  const tGender = useTranslations("booking.common.gender");
+  const relLabel = (r: string) => (tRel.has(r as "Self") ? tRel(r as "Self") : r);
+  const genderLabel = (g: string) => (tGender.has(g as "Male") ? tGender(g as "Male") : g);
+  const locale = formattingLocale(useLocale());
+  const fmtWhen = (iso: string) =>
+    new Date(iso).toLocaleString(locale, { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
   const { user } = useAuth();
   const isStaff = user?.role === "STAFF";
   const { data: ctx, error: ctxError, loading: ctxLoading, reload: reloadCtx, reloading: ctxReloading } =
-    useLoad<Context>(user ? "/api/doctor/walk-in-appointments" : null, { fallback: "Couldn't load the booking form." });
+    useLoad<Context>(user ? "/api/doctor/walk-in-appointments" : null, { fallback: t("loadFailed") });
 
   // ── Patient ──
   const [mobile, setMobile] = useState("");
@@ -120,24 +128,24 @@ export default function WalkInBookingPage() {
   useEffect(() => {
     if (!mobileValid) return;
     let cancelled = false;
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       setLookup({ state: "loading", mobile: normalized });
       try {
         const res = await fetch(`/api/doctor/patients/lookup?mobile=${normalized}`, { cache: "no-store" });
         const d = await res.json().catch(() => ({}));
         if (cancelled) return;
-        if (!res.ok) { setLookup({ state: "error", mobile: normalized, error: d.error ?? "Couldn't look up this number." }); return; }
+        if (!res.ok) { setLookup({ state: "error", mobile: normalized, error: d.error ?? t("lookupFailed") }); return; }
         if (!d.exists) { setLookup({ state: "new", mobile: normalized }); return; }
         setLookup({ state: "found", mobile: normalized, patient: d.patient });
         const p = d.patient as Extract<Lookup, { state: "found" }>["patient"];
         setAllergies(p.allergies ?? "");
         setAddress({ address: p.homeAddress ?? "", landmark: p.landmark ?? "", pinCode: p.pinCode ?? "" });
       } catch {
-        if (!cancelled) setLookup({ state: "error", mobile: normalized, error: "Network error — check your connection and try again." });
+        if (!cancelled) setLookup({ state: "error", mobile: normalized, error: t("networkError") });
       }
     }, 250);
-    return () => { cancelled = true; clearTimeout(t); };
-  }, [mobileValid, normalized]);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [mobileValid, normalized, t]);
 
   const onMobileChange = (v: string) => {
     setMobile(v);
@@ -167,12 +175,12 @@ export default function WalkInBookingPage() {
       .then(async (r) => {
         const d = await r.json().catch(() => ({}));
         if (cancelled) return;
-        if (!r.ok) { setSlotsError(d.error ?? "Couldn't load free slots."); setSlots([]); return; }
+        if (!r.ok) { setSlotsError(d.error ?? t("slotsFailed")); setSlots([]); return; }
         setSlots(d.slots ?? []);
       })
-      .catch(() => { if (!cancelled) { setSlotsError("Network error loading slots."); setSlots([]); } });
+      .catch(() => { if (!cancelled) { setSlotsError(t("slotsNetwork")); setSlots([]); } });
     return () => { cancelled = true; };
-  }, [ctx, whenMode, useSlotPicker, clinicId, date]);
+  }, [ctx, whenMode, useSlotPicker, clinicId, date, t]);
 
   const scheduledAt = useMemo(() => {
     if (whenMode === "NOW") return null;
@@ -184,23 +192,25 @@ export default function WalkInBookingPage() {
   // What's still missing, in the order the form asks for it.
   const holderNeedsName = isNew || (!!found && !found.name.trim());
   const holderNeedsAgeGender = who === "SELF" && (isNew || (!!found && (!found.age || !found.gender)));
-  const problem = (() => {
-    if (!patientReady) return "Enter the patient's mobile number.";
-    if (holderNeedsName && name.trim().length < 2) return "Enter the patient's full name.";
-    if (holderNeedsAgeGender && (!found?.age && !(Number(age) >= 1 && Number(age) <= 120))) return "Enter the patient's age.";
-    if (holderNeedsAgeGender && !found?.gender && !gender) return "Select the patient's gender.";
-    if (who === "NEW" && dep.name.trim().length < 2) return "Enter the family member's name.";
-    if (who === "NEW" && !dep.relation) return "Select how they're related.";
-    if (!consultType) return "Select the type of visit.";
-    if (consultType === "CLINIC" && (ctx?.clinics.length ?? 0) > 0 && !clinicId) return "Select the clinic.";
-    if (scheduledAt === undefined) return "Pick a time for the visit.";
-    if (consultType === "HOME" && !address.address.trim()) return "Enter the address for the home visit.";
-    if (symptoms.trim().length < 3) return "Enter the reason for the visit.";
-    if (!consent) return "Confirm the patient agreed to share these details.";
+  const problemKey = (() => {
+    if (!patientReady) return "mobile";
+    if (holderNeedsName && name.trim().length < 2) return "name";
+    if (holderNeedsAgeGender && (!found?.age && !(Number(age) >= 1 && Number(age) <= 120))) return "age";
+    if (holderNeedsAgeGender && !found?.gender && !gender) return "gender";
+    if (who === "NEW" && dep.name.trim().length < 2) return "depName";
+    if (who === "NEW" && !dep.relation) return "depRelation";
+    if (!consultType) return "type";
+    if (consultType === "CLINIC" && (ctx?.clinics.length ?? 0) > 0 && !clinicId) return "clinic";
+    if (scheduledAt === undefined) return "time";
+    if (consultType === "HOME" && !address.address.trim()) return "address";
+    if (symptoms.trim().length < 3) return "reason";
+    if (!consent) return "consent";
     return null;
   })();
+  const problem = problemKey ? t(`problem.${problemKey}`) : null;
 
-  const submit = useCallback(async (force = false) => {
+  // Plain function — the React Compiler memoizes it.
+  const submit = async (force = false) => {
     if (problem || !consultType) { setFormError(problem); return; }
     setSubmitting(true);
     setFormError(null);
@@ -231,7 +241,7 @@ export default function WalkInBookingPage() {
       });
     } catch {
       setSubmitting(false);
-      setFormError("Network error — check your connection and try again.");
+      setFormError(t("networkError"));
       return;
     }
     const d = await res.json().catch(() => ({}));
@@ -239,13 +249,13 @@ export default function WalkInBookingPage() {
     if (!res.ok) {
       if (d.code === "DUPLICATE_BOOKING") { setDuplicate(d.error); return; }
       setDuplicate(null);
-      setFormError(d.error ?? "Booking failed. Please try again.");
+      setFormError(d.error ?? t("bookingFailed"));
       return;
     }
     setDuplicate(null);
     setBooked({ ...(d as Booked), free: (d as Booked).appointment.paymentStatus === "PAID" });
     topRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [problem, consultType, normalized, holderNeedsName, name, holderNeedsAgeGender, age, gender, who, dep, clinicId, scheduledAt, symptoms, allergies, address, paymentMethod, consent]);
+  };
 
   const reset = () => {
     setBooked(null);
@@ -269,15 +279,15 @@ export default function WalkInBookingPage() {
       <DoctorMobileNav />
 
       <div ref={topRef} className="max-w-2xl mx-auto px-4 sm:px-6 py-8 scroll-mt-20">
-        <Link href="/doctor/dashboard" className="btn-ghost gap-1.5 text-sm mb-3 -ml-2"><ArrowLeft className="w-4 h-4" /> Dashboard</Link>
+        <Link href="/doctor/dashboard" className="btn-ghost gap-1.5 text-sm mb-3 -ml-2"><ArrowLeft className="w-4 h-4" /> {t("dashboard")}</Link>
         <div className="flex items-center gap-4 mb-6">
           <div className="w-12 h-12 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <UserPlus className="w-6 h-6 text-white" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-xl font-extrabold text-slate-900">Walk-in / phone booking</h1>
+            <h1 className="text-xl font-extrabold text-slate-900">{t("title")}</h1>
             <p className="text-sm text-slate-500 truncate">
-              Book a patient {ctx ? `with ${formatDoctorName(ctx.doctorName)}` : ""} — confirmed straight away
+              {ctx ? t("subtitleWith", { doctor: formatDoctorName(ctx.doctorName) }) : t("subtitle")}
             </p>
           </div>
         </div>
@@ -295,7 +305,7 @@ export default function WalkInBookingPage() {
         {ctx && !ctx.blocked && ctx.types.length === 0 && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800 flex gap-2">
             <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-500" />
-            {isStaff ? "The doctor hasn't turned on any visit types yet." : "Turn on at least one visit type in Profile → Consultation settings first."}
+            {isStaff ? t("noTypesStaff") : t("noTypesDoctor")}
           </div>
         )}
 
@@ -306,20 +316,20 @@ export default function WalkInBookingPage() {
                 <CheckCircle2 className="w-6 h-6 text-emerald-500" />
               </div>
               <div className="min-w-0">
-                <p className="font-extrabold text-slate-900 text-lg">{booked.appointment.patientLabel} is booked</p>
+                <p className="font-extrabold text-slate-900 text-lg">{t("booked", { name: booked.appointment.patientLabel })}</p>
                 <p className="text-sm text-slate-500">
-                  {TYPE_META[booked.appointment.consultType].label}
+                  {t(`type.${booked.appointment.consultType}`)}
                   {booked.appointment.consultType === "CLINIC" && selectedClinic ? ` · ${selectedClinic.name}` : ""}
-                  {" · "}{booked.appointment.timed ? fmtWhen(booked.appointment.scheduledAt) : "now, in today's queue"}
+                  {" · "}{booked.appointment.timed ? fmtWhen(booked.appointment.scheduledAt) : t("nowInQueue")}
                 </p>
               </div>
             </div>
 
             {booked.free ? (
-              <p className="text-sm bg-emerald-50 text-emerald-700 rounded-xl px-4 py-3 font-semibold">No fee for this visit — nothing to collect.</p>
+              <p className="text-sm bg-emerald-50 text-emerald-700 rounded-xl px-4 py-3 font-semibold">{t("noFee")}</p>
             ) : booked.appointment.paymentMethod === "CASH" ? (
               <p className="text-sm bg-slate-50 text-slate-700 rounded-xl px-4 py-3 flex items-center gap-2">
-                <Banknote className="w-4 h-4 text-slate-500" /> Collect <strong>₹{booked.appointment.amount}</strong> in cash at the visit.
+                <Banknote className="w-4 h-4 text-slate-500" /> <span>{t.rich("collectCash", { amount: booked.appointment.amount, b: (c) => <strong>{c}</strong> })}</span>
               </p>
             ) : (
               <div className="border border-slate-100 rounded-2xl p-4">
@@ -336,13 +346,13 @@ export default function WalkInBookingPage() {
 
             {booked.patientCreated && (
               <p className="text-xs text-slate-500 mt-4">
-                A DocOnClick account was made for {normalized}. If the patient signs up in the app with this number, they&apos;ll see this visit and their prescription there.
+                {t("accountCreated", { mobile: normalized })}
               </p>
             )}
 
             <div className="grid grid-cols-2 gap-2 mt-5">
-              <button type="button" onClick={reset} className="btn-primary justify-center py-3"><UserPlus className="w-4 h-4" /> Book another</button>
-              <Link href="/doctor/dashboard" className="btn-secondary justify-center py-3">Go to queue</Link>
+              <button type="button" onClick={reset} className="btn-primary justify-center py-3"><UserPlus className="w-4 h-4" /> {t("bookAnother")}</button>
+              <Link href="/doctor/dashboard" className="btn-secondary justify-center py-3">{t("goToQueue")}</Link>
             </div>
           </div>
         )}
@@ -351,55 +361,57 @@ export default function WalkInBookingPage() {
           <div className="space-y-4">
             {/* 1 — Patient */}
             <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-              <h2 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5"><Phone className="w-4 h-4 text-slate-400" /> Patient&apos;s mobile</h2>
+              <h2 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5"><Phone className="w-4 h-4 text-slate-400" /> {t("patientMobile")}</h2>
               <div className="relative">
                 <input
                   value={mobile}
                   onChange={(e) => onMobileChange(e.target.value)}
                   inputMode="tel"
                   autoComplete="off"
-                  placeholder="10-digit mobile number"
+                  placeholder={t("mobilePlaceholder")}
                   className="input-field w-full text-base tracking-wide"
                   autoFocus
                 />
                 {lookup.state === "loading" && <Loader2 className="w-4 h-4 animate-spin text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />}
               </div>
-              {mobile && !mobileValid && normalized.length >= 10 && <p className="text-xs text-red-500 mt-1.5">Enter a valid 10-digit Indian mobile number.</p>}
+              {mobile && !mobileValid && normalized.length >= 10 && <p className="text-xs text-red-500 mt-1.5">{t("mobileInvalid")}</p>}
               {lookup.state === "error" && <p className="text-sm text-red-600 mt-2">{lookup.error}</p>}
 
               {found && (
                 <div className="mt-3 bg-teal-50 border border-teal-100 rounded-xl px-4 py-3 flex items-start gap-2.5">
                   <UserCheck className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
                   <div className="min-w-0 text-sm">
-                    <p className="font-bold text-slate-900">{found.name.trim() || "Registered patient (name not set)"}</p>
+                    <p className="font-bold text-slate-900">{found.name.trim() || t("nameNotSet")}</p>
                     <p className="text-slate-600 text-xs mt-0.5">
-                      {[found.age ? `${found.age} yrs` : null, found.gender].filter(Boolean).join(" · ") || "Age/gender not set"}
+                      {[found.age ? t("age", { age: found.age }) : null, found.gender ? genderLabel(found.gender) : null].filter(Boolean).join(" · ") || t("ageGenderNotSet")}
                       {" · "}
                       {found.visitsWithDoctor > 0
-                        ? `${found.visitsWithDoctor} past visit${found.visitsWithDoctor === 1 ? "" : "s"}${found.lastVisitAt ? `, last ${new Date(found.lastVisitAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" })}` : ""}`
-                        : "first visit with this doctor"}
+                        ? found.lastVisitAt
+                          ? t("pastVisitsLast", { count: found.visitsWithDoctor, date: new Date(found.lastVisitAt).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" }) })
+                          : t("pastVisits", { count: found.visitsWithDoctor })
+                        : t("firstVisit")}
                     </p>
                   </div>
                 </div>
               )}
               {isNew && (
-                <p className="mt-3 text-xs text-slate-500 bg-slate-50 rounded-xl px-3 py-2">New patient — an account is created for this number with the booking.</p>
+                <p className="mt-3 text-xs text-slate-500 bg-slate-50 rounded-xl px-3 py-2">{t("newPatient")}</p>
               )}
 
               {(holderNeedsName || holderNeedsAgeGender) && (
                 <div className="mt-3 space-y-2.5">
                   {holderNeedsName && (
-                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Patient's full name" className="input-field w-full" autoComplete="off" />
+                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("patientName")} className="input-field w-full" autoComplete="off" />
                   )}
                   {holderNeedsAgeGender && (
                     <div className="grid grid-cols-2 gap-2.5">
                       {!found?.age && (
-                        <input value={age} onChange={(e) => setAge(e.target.value.replace(/\D/g, "").slice(0, 3))} inputMode="numeric" placeholder="Age" className="input-field w-full" />
+                        <input value={age} onChange={(e) => setAge(e.target.value.replace(/\D/g, "").slice(0, 3))} inputMode="numeric" placeholder={t("agePlaceholder")} className="input-field w-full" />
                       )}
                       {!found?.gender && (
                         <select value={gender} onChange={(e) => setGender(e.target.value)} className="input-field w-full">
-                          <option value="">Gender</option>
-                          {GENDERS.map((g) => <option key={g}>{g}</option>)}
+                          <option value="">{t("genderPlaceholder")}</option>
+                          {GENDERS.map((g) => <option key={g} value={g}>{genderLabel(g)}</option>)}
                         </select>
                       )}
                     </div>
@@ -409,25 +421,25 @@ export default function WalkInBookingPage() {
 
               {patientReady && (
                 <div className="mt-4">
-                  <p className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1"><Users className="w-3.5 h-3.5" /> Visit is for</p>
+                  <p className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {t("visitFor")}</p>
                   <div className="flex flex-wrap gap-2">
-                    <Chip active={who === "SELF"} onClick={() => setWho("SELF")}>{(found?.name.trim() || name.trim() || "Patient")} (self)</Chip>
+                    <Chip active={who === "SELF"} onClick={() => setWho("SELF")}>{t("self", { name: found?.name.trim() || name.trim() || t("patient") })}</Chip>
                     {dependents.map((d) => (
-                      <Chip key={d.id} active={who === d.id} onClick={() => setWho(d.id)}>{d.name} · {d.relation}</Chip>
+                      <Chip key={d.id} active={who === d.id} onClick={() => setWho(d.id)}>{d.name} · {relLabel(d.relation)}</Chip>
                     ))}
-                    <Chip active={who === "NEW"} onClick={() => setWho("NEW")}><Plus className="w-3.5 h-3.5" /> Family member</Chip>
+                    <Chip active={who === "NEW"} onClick={() => setWho("NEW")}><Plus className="w-3.5 h-3.5" /> {t("familyMember")}</Chip>
                   </div>
                   {who === "NEW" && (
                     <div className="mt-3 grid grid-cols-2 gap-2.5">
-                      <input value={dep.name} onChange={(e) => setDep({ ...dep, name: e.target.value })} placeholder="Their full name" className="input-field w-full col-span-2" autoComplete="off" />
+                      <input value={dep.name} onChange={(e) => setDep({ ...dep, name: e.target.value })} placeholder={t("depName")} className="input-field w-full col-span-2" autoComplete="off" />
                       <select value={dep.relation} onChange={(e) => setDep({ ...dep, relation: e.target.value })} className="input-field w-full">
-                        <option value="">Relation</option>
-                        {RELATIONS.filter((r) => r !== "Self").map((r) => <option key={r}>{r}</option>)}
+                        <option value="">{t("relationPlaceholder")}</option>
+                        {RELATIONS.filter((r) => r !== "Self").map((r) => <option key={r} value={r}>{tRel(r)}</option>)}
                       </select>
-                      <input value={dep.age} onChange={(e) => setDep({ ...dep, age: e.target.value.replace(/\D/g, "").slice(0, 3) })} inputMode="numeric" placeholder="Age (optional)" className="input-field w-full" />
+                      <input value={dep.age} onChange={(e) => setDep({ ...dep, age: e.target.value.replace(/\D/g, "").slice(0, 3) })} inputMode="numeric" placeholder={t("ageOptional")} className="input-field w-full" />
                       <select value={dep.gender} onChange={(e) => setDep({ ...dep, gender: e.target.value })} className="input-field w-full col-span-2">
-                        <option value="">Gender (optional)</option>
-                        {GENDERS.map((g) => <option key={g}>{g}</option>)}
+                        <option value="">{t("genderOptional")}</option>
+                        {GENDERS.map((g) => <option key={g} value={g}>{genderLabel(g)}</option>)}
                       </select>
                     </div>
                   )}
@@ -439,10 +451,11 @@ export default function WalkInBookingPage() {
               <>
                 {/* 2 — Visit */}
                 <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-                  <h2 className="text-sm font-bold text-slate-800 mb-3">Visit</h2>
+                  <h2 className="text-sm font-bold text-slate-800 mb-3">{t("visit")}</h2>
                   <div className={cn("grid gap-2", ctx.types.length === 3 ? "grid-cols-3" : ctx.types.length === 2 ? "grid-cols-2" : "grid-cols-1")}>
                     {ctx.types.map(({ type, fee }) => {
-                      const { label, icon: Icon } = TYPE_META[type];
+                      const { icon: Icon } = TYPE_META[type];
+                      const label = t(`type.${type}`);
                       return (
                         <button
                           key={type}
@@ -463,7 +476,7 @@ export default function WalkInBookingPage() {
 
                   {consultType === "CLINIC" && ctx.clinics.length > 1 && (
                     <select value={clinicId ?? ""} onChange={(e) => { setClinicId(e.target.value); setSlotTime(null); }} className="input-field w-full mt-3">
-                      {ctx.clinics.map((c) => <option key={c.id} value={c.id}>{c.name}{c.openNow ? " · open now" : ""}</option>)}
+                      {ctx.clinics.map((c) => <option key={c.id} value={c.id}>{c.name}{c.openNow ? ` · ${t("openNow")}` : ""}</option>)}
                     </select>
                   )}
                   {consultType === "CLINIC" && ctx.clinics.length === 1 && (
@@ -471,20 +484,20 @@ export default function WalkInBookingPage() {
                   )}
 
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    <Chip active={whenMode === "NOW"} onClick={() => setWhenMode("NOW")} block><Clock className="w-3.5 h-3.5" /> Now (in queue)</Chip>
-                    <Chip active={whenMode === "LATER"} onClick={() => setWhenMode("LATER")} block><CalendarClock className="w-3.5 h-3.5" /> Later</Chip>
+                    <Chip active={whenMode === "NOW"} onClick={() => setWhenMode("NOW")} block><Clock className="w-3.5 h-3.5" /> {t("now")}</Chip>
+                    <Chip active={whenMode === "LATER"} onClick={() => setWhenMode("LATER")} block><CalendarClock className="w-3.5 h-3.5" /> {t("later")}</Chip>
                   </div>
                   {whenMode === "NOW" && consultType === "CLINIC" && selectedClinic && selectedClinic.hasHours && !selectedClinic.openNow && (
-                    <p className="text-xs text-amber-700 mt-2">{selectedClinic.name} isn&apos;t in its posted hours right now — fine for a patient who&apos;s here.</p>
+                    <p className="text-xs text-amber-700 mt-2">{t("outsideHours", { clinic: selectedClinic.name })}</p>
                   )}
                   {whenMode === "LATER" && (
                     <div className="mt-3 space-y-3">
                       <input type="date" value={date} min={today} max={maxDate} onChange={(e) => { setDate(e.target.value); setSlotTime(null); }} className="input-field w-full" />
                       {useSlotPicker ? (
                         slots === null ? (
-                          <div className="flex items-center gap-2 text-sm text-slate-400"><Loader2 className="w-4 h-4 animate-spin" /> Loading free slots…</div>
+                          <div className="flex items-center gap-2 text-sm text-slate-400"><Loader2 className="w-4 h-4 animate-spin" /> {t("loadingSlots")}</div>
                         ) : slots.length === 0 ? (
-                          <p className="text-sm text-slate-500">{slotsError ?? "No free slots at this clinic on that day."}</p>
+                          <p className="text-sm text-slate-500">{slotsError ?? t("noSlots")}</p>
                         ) : (
                           <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 max-h-56 overflow-y-auto">
                             {slots.map((s) => (
@@ -510,43 +523,43 @@ export default function WalkInBookingPage() {
 
                   {consultType === "HOME" && (
                     <div className="mt-4 space-y-2.5">
-                      <p className="text-xs font-semibold text-slate-500">Visit address</p>
-                      <textarea value={address.address} onChange={(e) => setAddress({ ...address, address: e.target.value })} rows={2} placeholder="House / flat, street, area" className="input-field w-full" />
+                      <p className="text-xs font-semibold text-slate-500">{t("visitAddress")}</p>
+                      <textarea value={address.address} onChange={(e) => setAddress({ ...address, address: e.target.value })} rows={2} placeholder={t("addressPlaceholder")} className="input-field w-full" />
                       <div className="grid grid-cols-2 gap-2.5">
-                        <input value={address.landmark} onChange={(e) => setAddress({ ...address, landmark: e.target.value })} placeholder="Landmark (optional)" className="input-field w-full" />
-                        <input value={address.pinCode} onChange={(e) => setAddress({ ...address, pinCode: e.target.value.replace(/\D/g, "").slice(0, 6) })} inputMode="numeric" placeholder="PIN code" className="input-field w-full" />
+                        <input value={address.landmark} onChange={(e) => setAddress({ ...address, landmark: e.target.value })} placeholder={t("landmark")} className="input-field w-full" />
+                        <input value={address.pinCode} onChange={(e) => setAddress({ ...address, pinCode: e.target.value.replace(/\D/g, "").slice(0, 6) })} inputMode="numeric" placeholder={t("pinCode")} className="input-field w-full" />
                       </div>
                     </div>
                   )}
                   {consultType === "VIDEO" && (
-                    <p className="text-xs text-slate-500 mt-3">The patient joins the video call from the DocOnClick app, signed in with this number.</p>
+                    <p className="text-xs text-slate-500 mt-3">{t("videoHint")}</p>
                   )}
                 </section>
 
                 {/* 3 — Details */}
                 <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-2.5">
-                  <h2 className="text-sm font-bold text-slate-800">Reason for visit</h2>
-                  <textarea value={symptoms} onChange={(e) => setSymptoms(e.target.value)} rows={2} maxLength={1000} placeholder="e.g. Fever and cough for 3 days" className="input-field w-full" />
-                  <input value={allergies} onChange={(e) => setAllergies(e.target.value)} maxLength={500} placeholder="Allergies, if any (optional)" className="input-field w-full" />
+                  <h2 className="text-sm font-bold text-slate-800">{t("reason")}</h2>
+                  <textarea value={symptoms} onChange={(e) => setSymptoms(e.target.value)} rows={2} maxLength={1000} placeholder={t("reasonPlaceholder")} className="input-field w-full" />
+                  <input value={allergies} onChange={(e) => setAllergies(e.target.value)} maxLength={500} placeholder={t("allergiesPlaceholder")} className="input-field w-full" />
                 </section>
 
                 {/* 4 — Payment */}
                 <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-                  <h2 className="text-sm font-bold text-slate-800 mb-3">Payment · ₹{fee}</h2>
+                  <h2 className="text-sm font-bold text-slate-800 mb-3">{t("payment", { fee })}</h2>
                   <div className="grid grid-cols-2 gap-2">
-                    <PayOption active={paymentMethod === "CASH"} onClick={() => setPaymentMethod("CASH")} icon={Banknote} title="Cash" note={ctx.cashBlocked ? "Paused" : "Collect at the visit"} disabled={!!ctx.cashBlocked} />
-                    <PayOption active={paymentMethod === "ONLINE"} onClick={() => setPaymentMethod("ONLINE")} icon={QrCode} title="Online" note="Patient scans a QR / link" />
+                    <PayOption active={paymentMethod === "CASH"} onClick={() => setPaymentMethod("CASH")} icon={Banknote} title={t("cash")} note={ctx.cashBlocked ? t("paused") : t("collectAtVisit")} disabled={!!ctx.cashBlocked} />
+                    <PayOption active={paymentMethod === "ONLINE"} onClick={() => setPaymentMethod("ONLINE")} icon={QrCode} title={t("online")} note={t("onlineNote")} />
                   </div>
                   {ctx.cashBlocked && (
                     <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-3">
-                      {ctx.cashBlocked}{!isStaff && <> <Link href="/doctor/earnings" className="font-semibold underline">Pay now</Link></>}
+                      {ctx.cashBlocked}{!isStaff && <> <Link href="/doctor/earnings" className="font-semibold underline">{t("payNow")}</Link></>}
                     </p>
                   )}
                 </section>
 
                 <label className="flex items-start gap-2.5 px-1 text-sm text-slate-600 cursor-pointer">
                   <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 w-4 h-4 accent-teal-600" />
-                  The patient agreed to book this visit and share these details with the doctor.
+                  {t("consent")}
                 </label>
 
                 {formError && (
@@ -561,7 +574,7 @@ export default function WalkInBookingPage() {
                   disabled={submitting}
                   className="btn-primary w-full justify-center py-3.5 text-base disabled:opacity-60"
                 >
-                  {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Booking…</> : `Book ${whenMode === "NOW" ? "now" : "visit"} · ₹${fee} ${paymentMethod === "CASH" ? "cash" : "online"}`}
+                  {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("booking")}</> : t(whenMode === "NOW" ? "bookNow" : "bookVisit", { fee, method: paymentMethod })}
                 </button>
                 {problem && !formError && <p className="text-xs text-slate-400 text-center -mt-2">{problem}</p>}
               </>
@@ -573,10 +586,10 @@ export default function WalkInBookingPage() {
       {duplicate && (
         <ConfirmDialog
           icon={AlertTriangle}
-          title="Already booked"
+          title={t("alreadyBooked")}
           message={duplicate}
-          confirmLabel="Book anyway"
-          busyLabel="Booking…"
+          confirmLabel={t("bookAnyway")}
+          busyLabel={t("booking")}
           tone="warning"
           busy={submitting}
           onCancel={() => setDuplicate(null)}

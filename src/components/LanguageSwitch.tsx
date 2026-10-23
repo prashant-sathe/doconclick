@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Languages, Loader2 } from "lucide-react";
-import { APP_LANGUAGES, APP_LANGUAGE_LABELS, type AppLanguage, setLanguageCookie } from "@/lib/appLanguage";
+import { APP_LANGUAGES, APP_LANGUAGE_LABELS, type AppLanguage, setLanguageCookie, baseLanguage } from "@/lib/appLanguage";
 import { useToast } from "@/components/Toast";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 // adopts the choice).
 export default function LanguageSwitch({ compact = false }: { compact?: boolean }) {
   const t = useTranslations("common.language");
-  const current = useLocale();
+  const current = baseLanguage(useLocale());
   const router = useRouter();
   const toast = useToast();
   const [busy, setBusy] = useState<AppLanguage | null>(null);

@@ -8,6 +8,7 @@ import {
 } from "@/lib/pushClient";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { isNative } from "@/lib/platform";
+import { useTranslations } from "next-intl";
 
 // Profile-page counterpart to EnableNotificationsPrompt: that popup shows once
 // and can be dismissed forever, so this gives patients, doctors and admins a
@@ -19,6 +20,7 @@ import { isNative } from "@/lib/platform";
 // were enabled from a different one, which would show the toggle as "off"
 // for an account that's actually already receiving push.
 export default function NotificationSettings() {
+  const t = useTranslations("shared.push");
   const [supported, setSupported] = useState(true);
   const [checking, setChecking] = useState(true);
   const [permission, setPermission] = useState<NotificationPermission | null>(null);
@@ -55,9 +57,9 @@ export default function NotificationSettings() {
     return (
       <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
         <h2 className="font-bold text-slate-800 mb-1 flex items-center gap-2">
-          <Bell className="w-4 h-4 text-blue-500" /> Push Notifications
+          <Bell className="w-4 h-4 text-blue-500" /> {t("settingsTitle")}
         </h2>
-        <p className="text-sm text-slate-500">Not supported in this browser.</p>
+        <p className="text-sm text-slate-500">{t("notSupported")}</p>
       </section>
     );
   }
@@ -65,7 +67,7 @@ export default function NotificationSettings() {
   return (
     <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
       <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-        <Bell className="w-4 h-4 text-blue-500" /> Push Notifications
+        <Bell className="w-4 h-4 text-blue-500" /> {t("settingsTitle")}
       </h2>
 
       {permission === "denied" ? (
@@ -74,13 +76,12 @@ export default function NotificationSettings() {
             <BellOff className="w-4 h-4 text-amber-600" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-slate-900">Notifications are blocked</p>
+            <p className="text-sm font-bold text-slate-900">{t("blockedTitle")}</p>
             <p className="text-xs text-slate-500 mt-0.5">
               {isNative()
-                ? "Notifications are turned off for this app. Enable them from your phone's Settings → Apps → DocOnClick → Notifications."
-                : <>You&apos;ve blocked notifications for this site in your browser. Allow them from your browser&apos;s
-                    site settings, then reload this page.
-                    {isMac() && " If they still don't show up, your Mac's system notification settings may also be blocking them."}
+                ? t("blockedNative")
+                : <>{t("blockedBrowser")}
+                    {isMac() && ` ${t("blockedMac")}`}
                   </>}
             </p>
             {!isNative() && isMac() && (
@@ -89,7 +90,7 @@ export default function NotificationSettings() {
                 onClick={openSystemNotificationSettings}
                 className="text-xs font-semibold px-3 py-1.5 rounded-lg text-amber-700 hover:bg-amber-100 mt-2 inline-flex items-center gap-1"
               >
-                Open Mac notification settings <ExternalLink className="w-3 h-3" />
+                {t("openMacSettings")} <ExternalLink className="w-3 h-3" />
               </button>
             )}
           </div>
@@ -105,10 +106,10 @@ export default function NotificationSettings() {
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold text-slate-900">
-                {checking ? "Checking status…" : subscribed ? "Notifications are on" : "Notifications are off"}
+                {checking ? t("checking") : subscribed ? t("on") : t("off")}
               </p>
               <p className="text-xs text-slate-500 mt-0.5">
-                Get notified even when this tab isn&apos;t open — new requests, status updates and messages.
+                {t("promptBody")}
               </p>
             </div>
           </div>
@@ -118,7 +119,7 @@ export default function NotificationSettings() {
             disabled={busy || checking}
             className={cn(subscribed ? "btn-secondary" : "btn-primary", "flex-shrink-0 disabled:opacity-60")}
           >
-            {busy || checking ? <Loader2 className="w-4 h-4 animate-spin" /> : subscribed ? "Turn off" : "Enable"}
+            {busy || checking ? <Loader2 className="w-4 h-4 animate-spin" /> : subscribed ? t("turnOff") : t("enable")}
           </button>
         </div>
       )}
@@ -126,10 +127,10 @@ export default function NotificationSettings() {
       {confirmDisable && (
         <ConfirmDialog
           icon={BellOff}
-          title="Turn off notifications?"
-          message="This turns off push notifications on every device you're signed in on, not just this one — you'll need to re-enable it separately on each device."
-          confirmLabel="Turn Off"
-          busyLabel="Turning off…"
+          title={t("confirmOffTitle")}
+          message={t("confirmOffBody")}
+          confirmLabel={t("confirmOff")}
+          busyLabel={t("turningOff")}
           tone="warning"
           busy={busy}
           onCancel={() => setConfirmDisable(false)}

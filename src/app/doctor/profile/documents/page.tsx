@@ -4,8 +4,10 @@ import { Camera, BadgeCheck, FileText, Shield } from "lucide-react";
 import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import DocSlot from "@/components/doctor/DocSlot";
 import { useDoctorProfile } from "@/lib/useDoctorProfile";
+import { useTranslations } from "next-intl";
 
 export default function VerificationDocumentsPage() {
+  const t = useTranslations("doctorAccount.documents");
   const { profile, loading } = useDoctorProfile();
 
   const [docs, setDocs] = useState({
@@ -35,33 +37,33 @@ export default function VerificationDocumentsPage() {
 
   return (
     <DoctorProfileSubShell
-      title="Verification & Documents"
-      description="Uploads save immediately. Your profile only shows to patients once our team verifies you."
+      title={t("title")}
+      description={t("description")}
       icon={<Shield className="w-5 h-5" />}
       tint="bg-amber-50 text-amber-500"
       loading={loading}
     >
       {isVerified ? (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 flex items-center gap-2">
-          <BadgeCheck className="w-4 h-4 flex-shrink-0" /> Your credentials are verified. Documents are locked.
+          <BadgeCheck className="w-4 h-4 flex-shrink-0" /> {t("verified")}
         </div>
       ) : (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
-          The items marked <span className="text-red-500 font-bold">*</span> are mandatory to get verified.
+          {t.rich("mandatory", { star: () => <span className="text-red-500 font-bold">*</span> })}
         </div>
       )}
 
-      <DocSlot label="Profile Photo" icon={Camera} url={docs.photoUrl} type="photo" accept=".jpg,.jpeg,.png" cropAspect={1} removable onUploaded={upd("photoUrl")} />
-      <DocSlot label="Registration Certificate" icon={BadgeCheck} url={docs.medRegCertUrl} type="medRegCert" locked={isVerified} required removable onUploaded={upd("medRegCertUrl")} />
-      <DocSlot label="Medical Degree Certificate" icon={FileText} url={docs.degreeCertUrl} type="degreeCert" locked={isVerified} required removable onUploaded={upd("degreeCertUrl")} />
-      <DocSlot label="Government ID (KYC)" icon={Shield} url={docs.kycDocUrl} type="kyc" locked={isVerified} required removable onUploaded={upd("kycDocUrl")} />
+      <DocSlot label={t("photo")} icon={Camera} url={docs.photoUrl} type="photo" accept=".jpg,.jpeg,.png" cropAspect={1} removable onUploaded={upd("photoUrl")} />
+      <DocSlot label={t("regCert")} icon={BadgeCheck} url={docs.medRegCertUrl} type="medRegCert" locked={isVerified} required removable onUploaded={upd("medRegCertUrl")} />
+      <DocSlot label={t("degreeCert")} icon={FileText} url={docs.degreeCertUrl} type="degreeCert" locked={isVerified} required removable onUploaded={upd("degreeCertUrl")} />
+      <DocSlot label={t("kyc")} icon={Shield} url={docs.kycDocUrl} type="kyc" locked={isVerified} required removable onUploaded={upd("kycDocUrl")} />
       <DocSlot
-        label="Prescription Signature" icon={FileText} url={docs.signatureUrl} type="signature"
+        label={t("signature")} icon={FileText} url={docs.signatureUrl} type="signature"
         accept=".jpg,.jpeg,.png" cropAspect={2.5} required
-        requiredNote="Required for your account to be approved — not uploaded yet"
+        requiredNote={t("signatureRequired")}
         removable onUploaded={upd("signatureUrl")}
       />
-      <p className="text-xs text-slate-400">Your signature is printed on every prescription you generate.</p>
+      <p className="text-xs text-slate-400">{t("signatureHint")}</p>
     </DoctorProfileSubShell>
   );
 }

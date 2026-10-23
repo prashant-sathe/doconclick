@@ -12,6 +12,9 @@ import { useAuth } from "@/components/AuthProvider";
 import { formatDoctorName, formatProviderName } from "@/lib/utils";
 import { renderChatText } from "@/lib/chatMarkdown";
 import { readPatientLocation } from "@/lib/patientLocation";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
+import { GENDERS } from "@/lib/bookingProfile";
 import { ASSISTANT_MAX_MESSAGES, ASSISTANT_MAX_TOTAL_CHARS, ASSISTANT_MAX_MESSAGE_CHARS, type AssistantMessage } from "@/lib/assistantInput";
 
 // Loosely typed mirror of the OpenAI Responses API's input/output items —
@@ -176,12 +179,18 @@ function buildDisplayEntries(items: ConversationItem[]): DisplayEntry[] {
   return entries;
 }
 
-const STARTER_PROMPTS: { icon: typeof Thermometer; tint: "blue" | "teal" | "amber" | "emerald"; text: string }[] = [
-  { icon: Thermometer, tint: "blue", text: "I have a fever and cough" },
-  { icon: Baby, tint: "teal", text: "My child has a skin rash" },
-  { icon: Activity, tint: "amber", text: "I've had a headache for 3 days" },
-  { icon: ClipboardCheck, tint: "emerald", text: "I need a routine health check-up" },
+// `text` is a message key (patientAccount.assistant.starter); the prompt is
+// sent in the app's language — the assistant replies in kind.
+const STARTER_PROMPTS: { icon: typeof Thermometer; tint: "blue" | "teal" | "amber" | "emerald"; text: "fever" | "rash" | "headache" | "checkup" }[] = [
+  { icon: Thermometer, tint: "blue", text: "fever" },
+  { icon: Baby, tint: "teal", text: "rash" },
+  { icon: Activity, tint: "amber", text: "headache" },
+  { icon: ClipboardCheck, tint: "emerald", text: "checkup" },
 ];
+
+const TICKET_STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED"] as const;
+const isTicketStatus = (s: string): s is (typeof TICKET_STATUSES)[number] => (TICKET_STATUSES as readonly string[]).includes(s);
+const isGender = (g: string | null): g is (typeof GENDERS)[number] => !!g && (GENDERS as readonly string[]).includes(g);
 
 const TINT_CLASSES: Record<string, string> = {
   blue: "bg-blue-50 text-blue-600",
@@ -218,6 +227,8 @@ function NurseCard({ nurse, service, hasDoctorReferral }: {
   service: { id: string; name: string; kind: string; requiresPrescription: boolean };
   hasDoctorReferral: boolean;
 }) {
+  const t = useTranslations("patientAccount.assistant");
+  const tc = useTranslations("booking.common");
   const shift = service.kind === "SHIFT";
   const available = !shift && isDoctorAvailableNow(nurse.availability) && !nurse.busyNow && !nurse.awayNow;
   return (
@@ -234,28 +245,28 @@ function NurseCard({ nurse, service, hasDoctorReferral }: {
             <span className="text-sm font-bold text-slate-900 flex-shrink-0">₹{nurse.price}</span>
           </div>
           <span className="badge badge-danger mt-1.5">{service.name}</span>
-          <p className="text-[11px] text-slate-500 mt-1">{[nurse.qualification, nurse.experience ? `${nurse.experience} yrs exp` : null, nurse.gender].filter(Boolean).join(" · ")}</p>
+          <p className="text-[11px] text-slate-500 mt-1">{[nurse.qualification, nurse.experience ? t("yrsExp", { years: nurse.experience }) : null, isGender(nurse.gender) ? tc(`gender.${nurse.gender}`) : nurse.gender].filter(Boolean).join(" · ")}</p>
           {nurse.totalReviews > 0 && <div className="mt-1"><RatingStars avgRating={nurse.avgRating} totalReviews={nurse.totalReviews} /></div>}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[11px]">
-            {nurse.distanceKm != null && <span className="flex items-center gap-1 text-slate-500"><MapPin className="w-3 h-3" /> {nurse.distanceKm} km away</span>}
-            {nurse.policeVerified && <span className="font-semibold text-emerald-600">Police verified</span>}
+            {nurse.distanceKm != null && <span className="flex items-center gap-1 text-slate-500"><MapPin className="w-3 h-3" /> {t("kmAway", { km: nurse.distanceKm })}</span>}
+            {nurse.policeVerified && <span className="font-semibold text-emerald-600">{t("policeVerified")}</span>}
             {!shift && (
               <span className={`flex items-center gap-1 font-semibold ${available ? "text-emerald-600" : "text-amber-600"}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${available ? "bg-emerald-500" : "bg-amber-500"}`} />
-                {available ? "Available now" : nurse.awayNow ? "Away today — book a later day" : nurse.busyNow ? "On a visit now" : formatAvailability(nurse.availability)}
+                {available ? t("availableNow") : nurse.awayNow ? t("awayToday") : nurse.busyNow ? t("onVisitNow") : formatAvailability(nurse.availability)}
               </span>
             )}
           </div>
           {service.requiresPrescription && (
             <p className={`text-[11px] mt-1.5 font-semibold ${hasDoctorReferral ? "text-emerald-700" : "text-amber-700"}`}>
-              {hasDoctorReferral ? "Your doctor's prescription will be attached" : "Needs a doctor's prescription"}
+              {hasDoctorReferral ? t("rxWillAttach") : t("rxNeeded")}
             </p>
           )}
         </div>
       </div>
       <div className="flex gap-2 mt-3">
         <Link href={`/patient/nurse?serviceId=${service.id}&nurseId=${nurse.id}`} className="btn-primary flex-1 justify-center py-2 text-xs">
-          Book this nurse
+          {t("bookNurse")}
         </Link>
       </div>
     </div>
@@ -263,6 +274,7 @@ function NurseCard({ nurse, service, hasDoctorReferral }: {
 }
 
 function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
+  const t = useTranslations("patientAccount.assistant");
   const available = isDoctorAvailableNow(doctor.availability) && !doctor.awayNow;
   const initials = doctor.name
     .replace(/^Dr\.?\s*/i, "")
@@ -306,39 +318,39 @@ function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
           <div className="flex flex-wrap gap-1.5 mt-1.5">
             {doctor.offersClinic && (
               <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 rounded-full px-2 py-0.5">
-                <Building2 className="w-3 h-3" /> Clinic
+                <Building2 className="w-3 h-3" /> {t("clinic")}
               </span>
             )}
             {doctor.offersVideo && (
               <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 bg-blue-50 rounded-full px-2 py-0.5">
-                <Video className="w-3 h-3" /> Video call
+                <Video className="w-3 h-3" /> {t("videoCall")}
               </span>
             )}
             {doctor.offersHomeVisit && (
               <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 rounded-full px-2 py-0.5">
-                <Home className="w-3 h-3" /> Home visit
+                <Home className="w-3 h-3" /> {t("homeVisit")}
               </span>
             )}
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[11px]">
             {doctor.distanceKm != null && (
               <span className="flex items-center gap-1 text-slate-500">
-                <MapPin className="w-3 h-3" /> {doctor.distanceKm} km away
+                <MapPin className="w-3 h-3" /> {t("kmAway", { km: doctor.distanceKm })}
               </span>
             )}
             <span className={`flex items-center gap-1 font-semibold ${available ? "text-emerald-600" : "text-amber-600"}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${available ? "bg-emerald-500" : "bg-amber-500"}`} />
-              {available ? "Available now" : doctor.awayNow ? "Away today — book a later day" : doctor.availability}
+              {available ? t("availableNow") : doctor.awayNow ? t("awayToday") : doctor.availability}
             </span>
           </div>
         </div>
       </div>
       <div className="flex gap-2 mt-3">
         <Link href={`/patient/doctor/${doctor.id}`} className="btn-ghost flex-1 justify-center py-2 text-xs">
-          View profile
+          {t("viewProfile")}
         </Link>
         <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary flex-1 justify-center py-2 text-xs">
-          Book appointment
+          {t("bookAppointment")}
         </Link>
       </div>
     </div>
@@ -352,30 +364,34 @@ const STATUS_CLASSES: Record<string, string> = {
 };
 
 function StatusBadge({ status }: { status: string }) {
+  const t = useTranslations("patientAccount.ticketStatus");
   return (
     <span className={`text-[10px] font-bold uppercase tracking-wide border rounded-full px-2 py-0.5 ${STATUS_CLASSES[status] ?? "bg-slate-50 text-slate-600 border-slate-200"}`}>
-      {status.replace("_", " ")}
+      {isTicketStatus(status) ? t(status) : status.replace("_", " ")}
     </span>
   );
 }
 
 function TicketCreatedCard({ ticket }: { ticket: SupportTicket }) {
+  const t = useTranslations("patientAccount.assistant");
+  const locale = formattingLocale(useLocale());
   return (
     <div className="ml-9 bg-white border border-blue-100 rounded-2xl p-4 shadow-sm">
       <div className="flex items-center gap-2">
         <Ticket className="w-4 h-4 text-blue-600 flex-shrink-0" />
-        <span className="text-sm font-bold text-slate-900">Ticket raised</span>
+        <span className="text-sm font-bold text-slate-900">{t("ticketRaised")}</span>
         <StatusBadge status={ticket.status} />
       </div>
       <p className="text-sm text-slate-700 font-semibold mt-2">{ticket.subject}</p>
       <p className="text-[11px] text-slate-400 mt-1">
-        Ref #{ticket.id.slice(-8)} · {new Date(ticket.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+        {t("ref", { ref: ticket.id.slice(-8) })} · {new Date(ticket.createdAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })}
       </p>
     </div>
   );
 }
 
 function TicketListCard({ tickets }: { tickets: SupportTicket[] }) {
+  const locale = formattingLocale(useLocale());
   return (
     <div className="ml-9 flex flex-col gap-2">
       {tickets.map((t) => (
@@ -385,7 +401,7 @@ function TicketListCard({ tickets }: { tickets: SupportTicket[] }) {
             <StatusBadge status={t.status} />
           </div>
           <p className="flex items-center gap-1 text-[11px] text-slate-400 mt-1.5">
-            <Clock className="w-3 h-3" /> {new Date(t.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+            <Clock className="w-3 h-3" /> {new Date(t.createdAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })}
           </p>
         </div>
       ))}
@@ -447,29 +463,30 @@ function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: strin
   );
 }
 
-function WelcomeState({ name, onPick }: { name: string; onPick: (text: string) => void }) {
+function WelcomeState({ name, onPick }: { name: string | undefined; onPick: (text: string) => void }) {
+  const t = useTranslations("patientAccount.assistant");
   return (
     <div className="h-full flex flex-col items-center justify-center gap-6 px-6 py-10 text-center">
       <div className="w-16 h-16 rounded-[22px] gradient-primary flex items-center justify-center shadow-lg">
         <Sparkles className="w-7 h-7 text-white" />
       </div>
       <div>
-        <h1 className="gradient-text text-2xl font-extrabold tracking-tight">Hi {name}, what&apos;s bothering you?</h1>
+        <h1 className="gradient-text text-2xl font-extrabold tracking-tight">{name ? t("welcomeTitle", { name }) : t("welcomeTitleNoName")}</h1>
         <p className="text-slate-500 text-sm mt-2 max-w-sm mx-auto leading-relaxed">
-          Tell me what&apos;s going on, and I&apos;ll help point you to the right doctor.
+          {t("welcomeBody")}
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
         {STARTER_PROMPTS.map(({ icon: Icon, tint, text }) => (
           <button
             key={text}
-            onClick={() => onPick(text)}
+            onClick={() => onPick(t(`starter.${text}`))}
             className="flex items-center gap-3 bg-white border border-slate-200 rounded-2xl px-4 py-3.5 text-left shadow-sm hover:border-blue-200 hover:-translate-y-0.5 hover:shadow-md transition-all"
           >
             <span className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${TINT_CLASSES[tint]}`}>
               <Icon className="w-4 h-4" />
             </span>
-            <span className="text-[13.5px] font-semibold text-slate-800 flex-1">{text}</span>
+            <span className="text-[13.5px] font-semibold text-slate-800 flex-1">{t(`starter.${text}`)}</span>
             <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
           </button>
         ))}
@@ -481,6 +498,7 @@ function WelcomeState({ name, onPick }: { name: string; onPick: (text: string) =
 export default function HealthAssistantPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const t = useTranslations("patientAccount.assistant");
   const [items, setItems] = useState<ConversationItem[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -547,15 +565,15 @@ export default function HealthAssistantPage() {
           }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Something went wrong. Please try again.");
+        if (!res.ok) throw new Error(data.error || t("somethingWrong"));
         setItems([...nextItems, ...(Array.isArray(data.items) ? data.items : [])]);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+        setError(err instanceof Error ? err.message : t("somethingWrong"));
       } finally {
         setLoading(false);
       }
     },
-    [items, loading]
+    [items, loading, t]
   );
 
   const entries = buildDisplayEntries(items);
@@ -567,7 +585,7 @@ export default function HealthAssistantPage() {
         style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <button aria-label="Back"
+          <button aria-label={t("back")}
             onClick={() => router.push("/patient/dashboard")}
             className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors flex-shrink-0"
           >
@@ -577,27 +595,27 @@ export default function HealthAssistantPage() {
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-bold text-slate-900 leading-tight truncate">Health Assistant</div>
-            <div className="text-[11px] text-slate-400 font-medium">Powered by AI · Always available</div>
+            <div className="text-sm font-bold text-slate-900 leading-tight truncate">{t("title")}</div>
+            <div className="text-[11px] text-slate-400 font-medium">{t("subtitle")}</div>
           </div>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
-          <Link aria-label="My tickets"
+          <Link aria-label={t("myTickets")}
             href="/patient/support"
             className="tap-44 relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
           >
-            <LifeBuoy className="w-3.5 h-3.5" /> <span className="hidden sm:inline">My Tickets</span>
+            <LifeBuoy className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t("myTickets")}</span>
             {openTicketCount > 0 && (
               <span className="min-w-[16px] h-4 px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">
                 {openTicketCount}
               </span>
             )}
           </Link>
-          <button aria-label="New chat"
+          <button aria-label={t("newChat")}
             onClick={() => setItems([])}
             className="tap-44 flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
           >
-            <Plus className="w-3.5 h-3.5" /> <span className="hidden sm:inline">New chat</span>
+            <Plus className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t("newChat")}</span>
           </button>
         </div>
       </header>
@@ -605,13 +623,13 @@ export default function HealthAssistantPage() {
       <div className="flex-shrink-0 bg-blue-50 border-b border-blue-100 px-4 sm:px-7 py-2 flex items-center gap-2">
         <Info className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
         <span className="text-xs font-medium text-blue-700">
-          This assistant helps you find the right doctor or home nurse. It does not provide diagnosis or emergency care — for urgent symptoms, call 112 or go to the nearest hospital.
+          {t("disclaimer")}
         </span>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {entries.length === 0 ? (
-          <WelcomeState name={user?.name?.split(" ")[0] || "there"} onPick={send} />
+          <WelcomeState name={user?.name?.split(" ")[0]} onPick={send} />
         ) : (
           <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-4">
             {entries.map((entry) => (
@@ -642,12 +660,12 @@ export default function HealthAssistantPage() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Describe how you're feeling…"
+            placeholder={t("placeholder")}
             maxLength={ASSISTANT_MAX_MESSAGE_CHARS}
             disabled={loading}
             className="flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none disabled:opacity-60"
           />
-          <button aria-label="Send message"
+          <button aria-label={t("send")}
             type="submit"
             disabled={loading || !input.trim()}
             className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary text-white disabled:opacity-40 transition-opacity"
@@ -656,7 +674,7 @@ export default function HealthAssistantPage() {
           </button>
         </form>
         <p className="text-center text-[11px] text-slate-400 mt-2">
-          Health Assistant can make mistakes. Always consult a doctor for medical advice.
+          {t("footer")}
         </p>
       </div>
     </div>

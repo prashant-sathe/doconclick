@@ -6,10 +6,13 @@ import ProfileSubShell from "@/components/patient/ProfileSubShell";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import { usePatientProfile, patchPatientProfile } from "@/lib/usePatientProfile";
 import { isNative, getCurrentPositionCompat } from "@/lib/platform";
+import { useTranslations } from "next-intl";
 
 export default function AddressSettingsPage() {
   const router = useRouter();
   const { profile, loading } = usePatientProfile();
+  const t = useTranslations("patientAccount.address");
+  const ts = useTranslations("patientAccount.shell");
 
   const [form, setForm] = useState({
     location: "", homeAddress: "", landmark: "", pinCode: "",
@@ -58,8 +61,8 @@ export default function AddressSettingsPage() {
 
   const save = async () => {
     let bad = false;
-    if (!form.homeAddress.trim()) { setAddressError("Home address is required."); bad = true; } else setAddressError("");
-    if (!/^\d{6}$/.test(form.pinCode.trim())) { setPinError("A valid 6-digit PIN code is required."); bad = true; } else setPinError("");
+    if (!form.homeAddress.trim()) { setAddressError(t("errHome")); bad = true; } else setAddressError("");
+    if (!/^\d{6}$/.test(form.pinCode.trim())) { setPinError(t("errPin")); bad = true; } else setPinError("");
     if (bad) return;
     setSaving(true);
     setError("");
@@ -76,7 +79,7 @@ export default function AddressSettingsPage() {
       setDirty(false);
       setTimeout(() => router.push("/patient/profile"), 600);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not save.");
+      setError(e instanceof Error ? e.message : ts("couldNotSave"));
     } finally {
       setSaving(false);
     }
@@ -84,8 +87,8 @@ export default function AddressSettingsPage() {
 
   return (
     <ProfileSubShell
-      title="Location & Address"
-      description="Used to find doctors near you and for home visits."
+      title={t("title")}
+      description={t("description")}
       icon={<MapPin className="w-5 h-5" />}
       tint="bg-blue-50 text-blue-500"
       loading={loading}
@@ -96,11 +99,11 @@ export default function AddressSettingsPage() {
       onSave={save}
     >
       <div>
-        <label className="input-label">Current Location</label>
+        <label className="input-label">{t("current")}</label>
         <div className="flex gap-2">
           <div className="flex-1">
             <AddressAutocomplete
-              placeholder="Search city, area or society…"
+              placeholder={t("searchPlaceholder")}
               value={form.location}
               onChange={(v) => set({ location: v })}
               onSelect={(s) => set({ location: s.label, lat: s.lat, lng: s.lon })}
@@ -108,17 +111,17 @@ export default function AddressSettingsPage() {
           </div>
           <button type="button" onClick={getGPS} disabled={locating} className="btn-secondary flex-shrink-0 px-3 text-xs gap-1 self-start disabled:opacity-60">
             {locating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
-            {locating ? "Locating…" : "GPS"}
+            {locating ? t("locating") : "GPS"}
           </button>
         </div>
-        <p className="text-xs text-slate-400 mt-1">Tap GPS to fill your address from your current location.</p>
+        <p className="text-xs text-slate-400 mt-1">{t("gpsHint")}</p>
       </div>
 
       <div>
-        <label className="input-label">Home Address <span className="text-red-500">*</span></label>
+        <label className="input-label">{t("home")} <span className="text-red-500">*</span></label>
         <AddressAutocomplete
           multiline
-          placeholder="Flat/House No., Street, Area, Society"
+          placeholder={t("homePlaceholder")}
           value={form.homeAddress}
           onChange={(v) => set({ homeAddress: v })}
           onSelect={(s) => set({ homeAddress: s.label, lat: s.lat, lng: s.lon })}
@@ -128,11 +131,11 @@ export default function AddressSettingsPage() {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="input-label">Landmark</label>
-          <input className="input-field" placeholder="e.g. Near Metro Station" value={form.landmark} onChange={(e) => set({ landmark: e.target.value })} />
+          <label className="input-label">{t("landmark")}</label>
+          <input className="input-field" placeholder={t("landmarkPlaceholder")} value={form.landmark} onChange={(e) => set({ landmark: e.target.value })} />
         </div>
         <div>
-          <label className="input-label">PIN Code <span className="text-red-500">*</span></label>
+          <label className="input-label">{t("pin")} <span className="text-red-500">*</span></label>
           <input className="input-field" inputMode="numeric" placeholder="400001" maxLength={6} value={form.pinCode} onChange={(e) => set({ pinCode: e.target.value.replace(/\D/g, "").slice(0, 6) })} />
           {pinError && <p className="text-xs text-red-500 mt-1">{pinError}</p>}
         </div>

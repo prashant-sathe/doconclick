@@ -16,6 +16,10 @@ import { getCurrentPositionCompat } from "@/lib/platform";
 import { readPatientLocation } from "@/lib/patientLocation";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
+import { useTranslations } from "next-intl";
+
+const WEEK_DAY_KEYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+type WeekDayKey = (typeof WEEK_DAY_KEYS)[number];
 
 interface ClinicSlot {
   dayOfWeek: string;
@@ -73,6 +77,7 @@ interface DoctorReview {
 function Header() {
   const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
+  const t = useTranslations("patient.doctorProfile");
   return (
     <header className="safe-top sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
@@ -81,7 +86,7 @@ function Header() {
           <span className="font-extrabold text-slate-900">DocOnClick</span>
         </Link>
         <Link href={user ? "/patient/dashboard" : `/login?next=${encodeURIComponent(`/patient/doctor/${id}`)}`} className="tap-44-y btn-secondary py-2 px-3.5 text-sm">
-          {user ? "My Dashboard" : "Login"}
+          {user ? t("myDashboard") : t("login")}
         </Link>
       </div>
     </header>
@@ -92,6 +97,14 @@ export default function DoctorProfilePage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { colorFor } = useSpecialties();
+  const t = useTranslations("patient.doctorProfile");
+  const tc = useTranslations("patient.common");
+  const whenLabel = (daysAhead: number, dayOfWeek: string, time: string) => {
+    if (daysAhead === 0) return tc("when.today", { time });
+    if (daysAhead === 1) return tc("when.tomorrow", { time });
+    const day = (WEEK_DAY_KEYS as readonly string[]).includes(dayOfWeek) ? tc(`days.${dayOfWeek as WeekDayKey}`) : dayOfWeek;
+    return tc("when.on", { day, time });
+  };
   const [doctor, setDoctor] = useState<DoctorProfileData | null | undefined>(undefined);
   const [reviews, setReviews] = useState<DoctorReview[]>([]);
   const [saved, setSaved] = useState(false);
@@ -176,8 +189,8 @@ export default function DoctorProfilePage() {
           <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center">
             <UserX className="w-7 h-7 text-slate-400" />
           </div>
-          <h1 className="text-lg font-extrabold text-slate-900">Doctor not found</h1>
-          <p className="text-sm text-slate-500">This profile link is invalid or no longer available.</p>
+          <h1 className="text-lg font-extrabold text-slate-900">{t("notFoundTitle")}</h1>
+          <p className="text-sm text-slate-500">{t("notFoundBody")}</p>
         </div>
       </div>
     );
@@ -189,7 +202,7 @@ export default function DoctorProfilePage() {
   // visit for an upcoming open slot — surface when that is.
   const nextClinicOpening = hasOpenClinic ? null : findNextOpening(doctor.clinics, new Date());
   const nextOpeningLabel = nextClinicOpening
-    ? `${nextClinicOpening.daysAhead === 0 ? "today" : nextClinicOpening.daysAhead === 1 ? "tomorrow" : nextClinicOpening.dayOfWeek} ${formatSlotTime(nextClinicOpening.fromTime)}`
+    ? whenLabel(nextClinicOpening.daysAhead, nextClinicOpening.dayOfWeek, formatSlotTime(nextClinicOpening.fromTime))
     : null;
 
   const homeBaseLat = profile.lat ?? doctor.clinics[0]?.lat ?? null;
@@ -212,12 +225,14 @@ export default function DoctorProfilePage() {
           <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5 text-sm text-amber-800">
             <Compass className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <div className="min-w-0 flex-1">
-              {formatDoctorName(doctor.name)} is
-              {distance != null ? ` about ${distance.toFixed(0)} km away` : " outside your area"}, beyond the{" "}
-              {searchRadiusKm} km search range set in your{" "}
-              <Link href="/patient/profile" className="font-semibold underline">profile</Link>. You can still book.
+              {t.rich(distance != null ? "outOfRangeKm" : "outOfRangeUnknown", {
+                doctor: formatDoctorName(doctor.name),
+                km: distance != null ? distance.toFixed(0) : "",
+                range: searchRadiusKm ?? 0,
+                profile: (c) => <Link href="/patient/profile" className="font-semibold underline">{c}</Link>,
+              })}
             </div>
-            <button onClick={() => setRangeNoticeDismissed(true)} aria-label="Dismiss" className="text-amber-600 hover:text-amber-800 flex-shrink-0">
+            <button onClick={() => setRangeNoticeDismissed(true)} aria-label={tc("dismiss")} className="text-amber-600 hover:text-amber-800 flex-shrink-0">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -227,7 +242,7 @@ export default function DoctorProfilePage() {
             <div className="relative w-full h-40 sm:h-48 bg-slate-100">
               <Image
                 src={(doctor.clinics.length > 0 ? doctor.clinics[0].photoUrl : profile.clinicPhotoUrl)!}
-                alt={(doctor.clinics[0]?.name ?? profile.clinicName) ? `${doctor.clinics[0]?.name ?? profile.clinicName} — clinic photo` : "Clinic photo"}
+                alt={(doctor.clinics[0]?.name ?? profile.clinicName) ? t("clinicPhotoOf", { name: doctor.clinics[0]?.name ?? profile.clinicName ?? "" }) : t("clinicPhoto")}
                 fill
                 sizes="100vw"
                 className="object-cover"
@@ -238,11 +253,11 @@ export default function DoctorProfilePage() {
           {/* Header */}
           <div className="flex items-start gap-4 mb-5">
             {user?.role === "PATIENT" && (
-              <button aria-label={saved ? "Remove from saved doctors" : "Save doctor"} aria-pressed={saved}
+              <button aria-label={saved ? t("unsave") : t("save")} aria-pressed={saved}
                 type="button"
                 onClick={toggleSave}
                 disabled={savingBookmark}
-                title={saved ? "Remove from saved doctors" : "Save doctor for later"}
+                title={saved ? t("unsave") : t("saveForLater")}
                 className={cn(
                   "tap-44 absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors",
                   saved
@@ -289,7 +304,7 @@ export default function DoctorProfilePage() {
 
           {/* Chips */}
           <div className="flex flex-wrap gap-2 mb-5">
-            <span className="badge badge-info">{profile.experience} yrs exp</span>
+            <span className="badge badge-info">{tc("yrsExp", { years: profile.experience })}</span>
             <span className="badge badge-gray">
               <Clock className="w-3 h-3" /> {formatAvailability(profile.availability)}
             </span>
@@ -307,7 +322,7 @@ export default function DoctorProfilePage() {
           {/* Our Clinics */}
           {doctor.clinics.length > 0 && (
             <div className="mb-6">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Our Clinics</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t("ourClinics")}</p>
               <div className="space-y-2">
                 {doctor.clinics.map((clinic) => {
                   const open = isClinicOpenNow(clinic.slots);
@@ -321,12 +336,12 @@ export default function DoctorProfilePage() {
                         <p className="text-xs text-slate-500 mt-0.5">{clinic.address}</p>
                         {next && (
                           <p className="text-[11px] text-slate-400 mt-0.5">
-                            Opens {next.daysAhead === 0 ? "today" : next.daysAhead === 1 ? "tomorrow" : next.dayOfWeek} {formatSlotTime(next.fromTime)}
+                            {t("opens", { when: whenLabel(next.daysAhead, next.dayOfWeek, formatSlotTime(next.fromTime)) })}
                           </p>
                         )}
                       </div>
                       <span className={cn("badge flex-shrink-0", open ? "badge-success" : "badge-gray")}>
-                        {open ? "Open now" : "Closed now"}
+                        {open ? tc("openNow") : tc("closedNow")}
                       </span>
                     </div>
                   );
@@ -347,11 +362,11 @@ export default function DoctorProfilePage() {
                 {profile.offersClinic && (
                   <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                     <Building2 className={cn("w-5 h-5 mx-auto mb-1", hasOpenClinic ? "text-blue-500" : "text-slate-400")} />
-                    <p className="text-xs text-slate-500">Clinic Visit</p>
+                    <p className="text-xs text-slate-500">{tc("consultType.CLINIC")}</p>
                     <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{profile.consultFee}</p>
                     {!hasOpenClinic && (
                       <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                        {nextOpeningLabel ? `Closed now · opens ${nextOpeningLabel}` : "Closed now · schedule for later"}
+                        {nextOpeningLabel ? t("closedOpens", { when: nextOpeningLabel }) : t("closedScheduleLater")}
                       </p>
                     )}
                   </div>
@@ -359,7 +374,7 @@ export default function DoctorProfilePage() {
                 {profile.offersVideo && (
                   <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                     <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                    <p className="text-xs text-slate-500">Video Consultation</p>
+                    <p className="text-xs text-slate-500">{tc("consultType.VIDEO")}</p>
                     <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{profile.videoFee}</p>
                   </div>
                 )}
@@ -367,13 +382,13 @@ export default function DoctorProfilePage() {
                   hasHomeVisitReach ? (
                     <div className="rounded-2xl p-4 border border-blue-200 bg-blue-50 text-center">
                       <Home className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-                      <p className="text-xs text-blue-600">Home Visit</p>
+                      <p className="text-xs text-blue-600">{tc("consultType.HOME")}</p>
                       <p className="text-base font-extrabold text-blue-700 mt-0.5">₹{profile.homeVisitFee}</p>
                     </div>
                   ) : (
                     <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
                       <Home className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                      <p className="text-xs text-slate-400">Outside home visit range</p>
+                      <p className="text-xs text-slate-400">{t("outsideHomeRange")}</p>
                     </div>
                   )
                 )}
@@ -384,7 +399,7 @@ export default function DoctorProfilePage() {
           {/* Reviews */}
           {reviews.length > 0 && (
             <div className="mb-6">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Recent Reviews</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t("recentReviews")}</p>
               <div className="space-y-2">
                 {reviews.slice(0, 4).map((r) => (
                   <div key={r.id} className="bg-slate-50 rounded-xl px-3 py-2">
@@ -407,7 +422,7 @@ export default function DoctorProfilePage() {
             }
             className="btn-primary w-full justify-center py-3.5 text-base"
           >
-            Book Appointment
+            {t("bookAppointment")}
           </Link>
           </div>
         </div>

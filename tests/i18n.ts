@@ -13,6 +13,7 @@ import jwt from "jsonwebtoken";
 import { createTranslator } from "use-intl/core";
 import { prisma } from "../src/lib/prisma";
 import { NAMESPACES } from "../src/i18n/messages";
+import { uiLocale } from "../src/lib/appLanguage";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
@@ -74,7 +75,8 @@ async function main() {
   const { loadMessages } = await import("../src/i18n/messages");
   for (const locale of LOCALES) {
     const messages = await loadMessages(locale);
-    const t = createTranslator({ locale, messages, timeZone: "Asia/Kolkata" }) as unknown as { (k: string, v?: object): string; rich: (k: string, v?: object) => unknown };
+    // The locale next-intl runs in (Marathi with Latin digits — uiLocale()).
+    const t = createTranslator({ locale: uiLocale(locale), messages, timeZone: "Asia/Kolkata" }) as unknown as { (k: string, v?: object): string; rich: (k: string, v?: object) => unknown };
     const bad: string[] = [];
     for (const ns of NAMESPACES) {
       for (const [key, en] of leaves(read("en-IN", ns))) {
@@ -83,6 +85,8 @@ async function main() {
         try {
           const out = /<\w+>/.test(en) ? JSON.stringify(t.rich(`${ns}.${key}`, values)) : t(`${ns}.${key}`, values);
           if (/\{\w+\}|\bns\.|^\s*$/.test(String(out)) && en.trim()) bad.push(`${ns}.${key} → ${out}`);
+          // Digits stay Latin in every language (dates, plurals' #, numbers).
+          if (/[०-९]/.test(String(out))) bad.push(`${ns}.${key} has Devanagari digits → ${String(out).slice(0, 60)}`);
         } catch (e) {
           bad.push(`${ns}.${key}: ${(e as Error).message.slice(0, 80)}`);
         }

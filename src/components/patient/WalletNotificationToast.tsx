@@ -4,33 +4,40 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Wallet, XCircle, ShieldCheck, X } from "lucide-react";
 import type { WalletTxnEvent } from "@/hooks/useWalletNotifications";
+import { useTranslations } from "next-intl";
 
 const AUTO_DISMISS_MS = 6000;
 
-const TYPE_COPY: Record<string, { title: string; message: (e: WalletTxnEvent) => string; icon: typeof Wallet; color: string; bg: string }> = {
-  TOPUP: { title: "Wallet topped up!", message: (e) => `₹${e.amount} added. New balance ₹${e.balanceAfter}.`, icon: Wallet, color: "text-emerald-600", bg: "bg-emerald-50" },
-  BOOKING_PAYMENT: { title: "Wallet debited", message: (e) => `₹${e.amount} paid for an appointment. New balance ₹${e.balanceAfter}.`, icon: Wallet, color: "text-blue-600", bg: "bg-blue-50" },
-  ADMIN_CREDIT: { title: "Wallet credited by admin", message: (e) => `₹${e.amount} added.${e.note ? ` ${e.note}` : ""} New balance ₹${e.balanceAfter}.`, icon: ShieldCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
-  ADMIN_DEBIT: { title: "Wallet debited by admin", message: (e) => `₹${e.amount} deducted.${e.note ? ` ${e.note}` : ""} New balance ₹${e.balanceAfter}.`, icon: ShieldCheck, color: "text-amber-600", bg: "bg-amber-50" },
-  REASSIGNMENT_CREDIT: { title: "Appointment cancelled — refunded", message: (e) => `₹${e.amount} credited to your wallet. New balance ₹${e.balanceAfter}.`, icon: Wallet, color: "text-emerald-600", bg: "bg-emerald-50" },
-};
-
-const FAILED_COPY = { title: "Wallet top-up failed", message: (e: WalletTxnEvent) => `Your top-up of ₹${e.amount} didn't go through.`, icon: XCircle, color: "text-red-600", bg: "bg-red-50" };
+// Title/message copy lives in messages/<locale>/patient.json (walletToast.<type>).
+const TYPE_COPY = {
+  TOPUP: { icon: Wallet, color: "text-emerald-600", bg: "bg-emerald-50" },
+  BOOKING_PAYMENT: { icon: Wallet, color: "text-blue-600", bg: "bg-blue-50" },
+  ADMIN_CREDIT: { icon: ShieldCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
+  ADMIN_DEBIT: { icon: ShieldCheck, color: "text-amber-600", bg: "bg-amber-50" },
+  REASSIGNMENT_CREDIT: { icon: Wallet, color: "text-emerald-600", bg: "bg-emerald-50" },
+  FAILED: { icon: XCircle, color: "text-red-600", bg: "bg-red-50" },
+} as const;
+type ToastType = keyof typeof TYPE_COPY;
+const isToastType = (v: string): v is ToastType => v in TYPE_COPY;
 
 export default function WalletNotificationToast({ event, onDismiss }: {
   event: WalletTxnEvent;
   onDismiss: () => void;
 }) {
   const router = useRouter();
+  const t = useTranslations("patient.walletToast");
 
   useEffect(() => {
     const t = setTimeout(onDismiss, AUTO_DISMISS_MS);
     return () => clearTimeout(t);
   }, [event.id, event.status, onDismiss]);
 
-  const copy = event.status === "FAILED" ? FAILED_COPY : TYPE_COPY[event.type];
-  if (!copy) return null;
+  const key = event.status === "FAILED" ? "FAILED" : event.type;
+  if (!isToastType(key)) return null;
+  const copy = TYPE_COPY[key];
   const Icon = copy.icon;
+  // The admin's note is free text from the DB — appended as-is.
+  const values = { amount: String(event.amount), balance: String(event.balanceAfter), note: event.note ? ` ${event.note}` : "" };
 
   return createPortal(
     <div className="fixed bottom-36 sm:bottom-24 right-4 sm:right-6 z-50 w-[calc(100%-2rem)] max-w-sm animate-fade-in-up">
@@ -42,8 +49,8 @@ export default function WalletNotificationToast({ event, onDismiss }: {
           <Icon className={`w-4 h-4 ${copy.color}`} />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-slate-900">{copy.title}</p>
-          <p className="text-xs text-slate-500 mt-0.5">{copy.message(event)}</p>
+          <p className="text-sm font-bold text-slate-900">{t(`${key}.title`)}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{t(`${key}.message`, values)}</p>
         </div>
         <span
           onClick={(e) => { e.stopPropagation(); onDismiss(); }}

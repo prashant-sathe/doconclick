@@ -18,10 +18,13 @@ import { RELATIONS } from "@/lib/relations";
 import { readPatientLocation } from "@/lib/patientLocation";
 import { getCurrentPositionCompat } from "@/lib/platform";
 import { isDoctorAvailableNow, formatAvailability } from "@/lib/availability";
-import { buildVisitSchedule, intervalLabel, isShift, shiftLabel, PACKAGE_VISIT_OPTIONS, PACKAGE_INTERVAL_OPTIONS, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
+import { buildVisitSchedule, isShift, PACKAGE_VISIT_OPTIONS, PACKAGE_INTERVAL_OPTIONS, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
 import { patchPatientProfile } from "@/lib/usePatientProfile";
 import { prepareUpload, tooBigMessage } from "@/lib/compressImage";
 import { cn, formatProviderName } from "@/lib/utils";
+import { GENDERS } from "@/lib/bookingProfile";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 type Service = { id: string; name: string; description: string | null; durationMinutes: number; suggestedPrice: number; requiresPrescription: boolean; kind?: string };
 type Nurse = {
@@ -33,20 +36,24 @@ type Nurse = {
   awayUntil?: string | null; // last day off, or "today"
 };
 
-const awayLabel = (n: Nurse) =>
+// The last day off, formatted — null when it's just today (or not away).
+const awayUntilDate = (n: Nurse, locale: string) =>
   n.awayUntil && n.awayUntil !== "today"
-    ? `On leave until ${new Date(`${n.awayUntil}T00:00:00+05:30`).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short" })}`
-    : "Not taking bookings today";
+    ? new Date(`${n.awayUntil}T00:00:00+05:30`).toLocaleDateString(locale, { timeZone: "Asia/Kolkata", day: "numeric", month: "short" })
+    : null;
+const isGender = (g: string | null): g is (typeof GENDERS)[number] => !!g && (GENDERS as readonly string[]).includes(g);
+// Stored document categories stay English; labels from patientAccount.documents.category.
+const DOC_CATEGORY_KEY: Record<string, "labReport" | "prescription" | "scan" | "vaccination" | "discharge" | "other"> = {
+  "Lab Report": "labReport", Prescription: "prescription", "Scan/X-ray": "scan",
+  Vaccination: "vaccination", "Discharge Summary": "discharge", Other: "other",
+};
 
 // "As soon as possible" only makes sense inside working hours and when the nurse isn't mid-visit.
 const canComeNow = (n: Nurse) => isDoctorAvailableNow(n.availability) && !n.busyNow && !n.awayNow;
 type Doc = { id: string; title: string; category: string; createdAt: string };
 
-const SORTS = [
-  { id: "distance", label: "Nearest" },
-  { id: "rating", label: "Top rated" },
-  { id: "price", label: "Lowest price" },
-] as const;
+// Labels are message keys (patientAccount.nurse.sort).
+const SORTS = [{ id: "distance" }, { id: "rating" }, { id: "price" }] as const;
 
 // Local "yyyy-mm-ddThh:mm" for <input type="datetime-local"> min.
 function localInputValue(d: Date) {
@@ -58,6 +65,17 @@ function PatientNurseContent() {
   const { user, loading: authLoading, requireTerms } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("patientAccount.nurse");
+  const tc = useTranslations("booking.common");
+  const tDoc = useTranslations("patientAccount.documents");
+  const locale = formattingLocale(useLocale());
+  const awayLabel = (n: Nurse) => {
+    const until = awayUntilDate(n, locale);
+    return until ? t("onLeaveUntil", { date: until }) : t("notToday");
+  };
+  const shiftLabel = (durationMinutes: number) => t("shiftLabel", { hours: Math.round(durationMinutes / 60) });
+  const intervalLabel = (days: number) => t("interval", { days });
+  const genderLabel = (g: string | null) => (isGender(g) ? tc(`gender.${g}`) : g);
   // "Book Again" from a completed visit: ?nurseId=…&serviceId=…
   const deepLink = useRef({ serviceId: searchParams.get("serviceId"), nurseId: searchParams.get("nurseId") });
   // "Book a nurse" from a doctor's consultation: ?serviceId=…&referralId=…
@@ -140,7 +158,7 @@ function PatientNurseContent() {
         return { ...a, text, pinCode, lat, lng, coordsFor: text };
       });
     } catch {
-      setError("Couldn't get your location. Allow location access, or pick your address from the suggestions.");
+      setError(t("errGpsVisit"));
     } finally {
       setPinningVisit(false);
     }
@@ -150,12 +168,12 @@ function PatientNurseContent() {
     setLocating(true);
     try {
       const pos = await getCurrentPositionCompat({ enableHighAccuracy: true, timeout: 10000 });
-      const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude, label: "your current location" };
+      const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude, label: t("locCurrent") };
       setSearchLoc(loc);
       if (service) runSearch(service, loc);
     } catch {
       setSearchLoc("none");
-      if (!silent) setError("Couldn't get your location. Allow location access, or add your home address in your profile.");
+      if (!silent) setError(t("errGpsSearch"));
     } finally {
       setLocating(false);
     }
@@ -171,7 +189,7 @@ function PatientNurseContent() {
       }
       const chosen = readPatientLocation();
       if (chosen) { setSearchLoc(chosen); return; }
-      if (p?.lat != null && p?.lng != null) { setSearchLoc({ lat: p.lat, lng: p.lng, label: "your home address" }); return; }
+      if (p?.lat != null && p?.lng != null) { setSearchLoc({ lat: p.lat, lng: p.lng, label: t("locHome") }); return; }
       locateWithGps(true);
     });
     // Keyed on the account id, not the `user` object: AuthProvider hands out a
@@ -208,7 +226,7 @@ function PatientNurseContent() {
       const r = await res.json().catch(() => null);
       if (!res.ok || !r) {
         // e.g. the consultation it came from was cancelled (src/lib/nurseReferral.ts).
-        setNotice(`${r?.error ?? "That referral wasn't found."} You can still book a nurse below.`);
+        setNotice(t("referralNotice", { error: r?.error ?? t("referralNotFound") }));
         return;
       }
       setReferral(r);
@@ -216,6 +234,7 @@ function PatientNurseContent() {
       setIntervalDays(r.intervalDays);
       if (r.instructions) setNotes((n) => n || r.instructions);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [referralId, user?.id]);
 
   // Deep link step 1: once services and the search location are known, open the service.
@@ -228,7 +247,7 @@ function PatientNurseContent() {
     deepLink.current.serviceId = null;
     const s = services.find((x) => x.id === id);
     if (s) pickService(s);
-    else setNotice("That service isn't offered any more — please choose another.");
+    else setNotice(t("serviceGone"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [services, searchLoc, referral, notice]);
 
@@ -239,7 +258,7 @@ function PatientNurseContent() {
     deepLink.current.nurseId = null;
     const n = nurses.find((x) => x.id === id);
     if (n) pickNurse(n);
-    else if (!needsLocation) setNotice("That nurse isn't available for this service near you right now — here are other nurses.");
+    else if (!needsLocation) setNotice(t("nurseGone"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nurses]);
 
@@ -251,10 +270,10 @@ function PatientNurseContent() {
     : [];
   const fmtShift = (d: Date) => {
     const end = new Date(d.getTime() + (service?.durationMinutes ?? 0) * 60000);
-    return `${fmtDay(d)} → ${end.toLocaleString("en-IN", { weekday: "short", hour: "numeric", minute: "2-digit" })}`;
+    return `${fmtDay(d)} → ${end.toLocaleString(locale, { weekday: "short", hour: "numeric", minute: "2-digit" })}`;
   };
   const total = nurse ? nurse.price * visits : 0;
-  const fmtDay = (d: Date) => d.toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+  const fmtDay = (d: Date) => d.toLocaleString(locale, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
   const shown = useMemo(() => {
     const list = (nurses ?? []).filter((n) => !femaleOnly || n.gender === "Female");
@@ -268,7 +287,7 @@ function PatientNurseContent() {
   const uploadPrescription = async (original: File) => {
     setUploadingRx(true); setError("");
     const file = await prepareUpload(original).catch(() => null);
-    if (!file) { setUploadingRx(false); setError("Couldn't read that file — please pick it again."); return; }
+    if (!file) { setUploadingRx(false); setError(t("errReadFile")); return; }
     const tooBig = tooBigMessage(file);
     if (tooBig) { setUploadingRx(false); setError(tooBig); return; }
     const fd = new FormData();
@@ -277,7 +296,7 @@ function PatientNurseContent() {
     fd.append("file", file);
     const r = await fetch("/api/patients/me/documents", { method: "POST", body: fd });
     setUploadingRx(false);
-    if (!r.ok) { setError((await r.json().catch(() => ({}))).error ?? "Upload failed."); return; }
+    if (!r.ok) { setError((await r.json().catch(() => ({}))).error ?? t("uploadFailed")); return; }
     const created = await r.json();
     await loadDocs();
     setPrescriptionDocId(created.id);
@@ -286,20 +305,20 @@ function PatientNurseContent() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!service || !nurse) return;
-    if (relation !== "Self" && !dependentId) { setError("Please select or add the family member this visit is for."); return; }
-    if (when === "LATER" && (!scheduledAt || new Date(scheduledAt).getTime() <= Date.now())) { setError("Please pick a time in the future."); return; }
+    if (relation !== "Self" && !dependentId) { setError(t("errDependent")); return; }
+    if (when === "LATER" && (!scheduledAt || new Date(scheduledAt).getTime() <= Date.now())) { setError(t("errFuture")); return; }
     const visitAt = when === "LATER" && scheduledAt ? new Date(scheduledAt) : new Date();
     if (isShift(service)) {
-      if (!scheduledAt || visitAt.getTime() < Date.now() + SHIFT_MIN_LEAD_MS) { setError("Pick when the shift should start — at least an hour from now."); return; }
+      if (!scheduledAt || visitAt.getTime() < Date.now() + SHIFT_MIN_LEAD_MS) { setError(t("errShiftLead")); return; }
     } else if (!isDoctorAvailableNow(nurse.availability, visitAt)) {
-      setError(`${formatProviderName(nurse.name, "NURSE")} works ${formatAvailability(nurse.availability)}. Please pick a time within those hours.`);
+      setError(t("errHours", { name: formatProviderName(nurse.name, "NURSE"), hours: formatAvailability(nurse.availability) }));
       return;
     }
-    if (!address.text.trim()) { setError("Please add the address where the nurse should come."); return; }
-    if (!visitPinned) { setError("Pick your address from the suggestions, or tap “Use my current location”, so the nurse can find you."); return; }
-    if (address.pinCode && !/^\d{6}$/.test(address.pinCode)) { setError("PIN code must be 6 digits."); return; }
-    if (service.requiresPrescription && !prescriptionDocId && !(referral && referral.service.id === service.id)) { setError(`${service.name} needs a doctor's prescription. Please attach one.`); return; }
-    if (!consent) { setError("Please agree to the consent statement to continue."); return; }
+    if (!address.text.trim()) { setError(t("errAddress")); return; }
+    if (!visitPinned) { setError(t("errPinned")); return; }
+    if (address.pinCode && !/^\d{6}$/.test(address.pinCode)) { setError(t("errPin")); return; }
+    if (service.requiresPrescription && !prescriptionDocId && !(referral && referral.service.id === service.id)) { setError(t("errRx", { service: service.name })); return; }
+    if (!consent) { setError(t("errConsent")); return; }
     setError("");
     profileGate.run(!!dependentId, () => setConfirmOpen(true));
   };
@@ -352,10 +371,10 @@ function PatientNurseContent() {
       if (res.ok) { setBooked(true); window.scrollTo({ top: 0 }); return; }
       if (data.code === "TERMS_REQUIRED") requireTerms(() => setConfirmOpen(true));
       else if (data.code === "PROFILE_INCOMPLETE") profileGate.open(data.missing, () => setConfirmOpen(true));
-      else setError(data.error ?? "Booking failed. Please try again.");
+      else setError(data.error ?? t("bookingFailed"));
     } catch (err) {
       setConfirmOpen(false);
-      setError(err instanceof Error ? err.message : "Booking failed. Please try again.");
+      setError(err instanceof Error ? err.message : t("bookingFailed"));
     } finally {
       setBooking(false);
     }
@@ -378,17 +397,17 @@ function PatientNurseContent() {
             <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-4">
               <CalendarCheck2 className="w-8 h-8 text-emerald-500" />
             </div>
-            <h1 className="text-xl font-extrabold text-slate-900">Request sent!</h1>
+            <h1 className="text-xl font-extrabold text-slate-900">{t("sentTitle")}</h1>
             <p className="text-sm text-slate-500 mt-2">
-              {formatProviderName(nurse.name, "NURSE")} will confirm your {service.name} {visits > 1 ? `package (${visits} visits)` : "visit"} shortly. You&apos;ll pay once they accept.
+              {t("sentBody", { name: formatProviderName(nurse.name, "NURSE"), service: service.name, visits })}
             </p>
-            <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3 mt-6">View my appointments</Link>
+            <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3 mt-6">{t("viewAppointments")}</Link>
           </div>
         ) : (
           <>
             {(service || nurse) && (
               <button onClick={back} className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 mb-4">
-                <ArrowLeft className="w-4 h-4" /> Back
+                <ArrowLeft className="w-4 h-4" /> {t("back")}
               </button>
             )}
 
@@ -398,18 +417,18 @@ function PatientNurseContent() {
             {!service && (
               <>
                 <div className="mb-5">
-                  <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2"><HeartPulse className="w-6 h-6 text-rose-500" />Book a Nurse</h1>
-                  <p className="text-sm text-slate-500 mt-1">A registered nurse comes to your home. What do you need?</p>
+                  <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2"><HeartPulse className="w-6 h-6 text-rose-500" />{t("title")}</h1>
+                  <p className="text-sm text-slate-500 mt-1">{t("subtitle")}</p>
                 </div>
                 {services === null ? (
                   <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-slate-300" /></div>
                 ) : (
                   <div className="space-y-5">
                   {[
-                    { title: "Home visits", items: services.filter((s) => !isShift(s)) },
-                    { title: "Shifts — nurse stays with the patient", items: services.filter((s) => isShift(s)) },
+                    { id: "home", title: t("groupHome"), items: services.filter((s) => !isShift(s)) },
+                    { id: "shift", title: t("groupShift"), items: services.filter((s) => isShift(s)) },
                   ].filter((g) => g.items.length > 0).map((g) => (
-                  <div key={g.title}>
+                  <div key={g.id}>
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{g.title}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {g.items.map((s) => (
@@ -417,11 +436,11 @@ function PatientNurseContent() {
                         <p className="font-bold text-slate-900">{s.name}</p>
                         {s.description && <p className="text-xs text-slate-500 mt-1">{s.description}</p>}
                         <p className="text-xs text-slate-400 mt-2 flex items-center gap-2">
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{isShift(s) ? shiftLabel(s.durationMinutes) : `~${s.durationMinutes} min`}</span>
-                          {s.suggestedPrice > 0 && <span>from ~₹{s.suggestedPrice}</span>}
+                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{isShift(s) ? shiftLabel(s.durationMinutes) : t("approxMin", { min: s.durationMinutes })}</span>
+                          {s.suggestedPrice > 0 && <span>{t("fromPrice", { price: s.suggestedPrice })}</span>}
                         </p>
                         {s.requiresPrescription && (
-                          <p className="text-[11px] font-semibold text-amber-600 mt-1.5 flex items-center gap-1"><FileText className="w-3 h-3" />Doctor&apos;s prescription needed</p>
+                          <p className="text-[11px] font-semibold text-amber-600 mt-1.5 flex items-center gap-1"><FileText className="w-3 h-3" />{t("rxNeeded")}</p>
                         )}
                       </button>
                     ))}
@@ -436,34 +455,34 @@ function PatientNurseContent() {
             {service && !nurse && (
               <>
                 <h1 className="text-xl font-extrabold text-slate-900">{service.name}</h1>
-                <p className="text-sm text-slate-500 mb-4">Nurses near you who offer this service</p>
+                <p className="text-sm text-slate-500 mb-4">{t("nearYou")}</p>
                 <div className="flex flex-wrap items-center gap-2 mb-4">
                   {SORTS.map((s) => (
-                    <button key={s.id} onClick={() => setSort(s.id)} className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border", sort === s.id ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200")}>{s.label}</button>
+                    <button key={s.id} onClick={() => setSort(s.id)} className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border", sort === s.id ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200")}>{t(`sort.${s.id}`)}</button>
                   ))}
                   <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 ml-auto">
                     <input type="checkbox" checked={femaleOnly} onChange={(e) => setFemaleOnly(e.target.checked)} className="accent-rose-500" />
-                    Female nurse only
+                    {t("femaleOnly")}
                   </label>
                 </div>
                 {searchLoc && searchLoc !== "none" && !needsLocation && (
-                  <p className="text-xs text-slate-500 mb-3 flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />Showing nurses near {searchLoc.label}</p>
+                  <p className="text-xs text-slate-500 mb-3 flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{t("showingNear", { label: searchLoc.label })}</p>
                 )}
                 {nurses === null ? (
                   <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-slate-300" /></div>
                 ) : needsLocation ? (
                   <div className="bg-white rounded-2xl border border-amber-200 p-6 text-center">
-                    <p className="text-sm font-semibold text-slate-800">Where should the nurse come?</p>
-                    <p className="text-xs text-slate-500 mt-1 mb-4">We need your location to find nurses who travel to you.</p>
+                    <p className="text-sm font-semibold text-slate-800">{t("whereTitle")}</p>
+                    <p className="text-xs text-slate-500 mt-1 mb-4">{t("whereBody")}</p>
                     <button onClick={() => locateWithGps()} disabled={locating} className="btn-primary py-2.5 px-4 text-sm mx-auto">
-                      {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <LocateFixed className="w-4 h-4" />} Use my current location
+                      {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <LocateFixed className="w-4 h-4" />} {t("useLocation")}
                     </button>
-                    <Link href="/patient/profile/address" className="block text-xs font-semibold text-blue-600 mt-3">or add your home address →</Link>
+                    <Link href="/patient/profile/address" className="block text-xs font-semibold text-blue-600 mt-3">{t("addHome")}</Link>
                   </div>
                 ) : shown.length === 0 ? (
                   <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center">
-                    <p className="text-sm text-slate-500">No nurse near you offers this service right now.</p>
-                    <p className="text-xs text-slate-400 mt-1">Try another service, or check that your home address / location is set in your profile.</p>
+                    <p className="text-sm text-slate-500">{t("noneTitle")}</p>
+                    <p className="text-xs text-slate-400 mt-1">{t("noneBody")}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -480,20 +499,20 @@ function PatientNurseContent() {
                             </p>
                             <p className="text-sm font-extrabold text-slate-900 flex-shrink-0">₹{n.price}</p>
                           </div>
-                          <p className="text-xs text-slate-500">{[n.qualification, n.experience ? `${n.experience} yrs exp` : null, n.gender].filter(Boolean).join(" · ")}</p>
+                          <p className="text-xs text-slate-500">{[n.qualification, n.experience ? t("yrsExp", { years: n.experience }) : null, genderLabel(n.gender)].filter(Boolean).join(" · ")}</p>
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-slate-500">
                             {n.totalReviews > 0 && <span className="flex items-center gap-0.5"><Star className="w-3 h-3 fill-amber-400 text-amber-400" />{n.avgRating.toFixed(1)} ({n.totalReviews})</span>}
                             {n.distanceKm != null && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{n.distanceKm} km</span>}
-                            {n.policeVerified && <span className="flex items-center gap-0.5 text-emerald-600 font-semibold"><ShieldCheck className="w-3 h-3" />Police verified</span>}
+                            {n.policeVerified && <span className="flex items-center gap-0.5 text-emerald-600 font-semibold"><ShieldCheck className="w-3 h-3" />{t("policeVerified")}</span>}
                             {n.awayNow
-                              ? <span className="flex items-center gap-0.5 text-amber-600 font-semibold"><Clock className="w-3 h-3" />{awayLabel(n)} — book a later day</span>
+                              ? <span className="flex items-center gap-0.5 text-amber-600 font-semibold"><Clock className="w-3 h-3" />{t("awayBookLater", { away: awayLabel(n) })}</span>
                               : shiftMode
-                              ? <span className="flex items-center gap-0.5 text-emerald-600 font-semibold"><Clock className="w-3 h-3" />Takes shifts</span>
+                              ? <span className="flex items-center gap-0.5 text-emerald-600 font-semibold"><Clock className="w-3 h-3" />{t("takesShifts")}</span>
                               : !isDoctorAvailableNow(n.availability)
                               ? <span className="flex items-center gap-0.5 text-slate-400"><Clock className="w-3 h-3" />{formatAvailability(n.availability)}</span>
                               : n.busyNow
-                                ? <span className="flex items-center gap-0.5 text-amber-600 font-semibold"><Clock className="w-3 h-3" />On a visit now — book for later</span>
-                                : <span className="flex items-center gap-0.5 text-emerald-600 font-semibold"><Clock className="w-3 h-3" />Available now</span>}
+                                ? <span className="flex items-center gap-0.5 text-amber-600 font-semibold"><Clock className="w-3 h-3" />{t("busyBookLater")}</span>
+                                : <span className="flex items-center gap-0.5 text-emerald-600 font-semibold"><Clock className="w-3 h-3" />{t("availableNow")}</span>}
                           </div>
                         </div>
                       </button>
@@ -511,7 +530,7 @@ function PatientNurseContent() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-slate-900">{formatProviderName(nurse.name, "NURSE")}</p>
-                    <p className="text-xs text-slate-500">{[nurse.qualification, nurse.experience ? `${nurse.experience} yrs exp` : null].filter(Boolean).join(" · ")}</p>
+                    <p className="text-xs text-slate-500">{[nurse.qualification, nurse.experience ? t("yrsExp", { years: nurse.experience }) : null].filter(Boolean).join(" · ")}</p>
                     {nurse.languages && <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5"><Languages className="w-3 h-3" />{nurse.languages}</p>}
                     {nurse.bio && <p className="text-xs text-slate-500 mt-1.5">{nurse.bio}</p>}
                   </div>
@@ -524,12 +543,12 @@ function PatientNurseContent() {
                   </div>
 
                   <div>
-                    <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />Who is this for?</label>
+                    <label className="input-label"><Users className="inline w-3.5 h-3.5 mr-1" />{t("whoFor")}</label>
                     <div className="grid grid-cols-4 gap-2">
                       {RELATIONS.map((r) => (
                         <button key={r} type="button" onClick={() => { setRelation(r); setDependentId(null); }}
                           className={cn("min-h-11 py-2 rounded-xl border text-xs font-semibold", relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
-                          {r}
+                          {tc(`relation.${r}`)}
                         </button>
                       ))}
                     </div>
@@ -539,14 +558,14 @@ function PatientNurseContent() {
                   </div>
 
                   <div>
-                    <label className="input-label"><CalendarClock className="inline w-3.5 h-3.5 mr-1" />When?</label>
+                    <label className="input-label"><CalendarClock className="inline w-3.5 h-3.5 mr-1" />{t("when")}</label>
                     <div className={cn("grid gap-2", shiftMode ? "grid-cols-1" : "grid-cols-2")}>
                       {(shiftMode ? (["LATER"] as const) : (["NOW", "LATER"] as const)).map((w) => {
                         const off = w === "NOW" && !canComeNow(nurse);
                         return (
                           <button key={w} type="button" disabled={off} onClick={() => { setWhen(w); setError(""); }}
                             className={cn("py-2.5 rounded-xl border text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed", when === w ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
-                            {w === "NOW" ? "As soon as possible" : shiftMode ? "Shift starts at" : "Pick a time"}
+                            {w === "NOW" ? t("asap") : shiftMode ? t("shiftStartsAt") : t("pickTime")}
                           </button>
                         );
                       })}
@@ -555,21 +574,24 @@ function PatientNurseContent() {
                       <input type="datetime-local" className="input-field mt-2" min={localInputValue(new Date())} value={scheduledAt} onChange={(e) => { setScheduledAt(e.target.value); setError(""); }} />
                     )}
                     {shiftMode ? (
-                      <p className="text-[11px] text-slate-400 mt-1">{shiftLabel(service.durationMinutes)} — book at least an hour ahead so the nurse can plan.</p>
+                      <p className="text-[11px] text-slate-400 mt-1">{t("shiftHint", { shift: shiftLabel(service.durationMinutes) })}</p>
                     ) : (
                     <p className="text-[11px] text-slate-400 mt-1">
-                      Works {formatAvailability(nurse.availability)}
-                      {nurse.awayNow
-                        ? ` — ${awayLabel(nurse).toLowerCase()}, so pick a later day`
-                        : !isDoctorAvailableNow(nurse.availability)
-                        ? " — not working right now, so pick a time"
-                        : nurse.busyNow ? " — on another visit right now, so pick a later time" : ""}
+                      {(() => {
+                        const hours = formatAvailability(nurse.availability);
+                        const until = awayUntilDate(nurse, locale);
+                        return nurse.awayNow
+                          ? until ? t("worksAwayUntil", { hours, date: until }) : t("worksAwayToday", { hours })
+                          : !isDoctorAvailableNow(nurse.availability)
+                          ? t("worksOff", { hours })
+                          : nurse.busyNow ? t("worksBusy", { hours }) : t("works", { hours });
+                      })()}
                     </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="input-label">{shiftMode ? "How many shifts? (back-to-back days)" : "How many visits?"}</label>
+                    <label className="input-label">{shiftMode ? t("howManyShifts") : t("howManyVisits")}</label>
                     <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
                       {PACKAGE_VISIT_OPTIONS.map((n) => (
                         <button key={n} type="button" onClick={() => { setVisits(n); setError(""); }}
@@ -590,17 +612,17 @@ function PatientNurseContent() {
                         </div>
                         <div className="mt-2 rounded-xl bg-slate-50 border border-slate-100 p-3">
                           <p className="text-xs font-semibold text-slate-700 mb-1.5">
-                            {shiftMode ? `Your ${visits} shift${visits === 1 ? "" : "s"}` : `Your ${visits} visits${when === "NOW" ? " (first one as soon as possible)" : ""}`}
+                            {shiftMode ? t("yourShifts", { count: visits }) : when === "NOW" ? t("yourVisitsNow", { count: visits }) : t("yourVisits", { count: visits })}
                           </p>
                           {shiftMode && !scheduledAt ? (
-                            <p className="text-xs text-slate-400">Pick a start time to see the shifts.</p>
+                            <p className="text-xs text-slate-400">{t("pickStartToSee")}</p>
                           ) : (
                             <ol className="text-xs text-slate-600 space-y-0.5 list-decimal list-inside">
-                              {schedulePreview.map((d, i) => <li key={i}>{shiftMode ? fmtShift(d) : i === 0 && when === "NOW" ? "As soon as possible" : fmtDay(d)}</li>)}
+                              {schedulePreview.map((d, i) => <li key={i}>{shiftMode ? fmtShift(d) : i === 0 && when === "NOW" ? t("asap") : fmtDay(d)}</li>)}
                             </ol>
                           )}
                           <p className="text-[11px] text-slate-400 mt-1.5">
-                            {shiftMode ? "Back-to-back days, same start time." : `Days ${formatProviderName(nurse.name, "NURSE")} doesn't work are skipped.`} Pay once for all after she accepts.
+                            {shiftMode ? t("shiftsNote") : t("visitsNote", { name: formatProviderName(nurse.name, "NURSE") })}
                           </p>
                         </div>
                       </>
@@ -608,76 +630,76 @@ function PatientNurseContent() {
                   </div>
 
                   <div>
-                    <label className="input-label"><MapPin className="inline w-3.5 h-3.5 mr-1" />Visit address</label>
+                    <label className="input-label"><MapPin className="inline w-3.5 h-3.5 mr-1" />{t("visitAddress")}</label>
                     <AddressAutocomplete
                       multiline
                       value={address.text}
                       onChange={(v) => setAddress((a) => ({ ...a, text: v }))}
                       onSelect={(s) => setAddress((a) => ({ ...a, text: s.label, lat: s.lat, lng: s.lon, coordsFor: s.label }))}
-                      placeholder="Search your building, street or area"
+                      placeholder={t("addressPlaceholder")}
                     />
                     <div className="flex items-center justify-between gap-2 mt-1.5">
                       {visitPinned ? (
-                        <p className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3 h-3" />Location set</p>
+                        <p className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3 h-3" />{t("locationSet")}</p>
                       ) : (
-                        <p className="text-[11px] text-amber-600 font-semibold">Pick a suggestion or use your current location</p>
+                        <p className="text-[11px] text-amber-600 font-semibold">{t("pickSuggestion")}</p>
                       )}
                       <button type="button" onClick={pinVisitToGps} disabled={pinningVisit}
                         className="text-[11px] font-semibold text-blue-600 flex items-center gap-1 disabled:opacity-60">
-                        {pinningVisit ? <Loader2 className="w-3 h-3 animate-spin" /> : <LocateFixed className="w-3 h-3" />} Use my current location
+                        {pinningVisit ? <Loader2 className="w-3 h-3 animate-spin" /> : <LocateFixed className="w-3 h-3" />} {t("useLocation")}
                       </button>
                     </div>
                     <div className="grid grid-cols-3 gap-2 mt-2">
-                      <input className="input-field col-span-2" placeholder="Flat no., landmark (optional)" maxLength={120}
+                      <input className="input-field col-span-2" placeholder={t("landmarkPlaceholder")} maxLength={120}
                         value={address.landmark} onChange={(e) => setAddress((a) => ({ ...a, landmark: e.target.value }))} />
-                      <input className="input-field" inputMode="numeric" placeholder="PIN" maxLength={6}
+                      <input className="input-field" inputMode="numeric" placeholder={t("pinPlaceholder")} maxLength={6}
                         value={address.pinCode} onChange={(e) => setAddress((a) => ({ ...a, pinCode: e.target.value.replace(/\D/g, "").slice(0, 6) }))} />
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-1">Saved to your profile for next time.</p>
+                    <p className="text-[11px] text-slate-400 mt-1">{t("savedForNext")}</p>
                   </div>
 
                   {referral && referral.service.id === service.id && (
                     <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
-                      <p className="text-sm font-semibold text-emerald-800 flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" />Prescription from {formatProviderName(referral.doctorName, "DOCTOR")} attached</p>
-                      <p className="text-xs text-emerald-700 mt-0.5">The nurse will see your doctor&apos;s prescription and instructions — nothing to upload.</p>
+                      <p className="text-sm font-semibold text-emerald-800 flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" />{t("referralAttached", { doctor: formatProviderName(referral.doctorName, "DOCTOR") })}</p>
+                      <p className="text-xs text-emerald-700 mt-0.5">{t("referralBody")}</p>
                     </div>
                   )}
 
                   {service.requiresPrescription && !(referral && referral.service.id === service.id) && (
                     <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3">
-                      <p className="text-sm font-semibold text-amber-800 flex items-center gap-1.5"><FileText className="w-4 h-4" />Doctor&apos;s prescription (required)</p>
-                      <p className="text-xs text-amber-700 mt-0.5 mb-2">Nurses can only give {service.name.toLowerCase()} that a doctor has prescribed.</p>
+                      <p className="text-sm font-semibold text-amber-800 flex items-center gap-1.5"><FileText className="w-4 h-4" />{t("rxRequired")}</p>
+                      <p className="text-xs text-amber-700 mt-0.5 mb-2">{t("rxOnlyPrescribed", { service: service.name.toLowerCase() })}</p>
                       {docs.length > 0 && (
                         <select className="input-field mb-2" value={prescriptionDocId} onChange={(e) => { setPrescriptionDocId(e.target.value); setError(""); }}>
-                          <option value="">Choose from your health documents…</option>
-                          {docs.map((d) => <option key={d.id} value={d.id}>{d.title} ({d.category})</option>)}
+                          <option value="">{t("chooseDoc")}</option>
+                          {docs.map((d) => <option key={d.id} value={d.id}>{d.title} ({DOC_CATEGORY_KEY[d.category] ? tDoc(`category.${DOC_CATEGORY_KEY[d.category]}`) : d.category})</option>)}
                         </select>
                       )}
                       <label className={cn("btn-secondary py-2 px-3 text-xs cursor-pointer inline-flex", uploadingRx && "opacity-60 pointer-events-none")}>
-                        {uploadingRx ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />} Upload prescription
+                        {uploadingRx ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />} {t("uploadRx")}
                         <input type="file" className="hidden" accept="application/pdf,image/jpeg,image/png"
                           onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) uploadPrescription(f); }} />
                       </label>
-                      {prescriptionDocId && <p className="text-xs text-emerald-700 mt-2 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />Prescription attached</p>}
+                      {prescriptionDocId && <p className="text-xs text-emerald-700 mt-2 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />{t("rxAttached")}</p>}
                     </div>
                   )}
 
                   <div>
-                    <label className="input-label">Anything the nurse should know? (optional)</label>
-                    <textarea rows={2} className="input-field" placeholder="e.g. Injection name & dose, wound location, patient is bedridden…" value={notes} onChange={(e) => setNotes(e.target.value)} />
+                    <label className="input-label">{t("notesLabel")}</label>
+                    <textarea rows={2} className="input-field" placeholder={t("notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} />
                   </div>
 
                   <label className="flex items-start gap-2.5 text-xs text-slate-600">
                     <input type="checkbox" checked={consent} onChange={(e) => { setConsent(e.target.checked); setError(""); }} className="w-4 h-4 mt-0.5 accent-blue-500 flex-shrink-0" />
-                    I confirm the details are accurate and consent to this nurse visiting my home and accessing the relevant medical details for this visit.
+                    {t("consent")}
                   </label>
 
                   {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-start gap-2"><AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />{error}</div>}
 
                   <button type="submit" disabled={booking} className="btn-primary w-full justify-center py-3.5 text-base">
-                    {shiftMode ? `Request ${visits} shift${visits === 1 ? "" : "s"} (₹${total})` : visits > 1 ? `Request ${visits} visits (₹${total})` : `Request visit (₹${nurse.price})`}
+                    {shiftMode ? t("requestShifts", { count: visits, total }) : visits > 1 ? t("requestVisits", { count: visits, total }) : t("requestVisit", { price: nurse.price })}
                   </button>
-                  <p className="text-[11px] text-slate-400 text-center">You pay online after the nurse accepts.</p>
+                  <p className="text-[11px] text-slate-400 text-center">{t("payAfter")}</p>
                 </div>
               </form>
             )}
@@ -690,20 +712,20 @@ function PatientNurseContent() {
         <ConfirmDialog
           icon={CalendarCheck2}
           tone="primary"
-          title={shiftMode ? "Confirm this shift booking?" : "Confirm this visit?"}
+          title={shiftMode ? t("confirm.titleShift") : t("confirm.titleVisit")}
           message={
             <div className="space-y-1.5">
-              <div className="flex justify-between gap-3"><span>Nurse</span><span className="font-semibold text-slate-800 text-right">{formatProviderName(nurse.name, "NURSE")}</span></div>
-              <div className="flex justify-between gap-3"><span>Service</span><span className="font-semibold text-slate-800 text-right">{service.name}</span></div>
+              <div className="flex justify-between gap-3"><span>{t("confirm.nurse")}</span><span className="font-semibold text-slate-800 text-right">{formatProviderName(nurse.name, "NURSE")}</span></div>
+              <div className="flex justify-between gap-3"><span>{t("confirm.service")}</span><span className="font-semibold text-slate-800 text-right">{service.name}</span></div>
               {(visits > 1 || shiftMode) && (
-                <div className="flex justify-between gap-3"><span>{shiftMode ? "Shifts" : "Visits"}</span><span className="font-semibold text-slate-800 text-right">{shiftMode ? `${visits} × ${shiftLabel(service.durationMinutes)}` : `${visits} · ${intervalLabel(intervalDays)}`} · ₹{nurse.price} each</span></div>
+                <div className="flex justify-between gap-3"><span>{shiftMode ? t("confirm.shifts") : t("confirm.visits")}</span><span className="font-semibold text-slate-800 text-right">{t("confirm.each", { detail: shiftMode ? `${visits} × ${shiftLabel(service.durationMinutes)}` : `${visits} · ${intervalLabel(intervalDays)}`, price: nurse.price })}</span></div>
               )}
-              <div className="flex justify-between gap-3"><span>{visits > 1 ? "First visit" : "When"}</span><span className="font-semibold text-slate-800 text-right">{when === "LATER" && scheduledAt ? new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "As soon as possible"}</span></div>
-              <div className="flex justify-between gap-3"><span>Payment</span><span className="font-semibold text-slate-800 text-right">Online, after the nurse accepts</span></div>
+              <div className="flex justify-between gap-3"><span>{visits > 1 ? t("confirm.firstVisit") : t("confirm.when")}</span><span className="font-semibold text-slate-800 text-right">{when === "LATER" && scheduledAt ? new Date(scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }) : t("asap")}</span></div>
+              <div className="flex justify-between gap-3"><span>{t("confirm.payment")}</span><span className="font-semibold text-slate-800 text-right">{t("confirm.paymentValue")}</span></div>
             </div>
           }
-          confirmLabel={`Confirm (₹${total})`}
-          busyLabel="Booking…"
+          confirmLabel={t("confirm.confirm", { total })}
+          busyLabel={t("confirm.busy")}
           busy={booking}
           onCancel={() => setConfirmOpen(false)}
           onConfirm={confirmAndBook}

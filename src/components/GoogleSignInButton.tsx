@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { isNative } from "@/lib/platform";
 import { nativeGoogleSignIn } from "@/lib/nativeGoogleAuth";
 import { useAuth } from "@/components/AuthProvider";
+import { useTranslations } from "next-intl";
 
 type Props = {
   role?: "PATIENT" | "DOCTOR" | "NURSE";
@@ -13,7 +14,8 @@ type Props = {
   label?: string;
 };
 
-export default function GoogleSignInButton({ role = "PATIENT", next, intent, label = "Continue with Google" }: Props) {
+export default function GoogleSignInButton({ role = "PATIENT", next, intent, label }: Props) {
+  const t = useTranslations("auth.google");
   const router = useRouter();
   const { refresh } = useAuth();
   const [busy, setBusy] = useState(false);
@@ -68,7 +70,7 @@ export default function GoogleSignInButton({ role = "PATIENT", next, intent, lab
           <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .99 4.96l2.96 2.33C4.66 5.16 6.65 3.58 9 3.58Z" />
         </svg>
       )}
-      {busy ? "Signing in…" : label}
+      {busy ? t("signingIn") : (label ?? t("continue"))}
     </a>
   );
 }

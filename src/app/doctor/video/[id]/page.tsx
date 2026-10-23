@@ -9,6 +9,8 @@ import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import VideoCallRoom from "@/components/VideoCallRoom";
 import { VIDEO_UNLOCK_DELAY_SECONDS, videoJoinWindow } from "@/lib/videoCall";
 import { useVideoAppointment } from "@/lib/useVideoAppointment";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 interface VideoAppointment {
   status: string;
@@ -29,6 +31,10 @@ function patientLabel(a: VideoAppointment): string {
 
 export default function DoctorVideoCallPage() {
   const params = useParams<{ id: string }>();
+  const t = useTranslations("doctorAccount.consult");
+  const tRel = useTranslations("booking.common.relation");
+  const relLabel = (r: string) => (tRel.has(r as "Self") ? tRel(r as "Self") : r);
+  const locale = formattingLocale(useLocale());
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [now, setNow] = useState(() => Date.now());
@@ -59,7 +65,7 @@ export default function DoctorVideoCallPage() {
   const unlockRemainingSec = Math.max(0, Math.ceil((unlockAt - now) / 1000));
   // Same window the video-token route enforces.
   const joinWindow = appt ? videoJoinWindow(appt) : null;
-  const fmtTime = (t: number) => new Date(t).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" });
+  const fmtTime = (ms: number) => new Date(ms).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" });
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -68,7 +74,7 @@ export default function DoctorVideoCallPage() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
         <Link href="/doctor/dashboard" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 mb-4">
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {t("backToDashboard")}
         </Link>
 
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden h-[75vh] flex flex-col">
@@ -79,14 +85,14 @@ export default function DoctorVideoCallPage() {
             <div className="min-w-0">
               <p className="font-bold text-slate-900 truncate">{appt ? patientLabel(appt) : "…"}</p>
               {appt && appt.relation !== "Self" && (
-                <p className="text-xs text-slate-400 truncate">{appt.relation} of {appt.patient.name}</p>
+                <p className="text-xs text-slate-400 truncate">{t("relationOf", { relation: relLabel(appt.relation), name: appt.patient.name })}</p>
               )}
             </div>
           </div>
 
           {connectionWarning && (
             <div className="px-5 py-1.5 bg-amber-50 text-amber-700 text-[11px] font-semibold text-center flex-shrink-0">
-              Connection to DocOnClick is unstable — the call continues, retrying…
+              {t("unstable")}
             </div>
           )}
           {error && !appt ? (
@@ -96,41 +102,41 @@ export default function DoctorVideoCallPage() {
           ) : !requestOpen ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">Accept this request to start a video consultation with {patientLabel(appt)}.</p>
+              <p className="text-sm text-slate-500">{t("acceptToVideo", { name: patientLabel(appt) })}</p>
             </div>
           ) : !paid ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <CreditCard className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">Waiting for {patientLabel(appt)} to complete payment.</p>
+              <p className="text-sm text-slate-500">{t("waitingPayment", { name: patientLabel(appt) })}</p>
             </div>
           ) : unlockRemainingSec > 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Loader2 className="w-6 h-6 text-teal-400 animate-spin" />
-              <p className="text-sm text-slate-500">Video consultation unlocking in {unlockRemainingSec}s…</p>
+              <p className="text-sm text-slate-500">{t("unlocking", { seconds: unlockRemainingSec })}</p>
               <p className="text-xs text-slate-400">
-                Consultation will start at {new Date(unlockAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })}
+                {t("startsAt", { time: new Date(unlockAt).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" }) })}
               </p>
             </div>
           ) : !started && joinWindow && now < joinWindow.opensAt ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">The video consultation opens at {fmtTime(joinWindow.opensAt)}.</p>
-              <p className="text-xs text-slate-400">You can join a few minutes before the appointment time.</p>
+              <p className="text-sm text-slate-500">{t("opensAt", { time: fmtTime(joinWindow.opensAt) })}</p>
+              <p className="text-xs text-slate-400">{t("joinEarly")}</p>
             </div>
           ) : !started && joinWindow && now > joinWindow.closesAt ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-slate-400" />
-              <p className="text-sm text-slate-500">The time for this video consultation has passed.</p>
+              <p className="text-sm text-slate-500">{t("passed")}</p>
             </div>
           ) : !started ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-3">
               <div className="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center">
                 <Video className="w-6 h-6 text-teal-600" />
               </div>
-              <p className="text-sm text-slate-700 font-semibold">Ready to start the video consultation with {patientLabel(appt)}?</p>
-              <p className="text-xs text-slate-400 max-w-xs">This will turn on your camera and microphone.</p>
+              <p className="text-sm text-slate-700 font-semibold">{t("ready", { name: patientLabel(appt) })}</p>
+              <p className="text-xs text-slate-400 max-w-xs">{t("cameraMic")}</p>
               <button onClick={() => setStarted(true)} className="btn-primary py-2.5 px-5 text-sm mt-1">
-                <Video className="w-4 h-4" /> Start Video Consultation
+                <Video className="w-4 h-4" /> {t("startVideo")}
               </button>
             </div>
           ) : (

@@ -2,6 +2,7 @@
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
 import { MapPin } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface LocationPickerMapProps {
   lat: number | null;
@@ -25,6 +26,7 @@ function pinSvg() {
 }
 
 export default function LocationPickerMap({ lat, lng, onChange, height = 280 }: LocationPickerMapProps) {
+  const t = useTranslations("shared.locationPicker");
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletRef = useRef<typeof import("leaflet") | null>(null);
   const leafletMapRef = useRef<import("leaflet").Map | null>(null);
@@ -137,7 +139,7 @@ export default function LocationPickerMap({ lat, lng, onChange, height = 280 }: 
     <div>
       <div ref={mapRef} style={{ height }} className="w-full rounded-xl overflow-hidden border border-slate-200" />
       <p className="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1.5">
-        <MapPin className="w-3 h-3 flex-shrink-0" /> Tap the map or drag the pin to fine-tune your exact location.
+        <MapPin className="w-3 h-3 flex-shrink-0" /> {t("hint")}
       </p>
     </div>
   );

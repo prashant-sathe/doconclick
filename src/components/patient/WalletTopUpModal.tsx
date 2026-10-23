@@ -1,16 +1,18 @@
 "use client";
 import { useState } from "react";
 import { Loader2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const QUICK_AMOUNTS = [100, 500, 1000, 2000];
 
 export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
+  const t = useTranslations("patientAccount.topUp");
   const [amount, setAmount] = useState<number | "">(500);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const topUp = async () => {
-    if (!amount || amount <= 0) { setError("Enter a valid amount."); return; }
+    if (!amount || amount <= 0) { setError(t("invalid")); return; }
     setSubmitting(true);
     setError("");
     const res = await fetch("/api/wallet/topup/create-order", {
@@ -21,7 +23,7 @@ export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       setSubmitting(false);
-      setError(data.error ?? "Could not start top-up. Please try again.");
+      setError(data.error ?? t("couldNotStart"));
       return;
     }
     const { load } = await import("@cashfreepayments/cashfree-js");
@@ -38,8 +40,8 @@ export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-extrabold text-slate-900">Add Money</h2>
-          <button aria-label="Close" onClick={onClose} className="tap-44 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600">
+          <h2 className="text-lg font-extrabold text-slate-900">{t("title")}</h2>
+          <button aria-label={t("close")} onClick={onClose} className="tap-44 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -58,7 +60,7 @@ export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
           ))}
         </div>
 
-        <label className="block text-xs font-semibold text-slate-500 mb-1.5">Amount (₹)</label>
+        <label className="block text-xs font-semibold text-slate-500 mb-1.5">{t("amount")}</label>
         <input
           type="number"
           min={100}
@@ -66,7 +68,7 @@ export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
           value={amount}
           onChange={(e) => setAmount(e.target.value === "" ? "" : Number(e.target.value))}
           className="input-field w-full mb-4"
-          placeholder="Enter amount"
+          placeholder={t("placeholder")}
         />
 
         {error && (
@@ -77,7 +79,7 @@ export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
         )}
 
         <button onClick={topUp} disabled={submitting} className="btn-primary w-full justify-center py-3">
-          {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Cashfree…</> : "Proceed to Pay"}
+          {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("redirecting")}</> : t("proceed")}
         </button>
       </div>
     </div>

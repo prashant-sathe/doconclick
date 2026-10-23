@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Pencil, Check, X, Loader2, AlertCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 // Inline name editor for profile headers — click the pencil, edit, save.
 // Saving re-signs the auth cookie server-side, so callers must pass a
@@ -14,6 +15,7 @@ export default function EditableName({
   displayName?: string;
   onSaved: (newName: string) => void;
 }) {
+  const t = useTranslations("shared.editableName");
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(name);
   const [saving, setSaving] = useState(false);
@@ -43,7 +45,7 @@ export default function EditableName({
       setEditing(false);
       onSaved(trimmed);
     } else {
-      setError((await res.json().catch(() => ({}))).error ?? "Could not update name.");
+      setError((await res.json().catch(() => ({}))).error ?? t("failed"));
     }
   };
 
@@ -62,21 +64,21 @@ export default function EditableName({
             }}
             disabled={saving}
           />
-          <button aria-label="Save name"
+          <button aria-label={t("saveName")}
             type="button"
             onClick={save}
             disabled={saving}
             className="tap-44-y w-11 h-7 rounded-lg flex items-center justify-center text-emerald-600 hover:bg-emerald-50 flex-shrink-0"
-            title="Save"
+            title={t("save")}
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
           </button>
-          <button aria-label="Cancel editing"
+          <button aria-label={t("cancelEditing")}
             type="button"
             onClick={() => setEditing(false)}
             disabled={saving}
             className="tap-44-y w-11 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 flex-shrink-0"
-            title="Cancel"
+            title={t("cancel")}
           >
             <X className="w-4 h-4" />
           </button>
@@ -95,7 +97,7 @@ export default function EditableName({
       type="button"
       onClick={startEdit}
       className="tap-44-y group flex items-center gap-1.5 min-w-0 text-left"
-      title="Edit name"
+      title={t("editName")}
     >
       <h1 className="text-lg font-extrabold text-slate-900 truncate">{displayName ?? name}</h1>
       <Pencil className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-400 flex-shrink-0" />

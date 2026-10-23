@@ -4,6 +4,10 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Bell, X } from "lucide-react";
 import type { PendingRequest } from "@/hooks/useDoctorNotifications";
+import { useTranslations } from "next-intl";
+
+const CONSULT_TYPES = ["CLINIC", "HOME", "VIDEO"] as const;
+const isConsultType = (v: string): v is (typeof CONSULT_TYPES)[number] => (CONSULT_TYPES as readonly string[]).includes(v);
 
 const AUTO_DISMISS_MS = 6000;
 
@@ -14,10 +18,12 @@ export default function NotificationToast({ request, onDismiss, href = "/doctor/
   href?: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("shared.requestToast");
+  const tb = useTranslations("booking.common");
 
   useEffect(() => {
-    const t = setTimeout(onDismiss, AUTO_DISMISS_MS);
-    return () => clearTimeout(t);
+    const timer = setTimeout(onDismiss, AUTO_DISMISS_MS);
+    return () => clearTimeout(timer);
   }, [request.id, onDismiss]);
 
   const patientLabel = request.relation !== "Self" && request.patientName ? request.patientName : request.patient.name;
@@ -32,8 +38,8 @@ export default function NotificationToast({ request, onDismiss, href = "/doctor/
           <Bell className="w-4 h-4 text-teal-600" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-slate-900">{request.serviceName ? "New visit request" : "New appointment request"}</p>
-          <p className="text-xs text-slate-500 mt-0.5">{patientLabel} · {request.serviceName ?? request.consultType}</p>
+          <p className="text-sm font-bold text-slate-900">{request.serviceName ? t("newVisit") : t("newAppointment")}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{patientLabel} · {request.serviceName ?? (isConsultType(request.consultType) ? tb(`consultType.${request.consultType}`) : request.consultType)}</p>
           <p className="text-xs text-slate-400 mt-0.5 truncate">{request.symptoms}</p>
         </div>
         <span

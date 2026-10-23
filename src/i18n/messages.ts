@@ -3,15 +3,29 @@ import enCommon from "../../messages/en-IN/common.json";
 import enNav from "../../messages/en-IN/nav.json";
 import enBooking from "../../messages/en-IN/booking.json";
 import enPush from "../../messages/en-IN/push.json";
+import enAuth from "../../messages/en-IN/auth.json";
+import enShared from "../../messages/en-IN/shared.json";
+import enPatient from "../../messages/en-IN/patient.json";
+import enPatientAccount from "../../messages/en-IN/patientAccount.json";
+import enDoctor from "../../messages/en-IN/doctor.json";
+import enDoctorAccount from "../../messages/en-IN/doctorAccount.json";
+import enNurse from "../../messages/en-IN/nurse.json";
 
 // One JSON file per namespace per language: messages/<locale>/<namespace>.json.
 // English is the source of truth (and the type every t() key is checked
 // against); a key missing from hi/mr falls back to English, so an
 // untranslated string shows in English — never as a raw key.
-export const NAMESPACES = ["common", "nav", "booking", "push"] as const;
+export const NAMESPACES = [
+  "common", "nav", "booking", "push",
+  "auth", "shared", "patient", "patientAccount", "doctor", "doctorAccount", "nurse",
+] as const;
 type Namespace = (typeof NAMESPACES)[number];
 
-const en = { common: enCommon, nav: enNav, booking: enBooking, push: enPush };
+const en = {
+  common: enCommon, nav: enNav, booking: enBooking, push: enPush,
+  auth: enAuth, shared: enShared, patient: enPatient, patientAccount: enPatientAccount,
+  doctor: enDoctor, doctorAccount: enDoctorAccount, nurse: enNurse,
+};
 export type Messages = typeof en;
 
 function merge<T>(base: T, over: unknown): T {

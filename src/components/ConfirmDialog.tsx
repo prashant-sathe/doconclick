@@ -1,6 +1,7 @@
 "use client";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 // Shared confirmation modal for admin actions that are risky to fire by
 // accident (status changes, impersonation, settlements, sends) — matches the
@@ -27,7 +28,7 @@ export default function ConfirmDialog({
   message,
   confirmLabel,
   busyLabel,
-  cancelLabel = "Cancel",
+  cancelLabel,
   tone = "primary",
   busy = false,
   confirmDisabled = false,
@@ -47,6 +48,7 @@ export default function ConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const t = useTranslations("shared.confirmDialog");
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60] p-4">
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
@@ -57,7 +59,7 @@ export default function ConfirmDialog({
         <div className="text-sm text-slate-500 mb-5">{message}</div>
         <div className="flex gap-3">
           <button onClick={onCancel} disabled={busy} className="btn-secondary flex-1 disabled:opacity-60 disabled:cursor-not-allowed">
-            {cancelLabel}
+            {cancelLabel ?? t("cancel")}
           </button>
           <button
             onClick={onConfirm}
@@ -67,7 +69,7 @@ export default function ConfirmDialog({
               TONE_BUTTON[tone]
             )}
           >
-            {busy ? (busyLabel ?? "Working…") : confirmLabel}
+            {busy ? (busyLabel ?? t("working")) : confirmLabel}
           </button>
         </div>
       </div>

@@ -5,9 +5,10 @@ import { LogOut, Loader2, ShieldAlert, FileCheck } from "lucide-react";
 import { unlockAudio } from "@/lib/playNotificationSound";
 import { listenForForegroundPush } from "@/lib/pushClient";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
-import { isAppLanguage, languageFromCookieHeader, setLanguageCookie, DEFAULT_APP_LANGUAGE } from "@/lib/appLanguage";
+import { isAppLanguage, languageFromCookieHeader, setLanguageCookie, DEFAULT_APP_LANGUAGE, formattingLocale } from "@/lib/appLanguage";
 import LegalContent from "@/components/LegalContent";
 import { TERMS_OF_SERVICE, PRIVACY_POLICY, LEGAL_LAST_UPDATED } from "@/lib/legalContent";
+import { useLocale, useTranslations } from "next-intl";
 
 // How often an already-open tab re-checks whether it's been suspended —
 // doesn't need to be as tight as chat/notification polling, just tight
@@ -70,6 +71,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [termsPrompted, setTermsPrompted] = useState(false);
   const onTermsAccepted = useRef<(() => void) | undefined>(undefined);
   const router = useRouter();
+  const t = useTranslations("shared.auth");
+  const locale = useLocale();
 
   const refresh = useCallback(async () => {
     try {
@@ -79,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(data);
         setImpersonatedBy(null);
         setSuspended(true);
-        setSuspendedMessage(data.suspendedMessage ?? "Your account has been suspended.");
+        setSuspendedMessage(data.suspendedMessage ?? "");
       } else if (res.ok) {
         setUser(data);
         // Keep the account's language and this device's in step. A language
@@ -125,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       onTermsAccepted.current = undefined;
       resume?.();
     } catch {
-      setTermsError("Could not save your acceptance. Please try again.");
+      setTermsError(t("termsSaveFailed"));
     } finally {
       setAcceptingTerms(false);
     }
@@ -199,23 +202,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-3">
           <FileCheck className="w-7 h-7 text-blue-500" />
         </div>
-        <h3 className="text-lg font-extrabold text-slate-900">Terms of Service and Privacy Policy</h3>
+        <h3 className="text-lg font-extrabold text-slate-900">{t("termsTitle")}</h3>
         <p className="text-xs text-slate-400 mt-1">
-          {termsPrompted ? "Please accept these to continue booking." : `Last updated ${LEGAL_LAST_UPDATED}`}
+          {termsPrompted ? t("termsPrompted") : t("lastUpdated", { date: new Date(LEGAL_LAST_UPDATED).toLocaleDateString(formattingLocale(locale), { day: "numeric", month: "long", year: "numeric" }) })}
         </p>
       </div>
       <div className="flex-1 overflow-y-auto px-6 sm:px-8 space-y-8">
-        <LegalContent title="Terms of Service" sections={TERMS_OF_SERVICE} />
-        <LegalContent title="Privacy Policy" sections={PRIVACY_POLICY} />
+        <LegalContent title={t("termsOfService")} sections={TERMS_OF_SERVICE} />
+        <LegalContent title={t("privacyPolicy")} sections={PRIVACY_POLICY} />
       </div>
       <div className="p-6 sm:p-8 pt-4 flex-shrink-0 border-t border-slate-100 space-y-3">
         <label className="flex items-start gap-2.5 text-sm text-slate-700 cursor-pointer">
           <input type="checkbox" className="mt-0.5" checked={tosChecked} onChange={(e) => setTosChecked(e.target.checked)} />
-          I accept the Terms of Service
+          {t("acceptTerms")}
         </label>
         <label className="flex items-start gap-2.5 text-sm text-slate-700 cursor-pointer">
           <input type="checkbox" className="mt-0.5" checked={privacyChecked} onChange={(e) => setPrivacyChecked(e.target.checked)} />
-          I accept the Privacy Policy
+          {t("acceptPrivacy")}
         </label>
         {termsError && <p className="text-sm text-red-600">{termsError}</p>}
         <div className="flex gap-3 pt-1">
@@ -225,7 +228,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             disabled={acceptingTerms}
             className="btn-secondary flex-1 disabled:opacity-60"
           >
-            {termsPrompted ? "Cancel" : "Sign Out"}
+            {termsPrompted ? t("cancel") : t("signOut")}
           </button>
           <button
             type="button"
@@ -234,7 +237,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             className="btn-primary flex-1 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {acceptingTerms ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            Submit
+            {t("submit")}
           </button>
         </div>
       </div>
@@ -250,8 +253,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
               <ShieldAlert className="w-7 h-7 text-red-500" />
             </div>
-            <h3 className="text-lg font-extrabold text-slate-900">Account Suspended</h3>
-            <p className="text-sm text-slate-500 mt-2 leading-relaxed">{suspendedMessage}</p>
+            <h3 className="text-lg font-extrabold text-slate-900">{t("suspendedTitle")}</h3>
+            <p className="text-sm text-slate-500 mt-2 leading-relaxed">{suspendedMessage || t("suspendedDefault")}</p>
             <button
               type="button"
               onClick={confirmLogout}
@@ -259,7 +262,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               className="btn-secondary w-full justify-center mt-6 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
-              Sign Out
+              {t("signOut")}
             </button>
           </div>
         </div>
@@ -273,13 +276,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           {impersonatedBy ? (
             // An admin can't accept the Terms on the user's behalf.
             <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
-              <h3 className="text-lg font-extrabold text-slate-900">Terms not accepted</h3>
+              <h3 className="text-lg font-extrabold text-slate-900">{t("termsNotAcceptedTitle")}</h3>
               <p className="text-sm text-slate-500 mt-1.5">
-                This user hasn&apos;t accepted the Terms of Service and Privacy Policy yet, so they can&apos;t book.
-                They need to accept them from their own login.
+                {t("termsNotAcceptedBody")}
               </p>
               <button type="button" onClick={dismissTermsPrompt} className="btn-secondary w-full justify-center mt-5">
-                Close
+                {t("close")}
               </button>
             </div>
           ) : termsGate}
@@ -288,9 +290,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {confirmingLogout && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
-            <h3 className="text-lg font-extrabold text-slate-900">Sign out?</h3>
+            <h3 className="text-lg font-extrabold text-slate-900">{t("signOutTitle")}</h3>
             <p className="text-sm text-slate-500 mt-1.5">
-              You&apos;ll need to log in again to access your account.
+              {t("signOutBody")}
             </p>
             <div className="flex gap-3 mt-5">
               <button
@@ -299,7 +301,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 disabled={loggingOut}
                 className="btn-secondary flex-1"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="button"
@@ -308,7 +310,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 className="btn-danger flex-1 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
-                Sign Out
+                {t("signOut")}
               </button>
             </div>
           </div>

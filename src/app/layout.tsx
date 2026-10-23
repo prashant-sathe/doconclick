@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_Devanagari } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { baseLanguage } from "@/lib/appLanguage";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
@@ -80,7 +81,7 @@ export default async function RootLayout({
     // hydration fail silently app-wide inside the Android WebView.
     // lang: the user's language (src/lib/appLanguage.ts) — screen readers
     // pick a voice by it.
-    <html lang={locale} className={`${inter.variable} ${devanagari.variable}`} suppressHydrationWarning>
+    <html lang={baseLanguage(locale)} className={`${inter.variable} ${devanagari.variable}`} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"

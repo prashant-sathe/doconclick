@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import ImageCropModal from "@/components/ImageCropModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { prepareBlobUpload, tooBigMessage } from "@/lib/compressImage";
+import { useTranslations } from "next-intl";
 
 const FIELD_FOR: Record<string, string> = {
   photo: "photoUrl",
@@ -31,6 +32,7 @@ export default function DocSlot({
   removable?: boolean;
   onUploaded: (url: string) => void;
 }) {
+  const t = useTranslations("doctor.docSlot");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -40,7 +42,7 @@ export default function DocSlot({
     setBusy(true);
     setError("");
     const file = await prepareBlobUpload(fileOrBlob, `${type}.jpg`).catch(() => null);
-    if (!file) { setBusy(false); setError("Couldn't read that file — please pick it again."); return; }
+    if (!file) { setBusy(false); setError(t("readFailed")); return; }
     const tooBig = tooBigMessage(file);
     if (tooBig) { setBusy(false); setError(tooBig); return; }
     const form = new FormData();
@@ -52,7 +54,7 @@ export default function DocSlot({
       const data = await res.json();
       onUploaded(data[FIELD_FOR[type as string]]);
     } else {
-      setError((await res.json().catch(() => ({}))).error ?? "Upload failed.");
+      setError((await res.json().catch(() => ({}))).error ?? t("uploadFailed"));
     }
   };
 
@@ -66,7 +68,7 @@ export default function DocSlot({
     });
     setBusy(false);
     if (res.ok) onUploaded("");
-    else setError((await res.json().catch(() => ({}))).error ?? "Could not remove.");
+    else setError((await res.json().catch(() => ({}))).error ?? t("removeFailed"));
   };
 
   const onFileSelected = (file: File) => {
@@ -78,7 +80,7 @@ export default function DocSlot({
     <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-4">
       <div className="flex items-center gap-3 min-w-0">
         {(type === "photo" || type === "signature") && url ? (
-          <Image src={url} alt={type === "photo" ? "Profile photo" : "Signature"}
+          <Image src={url} alt={type === "photo" ? t("profilePhoto") : t("signature")}
             width={type === "photo" ? 36 : 56} height={36}
             className={cn("flex-shrink-0 border border-slate-200 object-contain bg-white", type === "photo" ? "w-9 h-9 rounded-full object-cover" : "w-14 h-9 rounded-lg p-1")} />
         ) : (
@@ -91,30 +93,30 @@ export default function DocSlot({
             {label} {required && <span className="text-red-500">*</span>}
           </p>
           {url ? (
-            <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 font-medium hover:underline">Uploaded — view file</a>
+            <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 font-medium hover:underline">{t("uploaded")}</a>
           ) : required ? (
-            <p className="text-xs text-red-600 font-semibold">{requiredNote ?? "Required to get verified — not uploaded yet"}</p>
+            <p className="text-xs text-red-600 font-semibold">{requiredNote ?? t("requiredNote")}</p>
           ) : (
-            <p className="text-xs text-slate-400">Not uploaded yet</p>
+            <p className="text-xs text-slate-400">{t("notUploaded")}</p>
           )}
           {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
         </div>
       </div>
       {locked ? (
         <span className="text-xs text-slate-400 font-semibold flex items-center gap-1 flex-shrink-0">
-          <Lock className="w-3.5 h-3.5" /> Verified &amp; locked
+          <Lock className="w-3.5 h-3.5" /> {t("locked")}
         </span>
       ) : (
         <div className="flex items-center gap-2 flex-shrink-0">
           <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer">
             {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
-            {url ? "Replace" : "Upload"}
+            {url ? t("replace") : t("upload")}
             <input type="file" accept={accept ?? ".pdf,.jpg,.jpeg,.png"} className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) onFileSelected(f); e.target.value = ""; }} />
           </label>
           {removable && url && (
             <button type="button" onClick={() => setConfirmRemove(true)} disabled={busy}
-              className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60" title="Remove">
+              className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60" title={t("remove")}>
               <Trash2 className="w-3.5 h-3.5" />
             </button>
           )}
@@ -132,12 +134,12 @@ export default function DocSlot({
       {confirmRemove && (
         <ConfirmDialog
           icon={Trash2}
-          title={`Remove ${label}?`}
+          title={t("removeTitle", { label })}
           message={required
-            ? "You'll need to re-upload it before you can get verified or take bookings again."
-            : "You can upload it again anytime."}
-          confirmLabel="Remove"
-          busyLabel="Removing…"
+            ? t("removeRequired")
+            : t("removeOptional")}
+          confirmLabel={t("remove")}
+          busyLabel={t("removing")}
           tone="danger"
           busy={busy}
           onCancel={() => setConfirmRemove(false)}

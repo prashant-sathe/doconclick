@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { WifiOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /**
  * App-wide "you're offline" strip. Inside the Capacitor WebView a dropped
@@ -10,6 +11,7 @@ import { WifiOff } from "lucide-react";
  * server and whenever the connection is fine.
  */
 export function OfflineBanner() {
+  const t = useTranslations("shared.offline");
   const [offline, setOffline] = useState(false);
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export function OfflineBanner() {
       className="safe-top fixed inset-x-0 top-0 z-[80] bg-slate-900 text-white text-xs font-medium px-4 py-2 flex items-center justify-center gap-2 shadow-md"
     >
       <WifiOff className="w-3.5 h-3.5 flex-shrink-0" />
-      No internet connection — some things won&apos;t work until you&apos;re back online.
+      {t("message")}
     </div>
   );
 }

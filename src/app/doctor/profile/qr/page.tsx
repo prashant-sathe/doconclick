@@ -5,8 +5,10 @@ import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import { useAuth } from "@/components/AuthProvider";
 import { useDoctorProfile } from "@/lib/useDoctorProfile";
 import { formatDoctorName } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export default function BookingQRPage() {
+  const t = useTranslations("doctorAccount.qr");
   const { user } = useAuth();
   const { profile, loading } = useDoctorProfile();
 
@@ -42,7 +44,7 @@ export default function BookingQRPage() {
       img.onload = () => {
         ctx.drawImage(img, (W - QR_SIZE) / 2, QR_Y, QR_SIZE, QR_SIZE);
         ctx.fillStyle = "#475569"; ctx.font = "16px Arial, sans-serif";
-        ctx.fillText("Scan to book an appointment", W / 2, QR_Y + QR_SIZE + 35);
+        ctx.fillText(t("scanToBook"), W / 2, QR_Y + QR_SIZE + 35);
         resolve(canvas);
       };
       img.onerror = () => reject(new Error("Failed to load QR image"));
@@ -80,15 +82,15 @@ export default function BookingQRPage() {
 
   return (
     <DoctorProfileSubShell
-      title="Booking QR Code"
-      description="Patients who scan this land on your public profile and can book with you."
+      title={t("title")}
+      description={t("description")}
       icon={<QrCode className="w-5 h-5" />}
       tint="bg-teal-50 text-teal-600"
       loading={loading}
     >
       {!isVerified ? (
         <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600">
-          <Lock className="w-4 h-4 flex-shrink-0" /> This unlocks once your profile is verified.
+          <Lock className="w-4 h-4 flex-shrink-0" /> {t("locked")}
         </div>
       ) : (
         <>
@@ -96,26 +98,26 @@ export default function BookingQRPage() {
             <div className="w-[132px] h-[132px] rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center flex-shrink-0">
               {qrDataUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={qrDataUrl} alt="Your booking QR code" width={120} height={120} />
+                <img src={qrDataUrl} alt={t("qrAlt")} width={120} height={120} />
               ) : (
                 <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
               )}
             </div>
             <div className="min-w-0 flex-1 w-full">
-              <p className="text-xs font-semibold text-slate-500 mb-1">Public profile link</p>
+              <p className="text-xs font-semibold text-slate-500 mb-1">{t("publicLink")}</p>
               <p className="text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2 break-all mb-3">{profileUrl}</p>
               <div className="flex flex-wrap gap-2">
                 <button type="button" onClick={copyLink} className="btn-secondary py-2 px-3 text-xs">
                   {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                  {linkCopied ? "Copied" : "Copy Link"}
+                  {linkCopied ? t("copied") : t("copyLink")}
                 </button>
                 {qrDataUrl && (
                   <>
                     <button type="button" onClick={downloadPNG} className="btn-secondary py-2 px-3 text-xs">
-                      <Download className="w-3.5 h-3.5" /> Download PNG
+                      <Download className="w-3.5 h-3.5" /> {t("downloadPng")}
                     </button>
                     <button type="button" onClick={downloadPDF} className="btn-secondary py-2 px-3 text-xs">
-                      <FileText className="w-3.5 h-3.5" /> Download PDF
+                      <FileText className="w-3.5 h-3.5" /> {t("downloadPdf")}
                     </button>
                   </>
                 )}

@@ -8,6 +8,8 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import { downloadOrShareUrl } from "@/lib/nativeDownload";
 import { isNative } from "@/lib/platform";
 import { prepareUpload, tooBigMessage } from "@/lib/compressImage";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 interface PatientDocument {
   id: string;
@@ -20,6 +22,16 @@ interface PatientDocument {
 
 const CATEGORIES = ["Lab Report", "Prescription", "Scan/X-ray", "Vaccination", "Discharge Summary", "Other"];
 
+// Stored category values stay English; these are their message keys.
+const CATEGORY_KEY: Record<string, "labReport" | "prescription" | "scan" | "vaccination" | "discharge" | "other"> = {
+  "Lab Report": "labReport",
+  Prescription: "prescription",
+  "Scan/X-ray": "scan",
+  Vaccination: "vaccination",
+  "Discharge Summary": "discharge",
+  Other: "other",
+};
+
 const CATEGORY_ICON: Record<string, React.ElementType> = {
   "Lab Report": FlaskConical,
   Prescription: Pill,
@@ -30,6 +42,9 @@ const CATEGORY_ICON: Record<string, React.ElementType> = {
 };
 
 export default function HealthDocumentsPage() {
+  const t = useTranslations("patientAccount.documents");
+  const locale = formattingLocale(useLocale());
+  const categoryLabel = (c: string) => (CATEGORY_KEY[c] ? t(`category.${CATEGORY_KEY[c]}`) : c);
   const [documents, setDocuments] = useState<PatientDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -74,8 +89,8 @@ export default function HealthDocumentsPage() {
 
   return (
     <ProfileSubShell
-      title="Health Documents"
-      description="Lab reports, scans, and other records — kept here, not tied to any one visit."
+      title={t("title")}
+      description={t("description")}
       icon={<FolderHeart className="w-5 h-5" />}
       tint="bg-rose-50 text-rose-600"
       loading={loading}
@@ -85,11 +100,11 @@ export default function HealthDocumentsPage() {
         onClick={() => setUploadOpen(true)}
         className="tap-44-y btn-secondary w-full justify-center py-2.5"
       >
-        <Plus className="w-4 h-4" /> Add Document
+        <Plus className="w-4 h-4" /> {t("add")}
       </button>
 
       {documents.length === 0 ? (
-        <p className="text-sm text-slate-400 text-center py-6">No documents saved yet.</p>
+        <p className="text-sm text-slate-400 text-center py-6">{t("none")}</p>
       ) : (
         <div className="space-y-2.5">
           {documents.map((doc) => {
@@ -102,23 +117,23 @@ export default function HealthDocumentsPage() {
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-slate-800 truncate">{doc.title}</p>
                   <p className="text-xs text-slate-400">
-                    {doc.category} · {new Date(doc.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    {categoryLabel(doc.category)} · {new Date(doc.createdAt).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })}
                   </p>
                 </div>
-                <button aria-label={`View or download ${doc.title}`}
+                <button aria-label={t("viewAria", { title: doc.title })}
                   type="button"
                   onClick={() => onOpen(doc)}
                   disabled={downloadingId === doc.id}
                   className="tap-44 w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-slate-100 flex-shrink-0"
-                  title="View / Download"
+                  title={t("viewTitle")}
                 >
                   {downloadingId === doc.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                 </button>
-                <button aria-label={`Remove ${doc.title}`}
+                <button aria-label={t("removeAria", { title: doc.title })}
                   type="button"
                   onClick={() => setDeleteTarget(doc)}
                   className="tap-44 w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0"
-                  title="Remove"
+                  title={t("remove")}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -138,10 +153,10 @@ export default function HealthDocumentsPage() {
       {deleteTarget && (
         <ConfirmDialog
           icon={Trash2}
-          title="Remove this document?"
-          message={`"${deleteTarget.title}" will be removed from your health records. This cannot be undone.`}
-          confirmLabel="Remove"
-          busyLabel="Removing…"
+          title={t("confirmTitle")}
+          message={t("confirmMessage", { title: deleteTarget.title })}
+          confirmLabel={t("remove")}
+          busyLabel={t("removing")}
           tone="danger"
           busy={deleting}
           onCancel={() => setDeleteTarget(null)}
@@ -153,6 +168,7 @@ export default function HealthDocumentsPage() {
 }
 
 function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded: (doc: PatientDocument) => void }) {
+  const t = useTranslations("patientAccount.documents");
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Other");
   const [file, setFile] = useState<File | null>(null);
@@ -160,12 +176,12 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
   const [error, setError] = useState("");
 
   const submit = async () => {
-    if (!title.trim()) { setError("Please give the document a title."); return; }
-    if (!file) { setError("Please choose a file."); return; }
+    if (!title.trim()) { setError(t("errTitle")); return; }
+    if (!file) { setError(t("errFile")); return; }
     setBusy(true);
     setError("");
     const prepared = await prepareUpload(file).catch(() => null);
-    if (!prepared) { setBusy(false); setError("Couldn't read that file — please pick it again."); return; }
+    if (!prepared) { setBusy(false); setError(t("errRead")); return; }
     const tooBig = tooBigMessage(prepared);
     if (tooBig) { setBusy(false); setError(tooBig); return; }
     const fd = new FormData();
@@ -178,7 +194,7 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
       onUploaded(await res.json());
     } else {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Couldn't upload this document. Please try again.");
+      setError(data.error ?? t("errUpload"));
     }
   };
 
@@ -186,26 +202,26 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-slate-800">Add Document</h3>
-          <button aria-label="Close" onClick={onClose} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
+          <h3 className="font-bold text-slate-800">{t("dialogTitle")}</h3>
+          <button aria-label={t("close")} onClick={onClose} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <label className="input-label">Title</label>
+        <label className="input-label">{t("titleLabel")}</label>
         <input
           className="input-field mb-3"
-          placeholder="e.g. Blood test, March 2026"
+          placeholder={t("titlePlaceholder")}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        <label className="input-label">Category</label>
+        <label className="input-label">{t("categoryLabel")}</label>
         <select className="input-field mb-3" value={category} onChange={(e) => setCategory(e.target.value)}>
-          {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          {CATEGORIES.map((c) => <option key={c} value={c}>{t(`category.${CATEGORY_KEY[c]}`)}</option>)}
         </select>
 
-        <label className="input-label">File (PDF, JPG or PNG, max 5MB)</label>
+        <label className="input-label">{t("fileLabel")}</label>
         <input
           type="file"
           accept="application/pdf,image/jpeg,image/png"
@@ -218,13 +234,13 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
         )}
 
         <div className="flex gap-3">
-          <button onClick={onClose} className="btn-secondary flex-1">Cancel</button>
+          <button onClick={onClose} className="btn-secondary flex-1">{t("cancel")}</button>
           <button
             onClick={submit}
             disabled={busy}
             className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-60"
           >
-            {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</> : "Upload"}
+            {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("uploading")}</> : t("upload")}
           </button>
         </div>
       </div>

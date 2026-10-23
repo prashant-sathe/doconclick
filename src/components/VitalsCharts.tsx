@@ -2,6 +2,8 @@
 import { useMemo, useRef, useState } from "react";
 import { AlertTriangle, CheckCircle2, Activity } from "lucide-react";
 import { classifyVitals, cToF, type VitalsInput } from "@/lib/vitals";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 // Vitals trends as small multiples — one chart per measure (never two
 // y-scales on one plot). Built to the dataviz rules: 2px lines, ≥8px dots
@@ -36,10 +38,10 @@ const C = {
   good: "#0ca30c",
 };
 
-type Series = { key: string; label: string; color: string; get: (r: VitalReadingRow) => number | null };
+// Titles/labels are message keys (patientAccount.vitalsCharts.metric / .series).
+type Series = { key: "sys" | "dia" | "spo2" | "pulse" | "temp" | "sugar"; color: string; get: (r: VitalReadingRow) => number | null };
 type Metric = {
-  id: string;
-  title: string;
+  id: "bp" | "spo2" | "pulse" | "temp" | "sugar";
   unit: string;
   series: Series[];
   normal: [number, number] | null; // band
@@ -48,20 +50,25 @@ type Metric = {
 
 const METRICS: Metric[] = [
   {
-    id: "bp", title: "Blood pressure", unit: "mmHg", normal: [60, 140], fmt: (n) => String(Math.round(n)),
+    id: "bp", unit: "mmHg", normal: [60, 140], fmt: (n) => String(Math.round(n)),
     series: [
-      { key: "sys", label: "Upper (systolic)", color: C.s1, get: (r) => r.systolic ?? null },
-      { key: "dia", label: "Lower (diastolic)", color: C.s2, get: (r) => r.diastolic ?? null },
+      { key: "sys", color: C.s1, get: (r) => r.systolic ?? null },
+      { key: "dia", color: C.s2, get: (r) => r.diastolic ?? null },
     ],
   },
-  { id: "spo2", title: "Oxygen (SpO2)", unit: "%", normal: [95, 100], fmt: (n) => `${Math.round(n)}`, series: [{ key: "spo2", label: "SpO2", color: C.s1, get: (r) => r.spo2 ?? null }] },
-  { id: "pulse", title: "Pulse", unit: "bpm", normal: [55, 100], fmt: (n) => `${Math.round(n)}`, series: [{ key: "pulse", label: "Pulse", color: C.s1, get: (r) => r.pulse ?? null }] },
-  { id: "temp", title: "Temperature", unit: "°F", normal: [97, 100.4], fmt: (n) => n.toFixed(1), series: [{ key: "temp", label: "Temperature", color: C.s1, get: (r) => (r.temperatureC != null ? cToF(r.temperatureC) : null) }] },
-  { id: "sugar", title: "Blood sugar", unit: "mg/dL", normal: [70, 180], fmt: (n) => `${Math.round(n)}`, series: [{ key: "sugar", label: "Sugar", color: C.s1, get: (r) => r.sugarMgDl ?? null }] },
+  { id: "spo2", unit: "%", normal: [95, 100], fmt: (n) => `${Math.round(n)}`, series: [{ key: "spo2", color: C.s1, get: (r) => r.spo2 ?? null }] },
+  { id: "pulse", unit: "bpm", normal: [55, 100], fmt: (n) => `${Math.round(n)}`, series: [{ key: "pulse", color: C.s1, get: (r) => r.pulse ?? null }] },
+  { id: "temp", unit: "°F", normal: [97, 100.4], fmt: (n) => n.toFixed(1), series: [{ key: "temp", color: C.s1, get: (r) => (r.temperatureC != null ? cToF(r.temperatureC) : null) }] },
+  { id: "sugar", unit: "mg/dL", normal: [70, 180], fmt: (n) => `${Math.round(n)}`, series: [{ key: "sugar", color: C.s1, get: (r) => r.sugarMgDl ?? null }] },
 ];
 
-const fmtDate = (iso: string) => new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
-const fmtDateTime = (iso: string) => new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+function useFormatters() {
+  const locale = formattingLocale(useLocale());
+  return {
+    fmtDate: (iso: string) => new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "short" }),
+    fmtDateTime: (iso: string) => new Date(iso).toLocaleString(locale, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }),
+  };
+}
 
 function niceTicks(min: number, max: number, count = 4): number[] {
   const span = max - min || 1;
@@ -87,6 +94,9 @@ function pointAlert(metric: Metric, r: VitalReadingRow): "CRITICAL" | "WARNING" 
 }
 
 function MetricChart({ metric, readings }: { metric: Metric; readings: VitalReadingRow[] }) {
+  const t = useTranslations("patientAccount.vitalsCharts");
+  const { fmtDate, fmtDateTime } = useFormatters();
+  const title = t(`metric.${metric.id}`);
   const rows = readings.filter((r) => metric.series.some((s) => s.get(r) != null));
   const [hover, setHover] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -124,14 +134,14 @@ function MetricChart({ metric, readings }: { metric: Metric; readings: VitalRead
   return (
     <figure className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
       <figcaption className="flex items-baseline justify-between gap-2 mb-1">
-        <span className="text-sm font-semibold" style={{ color: C.ink }}>{metric.title}</span>
-        <span className="text-[11px]" style={{ color: C.muted }}>{metric.unit} · {rows.length} reading{rows.length === 1 ? "" : "s"}</span>
+        <span className="text-sm font-semibold" style={{ color: C.ink }}>{title}</span>
+        <span className="text-[11px]" style={{ color: C.muted }}>{metric.unit} · {t("readings", { count: rows.length })}</span>
       </figcaption>
       {metric.series.length > 1 && (
         <div className="flex gap-3 mb-1" aria-hidden>
           {metric.series.map((s) => (
             <span key={s.key} className="flex items-center gap-1.5 text-[11px]" style={{ color: C.ink2 }}>
-              <span className="inline-block w-3 h-[2px] rounded" style={{ background: s.color }} />{s.label}
+              <span className="inline-block w-3 h-[2px] rounded" style={{ background: s.color }} />{t(`series.${s.key}`)}
             </span>
           ))}
         </div>
@@ -142,7 +152,7 @@ function MetricChart({ metric, readings }: { metric: Metric; readings: VitalRead
           viewBox={`0 0 ${W} ${H}`}
           className="w-full h-auto outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded"
           role="img"
-          aria-label={`${metric.title} trend, latest ${metric.series.map((s) => `${s.label} ${s.get(latest) ?? "—"}`).join(", ")} ${metric.unit}. Use left and right arrow keys to read each value.`}
+          aria-label={t("chartAria", { title, values: metric.series.map((s) => `${t(`series.${s.key}`)} ${s.get(latest) ?? "—"}`).join(", "), unit: metric.unit })}
           tabIndex={0}
           onPointerMove={onMove}
           onPointerLeave={() => setHover(null)}
@@ -154,7 +164,7 @@ function MetricChart({ metric, readings }: { metric: Metric; readings: VitalRead
               <rect x={padL} width={W - padL - padR} y={geo.y(Math.min(metric.normal[1], geo.ticks[geo.ticks.length - 1]))}
                 height={Math.max(0, geo.y(Math.max(metric.normal[0], geo.ticks[0])) - geo.y(Math.min(metric.normal[1], geo.ticks[geo.ticks.length - 1])))}
                 fill={C.band} />
-              <text x={W - padR + 4} y={geo.y(Math.min(metric.normal[1], geo.ticks[geo.ticks.length - 1])) + 9} fontSize="9" fill={C.muted}>normal</text>
+              <text x={W - padR + 4} y={geo.y(Math.min(metric.normal[1], geo.ticks[geo.ticks.length - 1])) + 9} fontSize="9" fill={C.muted}>{t("normalBand")}</text>
             </>
           )}
           {geo.ticks.map((t) => (
@@ -199,13 +209,13 @@ function MetricChart({ metric, readings }: { metric: Metric; readings: VitalRead
               <div key={s.key} className="flex items-center gap-1.5">
                 <span className="inline-block w-2.5 h-[2px] rounded" style={{ background: s.color }} />
                 <strong style={{ color: C.ink }}>{metric.fmt(s.get(active)!)} {metric.unit}</strong>
-                {metric.series.length > 1 && <span style={{ color: C.ink2 }}>{s.label}</span>}
+                {metric.series.length > 1 && <span style={{ color: C.ink2 }}>{t(`series.${s.key}`)}</span>}
               </div>
             ))}
             {pointAlert(metric, active) && (
               <div className="flex items-center gap-1 mt-0.5 font-semibold" style={{ color: pointAlert(metric, active) === "CRITICAL" ? C.critical : C.ink2 }}>
                 <AlertTriangle className="w-3 h-3" style={{ color: pointAlert(metric, active) === "CRITICAL" ? C.critical : C.warning }} />
-                {pointAlert(metric, active) === "CRITICAL" ? "Critical" : "Out of range"}
+                {pointAlert(metric, active) === "CRITICAL" ? t("critical") : t("outOfRange")}
               </div>
             )}
           </div>
@@ -216,12 +226,14 @@ function MetricChart({ metric, readings }: { metric: Metric; readings: VitalRead
 }
 
 /** Latest-value stat tiles + one trend chart per measure + the readings table. */
-export default function VitalsCharts({ readings, emptyText = "No vitals recorded yet." }: { readings: VitalReadingRow[]; emptyText?: string }) {
+export default function VitalsCharts({ readings, emptyText }: { readings: VitalReadingRow[]; emptyText?: string }) {
+  const t = useTranslations("patientAccount.vitalsCharts");
+  const { fmtDateTime } = useFormatters();
   const chrono = useMemo(() => [...readings].sort((a, b) => +new Date(a.recordedAt) - +new Date(b.recordedAt)), [readings]);
   if (readings.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-sm text-slate-400">
-        <Activity className="w-8 h-8 mx-auto mb-2 opacity-40" />{emptyText}
+        <Activity className="w-8 h-8 mx-auto mb-2 opacity-40" />{emptyText ?? t("emptyDefault")}
       </div>
     );
   }
@@ -229,32 +241,32 @@ export default function VitalsCharts({ readings, emptyText = "No vitals recorded
   const latestLevel = latest.alertLevel;
 
   const tiles = [
-    { label: "Blood pressure", value: latest.systolic != null ? `${latest.systolic}/${latest.diastolic}` : null, unit: "mmHg" },
-    { label: "SpO2", value: latest.spo2 != null ? `${latest.spo2}` : null, unit: "%" },
-    { label: "Pulse", value: latest.pulse != null ? `${latest.pulse}` : null, unit: "bpm" },
-    { label: "Temperature", value: latest.temperatureC != null ? `${cToF(latest.temperatureC)}` : null, unit: "°F" },
-    { label: "Sugar", value: latest.sugarMgDl != null ? `${latest.sugarMgDl}` : null, unit: "mg/dL" },
-  ].filter((t) => t.value != null);
+    { label: t("tile.bp"), value: latest.systolic != null ? `${latest.systolic}/${latest.diastolic}` : null, unit: "mmHg" },
+    { label: t("tile.spo2"), value: latest.spo2 != null ? `${latest.spo2}` : null, unit: "%" },
+    { label: t("tile.pulse"), value: latest.pulse != null ? `${latest.pulse}` : null, unit: "bpm" },
+    { label: t("tile.temp"), value: latest.temperatureC != null ? `${cToF(latest.temperatureC)}` : null, unit: "°F" },
+    { label: t("tile.sugar"), value: latest.sugarMgDl != null ? `${latest.sugarMgDl}` : null, unit: "mg/dL" },
+  ].filter((tile) => tile.value != null);
 
   return (
     <div className="space-y-4">
       <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
         <div className="flex items-center justify-between gap-2 mb-3">
-          <p className="text-sm font-semibold text-slate-800">Latest · {fmtDateTime(latest.recordedAt)}</p>
+          <p className="text-sm font-semibold text-slate-800">{t("latest", { when: fmtDateTime(latest.recordedAt) })}</p>
           {latestLevel === "NORMAL" ? (
-            <span className="text-xs font-semibold flex items-center gap-1" style={{ color: "#006300" }}><CheckCircle2 className="w-3.5 h-3.5" style={{ color: C.good }} />All in range</span>
+            <span className="text-xs font-semibold flex items-center gap-1" style={{ color: "#006300" }}><CheckCircle2 className="w-3.5 h-3.5" style={{ color: C.good }} />{t("allInRange")}</span>
           ) : (
             <span className="text-xs font-semibold flex items-center gap-1" style={{ color: latestLevel === "CRITICAL" ? C.critical : C.ink2 }}>
               <AlertTriangle className="w-3.5 h-3.5" style={{ color: latestLevel === "CRITICAL" ? C.critical : C.warning }} />
-              {latestLevel === "CRITICAL" ? "Critical — needs a doctor" : "Out of range"}
+              {latestLevel === "CRITICAL" ? t("criticalNeedsDoctor") : t("outOfRange")}
             </span>
           )}
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          {tiles.map((t) => (
-            <div key={t.label}>
-              <p className="text-[11px] text-slate-500">{t.label}</p>
-              <p className="text-lg font-semibold text-slate-900">{t.value} <span className="text-[11px] font-normal text-slate-400">{t.unit}</span></p>
+          {tiles.map((tile) => (
+            <div key={tile.label}>
+              <p className="text-[11px] text-slate-500">{tile.label}</p>
+              <p className="text-lg font-semibold text-slate-900">{tile.value} <span className="text-[11px] font-normal text-slate-400">{tile.unit}</span></p>
             </div>
           ))}
         </div>
@@ -266,18 +278,18 @@ export default function VitalsCharts({ readings, emptyText = "No vitals recorded
       </div>
 
       <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <p className="px-4 pt-3 pb-2 text-sm font-semibold text-slate-800">All readings</p>
+        <p className="px-4 pt-3 pb-2 text-sm font-semibold text-slate-800">{t("allReadings")}</p>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="text-left text-slate-500 border-b border-slate-100">
-                <th className="px-4 py-2 font-medium">When</th>
-                <th className="px-2 py-2 font-medium">BP</th>
-                <th className="px-2 py-2 font-medium">SpO2</th>
-                <th className="px-2 py-2 font-medium">Pulse</th>
-                <th className="px-2 py-2 font-medium">Temp °F</th>
-                <th className="px-2 py-2 font-medium">Sugar</th>
-                <th className="px-4 py-2 font-medium">Status</th>
+                <th className="px-4 py-2 font-medium">{t("col.when")}</th>
+                <th className="px-2 py-2 font-medium">{t("col.bp")}</th>
+                <th className="px-2 py-2 font-medium">{t("col.spo2")}</th>
+                <th className="px-2 py-2 font-medium">{t("col.pulse")}</th>
+                <th className="px-2 py-2 font-medium">{t("col.temp")}</th>
+                <th className="px-2 py-2 font-medium">{t("col.sugar")}</th>
+                <th className="px-4 py-2 font-medium">{t("col.status")}</th>
               </tr>
             </thead>
             <tbody style={{ fontVariantNumeric: "tabular-nums" }}>
@@ -285,7 +297,7 @@ export default function VitalsCharts({ readings, emptyText = "No vitals recorded
                 <tr key={r.id} className="border-b border-slate-50 align-top">
                   <td className="px-4 py-2 text-slate-600 whitespace-nowrap">
                     {fmtDateTime(r.recordedAt)}
-                    {r.recordedBy && <div className="text-[10px] text-slate-400">Nurse {r.recordedBy.name}{r.appointment?.serviceName ? ` · ${r.appointment.serviceName}` : ""}</div>}
+                    {r.recordedBy && <div className="text-[10px] text-slate-400">{t("recordedBy", { name: r.recordedBy.name })}{r.appointment?.serviceName ? ` · ${r.appointment.serviceName}` : ""}</div>}
                   </td>
                   <td className="px-2 py-2 text-slate-800">{r.systolic != null ? `${r.systolic}/${r.diastolic}` : "—"}</td>
                   <td className="px-2 py-2 text-slate-800">{r.spo2 ?? "—"}</td>
@@ -293,10 +305,10 @@ export default function VitalsCharts({ readings, emptyText = "No vitals recorded
                   <td className="px-2 py-2 text-slate-800">{r.temperatureC != null ? cToF(r.temperatureC) : "—"}</td>
                   <td className="px-2 py-2 text-slate-800">{r.sugarMgDl ?? "—"}{r.sugarMgDl != null && r.sugarType ? <span className="text-slate-400"> {r.sugarType === "FASTING" ? "F" : r.sugarType === "POST_MEAL" ? "PP" : "R"}</span> : null}</td>
                   <td className="px-4 py-2">
-                    {r.alertLevel === "NORMAL" ? <span className="text-slate-500">Normal</span> : (
+                    {r.alertLevel === "NORMAL" ? <span className="text-slate-500">{t("normal")}</span> : (
                       <span className="flex items-start gap-1" style={{ color: r.alertLevel === "CRITICAL" ? C.critical : C.ink2 }}>
                         <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" style={{ color: r.alertLevel === "CRITICAL" ? C.critical : C.warning }} />
-                        <span>{r.alertLevel === "CRITICAL" ? "Critical" : "Out of range"}{r.alerts ? `: ${r.alerts}` : ""}</span>
+                        <span>{r.alertLevel === "CRITICAL" ? t("critical") : t("outOfRange")}{r.alerts ? `: ${r.alerts}` : ""}</span>
                       </span>
                     )}
                     {r.notes && <div className="text-[10px] text-slate-400 mt-0.5">{r.notes}</div>}

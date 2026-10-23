@@ -9,6 +9,7 @@ import type {
 } from "agora-rtc-sdk-ng";
 import { Loader2, Mic, MicOff, PhoneOff, Video, VideoOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface VideoCallRoomProps {
   appointmentId: string;
@@ -16,13 +17,18 @@ interface VideoCallRoomProps {
   leaveHref: string;
 }
 
+// A message from the server (shown as-is) or one of ours (a shared.videoCall key
+// — kept as a key so the join effect doesn't depend on the translator).
+type Notice = { text: string } | { key: "startFailed" | "ended" | "extendFailed" | "extendOffline" };
+
 export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHref }: VideoCallRoomProps) {
   const router = useRouter();
+  const t = useTranslations("shared.videoCall");
   const [status, setStatus] = useState<"connecting" | "waiting" | "connected" | "error">("connecting");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<Notice | null>(null);
   // Non-fatal: the call keeps going (e.g. token renewal was refused because
   // the consultation window closed — the call ends when the token expires).
-  const [warning, setWarning] = useState("");
+  const [warning, setWarning] = useState<Notice | null>(null);
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
   const localRef = useRef<HTMLDivElement>(null);
@@ -68,7 +74,8 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
       const res = await fetch(`/api/appointments/${appointmentId}/video-token`);
       if (!res.ok) {
         if (cancelled) return;
-        setError((await res.json().catch(() => ({}))).error ?? "Could not start the video consultation.");
+        const msg = (await res.json().catch(() => ({}))).error;
+        setError(msg ? { text: msg } : { key: "startFailed" });
         setStatus("error");
         return;
       }
@@ -98,20 +105,20 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
           const renew = await fetch(`/api/appointments/${appointmentId}/video-token`);
           const data = await renew.json().catch(() => ({}));
           if (!renew.ok || !data.token) {
-            setWarning(data.error ?? "Couldn't extend the call — it may end in a few minutes.");
+            setWarning(data.error ? { text: data.error } : { key: "extendFailed" });
             return;
           }
           await client.renewToken(data.token);
-          setWarning("");
+          setWarning(null);
         } catch {
-          setWarning("Couldn't extend the call — it may end in a few minutes. Check your connection.");
+          setWarning({ key: "extendOffline" });
         }
       });
       client.on("token-privilege-did-expire", () => {
         localTracksRef.current?.audio.close();
         localTracksRef.current?.video.close();
         client.leave();
-        setError("The call has ended — the time for this video consultation is over.");
+        setError({ key: "ended" });
         setStatus("error");
       });
 
@@ -133,7 +140,7 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
 
     join().catch((err) => {
       if (cancelled) return;
-      setError(err instanceof Error ? err.message : "Could not start the video consultation.");
+      setError(err instanceof Error && err.message ? { text: err.message } : { key: "startFailed" });
       setStatus("error");
     });
 
@@ -166,12 +173,14 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
     router.push(leaveHref);
   };
 
+  const show = (n: Notice) => ("key" in n ? t(n.key) : n.text);
+
   const accentText = accent === "teal" ? "text-teal-300" : "text-blue-300";
 
   if (status === "error") {
     return (
       <div className="flex-1 flex items-center justify-center text-sm text-slate-400 text-center px-6">
-        {error}
+        {error && show(error)}
       </div>
     );
   }
@@ -183,12 +192,12 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
         {status !== "connected" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-300">
             <Loader2 className={cn("w-6 h-6 animate-spin", accentText)} />
-            <p className="text-sm">{status === "connecting" ? "Connecting…" : "Waiting for the other participant to join…"}</p>
+            <p className="text-sm">{status === "connecting" ? t("connecting") : t("waiting")}</p>
           </div>
         )}
         {warning && (
           <div className="absolute top-3 left-3 right-3 rounded-lg bg-amber-500/90 text-white text-xs font-semibold px-3 py-2 text-center">
-            {warning}
+            {show(warning)}
           </div>
         )}
         <div
@@ -198,7 +207,7 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
       </div>
 
       <div className="flex items-center justify-center gap-3 py-4 bg-slate-950">
-        <button aria-label={micOn ? "Mute microphone" : "Unmute microphone"} aria-pressed={!micOn}
+        <button aria-label={micOn ? t("mute") : t("unmute")} aria-pressed={!micOn}
           onClick={toggleMic}
           className={cn(
             "w-11 h-11 rounded-full flex items-center justify-center text-white transition-colors",
@@ -207,7 +216,7 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
         >
           {micOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
         </button>
-        <button aria-label={camOn ? "Turn camera off" : "Turn camera on"} aria-pressed={!camOn}
+        <button aria-label={camOn ? t("cameraOff") : t("cameraOn")} aria-pressed={!camOn}
           onClick={toggleCam}
           className={cn(
             "w-11 h-11 rounded-full flex items-center justify-center text-white transition-colors",
@@ -216,7 +225,7 @@ export default function VideoCallRoom({ appointmentId, accent = "blue", leaveHre
         >
           {camOn ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
         </button>
-        <button aria-label="End call"
+        <button aria-label={t("endCall")}
           onClick={leave}
           className="w-11 h-11 rounded-full flex items-center justify-center text-white bg-red-600 hover:bg-red-700"
         >

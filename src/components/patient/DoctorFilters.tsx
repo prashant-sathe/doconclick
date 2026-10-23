@@ -3,6 +3,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { SlidersHorizontal, X, Languages, GraduationCap, IndianRupee, ArrowUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import {
   type DoctorFilterState,
   type DoctorSortBy,
@@ -13,12 +14,8 @@ import {
 
 const EXPERIENCE_PRESETS = [0, 5, 10, 15];
 const FEE_PRESETS = [null, 300, 500, 1000] as const;
-const SORT_OPTIONS: { id: DoctorSortBy; label: string }[] = [
-  { id: "distance", label: "Nearest" },
-  { id: "rating", label: "Top Rated" },
-  { id: "experience", label: "Most Experienced" },
-  { id: "feeLowToHigh", label: "Lowest Fee" },
-];
+// Labels: messages/<locale>/patient.json → doctorFilters.sort.<id>
+const SORT_OPTIONS: DoctorSortBy[] = ["distance", "rating", "experience", "feeLowToHigh"];
 
 function activeFilterCount(f: DoctorFilterState): number {
   let n = 0;
@@ -43,6 +40,7 @@ export default function DoctorFilters({
   doctors: { doctorProfile: { languages: string } | null }[];
   className?: string;
 }) {
+  const t = useTranslations("patient.doctorFilters");
   const [open, setOpen] = useState(false);
   const count = activeFilterCount(value);
   const languages = collectAvailableLanguages(doctors);
@@ -61,7 +59,7 @@ export default function DoctorFilters({
         )}
       >
         <SlidersHorizontal className="w-3.5 h-3.5" />
-        Filters
+        {t("trigger")}
         {count > 0 && (
           <span className="w-4 h-4 rounded-full bg-white text-blue-600 text-[10px] font-bold flex items-center justify-center">
             {count}
@@ -76,8 +74,8 @@ export default function DoctorFilters({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-extrabold text-slate-900">Filter &amp; Sort</h3>
-              <button aria-label="Close filters" onClick={() => setOpen(false)} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
+              <h3 className="font-extrabold text-slate-900">{t("title")}</h3>
+              <button aria-label={t("close")} onClick={() => setOpen(false)} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -85,7 +83,7 @@ export default function DoctorFilters({
             {languages.length > 0 && (
               <div className="mb-5">
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <Languages className="w-3.5 h-3.5" /> Speaks
+                  <Languages className="w-3.5 h-3.5" /> {t("speaks")}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <button
@@ -96,7 +94,7 @@ export default function DoctorFilters({
                       value.language === "" ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
-                    Any
+                    {t("any")}
                   </button>
                   {languages.map((lang) => (
                     <button
@@ -117,7 +115,7 @@ export default function DoctorFilters({
 
             <div className="mb-5">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <GraduationCap className="w-3.5 h-3.5" /> Experience
+                <GraduationCap className="w-3.5 h-3.5" /> {t("experience")}
               </p>
               <div className="flex flex-wrap gap-2">
                 {EXPERIENCE_PRESETS.map((yrs) => (
@@ -130,7 +128,7 @@ export default function DoctorFilters({
                       value.minExperience === yrs ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
-                    {yrs === 0 ? "Any" : `${yrs}+ yrs`}
+                    {yrs === 0 ? t("any") : t("yearsPlus", { years: yrs })}
                   </button>
                 ))}
               </div>
@@ -138,7 +136,7 @@ export default function DoctorFilters({
 
             <div className="mb-5">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <IndianRupee className="w-3.5 h-3.5" /> Max Clinic Fee
+                <IndianRupee className="w-3.5 h-3.5" /> {t("maxFee")}
               </p>
               <div className="flex flex-wrap gap-2">
                 {FEE_PRESETS.map((fee) => (
@@ -151,7 +149,7 @@ export default function DoctorFilters({
                       value.maxFee === fee ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
-                    {fee == null ? "Any" : `≤ ₹${fee}`}
+                    {fee == null ? t("any") : `≤ ₹${fee}`}
                   </button>
                 ))}
               </div>
@@ -159,10 +157,10 @@ export default function DoctorFilters({
 
             <div className="mb-5">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <ArrowUpDown className="w-3.5 h-3.5" /> Sort By
+                <ArrowUpDown className="w-3.5 h-3.5" /> {t("sortBy")}
               </p>
               <div className="flex flex-wrap gap-2">
-                {SORT_OPTIONS.map(({ id, label }) => (
+                {SORT_OPTIONS.map((id) => (
                   <button
                     key={id}
                     type="button"
@@ -172,7 +170,7 @@ export default function DoctorFilters({
                       value.sortBy === id ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
-                    {label}
+                    {t(`sort.${id}`)}
                   </button>
                 ))}
               </div>
@@ -181,11 +179,11 @@ export default function DoctorFilters({
             <div className="flex gap-3">
               {!isDefaultDoctorFilters(value) && (
                 <button onClick={() => onChange(DEFAULT_DOCTOR_FILTERS)} className="btn-secondary flex-1">
-                  Reset
+                  {t("reset")}
                 </button>
               )}
               <button onClick={() => setOpen(false)} className="btn-primary flex-1 justify-center">
-                Show Results
+                {t("showResults")}
               </button>
             </div>
           </div>

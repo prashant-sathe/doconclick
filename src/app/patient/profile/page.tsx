@@ -19,8 +19,10 @@ import ImageCropModal from "@/components/ImageCropModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import EditableName from "@/components/EditableName";
 import { prepareBlobUpload } from "@/lib/compressImage";
+import { useTranslations } from "next-intl";
 
 function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) => void }) {
+  const t = useTranslations("patientAccount.hub");
   const inputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
@@ -61,13 +63,13 @@ function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) 
 
   return (
     <div ref={menuRef} className="relative flex-shrink-0">
-      <button aria-label="Change profile photo" aria-haspopup="menu"
+      <button aria-label={t("changePhotoAria")} aria-haspopup="menu"
         type="button"
         onClick={onAvatarClick}
         className="relative w-16 h-16 rounded-full block overflow-hidden bg-slate-100 border border-slate-200"
       >
         {url ? (
-          <Image src={url} alt="Profile" width={64} height={64} className="w-full h-full object-cover" />
+          <Image src={url} alt={t("photoAlt")} width={64} height={64} className="w-full h-full object-cover" />
         ) : (
           <User className="w-7 h-7 text-slate-300 absolute inset-0 m-auto" />
         )}
@@ -89,14 +91,14 @@ function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) 
             onClick={() => { setMenuOpen(false); inputRef.current?.click(); }}
             className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 text-left"
           >
-            <Camera className="w-4 h-4 text-slate-400" /> Change photo
+            <Camera className="w-4 h-4 text-slate-400" /> {t("changePhoto")}
           </button>
           <button
             type="button"
             onClick={() => { setMenuOpen(false); setConfirmRemove(true); }}
             className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 text-left"
           >
-            <Trash2 className="w-4 h-4" /> Remove photo
+            <Trash2 className="w-4 h-4" /> {t("removePhoto")}
           </button>
         </div>
       )}
@@ -112,10 +114,10 @@ function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) 
       {confirmRemove && (
         <ConfirmDialog
           icon={Trash2}
-          title="Remove profile photo?"
-          message="You can upload a new one anytime."
-          confirmLabel="Remove"
-          busyLabel="Removing…"
+          title={t("removeTitle")}
+          message={t("removeMessage")}
+          confirmLabel={t("remove")}
+          busyLabel={t("removing")}
           tone="danger"
           busy={busy}
           onCancel={() => setConfirmRemove(false)}
@@ -158,6 +160,7 @@ function StatusPill({ done, total }: { done: number; total: number }) {
 export default function PatientProfilePage() {
   const { user, loading: authLoading, logout, refresh } = useAuth();
   const router = useRouter();
+  const t = useTranslations("patientAccount.hub");
   const { profile, loading, setProfile } = usePatientProfile();
 
   useEffect(() => {
@@ -204,7 +207,7 @@ export default function PatientProfilePage() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6 flex items-center gap-4">
           <AvatarEditor url={p.photoUrl ?? ""} onChange={(url) => setProfile((prev) => ({ ...(prev ?? {}), photoUrl: url }))} />
           <div className="min-w-0 flex-1">
-            <EditableName name={user.name} displayName={user.name || "Add your name"} onSaved={refresh} />
+            <EditableName name={user.name} displayName={user.name || t("addName")} onSaved={refresh} />
             <p className="text-sm text-slate-500">{user.mobile}</p>
             <div className="mt-2 flex items-center gap-2">
               <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
@@ -214,7 +217,7 @@ export default function PatientProfilePage() {
                 />
               </div>
               <span className="text-xs font-semibold text-slate-500 flex-shrink-0">
-                {completeness.percent === 100 ? "Complete" : `${completeness.percent}%`}
+                {completeness.percent === 100 ? t("complete") : `${completeness.percent}%`}
               </span>
             </div>
           </div>
@@ -224,54 +227,54 @@ export default function PatientProfilePage() {
           <Link href="/patient/profile/personal" className="mb-5 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3.5">
             <span className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-100 text-amber-600"><User className="w-4 h-4" /></span>
             <span className="flex-1 min-w-0">
-              <span className="block text-sm font-semibold text-amber-900">Complete your profile</span>
+              <span className="block text-sm font-semibold text-amber-900">{t("completeTitle")}</span>
               <span className="block text-xs text-amber-700">
-                Add your {bookingMissing.join(", ")} — needed to book a doctor.
+                {t("completeBody", { fields: bookingMissing.map((f) => t(`field.${f}`)).join(", ") })}
               </span>
             </span>
             <ChevronRight className="w-4 h-4 text-amber-400 flex-shrink-0" />
           </Link>
         )}
 
-        <Group label="Your Information">
+        <Group label={t("groupInfo")}>
           <Row href="/patient/profile/personal" tint="bg-red-50 text-red-500" icon={<HeartPulse className="w-4 h-4" />}
-            title="Personal & Medical Info" trailing={<StatusPill done={medicalDone} total={4} />} />
+            title={t("personal")} trailing={<StatusPill done={medicalDone} total={4} />} />
           <Row href="/patient/profile/address" tint="bg-blue-50 text-blue-500" icon={<MapPin className="w-4 h-4" />}
-            title="Location & Address" trailing={<StatusPill done={addressDone} total={2} />} />
+            title={t("address")} trailing={<StatusPill done={addressDone} total={2} />} />
           <Row href="/patient/profile/emergency" tint="bg-emerald-50 text-emerald-600" icon={<PhoneCall className="w-4 h-4" />}
-            title="Emergency Contact" trailing={<StatusPill done={emergencyDone ? 1 : 0} total={1} />} />
+            title={t("emergency")} trailing={<StatusPill done={emergencyDone ? 1 : 0} total={1} />} />
           <Row href="/patient/profile/documents" tint="bg-rose-50 text-rose-600" icon={<FolderHeart className="w-4 h-4" />}
-            title="Health Documents" />
+            title={t("documents")} />
           <Row href="/patient/profile/vitals" tint="bg-rose-50 text-rose-500" icon={<Activity className="w-4 h-4" />}
-            title="Vitals (BP, sugar, SpO2…)" />
+            title={t("vitals")} />
         </Group>
 
-        <Group label="Preferences">
+        <Group label={t("groupPreferences")}>
           <Row href="/patient/profile/search-range" tint="bg-blue-50 text-blue-500" icon={<Compass className="w-4 h-4" />}
-            title="Doctor Search Range"
-            trailing={<span className="text-xs font-semibold text-slate-400 flex-shrink-0">{p.searchRadiusKm != null ? `${p.searchRadiusKm} km` : "Any distance"}</span>} />
+            title={t("searchRange")}
+            trailing={<span className="text-xs font-semibold text-slate-400 flex-shrink-0">{p.searchRadiusKm != null ? t("km", { km: p.searchRadiusKm }) : t("anyDistance")}</span>} />
           <Row href="/patient/profile/notifications" tint="bg-amber-50 text-amber-500" icon={<Bell className="w-4 h-4" />}
-            title="Notifications" />
+            title={t("notifications")} />
         </Group>
 
         <LanguageSwitch />
 
-        <Group label="Account">
+        <Group label={t("groupAccount")}>
           <Row href="/patient/wallet" tint="bg-emerald-50 text-emerald-600" icon={<WalletIcon className="w-4 h-4" />}
-            title="Wallet" />
+            title={t("wallet")} />
           <Row href="/patient/profile/security" tint="bg-indigo-50 text-indigo-500" icon={<Lock className="w-4 h-4" />}
-            title="Password & Security" />
+            title={t("security")} />
           <Row href="/patient/support" tint="bg-indigo-50 text-indigo-500" icon={<LifeBuoy className="w-4 h-4" />}
-            title="Help & Support" />
+            title={t("support")} />
           <Row href="/patient/profile/terms" tint="bg-slate-100 text-slate-500" icon={<FileCheck className="w-4 h-4" />}
-            title="Terms & Privacy Policy" />
+            title={t("terms")} />
         </Group>
 
         <button
           onClick={logout}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
         >
-          <LogOut className="w-4 h-4" /> Sign Out
+          <LogOut className="w-4 h-4" /> {t("signOut")}
         </button>
       </div>
     </div>

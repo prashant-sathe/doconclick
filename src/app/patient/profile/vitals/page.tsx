@@ -8,15 +8,21 @@ import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import VitalsCharts, { type VitalReadingRow } from "@/components/VitalsCharts";
 import { cn } from "@/lib/utils";
+import { RELATIONS } from "@/lib/relations";
+import { useTranslations } from "next-intl";
 
-type Person = { id: string | null; label: string };
+// id null = the patient themself ("Me"); labels are built at render (translated).
+type Person = { id: string | null; name?: string; relation?: string };
 
 // Vitals nurses recorded at home visits, for the patient and each family
 // member separately (never mixed) — the same readings the doctor sees.
 export default function PatientVitalsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [people, setPeople] = useState<Person[]>([{ id: null, label: "Me" }]);
+  const t = useTranslations("patientAccount.vitals");
+  const tc = useTranslations("booking.common");
+  const relationLabel = (r: string) => ((RELATIONS as readonly string[]).includes(r) ? tc(`relation.${r as (typeof RELATIONS)[number]}`) : r);
+  const [people, setPeople] = useState<Person[]>([{ id: null }]);
   const [who, setWho] = useState<string | null>(null);
   const [readings, setReadings] = useState<VitalReadingRow[] | null>(null);
 
@@ -27,7 +33,7 @@ export default function PatientVitalsPage() {
   useEffect(() => {
     if (!user?.id) return;
     fetch("/api/patients/me/dependents").then((r) => (r.ok ? r.json() : [])).then((deps: { id: string; name: string; relation: string }[]) => {
-      setPeople([{ id: null, label: "Me" }, ...deps.map((d) => ({ id: d.id, label: `${d.name} (${d.relation})` }))]);
+      setPeople([{ id: null }, ...deps.map((d) => ({ id: d.id, name: d.name, relation: d.relation }))]);
     }).catch(() => {});
   }, [user?.id]);
 
@@ -47,13 +53,13 @@ export default function PatientVitalsPage() {
       <PatientMobileNav />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
         <Link href="/patient/profile" className="tap-44-y inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 mb-4">
-          <ArrowLeft className="w-4 h-4" /> Back to Profile
+          <ArrowLeft className="w-4 h-4" /> {t("back")}
         </Link>
         <div className="flex items-center gap-3 mb-4">
           <span className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center"><Activity className="w-5 h-5" /></span>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900">Vitals</h1>
-            <p className="text-sm text-slate-500">Recorded by nurses at home visits — your doctor sees these too.</p>
+            <h1 className="text-xl font-extrabold text-slate-900">{t("title")}</h1>
+            <p className="text-sm text-slate-500">{t("subtitle")}</p>
           </div>
         </div>
         {people.length > 1 && (
@@ -61,7 +67,7 @@ export default function PatientVitalsPage() {
             {people.map((p) => (
               <button key={p.id ?? "me"} onClick={() => setWho(p.id)}
                 className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border", who === p.id ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200")}>
-                {p.label}
+                {p.id == null ? t("me") : `${p.name} (${relationLabel(p.relation ?? "")})`}
               </button>
             ))}
           </div>
@@ -69,7 +75,7 @@ export default function PatientVitalsPage() {
         {readings === null ? (
           <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-slate-300" /></div>
         ) : (
-          <VitalsCharts readings={readings} emptyText="No vitals yet — they appear here after a nurse records them at a visit." />
+          <VitalsCharts readings={readings} emptyText={t("empty")} />
         )}
       </div>
     </div>

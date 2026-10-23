@@ -2,10 +2,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { Loader2, Wallet, CheckCircle2, Clock, Send, History } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { NurseHeader, NurseMobileNav } from "@/components/nurse/NurseNav";
 import { money, sumMoney } from "@/lib/money";
+import { formattingLocale } from "@/lib/appLanguage";
 
 type Visit = {
   id: string; status: string; paymentStatus: string; paymentMethod: string; settlementId: string | null;
@@ -26,6 +28,9 @@ const inr = (n: number) => `₹${money(n).toLocaleString("en-IN")}`;
 export default function NurseEarningsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const t = useTranslations("nurse.earnings");
+  const tc = useTranslations("nurse.common");
+  const locale = formattingLocale(useLocale());
   const [visits, setVisits] = useState<Visit[] | null>(null);
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [requests, setRequests] = useState<PayoutRequest[]>([]);
@@ -72,7 +77,7 @@ export default function NurseEarningsPage() {
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       if (body.code === "BANK_DETAILS_REQUIRED") setBankOnFile(false);
-      setError(body.error ?? "Could not send the payout request.");
+      setError(body.error ?? t("requestFailed"));
       return;
     }
     load();
@@ -84,21 +89,21 @@ export default function NurseEarningsPage() {
       <NurseMobileNav />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
-        <h1 className="text-2xl font-extrabold text-slate-900 mb-4">Earnings</h1>
+        <h1 className="text-2xl font-extrabold text-slate-900 mb-4">{t("title")}</h1>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-            <p className="text-xs font-semibold text-slate-500 flex items-center gap-1"><Wallet className="w-3.5 h-3.5" />{pendingPayout < 0 ? "You owe" : "Net payout"}</p>
+            <p className="text-xs font-semibold text-slate-500 flex items-center gap-1"><Wallet className="w-3.5 h-3.5" />{pendingPayout < 0 ? t("youOwe") : t("netPayout")}</p>
             <p className="text-2xl font-extrabold text-slate-900 mt-1">{inr(Math.abs(pendingPayout))}</p>
             <p className="text-[11px] text-slate-400">
-              {unsettled.length} visit{unsettled.length === 1 ? "" : "s"}
-              {dues && dues.cashFeeOwed > 0 && ` · ${inr(dues.onlinePayoutOwed)} online − ${inr(dues.cashFeeOwed)} fee on cash visits`}
+              {t("visits", { count: unsettled.length })}
+              {dues && dues.cashFeeOwed > 0 && ` · ${t("cashBreakdown", { online: inr(dues.onlinePayoutOwed), fee: inr(dues.cashFeeOwed) })}`}
             </p>
           </div>
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-            <p className="text-xs font-semibold text-slate-500 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />Lifetime earnings</p>
+            <p className="text-xs font-semibold text-slate-500 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />{t("lifetime")}</p>
             <p className="text-2xl font-extrabold text-slate-900 mt-1">{inr(lifetime)}</p>
-            <p className="text-[11px] text-slate-400">{completed.length} completed</p>
+            <p className="text-[11px] text-slate-400">{t("completedCount", { count: completed.length })}</p>
           </div>
         </div>
 
@@ -107,53 +112,53 @@ export default function NurseEarningsPage() {
             <p className="text-sm text-amber-700 flex items-center gap-1.5"><Clock className="w-4 h-4" />
               {/* Settled at what's owed then, not the figure at request time. */}
               <span>
-                Payout requested on {new Date(openRequest.createdAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })} — the admin will settle it soon.{" "}
-                {pendingPayout > 0 ? <>You&apos;ll be paid what&apos;s owed then: <b>{inr(pendingPayout)}</b> right now</> : <>Nothing is owed to you right now</>}
-                {openRequest.amount !== pendingPayout && <span className="opacity-70"> ({inr(openRequest.amount)} when you asked)</span>}.
+                {t("payoutRequested", { date: new Date(openRequest.createdAt).toLocaleDateString(locale, { timeZone: "Asia/Kolkata" }) })}{" "}
+                {pendingPayout > 0 ? t.rich("owedNow", { amount: inr(pendingPayout), b: (c) => <b>{c}</b> }) : t("nothingOwed")}
+                {openRequest.amount !== pendingPayout && <span className="opacity-70"> {t("whenAsked", { amount: inr(openRequest.amount) })}</span>}.
               </span>
             </p>
           ) : !bankOnFile && pendingPayout > 0 ? (
             <p className="text-sm text-amber-700">
-              Add your bank details to request a payout.{" "}
-              <Link href="/nurse/profile#bank" className="font-bold underline">Add bank details →</Link>
+              {t("addBank")}{" "}
+              <Link href="/nurse/profile#bank" className="font-bold underline">{t("addBankLink")}</Link>
             </p>
           ) : (
             <button onClick={requestPayout} disabled={requesting || pendingPayout <= 0} className="btn-primary w-full justify-center py-2.5 text-sm disabled:opacity-50">
-              {requesting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} Request payout
+              {requesting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} {t("requestPayout")}
             </button>
           )}
           {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
         </div>
 
-        <h2 className="font-bold text-slate-800 mb-2">Completed visits</h2>
+        <h2 className="font-bold text-slate-800 mb-2">{t("completedVisits")}</h2>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-50 mb-6">
           {completed.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-8">No completed visits yet.</p>
+            <p className="text-sm text-slate-400 text-center py-8">{t("noCompleted")}</p>
           ) : completed.map((v) => (
             <div key={v.id} className="px-4 py-3 flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-800 truncate">{v.serviceName ?? "Nursing visit"}</p>
+                <p className="text-sm font-semibold text-slate-800 truncate">{v.serviceName ?? tc("nursingVisit")}</p>
                 <p className="text-xs text-slate-400 truncate">
-                  {v.relation !== "Self" && v.patientName ? v.patientName : v.patient.name} · {new Date(v.scheduledAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}
+                  {v.relation !== "Self" && v.patientName ? v.patientName : v.patient.name} · {new Date(v.scheduledAt).toLocaleDateString(locale, { timeZone: "Asia/Kolkata" })}
                 </p>
               </div>
               <div className="text-right flex-shrink-0">
                 <p className="text-sm font-bold text-slate-900">{inr(v.amount - v.platformFee)}</p>
-                <p className="text-[11px] text-slate-400">{v.settlementId ? "Settled" : "Pending"}</p>
+                <p className="text-[11px] text-slate-400">{v.settlementId ? t("settled") : t("pending")}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <h2 className="font-bold text-slate-800 mb-2 flex items-center gap-1.5"><History className="w-4 h-4" />Settlement history</h2>
+        <h2 className="font-bold text-slate-800 mb-2 flex items-center gap-1.5"><History className="w-4 h-4" />{t("history")}</h2>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-50">
           {settlements.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-8">No settlements yet.</p>
+            <p className="text-sm text-slate-400 text-center py-8">{t("noSettlements")}</p>
           ) : settlements.map((s) => (
             <div key={s.id} className="px-4 py-3 flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-slate-800">{inr(s.netAmount)}</p>
-                <p className="text-xs text-slate-400">{s.onlineCount} visit{s.onlineCount === 1 ? "" : "s"} · {new Date(s.createdAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}</p>
+                <p className="text-xs text-slate-400">{t("visits", { count: s.onlineCount })} · {new Date(s.createdAt).toLocaleDateString(locale, { timeZone: "Asia/Kolkata" })}</p>
               </div>
               {s.note && <p className="text-xs text-slate-500 max-w-[50%] truncate">{s.note}</p>}
             </div>

@@ -5,11 +5,13 @@ import {
   isPushSupported, subscribeToPush, isMac, openSystemNotificationSettings, getPushPermissionState,
 } from "@/lib/pushClient";
 import { isNative } from "@/lib/platform";
+import { useTranslations } from "next-intl";
 
 const DISMISSED_KEY = "doconclick_push_prompt_dismissed";
 const GRANTED_HINT_DISMISSED_KEY = "doconclick_push_granted_hint_dismissed";
 
 export default function EnableNotificationsPrompt() {
+  const t = useTranslations("shared.push");
   const [permission, setPermission] = useState<NotificationPermission | null>(null);
   const [visible, setVisible] = useState(false);
   const [hintVisible, setHintVisible] = useState(false);
@@ -56,13 +58,12 @@ export default function EnableNotificationsPrompt() {
           <BellOff className="w-4 h-4 text-amber-600" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-slate-900">Notifications are blocked</p>
+          <p className="text-sm font-bold text-slate-900">{t("blockedTitle")}</p>
           <p className="text-xs text-slate-500 mt-0.5">
             {isNative()
-              ? "Notifications are turned off for this app. Enable them from your phone's Settings → Apps → DocOnClick → Notifications."
-              : <>You&apos;ve blocked notifications for this site in your browser. Allow them from your browser&apos;s
-                  site settings, then reload this page.
-                  {isMac() && " If they still don't show up, your Mac's system notification settings may also be blocking them."}
+              ? t("blockedNative")
+              : <>{t("blockedBrowser")}
+                  {isMac() && ` ${t("blockedMac")}`}
                 </>}
           </p>
           {!isNative() && isMac() && (
@@ -70,7 +71,7 @@ export default function EnableNotificationsPrompt() {
               onClick={openSystemNotificationSettings}
               className="tap-44 text-xs font-semibold px-3 py-1.5 rounded-lg text-amber-700 hover:bg-amber-100 mt-2 inline-flex items-center gap-1"
             >
-              Open Mac notification settings <ExternalLink className="w-3 h-3" />
+              {t("openMacSettings")} <ExternalLink className="w-3 h-3" />
             </button>
           )}
         </div>
@@ -82,22 +83,22 @@ export default function EnableNotificationsPrompt() {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
         <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full relative">
-          <button aria-label="Dismiss" onClick={dismiss} className="tap-44 absolute top-4 right-4 text-slate-300 hover:text-slate-500">
+          <button aria-label={t("dismiss")} onClick={dismiss} className="tap-44 absolute top-4 right-4 text-slate-300 hover:text-slate-500">
             <X className="w-4 h-4" />
           </button>
           <div className="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center mb-4">
             <Bell className="w-6 h-6 text-blue-600" />
           </div>
-          <h3 className="text-lg font-extrabold text-slate-900">Turn on notifications</h3>
+          <h3 className="text-lg font-extrabold text-slate-900">{t("promptTitle")}</h3>
           <p className="text-sm text-slate-500 mt-1.5">
-            Get notified even when this tab isn&apos;t open — new requests, status updates, and messages.
+            {t("promptBody")}
           </p>
           <div className="flex gap-3 mt-5">
             <button onClick={dismiss} disabled={busy} className="min-h-11 btn-secondary flex-1 disabled:opacity-60">
-              Not now
+              {t("notNow")}
             </button>
             <button onClick={enable} disabled={busy} className="min-h-11 btn-primary flex-1 disabled:opacity-60">
-              {busy ? "Enabling..." : "Enable"}
+              {busy ? t("enabling") : t("enable")}
             </button>
           </div>
         </div>
@@ -109,13 +110,13 @@ export default function EnableNotificationsPrompt() {
     return (
       <div className="flex items-center gap-2 text-xs text-slate-400 mb-4">
         <Bell className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
-        <span>Notifications are on.</span>
+        <span>{t("onHint")}</span>
         {isMac() && (
           <button onClick={openSystemNotificationSettings} className="underline hover:text-slate-600">
-            Not receiving them? Open Mac settings
+            {t("notReceiving")}
           </button>
         )}
-        <button aria-label="Dismiss" onClick={dismissHint} className="ml-auto text-slate-300 hover:text-slate-500">
+        <button aria-label={t("dismiss")} onClick={dismissHint} className="ml-auto text-slate-300 hover:text-slate-500">
           <X className="w-3 h-3" />
         </button>
       </div>

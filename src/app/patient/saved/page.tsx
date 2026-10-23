@@ -12,6 +12,7 @@ import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import { readPatientLocation } from "@/lib/patientLocation";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
+import { useTranslations } from "next-intl";
 
 interface SavedDoctorEntry {
   id: string;
@@ -39,6 +40,7 @@ interface SavedDoctorEntry {
 export default function SavedDoctorsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const t = useTranslations("patient.saved");
   const { colorFor } = useSpecialties();
   const [saved, setSaved] = useState<SavedDoctorEntry[]>([]);
   const [searchRadiusKm, setSearchRadiusKm] = useState<number | null>(null);
@@ -93,16 +95,16 @@ export default function SavedDoctorsPage() {
             <Bookmark className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900">Saved Doctors</h1>
-            <p className="text-slate-500 text-sm">Doctors you&apos;ve bookmarked for a quick re-booking later.</p>
+            <h1 className="text-xl font-extrabold text-slate-900">{t("title")}</h1>
+            <p className="text-slate-500 text-sm">{t("subtitle")}</p>
           </div>
         </div>
 
         {pinnedLabel && (
           <div className="mb-6 flex items-center gap-2 text-xs bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-4 py-2.5">
             <Compass className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="flex-1 min-w-0">Distances shown from <span className="font-semibold">{pinnedLabel}</span></span>
-            <Link href="/patient/dashboard" className="font-semibold flex-shrink-0 underline">Change</Link>
+            <span className="flex-1 min-w-0">{t.rich("distancesFrom", { place: pinnedLabel, b: (c) => <span className="font-semibold">{c}</span> })}</span>
+            <Link href="/patient/dashboard" className="font-semibold flex-shrink-0 underline">{t("change")}</Link>
           </div>
         )}
 
@@ -113,9 +115,9 @@ export default function SavedDoctorsPage() {
         ) : saved.length === 0 ? (
           <div className="text-center py-16 text-slate-400">
             <Bookmark className="w-10 h-10 mx-auto mb-3 opacity-30" />
-            <p className="text-sm">No saved doctors yet.</p>
+            <p className="text-sm">{t("empty")}</p>
             <Link href="/patient/dashboard" className="tap-44-y inline-block mt-3 text-sm font-semibold text-blue-600 hover:underline">
-              Find a doctor to save
+              {t("findToSave")}
             </Link>
           </div>
         ) : (() => {
@@ -143,7 +145,7 @@ export default function SavedDoctorsPage() {
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">
                     {profile?.specialty}
-                    {distanceKm != null && <span className="text-slate-400"> · {distanceKm} km away</span>}
+                    {distanceKm != null && <span className="text-slate-400"> · {t("kmAway", { km: distanceKm })}</span>}
                   </p>
                   {profile?.clinicName && (
                     <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1 truncate">
@@ -157,14 +159,14 @@ export default function SavedDoctorsPage() {
                 <div className="flex flex-col gap-2 flex-shrink-0">
                   {entry.bookable ? (
                     <Link href={`/patient/book?doctorId=${doctor.id}`} className="btn-primary py-2.5 px-4 text-xs whitespace-nowrap justify-center">
-                      Book Again
+                      {t("bookAgain")}
                     </Link>
                   ) : (
                     <span
-                      title="This doctor is currently unavailable for booking"
+                      title={t("unavailableHint")}
                       className="btn-secondary py-2.5 px-4 text-xs whitespace-nowrap opacity-50 cursor-not-allowed justify-center"
                     >
-                      Unavailable
+                      {t("unavailable")}
                     </span>
                   )}
                   <button
@@ -172,7 +174,7 @@ export default function SavedDoctorsPage() {
                     disabled={removingId === doctor.id}
                     className="btn-secondary py-2.5 px-4 text-xs text-red-500 border-red-200 hover:bg-red-50 justify-center"
                   >
-                    <BookmarkX className="w-3.5 h-3.5" /> Remove
+                    <BookmarkX className="w-3.5 h-3.5" /> {t("remove")}
                   </button>
                 </div>
               </div>
@@ -185,7 +187,7 @@ export default function SavedDoctorsPage() {
 
               {inRange.length === 0 && outOfRange.length > 0 && (
                 <p className="text-sm text-slate-400 text-center py-6">
-                  All your saved doctors are outside your {searchRadiusKm} km search range.
+                  {t("allOutOfRange", { km: searchRadiusKm ?? 0 })}
                 </p>
               )}
 
@@ -196,7 +198,7 @@ export default function SavedDoctorsPage() {
                     className="w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 py-2"
                   >
                     <Compass className="w-3.5 h-3.5" />
-                    {outOfRange.length} saved {outOfRange.length === 1 ? "doctor" : "doctors"} outside your {searchRadiusKm} km range
+                    {t("outOfRangeToggle", { count: outOfRange.length, km: searchRadiusKm ?? 0 })}
                     <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", showOutOfRange && "rotate-180")} />
                   </button>
                   {showOutOfRange && <div className="space-y-3 mt-2">{outOfRange.map((e) => renderCard(e, true))}</div>}

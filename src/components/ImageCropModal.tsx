@@ -2,6 +2,7 @@
 import { useCallback, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import { Loader2, X, ZoomIn } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -37,6 +38,7 @@ export default function ImageCropModal({ file, aspect, round, onCancel, onConfir
   onCancel: () => void;
   onConfirm: (blob: Blob) => void;
 }) {
+  const t = useTranslations("shared.imageCrop");
   const [imageSrc] = useState(() => URL.createObjectURL(file));
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -65,7 +67,7 @@ export default function ImageCropModal({ file, aspect, round, onCancel, onConfir
       cleanup();
       onConfirm(blob);
     } catch {
-      setError("Could not crop this image. Please try another photo.");
+      setError(t("failed"));
       setBusy(false);
     }
   };
@@ -74,8 +76,8 @@ export default function ImageCropModal({ file, aspect, round, onCancel, onConfir
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-          <h3 className="font-bold text-slate-900">Crop photo</h3>
-          <button aria-label="Close" type="button" onClick={cancel} className="text-slate-300 hover:text-slate-500">
+          <h3 className="font-bold text-slate-900">{t("title")}</h3>
+          <button aria-label={t("close")} type="button" onClick={cancel} className="text-slate-300 hover:text-slate-500">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -100,19 +102,20 @@ export default function ImageCropModal({ file, aspect, round, onCancel, onConfir
             <input
               type="range" min={1} max={3} step={0.01} value={zoom}
               onChange={(e) => setZoom(Number(e.target.value))}
+              aria-label={t("zoom")}
               className="w-full accent-teal-500"
             />
           </div>
           {error && <p className="text-xs text-red-500">{error}</p>}
           <div className="flex gap-3">
             <button type="button" onClick={cancel} disabled={busy} className="btn-secondary flex-1 disabled:opacity-60">
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="button" onClick={confirm} disabled={busy || !croppedAreaPixels}
               className="btn-primary flex-1 disabled:opacity-60"
             >
-              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Use Photo"}
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : t("usePhoto")}
             </button>
           </div>
         </div>

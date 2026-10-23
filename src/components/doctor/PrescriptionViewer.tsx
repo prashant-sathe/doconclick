@@ -6,6 +6,7 @@ import { buildPrescriptionPdf, loadPrescription, prescriptionFileName } from "@/
 import { saveOrShareFile } from "@/lib/nativeDownload";
 import { isNative } from "@/lib/platform";
 import { formatDoctorName } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const DOC_W = 794; // PrescriptionDocument's A4 width
 
@@ -36,6 +37,8 @@ export default function PrescriptionViewer({ appointmentId, patientId, onClose, 
   /** Opened straight after completing the consultation. */
   justCompleted?: boolean;
 }) {
+  const t = useTranslations("doctor.prescriptionViewer");
+  const tc = useTranslations("doctor.common");
   const [data, setData] = useState<PrescriptionData | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState<"download" | "share" | null>(null);
@@ -79,14 +82,14 @@ export default function PrescriptionViewer({ appointmentId, patientId, onClose, 
       const pdf = await pdfFor();
       if (!(await saveOrShareFile(fileName, pdf.output("datauristring").split(",")[1]))) pdf.save(fileName);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't make the PDF.");
+      setError(e instanceof Error ? e.message : t("pdfFailed"));
     } finally {
       setBusy(null);
     }
   };
 
   const message = data
-    ? `Hello ${data.relation !== "Self" && data.patientName ? data.patientName : data.accountHolderName}, here is your prescription from ${formatDoctorName(data.doctorName)}. You can also find it in the DocOnClick app under Appointments.`
+    ? t("message", { name: data.relation !== "Self" && data.patientName ? data.patientName : data.accountHolderName, doctor: formatDoctorName(data.doctorName) })
     : "";
 
   const share = async () => {
@@ -105,7 +108,7 @@ export default function PrescriptionViewer({ appointmentId, patientId, onClose, 
       if (sheet) {
         const file = new File([pdf.output("blob")], fileName, { type: "application/pdf" });
         try {
-          await navigator.share({ files: [file], title: "Prescription", text: message });
+          await navigator.share({ files: [file], title: t("shareTitle"), text: message });
         } catch (e) {
           if ((e as Error)?.name !== "AbortError") throw e;
         }
@@ -115,10 +118,10 @@ export default function PrescriptionViewer({ appointmentId, patientId, onClose, 
       const url = `https://wa.me/${data.patientMobile && /^\d{10}$/.test(data.patientMobile) ? `91${data.patientMobile}` : ""}?text=${encodeURIComponent(message)}`;
       if (chat) chat.location.href = url;
       else window.open(url, "_blank");
-      setHint("The PDF was downloaded — attach it in the WhatsApp chat that just opened.");
+      setHint(t("downloadedHint"));
     } catch (e) {
       chat?.close();
-      setError(e instanceof Error ? e.message : "Couldn't share the prescription.");
+      setError(e instanceof Error ? e.message : t("shareFailed"));
     } finally {
       setBusy(null);
     }
@@ -130,17 +133,17 @@ export default function PrescriptionViewer({ appointmentId, patientId, onClose, 
         className="bg-white w-full sm:max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
-        aria-label="Prescription preview"
+        aria-label={t("dialogLabel")}
       >
         <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-3 border-b border-slate-100">
           <div className="min-w-0">
             {justCompleted && (
-              <p className="text-xs font-semibold text-emerald-600 flex items-center gap-1 mb-0.5"><CheckCircle2 className="w-3.5 h-3.5" /> Consultation completed</p>
+              <p className="text-xs font-semibold text-emerald-600 flex items-center gap-1 mb-0.5"><CheckCircle2 className="w-3.5 h-3.5" /> {t("completed")}</p>
             )}
-            <h2 className="font-bold text-slate-900">Prescription</h2>
-            <p className="text-xs text-slate-500">The patient sees this same document in their app.</p>
+            <h2 className="font-bold text-slate-900">{t("title")}</h2>
+            <p className="text-xs text-slate-500">{t("subtitle")}</p>
           </div>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-700 flex-shrink-0" aria-label="Close"><X className="w-5 h-5" /></button>
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-700 flex-shrink-0" aria-label={tc("close")}><X className="w-5 h-5" /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-100 p-3 sm:p-4">
@@ -150,7 +153,7 @@ export default function PrescriptionViewer({ appointmentId, patientId, onClose, 
           ) : !data ? (
             <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-slate-300" /></div>
           ) : (
-            <div style={{ height: docH * scale, width: DOC_W * scale }} className="mx-auto shadow-sm overflow-hidden" aria-label="Prescription document">
+            <div style={{ height: docH * scale, width: DOC_W * scale }} className="mx-auto shadow-sm overflow-hidden" aria-label={t("documentLabel")}>
               <div ref={docRef} style={{ width: DOC_W, transform: `scale(${scale})`, transformOrigin: "top left" }}>
                 <PrescriptionDocument data={data} patientId={patientId} />
               </div>
@@ -164,10 +167,10 @@ export default function PrescriptionViewer({ appointmentId, patientId, onClose, 
           {hint && <p className="text-xs text-slate-600 mb-2">{hint}</p>}
           <div className="grid grid-cols-2 gap-2">
             <button type="button" onClick={download} disabled={!data || !!busy} className="btn-secondary justify-center py-2.5 text-sm">
-              {busy === "download" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Download PDF
+              {busy === "download" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} {t("download")}
             </button>
             <button type="button" onClick={share} disabled={!data || !!busy} className="btn-primary justify-center py-2.5 text-sm">
-              {busy === "share" ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />} Send on WhatsApp
+              {busy === "share" ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />} {t("sendWhatsApp")}
             </button>
           </div>
         </div>

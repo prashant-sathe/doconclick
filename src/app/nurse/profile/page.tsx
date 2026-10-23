@@ -2,6 +2,7 @@
 import LanguageSwitch from "@/components/LanguageSwitch";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import {
   Loader2, CheckCircle2, Circle, ShieldCheck, Clock, XCircle, Ban, Upload, FileText, MapPin,
@@ -18,6 +19,7 @@ import { getCurrentPositionCompat } from "@/lib/platform";
 import { prepareUpload, tooBigMessage } from "@/lib/compressImage";
 import { parseAvailabilityString } from "@/lib/availability";
 import { cn } from "@/lib/utils";
+import { formattingLocale } from "@/lib/appLanguage";
 
 type Service = { id: string; name: string; description: string | null; suggestedPrice: number; requiresPrescription: boolean; durationMinutes: number; kind?: string };
 type Offering = { serviceId: string; price: number; service: Service };
@@ -37,30 +39,38 @@ type Me = {
   bookable: boolean;
 };
 
-const WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 // Same "Mon, Tue 08:00–20:00" format the doctor's Available Timings page
 // writes — structured so bookings can be checked against it.
 function parseHours(availability: string | null | undefined) {
   const rows = parseAvailabilityString(availability);
-  if (rows.length === 0) return { days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], from: "08:00", to: "20:00" };
-  return { days: WEEK.filter((d) => rows.some((r) => r.dayOfWeek === d)), from: rows[0].fromTime, to: rows[0].toTime };
+  if (rows.length === 0) return { days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as string[], from: "08:00", to: "20:00" };
+  return { days: WEEK.filter((d) => rows.some((r) => r.dayOfWeek === d)) as string[], from: rows[0].fromTime, to: rows[0].toTime };
 }
 
-const DOCS: { type: string; field: keyof NurseProfile; label: string; hint: string }[] = [
-  { type: "photo", field: "photoUrl", label: "Profile photo", hint: "JPG/PNG — shown to patients" },
-  { type: "councilCert", field: "councilCertUrl", label: "Nursing Council certificate", hint: "Required for approval" },
-  { type: "degreeCert", field: "degreeCertUrl", label: "Degree / diploma certificate", hint: "ANM / GNM / B.Sc / M.Sc" },
-  { type: "kyc", field: "kycDocUrl", label: "Aadhaar / PAN", hint: "Identity proof (KYC)" },
-  { type: "policeVerif", field: "policeVerifUrl", label: "Police verification (optional)", hint: "Earns a “Police verified” badge" },
-];
+// Labels are message keys (messages/<locale>/nurse.json → profile.docs.<type>, <type>Hint).
+const DOCS = [
+  { type: "photo", field: "photoUrl" },
+  { type: "councilCert", field: "councilCertUrl" },
+  { type: "degreeCert", field: "degreeCertUrl" },
+  { type: "kyc", field: "kycDocUrl" },
+  { type: "policeVerif", field: "policeVerifUrl" },
+] as const satisfies readonly { type: string; field: keyof NurseProfile }[];
 
-const STATUS_CARD: Record<string, { icon: React.ElementType; tone: string; title: string; body: string }> = {
-  PENDING: { icon: Clock, tone: "bg-amber-50 border-amber-200 text-amber-800", title: "Application under review", body: "Complete the checklist below — the admin reviews your documents and approves your profile." },
-  APPROVED: { icon: ShieldCheck, tone: "bg-emerald-50 border-emerald-200 text-emerald-800", title: "You're approved", body: "Patients near you can book the services you offer." },
-  REJECTED: { icon: XCircle, tone: "bg-red-50 border-red-200 text-red-800", title: "Application not approved", body: "Please check your details and documents, or contact support." },
-  SUSPENDED: { icon: Ban, tone: "bg-red-50 border-red-200 text-red-800", title: "Account suspended", body: "Contact support for assistance." },
-};
+const STATUS_CARD = {
+  PENDING: { icon: Clock, tone: "bg-amber-50 border-amber-200 text-amber-800" },
+  APPROVED: { icon: ShieldCheck, tone: "bg-emerald-50 border-emerald-200 text-emerald-800" },
+  REJECTED: { icon: XCircle, tone: "bg-red-50 border-red-200 text-red-800" },
+  SUSPENDED: { icon: Ban, tone: "bg-red-50 border-red-200 text-red-800" },
+} as const satisfies Record<string, { icon: React.ElementType; tone: string }>;
+type StatusKey = keyof typeof STATUS_CARD;
+// nurseChecklist() item keys (src/lib/nurseChecklist.ts) → profile.checklist.<key>.
+const CHECKLIST_KEYS: readonly string[] = ["qualification", "council", "councilCert", "degreeCert", "kyc", "photo", "services", "location", "bank"] satisfies ChecklistKey[];
+type ChecklistKey = "qualification" | "council" | "councilCert" | "degreeCert" | "kyc" | "photo" | "services" | "location" | "bank";
+const isStatusKey = (s: string): s is StatusKey => s in STATUS_CARD;
+const GENDER_KEYS = ["Male", "Female", "Other"] as const;
+const isGenderKey = (g: string): g is (typeof GENDER_KEYS)[number] => (GENDER_KEYS as readonly string[]).includes(g);
 
 function Section({ title, icon: Icon, id, children }: { title: string; icon: React.ElementType; id?: string; children: React.ReactNode }) {
   return (
@@ -72,12 +82,14 @@ function Section({ title, icon: Icon, id, children }: { title: string; icon: Rea
 }
 
 function SaveRow({ saving, saved, error, onSave }: { saving: boolean; saved: boolean; error: string; onSave: () => void }) {
+  const t = useTranslations("nurse.profile.save");
+  const tc = useTranslations("nurse.common");
   return (
     <div className="flex items-center gap-3 mt-4">
       <button type="button" onClick={onSave} disabled={saving} className="btn-primary py-2.5 px-5 text-sm">
-        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : <><Save className="w-4 h-4" /> Save</>}
+        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("saving")}</> : <><Save className="w-4 h-4" /> {t("save")}</>}
       </button>
-      {saved && <span className="text-sm text-emerald-600 font-semibold flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> Saved</span>}
+      {saved && <span className="text-sm text-emerald-600 font-semibold flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> {t("saved")}</span>}
       {error && <span className="text-sm text-red-600">{error}</span>}
     </div>
   );
@@ -85,6 +97,7 @@ function SaveRow({ saving, saved, error, onSave }: { saving: boolean; saved: boo
 
 // One save-state per section, so saving services doesn't flash "Saved" on the bank card.
 function useSaver() {
+  const t = useTranslations("nurse.profile.save");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -93,11 +106,11 @@ function useSaver() {
     try {
       const res = await fn();
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) { setError(data.error ?? "Could not save."); return; }
+      if (!res.ok) { setError(data.error ?? t("failed")); return; }
       setSaved(true);
       onOk?.(data);
     } catch {
-      setError("Network error — please try again.");
+      setError(t("networkError"));
     } finally {
       setSaving(false);
     }
@@ -109,6 +122,9 @@ function NurseProfileContent() {
   const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("nurse.profile");
+  const tc = useTranslations("nurse.common");
+  const locale = formattingLocale(useLocale());
   const [me, setMe] = useState<Me | null>(null);
   const [catalogue, setCatalogue] = useState<Service[]>([]);
   const [loadError, setLoadError] = useState("");
@@ -132,12 +148,12 @@ function NurseProfileContent() {
 
   const load = useCallback(async () => {
     const [meRes, svcRes] = await Promise.all([fetch("/api/nurses/me"), fetch("/api/nurse-services")]);
-    if (!meRes.ok) { setLoadError((await meRes.json().catch(() => ({}))).error ?? "Could not load your profile."); return; }
+    if (!meRes.ok) { setLoadError((await meRes.json().catch(() => ({}))).error ?? t("loadFailed")); return; }
     const data: Me = await meRes.json();
     setMe(data);
     setCatalogue(svcRes.ok ? await svcRes.json() : []);
     return data;
-  }, []);
+  }, [t]);
 
   // Form state is hydrated once per account (not on every reload of `me`),
   // so a background refresh never wipes unsaved edits.
@@ -178,7 +194,8 @@ function NurseProfileContent() {
   const p = me.nurseProfile;
   const locked = p.isVerified;
   const checklist = nurseChecklist({ ...p, serviceCount: p.services.length });
-  const status = STATUS_CARD[p.status] ?? STATUS_CARD.PENDING;
+  const statusKey: StatusKey = isStatusKey(p.status) ? p.status : "PENDING";
+  const status = STATUS_CARD[statusKey];
   const StatusIcon = status.icon;
   const subActive = !!p.subscriptionPaidUntil && new Date(p.subscriptionPaidUntil).getTime() > now;
   const needsRegFee = me.fees.registrationFee > 0 && !p.registrationFeePaid;
@@ -186,10 +203,10 @@ function NurseProfileContent() {
 
   const saveDetails = () => {
     if (hours.days.length === 0) {
-      return detailsSaver.run(async () => new Response(JSON.stringify({ error: "Pick at least one working day." }), { status: 400 }));
+      return detailsSaver.run(async () => new Response(JSON.stringify({ error: t("details.pickDay") }), { status: 400 }));
     }
     if (hours.from === hours.to) {
-      return detailsSaver.run(async () => new Response(JSON.stringify({ error: "Working hours can't start and end at the same time." }), { status: 400 }));
+      return detailsSaver.run(async () => new Response(JSON.stringify({ error: t("details.sameTime") }), { status: 400 }));
     }
     return detailsSaver.run(() => fetch("/api/nurses/me", {
       method: "PATCH", headers: { "Content-Type": "application/json" },
@@ -210,7 +227,7 @@ function NurseProfileContent() {
 
   const saveLocation = () => {
     if (loc.lat == null || loc.lng == null) {
-      return locSaver.run(async () => new Response(JSON.stringify({ error: "Pick your address from the suggestions or use your current location." }), { status: 400 }));
+      return locSaver.run(async () => new Response(JSON.stringify({ error: t("area.pickAddress") }), { status: 400 }));
     }
     return locSaver.run(() => fetch("/api/nurses/me", {
       method: "PATCH", headers: { "Content-Type": "application/json" },
@@ -237,7 +254,7 @@ function NurseProfileContent() {
       const geo = await fetch(`/api/geocode/reverse?lat=${latitude}&lon=${longitude}`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
       setLoc((l) => ({ ...l, lat: latitude, lng: longitude, address: geo?.label || l.address || "Current location" }));
     } catch {
-      setDocError("Couldn't get your location — allow location access, or type your address.");
+      setDocError(t("area.locationFailed"));
     } finally {
       setLocating(false);
     }
@@ -246,7 +263,7 @@ function NurseProfileContent() {
   const upload = async (type: string, original: File) => {
     setUploading(type); setDocError("");
     const file = await prepareUpload(original).catch(() => null);
-    if (!file) { setUploading(null); setDocError("Couldn't read that file — please pick it again."); return; }
+    if (!file) { setUploading(null); setDocError(t("docs.readFailed")); return; }
     const tooBig = tooBigMessage(file);
     if (tooBig) { setUploading(null); setDocError(tooBig); return; }
     const fd = new FormData();
@@ -254,7 +271,7 @@ function NurseProfileContent() {
     fd.append("file", file);
     const res = await fetch("/api/nurses/me/documents", { method: "POST", body: fd });
     setUploading(null);
-    if (!res.ok) { setDocError((await res.json().catch(() => ({}))).error ?? "Upload failed."); return; }
+    if (!res.ok) { setDocError((await res.json().catch(() => ({}))).error ?? t("docs.uploadFailed")); return; }
     load();
   };
 
@@ -264,7 +281,7 @@ function NurseProfileContent() {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind }),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) { setPaying(null); setPayError(data.error ?? "Could not start payment."); return; }
+    if (!res.ok) { setPaying(null); setPayError(data.error ?? t("fees.startFailed")); return; }
     const { load: loadCashfree } = await import("@cashfreepayments/cashfree-js");
     // Hardcoded like the doctor/patient checkout (NEXT_PUBLIC_ vars are baked in at build time).
     const cashfree = await loadCashfree({ mode: "production" });
@@ -287,32 +304,32 @@ function NurseProfileContent() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
         <div className="mb-5">
-          <h1 className="text-2xl font-extrabold text-slate-900">My Profile</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900">{t("title")}</h1>
           <p className="text-sm text-slate-500">{me.name} · {me.mobile}</p>
         </div>
 
         {searchParams.get("payment") === "done" && (
           <div className="rounded-2xl border border-blue-200 bg-blue-50 text-blue-800 px-4 py-3 text-sm mb-4">
-            Payment submitted — it can take a minute to show here. Refresh the page if it doesn&apos;t update.
+            {t("paymentSubmitted")}
           </div>
         )}
 
         {/* Status + checklist */}
         <div className={cn("rounded-2xl border px-4 py-4 mb-4", status.tone)}>
-          <p className="font-bold flex items-center gap-2"><StatusIcon className="w-5 h-5" />{status.title}</p>
-          <p className="text-sm mt-1 opacity-90">{status.body}</p>
+          <p className="font-bold flex items-center gap-2"><StatusIcon className="w-5 h-5" />{t(`status.${statusKey}.title`)}</p>
+          <p className="text-sm mt-1 opacity-90">{t(`status.${statusKey}.body`)}</p>
           {p.status === "APPROVED" && !me.bookable && (
-            <p className="text-sm mt-2 font-semibold">Patients can&apos;t book you until the fee below is paid.</p>
+            <p className="text-sm mt-2 font-semibold">{t("cantBookUntilFee")}</p>
           )}
         </div>
 
         {!checklist.complete && (
-          <Section title={`Profile checklist · ${checklist.doneCount}/${checklist.items.length}`} icon={CheckCircle2}>
+          <Section title={t("checklistTitle", { done: checklist.doneCount, total: checklist.items.length })} icon={CheckCircle2}>
             <ul className="space-y-2">
               {checklist.items.map((i) => (
                 <li key={i.key} className="flex items-center gap-2 text-sm">
                   {i.done ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <Circle className="w-4 h-4 text-slate-300" />}
-                  <span className={i.done ? "text-slate-400 line-through" : "text-slate-700"}>{i.label}</span>
+                  <span className={i.done ? "text-slate-400 line-through" : "text-slate-700"}>{CHECKLIST_KEYS.includes(i.key) ? t(`checklist.${i.key as ChecklistKey}`) : i.label}</span>
                 </li>
               ))}
             </ul>
@@ -320,29 +337,29 @@ function NurseProfileContent() {
         )}
 
         {(needsRegFee || needsSub || (me.fees.subscriptionFee > 0 && subActive)) && (
-          <Section title="Platform fees" icon={CreditCard}>
+          <Section title={t("fees.title")} icon={CreditCard}>
             {needsRegFee && (
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div>
-                  <p className="text-sm font-semibold text-slate-800">One-time registration fee</p>
+                  <p className="text-sm font-semibold text-slate-800">{t("fees.registration")}</p>
                   <p className="text-xs text-slate-500">₹{me.fees.registrationFee}</p>
                 </div>
                 <button onClick={() => pay("REGISTRATION")} disabled={!!paying} className="btn-primary py-2 px-4 text-sm">
-                  {paying === "REGISTRATION" ? <Loader2 className="w-4 h-4 animate-spin" /> : `Pay ₹${me.fees.registrationFee}`}
+                  {paying === "REGISTRATION" ? <Loader2 className="w-4 h-4 animate-spin" /> : t("fees.pay", { amount: me.fees.registrationFee })}
                 </button>
               </div>
             )}
             {me.fees.subscriptionFee > 0 && (
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-slate-800">Monthly subscription</p>
+                  <p className="text-sm font-semibold text-slate-800">{t("fees.subscription")}</p>
                   <p className="text-xs text-slate-500">
-                    ₹{me.fees.subscriptionFee}/month ·{" "}
-                    {subActive ? `active until ${new Date(p.subscriptionPaidUntil!).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}` : "not active"}
+                    {t("fees.perMonth", { amount: me.fees.subscriptionFee })} ·{" "}
+                    {subActive ? t("fees.activeUntil", { date: new Date(p.subscriptionPaidUntil!).toLocaleDateString(locale, { timeZone: "Asia/Kolkata" }) }) : t("fees.notActive")}
                   </p>
                 </div>
                 <button onClick={() => pay("SUBSCRIPTION")} disabled={!!paying || needsRegFee} className="btn-secondary py-2 px-4 text-sm">
-                  {paying === "SUBSCRIPTION" ? <Loader2 className="w-4 h-4 animate-spin" /> : subActive ? "Renew" : `Pay ₹${me.fees.subscriptionFee}`}
+                  {paying === "SUBSCRIPTION" ? <Loader2 className="w-4 h-4 animate-spin" /> : subActive ? t("fees.renew") : t("fees.pay", { amount: me.fees.subscriptionFee })}
                 </button>
               </div>
             )}
@@ -350,71 +367,71 @@ function NurseProfileContent() {
           </Section>
         )}
 
-        <Section title="Professional details" icon={Stethoscope}>
-          {locked && <p className="text-xs text-slate-500 mb-3">Your credentials are verified — qualification and council details are locked.</p>}
+        <Section title={t("details.title")} icon={Stethoscope}>
+          {locked && <p className="text-xs text-slate-500 mb-3">{t("details.locked")}</p>}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="input-label">Qualification *</label>
+              <label className="input-label">{t("details.qualification")}</label>
               <select disabled={locked} className="input-field" value={details.qualification} onChange={(e) => setDetails({ ...details, qualification: e.target.value })}>
-                <option value="">Select…</option>
+                <option value="">{t("details.select")}</option>
                 {NURSE_QUALIFICATIONS.map((q) => <option key={q}>{q}</option>)}
               </select>
             </div>
             <div>
-              <label className="input-label">Nursing Council reg. no. *</label>
-              <input disabled={locked} className="input-field uppercase" placeholder="e.g. MNC-123456" value={details.councilRegNo} onChange={(e) => setDetails({ ...details, councilRegNo: e.target.value })} />
+              <label className="input-label">{t("details.councilRegNo")}</label>
+              <input disabled={locked} className="input-field uppercase" placeholder={t("details.councilRegNoPlaceholder")} value={details.councilRegNo} onChange={(e) => setDetails({ ...details, councilRegNo: e.target.value })} />
             </div>
             <div>
-              <label className="input-label">Council state</label>
-              <input disabled={locked} className="input-field" placeholder="Maharashtra" value={details.councilState} onChange={(e) => setDetails({ ...details, councilState: e.target.value })} />
+              <label className="input-label">{t("details.councilState")}</label>
+              <input disabled={locked} className="input-field" placeholder={t("details.councilStatePlaceholder")} value={details.councilState} onChange={(e) => setDetails({ ...details, councilState: e.target.value })} />
             </div>
             <div>
-              <label className="input-label">Experience (years)</label>
+              <label className="input-label">{t("details.experience")}</label>
               <input type="number" min={0} max={60} inputMode="numeric" className="input-field" value={details.experience} onChange={(e) => setDetails({ ...details, experience: e.target.value })} />
             </div>
             <div>
-              <label className="input-label">Gender</label>
+              <label className="input-label">{t("details.gender")}</label>
               <select className="input-field" value={details.gender} onChange={(e) => setDetails({ ...details, gender: e.target.value })}>
-                <option value="">Select…</option>
-                {GENDERS.map((g) => <option key={g}>{g}</option>)}
+                <option value="">{t("details.select")}</option>
+                {GENDERS.map((g) => <option key={g} value={g}>{isGenderKey(g) ? tc(`gender.${g}`) : g}</option>)}
               </select>
             </div>
             <div>
-              <label className="input-label">Languages</label>
-              <input className="input-field" placeholder="Marathi, Hindi, English" value={details.languages} onChange={(e) => setDetails({ ...details, languages: e.target.value })} />
+              <label className="input-label">{t("details.languages")}</label>
+              <input className="input-field" placeholder={t("details.languagesPlaceholder")} value={details.languages} onChange={(e) => setDetails({ ...details, languages: e.target.value })} />
             </div>
             <div className="sm:col-span-2">
-              <label className="input-label">Working days &amp; hours</label>
+              <label className="input-label">{t("details.hours")}</label>
               <div className="flex flex-wrap gap-2 mb-2">
                 {WEEK.map((d) => (
                   <button key={d} type="button"
                     onClick={() => setHours((h) => ({ ...h, days: h.days.includes(d) ? h.days.filter((x) => x !== d) : WEEK.filter((w) => w === d || h.days.includes(w)) }))}
                     className={cn("px-3 py-2 rounded-xl text-xs font-bold border", hours.days.includes(d) ? "bg-rose-600 text-white border-rose-600" : "bg-white text-slate-600 border-slate-200")}>
-                    {d}
+                    {tc(`days.${d}`)}
                   </button>
                 ))}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-slate-500">From</label>
+                  <label className="text-xs text-slate-500">{t("details.from")}</label>
                   <input type="time" className="input-field" value={hours.from} onChange={(e) => setHours((h) => ({ ...h, from: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">To</label>
+                  <label className="text-xs text-slate-500">{t("details.to")}</label>
                   <input type="time" className="input-field" value={hours.to} onChange={(e) => setHours((h) => ({ ...h, to: e.target.value }))} />
                 </div>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Patients can only book you inside these hours.</p>
+              <p className="text-[11px] text-slate-400 mt-1">{t("details.hoursHint")}</p>
             </div>
             <div className="sm:col-span-2">
-              <label className="input-label">About you</label>
-              <textarea rows={3} className="input-field" placeholder="Experience, hospitals worked at, special skills…" value={details.bio} onChange={(e) => setDetails({ ...details, bio: e.target.value })} />
+              <label className="input-label">{t("details.about")}</label>
+              <textarea rows={3} className="input-field" placeholder={t("details.aboutPlaceholder")} value={details.bio} onChange={(e) => setDetails({ ...details, bio: e.target.value })} />
             </div>
           </div>
           <SaveRow {...detailsSaver} onSave={saveDetails} />
         </Section>
 
-        <Section title="Documents" icon={FileText}>
+        <Section title={t("docs.title")} icon={FileText}>
           <div className="space-y-3">
             {DOCS.map((d) => {
               const url = p[d.field] as string | null;
@@ -424,16 +441,16 @@ function NurseProfileContent() {
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                       {url ? <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" /> : <Circle className="w-4 h-4 text-slate-300 flex-shrink-0" />}
-                      {d.label}
+                      {t(`docs.${d.type}`)}
                     </p>
-                    <p className="text-xs text-slate-400">{d.hint}</p>
+                    <p className="text-xs text-slate-400">{t(`docs.${d.type}Hint`)}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    {url && <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-blue-600 hover:underline">View</a>}
+                    {url && <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-blue-600 hover:underline">{t("docs.view")}</a>}
                     {!docLocked && (
                       <label className={cn("btn-secondary py-1.5 px-3 text-xs cursor-pointer", uploading && "opacity-60 pointer-events-none")}>
                         {uploading === d.type ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-                        {url ? "Replace" : "Upload"}
+                        {url ? t("docs.replace") : t("docs.upload")}
                         <input
                           type="file"
                           className="hidden"
@@ -450,8 +467,8 @@ function NurseProfileContent() {
           {docError && <p className="text-sm text-red-600 mt-3">{docError}</p>}
         </Section>
 
-        <Section title="Services & prices" icon={IndianRupee}>
-          <p className="text-xs text-slate-500 mb-3">Pick what you offer and set your own price. Suggested prices are filled in for you.</p>
+        <Section title={t("services.title")} icon={IndianRupee}>
+          <p className="text-xs text-slate-500 mb-3">{t("services.hint")}</p>
           <div className="space-y-2">
             {catalogue.map((s) => {
               const on = s.id in picked;
@@ -461,7 +478,7 @@ function NurseProfileContent() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-800">{s.name}</p>
                     <p className="text-xs text-slate-400">
-                      {s.kind === "SHIFT" ? `${Math.round(s.durationMinutes / 60)}-hour shift — you stay with the patient` : `~${s.durationMinutes} min`}{s.requiresPrescription ? " · needs doctor's prescription" : ""}
+                      {s.kind === "SHIFT" ? t("services.shift", { hours: Math.round(s.durationMinutes / 60) }) : t("services.minutes", { minutes: s.durationMinutes })}{s.requiresPrescription ? ` · ${t("services.needsRx")}` : ""}
                     </p>
                   </div>
                   {on && (
@@ -472,7 +489,7 @@ function NurseProfileContent() {
                         className="input-field py-1.5 w-24 text-sm"
                         value={picked[s.id]}
                         onChange={(e) => setPicked({ ...picked, [s.id]: e.target.value })}
-                        aria-label={`${s.name} price`}
+                        aria-label={t("services.priceLabel", { name: s.name })}
                       />
                     </div>
                   )}
@@ -483,22 +500,22 @@ function NurseProfileContent() {
           <SaveRow {...servicesSaver} onSave={saveServices} />
         </Section>
 
-        <Section title="Service area" icon={MapPin}>
-          <label className="input-label">Your base address</label>
+        <Section title={t("area.title")} icon={MapPin}>
+          <label className="input-label">{t("area.baseAddress")}</label>
           <AddressAutocomplete
             value={loc.address}
             onChange={(v) => setLoc((l) => ({ ...l, address: v }))}
             onSelect={(s) => setLoc((l) => ({ ...l, address: s.label, lat: s.lat, lng: s.lon }))}
-            placeholder="Start typing your area…"
+            placeholder={t("area.placeholder")}
           />
           <button type="button" onClick={useCurrentLocation} disabled={locating} className="mt-2 text-sm font-semibold text-blue-600 flex items-center gap-1.5">
-            {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <LocateFixed className="w-4 h-4" />} Use my current location
+            {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <LocateFixed className="w-4 h-4" />} {t("area.useCurrent")}
           </button>
           {loc.lat != null && loc.lng != null && (
-            <p className="text-xs text-emerald-600 mt-1">Location set ({loc.lat.toFixed(4)}, {loc.lng.toFixed(4)})</p>
+            <p className="text-xs text-emerald-600 mt-1">{t("area.locationSet", { lat: loc.lat.toFixed(4), lng: loc.lng.toFixed(4) })}</p>
           )}
           <div className="mt-4">
-            <label className="input-label">I travel up to <strong>{loc.radius} km</strong> for home visits</label>
+            <label className="input-label">{t.rich("area.travelUpTo", { km: loc.radius, b: (c) => <strong>{c}</strong> })}</label>
             <input type="range" min={1} max={30} value={loc.radius} onChange={(e) => setLoc((l) => ({ ...l, radius: Number(e.target.value) }))} className="w-full accent-rose-500" />
           </div>
           <SaveRow {...locSaver} onSave={saveLocation} />
@@ -507,37 +524,37 @@ function NurseProfileContent() {
         <LanguageSwitch />
 
         {/* Linked from the dashboard's online/offline card (#time-off). */}
-        <Section title="Time off" icon={CalendarOff} id="time-off">
+        <Section title={t("timeOff")} icon={CalendarOff} id="time-off">
           <TimeOffManager />
         </Section>
 
         {/* Linked from Earnings when a payout needs bank details (#bank). */}
-        <Section title="Bank Details" icon={Landmark} id="bank">
-          <p className="text-xs text-slate-500 mb-3">Where DocOnClick sends your visit payouts.</p>
+        <Section title={t("bank.title")} icon={Landmark} id="bank">
+          <p className="text-xs text-slate-500 mb-3">{t("bank.hint")}</p>
           <div className="space-y-4">
             <div>
-              <label className="input-label">Bank Name</label>
+              <label className="input-label">{t("bank.bankName")}</label>
               <input className="input-field" placeholder="HDFC Bank" value={bank.bankName} onChange={(e) => setBank({ ...bank, bankName: e.target.value })} />
             </div>
             <div>
-              <label className="input-label">Account Number</label>
+              <label className="input-label">{t("bank.account")}</label>
               <input className="input-field" inputMode="numeric" placeholder="XXXX XXXX XXXX" value={bank.bankAccount} onChange={(e) => setBank({ ...bank, bankAccount: e.target.value })} />
             </div>
             <div>
-              <label className="input-label">IFSC Code</label>
+              <label className="input-label">{t("bank.ifsc")}</label>
               <input className="input-field uppercase" placeholder="HDFC0001234" value={bank.ifsc} onChange={(e) => setBank({ ...bank, ifsc: e.target.value.toUpperCase() })} />
             </div>
           </div>
           <SaveRow {...bankSaver} onSave={saveBank} />
         </Section>
 
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-1.5">Account</p>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-1.5">{t("account.heading")}</p>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-50 mb-4">
           {[
-            { href: "/nurse/security", label: "Password & Security", icon: Lock },
-            { href: "/nurse/notifications", label: "Notifications", icon: Bell },
-            { href: "/nurse/support", label: "Help & Support", icon: LifeBuoy },
-            { href: "/nurse/terms", label: "Terms & Privacy Policy", icon: FileCheck },
+            { href: "/nurse/security", label: t("account.security"), icon: Lock },
+            { href: "/nurse/notifications", label: t("account.notifications"), icon: Bell },
+            { href: "/nurse/support", label: t("account.support"), icon: LifeBuoy },
+            { href: "/nurse/terms", label: t("account.terms"), icon: FileCheck },
           ].map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} className="flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 transition-colors">
               <span className="w-9 h-9 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center flex-shrink-0"><Icon className="w-4 h-4" /></span>
@@ -548,7 +565,7 @@ function NurseProfileContent() {
         </div>
 
         <button onClick={logout} className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">
-          <LogOut className="w-4 h-4" /> Sign Out
+          <LogOut className="w-4 h-4" /> {t("signOut")}
         </button>
       </div>
     </div>

@@ -8,6 +8,7 @@ import PatientHeader from "@/components/patient/PatientHeader";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import ChatThread from "@/components/ChatThread";
 import { formatProviderName } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface ChatAppointment {
   status: string;
@@ -19,6 +20,7 @@ export default function PatientChatPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const t = useTranslations("patientAccount.chat");
   const [appt, setAppt] = useState<ChatAppointment | null>(null);
   const [error, setError] = useState("");
 
@@ -30,10 +32,10 @@ export default function PatientChatPage() {
   useEffect(() => {
     if (!user || user.role !== "PATIENT") return;
     fetch(`/api/appointments/${params.id}`).then(async (r) => {
-      if (!r.ok) { setError((await r.json().catch(() => ({}))).error ?? "Could not load this appointment."); return; }
+      if (!r.ok) { setError((await r.json().catch(() => ({}))).error ?? t("couldNotLoad")); return; }
       setAppt(await r.json());
     });
-  }, [user, params.id]);
+  }, [user, params.id, t]);
 
   if (authLoading || !user) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">
@@ -53,7 +55,7 @@ export default function PatientChatPage() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
         <Link href="/patient/appointments" className="tap-44-y inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 mb-4">
-          <ArrowLeft className="w-4 h-4" /> Back to Appointments
+          <ArrowLeft className="w-4 h-4" /> {t("back")}
         </Link>
 
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden h-[75vh] flex flex-col">
@@ -75,7 +77,7 @@ export default function PatientChatPage() {
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
               <p className="text-sm text-slate-500">
-                {`Chat opens once ${formatProviderName(appt.doctor.name, appt.providerType)} accepts this request.`}
+                {t("opensOnce", { name: formatProviderName(appt.doctor.name, appt.providerType) })}
               </p>
             </div>
           ) : (

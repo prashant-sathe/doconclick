@@ -10,23 +10,30 @@ import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { isNative } from "@/lib/platform";
 import { isValidMobile, normalizeMobile } from "@/lib/validation";
 import { ROLE_HOME, safeNext } from "@/lib/roleHome";
+import { useTranslations } from "next-intl";
 
-const ERROR_MESSAGES: Record<string, string> = {
-  google_failed: "Something went wrong verifying your Google account. Please try again.",
-  google_state_mismatch: "That verification link expired. Please try again.",
-  google_no_account: "No DocOnClick account uses that Google email.",
-};
+// ?error= codes from the Google flow → auth.googleError.* messages.
+const GOOGLE_ERRORS = ["google_failed", "google_state_mismatch", "google_no_account"] as const;
+const isGoogleError = (v: string | null): v is (typeof GOOGLE_ERRORS)[number] =>
+  !!v && (GOOGLE_ERRORS as readonly string[]).includes(v);
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextUrl = safeNext(searchParams.get("next"));
   const { refresh } = useAuth();
+  const t = useTranslations("auth.login");
+  const tc = useTranslations("auth.common");
+  const tv = useTranslations("auth.validation");
+  const tg = useTranslations("auth.googleError");
 
   const [form, setForm] = useState({ mobile: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(() => ERROR_MESSAGES[searchParams.get("error") ?? ""] ?? "");
+  const [error, setError] = useState(() => {
+    const code = searchParams.get("error");
+    return isGoogleError(code) ? tg(code) : "";
+  });
 
   const set = (k: string, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -35,8 +42,8 @@ function LoginForm() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.mobile || !form.password) { setError("Please enter your mobile number and password."); return; }
-    if (!isValidMobile(form.mobile)) { setError("Enter a valid 10-digit mobile number."); return; }
+    if (!form.mobile || !form.password) { setError(tv("mobileAndPasswordRequired")); return; }
+    if (!isValidMobile(form.mobile)) { setError(tv("mobileInvalid")); return; }
     setLoading(true);
     setError("");
 
@@ -49,7 +56,7 @@ function LoginForm() {
     const data = await res.json();
 
     if (!res.ok) {
-      setError(data.error ?? "Login failed. Please try again.");
+      setError(data.error ?? t("failed"));
       setLoading(false);
       return;
     }
@@ -65,8 +72,8 @@ function LoginForm() {
       {/* Header */}
       <div className="text-center mb-8">
         <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-16 h-16 object-contain mx-auto mb-4" loading="eager" />
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome back</h1>
-        <p className="text-slate-500 mt-2 text-sm">Sign in to your DocOnClick account</p>
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t("title")}</h1>
+        <p className="text-slate-500 mt-2 text-sm">{t("subtitle")}</p>
       </div>
 
       {/* Login Card */}
@@ -76,7 +83,7 @@ function LoginForm() {
           <div>
             <label className="input-label">
               <Phone className="inline w-3.5 h-3.5 mr-1.5" />
-              Mobile Number
+              {tc("mobileNumber")}
             </label>
             <input
               required
@@ -85,7 +92,7 @@ function LoginForm() {
               autoComplete="username"
               maxLength={10}
               className="input-field"
-              placeholder="10-digit mobile number"
+              placeholder={t("mobilePlaceholder")}
               value={form.mobile}
               onChange={(e) => set("mobile", e.target.value.replace(/\D/g, "").slice(0, 10))}
             />
@@ -96,10 +103,10 @@ function LoginForm() {
             <div className="flex items-center justify-between">
               <label className="input-label">
                 <Lock className="inline w-3.5 h-3.5 mr-1.5" />
-                Password
+                {tc("password")}
               </label>
               <Link href="/forgot-password" className="text-xs font-semibold text-blue-600 hover:underline">
-                Forgot password?
+                {t("forgotPassword")}
               </Link>
             </div>
             <div className="relative">
@@ -108,13 +115,14 @@ function LoginForm() {
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 className="input-field pr-12"
-                placeholder="Enter your password"
+                placeholder={t("passwordPlaceholder")}
                 value={form.password}
                 onChange={(e) => set("password", e.target.value)}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? tc("hidePassword") : tc("showPassword")}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -137,37 +145,37 @@ function LoginForm() {
             className="btn-primary w-full justify-center py-3.5 text-base mt-1"
           >
             {loading ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Signing in…</>
+              <><Loader2 className="w-4 h-4 animate-spin" /> {t("signingIn")}</>
             ) : (
-              "Sign In"
+              t("signIn")
             )}
           </button>
         </form>
 
         <div className="flex items-center gap-3 my-6">
           <div className="h-px bg-slate-100 flex-1" />
-          <span className="text-xs text-slate-400 font-medium">OR</span>
+          <span className="text-xs text-slate-400 font-medium">{tc("or")}</span>
           <div className="h-px bg-slate-100 flex-1" />
         </div>
         <GoogleSignInButton next={nextUrl ?? undefined} />
 
         <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-2 text-sm text-slate-400">
           <p>
-            New patient?{" "}
+            {t("newPatient")}{" "}
             <Link href={nextUrl ? `/patient/register?next=${encodeURIComponent(nextUrl)}` : "/patient/register"} className="text-blue-600 font-semibold hover:underline">
-              Create account →
+              {t("createAccount")}
             </Link>
           </p>
           <p>
-            Are you a doctor?{" "}
+            {t("areYouDoctor")}{" "}
             <Link href="/doctor/register" className="text-teal-600 font-semibold hover:underline">
-              Join the network →
+              {t("joinNetwork")}
             </Link>
           </p>
           <p>
-            Are you a registered nurse?{" "}
+            {t("areYouNurse")}{" "}
             <Link href="/nurse/register" className="text-rose-600 font-semibold hover:underline">
-              Join as a nurse →
+              {t("joinAsNurse")}
             </Link>
           </p>
         </div>
@@ -176,7 +184,7 @@ function LoginForm() {
       {/* Security note */}
       <p className="text-center text-xs text-slate-400 mt-5 flex items-center justify-center gap-1.5">
         <ShieldCheck className="w-3.5 h-3.5" />
-        Secured with 256-bit encryption. Your data is safe.
+        {tc("secured")}
       </p>
     </div>
   );
@@ -188,6 +196,7 @@ export default function LoginPageClient() {
   // isNative() directly here would mismatch the SSR output and silently
   // break hydration for the whole page. Default to the server's answer and
   // correct it after mount, once hydration has safely committed.
+  const tc = useTranslations("auth.common");
   const [native, setNative] = useState(false);
   useEffect(() => setNative(isNative()), []);
 
@@ -195,14 +204,14 @@ export default function LoginPageClient() {
     <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       {!native && (
         <div className="fixed top-5 left-6">
-          <Link href="/" className="btn-ghost gap-1.5 text-sm">← Home</Link>
+          <Link href="/" className="btn-ghost gap-1.5 text-sm">← {tc("home")}</Link>
         </div>
       )}
       {/* Before signing in: the choice is kept and adopted by the account. */}
       <div className="fixed right-4 z-10" style={{ top: "calc(1rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}>
         <LanguageSwitch compact />
       </div>
-      <Suspense fallback={<div className="text-slate-400">Loading…</div>}>
+      <Suspense fallback={<div className="text-slate-400">{tc("loading")}</div>}>
         <LoginForm />
       </Suspense>
     </div>

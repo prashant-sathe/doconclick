@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type AnnouncementButton = { label: string; url: string };
 
@@ -18,6 +19,7 @@ type Announcement = {
 const POLL_MS = 5000;
 
 export default function AnnouncementPopup({ onAllSeen }: { onAllSeen?: () => void }) {
+  const t = useTranslations("shared.announcement");
   const router = useRouter();
   const [queue, setQueue] = useState<Announcement[] | null>(null);
   const onAllSeenFiredRef = useRef(false);
@@ -89,7 +91,7 @@ export default function AnnouncementPopup({ onAllSeen }: { onAllSeen?: () => voi
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full relative overflow-hidden">
-        <button aria-label="Close announcement" onClick={dismiss} className="absolute top-5 right-5 text-white/80 hover:text-white z-10 bg-black/20 rounded-full p-1.5">
+        <button aria-label={t("close")} onClick={dismiss} className="absolute top-5 right-5 text-white/80 hover:text-white z-10 bg-black/20 rounded-full p-1.5">
           <X className="w-5 h-5" />
         </button>
         {current.bannerImageUrl && (

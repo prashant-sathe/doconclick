@@ -5,6 +5,7 @@ import { Phone, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { isValidMobile, normalizeMobile } from "@/lib/validation";
 import { ROLE_HOME, safeNext } from "@/lib/roleHome";
+import { useTranslations } from "next-intl";
 
 export default function CompleteProfile() {
   const router = useRouter();
@@ -12,6 +13,9 @@ export default function CompleteProfile() {
   const [mobile, setMobile] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const t = useTranslations("auth.completeProfile");
+  const tc = useTranslations("auth.common");
+  const tv = useTranslations("auth.validation");
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login");
@@ -19,7 +23,7 @@ export default function CompleteProfile() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValidMobile(mobile)) { setError("Enter a valid 10-digit mobile number."); return; }
+    if (!isValidMobile(mobile)) { setError(tv("mobileInvalid")); return; }
     setLoading(true);
     setError("");
 
@@ -31,7 +35,7 @@ export default function CompleteProfile() {
     const data = await res.json();
 
     if (!res.ok) {
-      setError(data.error ?? "Could not save your mobile number.");
+      setError(data.error ?? t("failed"));
       setLoading(false);
       return;
     }
@@ -50,10 +54,9 @@ export default function CompleteProfile() {
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-xl">
             <Phone className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">One last step</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t("title")}</h1>
           <p className="text-slate-500 mt-2 text-sm">
-            {user?.name ? `Welcome, ${user.name}! ` : ""}
-            Add your mobile number to continue.
+            {user?.name ? t("subtitleNamed", { name: user.name }) : t("subtitle")}
           </p>
         </div>
 
@@ -62,7 +65,7 @@ export default function CompleteProfile() {
             <div>
               <label className="input-label">
                 <Phone className="inline w-3.5 h-3.5 mr-1.5" />
-                Mobile Number
+                {tc("mobileNumber")}
               </label>
               <input
                 required
@@ -71,7 +74,7 @@ export default function CompleteProfile() {
                 autoComplete="tel"
                 maxLength={10}
                 className="input-field"
-                placeholder="Enter your 10-digit mobile number"
+                placeholder={t("mobilePlaceholder")}
                 value={mobile}
                 onChange={(e) => { setMobile(e.target.value.replace(/\D/g, "").slice(0, 10)); setError(""); }}
               />
@@ -89,14 +92,14 @@ export default function CompleteProfile() {
               disabled={loading}
               className="btn-primary w-full justify-center py-3.5 text-base mt-1"
             >
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : "Continue"}
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("saving")}</> : t("continue")}
             </button>
           </form>
         </div>
 
         <p className="text-center text-xs text-slate-400 mt-5 flex items-center justify-center gap-1.5">
           <ShieldCheck className="w-3.5 h-3.5" />
-          We use this to keep your account secure and let doctors reach you.
+          {t("why")}
         </p>
       </div>
     </div>

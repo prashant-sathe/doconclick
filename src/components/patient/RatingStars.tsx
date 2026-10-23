@@ -1,4 +1,5 @@
 import { Star } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function RatingStars({
   avgRating,
@@ -9,11 +10,12 @@ export default function RatingStars({
   totalReviews: number;
   size?: "sm" | "md";
 }) {
+  const t = useTranslations("patient.rating");
   const starSize = size === "md" ? "w-4 h-4" : "w-3 h-3";
   const rounded = Math.round(avgRating);
 
   if (totalReviews === 0) {
-    return <span className="text-[10px] text-slate-400">No reviews yet</span>;
+    return <span className="text-[10px] text-slate-400">{t("noReviews")}</span>;
   }
 
   return (
@@ -25,7 +27,7 @@ export default function RatingStars({
         />
       ))}
       <span className="text-[10px] text-slate-400 ml-1">
-        {avgRating.toFixed(1)} ({totalReviews} review{totalReviews === 1 ? "" : "s"})
+        {t("summary", { rating: avgRating.toFixed(1), count: totalReviews })}
       </span>
     </div>
   );

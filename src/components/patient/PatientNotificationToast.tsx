@@ -5,33 +5,41 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, XCircle, Clock, Car, MapPinCheck, X } from "lucide-react";
 import type { AppointmentStatusEvent } from "@/hooks/usePatientNotifications";
 import { formatProviderName } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const AUTO_DISMISS_MS = 6000;
 
-const EVENT_COPY: Record<string, { title: string; message: (doctor: string) => string; icon: typeof CheckCircle2; color: string; bg: string }> = {
-  SCHEDULED: { title: "Appointment confirmed!", message: (d) => `${d} accepted your request.`, icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
-  ON_THE_WAY: { title: "Your {provider} is on the way!", message: (d) => `${d} has started the journey to you.`, icon: Car, color: "text-blue-600", bg: "bg-blue-50" },
-  ARRIVED: { title: "Your {provider} has arrived!", message: (d) => `${d} is here for your visit.`, icon: MapPinCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
-  REJECTED: { title: "Request declined", message: (d) => `${d} was unable to accept your request.`, icon: XCircle, color: "text-red-600", bg: "bg-red-50" },
-  EXPIRED: { title: "No response from {provider}", message: (d) => `${d} didn't respond in time.`, icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
-  COMPLETED: { title: "Consultation completed", message: (d) => `Your consultation with ${d} is complete.`, icon: CheckCircle2, color: "text-blue-600", bg: "bg-blue-50" },
-  CANCELLED: { title: "Appointment cancelled", message: (d) => `Your appointment with ${d} was cancelled.`, icon: XCircle, color: "text-slate-500", bg: "bg-slate-100" },
-};
+// Title/message copy lives in messages/<locale>/patient.json (appointmentToast.<event>).
+const EVENT_COPY = {
+  SCHEDULED: { icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
+  ON_THE_WAY: { icon: Car, color: "text-blue-600", bg: "bg-blue-50" },
+  ARRIVED: { icon: MapPinCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
+  REJECTED: { icon: XCircle, color: "text-red-600", bg: "bg-red-50" },
+  EXPIRED: { icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
+  COMPLETED: { icon: CheckCircle2, color: "text-blue-600", bg: "bg-blue-50" },
+  CANCELLED: { icon: XCircle, color: "text-slate-500", bg: "bg-slate-100" },
+} as const;
+type ToastEvent = keyof typeof EVENT_COPY;
+const isToastEvent = (v: string): v is ToastEvent => v in EVENT_COPY;
 
 export default function PatientNotificationToast({ event, onDismiss }: {
   event: AppointmentStatusEvent;
   onDismiss: () => void;
 }) {
   const router = useRouter();
+  const t = useTranslations("patient.appointmentToast");
 
   useEffect(() => {
     const t = setTimeout(onDismiss, AUTO_DISMISS_MS);
     return () => clearTimeout(t);
   }, [event.id, event.event, onDismiss]);
 
-  const copy = EVENT_COPY[event.event];
-  if (!copy) return null;
+  if (!isToastEvent(event.event)) return null;
+  const key = event.event;
+  const copy = EVENT_COPY[key];
   const Icon = copy.icon;
+  const provider = event.providerType === "NURSE" ? "NURSE" : "DOCTOR";
+  const name = formatProviderName(event.doctor.name, event.providerType);
 
   return createPortal(
     <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 w-[calc(100%-2rem)] max-w-sm animate-fade-in-up">
@@ -43,8 +51,8 @@ export default function PatientNotificationToast({ event, onDismiss }: {
           <Icon className={`w-4 h-4 ${copy.color}`} />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-slate-900">{copy.title.replace("{provider}", event.providerType === "NURSE" ? "nurse" : "doctor")}</p>
-          <p className="text-xs text-slate-500 mt-0.5">{copy.message(formatProviderName(event.doctor.name, event.providerType))}</p>
+          <p className="text-sm font-bold text-slate-900">{t(`${key}.title`, { provider })}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{t(`${key}.message`, { name })}</p>
         </div>
         <span
           onClick={(e) => { e.stopPropagation(); onDismiss(); }}

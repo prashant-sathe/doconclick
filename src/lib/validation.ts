@@ -29,11 +29,23 @@ export function isValidEmail(raw: string): boolean {
 
 export const PASSWORD_MIN_LENGTH = 6;
 
-/** Returns an error message for an invalid name, or null when it's fine. */
-export function nameError(raw: string): string | null {
+/**
+ * Why a name is invalid, as a message key (auth.validation.<code> in
+ * messages/<locale>/auth.json) — for client forms that show it translated.
+ * null when it's fine.
+ */
+export function nameErrorCode(raw: string): "nameShort" | "nameLong" | null {
   const name = String(raw ?? "").trim();
-  if (name.length < 2) return "Please enter your full name.";
-  if (name.length > 80) return "That name is too long.";
+  if (name.length < 2) return "nameShort";
+  if (name.length > 80) return "nameLong";
+  return null;
+}
+
+/** Returns an (English) error message for an invalid name, or null when it's fine. */
+export function nameError(raw: string): string | null {
+  const code = nameErrorCode(raw);
+  if (code === "nameShort") return "Please enter your full name.";
+  if (code === "nameLong") return "That name is too long.";
   return null;
 }
 

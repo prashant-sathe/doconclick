@@ -1,0 +1,345 @@
+{
+  "specialtyFilter": {
+    "all": "All"
+  },
+  "badges": {
+    "verified": "Verified"
+  },
+  "rating": {
+    "noReviews": "No reviews yet",
+    "summary": "{rating} ({count, plural, one {# review} other {# reviews}})"
+  },
+  "prescriptionDownload": {
+    "generating": "Generating…",
+    "download": "Download Prescription",
+    "failed": "Failed to generate PDF"
+  },
+  "appointmentToast": {
+    "SCHEDULED": {
+      "title": "Appointment confirmed!",
+      "message": "{name} accepted your request."
+    },
+    "ON_THE_WAY": {
+      "title": "Your {provider, select, NURSE {nurse} other {doctor}} is on the way!",
+      "message": "{name} has started the journey to you."
+    },
+    "ARRIVED": {
+      "title": "Your {provider, select, NURSE {nurse} other {doctor}} has arrived!",
+      "message": "{name} is here for your visit."
+    },
+    "REJECTED": {
+      "title": "Request declined",
+      "message": "{name} was unable to accept your request."
+    },
+    "EXPIRED": {
+      "title": "No response from {provider, select, NURSE {nurse} other {doctor}}",
+      "message": "{name} didn't respond in time."
+    },
+    "COMPLETED": {
+      "title": "Consultation completed",
+      "message": "Your consultation with {name} is complete."
+    },
+    "CANCELLED": {
+      "title": "Appointment cancelled",
+      "message": "Your appointment with {name} was cancelled."
+    }
+  },
+  "walletToast": {
+    "TOPUP": {
+      "title": "Wallet topped up!",
+      "message": "₹{amount} added. New balance ₹{balance}."
+    },
+    "BOOKING_PAYMENT": {
+      "title": "Wallet debited",
+      "message": "₹{amount} paid for an appointment. New balance ₹{balance}."
+    },
+    "ADMIN_CREDIT": {
+      "title": "Wallet credited by admin",
+      "message": "₹{amount} added.{note} New balance ₹{balance}."
+    },
+    "ADMIN_DEBIT": {
+      "title": "Wallet debited by admin",
+      "message": "₹{amount} deducted.{note} New balance ₹{balance}."
+    },
+    "REASSIGNMENT_CREDIT": {
+      "title": "Appointment cancelled — refunded",
+      "message": "₹{amount} credited to your wallet. New balance ₹{balance}."
+    },
+    "FAILED": {
+      "title": "Wallet top-up failed",
+      "message": "Your top-up of ₹{amount} didn't go through."
+    }
+  },
+  "doctorFilters": {
+    "trigger": "Filters",
+    "title": "Filter & Sort",
+    "close": "Close filters",
+    "speaks": "Speaks",
+    "any": "Any",
+    "experience": "Experience",
+    "yearsPlus": "{years}+ yrs",
+    "maxFee": "Max Clinic Fee",
+    "sortBy": "Sort By",
+    "sort": {
+      "distance": "Nearest",
+      "rating": "Top Rated",
+      "experience": "Most Experienced",
+      "feeLowToHigh": "Lowest Fee"
+    },
+    "reset": "Reset",
+    "showResults": "Show Results"
+  },
+  "saved": {
+    "title": "Saved Doctors",
+    "subtitle": "Doctors you've bookmarked for a quick re-booking later.",
+    "distancesFrom": "Distances shown from <b>{place}</b>",
+    "change": "Change",
+    "empty": "No saved doctors yet.",
+    "findToSave": "Find a doctor to save",
+    "kmAway": "{km} km away",
+    "bookAgain": "Book Again",
+    "unavailableHint": "This doctor is currently unavailable for booking",
+    "unavailable": "Unavailable",
+    "remove": "Remove",
+    "allOutOfRange": "All your saved doctors are outside your {km} km search range.",
+    "outOfRangeToggle": "{count, plural, one {# saved doctor} other {# saved doctors}} outside your {km} km range"
+  },
+  "common": {
+    "dismiss": "Dismiss",
+    "yrsExp": "{years} yrs exp",
+    "openNow": "Open now",
+    "closedNow": "Closed now",
+    "kmAway": "{km} km away",
+    "consultType": {
+      "CLINIC": "Clinic Visit",
+      "VIDEO": "Video Consultation",
+      "HOME": "Home Visit"
+    },
+    "days": {
+      "Mon": "Mon",
+      "Tue": "Tue",
+      "Wed": "Wed",
+      "Thu": "Thu",
+      "Fri": "Fri",
+      "Sat": "Sat",
+      "Sun": "Sun"
+    },
+    "when": {
+      "today": "today {time}",
+      "tomorrow": "tomorrow {time}",
+      "on": "{day} {time}"
+    },
+    "relation": {
+      "Self": "Self",
+      "Spouse": "Spouse",
+      "Son": "Son",
+      "Daughter": "Daughter",
+      "Father": "Father",
+      "Mother": "Mother",
+      "Other": "Other"
+    },
+    "everyDays": "{count, plural, one {every day} other {every # days}}"
+  },
+  "doctorProfile": {
+    "myDashboard": "My Dashboard",
+    "login": "Login",
+    "notFoundTitle": "Doctor not found",
+    "notFoundBody": "This profile link is invalid or no longer available.",
+    "outOfRangeKm": "{doctor} is about {km} km away, beyond the {range} km search range set in your <profile>profile</profile>. You can still book.",
+    "outOfRangeUnknown": "{doctor} is outside your area, beyond the {range} km search range set in your <profile>profile</profile>. You can still book.",
+    "clinicPhotoOf": "{name} — clinic photo",
+    "clinicPhoto": "Clinic photo",
+    "unsave": "Remove from saved doctors",
+    "save": "Save doctor",
+    "saveForLater": "Save doctor for later",
+    "ourClinics": "Our Clinics",
+    "opens": "Opens {when}",
+    "closedOpens": "Closed now · opens {when}",
+    "closedScheduleLater": "Closed now · schedule for later",
+    "outsideHomeRange": "Outside home visit range",
+    "recentReviews": "Recent Reviews",
+    "bookAppointment": "Book Appointment"
+  },
+  "appointments": {
+    "title": "My Appointments",
+    "subtitle": "Track requests, upcoming appointments, and past consultations.",
+    "pendingHeading": "Pending Requests ({count})",
+    "upcomingHeading": "Upcoming ({count})",
+    "pastHeading": "Past ({count})",
+    "loadMore": "Load {count} more",
+    "loading": "Loading…",
+    "noUpcoming": "No upcoming appointments.",
+    "bookOneNow": "Book one now →",
+    "noPast": "No past appointments yet.",
+    "status": {
+      "PENDING_APPROVAL": "Waiting for {provider, select, NURSE {nurse} other {doctor}}",
+      "SCHEDULED": "Confirmed",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled",
+      "REJECTED": "Declined",
+      "EXPIRED": "{provider, select, NURSE {Nurse} other {Doctor}} was busy",
+      "NO_SHOW": "Missed (no-show)"
+    },
+    "errors": {
+      "withdraw": "Couldn't withdraw the request.",
+      "network": "Network error — please try again.",
+      "reschedule": "Couldn't reschedule this appointment. Please try again.",
+      "cancel": "Couldn't cancel this appointment. Please try again."
+    },
+    "review": {
+      "title": "Leave a Review",
+      "close": "Close",
+      "rateStars": "Rate {count, plural, one {# star} other {# stars}}",
+      "placeholder": "Share your experience (optional)…",
+      "submitting": "Submitting…",
+      "submit": "Submit Review",
+      "failed": "Could not submit review."
+    },
+    "card": {
+      "nurseVisit": "Nurse visit · {service}",
+      "forPatient": "For {name} ({relation})",
+      "shiftEnds": "{hours}-hour shift · ends {end}",
+      "packageVisit": "Visit {index} of {total} · {interval}",
+      "visitCode": "Visit code",
+      "visitCodeHint": "Tell this to the nurse when she arrives — only then can she start. Booked for someone at home? Share it with them, or tell her on the phone.",
+      "vitals": "Vitals: {summary}",
+      "seeTrend": "See trend →",
+      "startedWithoutCode": "Started without your code: “{note}”. If that wasn't you, contact Help & Support.",
+      "reassignedToYou": "{from} had an emergency and couldn't continue with your appointment, so we've assigned you to {to} instead.",
+      "waitingConfirmScheduled": "Waiting for {provider} to confirm your scheduled appointment.",
+      "waitingAccept": "Waiting for {provider} to accept this request.",
+      "timeLeft": "{time} left",
+      "expiring": "Expiring…",
+      "reassignedAway": "{from} had an emergency and couldn't continue with this appointment, so we've assigned you to {to} instead — check your pending requests.",
+      "rejected": "{provider} was unable to accept this request. No payment was taken.",
+      "expired": "{provider} didn't respond in time and may be too busy right now. No payment was taken — try booking again or choose another doctor.",
+      "providersClinic": "{provider}'s clinic",
+      "directions": "Get Directions",
+      "onTheWay": "{provider} is on the way",
+      "trackLive": "Track Live",
+      "arrived": "{provider} has arrived.",
+      "nothingToPay": "Nothing to pay — confirm your booking with {provider}.",
+      "paymentPending": "Payment pending — pay ₹{amount} to confirm your consultation with {provider}.",
+      "paymentPendingCoupon": "Payment pending — pay ₹{amount} ({coupon} applied) to confirm your consultation with {provider}.",
+      "online": "Online",
+      "cash": "Cash",
+      "paymentStatus": {
+        "PENDING": "PENDING",
+        "PAID": "PAID",
+        "CREDITED": "CREDITED"
+      },
+      "notes": "{provider, select, NURSE {Nurse's notes} other {Doctor's notes}}:",
+      "prescription": "Prescription",
+      "recommendsNurse": "{provider} recommends nurse care at home",
+      "visits": "{count, plural, one {# visit} other {# visits}}",
+      "nurseBooked": "Nurse booked",
+      "bookNurse": "Book a nurse",
+      "newTimeRequested": "New time requested: {time}",
+      "newTimeWaiting": "Waiting for {provider} to confirm. Your current time stays booked until then.",
+      "withdrawing": "Withdrawing…",
+      "keepCurrentTime": "Keep my current time",
+      "reschedule": "Reschedule",
+      "cancelAppointment": "Cancel Appointment",
+      "cancelRequest": "Cancel Request",
+      "confirm": "Confirm",
+      "payNow": "Pay Now",
+      "videoAfterPayment": "Video call unlocks after payment",
+      "chat": "Chat",
+      "unlockingIn": "Unlocking in {seconds}s",
+      "joinVideo": "Join Video Consultation",
+      "fileN": "File {n}",
+      "viewAttachment": "View Attached File",
+      "leaveReview": "Leave a Review",
+      "youRated": "You rated {rating}/5",
+      "followUpUnavailableHint": "This doctor isn't taking bookings right now",
+      "followUpUnavailable": "Follow-up unavailable",
+      "bookAgain": "Book Again",
+      "bookFollowUp": "Book Follow-up"
+    },
+    "cancelDialog": {
+      "titleAppointment": "Cancel this appointment?",
+      "titleRequest": "Cancel this request?",
+      "body": "Your {kind, select, appointment {appointment} other {request}} with {provider} on {time} will be cancelled. This cannot be undone.",
+      "refund": "₹{amount} will be credited back to your wallet.",
+      "keepAppointment": "Keep Appointment",
+      "keepRequest": "Keep Request",
+      "cancelling": "Cancelling…",
+      "confirm": "Cancel"
+    },
+    "rescheduleDialog": {
+      "title": "Reschedule appointment",
+      "body": "Pick a new time for your {kind, select, appointment {appointment} other {request}} with {provider}.",
+      "needsConfirm": "{provider} needs to confirm the new time. Until then your current booking ({time}) stays as it is.",
+      "needsConfirmReplaces": "{provider} needs to confirm the new time. Until then your current booking ({time}) stays as it is, and this replaces your earlier request.",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "confirm": "Confirm New Time"
+    }
+  },
+  "dashboard": {
+    "listYears": "{years} yrs",
+    "listOpen": "Open",
+    "listClosed": "Closed",
+    "openNow": "Open now",
+    "closed": "Closed",
+    "setYourLocation": "Set your location",
+    "yourLocationChange": "Your location · Change",
+    "completeProfile": "Complete your profile",
+    "profilePercent": "Profile {percent}%",
+    "healthAssistant": "Health Assistant",
+    "askAi": "Ask AI",
+    "myAppointments": "My Appointments",
+    "profile": "Profile",
+    "searchPlaceholder": "Search doctor or specialty…",
+    "clearSearch": "Clear search",
+    "mapView": "Map view",
+    "listView": "List view",
+    "refreshAria": "Refresh doctors and location",
+    "refreshTitle": "Refresh doctors & location",
+    "showingAllClinics": "Showing all clinics.",
+    "limitTo": "Limit to {km} km",
+    "showingWithin": "Showing clinics within {km} km.",
+    "change": "Change",
+    "useMyLocation": "Use my location",
+    "showingFallback": "Showing Pune — <link>Set your location</link>",
+    "nearest": "Nearest: <b>{name}</b>",
+    "checkingSession": "Checking session…",
+    "findingLocation": "Finding your location…",
+    "noDoctorsNearby": "No doctors found nearby.",
+    "specialties": "Specialties",
+    "tapPinToBook": "Tap a pin to book",
+    "clinicsNearby": "{count, plural, one {# clinic nearby} other {# clinics nearby}}",
+    "clinicPhotoOf": "{name} — clinic photo",
+    "clinicPhoto": "Clinic photo",
+    "unsave": "Remove from saved doctors",
+    "save": "Save doctor",
+    "saveForLater": "Save doctor for later",
+    "availableNow": "Available now",
+    "opens": "Opens {when}",
+    "closedOpens": "Closed now · opens {when}",
+    "closedScheduleLater": "Closed now · schedule for later",
+    "arrivalMin": "~{min} min arrival",
+    "outsideHomeRange": "Outside home visit range",
+    "recentReviews": "Recent Reviews",
+    "noClinicsWithinOf": "No clinics within {km} km of {place}.",
+    "noClinicsWithinHere": "No clinics within {km} km of here.",
+    "showAll": "Show all",
+    "tapPinHint": "Tap a doctor pin to see details",
+    "picker": {
+      "title": "Choose a location",
+      "close": "Close",
+      "showingNear": "Showing doctors near <b>{place}</b>. Booking for someone in another city? Set their area here.",
+      "hint": "Search an area to browse doctors there — e.g. when booking for a relative in another city.",
+      "placeholder": "Search city, area or society…",
+      "pickOnMap": "Pick an exact spot on the map",
+      "locating": "Locating…",
+      "useCurrent": "Use my current location"
+    },
+    "pick": {
+      "moveMap": "Move the map to the location",
+      "cancel": "Cancel",
+      "setting": "Setting…",
+      "confirm": "Set this location"
+    }
+  }
+}

@@ -7,6 +7,8 @@ import { useAuth } from "@/components/AuthProvider";
 import { formatDoctorName } from "@/lib/utils";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 interface Ticket {
   id: string;
@@ -22,6 +24,9 @@ const STATUS_BADGE: Record<string, string> = {
   RESOLVED: "badge badge-success",
 };
 
+const STATUS_KEYS = ["OPEN", "IN_PROGRESS", "RESOLVED"] as const;
+const isStatusKey = (s: string): s is (typeof STATUS_KEYS)[number] => (STATUS_KEYS as readonly string[]).includes(s);
+
 const STATUS_ICON: Record<string, React.ElementType> = {
   OPEN: AlertCircle,
   IN_PROGRESS: Clock,
@@ -29,6 +34,8 @@ const STATUS_ICON: Record<string, React.ElementType> = {
 };
 
 export default function DoctorSupportTicketsPage() {
+  const t = useTranslations("doctorAccount.tickets");
+  const locale = formattingLocale(useLocale());
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -61,13 +68,13 @@ export default function DoctorSupportTicketsPage() {
       <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6">
         <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
           <div>
-            <h1 className="text-2xl font-extrabold text-slate-900">My Support Tickets</h1>
+            <h1 className="text-2xl font-extrabold text-slate-900">{t("title")}</h1>
             <p className="text-slate-500 text-sm">
-              Hi {formatDoctorName(user.name)}, here&apos;s every ticket you&apos;ve raised with the DocOnClick team.
+              {t("intro", { name: formatDoctorName(user.name) })}
             </p>
           </div>
           <Link href="/doctor/support" className="btn-primary py-2.5 px-4 text-sm flex-shrink-0">
-            <Sparkles className="w-4 h-4" /> Ask Support Assistant
+            <Sparkles className="w-4 h-4" /> {t("askAssistant")}
           </Link>
         </div>
 
@@ -78,31 +85,31 @@ export default function DoctorSupportTicketsPage() {
         ) : tickets.length === 0 ? (
           <div className="text-center py-16 text-slate-400">
             <LifeBuoy className="w-10 h-10 mx-auto mb-3 opacity-30" />
-            <p className="text-sm mb-3">No tickets raised yet.</p>
+            <p className="text-sm mb-3">{t("empty")}</p>
             <Link href="/doctor/support" className="inline-block text-sm font-semibold text-teal-600 hover:underline">
-              Ask the Support Assistant to raise one
+              {t("emptyCta")}
             </Link>
           </div>
         ) : (
           <div className="space-y-3">
-            {tickets.map((t) => {
-              const Icon = STATUS_ICON[t.status] ?? AlertCircle;
+            {tickets.map((ticket) => {
+              const Icon = STATUS_ICON[ticket.status] ?? AlertCircle;
               return (
-                <div key={t.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                <div key={ticket.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
                   <div className="flex items-start gap-3">
                     <div className={
                       "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 " +
-                      (t.status === "RESOLVED" ? "bg-emerald-50 text-emerald-500" : t.status === "IN_PROGRESS" ? "bg-amber-50 text-amber-500" : "bg-red-50 text-red-500")
+                      (ticket.status === "RESOLVED" ? "bg-emerald-50 text-emerald-500" : ticket.status === "IN_PROGRESS" ? "bg-amber-50 text-amber-500" : "bg-red-50 text-red-500")
                     }>
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="font-bold text-slate-900 truncate">{t.subject}</span>
-                        <span className={STATUS_BADGE[t.status] ?? "badge badge-gray"}>{t.status.replace("_", " ")}</span>
+                        <span className="font-bold text-slate-900 truncate">{ticket.subject}</span>
+                        <span className={STATUS_BADGE[ticket.status] ?? "badge badge-gray"}>{isStatusKey(ticket.status) ? t(`status.${ticket.status}`) : ticket.status.replace("_", " ")}</span>
                       </div>
-                      <p className="text-sm text-slate-600 mb-1 whitespace-pre-wrap">{t.description}</p>
-                      <p className="text-xs text-slate-400">{new Date(t.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</p>
+                      <p className="text-sm text-slate-600 mb-1 whitespace-pre-wrap">{ticket.description}</p>
+                      <p className="text-xs text-slate-400">{new Date(ticket.createdAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</p>
                     </div>
                   </div>
                 </div>

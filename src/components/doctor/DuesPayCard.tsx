@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { AlertCircle, CheckCircle2, Clock, CreditCard, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type DuesInfo = {
   dues: { cashFeeOwed: number; onlinePayoutOwed: number; netAmount: number };
@@ -15,6 +16,8 @@ type DuesInfo = {
 // Earnings and on Subscribe — a doctor whose plan has lapsed lands on the
 // latter and can still pay what they owe. Renders nothing when nothing's owed.
 export default function DuesPayCard({ returnTo, onSettled, className = "mb-6" }: { returnTo: "earnings" | "subscribe"; onSettled?: () => void; className?: string }) {
+  const t = useTranslations("doctor.dues");
+  const tc = useTranslations("doctor.common");
   const [info, setInfo] = useState<DuesInfo | null>(null);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
@@ -77,14 +80,14 @@ export default function DuesPayCard({ returnTo, onSettled, className = "mb-6" }:
         body: JSON.stringify({ returnTo }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) { setPaying(false); setError(data.error ?? "Could not start payment."); void load(); return; }
+      if (!res.ok) { setPaying(false); setError(data.error ?? t("startFailed")); void load(); return; }
       const { load: loadCashfree } = await import("@cashfreepayments/cashfree-js");
       // Same hardcoded mode as the other checkouts (NEXT_PUBLIC_ vars are baked in at build time).
       const cashfree = await loadCashfree({ mode: "production" });
       cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
     } catch {
       setPaying(false);
-      setError("Network error — check your connection and try again.");
+      setError(tc("networkError"));
     }
   };
 
@@ -97,10 +100,10 @@ export default function DuesPayCard({ returnTo, onSettled, className = "mb-6" }:
         <div className={`flex items-center gap-3 rounded-2xl p-4 border ${owes ? "mb-3" : ""} ${returned === "settled" ? "bg-emerald-50 border-emerald-100 text-emerald-800" : returned === "checking" ? "bg-slate-50 border-slate-100 text-slate-700" : "bg-amber-50 border-amber-100 text-amber-800"}`}>
           {returned === "checking" ? <Loader2 className="w-5 h-5 animate-spin flex-shrink-0" /> : returned === "settled" ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : <Clock className="w-5 h-5 flex-shrink-0" />}
           <p className="text-sm text-left">
-            {returned === "checking" && "Confirming your platform-fee payment…"}
-            {returned === "settled" && "Platform fee paid — your cash visits are settled."}
-            {returned === "review" && "Payment received. Your visits changed while it was processing, so the admin will match it up shortly."}
-            {returned === "pending" && "We haven't heard back from the bank yet. If money left your account, don't pay again — this page will show it once it's confirmed."}
+            {returned === "checking" && t("checking")}
+            {returned === "settled" && t("settled")}
+            {returned === "review" && t("review")}
+            {returned === "pending" && t("pending")}
           </p>
         </div>
       )}
@@ -111,19 +114,25 @@ export default function DuesPayCard({ returnTo, onSettled, className = "mb-6" }:
             <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
             <div className="min-w-0 flex-1">
               <p className="text-sm text-red-700">
-                <span className="font-bold">₹{info.owed.toLocaleString("en-IN")} platform fee due</span> — the commission on cash consultations you collected
-                {info.dues.onlinePayoutOwed > 0 && <> (₹{info.dues.cashFeeOwed.toLocaleString("en-IN")}, less your ₹{info.dues.onlinePayoutOwed.toLocaleString("en-IN")} of online earnings)</>}.
+                {info.dues.onlinePayoutOwed > 0
+                  ? t.rich("dueLessOnline", {
+                      owed: info.owed.toLocaleString("en-IN"),
+                      cash: info.dues.cashFeeOwed.toLocaleString("en-IN"),
+                      online: info.dues.onlinePayoutOwed.toLocaleString("en-IN"),
+                      b: (c) => <span className="font-bold">{c}</span>,
+                    })
+                  : t.rich("due", { owed: info.owed.toLocaleString("en-IN"), b: (c) => <span className="font-bold">{c}</span> })}
               </p>
               {info.cashBlocked ? (
-                <p className="text-xs text-red-700 font-semibold mt-1">Cash walk-in bookings are paused until you pay — online bookings still work.</p>
+                <p className="text-xs text-red-700 font-semibold mt-1">{t("cashBlocked")}</p>
               ) : info.limit > 0 ? (
-                <p className="text-xs text-red-600 mt-1">Cash walk-ins pause once this reaches ₹{info.limit.toLocaleString("en-IN")}.</p>
+                <p className="text-xs text-red-600 mt-1">{t("limit", { limit: info.limit.toLocaleString("en-IN") })}</p>
               ) : null}
               {info.inReview > 0 && (
-                <p className="text-xs text-amber-700 mt-1">A payment of yours is waiting for the admin to match it — no need to pay it again.</p>
+                <p className="text-xs text-amber-700 mt-1">{t("inReview")}</p>
               )}
               <button onClick={pay} disabled={paying || returned === "checking" || info.inReview > 0} className="btn-primary mt-3 py-2.5 px-4 text-sm disabled:opacity-60">
-                {paying ? <><Loader2 className="w-4 h-4 animate-spin" /> Opening payment…</> : <><CreditCard className="w-4 h-4" /> Pay ₹{info.owed.toLocaleString("en-IN")} now</>}
+                {paying ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("opening")}</> : <><CreditCard className="w-4 h-4" /> {t("payNow", { owed: info.owed.toLocaleString("en-IN") })}</>}
               </button>
               {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
             </div>

@@ -6,6 +6,8 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import { downloadOrShareUrl } from "@/lib/nativeDownload";
 import { isNative } from "@/lib/platform";
 import { compressImage } from "@/lib/compressImage";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 interface ChatMessage {
   id: string;
@@ -54,6 +56,8 @@ interface ChatThreadProps {
 const POLL_MS = 4000;
 
 export default function ChatThread({ appointmentId, meId, accent = "blue" }: ChatThreadProps) {
+  const t = useTranslations("shared.chat");
+  const locale = formattingLocale(useLocale());
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [chat, setChat] = useState<ChatStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,8 +101,8 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       const res = await fetch(`/api/appointments/${appointmentId}/messages`);
       if (seqRef.current !== mine) return;
       if (!res.ok) {
-        const msg = (await res.json().catch(() => ({}))).error ?? "Could not load chat.";
-        if (loadedRef.current) setNotice("Couldn't refresh the chat — retrying…");
+        const msg = (await res.json().catch(() => ({}))).error ?? t("loadFailed");
+        if (loadedRef.current) setNotice(t("refreshFailed"));
         else setLoadError(msg);
         return;
       }
@@ -109,7 +113,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       setMessages(data);
       setChat(body.chat ?? null);
       setLoadError("");
-      setNotice((n) => (n === "Couldn't refresh the chat — retrying…" ? "" : n));
+      setNotice((n) => (n === t("refreshFailed") ? "" : n));
       if (data.length !== messageCountRef.current) {
         messageCountRef.current = data.length;
         requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }));
@@ -118,12 +122,12 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       markReadIfNew();
     } catch {
       if (seqRef.current !== mine) return;
-      if (loadedRef.current) setNotice("Couldn't refresh the chat — retrying…");
-      else setLoadError("Network error — check your connection.");
+      if (loadedRef.current) setNotice(t("refreshFailed"));
+      else setLoadError(t("networkError"));
     } finally {
       if (seqRef.current === mine) setLoading(false);
     }
-  }, [appointmentId, meId, markReadIfNew]);
+  }, [appointmentId, meId, markReadIfNew, t]);
 
   useEffect(() => {
     // Fetching on mount: load() only sets state after its first await.
@@ -159,12 +163,12 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
         return;
       }
       const failure = await res.json().catch(() => ({}));
-      setNotice(failure.error ?? "Could not send message.");
+      setNotice(failure.error ?? t("sendFailed"));
       // The chat just closed (e.g. the follow-up window ran out) — refresh so
       // the read-only notice replaces the composer; keep the history visible.
       if (failure.code === "CHAT_CLOSED") load();
     } catch {
-      setNotice("Message not sent — check your connection and try again.");
+      setNotice(t("sendOffline"));
     } finally {
       setSending(false);
     }
@@ -172,7 +176,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
 
   const attachFile = async (file: File) => {
     if (file.size > MAX_ATTACHMENT_BYTES) {
-      setNotice("File must be under 5MB.");
+      setNotice(t("fileTooBig"));
       return;
     }
     setUploading(true);
@@ -198,7 +202,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
         body: form,
       });
       if (!uploadRes.ok) {
-        setNotice((await uploadRes.json().catch(() => ({}))).error ?? "Could not upload file.");
+        setNotice((await uploadRes.json().catch(() => ({}))).error ?? t("uploadFailed"));
         return;
       }
       const { url, fileName, fileType } = await uploadRes.json();
@@ -211,10 +215,10 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       else {
         const failure = await sendRes.json().catch(() => ({}));
         if (failure.code === "CHAT_CLOSED") load();
-        setNotice(failure.error ?? "Could not send file.");
+        setNotice(failure.error ?? t("sendFileFailed"));
       }
     } catch {
-      setNotice("Could not upload that file. Please try again.");
+      setNotice(t("uploadRetry"));
     } finally {
       setUploading(false);
     }
@@ -228,7 +232,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
     if (downloadingId) return;
     setDownloadingId(m.id);
     downloadOrShareUrl(downloadUrl(m.fileUrl, m.fileName, "attachment"), m.fileName ?? "attachment")
-      .catch(() => setNotice("Could not download that attachment."))
+      .catch(() => setNotice(t("downloadFailed")))
       .finally(() => setDownloadingId(null));
   };
 
@@ -246,11 +250,11 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
         ) : loadError && messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 text-sm text-slate-400 text-center px-6">
             {loadError}
-            <button onClick={() => { setLoading(true); load(); }} className="btn-secondary py-1.5 px-3 text-xs">Retry</button>
+            <button onClick={() => { setLoading(true); load(); }} className="btn-secondary py-1.5 px-3 text-xs">{t("retry")}</button>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-sm text-slate-400 text-center px-6">
-            {chat && !chat.canSend ? "No messages in this chat." : "No messages yet. Say hello!"}
+            {chat && !chat.canSend ? t("emptyClosed") : t("empty")}
           </div>
         ) : (
           messages.map((m) => {
@@ -263,7 +267,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                 )}>
                   {m.fileUrl && (
                     m.fileType?.startsWith("image/") ? (
-                      <button aria-label={`Open image ${m.fileName ?? ""}`.trim()}
+                      <button aria-label={t("openImage", { name: m.fileName ?? "" }).trim()}
                         type="button"
                         onClick={() => setLightboxUrl(downloadUrl(m.fileUrl!, m.fileName, "inline"))}
                         className="block mb-1.5 -mx-1 w-full"
@@ -271,7 +275,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                         {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary aspect ratio per upload, next/image needs a fixed intrinsic size */}
                         <img
                           src={downloadUrl(m.fileUrl, m.fileName, "inline")}
-                          alt={m.fileName ?? "Attachment"}
+                          alt={m.fileName ?? t("attachment")}
                           className="max-w-full rounded-lg max-h-64 object-cover"
                           loading="lazy"
                           decoding="async"
@@ -287,7 +291,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                         )}
                       >
                         <FileText className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate flex-1">{m.fileName ?? "Attachment"}</span>
+                        <span className="truncate flex-1">{m.fileName ?? t("attachment")}</span>
                         {downloadingId === m.id
                           ? <Loader2 className="w-3.5 h-3.5 flex-shrink-0 animate-spin" />
                           : <Download className="w-3.5 h-3.5 flex-shrink-0" />}
@@ -296,7 +300,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                   )}
                   {m.text && <p className="whitespace-pre-wrap break-words">{m.text}</p>}
                   <p className={cn("text-[10px] mt-1", mine ? "text-white/70" : "text-slate-400")}>
-                    {new Date(m.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })}
+                    {new Date(m.createdAt).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })}
                   </p>
                 </div>
               </div>
@@ -309,7 +313,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       {notice && (
         <div role="alert" className="px-3 py-2 text-xs text-red-600 bg-red-50 border-t border-red-100 flex items-center justify-between gap-2">
           <span>{notice}</span>
-          <button onClick={() => setNotice("")} aria-label="Dismiss" className="text-red-400 hover:text-red-600 flex-shrink-0">
+          <button onClick={() => setNotice("")} aria-label={t("dismiss")} className="text-red-400 hover:text-red-600 flex-shrink-0">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -317,14 +321,14 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       {chat && !chat.canSend ? (
         <div className="border-t border-slate-100 bg-slate-50 px-4 py-3 flex items-start gap-2 text-xs text-slate-500">
           <Lock className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-slate-400" />
-          <span>{chat.reason ?? "This chat is read-only."}</span>
+          <span>{chat.reason ?? t("readOnly")}</span>
         </div>
       ) : (
       <>
       {chat?.sendUntil && (
         <div className="border-t border-slate-100 bg-amber-50 px-4 py-2 flex items-center gap-1.5 text-[11px] text-amber-700">
           <Clock className="w-3 h-3 flex-shrink-0" />
-          Follow-up chat open until {new Date(chat.sendUntil).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}
+          {t("openUntil", { when: new Date(chat.sendUntil).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) })}
         </div>
       )}
       <div className="border-t border-slate-100 bg-white p-3 flex items-end gap-2">
@@ -342,9 +346,9 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
             }
           }}
         />
-        <button aria-label="Attach a file"
+        <button aria-label={t("attach")}
           type="button"
-          title="Attach a medical report (PDF/JPG/PNG, under 5MB)"
+          title={t("attachHint")}
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading || sending}
           className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -354,14 +358,14 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
         <textarea
           rows={1}
           className={cn("input-field resize-none flex-1 py-2.5", accentRing)}
-          placeholder="Type a message…"
+          placeholder={t("placeholder")}
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
           }}
         />
-        <button aria-label="Send message"
+        <button aria-label={t("send")}
           onClick={send}
           disabled={!text.trim() || sending}
           className={cn("w-11 h-11 rounded-xl flex items-center justify-center text-white flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed", accentBtn)}
@@ -375,22 +379,25 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       {pendingFile && (
         <ConfirmDialog
           icon={pendingPreviewUrl ? Paperclip : FileText}
-          title="Send this file?"
+          title={t("sendFileTitle")}
           message={
             pendingPreviewUrl ? (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={pendingPreviewUrl} alt={pendingFile.name} className="w-full max-h-48 object-contain rounded-lg mb-2 bg-slate-50" />
-                It&apos;ll be sent to the other person right away — there&apos;s no way to unsend it once it&apos;s delivered.
+                {t("sendFileImageBody")}
               </>
             ) : (
               <>
-                <span className="font-semibold text-slate-700">{pendingFile.name}</span> will be sent to the other person right away — there&apos;s no way to unsend it once it&apos;s delivered.
+                {t.rich("sendFileBody", {
+                  name: pendingFile.name,
+                  file: (chunks) => <span className="font-semibold text-slate-700">{chunks}</span>,
+                })}
               </>
             )
           }
-          confirmLabel="Send"
-          busyLabel="Sending…"
+          confirmLabel={t("sendConfirm")}
+          busyLabel={t("sending")}
           tone="primary"
           busy={uploading}
           onCancel={() => {
@@ -418,14 +425,14 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
             type="button"
             onClick={() => setLightboxUrl(null)}
             className="absolute top-4 right-4 text-white/80 hover:text-white"
-            aria-label="Close"
+            aria-label={t("close")}
           >
             <X className="w-7 h-7" />
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={lightboxUrl}
-            alt="Attachment"
+            alt={t("attachment")}
             onClick={(e) => e.stopPropagation()}
             className="max-h-full max-w-full object-contain rounded-lg"
           />

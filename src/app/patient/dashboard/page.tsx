@@ -161,10 +161,10 @@ function makeMarkerTooltipHtml(opts: {
   clinicName: string;
   isOpen: boolean;
   distanceKm?: number;
+  statusText: string; // translated "Open now" / "Closed"
 }) {
-  const { doctorName, specialty, avgRating, totalReviews, clinicName, isOpen, distanceKm } = opts;
+  const { doctorName, specialty, avgRating, totalReviews, clinicName, isOpen, distanceKm, statusText } = opts;
   const statusColor = isOpen ? "#059669" : "#94a3b8";
-  const statusText = isOpen ? "Open now" : "Closed";
   return `<div style="min-width:180px;padding:10px 12px;background:white;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.18);font-family:inherit;">
     <div style="font-weight:800;font-size:13px;color:#0f172a;">${escapeHtml(doctorName)}</div>
     <div style="font-size:12px;color:#475569;margin-top:1px;">${escapeHtml(specialty)}</div>
@@ -173,7 +173,7 @@ function makeMarkerTooltipHtml(opts: {
       : ""}
     <div style="font-size:11px;color:#64748b;margin-top:4px;">${escapeHtml(clinicName)}</div>
     <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-      <span style="font-size:11px;font-weight:700;color:${statusColor};">${statusText}</span>
+      <span style="font-size:11px;font-weight:700;color:${statusColor};">${escapeHtml(statusText)}</span>
       ${distanceKm != null ? `<span style="font-size:11px;color:#94a3b8;">${distanceKm.toFixed(1)} km</span>` : ""}
     </div>
   </div>`;
@@ -211,14 +211,6 @@ function nowLocalInput() {
   return d.toISOString().slice(0, 16);
 }
 
-// "today 2:05 PM" / "tomorrow 9:00 AM" / "Mon 9:00 AM"
-function formatNextOpeningText(next: { daysAhead: number; dayOfWeek: string; fromTime: string } | null): string | null {
-  if (!next) return null;
-  if (next.daysAhead === 0) return `today ${formatSlotTime(next.fromTime)}`;
-  if (next.daysAhead === 1) return `tomorrow ${formatSlotTime(next.fromTime)}`;
-  return `${next.dayOfWeek} ${formatSlotTime(next.fromTime)}`;
-}
-
 // A <input type="datetime-local"> value for the start of an upcoming clinic
 // opening — used to prefill the scheduler so a "book it here anyway" tap lands
 // on a time the clinic is actually open.
@@ -245,6 +237,7 @@ function DoctorListCard({
   isOpen: boolean;
   onClick: () => void;
 }) {
+  const td = useTranslations("patient.dashboard");
   const profile = doctor.doctorProfile;
   if (!profile) return null;
   const bareName = doctor.name.replace(/^dr\.?\s*/i, "").trim();
@@ -273,7 +266,7 @@ function DoctorListCard({
           {profile.isVerified && <VerifiedBadge />}
         </div>
         <p className="text-xs text-slate-500 truncate">
-          {profile.specialty}{profile.experience ? ` · ${profile.experience} yrs` : ""}
+          {profile.specialty}{profile.experience ? ` · ${td("listYears", { years: profile.experience })}` : ""}
         </p>
         <div className="flex items-center gap-2 mt-1">
           <RatingStars avgRating={profile.avgRating} totalReviews={profile.totalReviews} size="sm" />
@@ -289,7 +282,7 @@ function DoctorListCard({
             isOpen ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-400"
           )}
         >
-          {isOpen ? "Open" : "Closed"}
+          {isOpen ? td("listOpen") : td("listClosed")}
         </span>
         <span className="text-xs font-bold text-slate-700 flex items-center">
           <IndianRupee className="w-3 h-3" />{profile.consultFee}
@@ -307,7 +300,10 @@ function PatientDashboardInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { specialties, colorFor } = useSpecialties();
-  // Booking sheet strings (the map/list/doctor card aren't translated yet).
+  // Booking sheet strings come from the "booking" namespace; the map, list
+  // and doctor card from "patient".
+  const td = useTranslations("patient.dashboard");
+  const tp = useTranslations("patient.common");
   const tb = useTranslations("booking.dashboardSheet");
   const tf = useTranslations("booking.form");
   const tc = useTranslations("booking.common");
@@ -320,6 +316,14 @@ function PatientDashboardInner() {
     if (next.daysAhead === 0) return tf("openingToday", { time });
     if (next.daysAhead === 1) return tf("openingTomorrow", { time });
     return tf("openingOn", { day: dayName(next.dayOfWeek), time });
+  };
+  // "today 2:05 PM" / "tomorrow 9:00 AM" / "Mon 9:00 AM" — the doctor card's "Opens …" chips.
+  const nextOpeningText = (next: { daysAhead: number; dayOfWeek: string; fromTime: string } | null): string | null => {
+    if (!next) return null;
+    const time = formatSlotTime(next.fromTime);
+    if (next.daysAhead === 0) return tp("when.today", { time });
+    if (next.daysAhead === 1) return tp("when.tomorrow", { time });
+    return tp("when.on", { day: dayName(next.dayOfWeek), time });
   };
 
   // State
@@ -741,6 +745,7 @@ function PatientDashboardInner() {
         clinicName: clinic.name,
         isOpen,
         distanceKm: distance,
+        statusText: isOpen ? td("openNow") : td("closed"),
       });
 
       if (markersRef.current.has(clinic.id)) {
@@ -778,7 +783,7 @@ function PatientDashboardInner() {
 
       markersRef.current.set(clinic.id, marker);
     });
-  }, [clinicMarkers, nearest?.id, colorFor, now]);
+  }, [clinicMarkers, nearest?.id, colorFor, now, td]);
 
   // ── Add user position circle ───────────────────────────────────────────
   const addUserCircle = useCallback(async (pos: [number, number]) => {
@@ -1038,7 +1043,7 @@ function PatientDashboardInner() {
         <div className="min-w-0">
           <Image src="/logo.png" alt="DocOnClick" width={431} height={102} className="h-6 sm:h-7 w-auto object-contain" />
           <p className={cn("text-xs mt-0.5 truncate", customLabel ? "text-blue-600 font-semibold" : "text-slate-500")}>
-            {customLabel ? `📍 ${customLabel}` : posError ? "📍 Set your location" : "📍 Your location · Change"}
+            {customLabel ? `📍 ${customLabel}` : posError ? `📍 ${td("setYourLocation")}` : `📍 ${td("yourLocationChange")}`}
           </p>
         </div>
       </button>
@@ -1049,29 +1054,29 @@ function PatientDashboardInner() {
           <button
             onClick={() => router.push("/patient/profile")}
             className="tap-44 hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors"
-            title="Complete your profile"
+            title={td("completeProfile")}
           >
-            Profile {profilePercent}%
+            {td("profilePercent", { percent: profilePercent })}
           </button>
         )}
         <button
           onClick={() => router.push("/patient/assistant")}
           className="tap-44 hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl gradient-primary text-white text-xs font-semibold hover:opacity-90 transition-opacity"
-          title="Health Assistant"
+          title={td("healthAssistant")}
         >
-          <Sparkles className="w-4 h-4" /> Ask AI
+          <Sparkles className="w-4 h-4" /> {td("askAi")}
         </button>
-        <button aria-label="My Appointments"
+        <button aria-label={td("myAppointments")}
           onClick={() => router.push("/patient/appointments")}
           className="tap-44 hidden lg:flex w-8 h-8 rounded-xl bg-blue-50 items-center justify-center text-blue-500 hover:bg-blue-100 transition-colors"
-          title="My Appointments"
+          title={td("myAppointments")}
         >
           <CalendarCheck2 className="w-4 h-4" />
         </button>
-        <button aria-label="Profile"
+        <button aria-label={td("profile")}
           onClick={() => router.push("/patient/profile")}
           className="tap-44 w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors flex-shrink-0"
-          title="Profile"
+          title={td("profile")}
         >
           <UserCircle className="w-4 h-4" />
         </button>
@@ -1087,13 +1092,13 @@ function PatientDashboardInner() {
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search doctor or specialty…"
+              placeholder={td("searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-8 pr-8 py-2 rounded-xl border border-slate-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {search && (
-              <button aria-label="Clear search"
+              <button aria-label={td("clearSearch")}
                 type="button"
                 onClick={() => setSearch("")}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
@@ -1103,9 +1108,9 @@ function PatientDashboardInner() {
             )}
           </div>
           <div className="flex items-center gap-0.5 bg-white/80 border border-slate-200 rounded-xl p-1 flex-shrink-0">
-            <button aria-label="Map view"
+            <button aria-label={td("mapView")}
               onClick={() => setViewMode("map")}
-              title="Map view"
+              title={td("mapView")}
               className={cn(
                 "tap-44-y w-11 h-7 rounded-lg flex items-center justify-center transition-colors",
                 viewMode === "map" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-slate-600"
@@ -1113,9 +1118,9 @@ function PatientDashboardInner() {
             >
               <MapPin className="w-4 h-4" />
             </button>
-            <button aria-label="List view"
+            <button aria-label={td("listView")}
               onClick={() => setViewMode("list")}
-              title="List view"
+              title={td("listView")}
               className={cn(
                 "tap-44-y w-11 h-7 rounded-lg flex items-center justify-center transition-colors",
                 viewMode === "list" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-slate-600"
@@ -1124,11 +1129,11 @@ function PatientDashboardInner() {
               <List className="w-4 h-4" />
             </button>
           </div>
-          <button aria-label="Refresh doctors and location"
+          <button aria-label={td("refreshAria")}
             onClick={refreshMap}
             disabled={refreshing}
             className="tap-44 w-9 h-9 rounded-xl bg-white/80 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 transition-colors disabled:opacity-60 flex-shrink-0"
-            title="Refresh doctors & location"
+            title={td("refreshTitle")}
           >
             <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
           </button>
@@ -1143,12 +1148,12 @@ function PatientDashboardInner() {
           <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
             <Compass className="w-3 h-3 flex-shrink-0" />
             {ignoreRadius ? (
-              <>Showing all clinics.{" "}
-                <button type="button" onClick={() => setIgnoreRadius(false)} className="font-semibold text-blue-600 hover:underline">Limit to {searchRadiusKm} km</button>
+              <>{td("showingAllClinics")}{" "}
+                <button type="button" onClick={() => setIgnoreRadius(false)} className="font-semibold text-blue-600 hover:underline">{td("limitTo", { km: searchRadiusKm })}</button>
               </>
             ) : (
-              <>Showing clinics within {searchRadiusKm} km.{" "}
-                <button type="button" onClick={() => router.push("/patient/profile")} className="font-semibold text-blue-600 hover:underline">Change</button>
+              <>{td("showingWithin", { km: searchRadiusKm })}{" "}
+                <button type="button" onClick={() => router.push("/patient/profile")} className="font-semibold text-blue-600 hover:underline">{td("change")}</button>
               </>
             )}
           </p>
@@ -1163,7 +1168,7 @@ function PatientDashboardInner() {
           >
             <MapPin className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
             <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
-              {customLabel} <span className="text-blue-600">· Use my location</span>
+              {customLabel} <span className="text-blue-600">· {td("useMyLocation")}</span>
             </span>
           </button>
         ) : posError ? (
@@ -1173,7 +1178,7 @@ function PatientDashboardInner() {
           >
             <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
             <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
-              Showing Pune — <span className="text-blue-600">Set your location</span>
+              {td.rich("showingFallback", { link: (c) => <span className="text-blue-600">{c}</span> })}
             </span>
           </button>
         ) : nearest?.doctorProfile && (
@@ -1192,7 +1197,7 @@ function PatientDashboardInner() {
               style={{ backgroundColor: colorFor(nearest.doctorProfile.specialty) }}
             />
             <span className="text-xs font-semibold text-slate-700 truncate min-w-0 flex-1">
-              Nearest: <span className="text-blue-600">{formatDoctorName(nearest.name)}</span>
+              {td.rich("nearest", { name: formatDoctorName(nearest.name), b: (c) => <span className="text-blue-600">{c}</span> })}
               {nearest.distance != null && (
                 <span className="text-slate-400 font-normal ml-1">
                   · {nearest.distance.toFixed(1)} km
@@ -1218,7 +1223,7 @@ function PatientDashboardInner() {
             <MapPin className="w-7 h-7 text-white" />
           </div>
           <p className="text-slate-500 text-sm animate-pulse">
-            {authLoading ? "Checking session…" : "Finding your location…"}
+            {authLoading ? td("checkingSession") : td("findingLocation")}
           </p>
         </div>
       )}
@@ -1237,7 +1242,7 @@ function PatientDashboardInner() {
             <div className="p-3 sm:p-4 pb-28 lg:pb-16 max-w-2xl mx-auto flex flex-col gap-2.5">
               {displayList.length === 0 ? (
                 <div className="text-center text-slate-400 text-sm py-12">
-                  No doctors found nearby.
+                  {td("noDoctorsNearby")}
                 </div>
               ) : (
                 displayList.map((doc) => {
@@ -1269,14 +1274,14 @@ function PatientDashboardInner() {
       {/* ── Legend ─────────────────────────────────────────────────── */}
       <div className={cn("hidden lg:block absolute bottom-6 left-4 z-20 pointer-events-none", (pickingOnMap || viewMode === "list") && "lg:hidden")}>
         <div className="glass-card rounded-2xl p-3 flex flex-col gap-1.5 max-w-[170px]">
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Specialties</p>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">{td("specialties")}</p>
           {specialties.slice(0, 5).map(({ name, color }) => (
             <div key={name} className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
               <span className="text-[10px] text-slate-600 leading-none">{name}</span>
             </div>
           ))}
-          <p className="text-[9px] text-slate-400 mt-1">Tap a pin to book</p>
+          <p className="text-[9px] text-slate-400 mt-1">{td("tapPinToBook")}</p>
         </div>
       </div>
 
@@ -1285,7 +1290,7 @@ function PatientDashboardInner() {
         <div className="glass-card rounded-2xl px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 pointer-events-auto">
           <Stethoscope className="w-4 h-4 text-blue-500" />
           <span className="text-xs sm:text-sm font-semibold text-slate-700">
-            {clinicMarkers.length} clinics nearby
+            {td("clinicsNearby", { count: clinicMarkers.length })}
           </span>
         </div>
       </div>
@@ -1623,7 +1628,7 @@ function PatientDashboardInner() {
                     <div className="relative w-full h-32 sm:h-40 rounded-2xl overflow-hidden bg-slate-100 mb-4 -mt-1">
                       <Image
                         src={(selectedClinic ? selectedClinic.photoUrl : selectedDoctor.doctorProfile.clinicPhotoUrl)!}
-                        alt={(selectedClinic?.name ?? selectedDoctor.doctorProfile.clinicName) ? `${selectedClinic?.name ?? selectedDoctor.doctorProfile.clinicName} — clinic photo` : "Clinic photo"}
+                        alt={(selectedClinic?.name ?? selectedDoctor.doctorProfile.clinicName) ? td("clinicPhotoOf", { name: selectedClinic?.name ?? selectedDoctor.doctorProfile.clinicName ?? "" }) : td("clinicPhoto")}
                         fill
                         sizes="100vw"
                         className="object-cover"
@@ -1663,11 +1668,11 @@ function PatientDashboardInner() {
                         />
                       </div>
                     </div>
-                    <button aria-label={savedDoctorIds.has(selectedDoctor.id) ? "Remove from saved doctors" : "Save doctor"} aria-pressed={savedDoctorIds.has(selectedDoctor.id)}
+                    <button aria-label={savedDoctorIds.has(selectedDoctor.id) ? td("unsave") : td("save")} aria-pressed={savedDoctorIds.has(selectedDoctor.id)}
                       type="button"
                       onClick={toggleSaveDoctor}
                       disabled={savingBookmark}
-                      title={savedDoctorIds.has(selectedDoctor.id) ? "Remove from saved doctors" : "Save doctor for later"}
+                      title={savedDoctorIds.has(selectedDoctor.id) ? td("unsave") : td("saveForLater")}
                       className={`tap-44 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors flex-shrink-0 ${
                         savedDoctorIds.has(selectedDoctor.id)
                           ? "bg-blue-50 border-blue-200 text-blue-600"
@@ -1684,7 +1689,7 @@ function PatientDashboardInner() {
                       {selectedDoctor.clinics.map((c) => {
                         const open = isClinicOpenNow(c.slots, effectiveBookingTime);
                         const isSelected = c.id === selectedClinicId;
-                        const when = open ? null : formatNextOpeningText(findNextOpening([c], effectiveBookingTime));
+                        const when = open ? null : nextOpeningText(findNextOpening([c], effectiveBookingTime));
                         return (
                           <button
                             key={c.id}
@@ -1699,13 +1704,13 @@ function PatientDashboardInner() {
                               <span className="text-xs font-medium text-slate-700 truncate">{c.name}</span>
                             </span>
                             {open ? (
-                              <span className="badge badge-success !px-2 !py-0.5 text-[10px] flex-shrink-0">Available now</span>
+                              <span className="badge badge-success !px-2 !py-0.5 text-[10px] flex-shrink-0">{td("availableNow")}</span>
                             ) : when ? (
                               <span className="text-[11px] text-slate-500 flex-shrink-0 flex items-center gap-1">
-                                <Clock className="w-3 h-3 flex-shrink-0 text-slate-400" /> Opens {when}
+                                <Clock className="w-3 h-3 flex-shrink-0 text-slate-400" /> {td("opens", { when })}
                               </span>
                             ) : (
-                              <span className="badge badge-gray !px-2 !py-0.5 text-[10px] flex-shrink-0">Closed</span>
+                              <span className="badge badge-gray !px-2 !py-0.5 text-[10px] flex-shrink-0">{td("closed")}</span>
                             )}
                           </button>
                         );
@@ -1719,7 +1724,7 @@ function PatientDashboardInner() {
 
                   {/* Chips row */}
                   <div className="flex flex-wrap gap-2 mb-5">
-                    <span className="badge badge-info">{selectedDoctor.doctorProfile.experience} yrs exp</span>
+                    <span className="badge badge-info">{tp("yrsExp", { years: selectedDoctor.doctorProfile.experience })}</span>
                     {selectedClinicDistance != null && (
                       <span className="badge badge-success">
                         <Navigation className="w-3 h-3" /> {selectedClinicDistance.toFixed(1)} km
@@ -1728,10 +1733,10 @@ function PatientDashboardInner() {
                     {selectedDoctor.clinics.length > 0 ? (() => {
                       const clinicForHours = selectedClinic ?? selectedDoctor.clinics[0];
                       const open = isClinicOpenNow(clinicForHours.slots, effectiveBookingTime);
-                      const when = open ? null : formatNextOpeningText(findNextOpening([clinicForHours], effectiveBookingTime));
+                      const when = open ? null : nextOpeningText(findNextOpening([clinicForHours], effectiveBookingTime));
                       return (
                         <span className={`badge ${open ? "badge-success" : "badge-gray"}`}>
-                          <Clock className="w-3 h-3" /> {open ? "Open now" : when ? `Opens ${when}` : "Closed"}
+                          <Clock className="w-3 h-3" /> {open ? td("openNow") : when ? td("opens", { when }) : td("closed")}
                         </span>
                       );
                     })() : (
@@ -1764,15 +1769,15 @@ function PatientDashboardInner() {
                     return (
                       <div className={cn("grid gap-3 mb-3", offeredCount === 1 ? "grid-cols-1" : offeredCount === 2 ? "grid-cols-2" : "grid-cols-3")}>
                         {offersClinic && (() => {
-                          const next = hasOpenClinic ? null : formatNextOpeningText(findNextOpening(selectedDoctor.clinics, new Date(now)));
+                          const next = hasOpenClinic ? null : nextOpeningText(findNextOpening(selectedDoctor.clinics, new Date(now)));
                           return (
                             <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                               <Building2 className={cn("w-5 h-5 mx-auto mb-1", hasOpenClinic ? "text-blue-500" : "text-slate-400")} />
-                              <p className="text-xs text-slate-500">Clinic Visit</p>
+                              <p className="text-xs text-slate-500">{tp("consultType.CLINIC")}</p>
                               <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.consultFee}</p>
                               {!hasOpenClinic && (
                                 <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                                  {next ? `Closed now · opens ${next}` : "Closed now · schedule for later"}
+                                  {next ? td("closedOpens", { when: next }) : td("closedScheduleLater")}
                                 </p>
                               )}
                             </div>
@@ -1781,7 +1786,7 @@ function PatientDashboardInner() {
                         {offersVideo && (
                           <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                             <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                            <p className="text-xs text-slate-500">Video Consultation</p>
+                            <p className="text-xs text-slate-500">{tp("consultType.VIDEO")}</p>
                             <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.videoFee}</p>
                           </div>
                         )}
@@ -1789,16 +1794,16 @@ function PatientDashboardInner() {
                           hasHomeVisitReach ? (
                             <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center">
                               <Home className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                              <p className="text-xs text-slate-500">Home Visit</p>
+                              <p className="text-xs text-slate-500">{tp("consultType.HOME")}</p>
                               <p className="text-base font-extrabold text-slate-900 mt-0.5">₹{selectedDoctor.doctorProfile.homeVisitFee}</p>
                               {selectedDoctor.distance != null && (
-                                <p className="text-[10px] text-slate-400 mt-0.5">~{estimateArrivalMinutes(selectedDoctor.distance)} min arrival</p>
+                                <p className="text-[10px] text-slate-400 mt-0.5">{td("arrivalMin", { min: estimateArrivalMinutes(selectedDoctor.distance) })}</p>
                               )}
                             </div>
                           ) : (
                             <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50 text-center flex flex-col items-center justify-center">
                               <Home className="w-5 h-5 text-slate-300 mx-auto mb-1" />
-                              <p className="text-xs text-slate-400">Outside home visit range</p>
+                              <p className="text-xs text-slate-400">{td("outsideHomeRange")}</p>
                             </div>
                           )
                         )}
@@ -1809,7 +1814,7 @@ function PatientDashboardInner() {
                   {/* Reviews */}
                   {reviews.length > 0 && (
                     <div className="mb-5">
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Recent Reviews</p>
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{td("recentReviews")}</p>
                       <div className="space-y-2 max-h-32 overflow-y-auto">
                         {reviews.slice(0, 4).map((r) => (
                           <div key={r.id} className="bg-slate-50 rounded-xl px-3 py-2">
@@ -1950,8 +1955,8 @@ function PatientDashboardInner() {
         <div className="absolute bottom-[calc(9rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-24 inset-x-0 z-20 flex justify-center px-4 pointer-events-none">
           <div className="glass-card rounded-2xl px-4 py-2.5 flex items-center gap-2 text-xs shadow border border-amber-200 pointer-events-auto max-w-full">
             <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-            <span className="text-slate-600 truncate">No clinics within {searchRadiusKm} km of {customLabel ?? "here"}.</span>
-            <button onClick={() => setIgnoreRadius(true)} className="font-semibold text-blue-600 flex-shrink-0">Show all</button>
+            <span className="text-slate-600 truncate">{customLabel ? td("noClinicsWithinOf", { km: searchRadiusKm, place: customLabel }) : td("noClinicsWithinHere", { km: searchRadiusKm })}</span>
+            <button onClick={() => setIgnoreRadius(true)} className="font-semibold text-blue-600 flex-shrink-0">{td("showAll")}</button>
           </div>
         </div>
       )}
@@ -1963,7 +1968,7 @@ function PatientDashboardInner() {
         <div className="absolute bottom-[calc(9rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-24 inset-x-0 z-20 flex justify-center pointer-events-none">
           <div className="glass-card rounded-full px-4 py-2 flex items-center gap-2 text-xs text-slate-500 shadow">
             <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
-            Tap a doctor pin to see details
+            {td("tapPinHint")}
           </div>
         </div>
       )}
@@ -1973,29 +1978,29 @@ function PatientDashboardInner() {
         <div className="absolute inset-0 z-50 flex items-start justify-center p-4 pt-24 bg-black/30" onClick={() => setLocationPickerOpen(false)}>
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-1">
-              <h3 className="font-extrabold text-slate-900">Choose a location</h3>
-              <button aria-label="Close" onClick={() => setLocationPickerOpen(false)} className="tap-44 w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
+              <h3 className="font-extrabold text-slate-900">{td("picker.title")}</h3>
+              <button aria-label={td("picker.close")} onClick={() => setLocationPickerOpen(false)} className="tap-44 w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <p className="text-xs text-slate-400 mb-4">
               {customLabel
-                ? <>Showing doctors near <span className="font-semibold text-slate-600">{customLabel}</span>. Booking for someone in another city? Set their area here.</>
-                : "Search an area to browse doctors there — e.g. when booking for a relative in another city."}
+                ? td.rich("picker.showingNear", { place: customLabel, b: (c) => <span className="font-semibold text-slate-600">{c}</span> })
+                : td("picker.hint")}
             </p>
 
             <AddressAutocomplete
               value={locationQuery}
               onChange={setLocationQuery}
               onSelect={(s) => applyCustomLocation(s.lat, s.lon, s.label.split(",").slice(0, 2).join(",").trim())}
-              placeholder="Search city, area or society…"
+              placeholder={td("picker.placeholder")}
             />
 
             <button
               onClick={() => { setLocationPickerOpen(false); setPickingOnMap(true); setViewMode("map"); }}
               className="btn-secondary w-full justify-center py-2.5 mt-3 gap-1.5 text-sm"
             >
-              <MapPin className="w-4 h-4" /> Pick an exact spot on the map
+              <MapPin className="w-4 h-4" /> {td("picker.pickOnMap")}
             </button>
 
             <button
@@ -2004,8 +2009,8 @@ function PatientDashboardInner() {
               className="w-full justify-center py-2.5 mt-2 gap-1.5 text-sm flex items-center font-semibold text-blue-600 disabled:opacity-60"
             >
               {locatingGps
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> Locating…</>
-                : <><Crosshair className="w-4 h-4" /> Use my current location</>}
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> {td("picker.locating")}</>
+                : <><Crosshair className="w-4 h-4" /> {td("picker.useCurrent")}</>}
             </button>
           </div>
         </div>
@@ -2025,8 +2030,8 @@ function PatientDashboardInner() {
           <div className="absolute top-0 inset-x-0 z-50 p-3 pointer-events-none" style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}>
             <div className="glass-card rounded-2xl px-4 py-3 flex items-center gap-2 shadow-lg pointer-events-auto">
               <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
-              <span className="text-sm font-semibold text-slate-700 flex-1">Move the map to the location</span>
-              <button onClick={() => setPickingOnMap(false)} className="text-sm font-semibold text-slate-400">Cancel</button>
+              <span className="text-sm font-semibold text-slate-700 flex-1">{td("pick.moveMap")}</span>
+              <button onClick={() => setPickingOnMap(false)} className="text-sm font-semibold text-slate-400">{td("pick.cancel")}</button>
             </div>
           </div>
           {/* Confirm button */}
@@ -2036,7 +2041,7 @@ function PatientDashboardInner() {
               disabled={confirmingPick}
               className="btn-primary w-full justify-center py-3.5 text-base pointer-events-auto disabled:opacity-70"
             >
-              {confirmingPick ? <><Loader2 className="w-4 h-4 animate-spin" /> Setting…</> : "Set this location"}
+              {confirmingPick ? <><Loader2 className="w-4 h-4 animate-spin" /> {td("pick.setting")}</> : td("pick.confirm")}
             </button>
           </div>
         </>

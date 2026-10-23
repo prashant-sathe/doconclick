@@ -4,6 +4,7 @@ import { Download, Loader2, AlertCircle } from "lucide-react";
 import type { PrescriptionData } from "./PrescriptionDocument";
 import { buildPrescriptionPdf, loadPrescription, prescriptionFileName } from "@/lib/prescriptionPdf";
 import { saveOrShareFile } from "@/lib/nativeDownload";
+import { useTranslations } from "next-intl";
 
 export default function PrescriptionDownloadButton({
   appointmentId,
@@ -16,6 +17,7 @@ export default function PrescriptionDownloadButton({
   // that already loaded this data and can't hit the patient-only GET route.
   data?: PrescriptionData;
 }) {
+  const t = useTranslations("patient.prescriptionDownload");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +33,7 @@ export default function PrescriptionDownloadButton({
       const handledNatively = await saveOrShareFile(fileName, pdf.output("datauristring").split(",")[1]);
       if (!handledNatively) pdf.save(fileName);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to generate PDF");
+      setError(e instanceof Error ? e.message : t("failed"));
     } finally {
       setBusy(false);
     }
@@ -42,11 +44,11 @@ export default function PrescriptionDownloadButton({
       <button onClick={download} disabled={busy} className="btn-secondary py-2 px-3 text-xs">
         {busy ? (
           <>
-            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating…
+            <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t("generating")}
           </>
         ) : (
           <>
-            <Download className="w-3.5 h-3.5" /> Download Prescription
+            <Download className="w-3.5 h-3.5" /> {t("download")}
           </>
         )}
       </button>

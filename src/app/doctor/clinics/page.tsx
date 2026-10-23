@@ -18,8 +18,10 @@ import ImageCropModal from "@/components/ImageCropModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { todayIsoDateIst } from "@/lib/clinicAvailability";
 import { prepareBlobUpload } from "@/lib/compressImage";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 interface Slot {
   dayOfWeek: string;
@@ -85,6 +87,7 @@ function newClinic(): ClinicForm {
 }
 
 function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded: (url: string) => void }) {
+  const t = useTranslations("doctorAccount.clinics");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -93,7 +96,7 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
     setBusy(true);
     setError("");
     const file = await prepareBlobUpload(fileOrBlob, "clinic-photo.jpg").catch(() => null);
-    if (!file) { setBusy(false); setError("Couldn't read that file — please pick it again."); return; }
+    if (!file) { setBusy(false); setError(t("fileReadFailed")); return; }
     const form = new FormData();
     form.append("file", file, "clinic-photo.jpg");
     const res = await fetch("/api/doctors/me/clinics/photo", { method: "POST", body: form });
@@ -102,7 +105,7 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
       const data = await res.json();
       onUploaded(data.url);
     } else {
-      setError((await res.json().catch(() => ({}))).error ?? "Upload failed.");
+      setError((await res.json().catch(() => ({}))).error ?? t("uploadFailed"));
     }
   };
 
@@ -115,24 +118,24 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
     <div>
       <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 mb-2">
         {url ? (
-          <Image src={url} alt="Clinic photo" fill sizes="100vw" className="object-cover" />
+          <Image src={url} alt={t("photoAlt")} fill sizes="100vw" className="object-cover" />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-1">
             <ImageIcon className="w-6 h-6" />
-            <span className="text-xs text-slate-400">No photo yet</span>
+            <span className="text-xs text-slate-400">{t("noPhoto")}</span>
           </div>
         )}
       </div>
       <div className="flex items-center gap-3">
         <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer flex-shrink-0">
           {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
-          {url ? "Replace Photo" : "Upload Photo"}
+          {url ? t("replacePhoto") : t("uploadPhoto")}
           <input type="file" accept=".jpg,.jpeg,.png" className="hidden"
             onChange={(e) => { const f = e.target.files?.[0]; if (f) setPendingFile(f); e.target.value = ""; }} />
         </label>
         {url && (
           <button type="button" onClick={remove} disabled={busy}
-            className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60 flex-shrink-0" title="Remove">
+            className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60 flex-shrink-0" title={t("remove")}>
             <Trash2 className="w-3.5 h-3.5" />
           </button>
         )}
@@ -168,6 +171,8 @@ interface AffectedBooking {
 
 // The bookings a leave day or a clinic removal would cancel, for the confirm dialogs.
 function AffectedBookingList({ bookings, showDate = false }: { bookings: AffectedBooking[]; showDate?: boolean }) {
+  const t = useTranslations("doctorAccount.clinics");
+  const locale = formattingLocale(useLocale());
   const refundTotal = bookings.reduce((sum, b) => sum + b.refund, 0);
   return (
     <>
@@ -176,31 +181,32 @@ function AffectedBookingList({ bookings, showDate = false }: { bookings: Affecte
           <li key={b.id} className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
             <span className="font-semibold text-slate-700 truncate">{b.patientName}</span>
             <span className="text-slate-500 flex-shrink-0">
-              {new Date(b.scheduledAt).toLocaleString("en-IN", {
+              {new Date(b.scheduledAt).toLocaleString(locale, {
                 timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit",
                 ...(showDate ? { day: "numeric", month: "short" } : {}),
               })}
-              {b.paid ? ` · ₹${b.refund} refund` : " · unpaid"}
+              {b.paid ? ` · ${t("refund", { amount: b.refund })}` : ` · ${t("unpaid")}`}
             </span>
           </li>
         ))}
       </ul>
       {refundTotal > 0 && (
-        <p className="mt-3 text-xs">₹{refundTotal} in total goes back to the patients&apos; wallets.</p>
+        <p className="mt-3 text-xs">{t("refundTotal", { amount: refundTotal })}</p>
       )}
     </>
   );
 }
 
 // "3 bookings cancelled and the patients notified. ₹900 refunded…"
-function cancelledNotice(cancelledBookings: number, refundTotal: number) {
-  return `${cancelledBookings} booking${cancelledBookings === 1 ? "" : "s"} cancelled and the patients notified.`
-    + (refundTotal > 0 ? ` ₹${refundTotal} refunded to their wallets.` : "");
+function useCancelledNotice() {
+  const t = useTranslations("doctorAccount.clinics");
+  return (cancelledBookings: number, refundTotal: number) =>
+    t("cancelled", { count: cancelledBookings }) + (refundTotal > 0 ? ` ${t("refunded", { amount: refundTotal })}` : "");
 }
 
-function formatLeaveDate(iso: string): string {
+function formatLeaveDate(iso: string, locale: string): string {
   const [y, m, d] = iso.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-IN", {
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(locale, {
     timeZone: "UTC", day: "numeric", month: "short", year: "numeric",
   });
 }
@@ -210,6 +216,9 @@ function formatLeaveDate(iso: string): string {
 // add/remove (unlike the rest of the clinic form) since there's nothing to
 // "save" together with it — each date is its own row server-side.
 function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
+  const t = useTranslations("doctorAccount.clinics");
+  const locale = formattingLocale(useLocale());
+  const cancelledNotice = useCancelledNotice();
   const [leaves, setLeaves] = useState<ClinicLeave[]>([]);
   const [loading, setLoading] = useState(true);
   const [date, setDate] = useState("");
@@ -253,7 +262,7 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
       setAffected(body.bookings);
     } else {
       setAffected(null);
-      setError(body.error ?? "Could not add that date.");
+      setError(body.error ?? t("addLeaveFailed"));
     }
   };
 
@@ -273,8 +282,8 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
 
   return (
     <div>
-      <label className="input-label flex items-center gap-1.5"><CalendarOff className="w-3.5 h-3.5" /> Leave / Holiday Dates <span className="text-slate-400 font-normal normal-case">(optional)</span></label>
-      <p className="text-xs text-slate-400 mt-1 mb-2">Mark specific dates you&apos;ll be closed — patients won&apos;t be able to book this clinic on those days, even within your normal hours.</p>
+      <label className="input-label flex items-center gap-1.5"><CalendarOff className="w-3.5 h-3.5" /> {t("leaveTitle")} <span className="text-slate-400 font-normal normal-case">{t("optional")}</span></label>
+      <p className="text-xs text-slate-400 mt-1 mb-2">{t("leaveHint")}</p>
 
       {loading ? (
         <Loader2 className="w-4 h-4 animate-spin text-slate-300" />
@@ -285,10 +294,10 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
               {leaves.map((l) => (
                 <li key={l.id} className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-sm">
                   <span className="text-slate-700 font-semibold">
-                    {formatLeaveDate(l.date)}
+                    {formatLeaveDate(l.date, locale)}
                     {l.reason && <span className="text-slate-400 font-normal"> — {l.reason}</span>}
                   </span>
-                  <button type="button" onClick={() => removeLeave(l.id)} disabled={removingId === l.id}
+                  <button type="button" onClick={() => removeLeave(l.id)} disabled={removingId === l.id} aria-label={t("removeDate")}
                     className="text-red-400 hover:text-red-600 p-1 rounded-lg hover:bg-red-50 flex-shrink-0 disabled:opacity-60">
                     {removingId === l.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                   </button>
@@ -300,11 +309,11 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
           <div className="flex items-center gap-2">
             <input type="date" className="input-field flex-1" min={todayIso} max={maxIso} value={date}
               onChange={(e) => { setDate(e.target.value); setError(""); setNotice(""); }} />
-            <input type="text" className="input-field flex-1" placeholder="Reason (optional)" value={reason}
+            <input type="text" className="input-field flex-1" placeholder={t("reasonOptional")} value={reason}
               onChange={(e) => setReason(e.target.value)} />
             <button type="button" onClick={() => addLeave()} disabled={!date || adding}
               className="btn-secondary flex-shrink-0 px-3 text-xs gap-1 disabled:opacity-60">
-              {adding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />} Add
+              {adding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />} {t("add")}
             </button>
           </div>
           {error && <p className="text-xs text-red-600 mt-1.5">{error}</p>}
@@ -315,15 +324,15 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
       {affected && (
         <ConfirmDialog
           icon={CalendarOff}
-          title={`Cancel ${affected.length} booking${affected.length === 1 ? "" : "s"} on ${formatLeaveDate(date)}?`}
+          title={t("leaveConfirmTitle", { count: affected.length, date: formatLeaveDate(date, locale) })}
           message={
             <>
-              <p>These patients are booked at this clinic that day. Adding the leave cancels their appointments and notifies them.</p>
+              <p>{t("leaveConfirmBody")}</p>
               <AffectedBookingList bookings={affected} />
             </>
           }
-          confirmLabel="Cancel bookings & add leave"
-          busyLabel="Cancelling…"
+          confirmLabel={t("leaveConfirm")}
+          busyLabel={t("cancelling")}
           tone="danger"
           busy={adding}
           onCancel={() => setAffected(null)}
@@ -341,6 +350,8 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
   onSave: () => void;
   onDelete: () => void;
 }) {
+  const t = useTranslations("doctorAccount.clinics");
+  const tDays = useTranslations("booking.common.days");
   const set = <K extends keyof ClinicForm>(key: K, value: ClinicForm[K]) =>
     onChange({ ...clinic, [key]: value, saved: false });
 
@@ -385,64 +396,64 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
           <span className="w-7 h-7 rounded-full bg-teal-50 text-teal-600 text-xs font-extrabold flex items-center justify-center flex-shrink-0">
             {index + 1}
           </span>
-          <h3 className="font-bold text-slate-800 truncate">{clinic.name || "New Clinic"}</h3>
+          <h3 className="font-bold text-slate-800 truncate">{clinic.name || t("newClinic")}</h3>
           {canSave ? (
-            <span className="badge badge-success text-[10px] flex-shrink-0"><CheckCircle2 className="w-3 h-3" /> Ready</span>
+            <span className="badge badge-success text-[10px] flex-shrink-0"><CheckCircle2 className="w-3 h-3" /> {t("ready")}</span>
           ) : (
-            <span className="badge badge-warning text-[10px] flex-shrink-0">Incomplete</span>
+            <span className="badge badge-warning text-[10px] flex-shrink-0">{t("incomplete")}</span>
           )}
         </div>
-        <button type="button" onClick={onDelete} title="Delete clinic" className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0">
+        <button type="button" onClick={onDelete} title={t("deleteClinicTitle")} className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0">
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
 
       <div>
-        <label className="input-label">Clinic Name <span className="text-slate-400 font-normal normal-case">(optional)</span></label>
-        <input className="input-field" placeholder="e.g. Sunrise Family Clinic" value={clinic.name}
+        <label className="input-label">{t("clinicName")} <span className="text-slate-400 font-normal normal-case">{t("optional")}</span></label>
+        <input className="input-field" placeholder={t("clinicNamePlaceholder")} value={clinic.name}
           onChange={(e) => set("name", e.target.value)} />
-        <p className="text-xs text-slate-400 mt-1">Leave blank to use your name as the clinic name.</p>
+        <p className="text-xs text-slate-400 mt-1">{t("clinicNameHint")}</p>
       </div>
 
       <div>
-        <label className="input-label">Photo <span className="text-slate-400 font-normal normal-case">(optional)</span></label>
+        <label className="input-label">{t("photo")} <span className="text-slate-400 font-normal normal-case">{t("optional")}</span></label>
         <ClinicPhotoUpload url={clinic.photoUrl} onUploaded={(url) => set("photoUrl", url)} />
       </div>
 
       <div>
-        <label className="input-label">Address <span className="text-red-500">*</span></label>
+        <label className="input-label">{t("address")} <span className="text-red-500">*</span></label>
         <div className="flex gap-2 mb-2">
           <div className="flex-1">
             <AddressAutocomplete
-              placeholder="Search this clinic's address…"
+              placeholder={t("addressPlaceholder")}
               value={clinic.address}
               onChange={(v) => set("address", v)}
               onSelect={(s) => onChange({ ...clinic, address: s.label, lat: s.lat, lng: s.lon, saved: false })}
             />
           </div>
           <button type="button" onClick={useCurrentLocation} className="btn-secondary flex-shrink-0 px-3 text-xs gap-1 self-start">
-            <Navigation className="w-3.5 h-3.5" /> Use Current
+            <Navigation className="w-3.5 h-3.5" /> {t("useCurrent")}
           </button>
         </div>
         {missingAddress && (
-          <p className="text-xs text-red-600 font-semibold mb-2">Address is required — patients need to see where this clinic is before they can book.</p>
+          <p className="text-xs text-red-600 font-semibold mb-2">{t("addressRequired")}</p>
         )}
-        <label className="input-label">Pin Location <span className="text-red-500">*</span></label>
+        <label className="input-label">{t("pinLocation")} <span className="text-red-500">*</span></label>
         <LocationPickerMap lat={clinic.lat} lng={clinic.lng}
           onChange={(lat, lng) => onChange({ ...clinic, lat, lng, saved: false })} height={220} />
         {clinic.lat != null && clinic.lng != null ? (
           <p className="text-xs text-emerald-600 font-semibold flex items-center gap-1 mt-1.5">
-            <MapPin className="w-3.5 h-3.5" /> Location set ({clinic.lat.toFixed(4)}, {clinic.lng.toFixed(4)})
+            <MapPin className="w-3.5 h-3.5" /> {t("locationSet", { coords: `${clinic.lat.toFixed(4)}, ${clinic.lng.toFixed(4)}` })}
           </p>
         ) : (
-          <p className="text-xs text-red-600 font-semibold mt-1.5">No location set yet — search an address or use your current location.</p>
+          <p className="text-xs text-red-600 font-semibold mt-1.5">{t("noLocation")}</p>
         )}
       </div>
 
       <div>
-        <label className="input-label flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Day-wise Availability <span className="text-red-500">*</span></label>
+        <label className="input-label flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {t("availability")} <span className="text-red-500">*</span></label>
         {missingSlot && (
-          <p className="text-xs text-red-600 font-semibold mt-1">Select at least one day and time — patients need to know when this clinic is open before they can book.</p>
+          <p className="text-xs text-red-600 font-semibold mt-1">{t("slotRequired")}</p>
         )}
         <div className="space-y-3 mt-2">
           {clinic.slotGroups.map((group, groupIdx) => (
@@ -453,23 +464,23 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
                     className={cn("px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-all",
                       group.days.includes(d) ? "bg-teal-600 text-white border-teal-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                     )}>
-                    {d}
+                    {tDays(d)}
                   </button>
                 ))}
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <label className="input-label">From</label>
+                  <label className="input-label">{t("from")}</label>
                   <input type="time" className="input-field" value={group.fromTime}
                     onChange={(e) => updateGroup(groupIdx, { fromTime: e.target.value })} />
                 </div>
                 <div className="flex-1">
-                  <label className="input-label">To</label>
+                  <label className="input-label">{t("to")}</label>
                   <input type="time" className="input-field" value={group.toTime}
                     onChange={(e) => updateGroup(groupIdx, { toTime: e.target.value })} />
                 </div>
                 {clinic.slotGroups.length > 1 && (
-                  <button type="button" onClick={() => removeGroup(groupIdx)}
+                  <button type="button" onClick={() => removeGroup(groupIdx)} aria-label={t("removeRange")}
                     className="text-red-400 hover:text-red-600 p-1.5 mt-4 rounded-lg hover:bg-red-50 flex-shrink-0">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -479,10 +490,10 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
           ))}
         </div>
         <button type="button" onClick={addGroup} className="btn-secondary mt-2.5 py-1.5 px-3 text-xs gap-1">
-          <Plus className="w-3.5 h-3.5" /> Add another time range
+          <Plus className="w-3.5 h-3.5" /> {t("addRange")}
         </button>
         <p className="text-[11px] text-slate-400 mt-1.5">
-          Closing at midnight? Set “To” to 12:00 AM. Open past midnight? Add the early-morning hours as a separate range on the next day.
+          {t("midnightHint")}
         </p>
       </div>
 
@@ -492,13 +503,15 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
 
       <button type="button" disabled={!canSave || clinic.saving} onClick={onSave}
         className="btn-primary w-full justify-center py-2.5 text-sm">
-        {clinic.saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : clinic.saved ? <><CheckCircle2 className="w-4 h-4" /> Saved!</> : <><Save className="w-4 h-4" /> Save Clinic</>}
+        {clinic.saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}</> : clinic.saved ? <><CheckCircle2 className="w-4 h-4" /> {t("saved")}</> : <><Save className="w-4 h-4" /> {t("saveClinic")}</>}
       </button>
     </section>
   );
 }
 
 export default function DoctorClinicsPage() {
+  const t = useTranslations("doctorAccount.clinics");
+  const cancelledNotice = useCancelledNotice();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [clinics, setClinics] = useState<ClinicForm[]>([]);
@@ -562,7 +575,7 @@ export default function DoctorClinicsPage() {
       }
       if (!res.ok) {
         setDeleteBookings(null);
-        setDeleteError(body.error ?? "Could not delete this clinic.");
+        setDeleteError(body.error ?? t("deleteFailed"));
         return false;
       }
       setPageNotice(body.cancelledBookings > 0 ? cancelledNotice(body.cancelledBookings, body.refundTotal) : "");
@@ -610,7 +623,7 @@ export default function DoctorClinicsPage() {
       updateAt(idx, { ...clinic, id: saved.id, saving: false, saved: true, error: "" });
     } else {
       const err = await res.json().catch(() => ({}));
-      updateAt(idx, { ...clinic, saving: false, saved: false, error: err.error ?? "Could not save this clinic." });
+      updateAt(idx, { ...clinic, saving: false, saved: false, error: err.error ?? t("saveFailed") });
     }
   };
 
@@ -631,9 +644,9 @@ export default function DoctorClinicsPage() {
             <Building2 className="w-7 h-7 text-white" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-xl font-extrabold text-slate-900">Manage Your Clinics</h1>
+            <h1 className="text-xl font-extrabold text-slate-900">{t("title")}</h1>
             <p className="text-sm text-slate-500 mt-0.5">
-              Add every location you practice at, with day-wise hours for each. Patients see a marker for each on the map.
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -660,12 +673,12 @@ export default function DoctorClinicsPage() {
           onClick={addClinic}
           className="w-full flex items-center justify-center gap-1.5 mt-6 py-3.5 rounded-2xl border-2 border-dashed border-slate-200 text-slate-500 text-sm font-semibold hover:border-teal-300 hover:text-teal-600 hover:bg-teal-50/50 transition-colors"
         >
-          <Plus className="w-4 h-4" /> Add Another Clinic
+          <Plus className="w-4 h-4" /> {t("addClinic")}
         </button>
 
         <div className="flex justify-end mt-6">
           <Link href="/doctor/dashboard" className={clinics.some((c) => c.id) ? "btn-primary gap-1.5 text-sm" : "btn-secondary gap-1.5 text-sm"}>
-            Continue to Dashboard <ArrowRight className="w-4 h-4" />
+            {t("continue")} <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
@@ -674,23 +687,23 @@ export default function DoctorClinicsPage() {
         <ConfirmDialog
           icon={Trash2}
           title={deleteBookings
-            ? `Cancel ${deleteBookings.length} booking${deleteBookings.length === 1 ? "" : "s"} and delete ${clinics[deleteIdx].name || "this clinic"}?`
-            : `Delete ${clinics[deleteIdx].name || "this clinic"}?`}
+            ? t("deleteWithBookingsTitle", { count: deleteBookings.length, clinic: clinics[deleteIdx].name || t("thisClinic") })
+            : t("deleteTitle", { clinic: clinics[deleteIdx].name || t("thisClinic") })}
           message={
             <>
               {deleteBookings ? (
                 <>
-                  <p>These patients have upcoming bookings here. Deleting the clinic cancels their appointments and notifies them.</p>
+                  <p>{t("deleteWithBookingsBody")}</p>
                   <AffectedBookingList bookings={deleteBookings} showDate />
                 </>
               ) : (
-                <p>Patients will no longer see this location on the map or be able to book here. Past appointments keep their clinic details, but you&apos;ll need to re-enter the address, hours and photo if you add it back.</p>
+                <p>{t("deleteBody")}</p>
               )}
               {deleteError && <p className="mt-3 text-xs text-red-600">{deleteError}</p>}
             </>
           }
-          confirmLabel={deleteBookings ? "Cancel bookings & delete" : "Delete Clinic"}
-          busyLabel="Deleting…"
+          confirmLabel={deleteBookings ? t("deleteWithBookingsConfirm") : t("deleteConfirm")}
+          busyLabel={t("deleting")}
           tone="danger"
           busy={deleting}
           onCancel={closeDeleteDialog}

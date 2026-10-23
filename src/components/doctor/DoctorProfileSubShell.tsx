@@ -4,6 +4,7 @@ import { ChevronLeft, Loader2, Check, Save } from "lucide-react";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 // Shared chrome for a single doctor profile-settings screen.
 export default function DoctorProfileSubShell({
@@ -31,6 +32,7 @@ export default function DoctorProfileSubShell({
   onSave?: () => void;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("doctorAccount.subShell");
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
       <DoctorHeader />
@@ -38,7 +40,7 @@ export default function DoctorProfileSubShell({
 
       <div className="max-w-xl mx-auto py-6 px-4 sm:px-6">
         <Link href="/doctor/profile" className="btn-ghost gap-1 text-sm -ml-2 mb-3">
-          <ChevronLeft className="w-4 h-4" /> Profile
+          <ChevronLeft className="w-4 h-4" /> {t("profile")}
         </Link>
         <div className="flex items-center gap-3">
           {icon && (
@@ -72,10 +74,10 @@ export default function DoctorProfileSubShell({
             className="btn-primary w-full justify-center py-3.5 text-base mt-5 disabled:opacity-60"
           >
             {saving
-              ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
+              ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}</>
               : saved && dirty === false
-                ? <><Check className="w-4 h-4" /> Saved</>
-                : <><Save className="w-4 h-4" /> Save</>}
+                ? <><Check className="w-4 h-4" /> {t("saved")}</>
+                : <><Save className="w-4 h-4" /> {t("save")}</>}
           </button>
         )}
       </div>

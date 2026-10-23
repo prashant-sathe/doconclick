@@ -6,8 +6,10 @@ import DoctorProfileSubShell from "@/components/doctor/DoctorProfileSubShell";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
 import { useAuth } from "@/components/AuthProvider";
 import { SetPasswordViaGoogle, LogoutAllDevices, DeleteAccount } from "@/components/AccountSecurity";
+import { useTranslations } from "next-intl";
 
 export default function DoctorSecurityPage() {
+  const t = useTranslations("doctorAccount.security");
   const router = useRouter();
   const { user } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
@@ -31,15 +33,15 @@ export default function DoctorSecurityPage() {
   const save = async () => {
     setError("");
     if (!currentPassword) {
-      setError("Enter your current password.");
+      setError(t("errCurrent"));
       return;
     }
     if (password.length < PASSWORD_MIN_LENGTH) {
-      setError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`);
+      setError(t("errMin", { min: PASSWORD_MIN_LENGTH }));
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("errMismatch"));
       return;
     }
 
@@ -59,14 +61,14 @@ export default function DoctorSecurityPage() {
       setConfirmPassword("");
       setTimeout(() => router.push("/doctor/profile"), 600);
     } else {
-      setError((await res.json().catch(() => ({}))).error ?? "Could not update your password.");
+      setError((await res.json().catch(() => ({}))).error ?? t("errUpdate"));
     }
   };
 
   return (
     <DoctorProfileSubShell
-      title="Password & Security"
-      description="Change your password, sign out everywhere, or delete your account."
+      title={t("title")}
+      description={t("description")}
       icon={<Lock className="w-5 h-5" />}
       tint="bg-indigo-50 text-indigo-500"
       saving={saving}
@@ -80,24 +82,24 @@ export default function DoctorSecurityPage() {
       ) : (
         <>
           <div>
-            <label className="input-label">Current Password</label>
+            <label className="input-label">{t("current")}</label>
             <input
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
               className="input-field"
-              placeholder="Your current password"
+              placeholder={t("currentPlaceholder")}
               value={currentPassword}
               onChange={(e) => set({ currentPassword: e.target.value })}
             />
           </div>
           <div>
-            <label className="input-label">New Password</label>
+            <label className="input-label">{t("new")}</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 className="input-field pr-11"
-                placeholder="Min. 6 characters"
+                placeholder={t("newPlaceholder", { min: PASSWORD_MIN_LENGTH })}
                 value={password}
                 onChange={(e) => set({ password: e.target.value })}
               />
@@ -111,12 +113,12 @@ export default function DoctorSecurityPage() {
             </div>
           </div>
           <div>
-            <label className="input-label">Confirm Password</label>
+            <label className="input-label">{t("confirm")}</label>
             <input
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               className="input-field"
-              placeholder="Repeat password"
+              placeholder={t("confirmPlaceholder")}
               value={confirmPassword}
               onChange={(e) => set({ confirmPassword: e.target.value })}
             />

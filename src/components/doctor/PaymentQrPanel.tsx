@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckCircle2, Copy, Check, Loader2, MessageCircle, RefreshCw, Banknote, QrCode } from "lucide-react";
 import { mutate } from "@/lib/apiClient";
 import { useToast } from "@/components/Toast";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 export type PaymentLink = { url: string; expiresAt: string };
 
@@ -31,6 +33,9 @@ export default function PaymentQrPanel({
   onSwitchedToCash?: () => void;
 }) {
   const toast = useToast();
+  const t = useTranslations("doctor.paymentQr");
+  const tc = useTranslations("doctor.common");
+  const locale = formattingLocale(useLocale());
   const [link, setLink] = useState<PaymentLink | null>(initialLink ?? null);
   // What's actually due (after any coupon), once the server has said.
   const [amount, setAmount] = useState(initialAmount);
@@ -101,7 +106,7 @@ export default function PaymentQrPanel({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("Couldn't copy — long-press the link to copy it.");
+      toast.error(t("copyFailed"));
     }
   };
 
@@ -110,7 +115,7 @@ export default function PaymentQrPanel({
     const r = await mutate(`/api/doctor/appointments/${appointmentId}/payment-method`, { method: "PATCH", body: { paymentMethod: "CASH" } });
     setSwitching(false);
     if (!r.ok) { toast.error(r.error); return; }
-    toast.success(`Switched to cash — collect ₹${amount} at the visit.`);
+    toast.success(t("switchedToCash", { amount }));
     onSwitchedToCash?.();
   };
 
@@ -120,14 +125,14 @@ export default function PaymentQrPanel({
         <div className="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-3">
           <CheckCircle2 className="w-8 h-8 text-emerald-500" />
         </div>
-        <p className="font-extrabold text-slate-900 text-lg">₹{amount} received</p>
-        <p className="text-sm text-slate-500 mt-1">Paid online — nothing to collect.</p>
+        <p className="font-extrabold text-slate-900 text-lg">{t("received", { amount })}</p>
+        <p className="text-sm text-slate-500 mt-1">{t("nothingToCollect")}</p>
       </div>
     );
   }
 
   const waText = link
-    ? `Please pay ₹${amount} for your appointment on DocOnClick: ${link.url}`
+    ? t("waText", { amount, url: link.url })
     : "";
 
   return (
@@ -137,24 +142,24 @@ export default function PaymentQrPanel({
           {linkError ? (
             <div className="px-4 text-center">
               <p className="text-sm text-red-600 mb-3">{linkError}</p>
-              <button type="button" onClick={fetchLink} className="btn-secondary py-2 px-3 text-xs"><RefreshCw className="w-3.5 h-3.5" /> Retry</button>
+              <button type="button" onClick={fetchLink} className="btn-secondary py-2 px-3 text-xs"><RefreshCw className="w-3.5 h-3.5" /> {tc("retry")}</button>
             </div>
           ) : qr ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={qr} alt="Payment QR code" width={220} height={220} />
+            <img src={qr} alt={t("qrAlt")} width={220} height={220} />
           ) : (
             <Loader2 className="w-6 h-6 animate-spin text-slate-300" />
           )}
         </div>
         <p className="text-sm font-semibold text-slate-700 mt-3 flex items-center gap-1.5">
-          <QrCode className="w-4 h-4 text-teal-600" /> Patient scans to pay ₹{amount}
+          <QrCode className="w-4 h-4 text-teal-600" /> {t("scanToPay", { amount })}
         </p>
         <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-          <Loader2 className="w-3 h-3 animate-spin" /> Waiting for payment…
+          <Loader2 className="w-3 h-3 animate-spin" /> {t("waiting")}
         </p>
         {link && (
           <p className="text-[11px] text-slate-400 mt-1">
-            Link valid till {new Date(link.expiresAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
+            {t("validTill", { when: new Date(link.expiresAt).toLocaleString(locale, { timeZone: "Asia/Kolkata", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) })}
           </p>
         )}
       </div>
@@ -170,7 +175,7 @@ export default function PaymentQrPanel({
             <MessageCircle className="w-4 h-4" /> WhatsApp
           </a>
           <button type="button" onClick={copy} className="btn-secondary py-2.5 justify-center text-sm">
-            {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />} {copied ? "Copied" : "Copy link"}
+            {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />} {copied ? t("copied") : t("copyLink")}
           </button>
         </div>
       )}
@@ -183,7 +188,7 @@ export default function PaymentQrPanel({
           className="w-full mt-3 text-sm font-semibold text-slate-500 hover:text-slate-800 py-2 flex items-center justify-center gap-1.5 disabled:opacity-60"
         >
           {switching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Banknote className="w-4 h-4" />}
-          Patient can&apos;t pay online? Take cash instead
+          {t("takeCash")}
         </button>
       )}
     </div>

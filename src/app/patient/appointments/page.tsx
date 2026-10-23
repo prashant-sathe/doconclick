@@ -15,10 +15,11 @@ import { isNative } from "@/lib/platform";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { useAppointmentFeed, useAppointmentHistory, mergeAppointments } from "@/components/AppointmentFeed";
-import { intervalLabel } from "@/lib/nursePackage";
 import { vitalsSummary, type VitalsInput } from "@/lib/vitals";
 import PullToRefresh from "@/components/PullToRefresh";
 import TimeSlotPicker from "@/components/patient/TimeSlotPicker";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 interface Medicine {
   id: string;
@@ -93,24 +94,19 @@ const STATUS_BADGE: Record<string, string> = {
   NO_SHOW: "badge badge-warning",
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING_APPROVAL: "Waiting for doctor",
-  SCHEDULED: "Confirmed",
-  COMPLETED: "Completed",
-  CANCELLED: "Cancelled",
-  REJECTED: "Declined",
-  EXPIRED: "Doctor was busy",
-  NO_SHOW: "Missed (no-show)",
-};
+// Labels: messages/<locale>/patient.json → appointments.status.<status>
+// (nurse bookings share these cards — the label takes the provider word).
+const STATUS_KEYS = ["PENDING_APPROVAL", "SCHEDULED", "COMPLETED", "CANCELLED", "REJECTED", "EXPIRED", "NO_SHOW"] as const;
+type StatusKey = (typeof STATUS_KEYS)[number];
+const isStatusKey = (v: string): v is StatusKey => (STATUS_KEYS as readonly string[]).includes(v);
+const PAYMENT_STATUS_KEYS = ["PENDING", "PAID", "CREDITED"] as const;
+type PaymentStatusKey = (typeof PAYMENT_STATUS_KEYS)[number];
+const isPaymentStatusKey = (v: string): v is PaymentStatusKey => (PAYMENT_STATUS_KEYS as readonly string[]).includes(v);
+const RELATION_KEYS = ["Self", "Spouse", "Son", "Daughter", "Father", "Mother", "Other"] as const;
+type RelationKey = (typeof RELATION_KEYS)[number];
+const isRelationKey = (v: string): v is RelationKey => (RELATION_KEYS as readonly string[]).includes(v);
 
-// Nurse bookings share these cards — swap the provider word where it shows.
-function statusLabel(a: { status: string; providerType?: string }) {
-  if (a.providerType === "NURSE") {
-    if (a.status === "PENDING_APPROVAL") return "Waiting for nurse";
-    if (a.status === "EXPIRED") return "Nurse was busy";
-  }
-  return STATUS_LABEL[a.status] ?? a.status;
-}
+const DATE_TIME: Intl.DateTimeFormatOptions = { dateStyle: "medium", timeStyle: "short" };
 
 const REQUEST_TIMEOUT_MS = 30 * 60 * 1000;
 
@@ -142,6 +138,7 @@ function clinicDirectionsUrl(profile: { address: string | null; lat: number | nu
 }
 
 function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: string; onClose: () => void; onSubmitted: () => void }) {
+  const t = useTranslations("patient.appointments.review");
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [busy, setBusy] = useState(false);
@@ -157,21 +154,21 @@ function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: s
     });
     setBusy(false);
     if (res.ok) onSubmitted();
-    else setError((await res.json()).error ?? "Could not submit review.");
+    else setError((await res.json()).error ?? t("failed"));
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-extrabold text-slate-900">Leave a Review</h3>
-          <button aria-label="Close" onClick={onClose} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
+          <h3 className="text-lg font-extrabold text-slate-900">{t("title")}</h3>
+          <button aria-label={t("close")} onClick={onClose} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
             <X className="w-4 h-4" />
           </button>
         </div>
         <div className="flex justify-center mb-4">
           {[1, 2, 3, 4, 5].map((s) => (
-            <button aria-label={`Rate ${s} star${s === 1 ? "" : "s"}`} aria-pressed={s <= rating} key={s} type="button" onClick={() => setRating(s)} className="p-1.5">
+            <button aria-label={t("rateStars", { count: s })} aria-pressed={s <= rating} key={s} type="button" onClick={() => setRating(s)} className="p-1.5">
               <Star className={cn("w-8 h-8", s <= rating ? "fill-amber-400 text-amber-400" : "fill-slate-100 text-slate-200")} />
             </button>
           ))}
@@ -179,13 +176,13 @@ function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: s
         <textarea
           rows={3}
           className="input-field resize-none mb-4"
-          placeholder="Share your experience (optional)…"
+          placeholder={t("placeholder")}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
         {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
         <button onClick={submit} disabled={busy} className="btn-primary w-full justify-center py-3">
-          {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting…</> : "Submit Review"}
+          {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("submitting")}</> : t("submit")}
         </button>
       </div>
     </div>
@@ -219,6 +216,13 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
 }) {
   const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
   const router = useRouter();
+  const t = useTranslations("patient.appointments.card");
+  const ta = useTranslations("patient.appointments");
+  const tc = useTranslations("patient.common");
+  const locale = formattingLocale(useLocale());
+  const provider = formatProviderName(a.doctor.name, a.providerType);
+  const providerKind = a.providerType === "NURSE" ? "NURSE" : "DOCTOR";
+  const statusText = isStatusKey(a.status) ? ta(`status.${a.status}`, { provider: providerKind }) : a.status;
   const needsPayment = a.status === "SCHEDULED" && a.paymentMethod === "ONLINE" && a.paymentStatus === "PENDING";
   // ₹0 (free fee or a 100% coupon): accepting normally marks it PAID; an older
   // row still waiting is just confirmed, never sent to a gateway.
@@ -254,30 +258,30 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
           </div>
           <div className="min-w-0">
             <div className="font-bold text-slate-900 flex items-center gap-2 flex-wrap">
-              {formatProviderName(a.doctor.name, a.providerType)}
+              {provider}
             </div>
-            <div className="text-xs text-slate-500 mt-0.5">{a.providerType === "NURSE" ? `Nurse visit · ${a.serviceName ?? ""}` : a.doctor.doctorProfile?.specialty ?? ""}</div>
+            <div className="text-xs text-slate-500 mt-0.5">{a.providerType === "NURSE" ? t("nurseVisit", { service: a.serviceName ?? "" }) : a.doctor.doctorProfile?.specialty ?? ""}</div>
             <div className="text-xs text-slate-400 mt-0.5">
-              {new Date(a.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+              {new Date(a.scheduledAt).toLocaleString(locale, DATE_TIME)}
             </div>
             {a.relation !== "Self" && a.patientName && (
-              <div className="text-xs text-blue-600 font-medium mt-0.5">For {a.patientName} ({a.relation})</div>
+              <div className="text-xs text-blue-600 font-medium mt-0.5">{t("forPatient", { name: a.patientName, relation: isRelationKey(a.relation) ? tc(`relation.${a.relation}`) : a.relation })}</div>
             )}
           </div>
         </div>
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-          <span className={STATUS_BADGE[a.status] ?? "badge badge-gray"}>{statusLabel(a)}</span>
+          <span className={STATUS_BADGE[a.status] ?? "badge badge-gray"}>{statusText}</span>
           <span className="text-sm font-bold text-slate-800">₹{a.amount}</span>
         </div>
       </div>
 
       {a.nurseService?.kind === "SHIFT" && (
         <p className="text-xs font-semibold text-violet-700 mb-1">
-          {Math.round(a.nurseService.durationMinutes / 60)}-hour shift · ends {new Date(new Date(a.scheduledAt).getTime() + a.nurseService.durationMinutes * 60000).toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
+          {t("shiftEnds", { hours: Math.round(a.nurseService.durationMinutes / 60), end: new Date(new Date(a.scheduledAt).getTime() + a.nurseService.durationMinutes * 60000).toLocaleString(locale, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) })}
         </p>
       )}
       {a.packageIndex && a.package && (
-        <p className="text-xs font-semibold text-rose-600 mb-1">Visit {a.packageIndex} of {a.package.visits} · {intervalLabel(a.package.intervalDays)}</p>
+        <p className="text-xs font-semibold text-rose-600 mb-1">{t("packageVisit", { index: a.packageIndex, total: a.package.visits, interval: tc("everyDays", { count: a.package.intervalDays }) })}</p>
       )}
       <p className="text-sm text-slate-600 mb-3">{a.symptoms}</p>
 
@@ -285,8 +289,8 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       {a.providerType === "NURSE" && a.status === "SCHEDULED" && a.visitOtp && !a.visitStartedAt && (
         <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 mb-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-semibold text-rose-700">Visit code</p>
-            <p className="text-[11px] text-rose-700/80">Tell this to the nurse when she arrives — only then can she start. Booked for someone at home? Share it with them, or tell her on the phone.</p>
+            <p className="text-xs font-semibold text-rose-700">{t("visitCode")}</p>
+            <p className="text-[11px] text-rose-700/80">{t("visitCodeHint")}</p>
           </div>
           <span className="text-2xl font-extrabold tracking-[0.3em] text-rose-700 flex-shrink-0">{a.visitOtp}</span>
         </div>
@@ -298,21 +302,21 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         )}>
           <span className="flex items-center gap-1.5 min-w-0">
             {a.vitals[0].alertLevel === "NORMAL" ? <Activity className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" /> : <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />}
-            <span className="truncate">Vitals: {vitalsSummary(a.vitals[0])}</span>
+            <span className="truncate">{t("vitals", { summary: vitalsSummary(a.vitals[0]) })}</span>
           </span>
-          <span className="font-semibold flex-shrink-0">See trend →</span>
+          <span className="font-semibold flex-shrink-0">{t("seeTrend")}</span>
         </Link>
       )}
       {a.providerType === "NURSE" && a.visitStartedAt && a.visitStartNote && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 mb-3 text-xs text-amber-800">
-          Started without your code: &ldquo;{a.visitStartNote}&rdquo;. If that wasn&apos;t you, contact Help &amp; Support.
+          {t("startedWithoutCode", { note: a.visitStartNote })}
         </div>
       )}
 
       {a.status === "PENDING_APPROVAL" && a.reassignedFromId && a.reassignedFrom && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
           <UserCheck className="w-4 h-4 flex-shrink-0" />
-          {formatDoctorName(a.reassignedFrom.doctor.name)} had an emergency and couldn&apos;t continue with your appointment, so we&apos;ve assigned you to {formatProviderName(a.doctor.name, a.providerType)} instead.
+          {t("reassignedToYou", { from: formatDoctorName(a.reassignedFrom.doctor.name), to: provider })}
         </div>
       )}
       {a.status === "PENDING_APPROVAL" && (
@@ -320,12 +324,12 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
           <span className="flex items-center gap-2">
             <Clock className="w-4 h-4 flex-shrink-0" />
             {scheduledForLater
-              ? `Waiting for ${formatProviderName(a.doctor.name, a.providerType)} to confirm your scheduled appointment.`
-              : `Waiting for ${formatProviderName(a.doctor.name, a.providerType)} to accept this request.`}
+              ? t("waitingConfirmScheduled", { provider })
+              : t("waitingAccept", { provider })}
           </span>
           {!scheduledForLater && (
             <span className="text-xs font-mono font-semibold text-amber-700 flex-shrink-0">
-              {timeLeftMs > 0 ? `${formatCountdown(timeLeftMs)} left` : "Expiring…"}
+              {timeLeftMs > 0 ? t("timeLeft", { time: formatCountdown(timeLeftMs) }) : t("expiring")}
             </span>
           )}
         </div>
@@ -333,17 +337,17 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       {a.status === "CANCELLED" && a.reassignedTo && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
           <UserCheck className="w-4 h-4 flex-shrink-0" />
-          {formatProviderName(a.doctor.name, a.providerType)} had an emergency and couldn&apos;t continue with this appointment, so we&apos;ve assigned you to {formatDoctorName(a.reassignedTo.doctor.name)} instead — check your pending requests.
+          {t("reassignedAway", { from: provider, to: formatDoctorName(a.reassignedTo.doctor.name) })}
         </div>
       )}
       {a.status === "REJECTED" && (
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
-          <ThumbsDown className="w-4 h-4 flex-shrink-0 text-slate-400" /> {formatProviderName(a.doctor.name, a.providerType)} was unable to accept this request. No payment was taken.
+          <ThumbsDown className="w-4 h-4 flex-shrink-0 text-slate-400" /> {t("rejected", { provider })}
         </div>
       )}
       {a.status === "EXPIRED" && (
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
-          <Clock className="w-4 h-4 flex-shrink-0 text-slate-400" /> {formatProviderName(a.doctor.name, a.providerType)}{" "}didn&apos;t respond in time and may be too busy right now. No payment was taken — try booking again or choose another doctor.
+          <Clock className="w-4 h-4 flex-shrink-0 text-slate-400" /> {t("expired", { provider })}
         </div>
       )}
       {a.consultType === "CLINIC" &&
@@ -358,12 +362,12 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
           <span className="flex items-center gap-2 min-w-0">
             <Building2 className="w-4 h-4 flex-shrink-0" />
             <span className="truncate">
-              {a.clinic?.name || a.doctor.doctorProfile?.clinicName || `${formatProviderName(a.doctor.name, a.providerType)}'s clinic`}
+              {a.clinic?.name || a.doctor.doctorProfile?.clinicName || t("providersClinic", { provider })}
               {a.clinic?.address && <span className="text-teal-600"> — {a.clinic.address}</span>}
             </span>
           </span>
           <span className="font-semibold underline flex items-center gap-1 flex-shrink-0">
-            <Navigation className="w-3.5 h-3.5" /> Get Directions
+            <Navigation className="w-3.5 h-3.5" /> {t("directions")}
           </span>
         </a>
       )}
@@ -373,16 +377,16 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
           className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 mb-3 flex items-center justify-between gap-2 hover:bg-emerald-100 transition-colors"
         >
           <span className="flex items-center gap-2">
-            <Car className="w-4 h-4 flex-shrink-0" /> {formatProviderName(a.doctor.name, a.providerType)} is on the way
+            <Car className="w-4 h-4 flex-shrink-0" /> {t("onTheWay", { provider })}
           </span>
           <span className="font-semibold underline flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5" /> Track Live
+            <MapPin className="w-3.5 h-3.5" /> {t("trackLive")}
           </span>
         </Link>
       )}
       {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
-          <MapPinCheck className="w-4 h-4 flex-shrink-0" /> {formatProviderName(a.doctor.name, a.providerType)} has arrived.
+          <MapPinCheck className="w-4 h-4 flex-shrink-0" /> {t("arrived", { provider })}
         </div>
       )}
       {needsPayment && (
@@ -390,8 +394,10 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
           <span className="flex items-center gap-2">
             <CardIcon className="w-4 h-4 flex-shrink-0" />
             {nothingToPay
-              ? <>Nothing to pay — confirm your booking with {formatProviderName(a.doctor.name, a.providerType)}.</>
-              : <>Payment pending — pay ₹{Math.max(0, a.amount - a.discountAmount)}{a.discountAmount > 0 ? ` (${a.couponCode} applied)` : ""} to confirm your consultation with {formatProviderName(a.doctor.name, a.providerType)}.</>}
+              ? t("nothingToPay", { provider })
+              : a.discountAmount > 0
+                ? t("paymentPendingCoupon", { amount: Math.max(0, a.amount - a.discountAmount), coupon: a.couponCode ?? "", provider })
+                : t("paymentPending", { amount: Math.max(0, a.amount - a.discountAmount), provider })}
           </span>
         </div>
       )}
@@ -399,25 +405,25 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       <div className="flex items-center gap-2 flex-wrap mb-3">
         <span className="badge badge-gray">
           {a.paymentMethod === "ONLINE" ? <CreditCard className="w-3 h-3" /> : <Wallet className="w-3 h-3" />}
-          {a.paymentMethod === "ONLINE" ? "Online" : "Cash"}
+          {a.paymentMethod === "ONLINE" ? t("online") : t("cash")}
         </span>
         {a.status !== "REJECTED" && a.status !== "PENDING_APPROVAL" && (
           <span className={cn("badge", a.paymentStatus === "PAID" ? "badge-success" : "badge-warning")}>
-            {a.paymentStatus}
+            {isPaymentStatusKey(a.paymentStatus) ? t(`paymentStatus.${a.paymentStatus}`) : a.paymentStatus}
           </span>
         )}
       </div>
 
       {a.doctorNotes && (
         <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-600 mb-3">
-          <span className="font-semibold text-slate-700">{a.providerType === "NURSE" ? "Nurse's notes" : "Doctor's notes"}: </span>{a.doctorNotes}
+          <span className="font-semibold text-slate-700">{t("notes", { provider: providerKind })} </span>{a.doctorNotes}
         </div>
       )}
 
       {a.status === "COMPLETED" && a.medicines.length > 0 && (
         <div className="border border-slate-100 rounded-xl overflow-hidden mb-3">
           <div className="bg-slate-50 px-3 py-2 flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-            <Pill className="w-3.5 h-3.5" /> Prescription
+            <Pill className="w-3.5 h-3.5" /> {t("prescription")}
           </div>
           <div className="divide-y divide-slate-50">
             {a.medicines.map((m) => (
@@ -433,16 +439,16 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
 
       {a.status === "COMPLETED" && a.referralGiven && (
         <div className="rounded-xl border border-rose-200 bg-rose-50/60 px-4 py-3 mb-3">
-          <p className="text-sm font-semibold text-rose-800 flex items-center gap-1.5"><HeartPulse className="w-4 h-4" />{formatProviderName(a.doctor.name, a.providerType)} recommends nurse care at home</p>
+          <p className="text-sm font-semibold text-rose-800 flex items-center gap-1.5"><HeartPulse className="w-4 h-4" />{t("recommendsNurse", { provider })}</p>
           <p className="text-xs text-rose-900/80 mt-0.5">
-            {a.referralGiven.service.name} — {a.referralGiven.visits} visit{a.referralGiven.visits === 1 ? "" : "s"}{a.referralGiven.visits > 1 ? `, ${intervalLabel(a.referralGiven.intervalDays)}` : ""}
+            {a.referralGiven.service.name} — {t("visits", { count: a.referralGiven.visits })}{a.referralGiven.visits > 1 ? `, ${tc("everyDays", { count: a.referralGiven.intervalDays })}` : ""}
             {a.referralGiven.instructions ? ` · ${a.referralGiven.instructions}` : ""}
           </p>
           {a.referralGiven.bookings.length > 0 ? (
-            <p className="text-xs font-semibold text-emerald-700 mt-2 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />Nurse booked</p>
+            <p className="text-xs font-semibold text-emerald-700 mt-2 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />{t("nurseBooked")}</p>
           ) : (
             <Link href={`/patient/nurse?serviceId=${a.referralGiven.service.id}&referralId=${a.referralGiven.id}`} className="tap-44-y btn-primary py-2 px-3 text-xs mt-2 inline-flex">
-              <HeartPulse className="w-3.5 h-3.5" /> Book a nurse
+              <HeartPulse className="w-3.5 h-3.5" /> {t("bookNurse")}
             </Link>
           )}
         </div>
@@ -452,9 +458,9 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
           <p className="font-semibold flex items-center gap-1.5">
             <CalendarClock className="w-3.5 h-3.5 flex-shrink-0" />
-            New time requested: {new Date(pendingNewTime).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+            {t("newTimeRequested", { time: new Date(pendingNewTime).toLocaleString(locale, DATE_TIME) })}
           </p>
-          <p className="mt-0.5">Waiting for {formatProviderName(a.doctor.name, a.providerType)} to confirm. Your current time stays booked until then.</p>
+          <p className="mt-0.5">{t("newTimeWaiting", { provider })}</p>
           <button
             disabled={withdrawing}
             onClick={async () => {
@@ -464,7 +470,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
             }}
             className="mt-1.5 font-semibold underline disabled:opacity-50"
           >
-            {withdrawing ? "Withdrawing…" : "Keep my current time"}
+            {withdrawing ? t("withdrawing") : t("keepCurrentTime")}
           </button>
           {withdrawError && <p className="text-red-600 mt-1">{withdrawError}</p>}
         </div>
@@ -473,28 +479,28 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       <div className="flex gap-2 flex-wrap">
         {canReschedule(a) && (
           <button onClick={() => onReschedule(a)} className="tap-44-y btn-secondary py-2 px-3 text-xs">
-            <CalendarClock className="w-3.5 h-3.5" /> Reschedule
+            <CalendarClock className="w-3.5 h-3.5" /> {t("reschedule")}
           </button>
         )}
         {canCancel(a) && (
           <button onClick={() => onCancel(a)} className="tap-44-y btn-secondary py-2 px-3 text-xs text-red-500 border-red-200 hover:bg-red-50">
-            {a.status === "SCHEDULED" ? "Cancel Appointment" : "Cancel Request"}
+            {a.status === "SCHEDULED" ? t("cancelAppointment") : t("cancelRequest")}
           </button>
         )}
         {needsPayment && (
           <Link href={`/patient/payment?apptId=${a.id}`} className="tap-44-y btn-primary py-2 px-3 text-xs">
-            <CardIcon className="w-3.5 h-3.5" /> {nothingToPay ? "Confirm" : "Pay Now"}
+            <CardIcon className="w-3.5 h-3.5" /> {nothingToPay ? t("confirm") : t("payNow")}
           </Link>
         )}
         {needsPayment && a.consultType === "VIDEO" && (
           <span className="inline-flex items-center text-xs text-slate-400 py-2">
-            Video call unlocks after payment
+            {t("videoAfterPayment")}
           </span>
         )}
         {/* After completion the chat stays readable, and open for follow-up questions for a few days. */}
         {(a.status === "SCHEDULED" || a.status === "COMPLETED") && (
           <Link href={`/patient/chat/${a.id}`} className="tap-44-y relative btn-secondary py-2 px-3 text-xs">
-            <MessageCircle className="w-3.5 h-3.5" /> Chat
+            <MessageCircle className="w-3.5 h-3.5" /> {t("chat")}
             {a.unreadMessageCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
                 {a.unreadMessageCount > 9 ? "9+" : a.unreadMessageCount}
@@ -505,16 +511,16 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         {a.consultType === "VIDEO" && a.status === "SCHEDULED" && a.paymentStatus === "PAID" && (
           videoUnlockRemainingSec(a, now) > 0 ? (
             <span className="tap-44-y btn-secondary py-2 px-3 text-xs opacity-60 cursor-not-allowed">
-              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Unlocking in {videoUnlockRemainingSec(a, now)}s
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t("unlockingIn", { seconds: videoUnlockRemainingSec(a, now) })}
             </span>
           ) : (
             <Link href={`/patient/video/${a.id}`} className="tap-44-y btn-secondary py-2 px-3 text-xs">
-              <Video className="w-3.5 h-3.5" /> Join Video Consultation
+              <Video className="w-3.5 h-3.5" /> {t("joinVideo")}
             </Link>
           )
         )}
         {a.status === "COMPLETED" && a.attachments.map((att, i) => {
-          const label = a.attachments.length > 1 ? `File ${i + 1}` : "View Attached File";
+          const label = a.attachments.length > 1 ? t("fileN", { n: i + 1 }) : t("viewAttachment");
           const fileName = att.fileName || att.url.split("/").pop()?.split("?")[0] || `attachment-${i + 1}`;
           return (
             <a
@@ -538,20 +544,20 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         )}
         {a.status === "COMPLETED" && !a.review && (
           <button onClick={() => onReview(a.id)} className="tap-44-y btn-secondary py-2 px-3 text-xs">
-            <Star className="w-3.5 h-3.5" /> Leave a Review
+            <Star className="w-3.5 h-3.5" /> {t("leaveReview")}
           </button>
         )}
         {a.review && (
           <span className="text-xs text-slate-500 flex items-center gap-1 py-2">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> You rated {a.review.rating}/5
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {t("youRated", { rating: a.review.rating })}
           </span>
         )}
         {a.status === "COMPLETED" && a.providerType !== "NURSE" && a.doctorBookable === false ? (
           <span
-            title="This doctor isn't taking bookings right now"
+            title={t("followUpUnavailableHint")}
             className="tap-44-y btn-secondary py-2 px-3 text-xs opacity-50 cursor-not-allowed"
           >
-            <RotateCcw className="w-3.5 h-3.5" /> Follow-up unavailable
+            <RotateCcw className="w-3.5 h-3.5" /> {t("followUpUnavailable")}
           </span>
         ) : a.status === "COMPLETED" && (
           <button
@@ -562,7 +568,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
             )}
             className="tap-44-y btn-secondary py-2 px-3 text-xs"
           >
-            <RotateCcw className="w-3.5 h-3.5" /> {a.providerType === "NURSE" ? "Book Again" : "Book Follow-up"}
+            <RotateCcw className="w-3.5 h-3.5" /> {a.providerType === "NURSE" ? t("bookAgain") : t("bookFollowUp")}
           </button>
         )}
       </div>
@@ -573,6 +579,8 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
 export default function PatientAppointments() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const t = useTranslations("patient.appointments");
+  const locale = formattingLocale(useLocale());
   // Live + recent appointments come from the layout's shared 5s poll (the
   // header's notifications read the same one — src/components/AppointmentFeed.tsx);
   // older past visits are paged in on demand.
@@ -642,9 +650,9 @@ export default function PatientAppointments() {
         body: JSON.stringify({ withdrawReschedule: true }),
       });
       load();
-      return res.ok ? null : (await res.json().catch(() => ({}))).error ?? "Couldn't withdraw the request.";
+      return res.ok ? null : (await res.json().catch(() => ({}))).error ?? t("errors.withdraw");
     } catch {
-      return "Network error — please try again.";
+      return t("errors.network");
     }
   };
 
@@ -663,7 +671,7 @@ export default function PatientAppointments() {
       load();
     } else {
       const data = await res.json().catch(() => ({}));
-      setRescheduleError(data.error ?? "Couldn't reschedule this appointment. Please try again.");
+      setRescheduleError(data.error ?? t("errors.reschedule"));
     }
   };
 
@@ -682,7 +690,7 @@ export default function PatientAppointments() {
       load();
     } else {
       const data = await res.json().catch(() => ({}));
-      setCancelError(data.error ?? "Couldn't cancel this appointment. Please try again.");
+      setCancelError(data.error ?? t("errors.cancel"));
     }
   };
 
@@ -715,8 +723,8 @@ export default function PatientAppointments() {
             <CalendarClock className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900">My Appointments</h1>
-            <p className="text-slate-500 text-sm">Track requests, upcoming appointments, and past consultations.</p>
+            <h1 className="text-xl font-extrabold text-slate-900">{t("title")}</h1>
+            <p className="text-slate-500 text-sm">{t("subtitle")}</p>
           </div>
         </div>
 
@@ -729,7 +737,7 @@ export default function PatientAppointments() {
             {pending.length > 0 && (
               <section>
                 <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Clock className="w-4 h-4" /> Pending Requests ({pending.length})
+                  <Clock className="w-4 h-4" /> {t("pendingHeading", { count: pending.length })}
                 </h2>
                 <div className="space-y-3">
                   {(pendingExpanded ? pending : pending.slice(0, PAGE_SIZE)).map((a) => (
@@ -738,7 +746,7 @@ export default function PatientAppointments() {
                 </div>
                 {!pendingExpanded && pending.length > PAGE_SIZE && (
                   <button onClick={() => setPendingExpanded(true)} className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors">
-                    Load {pending.length - PAGE_SIZE} more
+                    {t("loadMore", { count: pending.length - PAGE_SIZE })}
                   </button>
                 )}
               </section>
@@ -746,11 +754,11 @@ export default function PatientAppointments() {
 
             <section>
               <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <CalendarClock className="w-4 h-4" /> Upcoming ({upcoming.length})
+                <CalendarClock className="w-4 h-4" /> {t("upcomingHeading", { count: upcoming.length })}
               </h2>
               {upcoming.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-sm">
-                  No upcoming appointments. <Link href="/patient/dashboard" className="tap-44-y text-blue-600 font-semibold">Book one now →</Link>
+                  {t("noUpcoming")} <Link href="/patient/dashboard" className="tap-44-y text-blue-600 font-semibold">{t("bookOneNow")}</Link>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -761,16 +769,16 @@ export default function PatientAppointments() {
               )}
               {!upcomingExpanded && upcoming.length > PAGE_SIZE && (
                 <button onClick={() => setUpcomingExpanded(true)} className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors">
-                  Load {upcoming.length - PAGE_SIZE} more
+                  {t("loadMore", { count: upcoming.length - PAGE_SIZE })}
                 </button>
               )}
             </section>
 
             <section>
-              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Past ({pastTotal})</h2>
+              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">{t("pastHeading", { count: pastTotal })}</h2>
               {past.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-sm">
-                  No past appointments yet.
+                  {t("noPast")}
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -785,7 +793,7 @@ export default function PatientAppointments() {
                   disabled={history.loadingMore}
                   className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
                 >
-                  {history.loadingMore ? "Loading…" : `Load ${pastTotal - pastShown} more`}
+                  {history.loadingMore ? t("loading") : t("loadMore", { count: pastTotal - pastShown })}
                 </button>
               )}
             </section>
@@ -810,15 +818,19 @@ export default function PatientAppointments() {
               <div className="flex items-center gap-2 mb-3">
                 <ThumbsDown className="w-5 h-5 text-red-600" />
                 <h3 className="font-bold text-slate-800">
-                  {cancelTarget.status === "SCHEDULED" ? "Cancel this appointment?" : "Cancel this request?"}
+                  {cancelTarget.status === "SCHEDULED" ? t("cancelDialog.titleAppointment") : t("cancelDialog.titleRequest")}
                 </h3>
               </div>
               <p className="text-sm text-slate-500 mb-2">
-                Your {cancelTarget.status === "SCHEDULED" ? "appointment" : "request"} with {formatProviderName(cancelTarget.doctor.name, cancelTarget.providerType)} on {new Date(cancelTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} will be cancelled. This cannot be undone.
+                {t("cancelDialog.body", {
+                  kind: cancelTarget.status === "SCHEDULED" ? "appointment" : "request",
+                  provider: formatProviderName(cancelTarget.doctor.name, cancelTarget.providerType),
+                  time: new Date(cancelTarget.scheduledAt).toLocaleString(locale, DATE_TIME),
+                })}
               </p>
               {willRefund && (
                 <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-2">
-                  ₹{refundAmount} will be credited back to your wallet.
+                  {t("cancelDialog.refund", { amount: refundAmount })}
                 </p>
               )}
               {cancelError && (
@@ -828,10 +840,10 @@ export default function PatientAppointments() {
               )}
               <div className="flex gap-3 mt-3">
                 <button onClick={() => { setCancelTarget(null); setCancelError(""); }} className="btn-secondary flex-1">
-                  Keep {cancelTarget.status === "SCHEDULED" ? "Appointment" : "Request"}
+                  {cancelTarget.status === "SCHEDULED" ? t("cancelDialog.keepAppointment") : t("cancelDialog.keepRequest")}
                 </button>
                 <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                  {cancelling ? "Cancelling…" : "Cancel"}
+                  {cancelling ? t("cancelDialog.cancelling") : t("cancelDialog.confirm")}
                 </button>
               </div>
             </div>
@@ -844,14 +856,20 @@ export default function PatientAppointments() {
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <CalendarClock className="w-5 h-5 text-blue-600" />
-              <h3 className="font-bold text-slate-800">Reschedule appointment</h3>
+              <h3 className="font-bold text-slate-800">{t("rescheduleDialog.title")}</h3>
             </div>
             <p className="text-sm text-slate-500 mb-3">
-              Pick a new time for your {rescheduleTarget.status === "SCHEDULED" ? "appointment" : "request"} with {formatProviderName(rescheduleTarget.doctor.name, rescheduleTarget.providerType)}.
+              {t("rescheduleDialog.body", {
+                kind: rescheduleTarget.status === "SCHEDULED" ? "appointment" : "request",
+                provider: formatProviderName(rescheduleTarget.doctor.name, rescheduleTarget.providerType),
+              })}
             </p>
             {rescheduleTarget.status === "SCHEDULED" && (
               <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">
-                {`${formatProviderName(rescheduleTarget.doctor.name, rescheduleTarget.providerType)} needs to confirm the new time. Until then your current booking (${new Date(rescheduleTarget.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}) stays as it is${rescheduleTarget.requestedScheduledAt ? ", and this replaces your earlier request" : ""}.`}
+                {t(rescheduleTarget.requestedScheduledAt ? "rescheduleDialog.needsConfirmReplaces" : "rescheduleDialog.needsConfirm", {
+                  provider: formatProviderName(rescheduleTarget.doctor.name, rescheduleTarget.providerType),
+                  time: new Date(rescheduleTarget.scheduledAt).toLocaleString(locale, DATE_TIME),
+                })}
               </p>
             )}
             {rescheduleTarget.consultType === "CLINIC" && rescheduleTarget.clinicId ? (
@@ -881,14 +899,14 @@ export default function PatientAppointments() {
             )}
             <div className="flex gap-3">
               <button onClick={() => setRescheduleTarget(null)} className="btn-secondary flex-1">
-                Cancel
+                {t("rescheduleDialog.cancel")}
               </button>
               <button
                 onClick={confirmReschedule}
                 disabled={rescheduling || !newScheduledAt}
                 className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {rescheduling ? "Saving…" : "Confirm New Time"}
+                {rescheduling ? t("rescheduleDialog.saving") : t("rescheduleDialog.confirm")}
               </button>
             </div>
           </div>

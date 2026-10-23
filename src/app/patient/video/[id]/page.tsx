@@ -10,6 +10,8 @@ import VideoCallRoom from "@/components/VideoCallRoom";
 import { VIDEO_UNLOCK_DELAY_SECONDS, videoJoinWindow } from "@/lib/videoCall";
 import { useVideoAppointment } from "@/lib/useVideoAppointment";
 import { formatDoctorName } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 interface VideoAppointment {
   status: string;
@@ -28,6 +30,8 @@ export default function PatientVideoCallPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const t = useTranslations("patientAccount.video");
+  const locale = formattingLocale(useLocale());
   const [now, setNow] = useState(() => Date.now());
   const [started, setStarted] = useState(false);
 
@@ -56,7 +60,7 @@ export default function PatientVideoCallPage() {
   const unlockRemainingSec = Math.max(0, Math.ceil((unlockAt - now) / 1000));
   // Same window the video-token route enforces.
   const joinWindow = appt ? videoJoinWindow(appt) : null;
-  const fmtTime = (t: number) => new Date(t).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+  const fmtTime = (t: number) => new Date(t).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
 
   return (
     <div className="min-h-screen gradient-surface pb-24 lg:pb-10">
@@ -65,7 +69,7 @@ export default function PatientVideoCallPage() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
         <Link href="/patient/appointments" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 mb-4">
-          <ArrowLeft className="w-4 h-4" /> Back to Appointments
+          <ArrowLeft className="w-4 h-4" /> {t("back")}
         </Link>
 
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden h-[75vh] flex flex-col">
@@ -81,7 +85,7 @@ export default function PatientVideoCallPage() {
 
           {connectionWarning && (
             <div className="px-5 py-1.5 bg-amber-50 text-amber-700 text-[11px] font-semibold text-center flex-shrink-0">
-              Connection to DocOnClick is unstable — the call continues, retrying…
+              {t("unstable")}
             </div>
           )}
           {error && !appt ? (
@@ -91,47 +95,47 @@ export default function PatientVideoCallPage() {
           ) : !requestOpen ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">Video consultation opens once {formatDoctorName(appt.doctor.name)} accepts this request.</p>
+              <p className="text-sm text-slate-500">{t("opensOnce", { name: formatDoctorName(appt.doctor.name) })}</p>
             </div>
           ) : !paid ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-3">
               <CreditCard className="w-6 h-6 text-amber-400" />
               {/* ₹0: just confirmed, no gateway (normally already PAID on accept). */}
               <p className="text-sm text-slate-500">
-                {appt.amount - appt.discountAmount <= 0 ? "Confirm your free booking to start the video consultation." : "Please complete the payment to start the video consultation."}
+                {appt.amount - appt.discountAmount <= 0 ? t("confirmFree") : t("completePayment")}
               </p>
               <Link href={`/patient/payment?apptId=${params.id}`} className="btn-primary py-2.5 px-4 text-sm">
-                {appt.amount - appt.discountAmount <= 0 ? "Confirm booking" : "Pay Now"}
+                {appt.amount - appt.discountAmount <= 0 ? t("confirmBooking") : t("payNow")}
               </Link>
             </div>
           ) : unlockRemainingSec > 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
-              <p className="text-sm text-slate-500">Video consultation unlocking in {unlockRemainingSec}s…</p>
+              <p className="text-sm text-slate-500">{t("unlocking", { sec: unlockRemainingSec })}</p>
               <p className="text-xs text-slate-400">
-                Consultation will start at {new Date(unlockAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                {t("startsAt", { time: new Date(unlockAt).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }) })}
               </p>
             </div>
           ) : !started && joinWindow && now < joinWindow.opensAt ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-amber-400" />
-              <p className="text-sm text-slate-500">The video consultation opens at {fmtTime(joinWindow.opensAt)}.</p>
-              <p className="text-xs text-slate-400">You can join a few minutes before the appointment time.</p>
+              <p className="text-sm text-slate-500">{t("opensAt", { time: fmtTime(joinWindow.opensAt) })}</p>
+              <p className="text-xs text-slate-400">{t("joinEarly")}</p>
             </div>
           ) : !started && joinWindow && now > joinWindow.closesAt ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
               <Clock className="w-6 h-6 text-slate-400" />
-              <p className="text-sm text-slate-500">The time for this video consultation has passed.</p>
+              <p className="text-sm text-slate-500">{t("passed")}</p>
             </div>
           ) : !started ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-3">
               <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center">
                 <Video className="w-6 h-6 text-blue-600" />
               </div>
-              <p className="text-sm text-slate-700 font-semibold">Ready to start the video consultation with {formatDoctorName(appt.doctor.name)}?</p>
-              <p className="text-xs text-slate-400 max-w-xs">This will turn on your camera and microphone.</p>
+              <p className="text-sm text-slate-700 font-semibold">{t("ready", { name: formatDoctorName(appt.doctor.name) })}</p>
+              <p className="text-xs text-slate-400 max-w-xs">{t("cameraNote")}</p>
               <button onClick={() => setStarted(true)} className="btn-primary py-2.5 px-5 text-sm mt-1">
-                <Video className="w-4 h-4" /> Start Video Consultation
+                <Video className="w-4 h-4" /> {t("start")}
               </button>
             </div>
           ) : (

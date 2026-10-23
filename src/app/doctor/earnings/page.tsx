@@ -9,7 +9,12 @@ import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import DuesPayCard from "@/components/doctor/DuesPayCard";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { sumMoney } from "@/lib/money";
-import { istDayKey, istMonthKey, shiftMonthKey, addDaysYmd, mondayIndex, weekdayShortLabel } from "@/lib/istDate";
+import { istDayKey, istMonthKey, shiftMonthKey, addDaysYmd, mondayIndex } from "@/lib/istDate";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
+
+const CONSULT_TYPES = ["CLINIC", "HOME", "VIDEO"] as const;
+const isConsultType = (s: string): s is (typeof CONSULT_TYPES)[number] => (CONSULT_TYPES as readonly string[]).includes(s);
 
 interface Appointment {
   id: string;
@@ -58,6 +63,10 @@ interface Dues {
 }
 
 export default function DoctorEarnings() {
+  const t = useTranslations("doctorAccount.earnings");
+  const tTabs = useTranslations("doctorAccount.tabs");
+  const tType = useTranslations("doctorAccount.analytics.type");
+  const locale = formattingLocale(useLocale());
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -128,7 +137,7 @@ export default function DoctorEarnings() {
       const body = await res.json().catch(() => ({}));
       if (body.code === "BANK_DETAILS_REQUIRED") setBankOnFile(false);
       if (body.dues) setDues(body.dues);
-      setPayoutError(body.error ?? "Could not send the payout request.");
+      setPayoutError(body.error ?? t("payoutFailed"));
     }
   };
 
@@ -138,7 +147,9 @@ export default function DoctorEarnings() {
   const days = [...Array(7)].map((_, i) => {
     const dayKey = addDaysYmd(weekStartKey, i);
     const dayEarnings = total(completed.filter((a) => istDayKey(a.scheduledAt) === dayKey));
-    return { label: weekdayShortLabel(dayKey), value: dayEarnings };
+    const [y, m, dd] = dayKey.split("-").map(Number);
+    const label = new Date(Date.UTC(y, m - 1, dd)).toLocaleDateString(locale, { weekday: "short", timeZone: "UTC" });
+    return { key: dayKey, label, value: dayEarnings };
   });
   const maxDay = Math.max(1, ...days.map((d) => d.value));
 
@@ -152,37 +163,37 @@ export default function DoctorEarnings() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-extrabold text-slate-900">Earnings</h1>
-          <p className="text-slate-500 text-sm">Your consultation income, net of platform commission.</p>
+          <h1 className="text-2xl font-extrabold text-slate-900">{t("title")}</h1>
+          <p className="text-slate-500 text-sm">{t("subtitle")}</p>
         </div>
 
         {/* Tab switcher — this page has the ledger/payout detail, Analytics has the trends. */}
         <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 mb-6 w-fit">
           <span className="px-4 py-1.5 rounded-lg text-sm font-semibold bg-white text-teal-600 shadow-sm">
-            Earnings
+            {tTabs("earnings")}
           </span>
           <Link href="/doctor/analytics" className="px-4 py-1.5 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">
-            Analytics
+            {tTabs("analytics")}
           </Link>
         </div>
 
         {/* Headline number gets the hero treatment; the rest stays secondary */}
         <div className="gradient-hero rounded-2xl p-5 mb-4 text-white shadow-lg">
           <p className="text-[11px] font-bold uppercase tracking-wider text-white/70 mb-1 flex items-center gap-1.5">
-            <IndianRupee className="w-3.5 h-3.5" /> Total Earnings
+            <IndianRupee className="w-3.5 h-3.5" /> {t("total")}
           </p>
           <p className="text-3xl font-extrabold">₹{totalEarnings.toLocaleString("en-IN")}</p>
           <div className="h-px bg-white/15 my-4" />
           <div className="grid grid-cols-2 gap-3">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wide text-white/65 flex items-center gap-1">
-                <TrendingUp className="w-3 h-3" /> This Month
+                <TrendingUp className="w-3 h-3" /> {t("thisMonth")}
               </p>
               <p className="text-[16px] font-extrabold mt-0.5">₹{thisMonthEarnings.toLocaleString("en-IN")}</p>
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wide text-white/65 flex items-center gap-1">
-                <CreditCard className="w-3 h-3" /> {netPayout < 0 ? "You Owe" : "Net Payout"}
+                <CreditCard className="w-3 h-3" /> {netPayout < 0 ? t("youOwe") : t("netPayout")}
               </p>
               <p className="text-[16px] font-extrabold mt-0.5">₹{Math.abs(netPayout).toLocaleString("en-IN")}</p>
             </div>
@@ -198,35 +209,37 @@ export default function DoctorEarnings() {
             {/* Settling pays what's owed when the admin settles (it keeps
                 moving with new visits) — so show that, not the figure at request time. */}
             <p className="text-sm text-teal-800">
-              <span className="font-bold">Payout requested</span> on{" "}
-              {new Date(openPayoutRequest.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} — awaiting admin review.{" "}
+              {t.rich("requestedOn", {
+                date: new Date(openPayoutRequest.createdAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" }),
+                b: (c) => <span className="font-bold">{c}</span>,
+              })}{" "}
               {netPayout > 0
-                ? <>You&apos;ll be paid what&apos;s owed when it&apos;s settled: <span className="font-bold">₹{netPayout.toLocaleString("en-IN")}</span> right now</>
-                : <>Nothing is owed to you right now — the admin will settle the balance</>}
-              {openPayoutRequest.amount !== netPayout && <span className="text-teal-700/70"> (₹{openPayoutRequest.amount.toLocaleString("en-IN")} when you asked)</span>}.
+                ? t.rich("paidWhenSettled", { amount: netPayout.toLocaleString("en-IN"), b: (c) => <span className="font-bold">{c}</span> })
+                : t("nothingOwed")}
+              {openPayoutRequest.amount !== netPayout && <span className="text-teal-700/70"> {t("whenAsked", { amount: openPayoutRequest.amount.toLocaleString("en-IN") })}</span>}.
             </p>
           </div>
         ) : netPayout > 0 && (
           <div className="bg-white border border-slate-100 rounded-2xl p-4 mb-6 shadow-sm">
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm text-slate-600">
-                <span className="font-bold text-slate-800">₹{netPayout.toLocaleString("en-IN")}</span> is waiting to be settled to you.
+                {t.rich("waiting", { amount: netPayout.toLocaleString("en-IN"), b: (c) => <span className="font-bold text-slate-800">{c}</span> })}
               </p>
               {bankOnFile && (
                 <button onClick={requestPayout} disabled={requestingPayout} className="btn-primary py-1.5 px-3 text-xs gap-1.5 flex-shrink-0">
-                  {requestingPayout ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />} Request Payout
+                  {requestingPayout ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />} {t("requestPayout")}
                 </button>
               )}
             </div>
             {dues && dues.cashFeeOwed > 0 && (
               <p className="text-xs text-slate-400 mt-1.5">
-                ₹{dues.onlinePayoutOwed.toLocaleString("en-IN")} from online consultations − ₹{dues.cashFeeOwed.toLocaleString("en-IN")} platform fee on cash consultations you collected.
+                {t("duesBreakdown", { online: dues.onlinePayoutOwed.toLocaleString("en-IN"), fee: dues.cashFeeOwed.toLocaleString("en-IN") })}
               </p>
             )}
             {!bankOnFile && (
               <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 mt-3">
-                Add your bank details to request a payout.{" "}
-                <Link href="/doctor/profile/bank" className="font-bold underline">Add bank details →</Link>
+                {t("addBankHint")}{" "}
+                <Link href="/doctor/profile/bank" className="font-bold underline">{t("addBank")}</Link>
               </p>
             )}
           </div>
@@ -245,17 +258,16 @@ export default function DoctorEarnings() {
 
         {lastMonthEarnings > 0 && (
           <p className="text-xs text-slate-400 mb-6">
-            Last month: ₹{lastMonthEarnings.toLocaleString("en-IN")}
-            {thisMonthEarnings >= lastMonthEarnings ? " · trending up" : " · trending down"} vs this month so far.
+            {t(thisMonthEarnings >= lastMonthEarnings ? "lastMonthUp" : "lastMonthDown", { amount: lastMonthEarnings.toLocaleString("en-IN") })}
           </p>
         )}
 
         {/* Weekly bar breakdown */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
-          <h2 className="font-bold text-slate-800 mb-4">This Week</h2>
+          <h2 className="font-bold text-slate-800 mb-4">{t("thisWeek")}</h2>
           <div className="flex items-end justify-between gap-2 h-32">
             {days.map((d) => (
-              <div key={d.label} className="flex-1 flex flex-col items-center gap-1.5">
+              <div key={d.key} className="flex-1 flex flex-col items-center gap-1.5">
                 <div className="w-full flex items-end justify-center h-24">
                   <div
                     className="w-full max-w-8 bg-teal-500 rounded-t-md transition-all"
@@ -272,10 +284,10 @@ export default function DoctorEarnings() {
         {/* Recent transactions */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="font-bold text-slate-800">Recent Transactions</h2>
+            <h2 className="font-bold text-slate-800">{t("recent")}</h2>
           </div>
           {recent.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-10">No completed consultations yet.</p>
+            <p className="text-sm text-slate-400 text-center py-10">{t("noCompleted")}</p>
           ) : (
             <div className="divide-y divide-slate-50">
               {recent.map((a) => (
@@ -283,12 +295,12 @@ export default function DoctorEarnings() {
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-800 truncate">{patientLabel(a)}</p>
                     <p className="text-xs text-slate-400">
-                      {new Date(a.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {a.consultType} · {a.paymentMethod === "ONLINE" ? "Online" : "Cash"}
+                      {new Date(a.scheduledAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {isConsultType(a.consultType) ? tType(a.consultType) : a.consultType} · {a.paymentMethod === "ONLINE" ? t("online") : t("cash")}
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="text-sm font-bold text-emerald-600">+₹{net(a).toLocaleString("en-IN")}</p>
-                    <p className="text-[10px] text-slate-400">₹{a.amount} − ₹{a.platformFee} fee</p>
+                    <p className="text-[10px] text-slate-400">{t("feeLine", { amount: a.amount, fee: a.platformFee })}</p>
                   </div>
                 </div>
               ))}
@@ -299,7 +311,7 @@ export default function DoctorEarnings() {
               onClick={() => setVisibleCount((v) => v + 10)}
               className="w-full py-3 border-t border-slate-100 text-xs font-semibold text-teal-600 hover:bg-teal-50 transition-colors"
             >
-              Load {Math.min(10, recentAll.length - visibleCount)} more
+              {t("loadMore", { count: Math.min(10, recentAll.length - visibleCount) })}
             </button>
           )}
         </div>
@@ -307,19 +319,19 @@ export default function DoctorEarnings() {
         {/* Settlement history */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-6">
           <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="font-bold text-slate-800">Settlement History</h2>
+            <h2 className="font-bold text-slate-800">{t("settlements")}</h2>
           </div>
           {settlements.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-10">No settlements recorded yet.</p>
+            <p className="text-sm text-slate-400 text-center py-10">{t("noSettlements")}</p>
           ) : (
             <div className="divide-y divide-slate-50">
               {settlements.map((s) => (
                 <div key={s.id} className="px-6 py-3.5 flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-800">
-                      {new Date(s.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" })}
+                      {new Date(s.createdAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" })}
                     </p>
-                    <p className="text-xs text-slate-400">{s.cashCount} cash · {s.onlineCount} online</p>
+                    <p className="text-xs text-slate-400">{t("settlementCounts", { cash: s.cashCount, online: s.onlineCount })}</p>
                   </div>
                   <p className={`text-sm font-bold flex-shrink-0 ${s.netAmount < 0 ? "text-red-600" : "text-emerald-600"}`}>
                     {s.netAmount < 0 ? "−" : "+"}₹{Math.abs(s.netAmount).toLocaleString("en-IN")}

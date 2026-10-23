@@ -1,6 +1,7 @@
 "use client";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export default function SpecialtyFilter({
   value,
@@ -12,6 +13,7 @@ export default function SpecialtyFilter({
   className?: string;
 }) {
   const { specialties } = useSpecialties();
+  const t = useTranslations("patient.specialtyFilter");
   return (
     <div className="relative">
       <div className={cn("flex gap-2 overflow-x-auto no-scrollbar scroll-smooth", className)}>
@@ -25,7 +27,7 @@ export default function SpecialtyFilter({
               : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
           )}
         >
-          All
+          {t("all")}
         </button>
         {specialties.map(({ name, color }) => (
           <button

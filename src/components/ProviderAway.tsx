@@ -5,6 +5,8 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import { useToast } from "@/components/Toast";
 import { addDaysYmd } from "@/lib/istDate";
 import { cn } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
+import { formattingLocale } from "@/lib/appLanguage";
 
 // A doctor's or nurse's own controls for being away as a whole
 // (src/lib/timeOff.ts): "Go offline for today" and time off over a date
@@ -16,15 +18,17 @@ type Pending = { bookings: Booking[]; kept: number; send: (ids: string[]) => Pro
 type TimeOff = { id: string; startDate: string; endDate: string; reason: string | null };
 
 const todayIst = () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
-const day = (ymd: string) =>
-  new Date(`${ymd}T00:00:00+05:30`).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short" });
-const when = (iso: string) =>
-  new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
-const TYPE: Record<string, string> = { CLINIC: "Clinic", HOME: "Home visit", VIDEO: "Video" };
+const day = (ymd: string, locale: string) =>
+  new Date(`${ymd}T00:00:00+05:30`).toLocaleDateString(locale, { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short" });
+const when = (iso: string, locale: string) =>
+  new Date(iso).toLocaleString(locale, { timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
 /** POSTs, and when the server lists bookings to cancel, asks before sending them back. */
 function useAwayRequest() {
   const toast = useToast();
+  const t = useTranslations("doctor.away");
+  const tc = useTranslations("doctor.common");
+  const locale = formattingLocale(useLocale());
   const [pending, setPending] = useState<Pending | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -38,46 +42,46 @@ function useAwayRequest() {
           setPending({ bookings: data.bookings, kept: data.kept ?? 0, title, send: (ids) => send(ids) });
           return;
         }
-        if (!res.ok) { toast.error(data.error ?? "Something went wrong. Please try again."); setPending(null); return; }
+        if (!res.ok) { toast.error(data.error ?? t("somethingWrong")); setPending(null); return; }
         setPending(null);
         const n = Number(data.cancelledBookings ?? 0);
-        if (n > 0) toast.success(`${n} booking${n === 1 ? "" : "s"} cancelled${Number(data.refundTotal) > 0 ? ` — ₹${data.refundTotal} refunded to patients` : ""}. Patients were notified.`);
+        if (n > 0) toast.success(Number(data.refundTotal) > 0 ? t("cancelledRefundToast", { count: n, refund: String(data.refundTotal) }) : t("cancelledToast", { count: n }));
         onDone(data);
       } catch {
-        toast.error("Network error — check your connection and try again.");
+        toast.error(tc("networkError"));
       } finally {
         setBusy(false);
       }
     };
     await send();
-  }, [toast]);
+  }, [toast, t, tc]);
 
   const dialog = pending && (
     <ConfirmDialog
       icon={AlertTriangle}
       tone="danger"
       title={pending.title}
-      confirmLabel={`Cancel ${pending.bookings.length} & refund`}
-      busyLabel="Cancelling…"
+      confirmLabel={t("confirmCancel", { count: pending.bookings.length })}
+      busyLabel={t("cancelling")}
       busy={busy}
       onCancel={() => setPending(null)}
       onConfirm={() => pending.send(pending.bookings.map((b) => b.id))}
       message={
         <div>
-          <p className="mb-2">These bookings will be cancelled. Paid ones are refunded to the patient&apos;s wallet, and everyone is notified:</p>
+          <p className="mb-2">{t("listIntro")}</p>
           <ul className="max-h-56 overflow-y-auto divide-y divide-slate-100 border border-slate-100 rounded-xl">
             {pending.bookings.map((b) => (
               <li key={b.id} className="px-3 py-2">
                 <p className="font-semibold text-slate-800">{b.patientName}</p>
                 <p className="text-xs text-slate-500">
-                  {when(b.scheduledAt)} · {b.serviceName ?? TYPE[b.consultType] ?? b.consultType}
-                  {b.paid ? ` · refund ₹${b.refund}` : " · unpaid"}
+                  {when(b.scheduledAt, locale)} · {b.serviceName ?? t("type", { type: b.consultType })}
+                  {" · "}{b.paid ? t("refund", { amount: b.refund }) : t("unpaid")}
                 </p>
               </li>
             ))}
           </ul>
           {pending.kept > 0 && (
-            <p className="text-xs text-slate-500 mt-2">{pending.kept} visit{pending.kept === 1 ? " that's" : "s that are"} already under way stay{pending.kept === 1 ? "s" : ""} — finish {pending.kept === 1 ? "it" : "them"} as usual.</p>
+            <p className="text-xs text-slate-500 mt-2">{t("kept", { count: pending.kept })}</p>
           )}
         </div>
       }
@@ -102,15 +106,17 @@ function useAwayState() {
 
 /** Dashboard card: online / offline-for-today, plus today's leave if any. */
 export function OfflineToggle({ timeOffHref, onChanged }: { timeOffHref: string; onChanged?: () => void }) {
+  const t = useTranslations("doctor.away");
+  const locale = formattingLocale(useLocale());
   const { state, load } = useAwayState();
   const { run, busy, dialog } = useAwayRequest();
   if (!state) return null;
   const today = todayIst();
-  const leaveToday = state.timeOff.find((t) => t.startDate <= today && t.endDate >= today);
+  const leaveToday = state.timeOff.find((o) => o.startDate <= today && o.endDate >= today);
   const offline = !!state.offlineUntil;
 
   const toggle = () =>
-    run("/api/provider/offline", { offline: !offline }, "Go offline for today?", () => { void load(); onChanged?.(); });
+    run("/api/provider/offline", { offline: !offline }, t("goOfflineTitle"), () => { void load(); onChanged?.(); });
 
   return (
     <div className={cn(
@@ -121,24 +127,24 @@ export function OfflineToggle({ timeOffHref, onChanged }: { timeOffHref: string;
       <span className={cn("w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5", leaveToday || offline ? "bg-amber-500" : "bg-emerald-500")} />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-bold text-slate-800">
-          {leaveToday ? `On time off until ${day(leaveToday.endDate)}` : offline ? "Offline for the rest of today" : "Online — taking bookings"}
+          {leaveToday ? t("onTimeOff", { date: day(leaveToday.endDate, locale) }) : offline ? t("offlineToday") : t("online")}
         </p>
         <p className="text-xs text-slate-500">
           {leaveToday
-            ? "No new bookings until then. Remove the time off if you're back early."
+            ? t("onTimeOffHint")
             : offline
-              ? "No new bookings today. You're back online automatically tomorrow."
-              : "Not available today? Go offline — today's bookings are cancelled and refunded."}
+              ? t("offlineHint")
+              : t("onlineHint")}
         </p>
       </div>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0 pl-5 sm:pl-0">
         {!leaveToday && (
           <button onClick={toggle} disabled={busy} className={cn("py-2 px-3 text-xs", offline ? "btn-primary" : "btn-secondary text-amber-700 border-amber-200")}>
-            {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Power className="w-3.5 h-3.5" />} {offline ? "Go online" : "Go offline"}
+            {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Power className="w-3.5 h-3.5" />} {offline ? t("goOnline") : t("goOffline")}
           </button>
         )}
-        <a href={timeOffHref} className="btn-secondary py-2 px-3 text-xs"><CalendarOff className="w-3.5 h-3.5" /> Time off</a>
+        <a href={timeOffHref} className="btn-secondary py-2 px-3 text-xs"><CalendarOff className="w-3.5 h-3.5" /> {t("timeOff")}</a>
       </div>
       {dialog}
     </div>
@@ -148,6 +154,8 @@ export function OfflineToggle({ timeOffHref, onChanged }: { timeOffHref: string;
 /** Profile section: plan time off over a date range; see and remove upcoming ones. */
 export function TimeOffManager() {
   const toast = useToast();
+  const t = useTranslations("doctor.away");
+  const locale = formattingLocale(useLocale());
   const { state, load } = useAwayState();
   const { run, busy, dialog } = useAwayRequest();
   const today = todayIst();
@@ -159,11 +167,11 @@ export function TimeOffManager() {
 
   const add = () => {
     setError("");
-    if (!startDate) { setError("Pick a start date."); return; }
-    if (endDate && endDate < startDate) { setError("The end date is before the start date."); return; }
-    const label = startDate === (endDate || startDate) ? day(startDate) : `${day(startDate)} – ${day(endDate)}`;
-    void run("/api/provider/time-off", { startDate, endDate: endDate || startDate, reason }, `Time off ${label}?`, () => {
-      toast.success(`Time off added: ${label}.`);
+    if (!startDate) { setError(t("pickStart")); return; }
+    if (endDate && endDate < startDate) { setError(t("endBeforeStart")); return; }
+    const label = startDate === (endDate || startDate) ? day(startDate, locale) : `${day(startDate, locale)} – ${day(endDate, locale)}`;
+    void run("/api/provider/time-off", { startDate, endDate: endDate || startDate, reason }, t("timeOffTitle", { range: label }), () => {
+      toast.success(t("added", { range: label }));
       setReason("");
       void load();
     });
@@ -173,27 +181,27 @@ export function TimeOffManager() {
     setRemoving(id);
     const res = await fetch(`/api/provider/time-off/${id}`, { method: "DELETE" }).catch(() => null);
     setRemoving(null);
-    if (!res?.ok) { toast.error((await res?.json().catch(() => ({})))?.error ?? "Couldn't remove it."); return; }
-    toast.success("Time off removed — those days are open for booking again.");
+    if (!res?.ok) { toast.error((await res?.json().catch(() => ({})))?.error ?? t("removeFailed")); return; }
+    toast.success(t("removed"));
     void load();
   };
 
   return (
     <div>
       <p className="text-xs text-slate-500 mb-4">
-        For every clinic, video and home visit at once. Patients can&apos;t book these days; bookings already on them are cancelled and refunded once you confirm.
+        {t("intro")}
       </p>
 
       {state && state.timeOff.length > 0 && (
         <ul className="space-y-2 mb-5">
-          {state.timeOff.map((t) => (
-            <li key={t.id} className="flex items-center justify-between gap-3 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5">
+          {state.timeOff.map((o) => (
+            <li key={o.id} className="flex items-center justify-between gap-3 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5">
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-800">{t.startDate === t.endDate ? day(t.startDate) : `${day(t.startDate)} – ${day(t.endDate)}`}</p>
-                {t.reason && <p className="text-xs text-slate-500 truncate">{t.reason}</p>}
+                <p className="text-sm font-semibold text-slate-800">{o.startDate === o.endDate ? day(o.startDate, locale) : `${day(o.startDate, locale)} – ${day(o.endDate, locale)}`}</p>
+                {o.reason && <p className="text-xs text-slate-500 truncate">{o.reason}</p>}
               </div>
-              <button onClick={() => remove(t.id)} disabled={removing === t.id} className="w-9 h-9 rounded-lg border border-slate-100 bg-white flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0" aria-label="Remove time off">
-                {removing === t.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              <button onClick={() => remove(o.id)} disabled={removing === o.id} className="w-9 h-9 rounded-lg border border-slate-100 bg-white flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0" aria-label={t("removeTimeOff")}>
+                {removing === o.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
               </button>
             </li>
           ))}
@@ -202,19 +210,19 @@ export function TimeOffManager() {
 
       <div className="grid grid-cols-2 gap-2.5">
         <div>
-          <label className="input-label" htmlFor="to-start">From</label>
+          <label className="input-label" htmlFor="to-start">{t("from")}</label>
           <input id="to-start" type="date" className="input-field w-full" min={today} max={addDaysYmd(today, 365)} value={startDate}
             onChange={(e) => { setStartDate(e.target.value); if (!endDate || endDate < e.target.value) setEndDate(e.target.value); }} />
         </div>
         <div>
-          <label className="input-label" htmlFor="to-end">To (incl.)</label>
+          <label className="input-label" htmlFor="to-end">{t("to")}</label>
           <input id="to-end" type="date" className="input-field w-full" min={startDate || today} value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </div>
       </div>
-      <input className="input-field w-full mt-2.5" maxLength={200} placeholder="Reason (optional, only you see it)" value={reason} onChange={(e) => setReason(e.target.value)} />
+      <input className="input-field w-full mt-2.5" maxLength={200} placeholder={t("reason")} value={reason} onChange={(e) => setReason(e.target.value)} />
       {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
       <button onClick={add} disabled={busy} className="btn-primary mt-3 py-2.5 px-4 text-sm">
-        {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Add time off
+        {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} {t("add")}
       </button>
       {dialog}
     </div>

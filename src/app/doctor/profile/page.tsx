@@ -19,12 +19,14 @@ import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import ImageCropModal from "@/components/ImageCropModal";
 import EditableName from "@/components/EditableName";
 import { prepareBlobUpload } from "@/lib/compressImage";
+import { useTranslations } from "next-intl";
 
 function daysUntil(target: Date): number {
   return Math.max(0, Math.ceil((target.getTime() - Date.now()) / 86400000));
 }
 
 function AvatarEditor({ url, onChange }: { url: string | null; onChange: (url: string) => void }) {
+  const t = useTranslations("doctorAccount.hub");
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -48,7 +50,7 @@ function AvatarEditor({ url, onChange }: { url: string | null; onChange: (url: s
         className="relative w-16 h-16 rounded-full flex-shrink-0 overflow-hidden bg-slate-100 border border-slate-200"
       >
         {url ? (
-          <Image src={url} alt="Profile" width={64} height={64} className="w-full h-full object-cover" />
+          <Image src={url} alt={t("photoAlt")} width={64} height={64} className="w-full h-full object-cover" />
         ) : (
           <User className="w-7 h-7 text-slate-300 absolute inset-0 m-auto" />
         )}
@@ -103,6 +105,7 @@ function Status({ done }: { done: boolean }) {
 
 export default function DoctorProfilePage() {
   const { user, loading: authLoading, logout, refresh } = useAuth();
+  const t = useTranslations("doctorAccount.hub");
   const router = useRouter();
   const { profile, clinicCount, registrationFee, loading } = useDoctorProfile();
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
@@ -157,14 +160,14 @@ export default function DoctorProfilePage() {
           <AvatarEditor url={photoUrl} onChange={(u) => setPhotoUrl(u || null)} />
           <div className="min-w-0 flex-1">
             <EditableName name={user.name} displayName={formatDoctorName(user.name)} onSaved={refresh} />
-            <p className="text-sm text-slate-500 truncate">{p.specialty ?? "Specialty not set"}</p>
+            <p className="text-sm text-slate-500 truncate">{p.specialty ?? t("specialtyNotSet")}</p>
             <div className="mt-2 flex items-center gap-2">
               <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
                 <div className={cn("h-full rounded-full transition-all", completeness.percent === 100 ? "bg-emerald-500" : "bg-teal-500")}
                   style={{ width: `${completeness.percent}%` }} />
               </div>
               <span className="text-xs font-semibold text-slate-500 flex-shrink-0">
-                {completeness.percent === 100 ? "Complete" : `${completeness.percent}%`}
+                {completeness.percent === 100 ? t("complete") : `${completeness.percent}%`}
               </span>
             </div>
           </div>
@@ -176,14 +179,17 @@ export default function DoctorProfilePage() {
             <div className="flex items-start gap-2.5 min-w-0">
               <ShieldCheck className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-slate-700 min-w-0">
-                <span className="font-bold text-slate-900">Activate your account.</span>{" "}
+                <span className="font-bold text-slate-900">{t("activateTitle")}</span>{" "}
                 {registrationFee === 0
-                  ? "Complete your profile, then activate it — it's free right now."
-                  : <>Complete your profile, then pay a one-time {(registrationFee ?? 0) < 499 && <span className="line-through text-slate-400">₹499</span>} <span className="font-semibold">₹{registrationFee ?? "…"}</span>.</>}
+                  ? t("activateFree")
+                  : t.rich("activatePay", {
+                      strike: () => (registrationFee ?? 0) < 499 ? <span className="line-through text-slate-400">₹499</span> : null,
+                      fee: () => <span className="font-semibold">₹{registrationFee ?? "…"}</span>,
+                    })}
               </p>
             </div>
             <Link href="/doctor/payment" className="btn-primary py-2 px-3.5 text-sm flex-shrink-0">
-              <CreditCard className="w-4 h-4" /> {registrationFee === 0 ? "Activate" : registrationFee != null ? `Pay ₹${registrationFee}` : "Pay"}
+              <CreditCard className="w-4 h-4" /> {registrationFee === 0 ? t("activate") : registrationFee != null ? t("payAmount", { amount: registrationFee }) : t("pay")}
             </Link>
           </div>
         )}
@@ -191,9 +197,9 @@ export default function DoctorProfilePage() {
           <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-5 flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-start gap-2.5 min-w-0">
               <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-slate-700"><span className="font-bold text-slate-900">Your plan has expired.</span> Renew to keep seeing patients.</p>
+              <p className="text-sm text-slate-700"><span className="font-bold text-slate-900">{t("planExpired")}</span> {t("renewToKeep")}</p>
             </div>
-            <Link href="/doctor/subscribe" className="btn-primary py-2 px-3.5 text-sm flex-shrink-0"><CreditCard className="w-4 h-4" /> Renew ₹499</Link>
+            <Link href="/doctor/subscribe" className="btn-primary py-2 px-3.5 text-sm flex-shrink-0"><CreditCard className="w-4 h-4" /> {t("renew", { amount: 499 })}</Link>
           </div>
         )}
         {registrationFeePaid && subActive && (() => {
@@ -205,60 +211,60 @@ export default function DoctorProfilePage() {
             <div className="bg-white border border-slate-100 shadow-sm rounded-2xl p-4 mb-5 flex items-center gap-2.5 text-sm">
               <CheckCircle2 className={cn("w-5 h-5 flex-shrink-0", tone)} />
               <span className="text-slate-700 flex-1">
-                <span className="font-bold text-slate-900">{isTrial ? "Free trial active" : "Plan active"}</span> · {left === 0 ? "expires today" : `${left} day${left === 1 ? "" : "s"} left`}
+                <span className="font-bold text-slate-900">{isTrial ? t("trialActive") : t("planActive")}</span> · {left === 0 ? t("expiresToday") : t("daysLeft", { count: left })}
               </span>
-              <Link href="/doctor/subscribe" className="text-teal-600 font-semibold flex-shrink-0">Manage</Link>
+              <Link href="/doctor/subscribe" className="text-teal-600 font-semibold flex-shrink-0">{t("manage")}</Link>
             </div>
           );
         })()}
 
-        <Group label="Your Profile">
+        <Group label={t("groupProfile")}>
           <Row href="/doctor/profile/professional" tint="bg-teal-50 text-teal-600" icon={<Award className="w-4 h-4" />}
-            title="Professional Details" trailing={<Status done={professionalDone} />} />
+            title={t("professional")} trailing={<Status done={professionalDone} />} />
           <Row href="/doctor/profile/consultation" tint="bg-emerald-50 text-emerald-600" icon={<IndianRupee className="w-4 h-4" />}
-            title="Consultation & Fees" trailing={<Status done={consultationDone} />} />
+            title={t("consultation")} trailing={<Status done={consultationDone} />} />
           <Row href="/doctor/profile/availability" tint="bg-blue-50 text-blue-500" icon={<Clock className="w-4 h-4" />}
-            title="Available Timings" />
+            title={t("availability")} />
           <Row href="/doctor/clinics" tint="bg-red-50 text-red-500" icon={<Building2 className="w-4 h-4" />}
-            title="Clinics"
-            trailing={<span className="text-xs font-semibold text-slate-400 flex-shrink-0">{clinicCount || "None"}</span>} />
+            title={t("clinics")}
+            trailing={<span className="text-xs font-semibold text-slate-400 flex-shrink-0">{clinicCount || t("none")}</span>} />
         </Group>
 
-        <Group label="Verification & Payouts">
+        <Group label={t("groupVerification")}>
           <Row href="/doctor/profile/documents" tint="bg-amber-50 text-amber-500" icon={<Shield className="w-4 h-4" />}
-            title="Verification & Documents"
+            title={t("documents")}
             trailing={p.isVerified
-              ? <span className="text-xs font-semibold text-emerald-600 flex-shrink-0">Verified</span>
+              ? <span className="text-xs font-semibold text-emerald-600 flex-shrink-0">{t("verified")}</span>
               : <Status done={docsDone} />} />
           <Row href="/doctor/profile/bank" tint="bg-purple-50 text-purple-500" icon={<CreditCard className="w-4 h-4" />}
-            title="Bank Details" trailing={<Status done={done("Bank Details")} />} />
+            title={t("bank")} trailing={<Status done={done("Bank Details")} />} />
         </Group>
 
-        <Group label="Grow">
+        <Group label={t("groupGrow")}>
           <Row href="/doctor/profile/qr" tint="bg-teal-50 text-teal-600" icon={<QrCode className="w-4 h-4" />}
-            title="Booking QR Code" />
+            title={t("qr")} />
         </Group>
 
         <LanguageSwitch />
 
-        <Group label="Account">
+        <Group label={t("groupAccount")}>
           <Row href="/doctor/profile/notifications" tint="bg-amber-50 text-amber-500" icon={<Bell className="w-4 h-4" />}
-            title="Notifications" />
+            title={t("notifications")} />
           <Row href="/doctor/profile/security" tint="bg-indigo-50 text-indigo-500" icon={<Lock className="w-4 h-4" />}
-            title="Password & Security" />
+            title={t("security")} />
           <Row href="/doctor/profile/staff" tint="bg-cyan-50 text-cyan-600" icon={<Users className="w-4 h-4" />}
-            title="Staff Access" />
+            title={t("staff")} />
           <Row href="/doctor/support/tickets" tint="bg-indigo-50 text-indigo-500" icon={<LifeBuoy className="w-4 h-4" />}
-            title="My Support Tickets" />
+            title={t("tickets")} />
           <Row href="/doctor/profile/terms" tint="bg-slate-100 text-slate-500" icon={<FileCheck className="w-4 h-4" />}
-            title="Terms & Privacy Policy" />
+            title={t("terms")} />
         </Group>
 
         <button
           onClick={logout}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
         >
-          <LogOut className="w-4 h-4" /> Sign Out
+          <LogOut className="w-4 h-4" /> {t("signOut")}
         </button>
       </div>
     </div>

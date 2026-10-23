@@ -5,10 +5,13 @@ import { PhoneCall } from "lucide-react";
 import ProfileSubShell from "@/components/patient/ProfileSubShell";
 import { usePatientProfile, patchPatientProfile } from "@/lib/usePatientProfile";
 import { isValidMobile, normalizeMobile } from "@/lib/validation";
+import { useTranslations } from "next-intl";
 
 export default function EmergencyContactSettingsPage() {
   const router = useRouter();
   const { profile, loading } = usePatientProfile();
+  const t = useTranslations("patientAccount.emergency");
+  const ts = useTranslations("patientAccount.shell");
 
   const [form, setForm] = useState({ name: "", phone: "" });
   const [dirty, setDirty] = useState(false);
@@ -28,7 +31,7 @@ export default function EmergencyContactSettingsPage() {
   const set = (patch: Partial<typeof form>) => { setDirty(true); setSaved(false); setForm((f) => ({ ...f, ...patch })); };
 
   const save = async () => {
-    if (form.phone && !isValidMobile(form.phone)) { setError("Enter a valid 10-digit mobile number."); return; }
+    if (form.phone && !isValidMobile(form.phone)) { setError(t("errMobile")); return; }
     setSaving(true);
     setError("");
     try {
@@ -40,7 +43,7 @@ export default function EmergencyContactSettingsPage() {
       setDirty(false);
       setTimeout(() => router.push("/patient/profile"), 600);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not save.");
+      setError(e instanceof Error ? e.message : ts("couldNotSave"));
     } finally {
       setSaving(false);
     }
@@ -48,8 +51,8 @@ export default function EmergencyContactSettingsPage() {
 
   return (
     <ProfileSubShell
-      title="Emergency Contact"
-      description="Someone we can reach if you can't be contacted during a visit."
+      title={t("title")}
+      description={t("description")}
       icon={<PhoneCall className="w-5 h-5" />}
       tint="bg-emerald-50 text-emerald-600"
       loading={loading}
@@ -60,11 +63,11 @@ export default function EmergencyContactSettingsPage() {
       onSave={save}
     >
       <div>
-        <label className="input-label">Contact Name</label>
-        <input className="input-field" placeholder="e.g. Priya Sharma" value={form.name} onChange={(e) => set({ name: e.target.value })} />
+        <label className="input-label">{t("name")}</label>
+        <input className="input-field" placeholder={t("namePlaceholder")} value={form.name} onChange={(e) => set({ name: e.target.value })} />
       </div>
       <div>
-        <label className="input-label">Mobile Number</label>
+        <label className="input-label">{t("mobile")}</label>
         <input className="input-field" type="tel" inputMode="numeric" maxLength={10} placeholder="9800000000" value={form.phone} onChange={(e) => set({ phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} />
       </div>
     </ProfileSubShell>

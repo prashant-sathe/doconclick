@@ -5,6 +5,7 @@ import { Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
 import { ROLE_HOME } from "@/lib/roleHome";
+import { useTranslations } from "next-intl";
 
 export default function ResetPassword() {
   const router = useRouter();
@@ -14,6 +15,9 @@ export default function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const t = useTranslations("auth.reset");
+  const tc = useTranslations("auth.common");
+  const tv = useTranslations("auth.validation");
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login");
@@ -24,11 +28,11 @@ export default function ResetPassword() {
     setError("");
 
     if (password.length < PASSWORD_MIN_LENGTH) {
-      setError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`);
+      setError(tv("passwordMin", { min: PASSWORD_MIN_LENGTH }));
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(tv("passwordMismatch"));
       return;
     }
 
@@ -46,8 +50,8 @@ export default function ResetPassword() {
       // 15-minute Google verification has lapsed (or was never done).
       setError(
         ["REVERIFY_REQUIRED", "CURRENT_PASSWORD_REQUIRED", "WRONG_PASSWORD"].includes(data.code)
-          ? "Your verification expired. Go back to Forgot Password and verify with Google again."
-          : data.error ?? "Could not update your password."
+          ? t("verificationExpired")
+          : data.error ?? t("failed")
       );
       return;
     }
@@ -63,10 +67,9 @@ export default function ResetPassword() {
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-xl">
             <Lock className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Set a new password</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t("title")}</h1>
           <p className="text-slate-500 mt-2 text-sm">
-            {user?.name ? `You're verified, ${user.name}. ` : "You're verified. "}
-            Choose a new password below.
+            {user?.name ? t("subtitleNamed", { name: user.name }) : t("subtitle")}
           </p>
         </div>
 
@@ -75,7 +78,7 @@ export default function ResetPassword() {
             <div>
               <label className="input-label">
                 <Lock className="inline w-3.5 h-3.5 mr-1.5" />
-                New Password
+                {t("newPassword")}
               </label>
               <div className="relative">
                 <input
@@ -83,13 +86,14 @@ export default function ResetPassword() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   className="input-field pr-12"
-                  placeholder="Min. 6 characters"
+                  placeholder={tc("minChars", { min: PASSWORD_MIN_LENGTH })}
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError(""); }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? tc("hidePassword") : tc("showPassword")}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -98,13 +102,13 @@ export default function ResetPassword() {
             </div>
 
             <div>
-              <label className="input-label">Confirm Password</label>
+              <label className="input-label">{tc("confirmPassword")}</label>
               <input
                 required
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 className="input-field"
-                placeholder="Repeat password"
+                placeholder={tc("repeatPassword")}
                 value={confirmPassword}
                 onChange={(e) => { setConfirmPassword(e.target.value); setError(""); }}
               />
@@ -122,14 +126,14 @@ export default function ResetPassword() {
               disabled={loading}
               className="btn-primary w-full justify-center py-3.5 text-base mt-1"
             >
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : "Save New Password"}
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("saving")}</> : t("save")}
             </button>
           </form>
         </div>
 
         <p className="text-center text-xs text-slate-400 mt-5 flex items-center justify-center gap-1.5">
           <ShieldCheck className="w-3.5 h-3.5" />
-          Secured with 256-bit encryption. Your data is safe.
+          {tc("secured")}
         </p>
       </div>
     </div>

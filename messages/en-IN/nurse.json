@@ -1,0 +1,374 @@
+{
+  "common": {
+    "relation": {
+      "Self": "Self",
+      "Spouse": "Spouse",
+      "Son": "Son",
+      "Daughter": "Daughter",
+      "Father": "Father",
+      "Mother": "Mother",
+      "Other": "Other"
+    },
+    "gender": {
+      "Male": "Male",
+      "Female": "Female",
+      "Other": "Other"
+    },
+    "days": {
+      "Mon": "Mon",
+      "Tue": "Tue",
+      "Wed": "Wed",
+      "Thu": "Thu",
+      "Fri": "Fri",
+      "Sat": "Sat",
+      "Sun": "Sun"
+    },
+    "relationOf": "{relation} of {name}",
+    "nursingVisit": "Nursing visit",
+    "networkError": "Network error — check your connection and try again.",
+    "back": "Back",
+    "cancel": "Cancel",
+    "saving": "Saving…"
+  },
+  "subShell": {
+    "backToProfile": "Back to Profile"
+  },
+  "dashboard": {
+    "title": "My Visits",
+    "tabs": {
+      "requests": "Requests",
+      "upcoming": "Upcoming",
+      "history": "History"
+    },
+    "status": {
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled",
+      "REJECTED": "Declined",
+      "EXPIRED": "Expired",
+      "NO_SHOW": "No-show"
+    },
+    "ageYears": "{age} yrs",
+    "remindedToPay": "{name} was reminded to pay.",
+    "patientFallback": "The patient",
+    "loadProfileFailed": "Couldn't load your profile status.",
+    "startJourneyFailed": "Could not start the journey.",
+    "stopJourneyFailed": "Could not stop the journey.",
+    "updateFailed": "Could not update.",
+    "updateVisitFailed": "Could not update this visit.",
+    "locationNeeded": "Location access is needed to share your journey with the patient.",
+    "banner": {
+      "notBookable": "Patients can't book you yet",
+      "suspended": "Account suspended",
+      "rejected": "Application not approved",
+      "waiting": "Waiting for admin approval",
+      "payFee": "Pay the pending platform fee in your profile.",
+      "completeProfile": "Complete your profile, documents and services — then the admin will review it."
+    },
+    "empty": {
+      "requests": "No new requests right now.",
+      "upcoming": "No upcoming visits.",
+      "history": "No past visits yet."
+    },
+    "youGet": "You get ₹{amount}",
+    "visitOf": "Visit {index} of {total}",
+    "shiftHours": "({hours}-hour shift)",
+    "allergies": "Allergies: {list}",
+    "prescription": "Doctor's prescription: {title}",
+    "package": "Package · {count, plural, =1 {# visit} other {# visits}} · {interval}",
+    "interval": "{days, plural, =1 {every day} other {every # days}}",
+    "packageEarning": "You get ₹{amount} for the package",
+    "packageAcceptNote": "Accepting confirms every visit above.",
+    "referredBy": "Referred by Dr. {name} · {date}",
+    "instructions": "Instructions: {text}",
+    "decline": "Decline",
+    "accept": "Accept",
+    "paid": "Patient has paid",
+    "awaitingPayment": "Waiting for the patient's payment — you can complete the visit once it's paid",
+    "sending": "Sending…",
+    "remind": "Remind",
+    "call": "Call",
+    "chat": "Chat",
+    "map": "Map",
+    "startJourney": "Start journey",
+    "arrived": "I've arrived",
+    "stopJourney": "Stop journey",
+    "completeVisit": "Complete visit",
+    "cancelVisitLink": "Can't make it? Cancel visit",
+    "notes": "Notes: {notes}",
+    "requested": "Requested {date}",
+    "loadMore": "Load more ({count} older)",
+    "startEarly": "This visit is booked for {at}. You can start it from {from}.",
+    "startLate": "It's too long past the booked time to start this visit. Ask the patient to reschedule, or cancel it.",
+    "shiftWait": "This is a {hours}-hour shift — you can complete it from {at}.",
+    "completeDialog": {
+      "title": "Complete this visit",
+      "serviceFor": "{service} for {name}",
+      "notes": "Visit notes (optional)",
+      "notesPlaceholder": "What was done, vitals, advice…",
+      "markComplete": "Mark complete"
+    },
+    "journeyDialog": {
+      "startTitle": "Start your journey to {name}?",
+      "stopTitle": "Stop the journey?",
+      "startBody": "The patient will be told you're on the way and can follow your live location until you arrive.",
+      "stopBody": "Your live location stops being shared and the patient is told you're not on the way right now. You can start again later.",
+      "starting": "Starting…",
+      "stopping": "Stopping…"
+    },
+    "cancelDialog": {
+      "title": "Cancel this visit?",
+      "bodyPaid": "The patient will get a full refund to their wallet. Only cancel if it's an emergency.",
+      "bodyUnpaid": "The patient will be told you can't make it. Only cancel if it's an emergency.",
+      "confirm": "Cancel visit",
+      "cancelling": "Cancelling…"
+    }
+  },
+  "vitals": {
+    "title": "Vitals",
+    "record": "+ Record",
+    "previous": "Previous ({date}): {summary}",
+    "summary": {
+      "bp": "BP {systolic}/{diastolic}",
+      "pulse": "Pulse {value}",
+      "spo2": "SpO2 {value}%",
+      "temp": "{value}°F",
+      "sugar": "Sugar {value}"
+    },
+    "criticalTitle": "Critical reading",
+    "criticalAdvice": "Recheck once. If it stays like this, contact the patient's doctor now. Chest pain, breathing difficulty, fainting or confusion → call <b>108</b> immediately.",
+    "doctorAlerted": "The referring doctor and the patient have been alerted.",
+    "familyAlerted": "The patient's family has been alerted.",
+    "warningTitle": "Out of normal range",
+    "warningNote": "Mention it in your visit notes.",
+    "field": {
+      "systolic": "BP upper",
+      "diastolic": "BP lower",
+      "pulse": "Pulse /min",
+      "spo2": "SpO2 %",
+      "temp": "Temp °F",
+      "sugar": "Sugar mg/dL"
+    },
+    "sugarType": {
+      "FASTING": "Fasting",
+      "RANDOM": "Random",
+      "POST_MEAL": "After meal"
+    },
+    "looksCelsius": "That looks like °C — enter °F (e.g. 98.6). {c}°C = {f}°F",
+    "notesPlaceholder": "Notes (optional)",
+    "save": "Save vitals",
+    "saveFailed": "Could not save vitals."
+  },
+  "startVisit": {
+    "askCode": "Ask the patient for their visit code",
+    "codePlaceholder": "4-digit code",
+    "start": "Start visit",
+    "cantShare": "Patient can't share the code?",
+    "withoutTitle": "Start without the code",
+    "withoutHint": "Tell us why — the patient and DocOnClick will be notified.",
+    "reasonPlaceholder": "e.g. Elderly patient alone at home, son not reachable on phone",
+    "startWithout": "Start without code",
+    "failed": "Could not start the visit."
+  },
+  "profile": {
+    "title": "My Profile",
+    "loadFailed": "Could not load your profile.",
+    "paymentSubmitted": "Payment submitted — it can take a minute to show here. Refresh the page if it doesn't update.",
+    "status": {
+      "PENDING": {
+        "title": "Application under review",
+        "body": "Complete the checklist below — the admin reviews your documents and approves your profile."
+      },
+      "APPROVED": {
+        "title": "You're approved",
+        "body": "Patients near you can book the services you offer."
+      },
+      "REJECTED": {
+        "title": "Application not approved",
+        "body": "Please check your details and documents, or contact support."
+      },
+      "SUSPENDED": {
+        "title": "Account suspended",
+        "body": "Contact support for assistance."
+      }
+    },
+    "cantBookUntilFee": "Patients can't book you until the fee below is paid.",
+    "checklistTitle": "Profile checklist · {done}/{total}",
+    "checklist": {
+      "qualification": "Qualification",
+      "council": "Nursing Council registration number",
+      "councilCert": "Council registration certificate",
+      "degreeCert": "Degree / diploma certificate",
+      "kyc": "Aadhaar / PAN (KYC)",
+      "photo": "Profile photo",
+      "services": "At least one service with your price",
+      "location": "Your base location",
+      "bank": "Bank details for payouts"
+    },
+    "save": {
+      "save": "Save",
+      "saved": "Saved",
+      "failed": "Could not save.",
+      "networkError": "Network error — please try again."
+    },
+    "fees": {
+      "title": "Platform fees",
+      "registration": "One-time registration fee",
+      "pay": "Pay ₹{amount}",
+      "subscription": "Monthly subscription",
+      "perMonth": "₹{amount}/month",
+      "activeUntil": "active until {date}",
+      "notActive": "not active",
+      "renew": "Renew",
+      "startFailed": "Could not start payment."
+    },
+    "details": {
+      "title": "Professional details",
+      "locked": "Your credentials are verified — qualification and council details are locked.",
+      "qualification": "Qualification *",
+      "select": "Select…",
+      "councilRegNo": "Nursing Council reg. no. *",
+      "councilRegNoPlaceholder": "e.g. MNC-123456",
+      "councilState": "Council state",
+      "councilStatePlaceholder": "Maharashtra",
+      "experience": "Experience (years)",
+      "gender": "Gender",
+      "languages": "Languages",
+      "languagesPlaceholder": "Marathi, Hindi, English",
+      "hours": "Working days & hours",
+      "from": "From",
+      "to": "To",
+      "hoursHint": "Patients can only book you inside these hours.",
+      "about": "About you",
+      "aboutPlaceholder": "Experience, hospitals worked at, special skills…",
+      "pickDay": "Pick at least one working day.",
+      "sameTime": "Working hours can't start and end at the same time."
+    },
+    "docs": {
+      "title": "Documents",
+      "photo": "Profile photo",
+      "photoHint": "JPG/PNG — shown to patients",
+      "councilCert": "Nursing Council certificate",
+      "councilCertHint": "Required for approval",
+      "degreeCert": "Degree / diploma certificate",
+      "degreeCertHint": "ANM / GNM / B.Sc / M.Sc",
+      "kyc": "Aadhaar / PAN",
+      "kycHint": "Identity proof (KYC)",
+      "policeVerif": "Police verification (optional)",
+      "policeVerifHint": "Earns a “Police verified” badge",
+      "view": "View",
+      "replace": "Replace",
+      "upload": "Upload",
+      "readFailed": "Couldn't read that file — please pick it again.",
+      "uploadFailed": "Upload failed."
+    },
+    "services": {
+      "title": "Services & prices",
+      "hint": "Pick what you offer and set your own price. Suggested prices are filled in for you.",
+      "shift": "{hours}-hour shift — you stay with the patient",
+      "minutes": "~{minutes} min",
+      "needsRx": "needs doctor's prescription",
+      "priceLabel": "{name} price"
+    },
+    "area": {
+      "title": "Service area",
+      "baseAddress": "Your base address",
+      "placeholder": "Start typing your area…",
+      "useCurrent": "Use my current location",
+      "locationSet": "Location set ({lat}, {lng})",
+      "travelUpTo": "I travel up to <b>{km} km</b> for home visits",
+      "pickAddress": "Pick your address from the suggestions or use your current location.",
+      "locationFailed": "Couldn't get your location — allow location access, or type your address."
+    },
+    "timeOff": "Time off",
+    "bank": {
+      "title": "Bank Details",
+      "hint": "Where DocOnClick sends your visit payouts.",
+      "bankName": "Bank Name",
+      "account": "Account Number",
+      "ifsc": "IFSC Code"
+    },
+    "account": {
+      "heading": "Account",
+      "security": "Password & Security",
+      "notifications": "Notifications",
+      "support": "Help & Support",
+      "terms": "Terms & Privacy Policy"
+    },
+    "signOut": "Sign Out"
+  },
+  "earnings": {
+    "title": "Earnings",
+    "youOwe": "You owe",
+    "netPayout": "Net payout",
+    "visits": "{count, plural, =1 {# visit} other {# visits}}",
+    "cashBreakdown": "{online} online − {fee} fee on cash visits",
+    "lifetime": "Lifetime earnings",
+    "completedCount": "{count} completed",
+    "payoutRequested": "Payout requested on {date} — the admin will settle it soon.",
+    "owedNow": "You'll be paid what's owed then: <b>{amount}</b> right now",
+    "nothingOwed": "Nothing is owed to you right now",
+    "whenAsked": "({amount} when you asked)",
+    "addBank": "Add your bank details to request a payout.",
+    "addBankLink": "Add bank details →",
+    "requestPayout": "Request payout",
+    "requestFailed": "Could not send the payout request.",
+    "completedVisits": "Completed visits",
+    "noCompleted": "No completed visits yet.",
+    "settled": "Settled",
+    "pending": "Pending",
+    "history": "Settlement history",
+    "noSettlements": "No settlements yet."
+  },
+  "support": {
+    "title": "Help & Support",
+    "description": "Raise an issue with the DocOnClick team and track its status here.",
+    "raiseTitle": "Raise a Ticket",
+    "subject": "Subject",
+    "subjectPlaceholder": "Short summary of the issue",
+    "details": "Description",
+    "detailsPlaceholder": "Describe what happened — e.g. a visit, a payment or a patient issue…",
+    "failed": "Could not raise the ticket. Please try again.",
+    "submitting": "Submitting…",
+    "raise": "Raise Ticket",
+    "yours": "Your Tickets",
+    "none": "No tickets raised yet.",
+    "status": {
+      "OPEN": "Open",
+      "IN_PROGRESS": "In progress",
+      "RESOLVED": "Resolved"
+    }
+  },
+  "security": {
+    "title": "Password & Security",
+    "description": "Change your password, sign out everywhere, or delete your account.",
+    "enterCurrent": "Enter your current password.",
+    "minLength": "Password must be at least {min} characters.",
+    "mismatch": "Passwords do not match.",
+    "updateFailed": "Could not update your password.",
+    "current": "Current Password",
+    "currentPlaceholder": "Your current password",
+    "new": "New Password",
+    "minPlaceholder": "Min. {min} characters",
+    "confirm": "Confirm Password",
+    "repeat": "Repeat password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "updated": "Password updated",
+    "update": "Update password"
+  },
+  "chat": {
+    "backToVisits": "Back to Visits",
+    "loadFailed": "Could not load this appointment.",
+    "acceptToChat": "Accept this request to start chatting with {name}."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Get alerts for new visit requests, patient messages and payments."
+  },
+  "terms": {
+    "title": "Terms & Privacy Policy",
+    "lastUpdated": "Last updated {date}",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy"
+  }
+}
