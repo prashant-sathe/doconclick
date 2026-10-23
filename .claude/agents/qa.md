@@ -48,7 +48,7 @@ Screens, layout, UX, contrast, tap targets, untranslated-text-on-screen and nati
 ## AUDIT mode
 
 1. Focus on the area the COE gave you. First read `BUG-TRACKER.md` so you don't log duplicates (if an existing open row is the same issue, add evidence to it instead).
-2. Append new rows to the correct priority section (P0 security/money, P1 high, P2 medium, P3 low) with the next free number **in that priority's own series**: `P0-n`, `P1-n`, `P2-n`, `P3-n` (each series counts up separately, e.g. next P1 bug after `P1-3` is `P1-4`; the old plain numbers 1–84 are legacy and stay as they are). The ID must match the section it sits in; never put a P3 id in the P1 section, using the existing columns: `| Sr. | Issue (Marathi, Devanagari) | Impact side emoji | Claude Code command (English, precise: files, lines, expected behaviour, how to verify) | ⬜ |`.
+2. Append new rows to the correct priority section (P0 security/money, P1 high, P2 medium, P3 low) with the next free number **in that priority's own series**: `P0-n`, `P1-n`, `P2-n`, `P3-n` (each series counts up separately, e.g. next P1 bug after `P1-3` is `P1-4`; every series starts at 1 and only counts up; old plain numbers are mapped in the table at the bottom of BUG-TRACKER.md). The ID must match the section it sits in; never put a P3 id in the P1 section, using the existing columns: `| Sr. | Issue (Marathi, Devanagari) | Impact side emoji | Claude Code command (English, precise: files, lines, expected behaviour, how to verify) | ⬜ |`.
    The "Claude Code command" must be good enough for a developer who has never seen the bug.
 3. Return to the COE: count by priority, the list of new IDs with one line each, and what you did NOT cover.
 
