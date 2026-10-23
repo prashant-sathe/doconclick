@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/routeGuards";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: the current doctor's own support tickets — raised via the Support
 // Assistant chat's create_support_ticket tool, listed here for a plain
 // read-only view outside the chat.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const { authUser, denied } = await requireRole("DOCTOR");
   if (denied) return denied;
   const suspendedResponse = await requireActiveDoctor(authUser);
@@ -19,4 +20,4 @@ export async function GET() {
   });
 
   return NextResponse.json(complaints);
-}
+});

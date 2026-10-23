@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { referralProblem, REFERRAL_INACTIVE_CODE } from "@/lib/nurseReferral";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: a referral from one of the patient's own consultations — what the
 // nurse booking form needs to pre-fill and to show "prescription attached".
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withErrorLocale(async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -32,4 +33,4 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     doctorName: referral.appointment.doctor.name,
     consultedAt: referral.appointment.scheduledAt,
   });
-}
+});

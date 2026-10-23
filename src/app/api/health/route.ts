@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
+import { withErrorLocale } from "@/lib/apiErrors";
 
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   return NextResponse.json({ status: "ok" });
-}
+});

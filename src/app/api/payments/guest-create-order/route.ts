@@ -5,6 +5,7 @@ import { createCashfreeOrder } from "@/lib/cashfree";
 import { verifyGuestPaymentToken, guestPaymentPath } from "@/lib/guestPaymentToken";
 import { APPOINTMENT_ORDER_PREFIX, recordPaymentOrder, totalPayable, settleFreeAppointments, notifySettlement } from "@/lib/paymentOrders";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // Each call opens a gateway order; a patient retrying checkout needs a few.
 const checkLimit = createRateLimiter(10, 10 * 60_000);
@@ -13,7 +14,7 @@ const checkLimit = createRateLimiter(10, 10 * 60_000);
 // Cashfree order, recorded the same way, so the existing webhook settles it
 // with no idea who opened it. The token stands in for the patient's session
 // and only ever covers its own appointment.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const { token } = await req.json().catch(() => ({}));
   const apptId = verifyGuestPaymentToken(token);
   if (!apptId) {
@@ -69,4 +70,4 @@ export async function POST(req: Request) {
     console.error("Failed to create Cashfree order for guest payment", appointment.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
-}
+});

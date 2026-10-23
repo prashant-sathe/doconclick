@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { geocodeGuard, searchLimiter, searchAddress, normaliseQuery, GeocodeBusyError } from "@/lib/geocode";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: Address search suggestions, proxied to OpenStreetMap Nominatim
 // (server-side, per Nominatim's usage policy which requires a real User-Agent
 // and discourages direct client-side browser calls). Signed-in users only,
 // rate-limited and cached (src/lib/geocode.ts).
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const blocked = await geocodeGuard(searchLimiter);
   if (blocked) return blocked;
 
@@ -25,4 +26,4 @@ export async function GET(req: Request) {
     }
     return NextResponse.json([]);
   }
-}
+});

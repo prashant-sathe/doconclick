@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { loadAndAuthorize } from "../route";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // PATCH: mark every message the other party sent in this thread as read by
 // the caller — called when a chat thread is opened, so the unread badge on
 // the appointment list clears.
-export async function PATCH(
+export const PATCH = withErrorLocale(async function PATCH(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -25,4 +26,4 @@ export async function PATCH(
   });
 
   return NextResponse.json({ ok: true });
-}
+});

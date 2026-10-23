@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { requireActiveProvider } from "@/lib/providerGuard";
 import { unsettledDues } from "@/lib/payouts";
 import { money } from "@/lib/money";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // Shared by doctors and nurses (their earnings are the same Appointment rows).
 
@@ -19,7 +20,7 @@ async function bankDetailsOnFile(userId: string, role: string): Promise<boolean>
 // now (online payouts net of the commission on cash visits — the amount a
 // request would ask for; src/lib/payouts.ts), and whether bank details are on
 // file to pay it to.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   if (authUser.role !== "DOCTOR" && authUser.role !== "NURSE") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
@@ -43,14 +44,14 @@ export async function GET() {
     dues,
     bankDetailsOnFile: bank,
   });
-}
+});
 
 // POST: the provider flags "please settle me" — doesn't settle anything itself
 // (only the admin's Settle Now action does that), just surfaces the request
 // in the admin's settle queue. Blocked while a request is already open,
 // without bank details to pay to, or when nothing is owed after the
 // commission on cash visits is netted off.
-export async function POST() {
+export const POST = withErrorLocale(async function POST() {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   if (authUser.role !== "DOCTOR" && authUser.role !== "NURSE") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
@@ -83,4 +84,4 @@ export async function POST() {
     data: { doctorId: authUser.id, amount: dues.netAmount },
   });
   return NextResponse.json(created);
-}
+});

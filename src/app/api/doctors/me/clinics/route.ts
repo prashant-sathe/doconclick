@@ -4,9 +4,10 @@ import { getAuthUser } from "@/lib/auth";
 import { formatDoctorName } from "@/lib/utils";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 import { validateClinicInput } from "@/lib/clinicInput";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: The currently logged-in doctor's clinics (+ their slots)
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -20,10 +21,10 @@ export async function GET() {
     include: { slots: true },
   });
   return NextResponse.json(clinics);
-}
+});
 
 // POST: Add a new clinic location for the logged-in doctor
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -49,4 +50,4 @@ export async function POST(req: Request) {
     include: { slots: true },
   });
   return NextResponse.json(clinic);
-}
+});

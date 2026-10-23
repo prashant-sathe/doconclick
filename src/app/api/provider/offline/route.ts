@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { requireActiveProvider, isProviderRole } from "@/lib/providerGuard";
 import { istDayKey, istStartOfDay, istEndOfDay } from "@/lib/istDate";
 import { goAway } from "@/lib/timeOffApply";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST { offline: true, confirmBookingIds? } — "Go offline now": no new
 // bookings for the rest of today (IST), back automatically tomorrow. Today's
@@ -11,7 +12,7 @@ import { goAway } from "@/lib/timeOffApply";
 // they're cancelled + refunded + notified. Visits already under way and
 // timed ones already past are kept.
 // POST { offline: false } — back online.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || !isProviderRole(authUser.role)) return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   const denied = await requireActiveProvider(authUser);
@@ -37,4 +38,4 @@ export async function POST(req: Request) {
   });
   if (out instanceof NextResponse) return out;
   return NextResponse.json({ offlineUntil: out.result.offlineUntil, cancelledBookings: out.cancelled, refundTotal: out.refundTotal, keptInProgress: out.kept });
-}
+});

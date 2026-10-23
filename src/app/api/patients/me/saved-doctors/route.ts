@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { haversine, withinSearchRadius } from "@/lib/geo";
 import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: the current patient's bookmarked doctors, each tagged with distance
 // and whether it falls inside the patient's chosen search range.
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -111,10 +112,10 @@ export async function GET(req: Request) {
   });
 
   return NextResponse.json({ searchRadiusKm: radiusKm, saved: entries });
-}
+});
 
 // POST: bookmark a doctor for later booking — only one patients can book now
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -141,4 +142,4 @@ export async function POST(req: Request) {
     }
     throw err;
   }
-}
+});

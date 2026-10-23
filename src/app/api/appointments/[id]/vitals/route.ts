@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { requireActiveNurse } from "@/lib/providerGuard";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { classifyVitals, parseVitals, vitalsSummary } from "@/lib/vitals";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const MAX_PER_VISIT = 6;
 const LATE_ENTRY_MS = 12 * 60 * 60 * 1000;
@@ -11,7 +12,7 @@ const LATE_ENTRY_MS = 12 * 60 * 60 * 1000;
 // POST: the nurse records vitals during (or just after) a visit she started.
 // A CRITICAL reading alerts the patient's account holder and — if this
 // visit came from a doctor's referral — that doctor, straight away.
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withErrorLocale(async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "NURSE") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -75,4 +76,4 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
 
   return NextResponse.json({ reading, level, alerts, doctorAlerted: level === "CRITICAL" && !!appt.nurseReferral });
-}
+});

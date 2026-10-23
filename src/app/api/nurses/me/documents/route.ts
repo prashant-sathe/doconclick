@@ -5,6 +5,7 @@ import { uploadToS3 } from "@/lib/s3";
 import { verifyUpload } from "@/lib/fileSniff";
 import { slugify } from "@/lib/utils";
 import { requireActiveNurse } from "@/lib/providerGuard";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -50,7 +51,7 @@ async function lockedResponse(userId: string, type: string) {
 
 // POST: nurse uploads a verification document or profile photo.
 // Form fields: type (photo | councilCert | degreeCert | kyc | policeVerif), file
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const { authUser, denied } = await authorize();
   if (!authUser) return denied;
 
@@ -99,10 +100,10 @@ export async function POST(req: Request) {
     data: { [DOC_FIELD[type]]: url },
   });
   return NextResponse.json(updated);
-}
+});
 
 // DELETE: detach a document/photo slot. Body: { type }
-export async function DELETE(req: Request) {
+export const DELETE = withErrorLocale(async function DELETE(req: Request) {
   const { authUser, denied } = await authorize();
   if (!authUser) return denied;
 
@@ -118,4 +119,4 @@ export async function DELETE(req: Request) {
     data: { [DOC_FIELD[type]]: null },
   });
   return NextResponse.json(updated);
-}
+});

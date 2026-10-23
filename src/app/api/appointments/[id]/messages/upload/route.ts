@@ -4,6 +4,7 @@ import { uploadToS3 } from "@/lib/s3";
 import { verifyUpload } from "@/lib/fileSniff";
 import { loadAndAuthorize } from "../route";
 import { requireActiveProvider } from "@/lib/providerGuard";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -16,7 +17,7 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 // to attach to a chat message. Returns the stored URL for a follow-up
 // POST to the messages endpoint — mirrors the doctor-dashboard prescription
 // upload flow, just scoped to chat and single-file.
-export async function POST(
+export const POST = withErrorLocale(async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -55,4 +56,4 @@ export async function POST(
   const url = await uploadToS3(`chat-attachments/${filename}`, buffer, sniffed.type);
 
   return NextResponse.json({ url, fileName: file.name, fileType: sniffed.type });
-}
+});

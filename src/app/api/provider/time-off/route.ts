@@ -5,9 +5,10 @@ import { requireActiveProvider, isProviderRole } from "@/lib/providerGuard";
 import { istDayKey } from "@/lib/istDate";
 import { parseRange, rangeLabel, TIME_OFF_REASON_MAX } from "@/lib/timeOff";
 import { goAway } from "@/lib/timeOffApply";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: the provider's current and upcoming time off, and whether they're offline.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser || !isProviderRole(authUser.role)) return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   const [timeOff, user] = await Promise.all([
@@ -19,13 +20,13 @@ export async function GET() {
   ]);
   const offlineUntil = user?.offlineUntil && user.offlineUntil.getTime() > Date.now() ? user.offlineUntil : null;
   return NextResponse.json({ timeOff, offlineUntil });
-}
+});
 
 // POST { startDate, endDate?, reason?, confirmBookingIds? }: time off over a
 // range of IST days — every clinic, video and home visit. Bookings already in
 // the range come back first as 409 AWAY_HAS_BOOKINGS for the provider to
 // confirm; confirming adds it and cancels + refunds + notifies them.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || !isProviderRole(authUser.role)) return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   // Suspension only — taking time off (and so refunding patients) needs no plan.
@@ -58,4 +59,4 @@ export async function POST(req: Request) {
   });
   if (out instanceof NextResponse) return out;
   return NextResponse.json({ ...out.result, cancelledBookings: out.cancelled, refundTotal: out.refundTotal, keptInProgress: out.kept });
-}
+});

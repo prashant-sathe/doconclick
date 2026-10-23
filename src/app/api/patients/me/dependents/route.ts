@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, readJson } from "@/lib/routeGuards";
 import { parseBody, dependentCreateSchema, dependentData } from "@/lib/schemas";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: the current patient's saved family-member profiles
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const { authUser, denied } = await requireRole("PATIENT");
   if (denied) return denied;
 
@@ -16,10 +17,10 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
   return NextResponse.json(dependents);
-}
+});
 
 // POST: save a new family member's medical profile
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const { authUser, denied } = await requireRole("PATIENT");
   if (denied) return denied;
 
@@ -42,4 +43,4 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json(dependent);
-}
+});

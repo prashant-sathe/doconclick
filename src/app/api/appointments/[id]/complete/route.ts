@@ -11,6 +11,7 @@ import {
   checkPrescriptionFiles, uploadPrescriptionFiles, discardPrescriptionFiles, parseReferral, NOTES_MAX, badRequest,
   type ReferralInput,
 } from "@/lib/consultation";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 class LostRaceError extends Error {}
 
@@ -29,7 +30,7 @@ class LostRaceError extends Error {}
 // (S3 can't take part in it) and deleted again if it fails. The status change
 // is a conditional update carrying every completion guard, so a payment
 // refund, cancel or second tap landing at the same moment can't slip through.
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withErrorLocale(async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   if (authUser.role === "STAFF") return NextResponse.json({ error: "Only the doctor can mark a visit complete." }, { status: 403 });
@@ -148,4 +149,4 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (referralName) void sendPushToUser(appt.patientId, referralPushCopy(authUser.name, referralName));
 
   return NextResponse.json(completed);
-}
+});

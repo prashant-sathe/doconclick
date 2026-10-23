@@ -3,8 +3,9 @@ import { cookies } from "next/headers";
 import { getAuthUser, verifySession, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SUSPENDED_MESSAGE } from "@/lib/doctorGuard";
+import { withErrorLocale } from "@/lib/apiErrors";
 
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const user = await getAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -58,4 +59,4 @@ export async function GET() {
     language: dbUser?.language ?? null,
     impersonatedBy: impersonator ? { name: impersonator.name, role: impersonator.role } : null,
   });
-}
+});

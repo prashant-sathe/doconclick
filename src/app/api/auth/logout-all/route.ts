@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAuthUser, revokeSessions, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const COOKIE_NAME = "doconclick_token";
 
 // POST: sign this account out of every device, this one included. Plain
 // /api/auth/logout only clears this device's cookie.
-export async function POST() {
+export const POST = withErrorLocale(async function POST() {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -21,4 +22,4 @@ export async function POST() {
   const response = NextResponse.json({ success: true });
   response.cookies.set(COOKIE_NAME, "", { httpOnly: true, secure: COOKIE_SECURE, sameSite: "lax", maxAge: 0, path: "/" });
   return response;
-}
+});

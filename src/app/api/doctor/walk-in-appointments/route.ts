@@ -18,6 +18,7 @@ import { isClinicOpenNow } from "@/lib/clinicAvailability";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { cashDueProblem, CASH_DUE_LIMIT_CODE } from "@/lib/duesPayments";
 import { timeOffProblem, TIME_OFF_CODE } from "@/lib/timeOff";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // A busy front desk books a few patients an hour, not dozens a minute.
 const checkLimit = createRateLimiter(30, 10 * 60_000);
@@ -27,7 +28,7 @@ const TYPE_LABEL: Record<string, string> = { CLINIC: "clinic visit", HOME: "home
 
 // GET: what the walk-in form (/doctor/walk-in) can offer — the visit types
 // the doctor takes with their fees, and their clinics. For DOCTOR and STAFF.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   const scope = await resolveDoctorScope(authUser);
@@ -81,7 +82,7 @@ export async function GET() {
     // Why Cash can't be picked right now (too much platform fee owed), if so.
     cashBlocked: (await cashDueProblem(scope.doctorId, authUser.role === "STAFF" ? "staff" : "doctor"))?.message ?? null,
   });
-}
+});
 
 // POST: the doctor or their front desk (STAFF) books a walk-in or phone-in
 // patient. The booking is already accepted (SCHEDULED — the doctor's own side
@@ -89,7 +90,7 @@ export async function GET() {
 // client's number), and paid either in cash at the visit or online by the
 // patient through a pay link/QR (src/lib/guestPaymentToken.ts). A number with
 // no account gets one, passwordless until the patient registers with it.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   // Same rule as accepting a request: an expired plan can't take new visits.
@@ -397,4 +398,4 @@ export async function POST(req: Request) {
     console.error("Walk-in booking failed:", err);
     return NextResponse.json({ error: "Booking failed. Please try again." }, { status: 500 });
   }
-}
+});

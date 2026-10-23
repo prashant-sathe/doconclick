@@ -5,6 +5,7 @@ import { validateRegistration } from "@/lib/validation";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { Prisma } from "@/generated/prisma/client";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // One message for "that number is taken" whoever owns it (a patient, another
 // doctor's receptionist, a doctor), so the staff form can't be used to find
@@ -13,7 +14,7 @@ const MOBILE_UNAVAILABLE = "This mobile number can't be used for a staff account
 const createLimiter = createRateLimiter(10, 60 * 60_000); // per doctor, per hour
 
 // GET: the logged-in doctor's own staff/receptionist accounts
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   if (authUser.role !== "DOCTOR") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
@@ -38,13 +39,13 @@ export async function GET() {
       createdAt: s.createdAt,
     }))
   );
-}
+});
 
 // POST: doctor creates a new staff/receptionist account, scoped to their own
 // appointment queue only. The doctor sets the initial password directly and
 // shares it with the staff member — there's no SMS/email delivery in this
 // codebase to build an invite-link flow on top of.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   if (authUser.role !== "DOCTOR") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
@@ -92,4 +93,4 @@ export async function POST(req: Request) {
     active: created.staffAccount!.active,
     createdAt: created.staffAccount!.createdAt,
   });
-}
+});

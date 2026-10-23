@@ -5,11 +5,12 @@ import { externalOrigin } from "@/lib/googleOAuth";
 import { createCashfreeOrder } from "@/lib/cashfree";
 import { requireActiveNurse } from "@/lib/providerGuard";
 import { NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX } from "@/lib/nurseConstants";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST { kind: "REGISTRATION" | "SUBSCRIPTION" } — creates a Cashfree order
 // for the admin-set nurse fee. A fee of ₹0 means that step doesn't exist, so
 // there's nothing to pay for.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "NURSE") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -62,4 +63,4 @@ export async function POST(req: Request) {
     console.error("Failed to create Cashfree order for nurse fee", authUser.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
-}
+});

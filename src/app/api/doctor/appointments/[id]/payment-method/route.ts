@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { cashDueProblem, CASH_DUE_LIMIT_CODE } from "@/lib/duesPayments";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // PATCH { paymentMethod: "CASH" | "ONLINE" }: the desk changes how a walk-in
 // pays — the patient's phone can't pay online after all, or they'd rather
@@ -10,7 +11,7 @@ import { cashDueProblem, CASH_DUE_LIMIT_CODE } from "@/lib/duesPayments";
 // (bookedById) and only while unpaid; a patient's own booking is always
 // online. If an online payment for it still lands afterwards, settlement
 // marks it paid online (src/lib/paymentOrders.ts), so nothing is lost.
-export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withErrorLocale(async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   const scope = await resolveDoctorScope(authUser);
@@ -54,4 +55,4 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: "This appointment just changed — refresh and try again." }, { status: 409 });
   }
   return NextResponse.json({ paymentMethod });
-}
+});

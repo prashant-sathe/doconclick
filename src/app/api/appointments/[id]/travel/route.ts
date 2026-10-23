@@ -5,6 +5,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { requireActiveProvider } from "@/lib/providerGuard";
 import { journeyStartProblem } from "@/lib/journeyWindow";
 import { isUnpaidOnline, sendPayReminder, UNPAID_VISIT_CODE } from "@/lib/payReminder";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // NOT_STARTED is "Stop journey" — back from ON_THE_WAY, e.g. started by
 // mistake or turned back.
@@ -26,7 +27,7 @@ const isCoord = (v: unknown, max: number) =>
 // start window, src/lib/journeyWindow.ts), then repeatedly while travelling
 // to push updated coordinates, then once more with ARRIVED — or NOT_STARTED
 // to stop the journey. The patient is pushed only when the status changes.
-export async function PATCH(
+export const PATCH = withErrorLocale(async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -129,4 +130,4 @@ export async function PATCH(
     console.error(err);
     return NextResponse.json({ error: "Could not update the visit. Please try again." }, { status: 500 });
   }
-}
+});

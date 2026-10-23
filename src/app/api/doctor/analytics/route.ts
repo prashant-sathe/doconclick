@@ -5,13 +5,14 @@ import { requireActiveDoctor } from "@/lib/doctorGuard";
 import { money, sumMoney } from "@/lib/money";
 import { safeNum } from "@/lib/adminAuth";
 import { istMonthKey, shiftMonthKey, istStartOfMonth, monthShortLabel } from "@/lib/istDate";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const MONTHS = 6;
 
 // GET: the current doctor's own trends — monthly earnings/bookings, consult-type
 // split, and a rating trend. Doctor-scoped counterpart to the admin doctor-earnings
 // report; no cross-doctor comparison here, just this doctor's own numbers over time.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   if (authUser.role !== "DOCTOR") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
@@ -100,4 +101,4 @@ export async function GET() {
       }),
     },
   });
-}
+});

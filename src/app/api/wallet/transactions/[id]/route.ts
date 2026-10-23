@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: single wallet-transaction status lookup, polled by the top-up return
 // page while it waits for the webhook to settle a PENDING top-up.
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withErrorLocale(async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -27,4 +28,4 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     balanceAfter: txn.balanceAfter,
     createdAt: txn.createdAt,
   });
-}
+});

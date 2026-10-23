@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: The current doctor/patient's unseen sent announcements, oldest first
 // so nothing sent while they were offline gets skipped.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "PATIENT")) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -18,4 +19,4 @@ export async function GET() {
 
   const announcements = recipients.map((r) => r.announcement);
   return NextResponse.json(announcements);
-}
+});

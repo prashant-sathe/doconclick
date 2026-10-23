@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { normalizeMobile, MOBILE_REGEX } from "@/lib/validation";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // A front desk looks up a handful of patients an hour; this stops anyone
 // walking the number space to find out who has an account.
@@ -13,7 +14,7 @@ const checkLimit = createRateLimiter(60, 10 * 60_000);
 // number already a patient (book under their account, offer their family
 // members), new (an account is created with the booking), or someone who
 // can't be booked as a patient (a doctor/nurse/staff/admin number).
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   const scope = await resolveDoctorScope(authUser);
@@ -91,4 +92,4 @@ export async function GET(req: Request) {
       lastVisitAt: last?.scheduledAt ?? null,
     },
   });
-}
+});

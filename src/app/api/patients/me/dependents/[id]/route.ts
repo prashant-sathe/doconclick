@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, readJson } from "@/lib/routeGuards";
 import { parseBody, dependentUpdateSchema, dependentData } from "@/lib/schemas";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // PATCH: update a saved family-member profile
-export async function PATCH(
+export const PATCH = withErrorLocale(async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -31,12 +32,12 @@ export async function PATCH(
   });
 
   return NextResponse.json(updated);
-}
+});
 
 // DELETE: remove a saved family-member profile. Any past appointments keep
 // their own patientName/relation snapshot and just lose the dependentId
 // link (schema default SetNull), so history isn't affected.
-export async function DELETE(
+export const DELETE = withErrorLocale(async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -54,4 +55,4 @@ export async function DELETE(
 
   await prisma.patientDependent.delete({ where: { id } });
   return NextResponse.json({ success: true });
-}
+});

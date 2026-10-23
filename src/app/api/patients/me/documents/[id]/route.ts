@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // DELETE: remove one document from the patient's own vault. Doesn't remove
 // the file from S3, just the record — same convention as doctor documents
 // (see src/app/api/doctors/me/documents/route.ts).
-export async function DELETE(
+export const DELETE = withErrorLocale(async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -22,4 +23,4 @@ export async function DELETE(
 
   await prisma.patientDocument.delete({ where: { id } });
   return NextResponse.json({ ok: true });
-}
+});

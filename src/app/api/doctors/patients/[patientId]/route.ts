@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/routeGuards";
 import { careAccessProblem } from "@/lib/careAccess";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: A patient's (or one of their family member's) profile + shared
 // appointment history, visible to a doctor only with an accepted or completed
@@ -9,7 +10,7 @@ import { careAccessProblem } from "@/lib/careAccess";
 // optional `?dependentId=` — when present, both the medical-info block and
 // the appointment list are restricted to that specific family member, never
 // mixed with the account holder's own records or anyone else's.
-export async function GET(
+export const GET = withErrorLocale(async function GET(
   req: Request,
   { params }: { params: Promise<{ patientId: string }> }
 ) {
@@ -88,4 +89,4 @@ export async function GET(
       : null,
     appointments: sharedAppointments,
   });
-}
+});

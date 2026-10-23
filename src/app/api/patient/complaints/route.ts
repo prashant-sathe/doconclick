@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, readJson } from "@/lib/routeGuards";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // Shared by patients and nurses (nurses have no separate support channel).
 // GET: the current user's own support tickets
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const { authUser, denied } = await requireRole("PATIENT", "NURSE");
   if (denied) return denied;
 
@@ -15,10 +16,10 @@ export async function GET() {
   });
 
   return NextResponse.json(complaints);
-}
+});
 
 // POST: raise a new support ticket
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const { authUser, denied } = await requireRole("PATIENT", "NURSE");
   if (denied) return denied;
 
@@ -40,4 +41,4 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json(complaint, { status: 201 });
-}
+});

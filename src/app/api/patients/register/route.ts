@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, signToken, sessionPayload, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
 import { validateQuickRegistration } from "@/lib/validation";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -10,7 +11,7 @@ const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 // in. Name, age and gender are collected at the first booking (see
 // src/lib/bookingProfile.ts) — the profile starts with the same "not filled"
 // placeholders Google signup uses.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
 
   const result = validateQuickRegistration(body);
@@ -74,4 +75,4 @@ export async function POST(req: Request) {
     console.error("Patient registration failed:", err);
     return NextResponse.json({ error: "Registration failed. Please try again." }, { status: 500 });
   }
-}
+});

@@ -5,6 +5,7 @@ import { requireRole } from "@/lib/routeGuards";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { parseReferral } from "@/lib/consultation";
 import { referralPushCopy } from "@/lib/nurseReferral";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // Writing a referral needs an accepted or completed consultation; removing
 // one is allowed whatever happened to it — that's how a doctor clears the
@@ -30,7 +31,7 @@ async function loadOwnConsult(id: string, purpose: "write" | "delete") {
 // POST { serviceId, visits, intervalDays, instructions } — the doctor says
 // "this patient needs nurse care at home". The patient then gets a one-tap
 // "Book a nurse" on the consultation, with this prescription attached.
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withErrorLocale(async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { appt, authUser, error } = await loadOwnConsult(id, "write");
   if (error) return error;
@@ -52,12 +53,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     void sendPushToUser(appt!.patientId, referralPushCopy(authUser!.name, serviceName));
   }
   return NextResponse.json(referral);
-}
+});
 
-export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = withErrorLocale(async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { appt, error } = await loadOwnConsult(id, "delete");
   if (error) return error;
   await prisma.nurseReferral.deleteMany({ where: { appointmentId: appt!.id } });
   return NextResponse.json({ ok: true });
-}
+});

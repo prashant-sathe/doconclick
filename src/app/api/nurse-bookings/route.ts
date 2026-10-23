@@ -11,13 +11,14 @@ import { nurseSlotProblem } from "@/lib/nurseSchedule";
 import { buildVisitSchedule, isShift, PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
 import { referralProblem, REFERRAL_INACTIVE_CODE } from "@/lib/nurseReferral";
 import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, openRequestsProblem } from "@/lib/bookingLimits";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: patient books a nurse home visit (or a multi-visit package) for one service. Stored as a
 // regular Appointment (providerType NURSE, doctorId = the nurse) so payment,
 // wallet refunds, settlement, chat, tracking and reviews all work unchanged.
 // Unlike the doctor booking route the fee is never taken from the client —
 // it's the nurse's own price for the chosen service.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -295,4 +296,4 @@ export async function POST(req: Request) {
     totalAmount: amount * created.rows.length,
     scheduledVisits: created.rows.map((r) => r.scheduledAt),
   });
-}
+});

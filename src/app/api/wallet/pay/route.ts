@@ -4,11 +4,12 @@ import { requireRole, readJson } from "@/lib/routeGuards";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { getOrCreateWallet } from "@/lib/wallet";
 import { netPayable, confirmCouponRedemption } from "@/lib/coupons";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: pays an already-SCHEDULED appointment out of the patient's wallet
 // balance. Unlike Cashfree, this is a direct authenticated server call with
 // an immediate result — no external redirect, no webhook, no return page.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const { authUser, denied } = await requireRole("PATIENT");
   if (denied) return denied;
 
@@ -136,4 +137,4 @@ export async function POST(req: Request) {
     console.error("Failed to pay appointment from wallet", appointmentId, err);
     return NextResponse.json({ error: "Could not complete payment. Please try again." }, { status: 500 });
   }
-}
+});

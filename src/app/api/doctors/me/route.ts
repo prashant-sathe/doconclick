@@ -13,9 +13,10 @@ import {
   LOCKED_FIELDS, LOCKED_FIELD_LABELS, isProfileLocked, validateBank, maskAccount,
   type FieldChanges, type LockedField,
 } from "@/lib/doctorProfileLock";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: The currently logged-in doctor's own profile
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const { authUser, denied } = await requireRole("DOCTOR");
   if (denied) return denied;
   const suspendedResponse = await requireActiveDoctor(authUser);
@@ -45,7 +46,7 @@ export async function GET() {
   const { changeRequests, ...rest } = doctor;
   // The admin-set registration fee, for the activation banner and payment page.
   return NextResponse.json({ ...rest, changeRequest: changeRequests[0] ?? null, registrationFee: await getDoctorRegistrationFee() });
-}
+});
 
 // Free edits. medRegNo/qualification/specialty are handled separately (they
 // lock after verification) and bank details go through `bank` with a password.
@@ -94,7 +95,7 @@ const normalizeText = (v: unknown) => (v === "" || v == null ? null : String(v).
 // - bank: { bankName, accountNumber, accountNumberConfirm, ifsc } (or null to
 //   remove), validated, and only with `currentPassword`; the doctor is pushed
 //   a notice so a change they didn't make is noticed.
-export async function PATCH(req: Request) {
+export const PATCH = withErrorLocale(async function PATCH(req: Request) {
   const { authUser, denied } = await requireRole("DOCTOR");
   if (denied) return denied;
   const suspendedResponse = await requireActiveDoctor(authUser);
@@ -243,7 +244,7 @@ export async function PATCH(req: Request) {
   }
 
   return NextResponse.json({ ...result.updated, changeRequest: result.changeRequest });
-}
+});
 
 // Folds this edit into the doctor's one PENDING re-verification request:
 // fields sent now replace what was asked before, a field set back to its

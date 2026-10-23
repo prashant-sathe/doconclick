@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: Patient leaves a review for a completed appointment
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -65,4 +66,4 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json(review);
-}
+});

@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { requireActiveNurse } from "@/lib/providerGuard";
 import { parseBody, nurseServicesSchema } from "@/lib/schemas";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // PUT: replace the services this nurse offers. Body: { services: [{ serviceId, price }] }
-export async function PUT(req: Request) {
+export const PUT = withErrorLocale(async function PUT(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "NURSE") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -47,4 +48,4 @@ export async function PUT(req: Request) {
     include: { service: true },
   });
   return NextResponse.json(services);
-}
+});

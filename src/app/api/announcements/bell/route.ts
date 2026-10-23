@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: Recent sent announcements for the current doctor/patient, for the
 // notification bell dropdown — a history view, not just unseen ones.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "PATIENT")) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -22,4 +23,4 @@ export async function GET() {
     seen: r.seenAt != null,
   }));
   return NextResponse.json(announcements);
-}
+});

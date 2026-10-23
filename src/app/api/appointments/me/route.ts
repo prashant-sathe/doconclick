@@ -10,10 +10,11 @@ import { visitLocation } from "@/lib/visitAddress";
 import { hasCareAccess } from "@/lib/careAccess";
 import { GATEWAY_OMIT, withLiveLocationOnlyWhileLive } from "@/lib/appointmentView";
 import { parseFeedView, feedWhere, feedPaging, feedResponse, badCursor } from "@/lib/appointmentFeed";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: The logged-in user's own appointments (as patient or as doctor).
 // ?view=active (polling) / ?view=history (paged) — see src/lib/appointmentFeed.ts.
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -221,4 +222,4 @@ export async function GET(req: Request) {
   }
 
   return NextResponse.json({ error: "Not authorized" }, { status: 403 });
-}
+});

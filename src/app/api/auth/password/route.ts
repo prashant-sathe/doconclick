@@ -14,6 +14,7 @@ import {
 } from "@/lib/auth";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -26,7 +27,7 @@ const checkAttemptLimit = createRateLimiter(5, 15 * 60 * 1000);
 // password or the short-lived proof the forgot-password flow sets after
 // re-verifying via Google (also the only way for a Google-only account, which
 // has no password yet, to set one). Every other session is then revoked.
-export async function PATCH(req: Request) {
+export const PATCH = withErrorLocale(async function PATCH(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -81,4 +82,4 @@ export async function PATCH(req: Request) {
   });
   response.cookies.set(PWRESET_COOKIE_NAME, "", { httpOnly: true, secure: COOKIE_SECURE, sameSite: "lax", maxAge: 0, path: "/" });
   return response;
-}
+});

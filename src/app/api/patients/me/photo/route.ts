@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireRole, isRecordNotFound } from "@/lib/routeGuards";
 import { uploadToS3 } from "@/lib/s3";
 import { verifyUpload } from "@/lib/fileSniff";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -11,7 +12,7 @@ const ALLOWED_TYPES: Record<string, string> = {
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 // POST: Patient uploads/replaces their profile photo.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const { authUser, denied } = await requireRole("PATIENT");
   if (denied) return denied;
 
@@ -49,12 +50,12 @@ export async function POST(req: Request) {
     console.error(err);
     return NextResponse.json({ error: "Could not update your photo. Please try again." }, { status: 500 });
   }
-}
+});
 
 // DELETE: clears the patient's profile photo. Doesn't remove the file from
 // S3, just detaches it — same as "Replace" already leaving the old file
 // orphaned there.
-export async function DELETE() {
+export const DELETE = withErrorLocale(async function DELETE() {
   const { authUser, denied } = await requireRole("PATIENT");
   if (denied) return denied;
 
@@ -71,4 +72,4 @@ export async function DELETE() {
     console.error(err);
     return NextResponse.json({ error: "Could not update your photo. Please try again." }, { status: 500 });
   }
-}
+});

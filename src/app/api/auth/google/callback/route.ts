@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { signToken, signPasswordResetToken, COOKIE_SECURE, PWRESET_COOKIE_NAME, PWRESET_COOKIE_OPTIONS } from "@/lib/auth";
 import { STATE_COOKIE_NAME, decodeState, oauthCanonicalOrigin } from "@/lib/googleOAuth";
 import { resolveGoogleUser } from "@/lib/googleAuth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -20,7 +21,7 @@ function failureRedirect(origin: string, reason: string) {
   return response;
 }
 
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const url = new URL(req.url);
   // Must be the exact origin /start used for `redirect_uri`, or the token
   // exchange fails with redirect_uri_mismatch.
@@ -108,4 +109,4 @@ export async function GET(req: Request) {
     console.error("Google OAuth callback error:", err);
     return failureRedirect(origin, "google_failed");
   }
-}
+});

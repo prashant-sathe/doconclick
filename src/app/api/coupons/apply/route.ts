@@ -8,6 +8,7 @@ import {
   reserveCoupon,
   releaseCouponRedemption,
 } from "@/lib/coupons";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // The coupon can only be attached while the appointment is accepted but not
 // yet paid — the same window the /patient/payment page is shown in.
@@ -32,7 +33,7 @@ async function loadPayableAppointment(appointmentId: string, patientId: string) 
 }
 
 // POST: attach a coupon to an appointment and reserve a redemption slot.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -101,10 +102,10 @@ export async function POST(req: Request) {
     netPayable: netPayable({ amount: appointment.amount, discountAmount }),
     coupon: { code: coupon.code, description: coupon.description },
   });
-}
+});
 
 // DELETE: remove the coupon from an appointment and free its slot.
-export async function DELETE(req: Request) {
+export const DELETE = withErrorLocale(async function DELETE(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -124,4 +125,4 @@ export async function DELETE(req: Request) {
     discountAmount: 0,
     netPayable: appointment.amount,
   });
-}
+});

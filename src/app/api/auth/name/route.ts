@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, signToken, sessionPayload, COOKIE_SECURE } from "@/lib/auth";
 import { parseBody, updateNameSchema } from "@/lib/schemas";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
 // PATCH: lets any authenticated user (patient, doctor, admin) rename their
 // own account. name lives on User, not a role-specific profile table.
-export async function PATCH(req: Request) {
+export const PATCH = withErrorLocale(async function PATCH(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -34,4 +35,4 @@ export async function PATCH(req: Request) {
     path: "/",
   });
   return response;
-}
+});

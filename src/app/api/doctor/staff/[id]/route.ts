@@ -4,6 +4,7 @@ import { getAuthUser, hashPassword, revokeSessions } from "@/lib/auth";
 import { PASSWORD_MIN_LENGTH, nameError } from "@/lib/validation";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
 import { deleteAccount } from "@/lib/userDeletion";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // `id` here is the staff User's id (not the StaffProfile id) — matches what
 // GET /api/doctor/staff already hands the UI as `userId`.
@@ -21,7 +22,7 @@ async function ownStaff(doctorId: string, userId: string) {
 }
 
 // PATCH: rename, revoke/reactivate, or reset the password of a staff account.
-export async function PATCH(
+export const PATCH = withErrorLocale(async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -81,13 +82,13 @@ export async function PATCH(
 
   const user = await prisma.user.findUniqueOrThrow({ where: { id }, select: { name: true, mobile: true } });
   return NextResponse.json({ staffProfileId: updated.id, userId: id, name: user.name, mobile: user.mobile, active: updated.active });
-}
+});
 
 // DELETE: remove a staff account for good. Same path as any account deletion
 // (src/lib/userDeletion.ts): signed out everywhere, mobile/password cleared so
 // the number can be registered again; messages they sent stay in the chats
 // under their name. Allowed without an active plan — it only removes access.
-export async function DELETE(
+export const DELETE = withErrorLocale(async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -105,4 +106,4 @@ export async function DELETE(
   const result = await deleteAccount(id, "STAFF");
   if (!result) return NextResponse.json({ error: "Staff account not found" }, { status: 404 });
   return NextResponse.json({ deleted: true, userId: id });
-}
+});

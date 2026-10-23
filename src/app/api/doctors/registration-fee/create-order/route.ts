@@ -5,10 +5,11 @@ import { externalOrigin } from "@/lib/googleOAuth";
 import { createCashfreeOrder } from "@/lib/cashfree";
 import { getDoctorRegistrationFee, activateRegistration } from "@/lib/doctorFees";
 import { reserveDoctorFeeCoupon, releaseCouponRedemption } from "@/lib/coupons";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: Creates a real Cashfree order for a doctor's one-time registration fee.
 // Optional body `{ code }` applies a coupon (appliesTo must include DOCTOR_REGISTRATION).
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -80,4 +81,4 @@ export async function POST(req: Request) {
     console.error("Failed to create Cashfree order for doctor registration fee", authUser.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
-}
+});

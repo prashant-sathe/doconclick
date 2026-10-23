@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
 import { verifyUpload } from "@/lib/fileSniff";
 import { slugify } from "@/lib/utils";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -14,7 +15,7 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 const CATEGORIES = ["Lab Report", "Prescription", "Scan/X-ray", "Vaccination", "Discharge Summary", "Other"];
 
 // GET: this patient's health-records vault, newest first.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -24,10 +25,10 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
   return NextResponse.json(documents);
-}
+});
 
 // POST: upload one document into the vault (title + category + file).
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -76,4 +77,4 @@ export async function POST(req: Request) {
     console.error("Failed to upload patient document:", err);
     return NextResponse.json({ error: "Couldn't upload this document. Please try again." }, { status: 500 });
   }
-}
+});

@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME, verifyToken } from "@/lib/auth";
 import { endImpersonation } from "@/lib/impersonation";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const COOKIE_NAME = "doconclick_token";
 
-export async function POST() {
+export const POST = withErrorLocale(async function POST() {
   // Logging out while impersonating ends the impersonation — close its audit
   // log row too. verifyToken (signature + expiry), not verifySession: even an
   // admin revoked meanwhile still had a session that has now ended.
@@ -27,4 +28,4 @@ export async function POST() {
   // impersonation too, rather than leaving it to resurface on the next login.
   response.cookies.set(IMPERSONATOR_COOKIE_NAME, "", clearOpts);
   return response;
-}
+});

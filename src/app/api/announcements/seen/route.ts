@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST { ids: string[] }: Mark announcements as seen for the current user.
 // Idempotent — shared by the popup (one id at a time) and the bell (all
 // currently-unseen ids on open).
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "PATIENT")) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -22,4 +23,4 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

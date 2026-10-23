@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { resolveProviderScope } from "@/lib/providerGuard";
 import { isUnpaidOnline, sendPayReminder, PAY_REMINDER_COOLDOWN_MS } from "@/lib/payReminder";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: "Remind to pay" — the provider (or the doctor's front desk) nudges a
 // patient who hasn't paid for an accepted visit. At most once per
 // PAY_REMINDER_COOLDOWN_MS per visit.
-export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withErrorLocale(async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   const scope = await resolveProviderScope(authUser);
@@ -28,4 +29,4 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: `The patient was just reminded. You can remind them again in ${wait} min.`, code: "REMINDED_RECENTLY", reminderSentAt: r.at }, { status: 429 });
   }
   return NextResponse.json({ reminderSentAt: r.at, amount: r.amount });
-}
+});

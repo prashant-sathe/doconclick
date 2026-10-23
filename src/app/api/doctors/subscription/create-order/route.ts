@@ -5,11 +5,12 @@ import { externalOrigin } from "@/lib/googleOAuth";
 import { createCashfreeOrder, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { reserveDoctorFeeCoupon, releaseCouponRedemption } from "@/lib/coupons";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: Creates a real Cashfree order to renew a doctor's monthly
 // patient-access subscription. Optional body `{ code }` applies a coupon
 // (appliesTo must include DOCTOR_SUBSCRIPTION).
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -74,4 +75,4 @@ export async function POST(req: Request) {
     console.error("Failed to create Cashfree order for doctor subscription renewal", authUser.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
-}
+});

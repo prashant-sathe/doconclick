@@ -5,6 +5,7 @@ import { verifyGuestPaymentToken } from "@/lib/guestPaymentToken";
 import { settleAppointmentPayment, notifySettlement } from "@/lib/paymentOrders";
 import { netPayable } from "@/lib/coupons";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // `verify` asks Cashfree directly, once per open order — keep it rare.
 const checkVerifyLimit = createRateLimiter(10, 60 * 1000);
@@ -15,7 +16,7 @@ const LOOKBACK_MS = 24 * 60 * 60 * 1000;
 // return page's fallback when the webhook is late: settle any of this
 // appointment's open orders Cashfree says were paid, exactly as
 // /api/payments/verify-order does for a signed-in patient.
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const params = new URL(req.url).searchParams;
   const apptId = verifyGuestPaymentToken(params.get("t"));
   if (!apptId) {
@@ -92,4 +93,4 @@ export async function GET(req: Request) {
     paymentStatus: appt.paymentStatus,
     creditedAmount: credited?.amount ?? null,
   });
-}
+});

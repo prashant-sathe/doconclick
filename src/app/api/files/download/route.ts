@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // Streams an S3-hosted attachment back through our own origin with a
 // Content-Disposition header, so the browser downloads it instead of
 // navigating to it (the S3 bucket isn't CORS-configured for blob fetches,
 // and its objects were uploaded without a Content-Disposition of their own).
 // Restricted to our own bucket host to avoid being an open URL-fetch proxy.
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -53,4 +54,4 @@ export async function GET(req: Request) {
       "Content-Disposition": `${disposition}; filename="${safeName}"`,
     },
   });
-}
+});

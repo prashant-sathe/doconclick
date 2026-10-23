@@ -5,13 +5,14 @@ import { resolveDoctorScope } from "@/lib/staffGuard";
 import { signGuestPaymentToken, guestPaymentPath } from "@/lib/guestPaymentToken";
 import { externalOrigin } from "@/lib/googleOAuth";
 import { netPayable } from "@/lib/coupons";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: a pay link (shown as a QR at the desk, or sent on WhatsApp) for an
 // accepted, unpaid online appointment of this doctor's — so a patient who
 // can't or won't pay in the app pays on their own phone with no sign-in
 // (/pay/[id]). Each call issues a fresh link; older ones keep working until
 // they expire, and all of them pay the same appointment once.
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withErrorLocale(async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   const scope = await resolveDoctorScope(authUser);
@@ -41,4 +42,4 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     // For the desk's "Send on WhatsApp" button.
     patientMobile: appt.patient.mobile,
   });
-}
+});

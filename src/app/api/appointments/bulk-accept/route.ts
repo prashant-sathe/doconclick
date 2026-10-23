@@ -6,6 +6,7 @@ import { expireStalePendingRequests } from "@/lib/expireAppointments";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { doctorSlotProblem, isTimedBooking, acceptTimeProblem } from "@/lib/doctorSlots";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: Accept every one of the logged-in doctor's (or their staff's) still-
 // pending requests in one go — a busy morning shouldn't mean tapping "Accept"
@@ -15,7 +16,7 @@ import { doctorSlotProblem, isTimedBooking, acceptTimeProblem } from "@/lib/doct
 // closed or on leave that day (acceptTimeProblem), or that overlaps one
 // already confirmed (possibly earlier in this same batch) is left pending
 // and reported back.
-export async function POST() {
+export const POST = withErrorLocale(async function POST() {
   const authUser = await getAuthUser();
   if (!authUser || (authUser.role !== "DOCTOR" && authUser.role !== "STAFF")) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -67,4 +68,4 @@ export async function POST() {
   }
 
   return NextResponse.json({ count: accepted.length, skipped });
-}
+});

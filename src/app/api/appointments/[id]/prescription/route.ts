@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { checkPrescriptionFiles, uploadPrescriptionFiles, discardPrescriptionFiles } from "@/lib/consultation";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: Structured prescription data for PrescriptionDocument — for the
 // patient and the doctor who wrote it (once the consultation is completed),
 // and for admins (any status, e.g. reviewing a disputed booking).
-export async function GET(
+export const GET = withErrorLocale(async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -90,12 +91,12 @@ export async function GET(
       instructions: t.instructions,
     })),
   });
-}
+});
 
 // POST: Doctor uploads one or more prescription files (reports/scans) for their own appointment.
 // Attach-only: closing the consultation (and its payment/arrival guards) is the
 // PATCH /api/appointments/[id] handler's job, never this route's.
-export async function POST(
+export const POST = withErrorLocale(async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -138,4 +139,4 @@ export async function POST(
 
   const attachments = await prisma.prescriptionAttachment.findMany({ where: { appointmentId: id } });
   return NextResponse.json({ attachments });
-}
+});

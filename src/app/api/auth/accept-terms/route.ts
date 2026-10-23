@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { withErrorLocale } from "@/lib/apiErrors";
 
-export async function POST() {
+export const POST = withErrorLocale(async function POST() {
   const user = await getAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -15,4 +16,4 @@ export async function POST() {
   });
 
   return NextResponse.json({ termsAcceptedAt: updated.termsAcceptedAt });
-}
+});

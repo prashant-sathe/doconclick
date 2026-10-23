@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword, signToken, sessionPayload, COOKIE_SECURE } from "@/lib/auth";
 import { sendPushToAdmins } from "@/lib/firebaseAdmin";
 import { validateRegistration } from "@/lib/validation";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
 
   const result = validateRegistration(body);
@@ -73,4 +74,4 @@ export async function POST(req: Request) {
     console.error("Doctor registration failed:", err);
     return NextResponse.json({ error: "Registration failed. Please try again." }, { status: 500 });
   }
-}
+});

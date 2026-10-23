@@ -5,13 +5,14 @@ import { generateSlotsForDate, SLOT_INTERVAL_MINUTES } from "@/lib/clinicAvailab
 import { isTimedBooking } from "@/lib/doctorSlots";
 import { getBookingHorizonDays, horizonProblem } from "@/lib/bookingLimits";
 import { providerOffOnDate } from "@/lib/timeOff";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET /api/doctors/[id]/slots?clinicId=X&date=YYYY-MM-DD
 // Discrete bookable time slots for one of a doctor's clinics on one date —
 // the clinic's open-hour ranges (ClinicSlot) divided into fixed intervals,
 // minus whatever's already booked. Patient-facing (any signed-in patient can
 // check any doctor's slots — same visibility as the doctor's public profile).
-export async function GET(
+export const GET = withErrorLocale(async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -77,4 +78,4 @@ export async function GET(
 
   const slots = candidates.filter((s) => !isTaken(s.time));
   return NextResponse.json({ slots });
-}
+});

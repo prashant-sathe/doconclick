@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { getOrCreateWallet } from "@/lib/wallet";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: current patient's wallet balance + a page of transaction history.
 // Shared by the wallet page, header balance chip, and notification poller —
 // `take=0` skips the transactions query for callers that only need balance.
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -27,4 +28,4 @@ export async function GET(req: Request) {
     : [];
 
   return NextResponse.json({ balance: wallet.balance, transactions });
-}
+});

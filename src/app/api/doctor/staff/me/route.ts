@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: the logged-in staff account's own assignment — used by the dashboard
 // bootstrap in place of the doctor-only /api/doctors/me check.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "STAFF") {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
@@ -23,4 +24,4 @@ export async function GET() {
     doctorId: staffProfile.doctorId,
     doctorName: staffProfile.doctor.name,
   });
-}
+});

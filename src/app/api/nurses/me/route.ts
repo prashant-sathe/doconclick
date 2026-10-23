@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { requireActiveNurse, isNurseBookable } from "@/lib/providerGuard";
 import { parseBody, definedOnly, nurseProfilePatchSchema } from "@/lib/schemas";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: the logged-in nurse's own profile, offered services, and the
 // admin-set fees (so the client knows whether a payment step applies).
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "NURSE") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -41,13 +42,13 @@ export async function GET() {
     },
     bookable: isNurseBookable(nurse.nurseProfile, settings),
   });
-}
+});
 
 // Credentials the admin verified against — frozen once verified.
 const LOCKED_WHEN_VERIFIED = ["qualification", "councilRegNo", "councilState"];
 
 // PATCH: update the logged-in nurse's own profile
-export async function PATCH(req: Request) {
+export const PATCH = withErrorLocale(async function PATCH(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "NURSE") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -79,4 +80,4 @@ export async function PATCH(req: Request) {
     console.error(err);
     return NextResponse.json({ error: "Could not save your profile." }, { status: 500 });
   }
-}
+});

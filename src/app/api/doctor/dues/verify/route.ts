@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { fetchSuccessfulPayment } from "@/lib/cashfree";
 import { settleDuesPayment, notifyDuesSettled } from "@/lib/duesPayments";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const checkLimit = createRateLimiter(10, 60_000);
 
@@ -11,7 +12,7 @@ const checkLimit = createRateLimiter(10, 60_000);
 // Cashfree before the webhook — asks the gateway and settles exactly as the
 // webhook would. Answers SETTLED, REVIEW (paid, waiting on the admin) or
 // PENDING (nothing received yet).
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   const { orderId } = await req.json().catch(() => ({}));
@@ -36,4 +37,4 @@ export async function POST(req: Request) {
     status: order.settlementId ? "SETTLED" : order.status === "PAID" ? "REVIEW" : "PENDING",
     amount: order.amount,
   });
-}
+});

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { verifyPassword, signToken, sessionPayload, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
 import { normalizeMobile, MOBILE_REGEX } from "@/lib/validation";
 import { createRateLimiter, createFailureLimiter, clientIp } from "@/lib/rateLimit";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -14,7 +15,7 @@ const LOCKOUT_MESSAGE = "Too many sign-in attempts. Please wait 15 minutes and t
 const mobileFailures = createFailureLimiter(5, 15 * 60 * 1000);
 const checkIpLimit = createRateLimiter(30, 15 * 60 * 1000);
 
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   if (!checkIpLimit(clientIp(req))) {
     return NextResponse.json({ error: LOCKOUT_MESSAGE }, { status: 429 });
   }
@@ -93,4 +94,4 @@ export async function POST(req: Request) {
     console.error("Login error:", err);
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
-}
+});

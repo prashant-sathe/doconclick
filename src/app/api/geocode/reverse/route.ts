@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { geocodeGuard, reverseLimiter, cachedLookup, GeocodeBusyError } from "@/lib/geocode";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 interface NominatimReverseResult {
   display_name?: string;
@@ -10,7 +11,7 @@ interface NominatimReverseResult {
 // OpenStreetMap Nominatim (server-side, per Nominatim's usage policy which
 // requires a real User-Agent and discourages direct client-side browser calls).
 // Signed-in users only, rate-limited and cached (src/lib/geocode.ts).
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const blocked = await geocodeGuard(reverseLimiter);
   if (blocked) return blocked;
 
@@ -47,4 +48,4 @@ export async function GET(req: Request) {
     }
     return NextResponse.json({ label: null, pinCode: null });
   }
-}
+});

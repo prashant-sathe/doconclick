@@ -5,11 +5,12 @@ import { generateAgoraToken, TOKEN_TTL_SECONDS } from "@/lib/agora";
 import { VIDEO_UNLOCK_DELAY_SECONDS, videoJoinWindow } from "@/lib/videoCall";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: an Agora token for the caller (doctor or patient) to join — or renew
 // their token in — this appointment's video call. Also used for renewal, so
 // every check here applies mid-call too.
-export async function GET(
+export const GET = withErrorLocale(async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -87,4 +88,4 @@ export async function GET(
   const uid = authUser.id;
   const { appId, token } = generateAgoraToken(id, uid);
   return NextResponse.json({ appId, token, channel: id, uid, expiresInSeconds: TOKEN_TTL_SECONDS });
-}
+});

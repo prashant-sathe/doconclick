@@ -5,6 +5,7 @@ import { uploadToS3 } from "@/lib/s3";
 import { verifyUpload } from "@/lib/fileSniff";
 import { slugify } from "@/lib/utils";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -30,7 +31,7 @@ const DOC_FIELD: Record<string, "photoUrl" | "medRegCertUrl" | "degreeCertUrl" |
 
 // POST: Doctor uploads a verification document or profile photo.
 // `type` (form field) selects which slot: photo | medRegCert | degreeCert | kyc
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const { authUser, denied } = await requireRole("DOCTOR");
   if (denied) return denied;
   const suspendedResponse = await requireActiveDoctor(authUser);
@@ -91,12 +92,12 @@ export async function POST(req: Request) {
     console.error(err);
     return NextResponse.json({ error: "Could not update your document. Please try again." }, { status: 500 });
   }
-}
+});
 
 // DELETE: clears a document/photo slot. Same locked-once-verified guard as
 // POST — this doesn't remove the file from S3, just detaches it, matching
 // how "Replace" already leaves the old file orphaned there.
-export async function DELETE(req: Request) {
+export const DELETE = withErrorLocale(async function DELETE(req: Request) {
   const { authUser, denied } = await requireRole("DOCTOR");
   if (denied) return denied;
   const suspendedResponse = await requireActiveDoctor(authUser);
@@ -133,4 +134,4 @@ export async function DELETE(req: Request) {
     console.error(err);
     return NextResponse.json({ error: "Could not update your document. Please try again." }, { status: 500 });
   }
-}
+});

@@ -3,6 +3,7 @@ import { OAuth2Client } from "google-auth-library";
 import { setAuthCookie, setPasswordResetCookie } from "@/lib/auth";
 import { resolveGoogleUser } from "@/lib/googleAuth";
 import type { OAuthRole, OAuthIntent } from "@/lib/googleOAuth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // Native Google Sign-In (@capgo/capacitor-social-login) runs the OS account
 // picker inside the app and hands back an OpenID Connect ID token — no browser,
@@ -21,7 +22,7 @@ const AUDIENCES = [
 
 const client = new OAuth2Client();
 
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const idToken = body?.idToken;
   const role: OAuthRole = body?.role === "DOCTOR" || body?.role === "NURSE" ? body.role : "PATIENT";
@@ -65,4 +66,4 @@ export async function POST(req: Request) {
   // password without the old one.
   if (intent === "reset") await setPasswordResetCookie(resolved.payload);
   return NextResponse.json({ next: resolved.destination });
-}
+});

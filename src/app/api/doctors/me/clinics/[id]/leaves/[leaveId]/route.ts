@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // DELETE: Remove a leave/holiday date from one of the logged-in doctor's clinics
-export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string; leaveId: string }> }) {
+export const DELETE = withErrorLocale(async function DELETE(_req: Request, { params }: { params: Promise<{ id: string; leaveId: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -23,4 +24,4 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
 
   await prisma.clinicLeave.delete({ where: { id: leaveId } });
   return NextResponse.json({ ok: true });
-}
+});

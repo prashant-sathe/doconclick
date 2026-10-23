@@ -4,11 +4,12 @@ import { getAuthUser } from "@/lib/auth";
 import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 import { getDoctorRegistrationFee } from "@/lib/doctorFees";
 import { normalizeCode, validateCoupon, type CouponContext } from "@/lib/coupons";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 
 // POST: preview-only check of a coupon for a doctor fee. Does NOT reserve a
 // slot — the create-order route re-validates and reserves authoritatively.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -53,4 +54,4 @@ export async function POST(req: Request) {
     discountAmount: result.discountAmount,
     netAmount,
   });
-}
+});

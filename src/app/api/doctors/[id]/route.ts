@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { bookableDoctorWhere } from "@/lib/doctorBookable";
 import { PUBLIC_DOCTOR_PROFILE_SELECT, PUBLIC_CLINIC_SELECT, coarsenBase } from "@/lib/publicDoctor";
 import { publicAvailability } from "@/lib/timeOff";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: A single doctor's public profile (unauthenticated — used by QR/profile links)
-export async function GET(
+export const GET = withErrorLocale(async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -27,4 +28,4 @@ export async function GET(
 
   const availability = (await publicAvailability([doctor.id]))(doctor.id);
   return NextResponse.json({ ...doctor, doctorProfile: doctor.doctorProfile && coarsenBase(doctor.doctorProfile), ...availability });
-}
+});

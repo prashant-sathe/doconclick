@@ -4,10 +4,11 @@ import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
 import { createCashfreeOrder } from "@/lib/cashfree";
 import { APPOINTMENT_ORDER_PREFIX, recordPaymentOrder, totalPayable, settleFreeAppointments, notifySettlement } from "@/lib/paymentOrders";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: Creates a real Cashfree order for an appointment's online payment
 // and returns a payment_session_id for the client to redirect into checkout.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -83,4 +84,4 @@ export async function POST(req: Request) {
     console.error("Failed to create Cashfree order for appointment", appointment.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
-}
+});

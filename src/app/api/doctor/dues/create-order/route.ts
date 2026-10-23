@@ -6,6 +6,7 @@ import { createCashfreeOrder } from "@/lib/cashfree";
 import { UNSETTLED_WHERE, duesFor } from "@/lib/payouts";
 import { DUES_ORDER_PREFIX, owedByDoctor } from "@/lib/duesPayments";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const checkLimit = createRateLimiter(10, 10 * 60_000);
 
@@ -13,7 +14,7 @@ const checkLimit = createRateLimiter(10, 10 * 60_000);
 // now. Open to a doctor whose plan has lapsed — paying dues needs no plan. The visits
 // it covers are snapshotted, so the payment settles exactly those
 // (src/lib/duesPayments.ts) even if more are completed before it lands.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   if (!checkLimit(authUser.id)) {
@@ -58,4 +59,4 @@ export async function POST(req: Request) {
     console.error("Failed to create Cashfree order for doctor dues", authUser.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
-}
+});

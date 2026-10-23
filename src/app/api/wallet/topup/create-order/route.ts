@@ -4,11 +4,12 @@ import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
 import { createCashfreeOrder } from "@/lib/cashfree";
 import { getOrCreateWallet, WALLET_TOPUP_ORDER_PREFIX, MIN_TOPUP_AMOUNT, MAX_TOPUP_AMOUNT } from "@/lib/wallet";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: Creates a real Cashfree order for a wallet top-up and returns a
 // payment_session_id for the client to redirect into checkout. Mirrors
 // /api/payments/create-order for appointments.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -52,4 +53,4 @@ export async function POST(req: Request) {
     await prisma.walletTransaction.update({ where: { id: txn.id }, data: { status: "FAILED" } });
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
-}
+});

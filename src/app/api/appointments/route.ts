@@ -13,8 +13,9 @@ import { parseBody, appointmentBookingSchema } from "@/lib/schemas";
 import { doctorSlotProblem, snapToClinicGrid, isSlotIndexViolation } from "@/lib/doctorSlots";
 import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, doctorHoursProblem, openRequestsProblem } from "@/lib/bookingLimits";
 import { timeOffProblem, TIME_OFF_CODE } from "@/lib/timeOff";
+import { withErrorLocale } from "@/lib/apiErrors";
 
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -315,4 +316,4 @@ export async function POST(req: Request) {
     console.error(err);
     return NextResponse.json({ error: "Booking failed. Please try again." }, { status: 500 });
   }
-}
+});

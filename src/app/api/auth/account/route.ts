@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser, verifyPassword, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME, PWRESET_COOKIE_NAME } from "@/lib/auth";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { accountDeletionPreview, deleteAccount, DeletionBlockedError, SELF_DELETABLE_ROLES } from "@/lib/userDeletion";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const COOKIE_NAME = "doconclick_token";
 
@@ -12,20 +13,20 @@ const checkAttemptLimit = createRateLimiter(5, 15 * 60 * 1000);
 
 // GET: what deleting this account would do (open bookings to cancel, refunds,
 // wallet balance left behind) — shown on the confirmation screen.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   if (!SELF_DELETABLE_ROLES.includes(authUser.role)) {
     return NextResponse.json({ error: "This account can't be deleted from the app." }, { status: 403 });
   }
   return NextResponse.json(await accountDeletionPreview(authUser.id, authUser.role));
-}
+});
 
 // DELETE { password }: the signed-in patient, doctor or nurse deletes their
 // own account. A session alone isn't enough — the current password must come
 // with it. Open bookings are cancelled and refunded, then the account is
 // soft-deleted and anonymized (src/lib/userDeletion.ts).
-export async function DELETE(req: Request) {
+export const DELETE = withErrorLocale(async function DELETE(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   if (!SELF_DELETABLE_ROLES.includes(authUser.role)) {
@@ -73,4 +74,4 @@ export async function DELETE(req: Request) {
   response.cookies.set(COOKIE_NAME, "", cleared);
   response.cookies.set(PWRESET_COOKIE_NAME, "", cleared);
   return response;
-}
+});

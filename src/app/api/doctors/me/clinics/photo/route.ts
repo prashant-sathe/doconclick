@@ -3,6 +3,7 @@ import { getAuthUser } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
 import { verifyUpload } from "@/lib/fileSniff";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -14,7 +15,7 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 // row itself — the client attaches the returned URL to the clinic's
 // create/update payload, since a clinic may not exist yet (new clinic being
 // added) or already have its own dedicated PATCH endpoint.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -43,4 +44,4 @@ export async function POST(req: Request) {
   if ("error" in sniffed) return NextResponse.json({ error: sniffed.error }, { status: 400 });
   const url = await uploadToS3(`doctor-docs/${filename}`, buffer, sniffed.type);
   return NextResponse.json({ url });
-}
+});

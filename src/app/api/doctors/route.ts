@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { bookableDoctorWhere } from "@/lib/doctorBookable";
 import { PUBLIC_DOCTOR_PROFILE_SELECT, PUBLIC_CLINIC_SELECT, coarsenBase } from "@/lib/publicDoctor";
 import { publicAvailability } from "@/lib/timeOff";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: List approved doctors for patient portal, optionally filtered by specialty
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const specialty = searchParams.get("specialty");
 
@@ -24,4 +25,4 @@ export async function GET(req: Request) {
   return NextResponse.json(
     doctors.map((d) => ({ ...d, doctorProfile: d.doctorProfile && coarsenBase(d.doctorProfile), ...availability(d.id) }))
   );
-}
+});

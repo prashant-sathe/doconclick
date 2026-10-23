@@ -7,6 +7,7 @@ import { money, sumMoney } from "@/lib/money";
 import { duesFromGroups, UNSETTLED_WHERE } from "@/lib/payouts";
 import { computeDoctorCompleteness } from "@/lib/doctorProfileCompleteness";
 import { requireActiveDoctor } from "@/lib/doctorGuard";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 type InputItem = OpenAI.Responses.ResponseInputItem;
 type FunctionCall = OpenAI.Responses.ResponseFunctionToolCall;
@@ -321,7 +322,7 @@ async function executeTool(call: FunctionCall, doctorId: string): Promise<unknow
   }
 }
 
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -390,4 +391,4 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ items: newItems });
-}
+});

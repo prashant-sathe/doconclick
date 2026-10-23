@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { fetchSuccessfulPayment } from "@/lib/cashfree";
 import { settleAppointmentPayment, notifySettlement } from "@/lib/paymentOrders";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // Each call can hit the Cashfree API once per open order.
 const checkLimit = createRateLimiter(10, 60 * 1000);
@@ -14,7 +15,7 @@ const LOOKBACK_MS = 24 * 60 * 60 * 1000;
 // late or lost. Asks Cashfree directly whether any of this appointment's open
 // orders was paid and, if so, settles it exactly as the webhook would.
 // Responds with where the appointment's payment ended up.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -58,7 +59,7 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json(await paymentState(apptId));
-}
+});
 
 // PAID, CREDITED (the payment went to the wallet instead — e.g. the visit was
 // cancelled meanwhile), or PENDING (nothing received yet).

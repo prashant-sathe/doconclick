@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // Lets the notification-settings toggle show the account's real state
 // instead of trusting a per-browser localStorage flag, which goes stale
 // whenever the token was registered from a different device/session.
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -13,9 +14,9 @@ export async function GET() {
 
   const count = await prisma.pushToken.count({ where: { userId: authUser.id } });
   return NextResponse.json({ subscribed: count > 0 });
-}
+});
 
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -33,12 +34,12 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});
 
 // `token` deletes just that device's subscription (e.g. on logout). Omitting
 // it deletes every token for the account — used by the settings-page toggle,
 // where "off" means the account stops getting push on any device.
-export async function DELETE(req: Request) {
+export const DELETE = withErrorLocale(async function DELETE(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -53,4 +54,4 @@ export async function DELETE(req: Request) {
     where: token ? { token, userId: authUser.id } : { userId: authUser.id },
   });
   return NextResponse.json({ ok: true });
-}
+});

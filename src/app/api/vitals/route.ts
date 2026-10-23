@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { careAccessProblem } from "@/lib/careAccess";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET ?patientId=…&dependentId=… — vitals history for one person (the
 // account holder, or one family member — never mixed).
 // Patient: their own and their family members'. Doctor / nurse: only with an
 // accepted or recently completed visit with that person — same rule as the
 // doctor's patient-history page (src/lib/careAccess.ts).
-export async function GET(req: Request) {
+export const GET = withErrorLocale(async function GET(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
@@ -42,4 +43,4 @@ export async function GET(req: Request) {
     include: { recordedBy: { select: { name: true } }, appointment: { select: { serviceName: true } } },
   });
   return NextResponse.json(readings);
-}
+});

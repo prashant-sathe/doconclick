@@ -8,6 +8,7 @@ import { releaseCouponRedemption } from "@/lib/coupons";
 import { settleAppointmentPayment, notifySettlement } from "@/lib/paymentOrders";
 import { NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX } from "@/lib/nurseConstants";
 import { DUES_ORDER_PREFIX, settleDuesPayment, notifyDuesSettled } from "@/lib/duesPayments";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 interface CashfreeWebhookPayload {
   type: "PAYMENT_SUCCESS_WEBHOOK" | "PAYMENT_FAILED_WEBHOOK" | string;
@@ -22,7 +23,7 @@ interface CashfreeWebhookPayload {
 // POST: Cashfree calls this server-to-server when a payment succeeds/fails.
 // No session auth here — trust comes entirely from the signature check below,
 // which is why the raw body must be verified before it's ever parsed as JSON.
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const rawBody = await req.text();
   const signature = req.headers.get("x-webhook-signature");
   const timestamp = req.headers.get("x-webhook-timestamp");
@@ -284,4 +285,4 @@ export async function POST(req: Request) {
   notifySettlement(result);
 
   return NextResponse.json({ ok: true });
-}
+});

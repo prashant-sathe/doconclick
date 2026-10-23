@@ -9,6 +9,7 @@ import {
 } from "@/lib/appointmentCancel";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { formatDoctorName } from "@/lib/utils";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 async function loadOwnedClinic(doctorId: string, id: string) {
   const clinic = await prisma.clinic.findUnique({ where: { id } });
@@ -17,7 +18,7 @@ async function loadOwnedClinic(doctorId: string, id: string) {
 }
 
 // GET: List upcoming/all leave dates for one of the logged-in doctor's clinics
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withErrorLocale(async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -34,7 +35,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     orderBy: { date: "asc" },
   });
   return NextResponse.json({ leaves });
-}
+});
 
 const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -61,7 +62,7 @@ function istDayBounds(date: unknown): { start: Date; end: Date } | null {
 // to the patient's wallet (or its coupon slot freed) through the shared
 // cancel path, and each patient pushed. A booking that appears in between
 // re-triggers the confirmation instead of being cancelled unseen.
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withErrorLocale(async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -153,4 +154,4 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     cancelledBookings: result.cancelled.length,
     refundTotal: result.cancelled.reduce((sum, c) => sum + c.refund, 0),
   });
-}
+});

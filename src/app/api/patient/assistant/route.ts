@@ -12,6 +12,7 @@ import { searchNurses } from "@/lib/nurseSearch";
 import { awayAt } from "@/lib/timeOff";
 import { readJson } from "@/lib/routeGuards";
 import { parseBody, assistantRequestSchema } from "@/lib/schemas";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 type InputItem = OpenAI.Responses.ResponseInputItem;
 type FunctionCall = OpenAI.Responses.ResponseFunctionToolCall;
@@ -424,7 +425,7 @@ async function executeTool(call: FunctionCall, patientId: string, origin: Origin
   }
 }
 
-export async function POST(req: Request) {
+export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -493,4 +494,4 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ items: newItems });
-}
+});

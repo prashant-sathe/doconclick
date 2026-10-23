@@ -3,9 +3,10 @@ import { verifyVisitCoordinates } from "@/lib/visitVerify";
 import { prisma } from "@/lib/prisma";
 import { requireRole, readJson, isRecordNotFound } from "@/lib/routeGuards";
 import { parseBody, definedOnly, patientProfilePatchSchema } from "@/lib/schemas";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: The logged-in patient's own profile
-export async function GET() {
+export const GET = withErrorLocale(async function GET() {
   const { authUser, denied } = await requireRole("PATIENT");
   if (denied) return denied;
 
@@ -25,10 +26,10 @@ export async function GET() {
   }
 
   return NextResponse.json(patient);
-}
+});
 
 // PATCH: Update the logged-in patient's own profile
-export async function PATCH(req: Request) {
+export const PATCH = withErrorLocale(async function PATCH(req: Request) {
   const { authUser, denied } = await requireRole("PATIENT");
   if (denied) return denied;
 
@@ -90,4 +91,4 @@ export async function PATCH(req: Request) {
     console.error(err);
     return NextResponse.json({ error: "Could not save your profile. Please try again." }, { status: 500 });
   }
-}
+});

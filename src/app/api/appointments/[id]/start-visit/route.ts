@@ -6,6 +6,7 @@ import { requireActiveNurse } from "@/lib/providerGuard";
 import { sendPushToUser, sendPushToAdmins } from "@/lib/firebaseAdmin";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { visitStartProblem } from "@/lib/nursePackage";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const MAX_ATTEMPTS = 5;
 
@@ -18,7 +19,7 @@ const checkCodeRateLimit = createRateLimiter(10, 10 * 60 * 1000);
 // POST { skipReason } — the patient can't produce the code (no phone, the
 // account holder is elsewhere and unreachable…): start anyway, but the reason
 // is recorded, the patient is told, and the admin is alerted.
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withErrorLocale(async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "NURSE") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -122,4 +123,4 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     url: "/patient/appointments",
   });
   return NextResponse.json(updated);
-}
+});

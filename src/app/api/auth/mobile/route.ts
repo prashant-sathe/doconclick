@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, signToken, sessionPayload, COOKIE_SECURE } from "@/lib/auth";
 import { normalizeMobile, MOBILE_REGEX } from "@/lib/validation";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -11,7 +12,7 @@ const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 // that: the mobile number is the password-login identifier, so changing an
 // already-set one without verifying the new number would be an account
 // takeover path.
-export async function PATCH(req: Request) {
+export const PATCH = withErrorLocale(async function PATCH(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -58,4 +59,4 @@ export async function PATCH(req: Request) {
     console.error(err);
     return NextResponse.json({ error: "Could not update your mobile number." }, { status: 500 });
   }
-}
+});

@@ -18,6 +18,7 @@ import { getBookingHorizonDays, horizonProblem, doctorHoursProblem } from "@/lib
 import { referralPushCopy } from "@/lib/nurseReferral";
 import { settleIfFreeOnAccept } from "@/lib/paymentOrders";
 import { GATEWAY_OMIT, LIVE_LOCATION_CLEARED, withLiveLocationOnlyWhileLive } from "@/lib/appointmentView";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // Patient push per new status (messages/<locale>/push.json). The confirmed
 // copy adds "Nothing to pay" when `free` is "yes" (a ₹0 booking marked PAID on accept).
@@ -41,7 +42,7 @@ const DOCTOR_TRANSITIONS: Record<string, string[]> = {
 
 // GET: A single appointment, visible only to its own patient or doctor
 // (used for lightweight polling, e.g. live travel-status tracking)
-export async function GET(
+export const GET = withErrorLocale(async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -91,7 +92,7 @@ export async function GET(
     };
   }
   return NextResponse.json({ ...rest, ...(isPatient ? { visitOtp } : {}), package: pkg });
-}
+});
 
 // Provider-facing responses must never carry the patient's door code.
 function withoutVisitCode<T extends { visitOtp?: string | null }>(row: T): Omit<T, "visitOtp"> {
@@ -106,7 +107,7 @@ function newVisitCode() {
 
 // PATCH: Doctor accepts/rejects/completes/cancels their own appointment;
 // patient cancels their own not-yet-completed appointment.
-export async function PATCH(
+export const PATCH = withErrorLocale(async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -635,4 +636,4 @@ export async function PATCH(
   }
 
   return NextResponse.json({ error: "Not authorized" }, { status: 403 });
-}
+});

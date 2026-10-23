@@ -10,6 +10,7 @@ import {
   needsBookingConfirmation, affectedBookingSummary, BOOKINGS_CHANGED_MESSAGE,
 } from "@/lib/appointmentCancel";
 import { validateClinicInput } from "@/lib/clinicInput";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 
 async function loadOwnedClinic(doctorId: string, id: string) {
@@ -89,7 +90,7 @@ async function closeClinic<T>(
 }
 
 // PATCH: Update one of the logged-in doctor's clinics (fields + slots, slots are replaced wholesale)
-export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withErrorLocale(async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -141,13 +142,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   }
 
   return NextResponse.json(await prisma.$transaction(save));
-}
+});
 
 // DELETE { confirmBookingIds? }: remove one of the logged-in doctor's
 // clinics. Soft delete — the row stays (deletedAt + isActive false) so past
 // appointments keep their clinic, and open bookings must be confirmed for
 // cancel + refund first (see closeClinic).
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = withErrorLocale(async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "DOCTOR") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -167,4 +168,4 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   );
   if (closed instanceof NextResponse) return closed;
   return NextResponse.json({ ok: true, cancelledBookings: closed.cancelledBookings, refundTotal: closed.refundTotal });
-}
+});

@@ -6,6 +6,7 @@ import { requireActiveProvider } from "@/lib/providerGuard";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { readJson } from "@/lib/routeGuards";
 import { chatState, getChatFollowUpDays } from "@/lib/chatAccess";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // A message's fileUrl must point at our own upload bucket — it's only ever
 // meant to be set from the upload endpoint's response, never a client-typed
@@ -46,7 +47,7 @@ export async function loadAndAuthorize(id: string, authUser: JWTPayload, purpose
   return { appointment, chat };
 }
 
-export async function GET(
+export const GET = withErrorLocale(async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -67,9 +68,9 @@ export async function GET(
 
   // `chat` tells the UI whether to show the composer, and why not.
   return NextResponse.json({ messages, chat: { canSend: chat!.canSend, reason: chat!.reason, sendUntil: chat!.sendUntil } });
-}
+});
 
-export async function POST(
+export const POST = withErrorLocale(async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -125,4 +126,4 @@ export async function POST(
   });
 
   return NextResponse.json(message);
-}
+});

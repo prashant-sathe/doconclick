@@ -4,10 +4,11 @@ import { requireActiveDoctor } from "@/lib/doctorGuard";
 import { requireRole, readJson } from "@/lib/routeGuards";
 import { prescriptionEditProblem } from "@/lib/prescriptionLock";
 import { normalizePrescription, replacePrescription } from "@/lib/consultation";
+import { withErrorLocale } from "@/lib/apiErrors";
 
 // GET: the prescription's version history, newest first — for the doctor who
 // wrote it and for admins.
-export async function GET(
+export const GET = withErrorLocale(async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -21,12 +22,12 @@ export async function GET(
   }
   const versions = await prisma.prescriptionVersion.findMany({ where: { appointmentId: id }, orderBy: { version: "desc" } });
   return NextResponse.json({ versions });
-}
+});
 
 // POST: Doctor replaces the medicine/test list for their own appointment —
 // only while it's accepted or within the edit window after completion
 // (src/lib/prescriptionLock.ts). Every change is kept as a version.
-export async function POST(
+export const POST = withErrorLocale(async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -58,4 +59,4 @@ export async function POST(
     prisma.prescriptionTest.findMany({ where: { appointmentId: id } }),
   ]);
   return NextResponse.json({ medicines: resultMedicines, tests: resultTests });
-}
+});
