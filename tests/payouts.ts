@@ -4,7 +4,8 @@
 // the same figure on their earnings page, in their payout request, in the
 // admin settle queue and in the settlement — and a payout request needs bank
 // details on file. Pure checks, then against a live dev server and the DB in
-// .env, throwaway rows only (report rows dated in 2033).
+// .env, throwaway rows only (report rows dated in 2033). Parallel payout
+// requests open only one (BUG-TRACKER #72).
 //
 //   npm run test:payouts
 import "dotenv/config";
@@ -57,6 +58,7 @@ async function main() {
   const doctor = await mk({ name: "Payout Doctor", role: "DOCTOR", doctorProfile: docProfile() });
   const owes = await mk({ name: "Owing Doctor", role: "DOCTOR", doctorProfile: docProfile({ bankDetails: "HDFC | 1234567890 | IFSC: HDFC0001234" }) });
   const idle = await mk({ name: "Idle Doctor", role: "DOCTOR", doctorProfile: docProfile({ bankDetails: "HDFC | 1 | IFSC: HDFC0001234" }) });
+  const racer = await mk({ name: "Racing Doctor", role: "DOCTOR", doctorProfile: docProfile({ bankDetails: "AXIS | 42 | IFSC: UTIB0000001" }) });
   const nurse = await mk({ name: "Payout Nurse", role: "NURSE", nurseProfile: { create: { status: "APPROVED", registrationFeePaid: true, subscriptionPaidUntil: new Date(Date.now() + 30 * DAY), bankDetails: "SBI | 99 | IFSC: SBIN0000001" } } });
   const patient = await mk({ name: "Payout Patient", role: "PATIENT", patientProfile: { create: { age: 30, gender: "Male" } } });
 
@@ -73,6 +75,8 @@ async function main() {
     // Owing doctor: ₹45 online payout, ₹100 fee on cash.
     await visit(owes.id, { amount: 50, platformFee: 5 });
     await visit(owes.id, { paymentMethod: "CASH", amount: 1000, platformFee: 100 });
+    // Racing doctor: one ₹500 online visit (₹450 owed).
+    await visit(racer.id, { amount: 500, platformFee: 50 });
     // Nurse: one online visit.
     await visit(nurse.id, { providerType: "NURSE", consultType: "HOME", amount: 799.99, platformFee: 80 });
 
@@ -113,6 +117,13 @@ async function main() {
     // ── Nurse (bank details on the nurse profile) ──
     r = await call(nurse, "POST", "/api/doctor/payout-requests");
     check("nurse with bank details → request for ₹719.99", r.status === 200 && r.json.amount === 719.99, `${r.status} ${r.json.amount} ${r.json.error ?? ""}`);
+
+    // ── Parallel taps open only one request (BUG-TRACKER #72) ──
+    const race = await Promise.all(Array.from({ length: 4 }, () => call(racer, "POST", "/api/doctor/payout-requests")));
+    const codes = race.map((x) => x.status).sort();
+    check("4 parallel POSTs → 1×200 + 3×409 'awaiting review'", codes.join(",") === "200,409,409,409" && race.filter((x) => x.status === 409).every((x) => /awaiting review/i.test(x.json.error ?? "")), codes.join(","));
+    const racerRows = await prisma.payoutRequest.findMany({ where: { doctorId: racer.id } });
+    check("…and exactly one PENDING row for ₹450", racerRows.length === 1 && racerRows[0].status === "PENDING" && racerRows[0].amount === 450, racerRows.map((x) => `${x.status}:${x.amount}`).join(",") || "none");
 
     // ── Admin settle queue + settlement use the same figures ──
     const q = await call(admin, "GET", "/api/admin/finance/settlements");

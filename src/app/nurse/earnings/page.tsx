@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -38,6 +38,8 @@ export default function NurseEarningsPage() {
   const [bankOnFile, setBankOnFile] = useState(true);
   const [requesting, setRequesting] = useState(false);
   const [error, setError] = useState("");
+  // Blocks a second tap before the disabled state renders (BUG-TRACKER #72).
+  const requestInFlight = useRef(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login?next=/nurse/earnings");
@@ -71,9 +73,13 @@ export default function NurseEarningsPage() {
   const openRequest = requests.find((r) => r.status === "PENDING") ?? null;
 
   const requestPayout = async () => {
+    if (requestInFlight.current) return;
+    requestInFlight.current = true;
     setRequesting(true); setError("");
-    const res = await fetch("/api/doctor/payout-requests", { method: "POST" });
-    setRequesting(false);
+    const res = await fetch("/api/doctor/payout-requests", { method: "POST" }).finally(() => {
+      requestInFlight.current = false;
+      setRequesting(false);
+    });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       if (body.code === "BANK_DETAILS_REQUIRED") setBankOnFile(false);

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, IndianRupee, TrendingUp, CreditCard, Send, CheckCircle2 } from "lucide-react";
@@ -78,6 +78,8 @@ export default function DoctorEarnings() {
   const [visibleCount, setVisibleCount] = useState(10);
   const [requestingPayout, setRequestingPayout] = useState(false);
   const [payoutError, setPayoutError] = useState("");
+  // Blocks a second tap before the disabled state renders (BUG-TRACKER #72).
+  const payoutInFlight = useRef(false);
   useEffect(() => {
     if (!user || user.role !== "DOCTOR") return;
     fetch("/api/doctors/me")
@@ -126,10 +128,14 @@ export default function DoctorEarnings() {
   const openPayoutRequest = payoutRequests.find((r) => r.status === "PENDING") ?? null;
 
   const requestPayout = async () => {
+    if (payoutInFlight.current) return;
+    payoutInFlight.current = true;
     setRequestingPayout(true);
     setPayoutError("");
-    const res = await fetch("/api/doctor/payout-requests", { method: "POST" });
-    setRequestingPayout(false);
+    const res = await fetch("/api/doctor/payout-requests", { method: "POST" }).finally(() => {
+      payoutInFlight.current = false;
+      setRequestingPayout(false);
+    });
     if (res.ok) {
       const created: PayoutRequestRecord = await res.json();
       setPayoutRequests((cur) => [created, ...cur]);
