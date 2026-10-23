@@ -38,6 +38,7 @@
   "duesBelowMinimum": "{amount}: rupee amount (number)",
   "duesStaffCashPaused": "{amount}: amount including the ₹ sign, e.g. '₹1,200'",
   "duesDoctorCashPaused": "{amount}: amount including the ₹ sign, e.g. '₹1,200'; {limit}: rupee amount without the sign, e.g. '1,000'",
+  "careAccessEndedWalkIn": "{days}: number of days; {date}: English-formatted date, e.g. '3 Nov 2026'",
   "careAccessEnded": "{days}: number of days; {date}: English-formatted date, e.g. '3 Nov 2026'",
   "walkInDuplicateConfirmedClinic": "{name}: patient's name; {time}: English-formatted date and time, e.g. '3 Nov 2026, 4:30 pm'",
   "walkInDuplicateConfirmedClinicQueue": "{name}: patient's name; {time}: when it was added, English-formatted date and time, e.g. '3 Nov 2026, 4:30 pm'",

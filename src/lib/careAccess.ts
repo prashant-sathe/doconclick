@@ -55,5 +55,8 @@ export async function careAccessProblem(params: {
   }
   const last = real[0].scheduledAt;
   const fmt = (d: Date) => d.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium" });
+  if (visits.some((v) => v.bookedById)) {
+    return `Access to this patient's history ended ${CARE_ACCESS_WINDOW_DAYS} days after your last visit (${fmt(last)}). The walk-in you booked doesn't reopen it; it reopens only when they book with you themselves and you accept.`;
+  }
   return `Access to this patient's history ended ${CARE_ACCESS_WINDOW_DAYS} days after your last visit (${fmt(last)}). It reopens if they book with you again and you accept.`;
 }

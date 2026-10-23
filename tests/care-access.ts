@@ -72,6 +72,7 @@ async function main() {
   const walkIn = await patientOf("Access WalkIn");
   const walkInDone = await patientOf("Access WalkIn Done");
   const walkInOwn = await patientOf("Access WalkIn Own");
+  const lapsedWalkIn = await patientOf("Access Lapsed WalkIn");
   const parentProfile = await prisma.patientProfile.findUniqueOrThrow({ where: { userId: scheduled.id } });
   const child = await prisma.patientDependent.create({ data: { patientProfileId: parentProfile.id, name: "Access Child", relation: "Son" } });
 
@@ -91,10 +92,13 @@ async function main() {
   await appt(doctor.id, walkInDone.id, "COMPLETED", daysAgo(1), { consultType: "CLINIC", bookedById: doctor.id });
   await appt(doctor.id, walkInOwn.id, "SCHEDULED", daysAgo(0), { consultType: "CLINIC", bookedById: doctor.id });
   await appt(doctor.id, walkInOwn.id, "SCHEDULED", daysAgo(-2));
+  // P3-21: old self visit lapsed + a fresh desk walk-in.
+  await appt(doctor.id, lapsedWalkIn.id, "COMPLETED", daysAgo(200));
+  await appt(doctor.id, lapsedWalkIn.id, "SCHEDULED", daysAgo(0), { consultType: "CLINIC", bookedById: doctor.id });
   await appt(nurse.id, pending.id, "PENDING_APPROVAL", daysAgo(-1), { providerType: "NURSE", consultType: "HOME" });
   await appt(nurse.id, scheduled.id, "SCHEDULED", daysAgo(-1), { providerType: "NURSE", consultType: "HOME" });
   // A recent reading for every patient, so the dashboard check can tell who gets one.
-  for (const p of [pending, declined, scheduled, recent, lapsed, returning, walkIn, walkInDone, walkInOwn]) {
+  for (const p of [pending, declined, scheduled, recent, lapsed, returning, walkIn, walkInDone, walkInOwn, lapsedWalkIn]) {
     await prisma.vitalReading.create({ data: { patientId: p.id, recordedById: nurse.id, pulse: 80, recordedAt: daysAgo(1) } });
   }
 
@@ -112,6 +116,7 @@ async function main() {
       ["desk-made walk-in still scheduled", walkIn, false],
       ["#83 desk-made walk-in completed", walkInDone, false],
       ["desk-made walk-in + own accepted booking", walkInOwn, true],
+      ["P3-21 lapsed visit + new desk walk-in", lapsedWalkIn, false],
     ] as const) {
       const h = await history(p);
       check(`history: ${label} → ${ok ? 200 : 403}`, h.status === (ok ? 200 : 403), `${h.status} ${err(h.json)}`);
@@ -125,6 +130,9 @@ async function main() {
     check("scheduled walk-in explains it opens once the patient books themselves", walkInMsg.code === "NO_CARE_ACCESS" && (walkInMsg.error ?? "").includes("book a visit with you themselves"), JSON.stringify(walkInMsg));
     const doneMsg = (await history(walkInDone)).json as { error?: string; code?: string };
     check("#83 completed walk-in gets the same walk-in message", doneMsg.code === "NO_CARE_ACCESS" && (doneMsg.error ?? "").includes("book a visit with you themselves"), JSON.stringify(doneMsg));
+
+    const lwMsg = (await history(lapsedWalkIn)).json as { error?: string; code?: string };
+    check("P3-21 lapsed + walk-in: says ended AND that the walk-in does not reopen it", lwMsg.code === "NO_CARE_ACCESS" && (lwMsg.error ?? "").includes("ended") && (lwMsg.error ?? "").includes("walk-in you booked doesn't reopen"), JSON.stringify(lwMsg));
 
     const dep = await history(scheduled, child.id);
     check("parent's visit doesn't open the child's history", dep.status === 403, `${dep.status} ${err(dep.json)}`);
