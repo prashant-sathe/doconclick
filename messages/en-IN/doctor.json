@@ -112,7 +112,10 @@
       "late": "You accepted this appointment more than 10 minutes ago. Cancelling this late may lead to a penalty on your account in the future.",
       "keep": "Keep Appointment",
       "confirm": "Cancel Appointment",
-      "busy": "Cancelling…"
+      "busy": "Cancelling…",
+      "walkInTitle": "Cancel this walk-in?",
+      "walkInBody": "{name}'s walk-in on {when} will be cancelled. Any payment goes back to their wallet. It won't be sent to another doctor.",
+      "walkInConfirm": "Cancel Walk-in"
     },
     "payQrDialog": {
       "subtitle": "Pay on their phone — no sign-in needed"

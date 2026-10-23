@@ -353,6 +353,36 @@ async function main() {
     r = await book(freeDoctor, { mobile: newMobile2, force: true, paymentMethod: "ONLINE", clinicId: null });
     check("₹0 fee, online → PAID straight away, no link", r.status === 200 && (r.json.appointment as J).paymentStatus === "PAID" && r.json.payment === null, `${r.status} ${(r.json.appointment as J)?.paymentStatus}`);
 
+    // ── Cancelling a walk-in (#70): never handed to another doctor ──
+    // A free, nearby doctor of the same kind exists, so a patient's own booking
+    // would be reassigned to them — a desk-made walk-in must not be.
+    await prisma.clinic.create({ data: { doctorId: other.id, name: "Other Clinic", address: "FC Road, Pune", lat: 18.52, lng: 73.85, slots: { create: allWeek } } });
+    // Pushes are fire-and-forget — wait for the walkInCancelled inbox row.
+    const inboxKinds = async (userId: string) => {
+      let kinds: (string | null)[] = [];
+      for (let i = 0; i < 20 && !kinds.includes("walkInCancelled"); i++) {
+        if (i) await new Promise((res) => setTimeout(res, 150));
+        kinds = (await prisma.notification.findMany({ where: { userId }, select: { kind: true } })).map((x) => x.kind);
+      }
+      return kinds;
+    };
+    r = await book(desk, { mobile: regular.mobile, force: true, symptoms: "Double entry" });
+    const dupId = String((r.json.appointment as J)?.id);
+    await prisma.notification.deleteMany({ where: { userId: { in: [regular.id, other.id] } } });
+    r = await call(desk, "PATCH", `/api/appointments/${dupId}`, { status: "CANCELLED" });
+    const replacements = await prisma.appointment.count({ where: { reassignedFromId: dupId } });
+    check("desk cancels its own cash walk-in → CANCELLED, no replacement booked", r.status === 200 && (await appt(dupId)).status === "CANCELLED" && replacements === 0, `${r.status} ${r.json.error ?? ""} replacements=${replacements}`);
+    const kinds = await inboxKinds(regular.id);
+    check("…patient gets the neutral walkInCancelled push, not the emergency/reassigned one", kinds.length === 1 && kinds[0] === "walkInCancelled", JSON.stringify(kinds));
+    check("…no request pushed to the other doctor", (await prisma.notification.count({ where: { userId: other.id } })) === 0, "other doctor inbox empty");
+    r = await call(doctor, "PATCH", `/api/appointments/${vId}`, { status: "CANCELLED" });
+    const vUser = (await appt(vId)).patientId;
+    const refundRow = await prisma.walletTransaction.findUnique({ where: { refundOfAppointmentId: vId } });
+    check("doctor cancels a paid walk-in → refunded to the wallet (CANCELLATION_REFUND), not reassigned", r.status === 200 && refundRow?.type === "CANCELLATION_REFUND" && refundRow.amount === 300 && (await prisma.appointment.count({ where: { reassignedFromId: vId } })) === 0, `${r.status} ${refundRow?.type} ${refundRow?.amount}`);
+    await inboxKinds(vUser);
+    const vNote = await prisma.notification.findFirst({ where: { userId: vUser, kind: "walkInCancelled" } });
+    check("…its push says the ₹300 went back to the wallet, with no emergency wording", !!vNote && vNote.body.includes("₹300") && !/emergency/i.test(vNote.body), vNote?.body ?? "no walkInCancelled row");
+
     // ── Completing a cash walk-in ──
     r = await call(desk, "PATCH", `/api/appointments/${cashId}`, { status: "COMPLETED" });
     check("staff can't complete it → 403", r.status === 403, `${r.status}`);

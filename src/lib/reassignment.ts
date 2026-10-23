@@ -59,7 +59,10 @@ export async function cancelAndReassign(
   reassigned: Appointment | null;
   candidate: ReassignmentCandidate | null;
 }> {
-  const replacement = await findReplacement(appointment);
+  // A walk-in the provider's own desk booked never goes to another doctor
+  // (the patient is at that clinic, and the replacement would get the
+  // patient's history without their consent) — cancel and refund only.
+  const replacement = appointment.bookedById ? null : await findReplacement(appointment);
   const run = (withReplacement: typeof replacement) =>
     prisma.$transaction(async (tx) => {
       const { cancelled, wasPaid, refund } = await cancelAndRefund(tx, appointment.id, {

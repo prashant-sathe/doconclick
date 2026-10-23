@@ -1884,10 +1884,10 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <XCircle className="w-5 h-5 text-red-600" />
-              <h3 className="font-bold text-slate-800">{t("cancelDialog.title")}</h3>
+              <h3 className="font-bold text-slate-800">{t(cancelTarget.bookedById ? "cancelDialog.walkInTitle" : "cancelDialog.title")}</h3>
             </div>
             <p className={cn("text-sm text-slate-500", isLateCancellation(cancelTarget) ? "mb-3" : "mb-5")}>
-              {t("cancelDialog.body", { name: patientLabel(cancelTarget), when: new Date(cancelTarget.scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) })}
+              {t(cancelTarget.bookedById ? "cancelDialog.walkInBody" : "cancelDialog.body", { name: patientLabel(cancelTarget), when: new Date(cancelTarget.scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) })}
             </p>
             {isLateCancellation(cancelTarget) && (
               <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-5 flex items-start gap-1.5">
@@ -1900,7 +1900,7 @@ export default function DoctorDashboard() {
                 {t("cancelDialog.keep")}
               </button>
               <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                {cancelling ? t("cancelDialog.busy") : t("cancelDialog.confirm")}
+                {cancelling ? t("cancelDialog.busy") : t(cancelTarget.bookedById ? "cancelDialog.walkInConfirm" : "cancelDialog.confirm")}
               </button>
             </div>
           </div>

@@ -346,6 +346,30 @@ export const PATCH = withErrorLocale(async function PATCH(
     // can't carry over (the new appointment starts unpaid), so it's credited
     // to the patient's wallet instead of lost.
     if (status === "CANCELLED") {
+      // A walk-in the doctor's own desk booked (e.g. a double entry) is a
+      // desk correction, not the doctor letting a patient down — the patient
+      // is standing in this clinic, so never hand it to another doctor. Just
+      // cancel and refund (or free the coupon), with a neutral push.
+      if (appointment.bookedById) {
+        let walkIn;
+        try {
+          walkIn = await prisma.$transaction((tx) =>
+            cancelAndRefund(tx, appointment.id, {
+              data: { doctorNotes: doctorNotes ?? appointment.doctorNotes },
+              note: `Refund for walk-in appointment ${appointment.id}, cancelled by the clinic`,
+            })
+          );
+        } catch (err) {
+          if (isAlreadyClosed(err)) return NextResponse.json({ error: ALREADY_CLOSED_MESSAGE }, { status: 409 });
+          throw err;
+        }
+        void sendPushToUser(appointment.patientId, {
+          key: "walkInCancelled",
+          values: { doctor: actingDoctorName, paid: walkIn.wasPaid ? "yes" : "no", amount: walkIn.refund },
+          url: "/patient/appointments",
+        });
+        return NextResponse.json(withoutVisitCode(walkIn.cancelled));
+      }
       let result;
       try {
         result = await cancelAndReassign(appointment, {

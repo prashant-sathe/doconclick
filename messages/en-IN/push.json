@@ -63,6 +63,10 @@
     "title": "Appointment cancelled",
     "body": "{doctor} had an emergency and couldn't continue with your appointment. We couldn't find another {providerType, select, NURSE {nurse} other {doctor}} nearby right now — {paid, select, yes {₹{amount} has been credited to your wallet. Please book again.} other {please book again.}}"
   },
+  "walkInCancelled": {
+    "title": "Visit cancelled",
+    "body": "Your visit with {doctor} was cancelled.{paid, select, yes { ₹{amount} has been credited to your wallet.} other {}}"
+  },
   "apptCancelledByPatient": {
     "title": "Appointment cancelled",
     "body": "{paid, select, yes {{patient} cancelled their appointment. ₹{amount} was refunded to their wallet.} other {{patient} cancelled their appointment request.}}"
