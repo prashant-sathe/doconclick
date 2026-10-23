@@ -6,7 +6,7 @@
 // failed payment frees the slot. Doctor-only / booking-only coupons are
 // refused for nurses and vice versa.
 //
-// Like test:walk-in, this starts its OWN dev server on port 3100 with
+// Like test:walk-in, this starts its OWN dev server (MOCK_PORT env, default 3100, else a free port; tests/devServer.ts) with
 // Cashfree pointed at an in-process mock and a test-only secret, so no real
 // gateway order is ever created. Stop any running `next dev` first. Uses the
 // DB in .env, throwaway users/coupons only; the nurse fee settings are put
@@ -16,14 +16,15 @@
 import "dotenv/config";
 import crypto from "crypto";
 import http from "http";
-import { spawn, type ChildProcess } from "child_process";
+import type { ChildProcess } from "child_process";
+import type { AddressInfo } from "net";
+import { startDevServer } from "./devServer";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
 import { validateCoupon } from "../src/lib/coupons";
 
-const PORT = 3100;
-const MOCK_PORT = 4012;
-const BASE = `http://localhost:${PORT}`;
+let MOCK_PORT = 0; // mock Cashfree: free port picked in main()
+let BASE = ""; // set by startServer (MOCK_PORT env, default 3100, else a free port)
 const TEST_SECRET = "test-only-cashfree-secret";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
 
@@ -52,22 +53,11 @@ const mockServer = http.createServer((req, res) => {
 });
 
 async function startServer(): Promise<ChildProcess> {
-  const env: NodeJS.ProcessEnv = { ...process.env };
-  for (const k of Object.keys(env)) if (k.startsWith("AWS_")) delete env[k];
-  Object.assign(env, { CASHFREE_API_BASE: `http://127.0.0.1:${MOCK_PORT}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET });
-  const child = spawn("npx", ["next", "dev", "-p", String(PORT)], { env, stdio: ["ignore", "pipe", "pipe"] });
-  let log = "";
-  await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`dev server didn't start:\n${log}`)), 60000);
-    const onData = (d: Buffer) => {
-      log += d.toString();
-      if (/Ready in/.test(log)) { clearTimeout(timer); resolve(); }
-      if (/another instance|EADDRINUSE|already running/i.test(log)) { clearTimeout(timer); reject(new Error(`dev server failed — stop any running \`next dev\` first:\n${log}`)); }
-    };
-    child.stdout!.on("data", onData);
-    child.stderr!.on("data", onData);
-    child.on("exit", (code) => { clearTimeout(timer); reject(new Error(`dev server exited (${code}):\n${log}`)); });
+  const { child, base } = await startDevServer({
+    label: "nurse-fee-coupons",
+    env: { CASHFREE_API_BASE: `http://127.0.0.1:${MOCK_PORT}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET },
   });
+  BASE = base;
   return child;
 }
 
@@ -109,7 +99,8 @@ function pure() {
 
 async function main() {
   pure();
-  await new Promise<void>((r) => mockServer.listen(MOCK_PORT, "127.0.0.1", r));
+  await new Promise<void>((r) => mockServer.listen(0, "127.0.0.1", r));
+  MOCK_PORT = (mockServer.address() as AddressInfo).port;
   const stamp = String(Date.now()).slice(-7);
   const ids: string[] = [];
   const codes: string[] = [];

@@ -5,6 +5,9 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  // Test suites (tests/devServer.ts) start their own dev server while the
+  // owner's may be running; Next locks <distDir>/dev, so they pass their own dir.
+  ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
   output: "standalone",
   // The Capacitor app's WebView loads the dev server from a different origin
   // (Android emulator → 10.0.2.2, a physical device → the Mac's LAN IP), so

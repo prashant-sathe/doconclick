@@ -3,7 +3,7 @@
 // payments, and the verify-order fallback.
 //
 // Never touches the real Cashfree: this script starts its OWN dev server on
-// port 3100 with CASHFREE_API_BASE pointed at an in-process mock and a
+// a free port (MOCK_PORT env, default 3100; tests/devServer.ts) with CASHFREE_API_BASE pointed at an in-process mock and a
 // test-only CASHFREE_SECRET_KEY (Next doesn't let .env override variables
 // that are already set), and signs webhook bodies locally with that key.
 // Uses throwaway users deleted afterwards. Stop any running `next dev` first
@@ -13,13 +13,14 @@
 import "dotenv/config";
 import crypto from "crypto";
 import http from "http";
-import { spawn, type ChildProcess } from "child_process";
+import type { ChildProcess } from "child_process";
+import type { AddressInfo } from "net";
+import { startDevServer } from "./devServer";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
 
-const PORT = 3100;
-const MOCK_PORT = 4010;
-const BASE = `http://localhost:${PORT}`;
+let MOCK_PORT = 0; // mock Cashfree: free port picked in main()
+let BASE = ""; // set by startServer (MOCK_PORT env, default 3100, else a free port)
 const TEST_SECRET = "test-only-cashfree-secret";
 const JWT_SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
 
@@ -58,26 +59,11 @@ const mockServer = http.createServer((req, res) => {
 });
 
 async function startServer(): Promise<ChildProcess> {
-  const env: NodeJS.ProcessEnv = { ...process.env };
-  for (const k of Object.keys(env)) if (k.startsWith("AWS_")) delete env[k];
-  Object.assign(env, {
-    CASHFREE_API_BASE: `http://127.0.0.1:${MOCK_PORT}`,
-    CASHFREE_APP_ID: "test-app",
-    CASHFREE_SECRET_KEY: TEST_SECRET,
+  const { child, base } = await startDevServer({
+    label: "payment-orders",
+    env: { CASHFREE_API_BASE: `http://127.0.0.1:${MOCK_PORT}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET },
   });
-  const child = spawn("npx", ["next", "dev", "-p", String(PORT)], { env, stdio: ["ignore", "pipe", "pipe"] });
-  let log = "";
-  await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`dev server didn't start:\n${log}`)), 60000);
-    const onData = (d: Buffer) => {
-      log += d.toString();
-      if (/Ready in/.test(log)) { clearTimeout(timer); resolve(); }
-      if (/another instance|EADDRINUSE|already running/i.test(log)) { clearTimeout(timer); reject(new Error(`dev server failed — stop any running \`next dev\` first:\n${log}`)); }
-    };
-    child.stdout!.on("data", onData);
-    child.stderr!.on("data", onData);
-    child.on("exit", (code) => { clearTimeout(timer); reject(new Error(`dev server exited (${code}):\n${log}`)); });
-  });
+  BASE = base;
   return child;
 }
 
@@ -104,7 +90,8 @@ async function webhook(orderId: string, amount: number, opts: { paymentId?: stri
 }
 
 async function main() {
-  await new Promise<void>((r) => mockServer.listen(MOCK_PORT, "127.0.0.1", r));
+  await new Promise<void>((r) => mockServer.listen(0, "127.0.0.1", r));
+  MOCK_PORT = (mockServer.address() as AddressInfo).port;
   const stamp = String(Date.now()).slice(-9);
   const patient = await prisma.user.create({ data: { name: "Pay Test Patient", mobile: "6" + stamp, role: "PATIENT", patientProfile: { create: { age: 30, gender: "Male" } } } });
   const doctor = await prisma.user.create({ data: { name: "Pay Test Doctor", mobile: "7" + stamp, role: "DOCTOR" } });
