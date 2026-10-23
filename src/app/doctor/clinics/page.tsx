@@ -306,10 +306,10 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
             </ul>
           )}
 
-          <div className="flex items-center gap-2">
-            <input type="date" className="input-field flex-1" min={todayIso} max={maxIso} value={date}
+          <div className="grid grid-cols-[1fr_auto] items-center gap-2 sm:flex">
+            <input type="date" className="input-field min-w-0 sm:flex-1" min={todayIso} max={maxIso} value={date}
               onChange={(e) => { setDate(e.target.value); setError(""); setNotice(""); }} />
-            <input type="text" className="input-field flex-1" placeholder={t("reasonOptional")} value={reason}
+            <input type="text" className="input-field col-span-2 row-start-2 min-w-0 sm:flex-1" placeholder={t("reasonOptional")} value={reason}
               onChange={(e) => setReason(e.target.value)} />
             <button type="button" onClick={() => addLeave()} disabled={!date || adding}
               className="btn-secondary flex-shrink-0 px-3 text-xs gap-1 disabled:opacity-60">
