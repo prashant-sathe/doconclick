@@ -41,7 +41,7 @@ export default function DoctorHeader() {
   const isStaff = user?.role === "STAFF";
   const nav: readonly { href: string; label: (typeof NAV)[number]["label"] | (typeof STAFF_NAV)[number]["label"]; icon: typeof LayoutDashboard }[] = isStaff ? STAFF_NAV : NAV;
   const { pendingRequests, hasUnseen: requestsUnseen, activeToast, dismissToast, markSeen } = useDoctorNotifications(user?.id);
-  const { announcements, hasUnseen: announcementsUnseen, markSeen: markAnnouncementsSeen } = useAnnouncementNotifications(user?.id);
+  const { announcements, hasUnseen: announcementsUnseen, markSeen: markAnnouncementsSeen } = useAnnouncementNotifications(isStaff ? undefined : user?.id); // bell is 401 for STAFF — skip the call
   const hasUnseen = requestsUnseen || announcementsUnseen;
 
   const toggleBell = () => {

@@ -32,7 +32,8 @@ export default function DoctorMobileNav() {
   const [profileIncomplete, setProfileIncomplete] = useState(false);
 
   useEffect(() => {
-    if (isStaff) return;
+    // Wait until the role is known; only a DOCTOR has /api/doctors/me.
+    if (user?.role !== "DOCTOR") return;
     fetch("/api/doctors/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
@@ -42,7 +43,7 @@ export default function DoctorMobileNav() {
         }
       })
       .catch(() => {});
-  }, [isStaff]);
+  }, [user?.role]);
 
   return (
     <nav
