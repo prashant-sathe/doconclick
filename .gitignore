@@ -56,3 +56,8 @@ next-env.d.ts
 /ios/App/Pods/
 /ios/App/build/
 /ios/App/DerivedData/
+
+# agent pipeline hand-off notes / logs (local only)
+/.pipeline/
+/.claude/settings.local.json
+/.claude/worktrees/

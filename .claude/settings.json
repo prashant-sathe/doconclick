@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run test:*)",
+      "Bash(npm run lint*)",
+      "Bash(npm run i18n:*)",
+      "Bash(npm run db:push)",
+      "Bash(npx tsc *)",
+      "Bash(npx prisma generate*)",
+      "Bash(npx tsx *)",
+      "Bash(env -u *)",
+      "Bash(pgrep *)",
+      "Bash(curl * http://localhost*)",
+      "Bash(curl http://localhost*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(mkdir -p .pipeline*)",
+      "Bash(mkdir -p marketing*)",
+      "Edit(BUG-TRACKER.md)",
+      "Edit(QA-REPORT.md)",
+      "Edit(.pipeline/**)",
+      "Write(.pipeline/**)",
+      "Write(marketing/**)",
+      "Edit(marketing/**)",
+      "WebSearch",
+      "WebFetch"
+    ],
+    "deny": [
+      "Bash(git push*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean*)",
+      "Bash(git checkout -- *)",
+      "Bash(npm run db:seed*)",
+      "Bash(npx prisma migrate reset*)",
+      "Bash(npx prisma db push --force-reset*)",
+      "Bash(rm -rf .next*)",
+      "Bash(aws *)",
+      "Bash(ssh *)",
+      "Bash(scp *)"
+    ]
+  }
+}

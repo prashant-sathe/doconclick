@@ -5,6 +5,8 @@
 
 **Status legend:** ⬜ Open · 🟡 In progress · ✅ Fixed (commit hash सह) · ⏸️ Deferred · ❎ Won't fix
 
+**Agent pipeline status** (`.claude/agents/`, `/coe-cycle`): 💡 Proposed (BI ची कल्पना, COE approval बाकी) → ⬜ Open → 🟡 In dev → 🧪 In QA → 🔁 QA failed (n) → 👀 Awaiting COE → ✅ Fixed (commit). मालकाचं काम लागणारे items: ⏸️ Needs human — कारण. Hand-off notes `.pipeline/<ID>/` मध्ये.
+
 > **Claude साठी नियम:** या file मधला item fix केल्यावर त्याच row चा Status `✅ Fixed (<commit>)` करा. Fix verify झाला नसेल तर `🟡` ठेवा आणि कारण लिहा. नवीन bug सापडला तर तो योग्य priority section मध्ये पुढच्या Sr. ने जोडा.
 
 > ✅ Nurse agent चा live run पूर्ण झाला. Confirm झालेले bugs वर `(LIVE)` लावलं आहे आणि नवीन bugs #26, #52, #64, #65 म्हणून जोडले आहेत.
