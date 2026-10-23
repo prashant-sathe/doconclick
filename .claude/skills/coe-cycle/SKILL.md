@@ -12,4 +12,4 @@ Arguments: `$ARGUMENTS`
 - `bi-only` → only the business-analyst + triage
 - `marketing-only` → only the marketing agent
 
-Do not ask the user questions during the cycle — decide, record the decision, and put anything that genuinely needs the owner in `.pipeline/NEEDS-HUMAN.md`.
+Do not ask the user questions during the cycle — decide, record the decision, and put anything that genuinely needs the owner in `.pipeline/agents/coe/NEEDS-HUMAN.md`.
