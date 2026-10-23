@@ -239,6 +239,46 @@ async function main() {
       `doctor → ${ok}; row ${accepted.status}/${accepted.paymentStatus}`);
   }
 
+  // P2-31: a desk CASH->ONLINE switch racing the doctor's complete. A cash
+  // visit is marked PAID on completion, so an ONLINE visit must never come
+  // out COMPLETED + PAID without a payment.
+  async function paymentMethodRace(runs: number) {
+    const mk = () => prisma.appointment.create({
+      data: {
+        patientId: patient.id, doctorId: planDoctor.id, bookedById: planDoctor.id, symptoms: "race test", consultType: "VIDEO",
+        status: "SCHEDULED", paymentMethod: "CASH", paymentStatus: "PENDING", amount: FEE,
+        scheduledAt: new Date(Date.now() - 10 * 60_000),
+      },
+    });
+    // Deterministic: the row switched to ONLINE after the route read CASH.
+    const a = await mk();
+    await prisma.appointment.update({ where: { id: a.id }, data: { paymentMethod: "ONLINE" } });
+    const lost = await prisma.$transaction((tx) =>
+      claimStatusChange(tx, a.id, ["SCHEDULED"], { status: "COMPLETED", paymentStatus: "PAID" }, { paymentMethod: "CASH" }))
+      .then(() => "claimed", (e) => (e instanceof AppointmentAlreadyClosedError ? "lost" : String(e)));
+    const aRow = await prisma.appointment.findUniqueOrThrow({ where: { id: a.id } });
+    check("claim guard: CASH->ONLINE switched before the claim → claim loses", lost === "lost" && aRow.status === "SCHEDULED" && aRow.paymentStatus === "PENDING",
+      `claim ${lost}; row ${aRow.status}/${aRow.paymentMethod}/${aRow.paymentStatus}`);
+
+    let bad = 0;
+    const seen: string[] = [];
+    for (let i = 0; i < runs; i++) {
+      const appt = await mk();
+      const [sw, done] = await Promise.all([
+        fetch(`${BASE}/api/doctor/appointments/${appt.id}/payment-method`, {
+          method: "PATCH", headers: { cookie: cookieFor(planDoctor), "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentMethod: "ONLINE" }),
+        }).then((r) => r.status),
+        patch(planDoctor, appt.id, { status: "COMPLETED" }, i % 2 ? 15 : 0),
+      ]);
+      const row = await prisma.appointment.findUniqueOrThrow({ where: { id: appt.id } });
+      seen.push(`${sw}/${done}→${row.status}/${row.paymentMethod}/${row.paymentStatus}`);
+      const unpaidPaidOnline = row.paymentMethod === "ONLINE" && row.paymentStatus === "PAID";
+      if (unpaidPaidOnline || ![200, 400, 409].includes(sw) || ![200, 400, 409].includes(done)) bad++;
+    }
+    check(`payment-method switch vs complete ×${runs}: never ONLINE+PAID without payment`, bad === 0, `${bad} bad; switch/complete→final: ${seen.join(", ")}`);
+  }
+
   try {
     await race("patient ×8 cancel (SCHEDULED, paid)", "SCHEDULED", Array(PARALLEL).fill(asPatient));
     await race("doctor ×8 cancel (SCHEDULED, paid)", "SCHEDULED", Array(PARALLEL).fill(asDoctorCancel));
@@ -261,6 +301,7 @@ async function main() {
     await nursePackageRace("SCHEDULED", 6);
     await nursePackageRace("REJECTED", 6);
     await guardChecks();
+    await paymentMethodRace(8);
     check("provider 409s are all the already-updated error", wrong409 === 0, `${wrong409} other 409(s)`);
   } finally {
     const ids = [patient.id, doctor.id, planDoctor.id, nurse.id, staff.id];

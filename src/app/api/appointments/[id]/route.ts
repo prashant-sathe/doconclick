@@ -468,6 +468,8 @@ export const PATCH = withErrorLocale(async function PATCH(
     const claimGuard: Prisma.AppointmentWhereInput = {
       ...(status === "SCHEDULED" ? { scheduledAt: appointment.scheduledAt } : {}),
       ...((status === "COMPLETED" || status === "NO_SHOW") && appointment.consultType === "HOME" ? { travelStatus: "ARRIVED" } : {}),
+      // A desk CASH->ONLINE switch between the read and the claim must make the claim lose.
+      ...(status === "COMPLETED" ? { paymentMethod: appointment.paymentMethod } : {}),
       ...(status === "COMPLETED" && appointment.paymentMethod === "ONLINE" ? { paymentStatus: "PAID" } : {}),
       ...(status === "COMPLETED" && appointment.providerType === "NURSE" ? { visitStartedAt: { not: null } } : {}),
       ...(status === "NO_SHOW" ? { scheduledAt: { lte: new Date() } } : {}),
