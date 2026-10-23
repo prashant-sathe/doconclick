@@ -69,9 +69,9 @@ export const GET = withErrorLocale(async function GET(req: Request) {
     }),
   ]);
   const p = user.patientProfile;
-  // Only someone who booked this doctor themselves, or was actually seen, is
-  // "their" patient (src/lib/knownPatient.ts): for anyone else a mobile
-  // number reveals just the name (to confirm it's the right person), not
+  // Only someone who booked this doctor themselves (accepted or held) is
+  // "their" patient — a desk-made walk-in never counts, even once completed
+  // (src/lib/knownPatient.ts): for anyone else a mobile number reveals just the name (to confirm it's the right person), not
   // their address, allergies or family. A new family member typed in for
   // them is matched to an existing one by name.
   return NextResponse.json({

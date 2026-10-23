@@ -4,8 +4,10 @@
 // counts once the provider accepted it (SCHEDULED) or held it (COMPLETED); a
 // pending, declined, expired or cancelled request grants nothing. A walk-in
 // the provider's own desk booked (bookedById set) has no patient consent
-// behind it, so it counts only once it's COMPLETED (the visit took place) —
-// the same "real visit" rule as the front desk's lookup (src/lib/knownPatient.ts).
+// behind it, so it never counts — not even COMPLETED, since the doctor can
+// mark it complete with no proof the patient was there (#83). Only the
+// patient's own booking opens their history — the same rule as the front
+// desk's lookup (src/lib/knownPatient.ts).
 //
 // A confirmed visit that's still ahead keeps access open while the provider
 // prepares; once every shared visit is completed, access lasts
@@ -19,8 +21,8 @@ const WINDOW_MS = CARE_ACCESS_WINDOW_DAYS * 24 * 60 * 60_000;
 
 type Visit = { status: string; scheduledAt: Date; bookedById?: string | null };
 
-/** Whether one visit counts: accepted/held self-booking, or any completed visit. */
-const isRealVisit = (v: Visit) => v.status === "COMPLETED" || (v.status === "SCHEDULED" && !v.bookedById);
+/** Whether one visit counts: the patient's own booking, accepted or held. */
+const isRealVisit = (v: Visit) => !v.bookedById && (v.status === "SCHEDULED" || v.status === "COMPLETED");
 
 /** The rule itself, over one provider's visits with one person (any statuses). */
 export function hasCareAccess(visits: Visit[], now: Date = new Date()): boolean {
@@ -46,7 +48,7 @@ export async function careAccessProblem(params: {
   if (hasCareAccess(visits, now)) return null;
   const real = visits.filter(isRealVisit);
   if (real.length === 0 && visits.length > 0) {
-    return "For a walk-in you booked, the patient's history opens once you complete the consultation.";
+    return "For a walk-in you booked, the patient's history opens only once they book a visit with you themselves.";
   }
   if (real.length === 0) {
     return "You can see this patient's history only after you've accepted a visit with them.";

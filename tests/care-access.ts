@@ -1,7 +1,7 @@
 // Care access (BUG-TRACKER #33): a provider sees a patient's history and
 // vitals only with a SCHEDULED visit, or a COMPLETED one within the window
 // (src/lib/careAccess.ts) — never via a pending/declined/cancelled booking,
-// and (#82) a walk-in the doctor's desk booked counts only once COMPLETED.
+// and (#82/#83) a walk-in the doctor's desk booked never counts, even COMPLETED.
 // Pure checks, then API checks against a live dev server and the DB in .env,
 // throwaway users only.
 //
@@ -42,7 +42,8 @@ async function main() {
   check("old completed + new scheduled → access", hasCareAccess([v("COMPLETED", daysAgo(200)), v("SCHEDULED", daysAgo(-3))]), "true");
   const desk = (status: string, at: Date) => ({ status, scheduledAt: at, bookedById: "desk" });
   check("desk-made walk-in still scheduled → no access", !hasCareAccess([desk("SCHEDULED", daysAgo(0))]), "false");
-  check("desk-made walk-in completed inside the window → access", hasCareAccess([desk("COMPLETED", daysAgo(1))]), "true");
+  check("#83 desk-made walk-in completed inside the window → no access", !hasCareAccess([desk("COMPLETED", daysAgo(1))]), "false");
+  check("#83 own completed visit + desk-made completed walk-in → access", hasCareAccess([v("COMPLETED", daysAgo(5)), desk("COMPLETED", daysAgo(1))]), "true");
   check("desk-made walk-in completed past the window → no access", !hasCareAccess([desk("COMPLETED", daysAgo(CARE_ACCESS_WINDOW_DAYS + 1))]), "false");
   check("lapsed visit + new desk-made walk-in → no access", !hasCareAccess([v("COMPLETED", daysAgo(200)), desk("SCHEDULED", daysAgo(0))]), "false");
   check("self-booked accepted + desk-made walk-in → access", hasCareAccess([v("SCHEDULED", daysAgo(-1)), desk("SCHEDULED", daysAgo(0))]), "true");
@@ -109,7 +110,7 @@ async function main() {
       [`completed ${CARE_ACCESS_WINDOW_DAYS + 10} days ago`, lapsed, false],
       ["lapsed but booked again and accepted", returning, true],
       ["desk-made walk-in still scheduled", walkIn, false],
-      ["desk-made walk-in completed", walkInDone, true],
+      ["#83 desk-made walk-in completed", walkInDone, false],
       ["desk-made walk-in + own accepted booking", walkInOwn, true],
     ] as const) {
       const h = await history(p);
@@ -121,7 +122,9 @@ async function main() {
     check("lapsed access explains the window", lapsedMsg.includes(`${CARE_ACCESS_WINDOW_DAYS} days after your last visit`), lapsedMsg);
 
     const walkInMsg = (await history(walkIn)).json as { error?: string; code?: string };
-    check("scheduled walk-in explains it opens on completion", walkInMsg.code === "NO_CARE_ACCESS" && (walkInMsg.error ?? "").includes("once you complete the consultation"), JSON.stringify(walkInMsg));
+    check("scheduled walk-in explains it opens once the patient books themselves", walkInMsg.code === "NO_CARE_ACCESS" && (walkInMsg.error ?? "").includes("book a visit with you themselves"), JSON.stringify(walkInMsg));
+    const doneMsg = (await history(walkInDone)).json as { error?: string; code?: string };
+    check("#83 completed walk-in gets the same walk-in message", doneMsg.code === "NO_CARE_ACCESS" && (doneMsg.error ?? "").includes("book a visit with you themselves"), JSON.stringify(doneMsg));
 
     const dep = await history(scheduled, child.id);
     check("parent's visit doesn't open the child's history", dep.status === 403, `${dep.status} ${err(dep.json)}`);

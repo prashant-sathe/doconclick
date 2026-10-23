@@ -122,7 +122,7 @@ export const GET = withErrorLocale(async function GET(req: Request) {
     // Vitals nurses recorded for these patients in the last 30 days — so at
     // the next consultation the doctor sees what happened in between. Only
     // for people the doctor currently has care access to (accepted visit, or
-    // completed within the window; a desk-made walk-in only once completed —
+    // completed within the window; a desk-made walk-in never —
     // src/lib/careAccess.ts), never for a pending, declined or long-past
     // booking.
     // Judged on every visit with the person, not just this page/view of them.

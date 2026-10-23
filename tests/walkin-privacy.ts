@@ -2,10 +2,11 @@
 // must not unlock their saved address, allergies or family — not in the
 // lookup (/api/doctor/patients/lookup), not copied onto the booking, and not
 // in the doctor/desk queue (/api/appointments/me). Only a patient who booked
-// the doctor themselves (accepted or held) or was actually seen is "known"
+// the doctor themselves (accepted or held) is "known"
 // (src/lib/knownPatient.ts). #82: the same rule for the doctor's
-// patient-history page and vitals (src/lib/careAccess.ts) — a desk-made
-// walk-in opens them only once COMPLETED.
+// patient-history page and vitals (src/lib/careAccess.ts). #83: a desk-made
+// walk-in never opens them — not even once the doctor marks it COMPLETED
+// (POST /api/appointments/[id]/complete needs no proof the patient was there).
 //
 // Runs against an already running server (BASE_URL, default
 // http://localhost:3000) — cash/clinic walk-ins only, so no payment gateway.
@@ -134,23 +135,44 @@ async function main() {
     p = await lookup(desk, ownPatient.mobile);
     check("…a request not yet accepted doesn't count", p.known === false, `${p.known}`);
     await prisma.appointment.update({ where: { id: own.id }, data: { status: "CANCELLED" } });
-    await prisma.appointment.update({ where: { id: a1 }, data: { status: "COMPLETED" } });
-    p = await lookup(desk, stranger.mobile);
-    check("a walk-in that reached COMPLETED (actually seen) → known", p.known === true && p.homeAddress === "Flat 12, Secret Society, Kothrud", `${p.known}`);
-    // Clear the other (desk-made, still scheduled) walk-ins so only the completed one counts.
+
+    // ── #83 A1: the doctor books a CLINIC+CASH walk-in and completes it at once ──
+    // Clear the other desk-made rows so only this one is in play.
     await prisma.appointment.updateMany({ where: { patientId: stranger.id, doctorId: doctor.id, status: "SCHEDULED" }, data: { status: "CANCELLED" } });
+    r = await walkIn(doctor, { mobile: stranger.mobile, allergies: null });
+    const aDone = String((r.json.appointment as J)?.id);
+    const done = await call(doctor, "POST", `/api/appointments/${aDone}/complete`, {});
+    const doneRow = await prisma.appointment.findUnique({ where: { id: aDone } });
+    check("#83 walk-in + empty-body complete → still works (200, COMPLETED, cash marked paid)", r.status === 200 && done.status === 200 && doneRow?.status === "COMPLETED" && doneRow.paymentStatus === "PAID", `${r.status} ${done.status} ${done.json.error ?? ""} ${doneRow?.status}`);
+    p = await lookup(desk, stranger.mobile);
+    check("#83 lookup after the instant-completed walk-in → still hidden (desk)", hidden(p), JSON.stringify({ known: p.known, addr: p.homeAddress }));
+    p = await lookup(doctor, stranger.mobile);
+    check("#83 …and for the doctor", hidden(p), JSON.stringify({ known: p.known }));
     r = await history(stranger.id);
-    check("#82 completed walk-in → doctor history 200 with medical info", r.status === 200 && leaks(r.json), `${r.status} ${r.json.error ?? ""}`);
+    check("#83 doctor history → 403 NO_CARE_ACCESS, nothing leaked", r.status === 403 && r.json.code === "NO_CARE_ACCESS" && !leaks(r.json) && (r.json.error ?? "").includes("book a visit with you themselves"), `${r.status} ${r.json.code ?? ""} ${r.json.error ?? ""}`);
     r = await vitals(stranger.id);
-    check("#82 …and vitals → 200", r.status === 200, `${r.status} ${r.json.error ?? ""}`);
+    check("#83 …and vitals → 403", r.status === 403 && r.json.code === "NO_CARE_ACCESS", `${r.status} ${r.json.code ?? ""}`);
+    r = await walkIn(desk, { mobile: stranger.mobile, allergies: null });
+    let rowNext = await prisma.appointment.findUnique({ where: { id: String((r.json.appointment as J)?.id) } });
+    check("#83 next walk-in → profile allergies still NOT copied", r.status === 200 && rowNext?.allergies === null, `${r.status} ${rowNext?.allergies}`);
+    await prisma.appointment.updateMany({ where: { patientId: stranger.id, doctorId: doctor.id, status: "SCHEDULED" }, data: { status: "CANCELLED" } });
+
+    // ── Once the patient books the doctor themselves and is seen, they are known ──
+    await prisma.appointment.create({ data: { patientId: stranger.id, doctorId: doctor.id, symptoms: "own booking", status: "COMPLETED", consultType: "CLINIC", paymentMethod: "CASH", paymentStatus: "PAID", amount: 300, scheduledAt: new Date(Date.now() - DAY) } });
+    p = await lookup(desk, stranger.mobile);
+    check("the patient's own completed booking → known", p.known === true && p.homeAddress === "Flat 12, Secret Society, Kothrud", `${p.known}`);
+    r = await history(stranger.id);
+    check("…doctor history 200 with medical info", r.status === 200 && leaks(r.json), `${r.status} ${r.json.error ?? ""}`);
+    r = await vitals(stranger.id);
+    check("…and vitals → 200", r.status === 200, `${r.status} ${r.json.error ?? ""}`);
     // A self-booked accepted visit still opens history straight away.
     await prisma.appointment.update({ where: { id: own.id }, data: { status: "SCHEDULED" } });
     r = await history(ownPatient.id);
     check("#82 patient's own accepted booking → history 200", r.status === 200, `${r.status} ${r.json.error ?? ""}`);
     await prisma.appointment.update({ where: { id: own.id }, data: { status: "CANCELLED" } });
     r = await walkIn(desk, { mobile: stranger.mobile, allergies: null });
-    const row3 = await prisma.appointment.findUnique({ where: { id: String((r.json.appointment as J)?.id) } });
-    check("…and then profile allergies are reused for the next walk-in", r.status === 200 && row3?.allergies === "Penicillin", `${r.status} ${row3?.allergies}`);
+    rowNext = await prisma.appointment.findUnique({ where: { id: String((r.json.appointment as J)?.id) } });
+    check("…and then profile allergies are reused for the next walk-in", r.status === 200 && rowNext?.allergies === "Penicillin", `${r.status} ${rowNext?.allergies}`);
   } finally {
     await prisma.notification.deleteMany({ where: { userId: { in: ids } } });
     await prisma.appointment.deleteMany({ where: { OR: [{ patientId: { in: ids } }, { doctorId: { in: ids } }] } });
