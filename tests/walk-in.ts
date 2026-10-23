@@ -378,8 +378,16 @@ async function main() {
       }
       return kinds;
     };
+    await prisma.notification.deleteMany({ where: { userId: regular.id } });
     r = await book(desk, { mobile: regular.mobile, force: true, symptoms: "Double entry" });
     const dupId = String((r.json.appointment as J)?.id);
+    // The booking itself legitimately pushes walkInBookedPatient (fire-and-forget).
+    // Wait for it to land before clearing the inbox, or it arrives after the
+    // clean-up and looks like an extra push on cancel.
+    for (let i = 0; i < 40; i++) {
+      if (await prisma.notification.count({ where: { userId: regular.id, kind: "walkInBookedPatient" } })) break;
+      await new Promise((res) => setTimeout(res, 150));
+    }
     await prisma.notification.deleteMany({ where: { userId: { in: [regular.id, other.id] } } });
     r = await call(desk, "PATCH", `/api/appointments/${dupId}`, { status: "CANCELLED" });
     const replacements = await prisma.appointment.count({ where: { reassignedFromId: dupId } });
