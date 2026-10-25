@@ -56,11 +56,15 @@ async function saveDoc(userId: string, name: string, type: string, url: string |
   const field = DOC_FIELD[type];
   const before = (await prisma.nurseProfile.findUnique({ where: { userId } })) as Record<string, unknown> | null;
   const reReview = type !== "photo" && before?.status === "APPROVED" && !!before[field];
-  const updated = await prisma.nurseProfile.update({
-    where: { userId },
-    data: { [field]: url, ...(reReview ? { status: "PENDING" } : {}) },
+  // Conditional flip: a concurrent admin SUSPENDED/REJECTED must not be overwritten.
+  const { updated, flipped } = await prisma.$transaction(async (tx) => {
+    await tx.nurseProfile.update({ where: { userId }, data: { [field]: url } });
+    const f = reReview
+      ? await tx.nurseProfile.updateMany({ where: { userId, status: "APPROVED" }, data: { status: "PENDING" } })
+      : { count: 0 };
+    return { updated: await tx.nurseProfile.findUniqueOrThrow({ where: { userId } }), flipped: f.count === 1 };
   });
-  if (reReview) notifyAdminNurseReReview(name);
+  if (flipped) notifyAdminNurseReReview(name);
   return updated;
 }
 

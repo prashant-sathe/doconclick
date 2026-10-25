@@ -78,11 +78,18 @@ export const PATCH = withErrorLocale(async function PATCH(req: Request) {
     profile.status === "APPROVED" &&
     (RE_REVIEW_FIELDS.some(changed) ||
       baseLocationMovedFar(profile, { lat: data.lat as number | null | undefined, lng: data.lng as number | null | undefined }));
-  if (reReview) data.status = "PENDING";
 
   try {
-    const updated = await prisma.nurseProfile.update({ where: { userId: authUser.id }, data });
-    if (reReview) notifyAdminNurseReReview(authUser.name);
+    // Other fields never touch status. The APPROVED -> PENDING flip is a
+    // conditional write so a concurrent admin SUSPENDED/REJECTED is not overwritten.
+    const [updated, flipped] = await prisma.$transaction(async (tx) => {
+      await tx.nurseProfile.update({ where: { userId: authUser.id }, data });
+      const f = reReview
+        ? await tx.nurseProfile.updateMany({ where: { userId: authUser.id, status: "APPROVED" }, data: { status: "PENDING" } })
+        : { count: 0 };
+      return [await tx.nurseProfile.findUniqueOrThrow({ where: { userId: authUser.id } }), f.count === 1] as const;
+    });
+    if (flipped) notifyAdminNurseReReview(authUser.name);
     return NextResponse.json(updated);
   } catch (err: unknown) {
     if (err && typeof err === "object" && "code" in err && err.code === "P2002") {

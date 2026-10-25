@@ -139,6 +139,22 @@ async function main() {
     const afterDel = await prisma.nurseProfile.findUniqueOrThrow({ where: { userId: nurse.id } });
     check("approved nurse deletes degreeCert → PENDING", res.status === 200 && afterDel.status === "PENDING" && afterDel.degreeCertUrl === null, `${res.status} ${afterDel.status}`);
 
+    // ── P3-27: admin suspends in parallel with a re-review edit → stays SUSPENDED ──
+    for (const status of ["SUSPENDED", "REJECTED"]) {
+      await setDocs({ ...complete, status: "APPROVED", isVerified: false });
+      const [a, b] = await Promise.all([
+        as("PATCH", "/api/nurses/me", { councilRegNo: `RACE-${status}` }),
+        fetch(`${BASE}/api/admin/nurses/${nurse.id}`, { method: "PATCH", headers: { Cookie: cookieFor(admin), "Content-Type": "application/json" }, body: JSON.stringify({ status }) }),
+      ]);
+      const now = await statusNow();
+      // Admin 200 → the suspend/reject must survive. Admin 409 → the nurse's flip landed
+      // first and the admin was told to refresh (never a silent overwrite).
+      check(`parallel ${status} + re-review edit → ${status} survives (or admin gets 409)`, b.status === 200 ? now === status : b.status === 409 && now === "PENDING", `${a.status} ${b.status} ${now}`);
+    }
+    await setDocs({ ...complete, status: "SUSPENDED", isVerified: false });
+    res = await as("PATCH", "/api/nurses/me", { bio: "while suspended" });
+    check("edit while not APPROVED never changes status", (await statusNow()) === "SUSPENDED", `${res.status} ${await statusNow()}`);
+
     // ── Admin: isVerified needs APPROVED + a ready checklist ──
     const verify = async (body: unknown) => {
       const rv = await fetch(`${BASE}/api/admin/nurses/${nurse.id}`, { method: "PATCH", headers: { Cookie: cookieFor(admin), "Content-Type": "application/json" }, body: JSON.stringify(body) });
