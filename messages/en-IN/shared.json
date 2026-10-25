@@ -173,5 +173,26 @@
     "loadFailed": "Couldn't load your appointments.",
     "historyLoadFailed": "Couldn't load past appointments.",
     "networkError": "Network error — check your connection and try again."
+  },
+  "adminPayoutFix": {
+    "editReference": "Edit reference",
+    "title": "Correct the payout reference for {name}?",
+    "intro": "Use this only to fix a wrong UTR or date. The old values are kept in the audit trail; the provider sees the corrected ones.",
+    "current": "Recorded now: UTR {reference} · {date}",
+    "reference": "Correct UTR / bank reference",
+    "date": "Correct date sent",
+    "reason": "Reason for the correction (admin only)",
+    "reasonPlaceholder": "e.g. typed the wrong UTR",
+    "save": "Save correction",
+    "saveAnyway": "Save anyway",
+    "saving": "Saving…",
+    "duplicate": "This UTR is already recorded on another settlement ({names}). Check it, then press Save anyway to record it.",
+    "failed": "Could not save the correction.",
+    "network": "Network error — refresh to check whether it was saved before trying again.",
+    "saved": "Payout reference corrected.",
+    "corrected": "{count, plural, one {Corrected once} other {Corrected # times}}",
+    "earlier": "Earlier corrections",
+    "entry": "{when}: {from} → {to} · {admin} — {reason}",
+    "unknownAdmin": "admin"
   }
 }

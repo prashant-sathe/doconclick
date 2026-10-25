@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo, useRef } from "react";
-import { IndianRupee, TrendingUp, Save, Wallet, BadgeCheck, XCircle } from "lucide-react";
+import { IndianRupee, TrendingUp, Save, Wallet, BadgeCheck, XCircle, PencilLine } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { formatProviderName } from "@/lib/utils";
@@ -58,7 +59,19 @@ interface SettlementRecord {
   paidAt: string | null;
   payoutNote: string | null;
   paidByAdmin: { name: string } | null;
+  // UTR/date corrections after Mark paid (P3-32), newest first.
+  payoutCorrections?: {
+    previousReference: string | null;
+    previousPaidAt: string | null;
+    newReference: string;
+    newPaidAt: string;
+    reason: string;
+    correctedByAdminName: string | null;
+    createdAt: string;
+  }[];
 }
+
+const shortDate = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" }) : "");
 
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   PREPARED: { label: "Prepared — not paid", className: "badge badge-warning" },
@@ -75,6 +88,7 @@ function newIdempotencyKey(): string {
 
 export default function AdminFinance() {
   const toast = useToast();
+  const tFix = useTranslations("shared.adminPayoutFix");
   // Each section loads on its own, so one failing endpoint doesn't hide the rest.
   const analyticsLoad = useLoad<Analytics>("/api/admin/analytics", { fallback: "Couldn't load revenue figures." });
   const settingsLoad = useLoad<CommissionSettings>("/api/admin/settings", { fallback: "Couldn't load commission settings." });
@@ -119,7 +133,15 @@ export default function AdminFinance() {
   const [dismissReason, setDismissReason] = useState("");
   const [dismissError, setDismissError] = useState("");
   const [dismissing, setDismissing] = useState(false);
-  // Synchronous guard for both, like settleInFlight.
+  // Correct the UTR/date of a PAID settlement (audited server-side).
+  const [fixTarget, setFixTarget] = useState<SettlementRecord | null>(null);
+  const [fixRef, setFixRef] = useState("");
+  const [fixDate, setFixDate] = useState("");
+  const [fixReason, setFixReason] = useState("");
+  const [fixError, setFixError] = useState("");
+  const [fixDuplicate, setFixDuplicate] = useState(false);
+  const [fixing, setFixing] = useState(false);
+  // Synchronous guard for all three, like settleInFlight.
   const actionInFlight = useRef(false);
 
   const loadSettlements = () => {
@@ -267,6 +289,51 @@ export default function AdminFinance() {
     }
   };
 
+  const openFixReference = (row: SettlementRecord) => {
+    setFixTarget(row);
+    setFixRef(row.payoutReference ?? "");
+    setFixDate(row.paidAt ? istDayKey(new Date(row.paidAt)) : istDayKey(new Date()));
+    setFixReason("");
+    setFixError("");
+    setFixDuplicate(false);
+  };
+
+  // PATCH on the same route: conditional on PAID + the values on screen; the
+  // old UTR/date go to the audit trail. A reused UTR needs a second confirm.
+  const fixReference = async () => {
+    if (!fixTarget || actionInFlight.current) return;
+    actionInFlight.current = true;
+    setFixing(true);
+    setFixError("");
+    try {
+      const res = await fetch(`/api/admin/finance/settlements/${fixTarget.id}/paid`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference: fixRef, paidOn: fixDate, reason: fixReason, confirmDuplicate: fixDuplicate }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 409 && data.code === "DUPLICATE_REFERENCE") {
+        setFixDuplicate(true);
+        const others = (data.duplicates ?? []) as { doctor?: { name: string; role?: string } }[];
+        setFixError(tFix("duplicate", { names: others.map((d) => providerName(d.doctor?.name ?? "", d.doctor?.role)).join(", ") }));
+        return;
+      }
+      if (!res.ok) {
+        setFixError(data.error ?? tFix("failed"));
+        if (res.status === 409) void historyLoad.reload();
+        return;
+      }
+      toast.success(tFix("saved"));
+      setFixTarget(null);
+      void historyLoad.reload();
+    } catch {
+      setFixError(tFix("network"));
+    } finally {
+      actionInFlight.current = false;
+      setFixing(false);
+    }
+  };
+
   const dismissRequest = async () => {
     if (!dismissTarget?.payoutRequestId || actionInFlight.current) return;
     actionInFlight.current = true;
@@ -411,13 +478,22 @@ export default function AdminFinance() {
                   Mark paid
                 </button>
               )}
+              {row.status === "PAID" && (
+                <button onClick={() => openFixReference(row)} className="btn-secondary text-xs py-1 px-3 inline-flex items-center gap-1">
+                  <PencilLine className="w-3 h-3" aria-hidden />
+                  {tFix("editReference")}
+                </button>
+              )}
             </div>
             {row.status === "PAID" && (
               <div className="text-[11px] text-slate-500 [overflow-wrap:anywhere]" title={row.payoutNote ?? undefined}>
-                UTR {row.payoutReference} · {row.paidAt ? new Date(row.paidAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" }) : ""}
+                UTR {row.payoutReference} · {shortDate(row.paidAt)}
                 {row.paidByAdmin ? ` · ${row.paidByAdmin.name}` : ""}
                 {row.payoutNote ? " · note" : ""}
               </div>
+            )}
+            {row.status === "PAID" && (row.payoutCorrections?.length ?? 0) > 0 && (
+              <div className="text-[11px] text-amber-700">{tFix("corrected", { count: row.payoutCorrections!.length })}</div>
             )}
           </div>
         );
@@ -455,7 +531,7 @@ export default function AdminFinance() {
         );
       },
     },
-  ], []);
+  ], [tFix]);
 
   const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true, filter: true }), []);
 
@@ -735,6 +811,62 @@ export default function AdminFinance() {
           confirmDisabled={payRef.trim().length < 6 || !payDate}
           onCancel={() => setPayTarget(null)}
           onConfirm={markPaid}
+        />
+      )}
+
+      {/* Correct a paid settlement's UTR / date */}
+      {fixTarget && (
+        <ConfirmDialog
+          icon={PencilLine}
+          title={tFix("title", { name: providerName(fixTarget.doctor.name, fixTarget.doctor.role) })}
+          message={
+            <div className="space-y-3">
+              <p>{tFix("intro")}</p>
+              <p className="text-xs text-slate-500 [overflow-wrap:anywhere]">{tFix("current", { reference: fixTarget.payoutReference ?? "—", date: shortDate(fixTarget.paidAt) })}</p>
+              <div>
+                <label className="input-label">{tFix("reference")}</label>
+                <input
+                  value={fixRef}
+                  onChange={(e) => { setFixRef(e.target.value); setFixDuplicate(false); }}
+                  maxLength={40}
+                  className="input-field font-mono uppercase"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="input-label">{tFix("date")}</label>
+                <input type="date" value={fixDate} max={istDayKey(new Date())} onChange={(e) => setFixDate(e.target.value)} className="input-field" />
+              </div>
+              <div>
+                <label className="input-label">{tFix("reason")}</label>
+                <textarea value={fixReason} onChange={(e) => setFixReason(e.target.value)} maxLength={300} rows={2} className="input-field" placeholder={tFix("reasonPlaceholder")} />
+              </div>
+              {(fixTarget.payoutCorrections?.length ?? 0) > 0 && (
+                <div className="text-[11px] text-slate-500 space-y-0.5 [overflow-wrap:anywhere]">
+                  <p className="font-semibold text-slate-600">{tFix("earlier")}</p>
+                  {fixTarget.payoutCorrections!.map((c, i) => (
+                    <p key={i}>
+                      {tFix("entry", {
+                        when: shortDate(c.createdAt),
+                        from: `${c.previousReference ?? "—"} (${shortDate(c.previousPaidAt)})`,
+                        to: `${c.newReference} (${shortDate(c.newPaidAt)})`,
+                        admin: c.correctedByAdminName ?? tFix("unknownAdmin"),
+                        reason: c.reason,
+                      })}
+                    </p>
+                  ))}
+                </div>
+              )}
+              {fixError && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-2 py-1.5">{fixError}</p>}
+            </div>
+          }
+          confirmLabel={fixDuplicate ? tFix("saveAnyway") : tFix("save")}
+          busyLabel={tFix("saving")}
+          tone="primary"
+          busy={fixing}
+          confirmDisabled={fixRef.trim().length < 6 || !fixDate || fixReason.trim().length < 5}
+          onCancel={() => setFixTarget(null)}
+          onConfirm={fixReference}
         />
       )}
 

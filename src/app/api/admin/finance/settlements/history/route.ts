@@ -27,9 +27,23 @@ export async function GET(req: Request) {
       doctor: { select: { name: true, role: true } },
       settledByAdmin: { select: { name: true } },
       paidByAdmin: { select: { name: true } },
+      // UTR/date corrections on a paid settlement (P3-32), newest first.
+      payoutCorrections: {
+        orderBy: { createdAt: "desc" },
+        select: { previousReference: true, previousPaidAt: true, newReference: true, newPaidAt: true, reason: true, correctedByAdminId: true, createdAt: true },
+      },
     },
   });
 
+  // Who made each correction (a plain id on the audit row, so deleting an admin never touches it).
+  const adminIds = [...new Set(settlements.flatMap((s) => s.payoutCorrections.map((c) => c.correctedByAdminId)))];
+  const admins = adminIds.length
+    ? new Map((await prisma.user.findMany({ where: { id: { in: adminIds } }, select: { id: true, name: true } })).map((u) => [u.id, u.name]))
+    : new Map<string, string>();
+
   // Rounded to paise — older rows were stored from float sums.
-  return NextResponse.json(settlements.map((s) => moneyFields(s, ["cashFeeOwed", "onlinePayoutOwed", "netAmount"] as const)));
+  return NextResponse.json(settlements.map((s) => ({
+    ...moneyFields(s, ["cashFeeOwed", "onlinePayoutOwed", "netAmount"] as const),
+    payoutCorrections: s.payoutCorrections.map((c) => ({ ...c, correctedByAdminName: admins.get(c.correctedByAdminId) ?? null })),
+  })));
 }

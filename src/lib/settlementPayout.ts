@@ -27,6 +27,9 @@ export function normalizePayoutReference(raw: unknown): string | null {
 export const PAYOUT_NOTE_MAX = 500;
 export const DISMISS_REASON_MIN = 5;
 export const DISMISS_REASON_MAX = 300;
+// Why an admin corrected a PAID settlement's UTR/date (P3-32) — kept in the audit row.
+export const CORRECTION_REASON_MIN = 5;
+export const CORRECTION_REASON_MAX = 300;
 // How far back a payout date may be entered.
 const PAID_ON_MAX_AGE_DAYS = 365;
 

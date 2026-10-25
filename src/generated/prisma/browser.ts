@@ -138,6 +138,11 @@ export type DuesPayment = Prisma.DuesPaymentModel
  */
 export type PayoutRequest = Prisma.PayoutRequestModel
 /**
+ * Model SettlementPayoutCorrection
+ * 
+ */
+export type SettlementPayoutCorrection = Prisma.SettlementPayoutCorrectionModel
+/**
  * Model DoctorPaymentLog
  * 
  */

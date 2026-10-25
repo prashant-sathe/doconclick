@@ -421,6 +421,7 @@ export const ModelName = {
   ProviderTimeOff: 'ProviderTimeOff',
   DuesPayment: 'DuesPayment',
   PayoutRequest: 'PayoutRequest',
+  SettlementPayoutCorrection: 'SettlementPayoutCorrection',
   DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
   PrescriptionMedicine: 'PrescriptionMedicine',
@@ -456,7 +457,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "notification" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "providerTimeOff" | "duesPayment" | "payoutRequest" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionVersion" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
+    modelProps: "user" | "pushToken" | "notification" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "providerTimeOff" | "duesPayment" | "payoutRequest" | "settlementPayoutCorrection" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionVersion" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2233,6 +2234,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PayoutRequestCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PayoutRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    SettlementPayoutCorrection: {
+      payload: Prisma.$SettlementPayoutCorrectionPayload<ExtArgs>
+      fields: Prisma.SettlementPayoutCorrectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SettlementPayoutCorrectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SettlementPayoutCorrectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload>
+        }
+        findFirst: {
+          args: Prisma.SettlementPayoutCorrectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SettlementPayoutCorrectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload>
+        }
+        findMany: {
+          args: Prisma.SettlementPayoutCorrectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload>[]
+        }
+        create: {
+          args: Prisma.SettlementPayoutCorrectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload>
+        }
+        createMany: {
+          args: Prisma.SettlementPayoutCorrectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SettlementPayoutCorrectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload>[]
+        }
+        delete: {
+          args: Prisma.SettlementPayoutCorrectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload>
+        }
+        update: {
+          args: Prisma.SettlementPayoutCorrectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.SettlementPayoutCorrectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SettlementPayoutCorrectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SettlementPayoutCorrectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.SettlementPayoutCorrectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayoutCorrectionPayload>
+        }
+        aggregate: {
+          args: Prisma.SettlementPayoutCorrectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSettlementPayoutCorrection>
+        }
+        groupBy: {
+          args: Prisma.SettlementPayoutCorrectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementPayoutCorrectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SettlementPayoutCorrectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementPayoutCorrectionCountAggregateOutputType> | number
         }
       }
     }
@@ -4236,6 +4311,21 @@ export const PayoutRequestScalarFieldEnum = {
 export type PayoutRequestScalarFieldEnum = (typeof PayoutRequestScalarFieldEnum)[keyof typeof PayoutRequestScalarFieldEnum]
 
 
+export const SettlementPayoutCorrectionScalarFieldEnum = {
+  id: 'id',
+  settlementId: 'settlementId',
+  previousReference: 'previousReference',
+  previousPaidAt: 'previousPaidAt',
+  newReference: 'newReference',
+  newPaidAt: 'newPaidAt',
+  reason: 'reason',
+  correctedByAdminId: 'correctedByAdminId',
+  createdAt: 'createdAt'
+} as const
+
+export type SettlementPayoutCorrectionScalarFieldEnum = (typeof SettlementPayoutCorrectionScalarFieldEnum)[keyof typeof SettlementPayoutCorrectionScalarFieldEnum]
+
+
 export const DoctorPaymentLogScalarFieldEnum = {
   id: 'id',
   doctorId: 'doctorId',
@@ -4823,6 +4913,7 @@ export type GlobalOmitConfig = {
   providerTimeOff?: Prisma.ProviderTimeOffOmit
   duesPayment?: Prisma.DuesPaymentOmit
   payoutRequest?: Prisma.PayoutRequestOmit
+  settlementPayoutCorrection?: Prisma.SettlementPayoutCorrectionOmit
   doctorPaymentLog?: Prisma.DoctorPaymentLogOmit
   message?: Prisma.MessageOmit
   prescriptionMedicine?: Prisma.PrescriptionMedicineOmit

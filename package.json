@@ -87,6 +87,7 @@
     "test:i18n-errors": "tsx tests/i18n-errors.ts",
     "test:admin-booking-actions": "tsx tests/admin-booking-actions.ts",
     "test:doctor-fees": "tsx tests/doctor-fees.ts",
+    "test:payout-correction": "tsx tests/payout-correction.ts",
     "i18n:errors": "tsx scripts/i18n-errors.ts"
   },
   "prisma": {

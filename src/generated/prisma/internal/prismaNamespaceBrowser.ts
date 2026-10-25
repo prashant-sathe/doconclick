@@ -75,6 +75,7 @@ export const ModelName = {
   ProviderTimeOff: 'ProviderTimeOff',
   DuesPayment: 'DuesPayment',
   PayoutRequest: 'PayoutRequest',
+  SettlementPayoutCorrection: 'SettlementPayoutCorrection',
   DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
   PrescriptionMedicine: 'PrescriptionMedicine',
@@ -592,6 +593,21 @@ export const PayoutRequestScalarFieldEnum = {
 } as const
 
 export type PayoutRequestScalarFieldEnum = (typeof PayoutRequestScalarFieldEnum)[keyof typeof PayoutRequestScalarFieldEnum]
+
+
+export const SettlementPayoutCorrectionScalarFieldEnum = {
+  id: 'id',
+  settlementId: 'settlementId',
+  previousReference: 'previousReference',
+  previousPaidAt: 'previousPaidAt',
+  newReference: 'newReference',
+  newPaidAt: 'newPaidAt',
+  reason: 'reason',
+  correctedByAdminId: 'correctedByAdminId',
+  createdAt: 'createdAt'
+} as const
+
+export type SettlementPayoutCorrectionScalarFieldEnum = (typeof SettlementPayoutCorrectionScalarFieldEnum)[keyof typeof SettlementPayoutCorrectionScalarFieldEnum]
 
 
 export const DoctorPaymentLogScalarFieldEnum = {

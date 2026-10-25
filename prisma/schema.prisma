@@ -610,6 +610,7 @@ model Settlement {
   createdAt        DateTime @default(now())
   appointments     Appointment[]
   payoutRequests   PayoutRequest[]
+  payoutCorrections SettlementPayoutCorrection[]
   duesPayment      DuesPayment?
 }
 
@@ -673,6 +674,25 @@ model PayoutRequest {
   // to the provider; the admin id is the audit trail.
   dismissReason      String?
   dismissedByAdminId String?
+}
+
+// Audit trail for fixing a PAID settlement's bank reference/date (P3-32):
+// one append-only row per correction — what was there before, what it
+// became, why, and which admin did it. The settlement row carries the current
+// values; nothing here is ever edited or shown to the provider.
+model SettlementPayoutCorrection {
+  id                 String     @id @default(cuid())
+  settlementId       String
+  settlement         Settlement @relation(fields: [settlementId], references: [id], onDelete: Cascade)
+  previousReference  String?
+  previousPaidAt     DateTime?
+  newReference       String
+  newPaidAt          DateTime
+  reason             String
+  correctedByAdminId String
+  createdAt          DateTime   @default(now())
+
+  @@index([settlementId, createdAt])
 }
 
 model DoctorPaymentLog {
