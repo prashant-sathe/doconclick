@@ -330,5 +330,25 @@
   "apptCancelledProviderDeleted": {
     "title": "अपॉइंटमेंट रद्द हुआ",
     "body": "{provider} अब DocOnClick पर नहीं हैं, इसलिए {when, date, medium}, {when, time, short} का आपका अपॉइंटमेंट रद्द कर दिया गया है। {refunded, select, yes {₹{amount} आपके वॉलेट में वापस कर दिए गए हैं — कृपया दोबारा बुक करें।} other {कृपया दोबारा बुक करें।}}"
+  },
+  "apptCancelledByAdmin": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "DocOnClick सपोर्ट ने {provider} के साथ {when, date, ::EEEdMMM}, {when, time, short} का आपका अपॉइंटमेंट रद्द कर दिया है।{refunded, select, yes { ₹{amount} आपके वॉलेट में वापस कर दिए गए हैं।} other {}} अगर अब भी इलाज चाहिए तो कृपया दोबारा बुक करें।"
+  },
+  "apptCancelledByAdminToProvider": {
+    "title": "अपॉइंटमेंट रद्द हुआ",
+    "body": "DocOnClick सपोर्ट ने {named, select, yes {{patient} का} other {एक मरीज़ का}} {when, date, ::EEEdMMM}, {when, time, short} का अपॉइंटमेंट रद्द कर दिया है। आपको इसके लिए जाने की ज़रूरत नहीं है।"
+  },
+  "apptReassignedByAdmin": {
+    "title": "आपका अपॉइंटमेंट दूसरे डॉक्टर को सौंपा गया",
+    "body": "DocOnClick सपोर्ट ने {when, date, ::EEEdMMM}, {when, time, short} का आपका अपॉइंटमेंट {provider} से {newDoctor} को भेज दिया है।{refunded, select, yes { ₹{amount} आपके वॉलेट में वापस जमा कर दिए गए हैं — उनके स्वीकार करने के बाद दोबारा भुगतान करें।} other {}}"
+  },
+  "apptNoShowByAdmin": {
+    "title": "नो-शो दर्ज किया गया",
+    "body": "DocOnClick सपोर्ट ने {provider} के साथ {when, date, ::EEEdMMM}, {when, time, short} के आपके अपॉइंटमेंट को नो-शो (अनुपस्थित) दर्ज किया है।"
+  },
+  "apptNoShowByAdminToProvider": {
+    "title": "नो-शो दर्ज किया गया",
+    "body": "DocOnClick सपोर्ट ने {named, select, yes {{patient} के} other {एक मरीज़ के}} {when, date, ::EEEdMMM}, {when, time, short} के अपॉइंटमेंट को नो-शो दर्ज किया है।"
   }
 }

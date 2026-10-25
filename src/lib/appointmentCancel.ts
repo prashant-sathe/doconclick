@@ -37,6 +37,7 @@ export async function claimStatusChange(
 type CancelOptions = {
   data?: Prisma.AppointmentUpdateManyMutationInput;
   refundType?: "CANCELLATION_REFUND" | "REASSIGNMENT_CREDIT";
+  adminId?: string; // set on the refund row when an admin cancelled it
 };
 
 // Settles the money on an appointment just claimed as CANCELLED: a paid one
@@ -48,7 +49,8 @@ async function settleCancelled(
   tx: Prisma.TransactionClient,
   cancelled: Prisma.AppointmentGetPayload<object>,
   refundType: NonNullable<CancelOptions["refundType"]>,
-  note: string
+  note: string,
+  adminId?: string
 ) {
   const wasPaid = cancelled.paymentStatus === "PAID";
   const refund = wasPaid ? netPayable(cancelled) : 0;
@@ -59,6 +61,7 @@ async function settleCancelled(
       amount: refund,
       type: refundType,
       note,
+      adminId,
     });
   } else {
     await releaseCouponRedemption(tx, { appointmentId: cancelled.id });
@@ -70,15 +73,15 @@ const cancelData = (data: Prisma.AppointmentUpdateManyMutationInput = {}) =>
   ({ ...data, status: "CANCELLED", requestedScheduledAt: null, ...LIVE_LOCATION_CLEARED });
 
 // Cancels one live appointment and settles its money — the path every
-// single cancel uses (doctor, patient). Throws AppointmentAlreadyClosedError
+// single cancel uses (doctor, patient, admin). Throws AppointmentAlreadyClosedError
 // if it's no longer live.
 export async function cancelAndRefund(
   tx: Prisma.TransactionClient,
   id: string,
-  { data, refundType = "CANCELLATION_REFUND", note }: CancelOptions & { note: string }
+  { data, refundType = "CANCELLATION_REFUND", note, adminId }: CancelOptions & { note: string }
 ) {
   const cancelled = await claimStatusChange(tx, id, LIVE_STATUSES, cancelData(data));
-  return settleCancelled(tx, cancelled, refundType, note);
+  return settleCancelled(tx, cancelled, refundType, note, adminId);
 }
 
 // The same for several appointments in one transaction (clinic leave,

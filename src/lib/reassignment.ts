@@ -48,10 +48,10 @@ async function findReplacement(appointment: Appointment) {
 // reassignedFromId). Any payment already collected can't carry over — the
 // new appointment starts unpaid — so it's credited to the patient's wallet.
 // Used when a doctor cancels on a patient and when an admin suspends or
-// removes a doctor. Throws AppointmentAlreadyClosedError if it's no longer live.
+// removes a doctor, or reassigns one booking from /admin/bookings. Throws AppointmentAlreadyClosedError if it's no longer live.
 export async function cancelAndReassign(
   appointment: Appointment,
-  { data, note }: { data?: Prisma.AppointmentUpdateManyMutationInput; note: string }
+  { data, note, adminId }: { data?: Prisma.AppointmentUpdateManyMutationInput; note: string; adminId?: string }
 ): Promise<{
   cancelled: Appointment;
   wasPaid: boolean;
@@ -69,6 +69,7 @@ export async function cancelAndReassign(
         data,
         refundType: "REASSIGNMENT_CREDIT",
         note,
+        adminId,
       });
       const reassigned = withReplacement
         ? await tx.appointment.create({

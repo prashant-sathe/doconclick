@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Search, CalendarCheck, Eye, X, FileText, Pill, FlaskConical, Phone, Download } from "lucide-react";
+import { Search, CalendarCheck, Eye, X, FileText, Pill, FlaskConical, Phone, Download, ShieldAlert, Wallet } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { cn, formatProviderName, nameOrMobile } from "@/lib/utils";
@@ -8,7 +8,8 @@ import { brandGridTheme } from "@/lib/agGridTheme";
 import PrescriptionDownloadButton from "@/components/patient/PrescriptionDownloadButton";
 import ReceiptDownloadButton from "@/components/patient/ReceiptDownloadButton";
 import LoadError from "@/components/LoadError";
-import { useLoad } from "@/lib/apiClient";
+import { useLoad, mutate } from "@/lib/apiClient";
+import { BOOKING_ACTION_REASON_MIN, BOOKING_ACTION_REASON_MAX } from "@/lib/adminBookingActions";
 
 interface Appointment {
   id: string;
@@ -47,6 +48,17 @@ interface Attachment {
   createdAt: string;
 }
 
+interface LedgerRow {
+  id: string;
+  type: string;
+  amount: number;
+  balanceAfter: number | null;
+  status: string;
+  note: string | null;
+  createdAt: string;
+  admin: { name: string } | null;
+}
+
 interface AppointmentDetail extends Appointment {
   id: string;
   serviceName?: string | null;
@@ -69,6 +81,141 @@ interface AppointmentDetail extends Appointment {
   medicines: Medicine[];
   tests: Test[];
   attachments: Attachment[];
+  bookedById: string | null;
+  paymentMethod: string;
+  cashfreePaymentId: string | null;
+  adminActionReason: string | null;
+  adminActionAt: string | null;
+  adminActionByName: string | null;
+  reassignedTo: { id: string; status: string; doctor: { name: string } } | null;
+  ledger: LedgerRow[];
+}
+
+// Money into the patient's wallet vs out of it, for the ledger list.
+const LEDGER_LABEL: Record<string, string> = {
+  BOOKING_PAYMENT: "Paid from wallet",
+  CANCELLATION_REFUND: "Refunded to wallet",
+  REASSIGNMENT_CREDIT: "Credited to wallet (reassigned)",
+};
+
+type BookingAction = "CANCEL" | "REASSIGN" | "NO_SHOW";
+const ACTION_COPY: Record<BookingAction, { label: string; confirm: string; hint: string }> = {
+  CANCEL: {
+    label: "Cancel + refund",
+    confirm: "Cancel booking",
+    hint: "Cancels the booking. Anything the patient paid goes back to their DocOnClick wallet (never to the card/UPI). Patient and provider are notified.",
+  },
+  REASSIGN: {
+    label: "Reassign",
+    confirm: "Reassign booking",
+    hint: "Cancels this booking and sends the patient's request to the nearest free doctor of the same specialty. Any payment is credited to the wallet. If nobody is free, it's just cancelled and refunded.",
+  },
+  NO_SHOW: {
+    label: "Mark no-show",
+    confirm: "Mark no-show",
+    hint: "Marks that the patient didn't turn up. No refund, and the provider isn't paid for it. Only after the booking time has passed.",
+  },
+};
+
+// Cancel / reassign / no-show with a required reason — the server re-checks
+// everything and refunds at most once, so a stale drawer just gets a 409.
+function BookingActions({ data, onDone }: { data: AppointmentDetail; onDone: () => void }) {
+  const [action, setAction] = useState<BookingAction | null>(null);
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(null);
+  const [openedAt] = useState(() => Date.now());
+
+  const live = data.status === "PENDING_APPROVAL" || data.status === "SCHEDULED";
+  if (!live && !done) return null;
+  const timePassed = new Date(data.scheduledAt).getTime() <= openedAt;
+  const available: BookingAction[] = [
+    "CANCEL",
+    ...(data.providerType !== "NURSE" && !data.bookedById ? ["REASSIGN" as const] : []),
+    ...(data.status === "SCHEDULED" && timePassed ? ["NO_SHOW" as const] : []),
+  ];
+  const trimmed = reason.trim();
+  const reasonOk = trimmed.length >= BOOKING_ACTION_REASON_MIN && trimmed.length <= BOOKING_ACTION_REASON_MAX;
+
+  async function submit() {
+    if (!action || !reasonOk || busy) return;
+    setBusy(true);
+    setError(null);
+    const res = await mutate<{ status: string; refund: number; reassignedTo: { doctorName: string } | null }>(
+      `/api/admin/bookings/${data.id}/action`,
+      { body: { action, reason: trimmed }, fallback: "Couldn't update this booking." },
+    );
+    setBusy(false);
+    if (!res.ok) {
+      setError(res.error);
+      if (res.status === 409) onDone(); // it changed under us — show the latest
+      return;
+    }
+    const r = res.data;
+    setDone(
+      r.status === "NO_SHOW" ? "Marked as a no-show."
+        : r.reassignedTo ? `Reassigned to ${formatProviderName(r.reassignedTo.doctorName)}.${r.refund > 0 ? ` ₹${r.refund} credited to the patient's wallet.` : ""}`
+          : `Cancelled.${r.refund > 0 ? ` ₹${r.refund} refunded to the patient's wallet.` : ""}${action === "REASSIGN" ? " No other doctor was free." : ""}`
+    );
+    setAction(null);
+    setReason("");
+    onDone();
+  }
+
+  return (
+    <Section title="Admin actions" icon={ShieldAlert}>
+      <div className="p-4 space-y-3">
+        {done && <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">{done}</div>}
+        {live && (
+          <div className="flex flex-wrap gap-2">
+            {available.map((a) => (
+              <button
+                key={a}
+                type="button"
+                onClick={() => { setAction(a); setError(null); setDone(null); }}
+                className={cn(
+                  "px-3 py-2 rounded-xl text-xs font-semibold border transition-all",
+                  action === a
+                    ? "bg-red-600 text-white border-red-600"
+                    : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
+                )}
+              >
+                {ACTION_COPY[a].label}
+              </button>
+            ))}
+          </div>
+        )}
+        {live && action && (
+          <div className="space-y-2">
+            <p className="text-xs text-slate-500">{ACTION_COPY[action].hint}</p>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              maxLength={BOOKING_ACTION_REASON_MAX}
+              rows={3}
+              placeholder="Reason (kept on the audit trail, not shown to the patient or provider)"
+              className="input-field w-full"
+            />
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <span className="text-xs text-slate-400">{trimmed.length}/{BOOKING_ACTION_REASON_MAX} · at least {BOOKING_ACTION_REASON_MIN}</span>
+              <div className="flex gap-2">
+                <button type="button" onClick={() => { setAction(null); setError(null); }}
+                  className="px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-white text-slate-600">
+                  Back
+                </button>
+                <button type="button" onClick={submit} disabled={!reasonOk || busy}
+                  className="px-3 py-2 rounded-xl text-xs font-semibold bg-red-600 text-white disabled:opacity-50">
+                  {busy ? "Working…" : ACTION_COPY[action].confirm}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {error && <div className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</div>}
+      </div>
+    </Section>
+  );
 }
 
 const STATUS_BADGE: Record<string, string> = {
@@ -91,7 +238,7 @@ function downloadUrl(fileUrl: string, name: string) {
 }
 
 // ── Booking Detail Drawer ────────────────────────────────────────
-function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () => void }) {
+function BookingDrawer({ bookingId, onClose, onChanged }: { bookingId: string; onClose: () => void; onChanged: () => void }) {
   const { data, error, loading, reloading, reload } = useLoad<AppointmentDetail>(`/api/admin/bookings/${bookingId}`, { fallback: "Couldn't load this booking." });
 
   const hasDocuments = (data?.attachments.length ?? 0) > 0 || !!data?.prescriptionUrl;
@@ -141,6 +288,19 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
                 {data.paymentStatus === "PAID" && <span className="ml-auto"><ReceiptDownloadButton kind="appointment" id={data.id} compact /></span>}
               </div>
 
+              <BookingActions data={data} onDone={() => { reload(); onChanged(); }} />
+
+              {data.adminActionAt && (
+                <Section title="Admin action" icon={ShieldAlert}>
+                  <Row label="By" value={data.adminActionByName ?? "—"} />
+                  <Row label="When" value={new Date(data.adminActionAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} />
+                  <Row label="Reason" value={data.adminActionReason ?? "—"} />
+                  {data.reassignedTo && (
+                    <Row label="Reassigned to" value={`${formatProviderName(data.reassignedTo.doctor.name)} · ${data.reassignedTo.status}`} />
+                  )}
+                </Section>
+              )}
+
               <Section title="Patient" icon={Phone}>
                 <Row label="Name" value={data.relation !== "Self" && data.patientName ? `${data.patientName} (${data.relation} of ${nameOrMobile(data.patient.name, data.patient.mobile)})` : nameOrMobile(data.patient.name, data.patient.mobile)} />
                 <Row label="Mobile" value={data.patient.mobile} />
@@ -163,6 +323,30 @@ function BookingDrawer({ bookingId, onClose }: { bookingId: string; onClose: () 
                   <Row label="Specialty" value={data.doctor.doctorProfile?.specialty ?? "—"} />
                 )}
                 <Row label="Mobile" value={data.doctor.mobile} />
+              </Section>
+
+              <Section title="Wallet ledger for this booking" icon={Wallet}>
+                <Row
+                  label="Payment"
+                  value={`${data.paymentStatus} · ${data.paymentMethod}${data.cashfreePaymentId ? ` · gateway ${data.cashfreePaymentId}` : ""}`}
+                />
+                {data.ledger.length === 0 ? (
+                  <div className="px-4 py-4 text-sm text-slate-400 text-center">No wallet payments or refunds for this booking</div>
+                ) : data.ledger.map((t) => (
+                  <div key={t.id} className="flex items-start justify-between px-4 py-3 gap-4">
+                    <div className="min-w-0">
+                      <div className="text-sm text-slate-800">{LEDGER_LABEL[t.type] ?? t.type}{t.status !== "SUCCESS" ? ` · ${t.status}` : ""}</div>
+                      <div className="text-xs text-slate-400 break-words">
+                        {new Date(t.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                        {t.admin && ` · by ${t.admin.name}`}
+                        {t.note && ` · ${t.note}`}
+                      </div>
+                    </div>
+                    <span className={cn("text-sm font-semibold flex-shrink-0", t.type === "BOOKING_PAYMENT" ? "text-slate-700" : "text-emerald-600")}>
+                      {t.type === "BOOKING_PAYMENT" ? "−" : "+"}₹{t.amount}
+                    </span>
+                  </div>
+                ))}
               </Section>
 
               {/* Documents / Reports / Prescription */}
@@ -460,7 +644,7 @@ export default function AdminBookings() {
       </div>
 
       {viewId && (
-        <BookingDrawer bookingId={viewId} onClose={() => setViewId(null)} />
+        <BookingDrawer bookingId={viewId} onClose={() => setViewId(null)} onChanged={reload} />
       )}
     </div>
   );

@@ -24,6 +24,7 @@ export const GET = withErrorLocale(async function GET(req: Request) {
         orderBy: { createdAt: "desc" },
         take,
         skip,
+        omit: { adminId: true }, // which admin acted is internal
       })
     : [];
 

@@ -22,12 +22,13 @@ export async function getOrCreateWallet(client: PrismaClientOrTx, userId: string
 // appointment fails the surrounding transaction instead of paying out twice.
 export async function refundAppointmentToWallet(
   tx: Prisma.TransactionClient,
-  { patientId, appointmentId, amount, type, note }: {
+  { patientId, appointmentId, amount, type, note, adminId }: {
     patientId: string;
     appointmentId: string;
     amount: number;
     type: "CANCELLATION_REFUND" | "REASSIGNMENT_CREDIT";
     note: string;
+    adminId?: string; // the admin who cancelled it from /admin/bookings
   }
 ) {
   const wallet = await getOrCreateWallet(tx, patientId);
@@ -44,6 +45,7 @@ export async function refundAppointmentToWallet(
       status: "SUCCESS",
       refundOfAppointmentId: appointmentId,
       note,
+      adminId,
     },
   });
   return updatedWallet;

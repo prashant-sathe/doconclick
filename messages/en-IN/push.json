@@ -330,5 +330,25 @@
   "apptCancelledProviderDeleted": {
     "title": "Appointment cancelled",
     "body": "{provider} is no longer on DocOnClick, so your appointment on {when, date, medium}, {when, time, short} was cancelled. {refunded, select, yes {₹{amount} was refunded to your wallet — please book again.} other {Please book again.}}"
+  },
+  "apptCancelledByAdmin": {
+    "title": "Appointment cancelled",
+    "body": "DocOnClick support cancelled your appointment with {provider} on {when, date, ::EEEdMMM}, {when, time, short}.{refunded, select, yes { ₹{amount} was refunded to your wallet.} other {}} Please book again if you still need care."
+  },
+  "apptCancelledByAdminToProvider": {
+    "title": "Appointment cancelled",
+    "body": "DocOnClick support cancelled {named, select, yes {{patient}'s} other {a patient's}} appointment on {when, date, ::EEEdMMM}, {when, time, short}. You don't need to attend it."
+  },
+  "apptReassignedByAdmin": {
+    "title": "Your appointment was reassigned",
+    "body": "DocOnClick support moved your {when, date, ::EEEdMMM}, {when, time, short} appointment from {provider} to {newDoctor}.{refunded, select, yes { ₹{amount} was credited back to your wallet — pay again once they accept.} other {}}"
+  },
+  "apptNoShowByAdmin": {
+    "title": "Marked as a no-show",
+    "body": "DocOnClick support marked your {when, date, ::EEEdMMM}, {when, time, short} appointment with {provider} as a no-show."
+  },
+  "apptNoShowByAdminToProvider": {
+    "title": "Marked as a no-show",
+    "body": "DocOnClick support marked {named, select, yes {{patient}'s} other {a patient's}} {when, date, ::EEEdMMM}, {when, time, short} appointment as a no-show."
   }
 }

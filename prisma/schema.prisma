@@ -511,6 +511,12 @@ model Appointment {
   // patient's behalf — a walk-in or phone-in (/doctor/walk-in) — to the id
   // of whoever entered it. Null for everything the patient booked.
   bookedById    String?
+  // Audit for an admin cancel / reassign / no-show from /admin/bookings
+  // (POST /api/admin/bookings/[id]/action): which admin, the reason they
+  // gave (admin-only — never shown to the patient or provider), and when.
+  adminActionBy     String?
+  adminActionReason String?
+  adminActionAt     DateTime?
   createdAt     DateTime  @default(now())
   review        Review?
   medicines     PrescriptionMedicine[]
