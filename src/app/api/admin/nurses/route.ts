@@ -15,6 +15,10 @@ export async function GET(req: Request) {
   const cursor = sp.get("cursor");
   const paged = (Number.isInteger(takeRaw) && takeRaw > 0) || !!cursor;
   const take = Math.min(Number.isInteger(takeRaw) && takeRaw > 0 ? takeRaw : 50, 200);
+  // An unknown cursor makes Prisma throw (a 500); answer 400 instead.
+  if (cursor && !(await prisma.user.findFirst({ where: { id: cursor, role: "NURSE" }, select: { id: true } }))) {
+    return NextResponse.json({ error: "Invalid cursor" }, { status: 400 });
+  }
   const nurses = await prisma.user.findMany({
     where: { role: "NURSE", deletedAt: null, ...(status ? { nurseProfile: { status } } : {}) },
     omit: { password: true },
