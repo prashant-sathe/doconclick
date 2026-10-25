@@ -7,7 +7,7 @@ import { verifyVisitCoordinates } from "@/lib/visitVerify";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { missingProfileFields } from "@/lib/bookingProfile";
 import { isNurseBookable } from "@/lib/providerGuard";
-import { nurseSlotProblem } from "@/lib/nurseSchedule";
+import { nurseSlotProblem, nurseScheduleCtx } from "@/lib/nurseSchedule";
 import { buildVisitSchedule, isShift, PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
 import { referralProblem, REFERRAL_INACTIVE_CODE } from "@/lib/nurseReferral";
 import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, openRequestsProblem } from "@/lib/bookingLimits";
@@ -147,8 +147,10 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     intervalDays,
     shift ? null : nurse.nurseProfile.availability,
   );
+  const scheduleCtx = await nurseScheduleCtx(nurse.id, schedule);
   for (let i = 0; i < schedule.length; i++) {
     const problem = await nurseSlotProblem({
+      ctx: scheduleCtx,
       nurseId: nurse.id,
       availability: nurse.nurseProfile.availability,
       when: schedule[i],

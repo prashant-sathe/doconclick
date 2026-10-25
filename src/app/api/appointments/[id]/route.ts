@@ -8,7 +8,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { refundAppointmentToWallet } from "@/lib/wallet";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
-import { nurseSlotProblem } from "@/lib/nurseSchedule";
+import { nurseSlotProblem, nurseScheduleCtx } from "@/lib/nurseSchedule";
 import { shiftCompleteProblem, isShift, SHIFT_MIN_LEAD_MS, VISIT_START_LATE_MS } from "@/lib/nursePackage";
 import { netPayable } from "@/lib/coupons";
 import { cancelAndRefund, claimStatusChange, isAlreadyClosed, ALREADY_CLOSED_MESSAGE } from "@/lib/appointmentCancel";
@@ -251,11 +251,14 @@ export const PATCH = withErrorLocale(async function PATCH(
         const svc = appointment.nurseServiceId
           ? await prisma.nurseService.findUnique({ where: { id: appointment.nurseServiceId }, select: { durationMinutes: true } })
           : null;
-        for (const g of group) {
+        const checkTimes = group.map((g) => new Date(Math.max(g.scheduledAt.getTime(), Date.now())));
+        const scheduleCtx = await nurseScheduleCtx(appointment.doctorId, checkTimes);
+        for (const [gi, g] of group.entries()) {
           const problem = await nurseSlotProblem({
+            ctx: scheduleCtx,
             nurseId: appointment.doctorId,
             availability: null,
-            when: new Date(Math.max(g.scheduledAt.getTime(), Date.now())),
+            when: checkTimes[gi],
             durationMinutes: svc?.durationMinutes,
             excludeAppointmentId: g.id,
             viewer: "nurse",

@@ -29,10 +29,24 @@ export async function searchNurses(params: { patientId: string; serviceId: strin
     return { service, nurses: [], needsLocation: true };
   }
 
+  // Bounding-box prefilter in SQL: no nurse can serve a patient farther away
+  // than the largest radius that applies (her own, capped by the patient's
+  // search range), so rows outside that box never reach the JS haversine.
+  // Nurses with no coordinates are dropped by the distance filter anyway.
+  const maxNurseRadius = (await prisma.nurseProfile.aggregate({ _max: { radius: true } }))._max.radius ?? 0;
+  const reachKm = patientProfile?.searchRadiusKm ? Math.min(maxNurseRadius, patientProfile.searchRadiusKm) : maxNurseRadius;
+  const dLat = reachKm / 111 + 0.01;
+  const dLng = reachKm / (111 * Math.max(Math.cos((pLat * Math.PI) / 180), 0.01)) + 0.01;
+
   const offerings = await prisma.nurseServiceOffering.findMany({
     where: {
       serviceId,
-      nurseProfile: { status: "APPROVED", user: { deletedAt: null } },
+      nurseProfile: {
+        status: "APPROVED",
+        user: { deletedAt: null },
+        lat: { gte: pLat - dLat, lte: pLat + dLat },
+        lng: { gte: pLng - dLng, lte: pLng + dLng },
+      },
     },
     include: {
       nurseProfile: {

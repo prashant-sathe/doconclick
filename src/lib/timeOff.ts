@@ -69,7 +69,48 @@ export async function timeOffProblem(
   who: "doctor" | "nurse" = "doctor",
 ): Promise<string | null> {
   const away = (await awayAt([providerId], when)).get(providerId);
-  if (!away) return null;
+  return away ? awayMessage(away, viewer, who) : null;
+}
+
+/**
+ * One provider's time-off rows, fetched once so many `when`s (a package's
+ * visits) can be checked in memory instead of 2 queries each.
+ */
+export interface TimeOffSnapshot {
+  offlineUntil: Date | null;
+  leaves: { startDate: string; endDate: string; reason: string | null }[];
+}
+
+export async function timeOffSnapshot(providerId: string, from: Date): Promise<TimeOffSnapshot> {
+  const [user, leaves] = await Promise.all([
+    prisma.user.findUnique({ where: { id: providerId }, select: { offlineUntil: true } }),
+    prisma.providerTimeOff.findMany({
+      where: { providerId, endDate: { gte: istDayKey(from) } },
+      orderBy: { endDate: "desc" },
+      select: { startDate: true, endDate: true, reason: true },
+    }),
+  ]);
+  return { offlineUntil: user?.offlineUntil ?? null, leaves };
+}
+
+/** Same answer as timeOffProblem(), from a snapshot (no queries). */
+export function timeOffProblemFrom(
+  snap: TimeOffSnapshot,
+  when: Date,
+  viewer: "patient" | "provider" | "staff",
+  who: "doctor" | "nurse" = "doctor",
+): string | null {
+  const ymd = istDayKey(when);
+  const leave = snap.leaves.find((l) => l.startDate <= ymd && l.endDate >= ymd);
+  let away: Away | null = null;
+  if (leave) away = { kind: "LEAVE", startDate: leave.startDate, endDate: leave.endDate, reason: leave.reason };
+  else if (snap.offlineUntil && snap.offlineUntil.getTime() > Math.max(Date.now(), when.getTime())) {
+    away = { kind: "OFFLINE", until: snap.offlineUntil };
+  }
+  return away ? awayMessage(away, viewer, who) : null;
+}
+
+function awayMessage(away: Away, viewer: "patient" | "provider" | "staff", who: "doctor" | "nurse"): string {
   if (away.kind === "OFFLINE") {
     return viewer === "provider"
       ? "You're offline for the rest of today. Go online from your dashboard to take bookings."

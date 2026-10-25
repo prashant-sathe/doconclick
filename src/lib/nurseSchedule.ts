@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { timeOffProblem } from "@/lib/timeOff";
+import { timeOffProblem, timeOffProblemFrom, timeOffSnapshot, type TimeOffSnapshot } from "@/lib/timeOff";
 import { isDoctorAvailableNow, formatAvailability } from "@/lib/availability";
 
 // A nurse is one person travelling between homes — two visits can't overlap.
@@ -16,6 +16,37 @@ const DEFAULT_VISIT_MIN = 60;
 async function longestVisitMs(): Promise<number> {
   const { _max } = await prisma.nurseService.aggregate({ _max: { durationMinutes: true } });
   return (Math.max(_max.durationMinutes ?? 0, DEFAULT_VISIT_MIN) + NURSE_TRAVEL_BUFFER_MIN) * 60000;
+}
+
+/**
+ * Everything nurseSlotProblem would query, fetched once for a set of start
+ * times (a package's visits, or an accept loop) — pass it back as `ctx` and
+ * each check runs in memory. Same answers as the per-call path.
+ */
+export interface NurseScheduleCtx {
+  nurseId: string;
+  longestMs: number;
+  visits: { id: string; scheduledAt: Date; serviceName: string | null; nurseService: { durationMinutes: number } | null }[];
+  timeOff: TimeOffSnapshot;
+}
+
+export async function nurseScheduleCtx(nurseId: string, whens: Date[]): Promise<NurseScheduleCtx> {
+  const times = whens.map((w) => w.getTime());
+  const min = Math.min(...times);
+  const max = Math.max(...times);
+  const longestMs = await longestVisitMs();
+  const [visits, timeOff] = await Promise.all([
+    prisma.appointment.findMany({
+      where: {
+        doctorId: nurseId,
+        status: "SCHEDULED",
+        scheduledAt: { gte: new Date(min - longestMs), lt: new Date(max + longestMs) },
+      },
+      select: { id: true, scheduledAt: true, serviceName: true, nurseService: { select: { durationMinutes: true } } },
+    }),
+    timeOffSnapshot(nurseId, new Date(min)),
+  ]);
+  return { nurseId, longestMs, visits, timeOff };
 }
 
 const fmt = (d: Date) =>
@@ -58,9 +89,13 @@ export async function nurseSlotProblem(params: {
   viewer: "patient" | "nurse";
   /** Off when the nurse herself accepts — taking a visit just past her hours is her call. */
   checkHours?: boolean;
+  /** Pre-fetched data (nurseScheduleCtx) covering `when` — skips the queries. */
+  ctx?: NurseScheduleCtx;
 }): Promise<string | null> {
   const { nurseId, availability, when, excludeAppointmentId, viewer } = params;
-  const away = await timeOffProblem(nurseId, when, viewer === "patient" ? "patient" : "provider", "nurse");
+  const ctx = params.ctx?.nurseId === nurseId ? params.ctx : undefined;
+  const awayViewer = viewer === "patient" ? "patient" : "provider";
+  const away = ctx ? timeOffProblemFrom(ctx.timeOff, when, awayViewer, "nurse") : await timeOffProblem(nurseId, when, awayViewer, "nurse");
   if (away) return away;
   const duration = (params.durationMinutes ?? DEFAULT_VISIT_MIN) + NURSE_TRAVEL_BUFFER_MIN;
 
@@ -72,15 +107,22 @@ export async function nurseSlotProblem(params: {
 
   // Anything that could overlap [when, when + duration): visits starting up
   // to the longest service (+ travel) before it, through to its own end.
-  const nearby = await prisma.appointment.findMany({
-    where: {
-      doctorId: nurseId,
-      status: "SCHEDULED",
-      ...(excludeAppointmentId ? { id: { not: excludeAppointmentId } } : {}),
-      scheduledAt: { gte: new Date(when.getTime() - (await longestVisitMs())), lt: new Date(when.getTime() + duration * 60000) },
-    },
-    select: { scheduledAt: true, serviceName: true, nurseService: { select: { durationMinutes: true } } },
-  });
+  const nearby = ctx
+    ? ctx.visits.filter(
+        (a) =>
+          a.id !== excludeAppointmentId &&
+          a.scheduledAt.getTime() >= when.getTime() - ctx.longestMs &&
+          a.scheduledAt.getTime() < when.getTime() + duration * 60000,
+      )
+    : await prisma.appointment.findMany({
+        where: {
+          doctorId: nurseId,
+          status: "SCHEDULED",
+          ...(excludeAppointmentId ? { id: { not: excludeAppointmentId } } : {}),
+          scheduledAt: { gte: new Date(when.getTime() - (await longestVisitMs())), lt: new Date(when.getTime() + duration * 60000) },
+        },
+        select: { scheduledAt: true, serviceName: true, nurseService: { select: { durationMinutes: true } } },
+      });
 
   const start = when.getTime();
   const end = start + duration * 60000;
