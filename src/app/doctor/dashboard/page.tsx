@@ -1785,7 +1785,7 @@ export default function DoctorDashboard() {
                     {isStaff ? (
                       <span className="font-semibold text-slate-800 text-sm">{patientLabel(a)}</span>
                     ) : (
-                      <Link href={historyHref(a)} className="font-semibold text-slate-800 text-sm hover:underline hover:text-teal-600">
+                      <Link href={historyHref(a)} className="tap-44-y font-semibold text-slate-800 text-sm hover:underline hover:text-teal-600">
                         {patientLabel(a)}
                       </Link>
                     )}
@@ -1804,17 +1804,17 @@ export default function DoctorDashboard() {
                   <div className="flex items-center gap-3">
                     {!isStaff && <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>}
                     {!isStaff && (
-                      <button type="button" onClick={() => setFollowUpFor(a)} className="w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={tfu("title")} aria-label={tfu("title")}>
+                      <button type="button" onClick={() => setFollowUpFor(a)} className="w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={tfu("title")} aria-label={tfu("title")}>
                         <CalendarClock className="w-4 h-4 text-teal-600" />
                       </button>
                     )}
                     {!isStaff && (
-                      <button type="button" onClick={() => setRxFor({ id: a.id, patientId: a.patientId })} className="w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("prescriptionTitle")} aria-label={t("prescription")}>
+                      <button type="button" onClick={() => setRxFor({ id: a.id, patientId: a.patientId })} className="w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("prescriptionTitle")} aria-label={t("prescription")}>
                         <FileText className="w-4 h-4 text-teal-600" />
                       </button>
                     )}
                     {/* Readable after completion; open for follow-up questions for a few days. */}
-                    <Link href={`/doctor/chat/${a.id}`} className="relative w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("chatWithPatient")}>
+                    <Link href={`/doctor/chat/${a.id}`} className="relative w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("chatWithPatient")}>
                       <MessageCircle className="w-4 h-4 text-slate-500" />
                       {a.unreadMessageCount > 0 && (
                         <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">

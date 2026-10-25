@@ -179,7 +179,8 @@ export async function parseFollowUp(raw: unknown, now: Date = new Date()): Promi
     return { error: `The follow-up can be at most ${horizon} days ahead.`, code: "INVALID_FOLLOW_UP" };
   }
   if (note !== undefined && note !== null && typeof note !== "string") return { error: "The follow-up note must be text.", code: "INVALID_FOLLOW_UP" };
-  const text = typeof note === "string" ? note.trim() : "";
+  // A one-line note: control characters (newlines, tabs, NUL, C1) become spaces.
+  const text = typeof note === "string" ? note.replace(/[\u0000-\u001f\u007f-\u009f]+/g, " ").replace(/ {2,}/g, " ").trim() : "";
   if (text.length > FOLLOW_UP_NOTE_MAX) {
     return { error: `Keep the follow-up note under ${FOLLOW_UP_NOTE_MAX} characters.`, code: "INVALID_FOLLOW_UP" };
   }

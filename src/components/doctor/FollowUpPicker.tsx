@@ -28,7 +28,7 @@ export default function FollowUpPicker({ value, onChange }: { value: FollowUpVal
         <button
           type="button"
           onClick={() => onChange(NO_FOLLOW_UP)}
-          className={cn("min-h-9 px-3 rounded-lg border text-xs font-semibold", !value.date ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 bg-white text-slate-600")}
+          className={cn("min-h-11 px-3 rounded-lg border text-xs font-semibold", !value.date ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 bg-white text-slate-600")}
         >
           {t("none")}
         </button>
@@ -37,7 +37,7 @@ export default function FollowUpPicker({ value, onChange }: { value: FollowUpVal
             key={c.days}
             type="button"
             onClick={() => onChange({ ...value, date: c.date })}
-            className={cn("min-h-9 px-3 rounded-lg border text-xs font-semibold", value.date === c.date ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 bg-white text-slate-600")}
+            className={cn("min-h-11 px-3 rounded-lg border text-xs font-semibold", value.date === c.date ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 bg-white text-slate-600")}
           >
             {t("inDays", { n: c.days })}
           </button>
@@ -45,7 +45,7 @@ export default function FollowUpPicker({ value, onChange }: { value: FollowUpVal
         <input
           type="date"
           aria-label={t("otherDate")}
-          className={cn("input-field text-xs py-1.5 w-auto min-h-9", value.date && !onChip && "border-teal-500")}
+          className={cn("input-field text-xs py-1.5 w-auto min-h-11", value.date && !onChip && "border-teal-500")}
           min={followUpYmdIn(1)}
           value={value.date}
           onChange={(e) => onChange({ ...value, date: e.target.value })}
@@ -108,7 +108,7 @@ export function FollowUpEditDialog({ appointmentId, current, onClose, onSaved }:
         <div className="flex items-center gap-2 mb-3">
           <CalendarClock className="w-5 h-5 text-teal-600" />
           <h3 className="font-bold text-slate-800 flex-1">{t("title")}</h3>
-          <button type="button" onClick={onClose} aria-label={t("close")} className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-slate-600">
+          <button type="button" onClick={onClose} aria-label={t("close")} className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-slate-600">
             <X className="w-4 h-4" />
           </button>
         </div>

@@ -15,7 +15,14 @@ export function followUpYmdIn(days: number, now: Date = new Date()): string {
 /** The stored instant for a follow-up day (its first instant, IST). */
 export const followUpInstant = (ymd: string) => istStartOfDay(ymd);
 
-/** "Mon, 3 Nov" style label for a stored follow-up date, read as an IST day. */
+/**
+ * "Mon, 3 Nov 2026" style label for a stored follow-up date, read as an IST
+ * day. Built from parts: ICU's own mr / en patterns put a stray comma after
+ * the day ("रवि, 1, नोव्हें 2026"), so the order and separators are fixed here.
+ */
 export function followUpLabel(date: Date | string, locale: string): string {
-  return new Date(date).toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
+  const parts = new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" })
+    .formatToParts(new Date(date));
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("weekday")}, ${get("day")} ${get("month")} ${get("year")}`;
 }

@@ -14,7 +14,7 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
 import { sendDueFollowUpReminders } from "../src/lib/appointmentReminders";
 import { getBookingHorizonDays } from "../src/lib/bookingLimits";
-import { followUpYmdIn, followUpInstant } from "../src/lib/followUp";
+import { followUpYmdIn, followUpInstant, followUpLabel } from "../src/lib/followUp";
 
 // Never a real push from a test.
 for (const k of ["FIREBASE_PROJECT_ID", "FIREBASE_CLIENT_EMAIL", "FIREBASE_PRIVATE_KEY"]) delete process.env[k];
@@ -52,6 +52,7 @@ async function main() {
   const profile = { create: { status: "APPROVED", isVerified: true, registrationFeePaid: true, trialEndsAt: new Date(Date.now() + 30 * DAY) } };
   const doctor = await mk({ name: "Follow Doctor", role: "DOCTOR", doctorProfile: profile });
   const other = await mk({ name: "Other Follow Doctor", role: "DOCTOR", doctorProfile: profile });
+  const expired = await mk({ name: "Expired Follow Doctor", role: "DOCTOR", doctorProfile: { create: { ...profile.create, trialEndsAt: new Date(Date.now() - DAY) } } });
   const desk = await mk({ name: "Follow Desk", role: "STAFF" });
   await prisma.staffProfile.create({ data: { userId: desk.id, doctorId: doctor.id } });
   const patient = await mk({ name: "Follow Patient", role: "PATIENT", password: "x", language: "mr-IN", patientProfile: { create: { age: 30, gender: "Male" } } });
@@ -117,6 +118,25 @@ async function main() {
     check("…response has no gateway ids or door code", !("cashfreeOrderId" in r.json) && !("visitOtp" in r.json), "ok");
     r = await call(doctor, "PATCH", `/api/appointments/${a.id}`, { followUp: null });
     check("clear → 200, no follow-up", r.status === 200 && (await row(a.id)).followUpDate === null, `${r.status}`);
+
+    // Plan lapsed: setting/changing refused, clearing still allowed.
+    const lapsed = await visit();
+    await prisma.appointment.update({ where: { id: lapsed.id }, data: { doctorId: expired.id, status: "COMPLETED", completedAt: new Date(), followUpDate: followUpInstant(followUpYmdIn(5)) } });
+    r = await call(expired, "PATCH", `/api/appointments/${lapsed.id}`, { followUp: { date: followUpYmdIn(9) } });
+    check("doctor out of plan can't set a follow-up → 403 SUBSCRIPTION_EXPIRED", r.status === 403 && r.json.code === "SUBSCRIPTION_EXPIRED" && (await row(lapsed.id)).followUpDate?.getTime() === followUpInstant(followUpYmdIn(5)).getTime(), `${r.status} ${r.json.code}`);
+    r = await call(expired, "PATCH", `/api/appointments/${lapsed.id}`, { followUp: null });
+    check("…but can still clear one", r.status === 200 && (await row(lapsed.id)).followUpDate === null, `${r.status}`);
+
+    // Control characters in the note are stripped to single spaces.
+    r = await call(doctor, "PATCH", `/api/appointments/${a.id}`, { followUp: { date: followUpYmdIn(14), note: "  Bring\u0000 CBC\n\n\treport\u0085now \u007f " } });
+    check("note control chars → spaces, trimmed", r.status === 200 && (await row(a.id)).followUpNote === "Bring CBC report now", `${r.status} "${(await row(a.id)).followUpNote}"`);
+    r = await call(doctor, "PATCH", `/api/appointments/${a.id}`, { followUp: { date: followUpYmdIn(14), note: "\u0000\n\t" } });
+    check("a control-only note → no note", r.status === 200 && (await row(a.id)).followUpNote === null, `${r.status}`);
+
+    // Date label: no stray comma after the day in mr (or any locale).
+    const d = new Date("2026-11-01T00:00:00+05:30");
+    check("mr label has no extra comma", followUpLabel(d, "mr-IN-u-nu-latn") === "रवि, 1 नोव्हें 2026", followUpLabel(d, "mr-IN-u-nu-latn"));
+    check("en label is 'Sun, 1 Nov 2026'", followUpLabel(d, "en-IN") === "Sun, 1 Nov 2026", followUpLabel(d, "en-IN"));
 
     // ── Reminder: once, localized, skipped when rebooked or deleted ──
     // Far enough ahead (10 days) that the dev server's own 5-minute sweep

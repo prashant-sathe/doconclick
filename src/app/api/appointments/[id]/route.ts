@@ -135,7 +135,9 @@ export const PATCH = withErrorLocale(async function PATCH(
     // Accepting (a request or a new time) and completing are what a plan pays
     // for; cancelling, declining and no-shows stay open to an expired doctor
     // so their patients are still refunded / reassigned.
-    const needsPlan = status === "SCHEDULED" || status === "COMPLETED" || reschedule === "ACCEPT";
+    const needsPlan = status === "SCHEDULED" || status === "COMPLETED" || reschedule === "ACCEPT"
+      // Setting or changing a follow-up is plan work too; clearing one isn't.
+      || (followUp !== undefined && followUp !== null);
     const scope = await resolveProviderScope(authUser, { requireSubscription: needsPlan });
     if (scope.denied) return scope.denied;
     if (appointment.doctorId !== scope.doctorId) {
