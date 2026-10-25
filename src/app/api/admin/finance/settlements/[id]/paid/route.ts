@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
 import { readJson } from "@/lib/routeGuards";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { moneyFields } from "@/lib/money";
 import {
   SETTLEMENT_STATUS, PAYOUT_NOTE_MAX, CORRECTION_REASON_MIN, CORRECTION_REASON_MAX, normalizePayoutReference, parsePaidOn,
@@ -118,7 +119,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: `Keep the reason under ${CORRECTION_REASON_MAX} characters.` }, { status: 400 });
   }
 
-  const settlement = await prisma.settlement.findUnique({ where: { id }, select: { id: true, status: true, payoutReference: true, paidAt: true } });
+  const settlement = await prisma.settlement.findUnique({ where: { id }, select: { id: true, doctorId: true, status: true, payoutReference: true, paidAt: true } });
   if (!settlement) return NextResponse.json({ error: "Settlement not found." }, { status: 404 });
   if (settlement.status !== SETTLEMENT_STATUS.PAID) {
     return NextResponse.json(
@@ -159,6 +160,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (!corrected) {
     return NextResponse.json({ error: "This payout was just changed by someone else — refresh and check it before correcting." }, { status: 409 });
   }
+
+  // Tell the provider the reference changed — the new UTR only, never the
+  // reason or which admin did it (those stay in the admin-only audit trail).
+  const provider = await prisma.user.findUnique({ where: { id: settlement.doctorId }, select: { role: true } });
+  void sendPushToUser(settlement.doctorId, {
+    key: "payoutReferenceCorrected",
+    values: { reference },
+    url: provider?.role === "NURSE" ? "/nurse/earnings" : "/doctor/earnings",
+  });
 
   return settlementResponse(id);
 }

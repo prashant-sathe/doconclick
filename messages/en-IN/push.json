@@ -358,5 +358,9 @@
   "payoutRequestDismissed": {
     "title": "Payout request dismissed",
     "body": "Your ₹{amount} payout request was dismissed: {reason}. You can request again from Earnings."
+  },
+  "payoutReferenceCorrected": {
+    "title": "Payout reference updated",
+    "body": "Your payout reference was corrected. The new UTR is {reference}."
   }
 }

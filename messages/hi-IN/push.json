@@ -358,5 +358,9 @@
   "payoutRequestDismissed": {
     "title": "पेआउट अनुरोध खारिज हुआ",
     "body": "आपका ₹{amount} का पेआउट अनुरोध खारिज कर दिया गया: {reason}. आप कमाई पेज से फिर से अनुरोध कर सकते हैं।"
+  },
+  "payoutReferenceCorrected": {
+    "title": "पेआउट संदर्भ अपडेट हुआ",
+    "body": "आपके पेआउट का संदर्भ सही किया गया है। नया UTR {reference} है।"
   }
 }

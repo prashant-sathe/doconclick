@@ -681,11 +681,14 @@ model PayoutRequest {
 // Audit trail for fixing a PAID settlement's bank reference/date (P3-32):
 // one append-only row per correction — what was there before, what it
 // became, why, and which admin did it. The settlement row carries the current
-// values; nothing here is ever edited or shown to the provider.
+// values; nothing here is ever edited or shown to the provider. Append-only
+// is also enforced by the database: a trigger in prisma/sql/partial-indexes.sql
+// rejects UPDATE/DELETE/TRUNCATE, and onDelete: Restrict stops a settlement
+// with corrections from being deleted.
 model SettlementPayoutCorrection {
   id                 String     @id @default(cuid())
   settlementId       String
-  settlement         Settlement @relation(fields: [settlementId], references: [id], onDelete: Cascade)
+  settlement         Settlement @relation(fields: [settlementId], references: [id], onDelete: Restrict)
   previousReference  String?
   previousPaidAt     DateTime?
   newReference       String

@@ -3,7 +3,8 @@
 // reason; conditional on PAID with the values just read, and every edit
 // leaves an append-only SettlementPayoutCorrection row (old → new, reason,
 // admin). PREPARED / NO_PAYOUT / pre-tracking settlements are refused; the
-// provider sees the corrected UTR, never the audit trail.
+// provider sees the corrected UTR, never the audit trail, and gets an inbox
+// note with the new UTR only (P3-36); the table is append-only in the DB too.
 // Throwaway users only (deleted afterwards); runs against a live dev server
 // and the DB in .env. Never sends a real push.
 //
@@ -166,9 +167,65 @@ async function main() {
     check("NO_PAYOUT → 409; pre-tracking (null) → 409; unknown id → 404; no audit rows",
       s3.json.status === "NO_PAYOUT" && neg.status === 409 && leg.status === 409 && missing.status === 404 && (await audit(String(s3.json.id))).length === 0 && (await audit(legacy.id)).length === 0,
       `${s3.json.status} ${neg.status} ${leg.status} ${missing.status}`);
+
+    // 9. The provider is told (inbox) the NEW UTR only — in their own
+    // language, never the reason or the admin's name (P3-36).
+    const inboxFor = async (userId: string, needle: string) => {
+      for (let i = 0; i < 25; i++) {
+        const rows = await prisma.notification.findMany({ where: { userId, kind: "payoutReferenceCorrected" }, orderBy: { createdAt: "desc" } });
+        const hit = rows.find((r) => r.body.includes(needle));
+        if (hit) return hit;
+        await new Promise((r) => setTimeout(r, 200));
+      }
+      return null;
+    };
+    const nurse = await mk({ name: "Fix Nurse", role: "NURSE" });
+    const langs: Array<[string, U, string, RegExp]> = [["en-IN", doctor, "/doctor/earnings", /corrected/], ["hi-IN", owes, "/doctor/earnings", /सही किया/], ["mr-IN", nurse, "/nurse/earnings", /दुरुस्त केला/]];
+    let k = 0;
+    for (const [lang, who, url, wording] of langs) {
+      await prisma.user.update({ where: { id: who.id }, data: { language: lang } });
+      await visit(who.id, { consultType: "CLINIC", paymentMethod: "ONLINE" });
+      const sx = await settle(who);
+      const sxId = String(sx.json.id);
+      await call(admin, "POST", `/api/admin/finance/settlements/${sxId}/paid`, { reference: `61${stamp}${k}1`, paidOn: today });
+      const newRef = `61${stamp}${k}2`;
+      const secret = `private reason ${lang} ${stamp}`;
+      const r = await fix(sxId, { reference: newRef, paidOn: today, reason: secret });
+      const n = await inboxFor(who.id, newRef);
+      check(`${lang}: correction → inbox row with the new UTR only, localized, right link`,
+        r.status === 200 && !!n && wording.test(n.body) && n.url === url && !n.body.includes(secret) && !n.title.includes(secret) && !n.body.includes(admin.name) && !n.body.includes(`61${stamp}${k}1`),
+        `${r.status} ${n?.title} | ${n?.body} | ${n?.url}`);
+      k++;
+    }
+    const failedFix = await fix(s1Id, { reference: "xx", paidOn: today, reason: "bad input" });
+    const countBefore = await prisma.notification.count({ where: { userId: doctor.id, kind: "payoutReferenceCorrected" } });
+    const noop = await fix(s1Id, { reference: String((await prisma.settlement.findUniqueOrThrow({ where: { id: s1Id } })).payoutReference), paidOn: istDayKey((await prisma.settlement.findUniqueOrThrow({ where: { id: s1Id } })).paidAt!), reason: "nothing changes" });
+    await new Promise((r) => setTimeout(r, 800));
+    check("rejected / no-change corrections send no notification", failedFix.status === 400 && noop.status === 400 && (await prisma.notification.count({ where: { userId: doctor.id, kind: "payoutReferenceCorrected" } })) === countBefore, `${failedFix.status} ${noop.status}`);
+
+    // 10. Database-level append-only protection
+    const rejects = async (fn: () => Promise<unknown>) => { try { await fn(); return false; } catch { return true; } };
+    const target = (await audit(s1Id))[0];
+    const upd = await rejects(() => prisma.settlementPayoutCorrection.update({ where: { id: target.id }, data: { reason: "tampered" } }));
+    const updRaw = await rejects(() => prisma.$executeRawUnsafe(`UPDATE "SettlementPayoutCorrection" SET "newReference" = 'X' WHERE id = '${target.id}'`));
+    const del = await rejects(() => prisma.settlementPayoutCorrection.delete({ where: { id: target.id } }));
+    const delMany = await rejects(() => prisma.settlementPayoutCorrection.deleteMany({ where: { settlementId: s1Id } }));
+    const trunc = await rejects(() => prisma.$executeRawUnsafe(`TRUNCATE "SettlementPayoutCorrection"`));
+    const delSettlement = await rejects(() => prisma.settlement.delete({ where: { id: s1Id } }));
+    const intact = (await audit(s1Id)).find((a) => a.id === target.id);
+    check("DB rejects UPDATE, DELETE, deleteMany, TRUNCATE on corrections, and deleting a settlement that has them",
+      upd && updRaw && del && delMany && trunc && delSettlement && intact?.reason === target.reason && !!(await prisma.settlement.findUnique({ where: { id: s1Id } })),
+      [upd, updRaw, del, delMany, trunc, delSettlement].join(","));
   } finally {
     await prisma.appointment.deleteMany({ where: { doctorId: { in: ids } } });
-    await prisma.settlement.deleteMany({ where: { doctorId: { in: ids } } });
+    // Test-only purge: the append-only trigger lets DELETE through inside a
+    // transaction that sets this flag (nothing in src/ ever does).
+    await prisma.$transaction(async (tx) => {
+      await tx.$executeRawUnsafe(`SET LOCAL app.allow_correction_purge = 'on'`);
+      await tx.settlementPayoutCorrection.deleteMany({ where: { settlement: { doctorId: { in: ids } } } });
+      await tx.settlement.deleteMany({ where: { doctorId: { in: ids } } });
+    });
+    await prisma.notification.deleteMany({ where: { userId: { in: ids } } });
     await prisma.user.deleteMany({ where: { id: { in: ids } } });
     await prisma.$disconnect();
   }
