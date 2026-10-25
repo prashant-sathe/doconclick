@@ -200,7 +200,11 @@
     "loadMore": "{count} और देखें",
     "settlements": "सेटलमेंट का इतिहास",
     "noSettlements": "अभी तक कोई सेटलमेंट दर्ज नहीं है।",
-    "settlementCounts": "{cash} कैश · {online} ऑनलाइन"
+    "settlementCounts": "{cash} कैश · {online} ऑनलाइन",
+    "payoutProcessing": "पेआउट प्रोसेस हो रहा है",
+    "payoutPaidOn": "{date} को भुगतान हुआ",
+    "payoutRef": "संदर्भ (UTR) {ref}",
+    "requestDismissed": "{date} का आपका पेआउट अनुरोध खारिज कर दिया गया: <b>{reason}</b>. आप फिर से अनुरोध कर सकते हैं।"
   },
   "hub": {
     "photoAlt": "प्रोफ़ाइल फ़ोटो",

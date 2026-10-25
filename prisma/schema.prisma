@@ -45,6 +45,7 @@ model User {
   messagesSent   Message[]       @relation("SentMessages")
   settlements       Settlement[] @relation("DoctorSettlements")
   settlementsAdmined Settlement[] @relation("AdminSettlements")
+  settlementsPaid   Settlement[] @relation("SettlementsPaidBy")
   payoutRequests    PayoutRequest[] @relation("DoctorPayoutRequests")
   duesPayments      DuesPayment[]   @relation("DoctorDuesPayments")
   timeOff           ProviderTimeOff[] @relation("ProviderTimeOff")
@@ -584,6 +585,17 @@ model Settlement {
   idempotencyKey   String?  @unique
   settledByAdminId String?
   settledByAdmin   User?    @relation("AdminSettlements", fields: [settledByAdminId], references: [id])
+  // Payout lifecycle (F27; src/lib/settlementPayout.ts). PREPARED = the
+  // platform owes this net and hasn't sent it yet; PAID = sent, with the bank
+  // reference/UTR and the date it went out; NO_PAYOUT = net ≤ 0, nothing for
+  // the platform to send. null = settled before F27 (treated as paid, no reference).
+  status           String?
+  payoutReference  String?   // UTR / bank reference, shown to the provider
+  paidAt           DateTime? // the day the payout was sent (admin-entered)
+  payoutNote       String?   // admin-only — never returned to the provider
+  paidByAdminId    String?
+  paidByAdmin      User?     @relation("SettlementsPaidBy", fields: [paidByAdminId], references: [id])
+  markedPaidAt     DateTime? // when the admin recorded it
   createdAt        DateTime @default(now())
   appointments     Appointment[]
   payoutRequests   PayoutRequest[]
@@ -646,6 +658,10 @@ model PayoutRequest {
   resolvedAt   DateTime?
   settlementId String?
   settlement   Settlement? @relation(fields: [settlementId], references: [id], onDelete: SetNull)
+  // Set when an admin dismisses it (status DISMISSED) — the reason is shown
+  // to the provider; the admin id is the audit trail.
+  dismissReason      String?
+  dismissedByAdminId String?
 }
 
 model DoctorPaymentLog {

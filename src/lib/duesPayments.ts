@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { UNSETTLED_WHERE, duesFor, unsettledDues, type Dues } from "@/lib/payouts";
 import { money } from "@/lib/money";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { initialSettlementStatus } from "@/lib/settlementPayout";
 
 // A doctor paying the platform the commission they owe on cash visits (net
 // of their online earnings — src/lib/payouts.ts) through Cashfree, and the
@@ -87,7 +88,8 @@ export async function settleDuesPayment(payment: { orderId: string; amount: numb
     }
 
     const settlement = await tx.settlement.create({
-      data: { doctorId: order.doctorId, ...totals, note: `Paid by the doctor via Cashfree (payment ${payment.cfPaymentId})` },
+      // Net ≤ 0 (the doctor paid us), so NO_PAYOUT — nothing for the platform to send.
+      data: { doctorId: order.doctorId, ...totals, status: initialSettlementStatus(totals.netAmount), note: `Paid by the doctor via Cashfree (payment ${payment.cfPaymentId})` },
     });
     const moved = await tx.appointment.updateMany({ where: covered, data: { settlementId: settlement.id } });
     // An admin settlement claimed some of these at this very moment: roll

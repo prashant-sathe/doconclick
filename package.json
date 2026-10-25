@@ -17,6 +17,7 @@
     "test:reschedule": "tsx tests/reschedule-request.ts",
     "test:slots": "tsx tests/slot-booking.ts",
     "test:settlements": "tsx tests/settlement-idempotency.ts",
+    "test:payout-utr": "tsx tests/payout-utr.ts",
     "test:auth": "tsx tests/auth-sessions.ts",
     "test:admin-delete": "tsx tests/admin-delete-guards.ts",
     "test:payments": "tsx tests/payment-orders.ts",

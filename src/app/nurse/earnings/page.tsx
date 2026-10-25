@@ -14,8 +14,12 @@ type Visit = {
   amount: number; platformFee: number; serviceName: string | null; scheduledAt: string;
   patientName: string | null; relation: string; patient: { name: string };
 };
-type Settlement = { id: string; netAmount: number; onlineCount: number; createdAt: string; note: string | null };
-type PayoutRequest = { id: string; amount: number; status: string; createdAt: string };
+// status (F27): PREPARED (payout not sent yet), PAID (UTR + date), NO_PAYOUT; null = older record
+type Settlement = {
+  id: string; netAmount: number; onlineCount: number; createdAt: string; note: string | null;
+  status: string | null; payoutReference: string | null; paidAt: string | null;
+};
+type PayoutRequest = { id: string; amount: number; status: string; createdAt: string; dismissReason?: string | null };
 // What's owed right now (src/lib/payouts.ts): online payouts net of the
 // platform fee on any cash visits — the amount a payout request asks for.
 type Dues = { cashCount: number; onlineCount: number; cashFeeOwed: number; onlinePayoutOwed: number; netAmount: number };
@@ -71,6 +75,9 @@ export default function NurseEarningsPage() {
   const pendingPayout = dues?.netAmount ?? 0;
   const lifetime = sumMoney(completed.flatMap((v) => [v.amount, -v.platformFee]));
   const openRequest = requests.find((r) => r.status === "PENDING") ?? null;
+  // The latest request was dismissed by the admin — say why until they ask again.
+  const dismissedRequest = !openRequest && requests[0]?.status === "DISMISSED" ? requests[0] : null;
+  const fmtDate = (d: string) => new Date(d).toLocaleDateString(locale, { timeZone: "Asia/Kolkata" });
 
   const requestPayout = async () => {
     if (requestInFlight.current) return;
@@ -133,6 +140,15 @@ export default function NurseEarningsPage() {
               {requesting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} {t("requestPayout")}
             </button>
           )}
+          {dismissedRequest && (
+            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 mt-3 break-words">
+              {t.rich("requestDismissed", {
+                date: fmtDate(dismissedRequest.createdAt),
+                reason: dismissedRequest.dismissReason ?? "—",
+                b: (c) => <span className="font-semibold">{c}</span>,
+              })}
+            </p>
+          )}
           {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
         </div>
 
@@ -161,10 +177,17 @@ export default function NurseEarningsPage() {
           {settlements.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-8">{t("noSettlements")}</p>
           ) : settlements.map((s) => (
-            <div key={s.id} className="px-4 py-3 flex items-center justify-between">
-              <div>
+            <div key={s.id} className="px-4 py-3 flex items-center justify-between gap-3">
+              <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-800">{inr(s.netAmount)}</p>
-                <p className="text-xs text-slate-400">{t("visits", { count: s.onlineCount })} · {new Date(s.createdAt).toLocaleDateString(locale, { timeZone: "Asia/Kolkata" })}</p>
+                <p className="text-xs text-slate-400">{t("visits", { count: s.onlineCount })} · {fmtDate(s.createdAt)}</p>
+                {s.status === "PREPARED" && <p className="text-xs font-semibold text-amber-600 mt-0.5">{t("payoutProcessing")}</p>}
+                {s.status === "PAID" && s.paidAt && (
+                  <p className="text-xs text-emerald-700 mt-0.5 break-all">
+                    {t("payoutPaidOn", { date: fmtDate(s.paidAt) })}
+                    {s.payoutReference && <> · {t("payoutRef", { ref: s.payoutReference })}</>}
+                  </p>
+                )}
               </div>
               {s.note && <p className="text-xs text-slate-500 max-w-[50%] truncate">{s.note}</p>}
             </div>

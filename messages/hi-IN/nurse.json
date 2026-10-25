@@ -324,7 +324,11 @@
     "settled": "सेटल हो गया",
     "pending": "बाकी",
     "history": "सेटलमेंट का इतिहास",
-    "noSettlements": "अभी तक कोई सेटलमेंट नहीं हुआ है।"
+    "noSettlements": "अभी तक कोई सेटलमेंट नहीं हुआ है।",
+    "payoutProcessing": "पेआउट प्रोसेस हो रहा है",
+    "payoutPaidOn": "{date} को भुगतान हुआ",
+    "payoutRef": "संदर्भ (UTR) {ref}",
+    "requestDismissed": "{date} का आपका पेआउट अनुरोध खारिज कर दिया गया: <b>{reason}</b>. आप फिर से अनुरोध कर सकते हैं।"
   },
   "support": {
     "title": "मदद और सहायता",

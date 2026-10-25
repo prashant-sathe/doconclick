@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { requireActiveProvider } from "@/lib/providerGuard";
 import { moneyFields } from "@/lib/money";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { PROVIDER_SETTLEMENT_SELECT } from "@/lib/settlementPayout";
 
 // GET: the current doctor's own past settlements, newest first
 export const GET = withErrorLocale(async function GET() {
@@ -16,6 +17,8 @@ export const GET = withErrorLocale(async function GET() {
   const settlements = await prisma.settlement.findMany({
     where: { doctorId: authUser.id },
     orderBy: { createdAt: "desc" },
+    // Whitelisted: the admin's payout note and admin ids stay server-side.
+    select: PROVIDER_SETTLEMENT_SELECT,
   });
 
   // Rounded to paise — older rows were stored from float sums.

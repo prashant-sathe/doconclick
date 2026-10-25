@@ -535,6 +535,12 @@ export const SettlementScalarFieldEnum = {
   note: 'note',
   idempotencyKey: 'idempotencyKey',
   settledByAdminId: 'settledByAdminId',
+  status: 'status',
+  payoutReference: 'payoutReference',
+  paidAt: 'paidAt',
+  payoutNote: 'payoutNote',
+  paidByAdminId: 'paidByAdminId',
+  markedPaidAt: 'markedPaidAt',
   createdAt: 'createdAt'
 } as const
 
@@ -577,7 +583,9 @@ export const PayoutRequestScalarFieldEnum = {
   note: 'note',
   createdAt: 'createdAt',
   resolvedAt: 'resolvedAt',
-  settlementId: 'settlementId'
+  settlementId: 'settlementId',
+  dismissReason: 'dismissReason',
+  dismissedByAdminId: 'dismissedByAdminId'
 } as const
 
 export type PayoutRequestScalarFieldEnum = (typeof PayoutRequestScalarFieldEnum)[keyof typeof PayoutRequestScalarFieldEnum]

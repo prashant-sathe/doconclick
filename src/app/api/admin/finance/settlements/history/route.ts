@@ -26,6 +26,7 @@ export async function GET(req: Request) {
     include: {
       doctor: { select: { name: true, role: true } },
       settledByAdmin: { select: { name: true } },
+      paidByAdmin: { select: { name: true } },
     },
   });
 

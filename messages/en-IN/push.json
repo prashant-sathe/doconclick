@@ -350,5 +350,9 @@
   "apptNoShowByAdminToProvider": {
     "title": "Marked as a no-show",
     "body": "DocOnClick support marked {named, select, yes {{patient}'s} other {a patient's}} {when, date, ::EEEdMMM}, {when, time, short} appointment as a no-show."
+  },
+  "payoutRequestDismissed": {
+    "title": "Payout request dismissed",
+    "body": "Your ₹{amount} payout request was dismissed: {reason}. You can request again from Earnings."
   }
 }

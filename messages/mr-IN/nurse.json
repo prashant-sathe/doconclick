@@ -324,7 +324,11 @@
     "settled": "सेटल झाले",
     "pending": "बाकी",
     "history": "सेटलमेंटचा इतिहास",
-    "noSettlements": "अजून कोणतेही सेटलमेंट झालेले नाही."
+    "noSettlements": "अजून कोणतेही सेटलमेंट झालेले नाही.",
+    "payoutProcessing": "पेआउटची प्रक्रिया सुरू आहे",
+    "payoutPaidOn": "{date} रोजी पैसे पाठवले",
+    "payoutRef": "संदर्भ क्र. (UTR) {ref}",
+    "requestDismissed": "{date} रोजीची तुमची पेआउट विनंती नाकारली गेली: <b>{reason}</b>. तुम्ही पुन्हा विनंती करू शकता."
   },
   "support": {
     "title": "मदत आणि सपोर्ट",

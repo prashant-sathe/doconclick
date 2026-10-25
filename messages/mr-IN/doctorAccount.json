@@ -200,7 +200,11 @@
     "loadMore": "आणखी {count} पाहा",
     "settlements": "सेटलमेंटचा इतिहास",
     "noSettlements": "अजून एकही सेटलमेंट नोंदलेले नाही.",
-    "settlementCounts": "{cash} कॅश · {online} ऑनलाइन"
+    "settlementCounts": "{cash} कॅश · {online} ऑनलाइन",
+    "payoutProcessing": "पेआउटची प्रक्रिया सुरू आहे",
+    "payoutPaidOn": "{date} रोजी पैसे पाठवले",
+    "payoutRef": "संदर्भ क्र. (UTR) {ref}",
+    "requestDismissed": "{date} रोजीची तुमची पेआउट विनंती नाकारली गेली: <b>{reason}</b>. तुम्ही पुन्हा विनंती करू शकता."
   },
   "hub": {
     "photoAlt": "प्रोफाइल फोटो",

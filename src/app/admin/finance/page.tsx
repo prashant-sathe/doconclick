@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo, useRef } from "react";
-import { IndianRupee, TrendingUp, Save, Wallet } from "lucide-react";
+import { IndianRupee, TrendingUp, Save, Wallet, BadgeCheck, XCircle } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
 import { formatProviderName } from "@/lib/utils";
@@ -13,6 +13,7 @@ import LoadError from "@/components/LoadError";
 import DuesReviewPanel from "@/components/admin/DuesReviewPanel";
 import { useToast } from "@/components/Toast";
 import { useLoad } from "@/lib/apiClient";
+import { istDayKey } from "@/lib/istDate";
 
 interface Analytics {
   totalRevenue: number;
@@ -37,6 +38,7 @@ interface PendingSettlement {
   cashFeeOwed: number;
   onlinePayoutOwed: number;
   netAmount: number;
+  payoutRequestId: string | null;
   payoutRequestedAt: string | null;
   payoutRequestedAmount: number | null;
 }
@@ -50,7 +52,19 @@ interface SettlementRecord {
   onlinePayoutOwed: number;
   netAmount: number;
   createdAt: string;
+  // PREPARED → (Mark paid) → PAID; NO_PAYOUT when net ≤ 0; null = settled before payout tracking
+  status: string | null;
+  payoutReference: string | null;
+  paidAt: string | null;
+  payoutNote: string | null;
+  paidByAdmin: { name: string } | null;
 }
+
+const STATUS_BADGE: Record<string, { label: string; className: string }> = {
+  PREPARED: { label: "Prepared — not paid", className: "badge badge-warning" },
+  PAID: { label: "Paid", className: "badge badge-success" },
+  NO_PAYOUT: { label: "No payout", className: "badge badge-gray" },
+};
 
 // crypto.randomUUID only exists on secure origins; an admin page served over
 // plain HTTP (e.g. straight to an EC2 IP) still has getRandomValues.
@@ -93,6 +107,20 @@ export default function AdminFinance() {
   // Synchronous guard: state updates land a render later, a double-click doesn't.
   const settleInFlight = useRef(false);
   const [confirmSaveSettings, setConfirmSaveSettings] = useState(false);
+  // Mark paid (UTR + date + admin-only note) and dismiss-request dialogs.
+  const [payTarget, setPayTarget] = useState<SettlementRecord | null>(null);
+  const [payRef, setPayRef] = useState("");
+  const [payDate, setPayDate] = useState("");
+  const [payNote, setPayNote] = useState("");
+  const [payError, setPayError] = useState("");
+  const [payDuplicate, setPayDuplicate] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [dismissTarget, setDismissTarget] = useState<PendingSettlement | null>(null);
+  const [dismissReason, setDismissReason] = useState("");
+  const [dismissError, setDismissError] = useState("");
+  const [dismissing, setDismissing] = useState(false);
+  // Synchronous guard for both, like settleInFlight.
+  const actionInFlight = useRef(false);
 
   const loadSettlements = () => {
     void pendingLoad.reload();
@@ -194,12 +222,88 @@ export default function AdminFinance() {
     }
   };
 
+  const openMarkPaid = (row: SettlementRecord) => {
+    setPayTarget(row);
+    setPayRef("");
+    setPayDate(istDayKey(new Date()));
+    setPayNote("");
+    setPayError("");
+    setPayDuplicate(false);
+  };
+
+  // The server re-checks everything: PREPARED → PAID is a conditional claim
+  // (409 on a double click), and a UTR already used elsewhere needs a second confirm.
+  const markPaid = async () => {
+    if (!payTarget || actionInFlight.current) return;
+    actionInFlight.current = true;
+    setPaying(true);
+    setPayError("");
+    try {
+      const res = await fetch(`/api/admin/finance/settlements/${payTarget.id}/paid`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference: payRef, paidOn: payDate, note: payNote, confirmDuplicate: payDuplicate }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 409 && data.code === "DUPLICATE_REFERENCE") {
+        setPayDuplicate(true);
+        const others = (data.duplicates ?? []) as { doctor?: { name: string; role?: string } }[];
+        setPayError(`${data.error} (${others.map((d) => providerName(d.doctor?.name ?? "", d.doctor?.role)).join(", ")}). Check it, then press Mark paid again to record it anyway.`);
+        return;
+      }
+      if (!res.ok) {
+        setPayError(data.error ?? "Could not mark this settlement paid.");
+        if (res.status === 409) void historyLoad.reload();
+        return;
+      }
+      toast.success("Payout marked paid.");
+      setPayTarget(null);
+      void historyLoad.reload();
+    } catch {
+      setPayError("Network error — refresh to check whether it was recorded before trying again.");
+    } finally {
+      actionInFlight.current = false;
+      setPaying(false);
+    }
+  };
+
+  const dismissRequest = async () => {
+    if (!dismissTarget?.payoutRequestId || actionInFlight.current) return;
+    actionInFlight.current = true;
+    setDismissing(true);
+    setDismissError("");
+    try {
+      const res = await fetch(`/api/admin/finance/payout-requests/${dismissTarget.payoutRequestId}/dismiss`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: dismissReason }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setDismissError(data.error ?? "Could not dismiss the request.");
+        if (res.status === 409) void pendingLoad.reload();
+        return;
+      }
+      toast.success("Payout request dismissed — the provider has been notified.");
+      setDismissTarget(null);
+      void pendingLoad.reload();
+    } catch {
+      setDismissError("Network error — please try again.");
+    } finally {
+      actionInFlight.current = false;
+      setDismissing(false);
+    }
+  };
+
   const pendingColumnDefs = useMemo<ColDef<PendingSettlement>[]>(() => [
     {
       headerName: "Doctor",
       field: "doctorName",
       minWidth: 220,
       flex: 1.3,
+      // Wraps and grows, so the bank line and Dismiss stay visible (incl. at 390px).
+      autoHeight: true,
+      cellClass: "!whitespace-normal",
       cellRenderer: (p: ICellRendererParams<PendingSettlement>) => {
         const row = p.data;
         if (!row) return null;
@@ -217,6 +321,14 @@ export default function AdminFinance() {
               <div className="text-[11px] text-slate-400">{row.bankDetails}</div>
             ) : (
               <div className="text-[11px] text-red-500">No bank details on file{row.doctorMobile ? ` · ${row.doctorMobile}` : ""}</div>
+            )}
+            {row.payoutRequestId && (
+              <button
+                onClick={() => { setDismissTarget(row); setDismissReason(""); setDismissError(""); }}
+                className="text-[11px] font-semibold text-slate-500 hover:text-red-600 underline mt-0.5"
+              >
+                Dismiss request
+              </button>
             )}
           </div>
         );
@@ -259,7 +371,10 @@ export default function AdminFinance() {
       width: 140,
       sortable: false,
       filter: false,
-      cellRenderer: (p: ICellRendererParams<PendingSettlement>) => (
+      // A row only there for its open request (nothing unsettled) has nothing to settle.
+      cellRenderer: (p: ICellRendererParams<PendingSettlement>) => p.data && p.data.cashCount + p.data.onlineCount === 0 ? (
+        <span className="text-xs text-slate-400">Nothing to settle</span>
+      ) : (
         <button
           onClick={() => p.data && setSettleTarget(p.data)}
           disabled={settlingId !== null}
@@ -273,12 +388,40 @@ export default function AdminFinance() {
 
   const historyColumnDefs = useMemo<ColDef<SettlementRecord>[]>(() => [
     {
-      headerName: "Doctor",
+      // Doctor + payout status + Mark paid stacked in the first column, so the
+      // required step is on screen without scrolling the grid (incl. at 390px).
+      headerName: "Doctor / Payout",
       field: "doctor.name",
-      minWidth: 180,
-      flex: 1.2,
+      minWidth: 240,
+      flex: 1.6,
+      autoHeight: true,
+      cellClass: "!whitespace-normal",
       valueFormatter: (p: ValueFormatterParams<SettlementRecord>) => providerName(p.value ?? "", p.data?.doctor.role),
-      cellClass: "font-semibold text-slate-800",
+      cellRenderer: (p: ICellRendererParams<SettlementRecord>) => {
+        const row = p.data;
+        if (!row) return null;
+        const badge = row.status ? STATUS_BADGE[row.status] : null;
+        return (
+          <div className="leading-tight py-1.5 space-y-1">
+            <div className="font-semibold text-slate-800">{providerName(row.doctor.name, row.doctor.role)}</div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`${badge?.className ?? "badge badge-gray"} text-[10px] whitespace-normal`}>{badge?.label ?? "Settled (no reference)"}</span>
+              {row.status === "PREPARED" && (
+                <button onClick={() => openMarkPaid(row)} className="btn-primary text-xs py-1 px-3">
+                  Mark paid
+                </button>
+              )}
+            </div>
+            {row.status === "PAID" && (
+              <div className="text-[11px] text-slate-500 [overflow-wrap:anywhere]" title={row.payoutNote ?? undefined}>
+                UTR {row.payoutReference} · {row.paidAt ? new Date(row.paidAt).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" }) : ""}
+                {row.paidByAdmin ? ` · ${row.paidByAdmin.name}` : ""}
+                {row.payoutNote ? " · note" : ""}
+              </div>
+            )}
+          </div>
+        );
+      },
     },
     {
       headerName: "Date",
@@ -538,11 +681,11 @@ export default function AdminFinance() {
           title={`Settle with ${providerName(settleTarget.doctorName, settleTarget.providerRole)}?`}
           message={
             <>
-              This clears their {settleTarget.cashCount} cash and {settleTarget.onlineCount} online due{settleTarget.cashCount + settleTarget.onlineCount === 1 ? "" : "s"} — net{" "}
+              This prepares a settlement for their {settleTarget.cashCount} cash and {settleTarget.onlineCount} online due{settleTarget.cashCount + settleTarget.onlineCount === 1 ? "" : "s"} — net{" "}
               <span className={settleTarget.netAmount < 0 ? "font-semibold text-red-600" : "font-semibold text-emerald-600"}>
                 {settleTarget.netAmount < 0 ? "−" : ""}₹{Math.abs(settleTarget.netAmount).toLocaleString("en-IN")}
               </span>
-              . This is recorded permanently and cannot be undone.
+              . It is recorded permanently and cannot be undone.{settleTarget.netAmount > 0 ? " After you send the money, use Mark paid in Settlement History to record the UTR." : ""}
             </>
           }
           confirmLabel="Settle Now"
@@ -553,6 +696,70 @@ export default function AdminFinance() {
           onConfirm={async () => {
             if (await settleDoctor(settleTarget.doctorId)) setSettleTarget(null);
           }}
+        />
+      )}
+
+      {/* Mark paid */}
+      {payTarget && (
+        <ConfirmDialog
+          icon={BadgeCheck}
+          title={`Mark ₹${payTarget.netAmount.toLocaleString("en-IN")} paid to ${providerName(payTarget.doctor.name, payTarget.doctor.role)}?`}
+          message={
+            <div className="space-y-3">
+              <div>
+                <label className="input-label">UTR / bank reference</label>
+                <input
+                  value={payRef}
+                  onChange={(e) => { setPayRef(e.target.value); setPayDuplicate(false); }}
+                  maxLength={40}
+                  className="input-field font-mono uppercase"
+                  placeholder="e.g. 412345678901"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="input-label">Date sent</label>
+                <input type="date" value={payDate} max={istDayKey(new Date())} onChange={(e) => setPayDate(e.target.value)} className="input-field" />
+              </div>
+              <div>
+                <label className="input-label">Note (admin only — not shown to the provider)</label>
+                <textarea value={payNote} onChange={(e) => setPayNote(e.target.value)} maxLength={500} rows={2} className="input-field" />
+              </div>
+              {payError && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-2 py-1.5">{payError}</p>}
+            </div>
+          }
+          confirmLabel={payDuplicate ? "Record anyway" : "Mark paid"}
+          busyLabel="Saving…"
+          tone="success"
+          busy={paying}
+          confirmDisabled={payRef.trim().length < 6 || !payDate}
+          onCancel={() => setPayTarget(null)}
+          onConfirm={markPaid}
+        />
+      )}
+
+      {/* Dismiss payout request */}
+      {dismissTarget && (
+        <ConfirmDialog
+          icon={XCircle}
+          title={`Dismiss ${providerName(dismissTarget.doctorName, dismissTarget.providerRole)}'s payout request?`}
+          message={
+            <div className="space-y-3">
+              <p>Nothing is settled or paid. The provider is notified with this reason and can request again.</p>
+              <div>
+                <label className="input-label">Reason (shown to the provider)</label>
+                <textarea value={dismissReason} onChange={(e) => setDismissReason(e.target.value)} maxLength={300} rows={3} className="input-field" autoFocus />
+              </div>
+              {dismissError && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-2 py-1.5">{dismissError}</p>}
+            </div>
+          }
+          confirmLabel="Dismiss request"
+          busyLabel="Dismissing…"
+          tone="danger"
+          busy={dismissing}
+          confirmDisabled={dismissReason.trim().length < 5}
+          onCancel={() => setDismissTarget(null)}
+          onConfirm={dismissRequest}
         />
       )}
 

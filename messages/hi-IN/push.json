@@ -350,5 +350,9 @@
   "apptNoShowByAdminToProvider": {
     "title": "नो-शो दर्ज किया गया",
     "body": "DocOnClick सपोर्ट ने {named, select, yes {{patient} के} other {एक मरीज़ के}} {when, date, ::EEEdMMM}, {when, time, short} के अपॉइंटमेंट को नो-शो दर्ज किया है।"
+  },
+  "payoutRequestDismissed": {
+    "title": "पेआउट अनुरोध खारिज हुआ",
+    "body": "आपका ₹{amount} का पेआउट अनुरोध खारिज कर दिया गया: {reason}. आप कमाई पेज से फिर से अनुरोध कर सकते हैं।"
   }
 }

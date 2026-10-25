@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { UNSETTLED_WHERE, duesFromGroups, duesFor } from "@/lib/payouts";
 import { Prisma } from "@/generated/prisma/client";
+import { initialSettlementStatus } from "@/lib/settlementPayout";
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -31,21 +32,25 @@ export async function GET() {
   for (const g of grouped) groupsByDoctor.set(g.doctorId, [...(groupsByDoctor.get(g.doctorId) ?? []), g]);
   const byDoctor = new Map([...groupsByDoctor].map(([doctorId, groups]) => [doctorId, duesFromGroups(groups)]));
 
-  const doctorIds = [...byDoctor.keys()];
+  const openRequests = await prisma.payoutRequest.findMany({
+    where: { status: "PENDING" },
+    orderBy: { createdAt: "asc" },
+  });
+  const requestByDoctor = new Map<string, (typeof openRequests)[number]>();
+  for (const r of openRequests) if (!requestByDoctor.has(r.doctorId)) requestByDoctor.set(r.doctorId, r);
+
+  // A provider with an open request but nothing left unsettled (e.g. their
+  // own dues payment settled every visit) still shows, so the admin can
+  // dismiss the request — with zero totals and nothing to Settle Now.
+  const doctorIds = [...new Set([...byDoctor.keys(), ...requestByDoctor.keys()])];
   const doctors = await prisma.user.findMany({
     where: { id: { in: doctorIds } },
     select: { id: true, name: true, mobile: true, role: true, doctorProfile: { select: { bankDetails: true } }, nurseProfile: { select: { bankDetails: true } } },
   });
   const infoById = new Map(doctors.map((d) => [d.id, d]));
 
-  const openRequests = await prisma.payoutRequest.findMany({
-    where: { doctorId: { in: doctorIds }, status: "PENDING" },
-    orderBy: { createdAt: "asc" },
-  });
-  const requestByDoctor = new Map(openRequests.map((r) => [r.doctorId, r]));
-
   const queue = doctorIds.map((doctorId) => {
-    const t = byDoctor.get(doctorId)!;
+    const t = byDoctor.get(doctorId) ?? { cashCount: 0, onlineCount: 0, cashFeeOwed: 0, onlinePayoutOwed: 0, netAmount: 0 };
     const info = infoById.get(doctorId);
     const request = requestByDoctor.get(doctorId);
     return {
@@ -59,6 +64,7 @@ export async function GET() {
       cashFeeOwed: t.cashFeeOwed,
       onlinePayoutOwed: t.onlinePayoutOwed,
       netAmount: t.netAmount,
+      payoutRequestId: request?.id ?? null,
       payoutRequestedAt: request?.createdAt ?? null,
       // What they were owed when they asked — `netAmount` is what Settle Now pays.
       payoutRequestedAmount: request ? request.amount : null,
@@ -133,7 +139,9 @@ export async function POST(req: Request) {
       const totals = await totalsForSettlement(tx, created.id);
       if (totals.netAmount < 0 && acknowledgeNegative !== true) throw new NeedsAcknowledgementError(totals);
 
-      const settled = await tx.settlement.update({ where: { id: created.id }, data: totals });
+      // Prepared, not paid: the payout goes out by bank transfer afterwards and
+      // the admin marks it paid with the UTR (…/settlements/[id]/paid).
+      const settled = await tx.settlement.update({ where: { id: created.id }, data: { ...totals, status: initialSettlementStatus(totals.netAmount) } });
       // The request is paid at what's owed now (these claimed rows), not what
       // was owed when it was made — record that as its amount.
       await tx.payoutRequest.updateMany({

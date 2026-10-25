@@ -43,6 +43,8 @@ export type PayoutRequestMinAggregateOutputType = {
   createdAt: Date | null
   resolvedAt: Date | null
   settlementId: string | null
+  dismissReason: string | null
+  dismissedByAdminId: string | null
 }
 
 export type PayoutRequestMaxAggregateOutputType = {
@@ -54,6 +56,8 @@ export type PayoutRequestMaxAggregateOutputType = {
   createdAt: Date | null
   resolvedAt: Date | null
   settlementId: string | null
+  dismissReason: string | null
+  dismissedByAdminId: string | null
 }
 
 export type PayoutRequestCountAggregateOutputType = {
@@ -65,6 +69,8 @@ export type PayoutRequestCountAggregateOutputType = {
   createdAt: number
   resolvedAt: number
   settlementId: number
+  dismissReason: number
+  dismissedByAdminId: number
   _all: number
 }
 
@@ -86,6 +92,8 @@ export type PayoutRequestMinAggregateInputType = {
   createdAt?: true
   resolvedAt?: true
   settlementId?: true
+  dismissReason?: true
+  dismissedByAdminId?: true
 }
 
 export type PayoutRequestMaxAggregateInputType = {
@@ -97,6 +105,8 @@ export type PayoutRequestMaxAggregateInputType = {
   createdAt?: true
   resolvedAt?: true
   settlementId?: true
+  dismissReason?: true
+  dismissedByAdminId?: true
 }
 
 export type PayoutRequestCountAggregateInputType = {
@@ -108,6 +118,8 @@ export type PayoutRequestCountAggregateInputType = {
   createdAt?: true
   resolvedAt?: true
   settlementId?: true
+  dismissReason?: true
+  dismissedByAdminId?: true
   _all?: true
 }
 
@@ -206,6 +218,8 @@ export type PayoutRequestGroupByOutputType = {
   createdAt: Date
   resolvedAt: Date | null
   settlementId: string | null
+  dismissReason: string | null
+  dismissedByAdminId: string | null
   _count: PayoutRequestCountAggregateOutputType | null
   _avg: PayoutRequestAvgAggregateOutputType | null
   _sum: PayoutRequestSumAggregateOutputType | null
@@ -240,6 +254,8 @@ export type PayoutRequestWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"PayoutRequest"> | Date | string
   resolvedAt?: Prisma.DateTimeNullableFilter<"PayoutRequest"> | Date | string | null
   settlementId?: Prisma.StringNullableFilter<"PayoutRequest"> | string | null
+  dismissReason?: Prisma.StringNullableFilter<"PayoutRequest"> | string | null
+  dismissedByAdminId?: Prisma.StringNullableFilter<"PayoutRequest"> | string | null
   doctor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   settlement?: Prisma.XOR<Prisma.SettlementNullableScalarRelationFilter, Prisma.SettlementWhereInput> | null
 }
@@ -253,6 +269,8 @@ export type PayoutRequestOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   settlementId?: Prisma.SortOrderInput | Prisma.SortOrder
+  dismissReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  dismissedByAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   doctor?: Prisma.UserOrderByWithRelationInput
   settlement?: Prisma.SettlementOrderByWithRelationInput
 }
@@ -269,6 +287,8 @@ export type PayoutRequestWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"PayoutRequest"> | Date | string
   resolvedAt?: Prisma.DateTimeNullableFilter<"PayoutRequest"> | Date | string | null
   settlementId?: Prisma.StringNullableFilter<"PayoutRequest"> | string | null
+  dismissReason?: Prisma.StringNullableFilter<"PayoutRequest"> | string | null
+  dismissedByAdminId?: Prisma.StringNullableFilter<"PayoutRequest"> | string | null
   doctor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   settlement?: Prisma.XOR<Prisma.SettlementNullableScalarRelationFilter, Prisma.SettlementWhereInput> | null
 }, "id">
@@ -282,6 +302,8 @@ export type PayoutRequestOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   settlementId?: Prisma.SortOrderInput | Prisma.SortOrder
+  dismissReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  dismissedByAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PayoutRequestCountOrderByAggregateInput
   _avg?: Prisma.PayoutRequestAvgOrderByAggregateInput
   _max?: Prisma.PayoutRequestMaxOrderByAggregateInput
@@ -301,6 +323,8 @@ export type PayoutRequestScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PayoutRequest"> | Date | string
   resolvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PayoutRequest"> | Date | string | null
   settlementId?: Prisma.StringNullableWithAggregatesFilter<"PayoutRequest"> | string | null
+  dismissReason?: Prisma.StringNullableWithAggregatesFilter<"PayoutRequest"> | string | null
+  dismissedByAdminId?: Prisma.StringNullableWithAggregatesFilter<"PayoutRequest"> | string | null
 }
 
 export type PayoutRequestCreateInput = {
@@ -310,6 +334,8 @@ export type PayoutRequestCreateInput = {
   note?: string | null
   createdAt?: Date | string
   resolvedAt?: Date | string | null
+  dismissReason?: string | null
+  dismissedByAdminId?: string | null
   doctor: Prisma.UserCreateNestedOneWithoutPayoutRequestsInput
   settlement?: Prisma.SettlementCreateNestedOneWithoutPayoutRequestsInput
 }
@@ -323,6 +349,8 @@ export type PayoutRequestUncheckedCreateInput = {
   createdAt?: Date | string
   resolvedAt?: Date | string | null
   settlementId?: string | null
+  dismissReason?: string | null
+  dismissedByAdminId?: string | null
 }
 
 export type PayoutRequestUpdateInput = {
@@ -332,6 +360,8 @@ export type PayoutRequestUpdateInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dismissReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctor?: Prisma.UserUpdateOneRequiredWithoutPayoutRequestsNestedInput
   settlement?: Prisma.SettlementUpdateOneWithoutPayoutRequestsNestedInput
 }
@@ -345,6 +375,8 @@ export type PayoutRequestUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   settlementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PayoutRequestCreateManyInput = {
@@ -356,6 +388,8 @@ export type PayoutRequestCreateManyInput = {
   createdAt?: Date | string
   resolvedAt?: Date | string | null
   settlementId?: string | null
+  dismissReason?: string | null
+  dismissedByAdminId?: string | null
 }
 
 export type PayoutRequestUpdateManyMutationInput = {
@@ -365,6 +399,8 @@ export type PayoutRequestUpdateManyMutationInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dismissReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PayoutRequestUncheckedUpdateManyInput = {
@@ -376,6 +412,8 @@ export type PayoutRequestUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   settlementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PayoutRequestListRelationFilter = {
@@ -397,6 +435,8 @@ export type PayoutRequestCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   settlementId?: Prisma.SortOrder
+  dismissReason?: Prisma.SortOrder
+  dismissedByAdminId?: Prisma.SortOrder
 }
 
 export type PayoutRequestAvgOrderByAggregateInput = {
@@ -412,6 +452,8 @@ export type PayoutRequestMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   settlementId?: Prisma.SortOrder
+  dismissReason?: Prisma.SortOrder
+  dismissedByAdminId?: Prisma.SortOrder
 }
 
 export type PayoutRequestMinOrderByAggregateInput = {
@@ -423,6 +465,8 @@ export type PayoutRequestMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   settlementId?: Prisma.SortOrder
+  dismissReason?: Prisma.SortOrder
+  dismissedByAdminId?: Prisma.SortOrder
 }
 
 export type PayoutRequestSumOrderByAggregateInput = {
@@ -520,6 +564,8 @@ export type PayoutRequestCreateWithoutDoctorInput = {
   note?: string | null
   createdAt?: Date | string
   resolvedAt?: Date | string | null
+  dismissReason?: string | null
+  dismissedByAdminId?: string | null
   settlement?: Prisma.SettlementCreateNestedOneWithoutPayoutRequestsInput
 }
 
@@ -531,6 +577,8 @@ export type PayoutRequestUncheckedCreateWithoutDoctorInput = {
   createdAt?: Date | string
   resolvedAt?: Date | string | null
   settlementId?: string | null
+  dismissReason?: string | null
+  dismissedByAdminId?: string | null
 }
 
 export type PayoutRequestCreateOrConnectWithoutDoctorInput = {
@@ -571,6 +619,8 @@ export type PayoutRequestScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"PayoutRequest"> | Date | string
   resolvedAt?: Prisma.DateTimeNullableFilter<"PayoutRequest"> | Date | string | null
   settlementId?: Prisma.StringNullableFilter<"PayoutRequest"> | string | null
+  dismissReason?: Prisma.StringNullableFilter<"PayoutRequest"> | string | null
+  dismissedByAdminId?: Prisma.StringNullableFilter<"PayoutRequest"> | string | null
 }
 
 export type PayoutRequestCreateWithoutSettlementInput = {
@@ -580,6 +630,8 @@ export type PayoutRequestCreateWithoutSettlementInput = {
   note?: string | null
   createdAt?: Date | string
   resolvedAt?: Date | string | null
+  dismissReason?: string | null
+  dismissedByAdminId?: string | null
   doctor: Prisma.UserCreateNestedOneWithoutPayoutRequestsInput
 }
 
@@ -591,6 +643,8 @@ export type PayoutRequestUncheckedCreateWithoutSettlementInput = {
   note?: string | null
   createdAt?: Date | string
   resolvedAt?: Date | string | null
+  dismissReason?: string | null
+  dismissedByAdminId?: string | null
 }
 
 export type PayoutRequestCreateOrConnectWithoutSettlementInput = {
@@ -627,6 +681,8 @@ export type PayoutRequestCreateManyDoctorInput = {
   createdAt?: Date | string
   resolvedAt?: Date | string | null
   settlementId?: string | null
+  dismissReason?: string | null
+  dismissedByAdminId?: string | null
 }
 
 export type PayoutRequestUpdateWithoutDoctorInput = {
@@ -636,6 +692,8 @@ export type PayoutRequestUpdateWithoutDoctorInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dismissReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settlement?: Prisma.SettlementUpdateOneWithoutPayoutRequestsNestedInput
 }
 
@@ -647,6 +705,8 @@ export type PayoutRequestUncheckedUpdateWithoutDoctorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   settlementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PayoutRequestUncheckedUpdateManyWithoutDoctorInput = {
@@ -657,6 +717,8 @@ export type PayoutRequestUncheckedUpdateManyWithoutDoctorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   settlementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PayoutRequestCreateManySettlementInput = {
@@ -667,6 +729,8 @@ export type PayoutRequestCreateManySettlementInput = {
   note?: string | null
   createdAt?: Date | string
   resolvedAt?: Date | string | null
+  dismissReason?: string | null
+  dismissedByAdminId?: string | null
 }
 
 export type PayoutRequestUpdateWithoutSettlementInput = {
@@ -676,6 +740,8 @@ export type PayoutRequestUpdateWithoutSettlementInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dismissReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   doctor?: Prisma.UserUpdateOneRequiredWithoutPayoutRequestsNestedInput
 }
 
@@ -687,6 +753,8 @@ export type PayoutRequestUncheckedUpdateWithoutSettlementInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dismissReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PayoutRequestUncheckedUpdateManyWithoutSettlementInput = {
@@ -697,6 +765,8 @@ export type PayoutRequestUncheckedUpdateManyWithoutSettlementInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dismissReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dismissedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -710,6 +780,8 @@ export type PayoutRequestSelect<ExtArgs extends runtime.Types.Extensions.Interna
   createdAt?: boolean
   resolvedAt?: boolean
   settlementId?: boolean
+  dismissReason?: boolean
+  dismissedByAdminId?: boolean
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   settlement?: boolean | Prisma.PayoutRequest$settlementArgs<ExtArgs>
 }, ExtArgs["result"]["payoutRequest"]>
@@ -723,6 +795,8 @@ export type PayoutRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   createdAt?: boolean
   resolvedAt?: boolean
   settlementId?: boolean
+  dismissReason?: boolean
+  dismissedByAdminId?: boolean
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   settlement?: boolean | Prisma.PayoutRequest$settlementArgs<ExtArgs>
 }, ExtArgs["result"]["payoutRequest"]>
@@ -736,6 +810,8 @@ export type PayoutRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   createdAt?: boolean
   resolvedAt?: boolean
   settlementId?: boolean
+  dismissReason?: boolean
+  dismissedByAdminId?: boolean
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   settlement?: boolean | Prisma.PayoutRequest$settlementArgs<ExtArgs>
 }, ExtArgs["result"]["payoutRequest"]>
@@ -749,9 +825,11 @@ export type PayoutRequestSelectScalar = {
   createdAt?: boolean
   resolvedAt?: boolean
   settlementId?: boolean
+  dismissReason?: boolean
+  dismissedByAdminId?: boolean
 }
 
-export type PayoutRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "doctorId" | "amount" | "status" | "note" | "createdAt" | "resolvedAt" | "settlementId", ExtArgs["result"]["payoutRequest"]>
+export type PayoutRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "doctorId" | "amount" | "status" | "note" | "createdAt" | "resolvedAt" | "settlementId" | "dismissReason" | "dismissedByAdminId", ExtArgs["result"]["payoutRequest"]>
 export type PayoutRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   settlement?: boolean | Prisma.PayoutRequest$settlementArgs<ExtArgs>
@@ -780,6 +858,8 @@ export type $PayoutRequestPayload<ExtArgs extends runtime.Types.Extensions.Inter
     createdAt: Date
     resolvedAt: Date | null
     settlementId: string | null
+    dismissReason: string | null
+    dismissedByAdminId: string | null
   }, ExtArgs["result"]["payoutRequest"]>
   composites: {}
 }
@@ -1213,6 +1293,8 @@ export interface PayoutRequestFieldRefs {
   readonly createdAt: Prisma.FieldRef<"PayoutRequest", 'DateTime'>
   readonly resolvedAt: Prisma.FieldRef<"PayoutRequest", 'DateTime'>
   readonly settlementId: Prisma.FieldRef<"PayoutRequest", 'String'>
+  readonly dismissReason: Prisma.FieldRef<"PayoutRequest", 'String'>
+  readonly dismissedByAdminId: Prisma.FieldRef<"PayoutRequest", 'String'>
 }
     
 

@@ -200,7 +200,11 @@
     "loadMore": "Load {count} more",
     "settlements": "Settlement History",
     "noSettlements": "No settlements recorded yet.",
-    "settlementCounts": "{cash} cash · {online} online"
+    "settlementCounts": "{cash} cash · {online} online",
+    "payoutProcessing": "Payout being processed",
+    "payoutPaidOn": "Paid on {date}",
+    "payoutRef": "UTR {ref}",
+    "requestDismissed": "Your payout request from {date} was dismissed: <b>{reason}</b>. You can request again."
   },
   "hub": {
     "photoAlt": "Profile photo",

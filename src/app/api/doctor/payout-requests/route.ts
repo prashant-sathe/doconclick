@@ -28,7 +28,8 @@ export const GET = withErrorLocale(async function GET() {
   if (denied) return denied;
 
   const [requests, dues, bank] = await Promise.all([
-    prisma.payoutRequest.findMany({ where: { doctorId: authUser.id }, orderBy: { createdAt: "desc" } }),
+    // dismissReason is for the provider; the dismissing admin's id isn't.
+    prisma.payoutRequest.findMany({ where: { doctorId: authUser.id }, orderBy: { createdAt: "desc" }, omit: { dismissedByAdminId: true } }),
     unsettledDues(authUser.id),
     bankDetailsOnFile(authUser.id, authUser.role),
   ]);

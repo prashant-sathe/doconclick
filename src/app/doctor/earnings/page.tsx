@@ -50,6 +50,10 @@ interface SettlementRecord {
   onlinePayoutOwed: number;
   netAmount: number;
   createdAt: string;
+  // F27: PREPARED (payout not sent yet), PAID (with UTR + date), NO_PAYOUT; null = older record
+  status: string | null;
+  payoutReference: string | null;
+  paidAt: string | null;
 }
 
 interface PayoutRequestRecord {
@@ -57,6 +61,7 @@ interface PayoutRequestRecord {
   amount: number;
   status: string;
   createdAt: string;
+  dismissReason?: string | null;
 }
 
 // What's owed right now (src/lib/payouts.ts): online payouts net of the
@@ -181,6 +186,9 @@ export default function DoctorEarnings() {
   const lastMonthEarnings = summary?.lastMonth ?? 0;
   const netPayout = dues?.netAmount ?? 0;
   const openPayoutRequest = payoutRequests.find((r) => r.status === "PENDING") ?? null;
+  // The latest request was dismissed by the admin — say why until they ask again.
+  const dismissedRequest = !openPayoutRequest && payoutRequests[0]?.status === "DISMISSED" ? payoutRequests[0] : null;
+  const fmtDate = (d: string) => new Date(d).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" });
 
   const requestPayout = async () => {
     if (payoutInFlight.current) return;
@@ -299,6 +307,15 @@ export default function DoctorEarnings() {
             )}
           </div>
         )}
+        {dismissedRequest && (
+          <p className="text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 mb-6 -mt-3 break-words">
+            {t.rich("requestDismissed", {
+              date: fmtDate(dismissedRequest.createdAt),
+              reason: dismissedRequest.dismissReason ?? "—",
+              b: (c) => <span className="font-semibold">{c}</span>,
+            })}
+          </p>
+        )}
         {payoutError && <p className="text-xs text-red-600 mb-6 -mt-4">{payoutError}</p>}
 
         <DuesPayCard
@@ -389,6 +406,13 @@ export default function DoctorEarnings() {
                       {new Date(s.createdAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" })}
                     </p>
                     <p className="text-xs text-slate-400">{t("settlementCounts", { cash: s.cashCount, online: s.onlineCount })}</p>
+                    {s.status === "PREPARED" && <p className="text-xs font-semibold text-amber-600 mt-0.5">{t("payoutProcessing")}</p>}
+                    {s.status === "PAID" && s.paidAt && (
+                      <p className="text-xs text-emerald-700 mt-0.5 break-all">
+                        {t("payoutPaidOn", { date: fmtDate(s.paidAt) })}
+                        {s.payoutReference && <> · {t("payoutRef", { ref: s.payoutReference })}</>}
+                      </p>
+                    )}
                   </div>
                   <p className={`text-sm font-bold flex-shrink-0 ${s.netAmount < 0 ? "text-red-600" : "text-emerald-600"}`}>
                     {s.netAmount < 0 ? "−" : "+"}₹{Math.abs(s.netAmount).toLocaleString("en-IN")}
