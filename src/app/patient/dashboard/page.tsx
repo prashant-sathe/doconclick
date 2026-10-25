@@ -2034,8 +2034,9 @@ function PatientDashboardInner() {
               <button onClick={() => setPickingOnMap(false)} className="text-sm font-semibold text-slate-400">{td("pick.cancel")}</button>
             </div>
           </div>
-          {/* Confirm button */}
-          <div className="absolute bottom-0 inset-x-0 z-50 p-4 pointer-events-none" style={{ paddingBottom: "calc(1rem + var(--safe-area-inset-bottom, env(safe-area-inset-bottom)))" }}>
+          {/* Confirm button — below lg it sits above the fixed PatientMobileNav
+              (nav height + safe area, same offset as the map controls). */}
+          <div className="absolute bottom-[calc(4rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-0 lg:pb-[calc(1rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] inset-x-0 z-50 p-4 pointer-events-none">
             <button
               onClick={confirmMapPick}
               disabled={confirmingPick}
