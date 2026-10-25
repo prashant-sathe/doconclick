@@ -10,18 +10,32 @@ const MIN_DOCTORS = 25;
 const MIN_CONSULTATIONS = 500;
 const MIN_REVIEWS = 30;
 
-export const revalidate = 3600;
+// Not prerendered: the DB isn't reachable during `next build` (Docker). The
+// 1h cache is served via Cache-Control instead.
+export const dynamic = "force-dynamic";
 
 export const GET = withErrorLocale(async function GET() {
   const [doctors, consultations, ratingAgg] = await Promise.all([
-    prisma.doctorProfile.count({ where: { status: "APPROVED", isVerified: true } }),
+    prisma.doctorProfile.count({
+      where: { status: "APPROVED", isVerified: true },
+    }),
     prisma.appointment.count({ where: { status: "COMPLETED" } }),
     prisma.review.aggregate({ _avg: { rating: true }, _count: { _all: true } }),
   ]);
   const reviews = ratingAgg._count._all;
-  return NextResponse.json({
-    doctors: doctors >= MIN_DOCTORS ? doctors : null,
-    consultations: consultations >= MIN_CONSULTATIONS ? consultations : null,
-    rating: reviews >= MIN_REVIEWS && ratingAgg._avg.rating ? Math.round(ratingAgg._avg.rating * 10) / 10 : null,
-  });
+  return NextResponse.json(
+    {
+      doctors: doctors >= MIN_DOCTORS ? doctors : null,
+      consultations: consultations >= MIN_CONSULTATIONS ? consultations : null,
+      rating:
+        reviews >= MIN_REVIEWS && ratingAgg._avg.rating
+          ? Math.round(ratingAgg._avg.rating * 10) / 10
+          : null,
+    },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=600",
+      },
+    },
+  );
 });
