@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { uploadToS3, deleteFromS3 } from "@/lib/s3";
 import { verifyUpload } from "@/lib/fileSniff";
 import { recordPrescriptionVersion } from "@/lib/prescriptionLock";
+import { syncMedicineReminders } from "@/lib/medicineReminders";
 import { PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS } from "@/lib/nursePackage";
 import { getBookingHorizonDays } from "@/lib/bookingLimits";
 import { addDaysYmd, istDayKey, isValidYmd } from "@/lib/istDate";
@@ -77,7 +78,10 @@ export function normalizePrescription(medicines: unknown, tests: unknown):
 const medicineSnapshot = (m: MedicineItem) => ({ name: m.name, dosage: m.dosage, frequency: m.frequency, duration: m.duration, instructions: m.instructions });
 const testSnapshot = (t: TestItem) => ({ name: t.name, instructions: t.instructions });
 
-/** Replaces an appointment's medicines and tests, keeping a version when they change. */
+/**
+ * Replaces an appointment's medicines and tests, keeping a version when they
+ * change, and rebuilds the patient's medicine reminders from the new list.
+ */
 export async function replacePrescription(
   tx: Prisma.TransactionClient,
   { appointmentId, editedById, medicines, tests }: { appointmentId: string; editedById: string; medicines: MedicineItem[]; tests: TestItem[] },
@@ -96,6 +100,7 @@ export async function replacePrescription(
     before: { medicines: beforeMedicines.map(medicineSnapshot), tests: beforeTests.map(testSnapshot) },
     next: { medicines: medicines.map(medicineSnapshot), tests: tests.map(testSnapshot) },
   });
+  await syncMedicineReminders(tx, appointmentId, medicines);
 }
 
 // ── Files ──

@@ -529,5 +529,9 @@
   "favouriteNeedsName": "औषधाचे नाव लिहा.",
   "templateNeedsName": "टेम्पलेटला नाव द्या.",
   "templateNameTooLong": "टेम्पलेटचे नाव {templateNameMax} अक्षरांपेक्षा कमी ठेवा.",
-  "templateEmpty": "टेम्पलेट म्हणून सेव्ह करण्यासाठी एखादे औषध किंवा तपासणी जोडा."
+  "templateEmpty": "टेम्पलेट म्हणून सेव्ह करण्यासाठी एखादे औषध किंवा तपासणी जोडा.",
+  "medicineReminderNotFound": "औषधाची आठवण सापडली नाही.",
+  "doseNotToday": "हा डोस आजसाठी ठरलेला नाही.",
+  "doseTimesInvalid": "सकाळी 6 ते रात्री 10 दरम्यान डोसच्या 1 ते 6 वेळा निवडा.",
+  "courseDaysInvalid": "कोर्स 1 ते {maxCourseDays} दिवसांचा असू शकतो."
 }

@@ -529,5 +529,9 @@
   "favouriteNeedsName": "दवा का नाम लिखें।",
   "templateNeedsName": "टेम्पलेट को एक नाम दें।",
   "templateNameTooLong": "टेम्पलेट का नाम {templateNameMax} अक्षरों से कम रखें।",
-  "templateEmpty": "टेम्पलेट सेव करने के लिए कोई दवा या जाँच जोड़ें।"
+  "templateEmpty": "टेम्पलेट सेव करने के लिए कोई दवा या जाँच जोड़ें।",
+  "medicineReminderNotFound": "दवा का रिमाइंडर नहीं मिला।",
+  "doseNotToday": "यह खुराक आज के लिए तय नहीं है।",
+  "doseTimesInvalid": "सुबह 6 से रात 10 बजे के बीच 1 से 6 खुराक के समय चुनें।",
+  "courseDaysInvalid": "कोर्स 1 से {maxCourseDays} दिन का हो सकता है।"
 }

@@ -182,6 +182,16 @@ export type Message = Prisma.MessageModel
  */
 export type PrescriptionMedicine = Prisma.PrescriptionMedicineModel
 /**
+ * Model MedicineReminder
+ * 
+ */
+export type MedicineReminder = Prisma.MedicineReminderModel
+/**
+ * Model MedicineDose
+ * 
+ */
+export type MedicineDose = Prisma.MedicineDoseModel
+/**
  * Model PrescriptionTest
  * 
  */

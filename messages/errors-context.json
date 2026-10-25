@@ -126,5 +126,6 @@
   "feedConsultTypeInvalid": "{types}: comma-separated English consult type codes: CLINIC, HOME, VIDEO (stay English)",
   "favouritesFull": "{maxFavouriteMedicines}: a number",
   "templatesFull": "{maxPrescriptionTemplates}: a number",
-  "templateNameTooLong": "{templateNameMax}: number of characters"
+  "templateNameTooLong": "{templateNameMax}: number of characters",
+  "courseDaysInvalid": "{maxCourseDays}: largest number of days a medicine course can be set to (90)"
 }

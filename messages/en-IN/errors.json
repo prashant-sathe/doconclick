@@ -529,5 +529,9 @@
   "favouriteNeedsName": "Enter the medicine name.",
   "templateNeedsName": "Give the template a name.",
   "templateNameTooLong": "Keep the template name under {templateNameMax} characters.",
-  "templateEmpty": "Add a medicine or a test to save as a template."
+  "templateEmpty": "Add a medicine or a test to save as a template.",
+  "medicineReminderNotFound": "Medicine reminder not found.",
+  "doseNotToday": "This dose isn't scheduled for today.",
+  "doseTimesInvalid": "Pick 1 to 6 dose times between 6 am and 10 pm.",
+  "courseDaysInvalid": "The course can be 1 to {maxCourseDays} days."
 }

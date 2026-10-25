@@ -108,6 +108,7 @@ export type AppointmentMinAggregateOutputType = {
   followUpDate: Date | null
   followUpNote: string | null
   followUpReminderSentAt: Date | null
+  medicineRefillSentAt: Date | null
   payReminderSentAt: Date | null
   bookedById: string | null
   adminActionBy: string | null
@@ -174,6 +175,7 @@ export type AppointmentMaxAggregateOutputType = {
   followUpDate: Date | null
   followUpNote: string | null
   followUpReminderSentAt: Date | null
+  medicineRefillSentAt: Date | null
   payReminderSentAt: Date | null
   bookedById: string | null
   adminActionBy: string | null
@@ -240,6 +242,7 @@ export type AppointmentCountAggregateOutputType = {
   followUpDate: number
   followUpNote: number
   followUpReminderSentAt: number
+  medicineRefillSentAt: number
   payReminderSentAt: number
   bookedById: number
   adminActionBy: number
@@ -332,6 +335,7 @@ export type AppointmentMinAggregateInputType = {
   followUpDate?: true
   followUpNote?: true
   followUpReminderSentAt?: true
+  medicineRefillSentAt?: true
   payReminderSentAt?: true
   bookedById?: true
   adminActionBy?: true
@@ -398,6 +402,7 @@ export type AppointmentMaxAggregateInputType = {
   followUpDate?: true
   followUpNote?: true
   followUpReminderSentAt?: true
+  medicineRefillSentAt?: true
   payReminderSentAt?: true
   bookedById?: true
   adminActionBy?: true
@@ -464,6 +469,7 @@ export type AppointmentCountAggregateInputType = {
   followUpDate?: true
   followUpNote?: true
   followUpReminderSentAt?: true
+  medicineRefillSentAt?: true
   payReminderSentAt?: true
   bookedById?: true
   adminActionBy?: true
@@ -617,6 +623,7 @@ export type AppointmentGroupByOutputType = {
   followUpDate: Date | null
   followUpNote: string | null
   followUpReminderSentAt: Date | null
+  medicineRefillSentAt: Date | null
   payReminderSentAt: Date | null
   bookedById: string | null
   adminActionBy: string | null
@@ -706,6 +713,7 @@ export type AppointmentWhereInput = {
   followUpDate?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   followUpNote?: Prisma.StringNullableFilter<"Appointment"> | string | null
   followUpReminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  medicineRefillSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   payReminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   bookedById?: Prisma.StringNullableFilter<"Appointment"> | string | null
   adminActionBy?: Prisma.StringNullableFilter<"Appointment"> | string | null
@@ -738,6 +746,7 @@ export type AppointmentWhereInput = {
   walletTransaction?: Prisma.XOR<Prisma.WalletTransactionNullableScalarRelationFilter, Prisma.WalletTransactionWhereInput> | null
   paymentOrderItems?: Prisma.PaymentOrderItemListRelationFilter
   couponRedemption?: Prisma.XOR<Prisma.CouponRedemptionNullableScalarRelationFilter, Prisma.CouponRedemptionWhereInput> | null
+  medicineReminders?: Prisma.MedicineReminderListRelationFilter
 }
 
 export type AppointmentOrderByWithRelationInput = {
@@ -798,6 +807,7 @@ export type AppointmentOrderByWithRelationInput = {
   followUpDate?: Prisma.SortOrderInput | Prisma.SortOrder
   followUpNote?: Prisma.SortOrderInput | Prisma.SortOrder
   followUpReminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  medicineRefillSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   payReminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   bookedById?: Prisma.SortOrderInput | Prisma.SortOrder
   adminActionBy?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -830,6 +840,7 @@ export type AppointmentOrderByWithRelationInput = {
   walletTransaction?: Prisma.WalletTransactionOrderByWithRelationInput
   paymentOrderItems?: Prisma.PaymentOrderItemOrderByRelationAggregateInput
   couponRedemption?: Prisma.CouponRedemptionOrderByWithRelationInput
+  medicineReminders?: Prisma.MedicineReminderOrderByRelationAggregateInput
 }
 
 export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
@@ -893,6 +904,7 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   followUpDate?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   followUpNote?: Prisma.StringNullableFilter<"Appointment"> | string | null
   followUpReminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  medicineRefillSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   payReminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   bookedById?: Prisma.StringNullableFilter<"Appointment"> | string | null
   adminActionBy?: Prisma.StringNullableFilter<"Appointment"> | string | null
@@ -925,6 +937,7 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   walletTransaction?: Prisma.XOR<Prisma.WalletTransactionNullableScalarRelationFilter, Prisma.WalletTransactionWhereInput> | null
   paymentOrderItems?: Prisma.PaymentOrderItemListRelationFilter
   couponRedemption?: Prisma.XOR<Prisma.CouponRedemptionNullableScalarRelationFilter, Prisma.CouponRedemptionWhereInput> | null
+  medicineReminders?: Prisma.MedicineReminderListRelationFilter
 }, "id" | "reassignedFromId">
 
 export type AppointmentOrderByWithAggregationInput = {
@@ -985,6 +998,7 @@ export type AppointmentOrderByWithAggregationInput = {
   followUpDate?: Prisma.SortOrderInput | Prisma.SortOrder
   followUpNote?: Prisma.SortOrderInput | Prisma.SortOrder
   followUpReminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  medicineRefillSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   payReminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   bookedById?: Prisma.SortOrderInput | Prisma.SortOrder
   adminActionBy?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -1059,6 +1073,7 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   followUpDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   followUpNote?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   followUpReminderSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
+  medicineRefillSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   payReminderSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   bookedById?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   adminActionBy?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
@@ -1113,6 +1128,7 @@ export type AppointmentCreateInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -1145,6 +1161,7 @@ export type AppointmentCreateInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateInput = {
@@ -1205,6 +1222,7 @@ export type AppointmentUncheckedCreateInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -1225,6 +1243,7 @@ export type AppointmentUncheckedCreateInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUpdateInput = {
@@ -1273,6 +1292,7 @@ export type AppointmentUpdateInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1305,6 +1325,7 @@ export type AppointmentUpdateInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateInput = {
@@ -1365,6 +1386,7 @@ export type AppointmentUncheckedUpdateInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1385,6 +1407,7 @@ export type AppointmentUncheckedUpdateInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateManyInput = {
@@ -1445,6 +1468,7 @@ export type AppointmentCreateManyInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -1499,6 +1523,7 @@ export type AppointmentUpdateManyMutationInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1565,6 +1590,7 @@ export type AppointmentUncheckedUpdateManyInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1651,6 +1677,7 @@ export type AppointmentCountOrderByAggregateInput = {
   followUpDate?: Prisma.SortOrder
   followUpNote?: Prisma.SortOrder
   followUpReminderSentAt?: Prisma.SortOrder
+  medicineRefillSentAt?: Prisma.SortOrder
   payReminderSentAt?: Prisma.SortOrder
   bookedById?: Prisma.SortOrder
   adminActionBy?: Prisma.SortOrder
@@ -1729,6 +1756,7 @@ export type AppointmentMaxOrderByAggregateInput = {
   followUpDate?: Prisma.SortOrder
   followUpNote?: Prisma.SortOrder
   followUpReminderSentAt?: Prisma.SortOrder
+  medicineRefillSentAt?: Prisma.SortOrder
   payReminderSentAt?: Prisma.SortOrder
   bookedById?: Prisma.SortOrder
   adminActionBy?: Prisma.SortOrder
@@ -1795,6 +1823,7 @@ export type AppointmentMinOrderByAggregateInput = {
   followUpDate?: Prisma.SortOrder
   followUpNote?: Prisma.SortOrder
   followUpReminderSentAt?: Prisma.SortOrder
+  medicineRefillSentAt?: Prisma.SortOrder
   payReminderSentAt?: Prisma.SortOrder
   bookedById?: Prisma.SortOrder
   adminActionBy?: Prisma.SortOrder
@@ -2331,6 +2360,20 @@ export type AppointmentUpdateOneRequiredWithoutMedicinesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AppointmentUpdateToOneWithWhereWithoutMedicinesInput, Prisma.AppointmentUpdateWithoutMedicinesInput>, Prisma.AppointmentUncheckedUpdateWithoutMedicinesInput>
 }
 
+export type AppointmentCreateNestedOneWithoutMedicineRemindersInput = {
+  create?: Prisma.XOR<Prisma.AppointmentCreateWithoutMedicineRemindersInput, Prisma.AppointmentUncheckedCreateWithoutMedicineRemindersInput>
+  connectOrCreate?: Prisma.AppointmentCreateOrConnectWithoutMedicineRemindersInput
+  connect?: Prisma.AppointmentWhereUniqueInput
+}
+
+export type AppointmentUpdateOneRequiredWithoutMedicineRemindersNestedInput = {
+  create?: Prisma.XOR<Prisma.AppointmentCreateWithoutMedicineRemindersInput, Prisma.AppointmentUncheckedCreateWithoutMedicineRemindersInput>
+  connectOrCreate?: Prisma.AppointmentCreateOrConnectWithoutMedicineRemindersInput
+  upsert?: Prisma.AppointmentUpsertWithoutMedicineRemindersInput
+  connect?: Prisma.AppointmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AppointmentUpdateToOneWithWhereWithoutMedicineRemindersInput, Prisma.AppointmentUpdateWithoutMedicineRemindersInput>, Prisma.AppointmentUncheckedUpdateWithoutMedicineRemindersInput>
+}
+
 export type AppointmentCreateNestedOneWithoutTestsInput = {
   create?: Prisma.XOR<Prisma.AppointmentCreateWithoutTestsInput, Prisma.AppointmentUncheckedCreateWithoutTestsInput>
   connectOrCreate?: Prisma.AppointmentCreateOrConnectWithoutTestsInput
@@ -2563,6 +2606,7 @@ export type AppointmentCreateWithoutPatientInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -2594,6 +2638,7 @@ export type AppointmentCreateWithoutPatientInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutPatientInput = {
@@ -2653,6 +2698,7 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -2673,6 +2719,7 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutPatientInput = {
@@ -2731,6 +2778,7 @@ export type AppointmentCreateWithoutDoctorInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -2762,6 +2810,7 @@ export type AppointmentCreateWithoutDoctorInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutDoctorInput = {
@@ -2821,6 +2870,7 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -2841,6 +2891,7 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutDoctorInput = {
@@ -2930,6 +2981,7 @@ export type AppointmentScalarWhereInput = {
   followUpDate?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   followUpNote?: Prisma.StringNullableFilter<"Appointment"> | string | null
   followUpReminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  medicineRefillSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   payReminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   bookedById?: Prisma.StringNullableFilter<"Appointment"> | string | null
   adminActionBy?: Prisma.StringNullableFilter<"Appointment"> | string | null
@@ -3000,6 +3052,7 @@ export type AppointmentCreateWithoutDependentInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -3031,6 +3084,7 @@ export type AppointmentCreateWithoutDependentInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutDependentInput = {
@@ -3090,6 +3144,7 @@ export type AppointmentUncheckedCreateWithoutDependentInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -3110,6 +3165,7 @@ export type AppointmentUncheckedCreateWithoutDependentInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutDependentInput = {
@@ -3184,6 +3240,7 @@ export type AppointmentCreateWithoutPrescriptionDocInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -3215,6 +3272,7 @@ export type AppointmentCreateWithoutPrescriptionDocInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutPrescriptionDocInput = {
@@ -3274,6 +3332,7 @@ export type AppointmentUncheckedCreateWithoutPrescriptionDocInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -3294,6 +3353,7 @@ export type AppointmentUncheckedCreateWithoutPrescriptionDocInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutPrescriptionDocInput = {
@@ -3368,6 +3428,7 @@ export type AppointmentCreateWithoutNurseServiceInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -3399,6 +3460,7 @@ export type AppointmentCreateWithoutNurseServiceInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutNurseServiceInput = {
@@ -3458,6 +3520,7 @@ export type AppointmentUncheckedCreateWithoutNurseServiceInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -3478,6 +3541,7 @@ export type AppointmentUncheckedCreateWithoutNurseServiceInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutNurseServiceInput = {
@@ -3552,6 +3616,7 @@ export type AppointmentCreateWithoutVitalsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -3583,6 +3648,7 @@ export type AppointmentCreateWithoutVitalsInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutVitalsInput = {
@@ -3643,6 +3709,7 @@ export type AppointmentUncheckedCreateWithoutVitalsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -3662,6 +3729,7 @@ export type AppointmentUncheckedCreateWithoutVitalsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutVitalsInput = {
@@ -3726,6 +3794,7 @@ export type AppointmentUpdateWithoutVitalsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3757,6 +3826,7 @@ export type AppointmentUpdateWithoutVitalsInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutVitalsInput = {
@@ -3817,6 +3887,7 @@ export type AppointmentUncheckedUpdateWithoutVitalsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3836,6 +3907,7 @@ export type AppointmentUncheckedUpdateWithoutVitalsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateWithoutPackageInput = {
@@ -3884,6 +3956,7 @@ export type AppointmentCreateWithoutPackageInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -3915,6 +3988,7 @@ export type AppointmentCreateWithoutPackageInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutPackageInput = {
@@ -3974,6 +4048,7 @@ export type AppointmentUncheckedCreateWithoutPackageInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -3994,6 +4069,7 @@ export type AppointmentUncheckedCreateWithoutPackageInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutPackageInput = {
@@ -4068,6 +4144,7 @@ export type AppointmentCreateWithoutReferralGivenInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -4099,6 +4176,7 @@ export type AppointmentCreateWithoutReferralGivenInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutReferralGivenInput = {
@@ -4159,6 +4237,7 @@ export type AppointmentUncheckedCreateWithoutReferralGivenInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -4178,6 +4257,7 @@ export type AppointmentUncheckedCreateWithoutReferralGivenInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutReferralGivenInput = {
@@ -4231,6 +4311,7 @@ export type AppointmentCreateWithoutNurseReferralInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -4262,6 +4343,7 @@ export type AppointmentCreateWithoutNurseReferralInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutNurseReferralInput = {
@@ -4321,6 +4403,7 @@ export type AppointmentUncheckedCreateWithoutNurseReferralInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -4341,6 +4424,7 @@ export type AppointmentUncheckedCreateWithoutNurseReferralInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutNurseReferralInput = {
@@ -4410,6 +4494,7 @@ export type AppointmentUpdateWithoutReferralGivenInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4441,6 +4526,7 @@ export type AppointmentUpdateWithoutReferralGivenInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutReferralGivenInput = {
@@ -4501,6 +4587,7 @@ export type AppointmentUncheckedUpdateWithoutReferralGivenInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4520,6 +4607,7 @@ export type AppointmentUncheckedUpdateWithoutReferralGivenInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUpsertWithWhereUniqueWithoutNurseReferralInput = {
@@ -4584,6 +4672,7 @@ export type AppointmentCreateWithoutFollowUpsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -4615,6 +4704,7 @@ export type AppointmentCreateWithoutFollowUpsInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
@@ -4675,6 +4765,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -4694,6 +4785,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutFollowUpsInput = {
@@ -4747,6 +4839,7 @@ export type AppointmentCreateWithoutFollowUpOfInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -4778,6 +4871,7 @@ export type AppointmentCreateWithoutFollowUpOfInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
@@ -4837,6 +4931,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -4857,6 +4952,7 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutFollowUpOfInput = {
@@ -4915,6 +5011,7 @@ export type AppointmentCreateWithoutReassignedToInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -4946,6 +5043,7 @@ export type AppointmentCreateWithoutReassignedToInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutReassignedToInput = {
@@ -5006,6 +5104,7 @@ export type AppointmentUncheckedCreateWithoutReassignedToInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -5025,6 +5124,7 @@ export type AppointmentUncheckedCreateWithoutReassignedToInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutReassignedToInput = {
@@ -5078,6 +5178,7 @@ export type AppointmentCreateWithoutReassignedFromInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -5109,6 +5210,7 @@ export type AppointmentCreateWithoutReassignedFromInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutReassignedFromInput = {
@@ -5168,6 +5270,7 @@ export type AppointmentUncheckedCreateWithoutReassignedFromInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -5188,6 +5291,7 @@ export type AppointmentUncheckedCreateWithoutReassignedFromInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutReassignedFromInput = {
@@ -5252,6 +5356,7 @@ export type AppointmentUpdateWithoutFollowUpsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5283,6 +5388,7 @@ export type AppointmentUpdateWithoutFollowUpsInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
@@ -5343,6 +5449,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5362,6 +5469,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUpsertWithWhereUniqueWithoutFollowUpOfInput = {
@@ -5437,6 +5545,7 @@ export type AppointmentUpdateWithoutReassignedToInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5468,6 +5577,7 @@ export type AppointmentUpdateWithoutReassignedToInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutReassignedToInput = {
@@ -5528,6 +5638,7 @@ export type AppointmentUncheckedUpdateWithoutReassignedToInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5547,6 +5658,7 @@ export type AppointmentUncheckedUpdateWithoutReassignedToInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUpsertWithoutReassignedFromInput = {
@@ -5606,6 +5718,7 @@ export type AppointmentUpdateWithoutReassignedFromInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5637,6 +5750,7 @@ export type AppointmentUpdateWithoutReassignedFromInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutReassignedFromInput = {
@@ -5696,6 +5810,7 @@ export type AppointmentUncheckedUpdateWithoutReassignedFromInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5716,6 +5831,7 @@ export type AppointmentUncheckedUpdateWithoutReassignedFromInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateWithoutWalletTransactionInput = {
@@ -5764,6 +5880,7 @@ export type AppointmentCreateWithoutWalletTransactionInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -5795,6 +5912,7 @@ export type AppointmentCreateWithoutWalletTransactionInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutWalletTransactionInput = {
@@ -5855,6 +5973,7 @@ export type AppointmentUncheckedCreateWithoutWalletTransactionInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -5874,6 +5993,7 @@ export type AppointmentUncheckedCreateWithoutWalletTransactionInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutWalletTransactionInput = {
@@ -5938,6 +6058,7 @@ export type AppointmentUpdateWithoutWalletTransactionInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5969,6 +6090,7 @@ export type AppointmentUpdateWithoutWalletTransactionInput = {
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutWalletTransactionInput = {
@@ -6029,6 +6151,7 @@ export type AppointmentUncheckedUpdateWithoutWalletTransactionInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6048,6 +6171,7 @@ export type AppointmentUncheckedUpdateWithoutWalletTransactionInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateWithoutSettlementInput = {
@@ -6096,6 +6220,7 @@ export type AppointmentCreateWithoutSettlementInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -6127,6 +6252,7 @@ export type AppointmentCreateWithoutSettlementInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutSettlementInput = {
@@ -6186,6 +6312,7 @@ export type AppointmentUncheckedCreateWithoutSettlementInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -6206,6 +6333,7 @@ export type AppointmentUncheckedCreateWithoutSettlementInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutSettlementInput = {
@@ -6280,6 +6408,7 @@ export type AppointmentCreateWithoutMessagesInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -6311,6 +6440,7 @@ export type AppointmentCreateWithoutMessagesInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutMessagesInput = {
@@ -6371,6 +6501,7 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -6390,6 +6521,7 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutMessagesInput = {
@@ -6454,6 +6586,7 @@ export type AppointmentUpdateWithoutMessagesInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6485,6 +6618,7 @@ export type AppointmentUpdateWithoutMessagesInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutMessagesInput = {
@@ -6545,6 +6679,7 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6564,6 +6699,7 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateWithoutMedicinesInput = {
@@ -6612,6 +6748,7 @@ export type AppointmentCreateWithoutMedicinesInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -6643,6 +6780,7 @@ export type AppointmentCreateWithoutMedicinesInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutMedicinesInput = {
@@ -6703,6 +6841,7 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -6722,6 +6861,7 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutMedicinesInput = {
@@ -6786,6 +6926,7 @@ export type AppointmentUpdateWithoutMedicinesInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6817,6 +6958,7 @@ export type AppointmentUpdateWithoutMedicinesInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
@@ -6877,6 +7019,7 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6889,6 +7032,347 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
   reassignedTo?: Prisma.AppointmentUncheckedUpdateOneWithoutReassignedFromNestedInput
   review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
+  attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
+  prescriptionVersions?: Prisma.PrescriptionVersionUncheckedUpdateManyWithoutAppointmentNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
+  walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
+  couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
+}
+
+export type AppointmentCreateWithoutMedicineRemindersInput = {
+  id?: string
+  symptoms: string
+  patientName?: string | null
+  relation?: string
+  allergies?: string | null
+  consentGiven?: boolean
+  consultType?: string
+  providerType?: string
+  serviceName?: string | null
+  visitOtp?: string | null
+  visitOtpAttempts?: number
+  visitStartedAt?: Date | string | null
+  visitStartNote?: string | null
+  packageIndex?: number | null
+  status?: string
+  acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
+  completedAt?: Date | string | null
+  paymentMethod?: string
+  paymentStatus?: string
+  paidAt?: Date | string | null
+  isEmergency?: boolean
+  amount?: number
+  platformFee?: number
+  couponCode?: string | null
+  discountAmount?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
+  prescriptionUrl?: string | null
+  doctorNotes?: string | null
+  travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
+  doctorLat?: number | null
+  doctorLng?: number | null
+  doctorLocationUpdatedAt?: Date | string | null
+  scheduledAt?: Date | string
+  requestedScheduledAt?: Date | string | null
+  reminderSentAt?: Date | string | null
+  followUpDate?: Date | string | null
+  followUpNote?: string | null
+  followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
+  payReminderSentAt?: Date | string | null
+  bookedById?: string | null
+  adminActionBy?: string | null
+  adminActionReason?: string | null
+  adminActionAt?: Date | string | null
+  createdAt?: Date | string
+  patient: Prisma.UserCreateNestedOneWithoutAsPatientInput
+  doctor: Prisma.UserCreateNestedOneWithoutAsDoctorInput
+  dependent?: Prisma.PatientDependentCreateNestedOneWithoutAppointmentsInput
+  nurseService?: Prisma.NurseServiceCreateNestedOneWithoutAppointmentsInput
+  prescriptionDoc?: Prisma.PatientDocumentCreateNestedOneWithoutNurseBookingsInput
+  package?: Prisma.NursePackageCreateNestedOneWithoutAppointmentsInput
+  nurseReferral?: Prisma.NurseReferralCreateNestedOneWithoutBookingsInput
+  referralGiven?: Prisma.NurseReferralCreateNestedOneWithoutAppointmentInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutAppointmentInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutAppointmentInput
+  coupon?: Prisma.CouponCreateNestedOneWithoutAppointmentsInput
+  settlement?: Prisma.SettlementCreateNestedOneWithoutAppointmentsInput
+  followUpOf?: Prisma.AppointmentCreateNestedOneWithoutFollowUpsInput
+  followUps?: Prisma.AppointmentCreateNestedManyWithoutFollowUpOfInput
+  reassignedFrom?: Prisma.AppointmentCreateNestedOneWithoutReassignedToInput
+  reassignedTo?: Prisma.AppointmentCreateNestedOneWithoutReassignedFromInput
+  clinic?: Prisma.ClinicCreateNestedOneWithoutAppointmentsInput
+  review?: Prisma.ReviewCreateNestedOneWithoutAppointmentInput
+  medicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestCreateNestedManyWithoutAppointmentInput
+  attachments?: Prisma.PrescriptionAttachmentCreateNestedManyWithoutAppointmentInput
+  prescriptionVersions?: Prisma.PrescriptionVersionCreateNestedManyWithoutAppointmentInput
+  messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
+  walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
+  couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+}
+
+export type AppointmentUncheckedCreateWithoutMedicineRemindersInput = {
+  id?: string
+  patientId: string
+  doctorId: string
+  symptoms: string
+  patientName?: string | null
+  relation?: string
+  allergies?: string | null
+  dependentId?: string | null
+  consentGiven?: boolean
+  consultType?: string
+  providerType?: string
+  nurseServiceId?: string | null
+  serviceName?: string | null
+  prescriptionDocId?: string | null
+  visitOtp?: string | null
+  visitOtpAttempts?: number
+  visitStartedAt?: Date | string | null
+  visitStartNote?: string | null
+  packageId?: string | null
+  packageIndex?: number | null
+  nurseReferralId?: string | null
+  status?: string
+  acceptedAt?: Date | string | null
+  videoStartedPushAt?: Date | string | null
+  completedAt?: Date | string | null
+  paymentMethod?: string
+  paymentStatus?: string
+  paidAt?: Date | string | null
+  isEmergency?: boolean
+  amount?: number
+  platformFee?: number
+  couponId?: string | null
+  couponCode?: string | null
+  discountAmount?: number
+  cashfreeOrderId?: string | null
+  cashfreePaymentId?: string | null
+  settlementId?: string | null
+  prescriptionUrl?: string | null
+  doctorNotes?: string | null
+  travelStatus?: string
+  visitAddress?: string | null
+  visitLandmark?: string | null
+  visitPinCode?: string | null
+  visitLat?: number | null
+  visitLng?: number | null
+  doctorLat?: number | null
+  doctorLng?: number | null
+  doctorLocationUpdatedAt?: Date | string | null
+  followUpOfId?: string | null
+  reassignedFromId?: string | null
+  clinicId?: string | null
+  scheduledAt?: Date | string
+  requestedScheduledAt?: Date | string | null
+  reminderSentAt?: Date | string | null
+  followUpDate?: Date | string | null
+  followUpNote?: string | null
+  followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
+  payReminderSentAt?: Date | string | null
+  bookedById?: string | null
+  adminActionBy?: string | null
+  adminActionReason?: string | null
+  adminActionAt?: Date | string | null
+  createdAt?: Date | string
+  referralGiven?: Prisma.NurseReferralUncheckedCreateNestedOneWithoutAppointmentInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutAppointmentInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAppointmentInput
+  followUps?: Prisma.AppointmentUncheckedCreateNestedManyWithoutFollowUpOfInput
+  reassignedTo?: Prisma.AppointmentUncheckedCreateNestedOneWithoutReassignedFromInput
+  review?: Prisma.ReviewUncheckedCreateNestedOneWithoutAppointmentInput
+  medicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutAppointmentInput
+  tests?: Prisma.PrescriptionTestUncheckedCreateNestedManyWithoutAppointmentInput
+  attachments?: Prisma.PrescriptionAttachmentUncheckedCreateNestedManyWithoutAppointmentInput
+  prescriptionVersions?: Prisma.PrescriptionVersionUncheckedCreateNestedManyWithoutAppointmentInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
+  walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
+  couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+}
+
+export type AppointmentCreateOrConnectWithoutMedicineRemindersInput = {
+  where: Prisma.AppointmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppointmentCreateWithoutMedicineRemindersInput, Prisma.AppointmentUncheckedCreateWithoutMedicineRemindersInput>
+}
+
+export type AppointmentUpsertWithoutMedicineRemindersInput = {
+  update: Prisma.XOR<Prisma.AppointmentUpdateWithoutMedicineRemindersInput, Prisma.AppointmentUncheckedUpdateWithoutMedicineRemindersInput>
+  create: Prisma.XOR<Prisma.AppointmentCreateWithoutMedicineRemindersInput, Prisma.AppointmentUncheckedCreateWithoutMedicineRemindersInput>
+  where?: Prisma.AppointmentWhereInput
+}
+
+export type AppointmentUpdateToOneWithWhereWithoutMedicineRemindersInput = {
+  where?: Prisma.AppointmentWhereInput
+  data: Prisma.XOR<Prisma.AppointmentUpdateWithoutMedicineRemindersInput, Prisma.AppointmentUncheckedUpdateWithoutMedicineRemindersInput>
+}
+
+export type AppointmentUpdateWithoutMedicineRemindersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  consultType?: Prisma.StringFieldUpdateOperationsInput | string
+  providerType?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitOtp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitOtpAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  visitStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visitStartNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminActionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminActionAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patient?: Prisma.UserUpdateOneRequiredWithoutAsPatientNestedInput
+  doctor?: Prisma.UserUpdateOneRequiredWithoutAsDoctorNestedInput
+  dependent?: Prisma.PatientDependentUpdateOneWithoutAppointmentsNestedInput
+  nurseService?: Prisma.NurseServiceUpdateOneWithoutAppointmentsNestedInput
+  prescriptionDoc?: Prisma.PatientDocumentUpdateOneWithoutNurseBookingsNestedInput
+  package?: Prisma.NursePackageUpdateOneWithoutAppointmentsNestedInput
+  nurseReferral?: Prisma.NurseReferralUpdateOneWithoutBookingsNestedInput
+  referralGiven?: Prisma.NurseReferralUpdateOneWithoutAppointmentNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutAppointmentNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutAppointmentNestedInput
+  coupon?: Prisma.CouponUpdateOneWithoutAppointmentsNestedInput
+  settlement?: Prisma.SettlementUpdateOneWithoutAppointmentsNestedInput
+  followUpOf?: Prisma.AppointmentUpdateOneWithoutFollowUpsNestedInput
+  followUps?: Prisma.AppointmentUpdateManyWithoutFollowUpOfNestedInput
+  reassignedFrom?: Prisma.AppointmentUpdateOneWithoutReassignedToNestedInput
+  reassignedTo?: Prisma.AppointmentUpdateOneWithoutReassignedFromNestedInput
+  clinic?: Prisma.ClinicUpdateOneWithoutAppointmentsNestedInput
+  review?: Prisma.ReviewUpdateOneWithoutAppointmentNestedInput
+  medicines?: Prisma.PrescriptionMedicineUpdateManyWithoutAppointmentNestedInput
+  tests?: Prisma.PrescriptionTestUpdateManyWithoutAppointmentNestedInput
+  attachments?: Prisma.PrescriptionAttachmentUpdateManyWithoutAppointmentNestedInput
+  prescriptionVersions?: Prisma.PrescriptionVersionUpdateManyWithoutAppointmentNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
+  walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
+  paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
+  couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+}
+
+export type AppointmentUncheckedUpdateWithoutMedicineRemindersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  patientId?: Prisma.StringFieldUpdateOperationsInput | string
+  doctorId?: Prisma.StringFieldUpdateOperationsInput | string
+  symptoms?: Prisma.StringFieldUpdateOperationsInput | string
+  patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.StringFieldUpdateOperationsInput | string
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dependentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentGiven?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  consultType?: Prisma.StringFieldUpdateOperationsInput | string
+  providerType?: Prisma.StringFieldUpdateOperationsInput | string
+  nurseServiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prescriptionDocId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitOtp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitOtpAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  visitStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visitStartNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  packageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  packageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  nurseReferralId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  videoStartedPushAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isEmergency?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  platformFee?: Prisma.FloatFieldUpdateOperationsInput | number
+  couponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  couponCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashfreeOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cashfreePaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settlementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prescriptionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  travelStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  visitAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLandmark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitPinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  visitLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  doctorLocationUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  followUpOfId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reassignedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminActionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminActionAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  referralGiven?: Prisma.NurseReferralUncheckedUpdateOneWithoutAppointmentNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutAppointmentNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutAppointmentNestedInput
+  followUps?: Prisma.AppointmentUncheckedUpdateManyWithoutFollowUpOfNestedInput
+  reassignedTo?: Prisma.AppointmentUncheckedUpdateOneWithoutReassignedFromNestedInput
+  review?: Prisma.ReviewUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutAppointmentNestedInput
   tests?: Prisma.PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput
   attachments?: Prisma.PrescriptionAttachmentUncheckedUpdateManyWithoutAppointmentNestedInput
   prescriptionVersions?: Prisma.PrescriptionVersionUncheckedUpdateManyWithoutAppointmentNestedInput
@@ -6944,6 +7428,7 @@ export type AppointmentCreateWithoutTestsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -6975,6 +7460,7 @@ export type AppointmentCreateWithoutTestsInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutTestsInput = {
@@ -7035,6 +7521,7 @@ export type AppointmentUncheckedCreateWithoutTestsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -7054,6 +7541,7 @@ export type AppointmentUncheckedCreateWithoutTestsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutTestsInput = {
@@ -7118,6 +7606,7 @@ export type AppointmentUpdateWithoutTestsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7149,6 +7638,7 @@ export type AppointmentUpdateWithoutTestsInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutTestsInput = {
@@ -7209,6 +7699,7 @@ export type AppointmentUncheckedUpdateWithoutTestsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7228,6 +7719,7 @@ export type AppointmentUncheckedUpdateWithoutTestsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateWithoutPrescriptionVersionsInput = {
@@ -7276,6 +7768,7 @@ export type AppointmentCreateWithoutPrescriptionVersionsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -7307,6 +7800,7 @@ export type AppointmentCreateWithoutPrescriptionVersionsInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutPrescriptionVersionsInput = {
@@ -7367,6 +7861,7 @@ export type AppointmentUncheckedCreateWithoutPrescriptionVersionsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -7386,6 +7881,7 @@ export type AppointmentUncheckedCreateWithoutPrescriptionVersionsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutPrescriptionVersionsInput = {
@@ -7450,6 +7946,7 @@ export type AppointmentUpdateWithoutPrescriptionVersionsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7481,6 +7978,7 @@ export type AppointmentUpdateWithoutPrescriptionVersionsInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutPrescriptionVersionsInput = {
@@ -7541,6 +8039,7 @@ export type AppointmentUncheckedUpdateWithoutPrescriptionVersionsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7560,6 +8059,7 @@ export type AppointmentUncheckedUpdateWithoutPrescriptionVersionsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateWithoutAttachmentsInput = {
@@ -7608,6 +8108,7 @@ export type AppointmentCreateWithoutAttachmentsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -7639,6 +8140,7 @@ export type AppointmentCreateWithoutAttachmentsInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
@@ -7699,6 +8201,7 @@ export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -7718,6 +8221,7 @@ export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutAttachmentsInput = {
@@ -7782,6 +8286,7 @@ export type AppointmentUpdateWithoutAttachmentsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7813,6 +8318,7 @@ export type AppointmentUpdateWithoutAttachmentsInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
@@ -7873,6 +8379,7 @@ export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7892,6 +8399,7 @@ export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateWithoutReviewInput = {
@@ -7940,6 +8448,7 @@ export type AppointmentCreateWithoutReviewInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -7971,6 +8480,7 @@ export type AppointmentCreateWithoutReviewInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutReviewInput = {
@@ -8031,6 +8541,7 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -8050,6 +8561,7 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutReviewInput = {
@@ -8114,6 +8626,7 @@ export type AppointmentUpdateWithoutReviewInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8145,6 +8658,7 @@ export type AppointmentUpdateWithoutReviewInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutReviewInput = {
@@ -8205,6 +8719,7 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8224,6 +8739,7 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateWithoutComplaintsInput = {
@@ -8272,6 +8788,7 @@ export type AppointmentCreateWithoutComplaintsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -8303,6 +8820,7 @@ export type AppointmentCreateWithoutComplaintsInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutComplaintsInput = {
@@ -8363,6 +8881,7 @@ export type AppointmentUncheckedCreateWithoutComplaintsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -8382,6 +8901,7 @@ export type AppointmentUncheckedCreateWithoutComplaintsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutComplaintsInput = {
@@ -8446,6 +8966,7 @@ export type AppointmentUpdateWithoutComplaintsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8477,6 +8998,7 @@ export type AppointmentUpdateWithoutComplaintsInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutComplaintsInput = {
@@ -8537,6 +9059,7 @@ export type AppointmentUncheckedUpdateWithoutComplaintsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8556,6 +9079,7 @@ export type AppointmentUncheckedUpdateWithoutComplaintsInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateWithoutClinicInput = {
@@ -8604,6 +9128,7 @@ export type AppointmentCreateWithoutClinicInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -8635,6 +9160,7 @@ export type AppointmentCreateWithoutClinicInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutClinicInput = {
@@ -8694,6 +9220,7 @@ export type AppointmentUncheckedCreateWithoutClinicInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -8714,6 +9241,7 @@ export type AppointmentUncheckedCreateWithoutClinicInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutClinicInput = {
@@ -8788,6 +9316,7 @@ export type AppointmentCreateWithoutCouponInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -8819,6 +9348,7 @@ export type AppointmentCreateWithoutCouponInput = {
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutCouponInput = {
@@ -8878,6 +9408,7 @@ export type AppointmentUncheckedCreateWithoutCouponInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -8898,6 +9429,7 @@ export type AppointmentUncheckedCreateWithoutCouponInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutCouponInput = {
@@ -8972,6 +9504,7 @@ export type AppointmentCreateWithoutCouponRedemptionInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -9003,6 +9536,7 @@ export type AppointmentCreateWithoutCouponRedemptionInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemCreateNestedManyWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutCouponRedemptionInput = {
@@ -9063,6 +9597,7 @@ export type AppointmentUncheckedCreateWithoutCouponRedemptionInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -9082,6 +9617,7 @@ export type AppointmentUncheckedCreateWithoutCouponRedemptionInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedCreateNestedManyWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutCouponRedemptionInput = {
@@ -9146,6 +9682,7 @@ export type AppointmentUpdateWithoutCouponRedemptionInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9177,6 +9714,7 @@ export type AppointmentUpdateWithoutCouponRedemptionInput = {
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutCouponRedemptionInput = {
@@ -9237,6 +9775,7 @@ export type AppointmentUncheckedUpdateWithoutCouponRedemptionInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9256,6 +9795,7 @@ export type AppointmentUncheckedUpdateWithoutCouponRedemptionInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateWithoutPaymentOrderItemsInput = {
@@ -9304,6 +9844,7 @@ export type AppointmentCreateWithoutPaymentOrderItemsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -9335,6 +9876,7 @@ export type AppointmentCreateWithoutPaymentOrderItemsInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionCreateNestedOneWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentUncheckedCreateWithoutPaymentOrderItemsInput = {
@@ -9395,6 +9937,7 @@ export type AppointmentUncheckedCreateWithoutPaymentOrderItemsInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -9414,6 +9957,7 @@ export type AppointmentUncheckedCreateWithoutPaymentOrderItemsInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAppointmentInput
   walletTransaction?: Prisma.WalletTransactionUncheckedCreateNestedOneWithoutAppointmentInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedCreateNestedOneWithoutAppointmentInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutAppointmentInput
 }
 
 export type AppointmentCreateOrConnectWithoutPaymentOrderItemsInput = {
@@ -9478,6 +10022,7 @@ export type AppointmentUpdateWithoutPaymentOrderItemsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9509,6 +10054,7 @@ export type AppointmentUpdateWithoutPaymentOrderItemsInput = {
   messages?: Prisma.MessageUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutPaymentOrderItemsInput = {
@@ -9569,6 +10115,7 @@ export type AppointmentUncheckedUpdateWithoutPaymentOrderItemsInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9588,6 +10135,7 @@ export type AppointmentUncheckedUpdateWithoutPaymentOrderItemsInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAppointmentNestedInput
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentCreateManyPatientInput = {
@@ -9647,6 +10195,7 @@ export type AppointmentCreateManyPatientInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -9712,6 +10261,7 @@ export type AppointmentCreateManyDoctorInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -9766,6 +10316,7 @@ export type AppointmentUpdateWithoutPatientInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9797,6 +10348,7 @@ export type AppointmentUpdateWithoutPatientInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutPatientInput = {
@@ -9856,6 +10408,7 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9876,6 +10429,7 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
@@ -9935,6 +10489,7 @@ export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9989,6 +10544,7 @@ export type AppointmentUpdateWithoutDoctorInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10020,6 +10576,7 @@ export type AppointmentUpdateWithoutDoctorInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutDoctorInput = {
@@ -10079,6 +10636,7 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10099,6 +10657,7 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
@@ -10158,6 +10717,7 @@ export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10223,6 +10783,7 @@ export type AppointmentCreateManyDependentInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -10277,6 +10838,7 @@ export type AppointmentUpdateWithoutDependentInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10308,6 +10870,7 @@ export type AppointmentUpdateWithoutDependentInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutDependentInput = {
@@ -10367,6 +10930,7 @@ export type AppointmentUncheckedUpdateWithoutDependentInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10387,6 +10951,7 @@ export type AppointmentUncheckedUpdateWithoutDependentInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutDependentInput = {
@@ -10446,6 +11011,7 @@ export type AppointmentUncheckedUpdateManyWithoutDependentInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10511,6 +11077,7 @@ export type AppointmentCreateManyPrescriptionDocInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -10565,6 +11132,7 @@ export type AppointmentUpdateWithoutPrescriptionDocInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10596,6 +11164,7 @@ export type AppointmentUpdateWithoutPrescriptionDocInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutPrescriptionDocInput = {
@@ -10655,6 +11224,7 @@ export type AppointmentUncheckedUpdateWithoutPrescriptionDocInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10675,6 +11245,7 @@ export type AppointmentUncheckedUpdateWithoutPrescriptionDocInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutPrescriptionDocInput = {
@@ -10734,6 +11305,7 @@ export type AppointmentUncheckedUpdateManyWithoutPrescriptionDocInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10799,6 +11371,7 @@ export type AppointmentCreateManyNurseServiceInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -10853,6 +11426,7 @@ export type AppointmentUpdateWithoutNurseServiceInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10884,6 +11458,7 @@ export type AppointmentUpdateWithoutNurseServiceInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutNurseServiceInput = {
@@ -10943,6 +11518,7 @@ export type AppointmentUncheckedUpdateWithoutNurseServiceInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10963,6 +11539,7 @@ export type AppointmentUncheckedUpdateWithoutNurseServiceInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutNurseServiceInput = {
@@ -11022,6 +11599,7 @@ export type AppointmentUncheckedUpdateManyWithoutNurseServiceInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11087,6 +11665,7 @@ export type AppointmentCreateManyPackageInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -11141,6 +11720,7 @@ export type AppointmentUpdateWithoutPackageInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11172,6 +11752,7 @@ export type AppointmentUpdateWithoutPackageInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutPackageInput = {
@@ -11231,6 +11812,7 @@ export type AppointmentUncheckedUpdateWithoutPackageInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11251,6 +11833,7 @@ export type AppointmentUncheckedUpdateWithoutPackageInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutPackageInput = {
@@ -11310,6 +11893,7 @@ export type AppointmentUncheckedUpdateManyWithoutPackageInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11375,6 +11959,7 @@ export type AppointmentCreateManyNurseReferralInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -11429,6 +12014,7 @@ export type AppointmentUpdateWithoutNurseReferralInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11460,6 +12046,7 @@ export type AppointmentUpdateWithoutNurseReferralInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutNurseReferralInput = {
@@ -11519,6 +12106,7 @@ export type AppointmentUncheckedUpdateWithoutNurseReferralInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11539,6 +12127,7 @@ export type AppointmentUncheckedUpdateWithoutNurseReferralInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutNurseReferralInput = {
@@ -11598,6 +12187,7 @@ export type AppointmentUncheckedUpdateManyWithoutNurseReferralInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11663,6 +12253,7 @@ export type AppointmentCreateManyFollowUpOfInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -11717,6 +12308,7 @@ export type AppointmentUpdateWithoutFollowUpOfInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11748,6 +12340,7 @@ export type AppointmentUpdateWithoutFollowUpOfInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
@@ -11807,6 +12400,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11827,6 +12421,7 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutFollowUpOfInput = {
@@ -11886,6 +12481,7 @@ export type AppointmentUncheckedUpdateManyWithoutFollowUpOfInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11951,6 +12547,7 @@ export type AppointmentCreateManySettlementInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -12005,6 +12602,7 @@ export type AppointmentUpdateWithoutSettlementInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12036,6 +12634,7 @@ export type AppointmentUpdateWithoutSettlementInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutSettlementInput = {
@@ -12095,6 +12694,7 @@ export type AppointmentUncheckedUpdateWithoutSettlementInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12115,6 +12715,7 @@ export type AppointmentUncheckedUpdateWithoutSettlementInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutSettlementInput = {
@@ -12174,6 +12775,7 @@ export type AppointmentUncheckedUpdateManyWithoutSettlementInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12239,6 +12841,7 @@ export type AppointmentCreateManyClinicInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -12293,6 +12896,7 @@ export type AppointmentUpdateWithoutClinicInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12324,6 +12928,7 @@ export type AppointmentUpdateWithoutClinicInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutClinicInput = {
@@ -12383,6 +12988,7 @@ export type AppointmentUncheckedUpdateWithoutClinicInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12403,6 +13009,7 @@ export type AppointmentUncheckedUpdateWithoutClinicInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutClinicInput = {
@@ -12462,6 +13069,7 @@ export type AppointmentUncheckedUpdateManyWithoutClinicInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12527,6 +13135,7 @@ export type AppointmentCreateManyCouponInput = {
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
+  medicineRefillSentAt?: Date | string | null
   payReminderSentAt?: Date | string | null
   bookedById?: string | null
   adminActionBy?: string | null
@@ -12581,6 +13190,7 @@ export type AppointmentUpdateWithoutCouponInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12612,6 +13222,7 @@ export type AppointmentUpdateWithoutCouponInput = {
   walletTransaction?: Prisma.WalletTransactionUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateWithoutCouponInput = {
@@ -12671,6 +13282,7 @@ export type AppointmentUncheckedUpdateWithoutCouponInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12691,6 +13303,7 @@ export type AppointmentUncheckedUpdateWithoutCouponInput = {
   walletTransaction?: Prisma.WalletTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
   paymentOrderItems?: Prisma.PaymentOrderItemUncheckedUpdateManyWithoutAppointmentNestedInput
   couponRedemption?: Prisma.CouponRedemptionUncheckedUpdateOneWithoutAppointmentNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutAppointmentNestedInput
 }
 
 export type AppointmentUncheckedUpdateManyWithoutCouponInput = {
@@ -12750,6 +13363,7 @@ export type AppointmentUncheckedUpdateManyWithoutCouponInput = {
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  medicineRefillSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminActionBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12773,6 +13387,7 @@ export type AppointmentCountOutputType = {
   prescriptionVersions: number
   messages: number
   paymentOrderItems: number
+  medicineReminders: number
 }
 
 export type AppointmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -12785,6 +13400,7 @@ export type AppointmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   prescriptionVersions?: boolean | AppointmentCountOutputTypeCountPrescriptionVersionsArgs
   messages?: boolean | AppointmentCountOutputTypeCountMessagesArgs
   paymentOrderItems?: boolean | AppointmentCountOutputTypeCountPaymentOrderItemsArgs
+  medicineReminders?: boolean | AppointmentCountOutputTypeCountMedicineRemindersArgs
 }
 
 /**
@@ -12860,6 +13476,13 @@ export type AppointmentCountOutputTypeCountPaymentOrderItemsArgs<ExtArgs extends
   where?: Prisma.PaymentOrderItemWhereInput
 }
 
+/**
+ * AppointmentCountOutputType without action
+ */
+export type AppointmentCountOutputTypeCountMedicineRemindersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MedicineReminderWhereInput
+}
+
 
 export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -12919,6 +13542,7 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   followUpDate?: boolean
   followUpNote?: boolean
   followUpReminderSentAt?: boolean
+  medicineRefillSentAt?: boolean
   payReminderSentAt?: boolean
   bookedById?: boolean
   adminActionBy?: boolean
@@ -12951,6 +13575,7 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   walletTransaction?: boolean | Prisma.Appointment$walletTransactionArgs<ExtArgs>
   paymentOrderItems?: boolean | Prisma.Appointment$paymentOrderItemsArgs<ExtArgs>
   couponRedemption?: boolean | Prisma.Appointment$couponRedemptionArgs<ExtArgs>
+  medicineReminders?: boolean | Prisma.Appointment$medicineRemindersArgs<ExtArgs>
   _count?: boolean | Prisma.AppointmentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["appointment"]>
 
@@ -13012,6 +13637,7 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   followUpDate?: boolean
   followUpNote?: boolean
   followUpReminderSentAt?: boolean
+  medicineRefillSentAt?: boolean
   payReminderSentAt?: boolean
   bookedById?: boolean
   adminActionBy?: boolean
@@ -13090,6 +13716,7 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   followUpDate?: boolean
   followUpNote?: boolean
   followUpReminderSentAt?: boolean
+  medicineRefillSentAt?: boolean
   payReminderSentAt?: boolean
   bookedById?: boolean
   adminActionBy?: boolean
@@ -13168,6 +13795,7 @@ export type AppointmentSelectScalar = {
   followUpDate?: boolean
   followUpNote?: boolean
   followUpReminderSentAt?: boolean
+  medicineRefillSentAt?: boolean
   payReminderSentAt?: boolean
   bookedById?: boolean
   adminActionBy?: boolean
@@ -13176,7 +13804,7 @@ export type AppointmentSelectScalar = {
   createdAt?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "providerType" | "nurseServiceId" | "serviceName" | "prescriptionDocId" | "visitOtp" | "visitOtpAttempts" | "visitStartedAt" | "visitStartNote" | "packageId" | "packageIndex" | "nurseReferralId" | "status" | "acceptedAt" | "videoStartedPushAt" | "completedAt" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "couponId" | "couponCode" | "discountAmount" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "visitAddress" | "visitLandmark" | "visitPinCode" | "visitLat" | "visitLng" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "reassignedFromId" | "clinicId" | "scheduledAt" | "requestedScheduledAt" | "reminderSentAt" | "followUpDate" | "followUpNote" | "followUpReminderSentAt" | "payReminderSentAt" | "bookedById" | "adminActionBy" | "adminActionReason" | "adminActionAt" | "createdAt", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "providerType" | "nurseServiceId" | "serviceName" | "prescriptionDocId" | "visitOtp" | "visitOtpAttempts" | "visitStartedAt" | "visitStartNote" | "packageId" | "packageIndex" | "nurseReferralId" | "status" | "acceptedAt" | "videoStartedPushAt" | "completedAt" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "couponId" | "couponCode" | "discountAmount" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "visitAddress" | "visitLandmark" | "visitPinCode" | "visitLat" | "visitLng" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "reassignedFromId" | "clinicId" | "scheduledAt" | "requestedScheduledAt" | "reminderSentAt" | "followUpDate" | "followUpNote" | "followUpReminderSentAt" | "medicineRefillSentAt" | "payReminderSentAt" | "bookedById" | "adminActionBy" | "adminActionReason" | "adminActionAt" | "createdAt", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -13204,6 +13832,7 @@ export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.Internal
   walletTransaction?: boolean | Prisma.Appointment$walletTransactionArgs<ExtArgs>
   paymentOrderItems?: boolean | Prisma.Appointment$paymentOrderItemsArgs<ExtArgs>
   couponRedemption?: boolean | Prisma.Appointment$couponRedemptionArgs<ExtArgs>
+  medicineReminders?: boolean | Prisma.Appointment$medicineRemindersArgs<ExtArgs>
   _count?: boolean | Prisma.AppointmentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AppointmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -13264,6 +13893,7 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     walletTransaction: Prisma.$WalletTransactionPayload<ExtArgs> | null
     paymentOrderItems: Prisma.$PaymentOrderItemPayload<ExtArgs>[]
     couponRedemption: Prisma.$CouponRedemptionPayload<ExtArgs> | null
+    medicineReminders: Prisma.$MedicineReminderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -13323,6 +13953,7 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     followUpDate: Date | null
     followUpNote: string | null
     followUpReminderSentAt: Date | null
+    medicineRefillSentAt: Date | null
     payReminderSentAt: Date | null
     bookedById: string | null
     adminActionBy: string | null
@@ -13749,6 +14380,7 @@ export interface Prisma__AppointmentClient<T, Null = never, ExtArgs extends runt
   walletTransaction<T extends Prisma.Appointment$walletTransactionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$walletTransactionArgs<ExtArgs>>): Prisma.Prisma__WalletTransactionClient<runtime.Types.Result.GetResult<Prisma.$WalletTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   paymentOrderItems<T extends Prisma.Appointment$paymentOrderItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$paymentOrderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentOrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   couponRedemption<T extends Prisma.Appointment$couponRedemptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$couponRedemptionArgs<ExtArgs>>): Prisma.Prisma__CouponRedemptionClient<runtime.Types.Result.GetResult<Prisma.$CouponRedemptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  medicineReminders<T extends Prisma.Appointment$medicineRemindersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appointment$medicineRemindersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MedicineReminderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13835,6 +14467,7 @@ export interface AppointmentFieldRefs {
   readonly followUpDate: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly followUpNote: Prisma.FieldRef<"Appointment", 'String'>
   readonly followUpReminderSentAt: Prisma.FieldRef<"Appointment", 'DateTime'>
+  readonly medicineRefillSentAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly payReminderSentAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly bookedById: Prisma.FieldRef<"Appointment", 'String'>
   readonly adminActionBy: Prisma.FieldRef<"Appointment", 'String'>
@@ -14740,6 +15373,30 @@ export type Appointment$couponRedemptionArgs<ExtArgs extends runtime.Types.Exten
    */
   include?: Prisma.CouponRedemptionInclude<ExtArgs> | null
   where?: Prisma.CouponRedemptionWhereInput
+}
+
+/**
+ * Appointment.medicineReminders
+ */
+export type Appointment$medicineRemindersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MedicineReminder
+   */
+  select?: Prisma.MedicineReminderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MedicineReminder
+   */
+  omit?: Prisma.MedicineReminderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MedicineReminderInclude<ExtArgs> | null
+  where?: Prisma.MedicineReminderWhereInput
+  orderBy?: Prisma.MedicineReminderOrderByWithRelationInput | Prisma.MedicineReminderOrderByWithRelationInput[]
+  cursor?: Prisma.MedicineReminderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MedicineReminderScalarFieldEnum | Prisma.MedicineReminderScalarFieldEnum[]
 }
 
 /**

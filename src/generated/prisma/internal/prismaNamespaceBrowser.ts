@@ -79,6 +79,8 @@ export const ModelName = {
   DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
   PrescriptionMedicine: 'PrescriptionMedicine',
+  MedicineReminder: 'MedicineReminder',
+  MedicineDose: 'MedicineDose',
   PrescriptionTest: 'PrescriptionTest',
   PrescriptionVersion: 'PrescriptionVersion',
   DoctorFavouriteMedicine: 'DoctorFavouriteMedicine',
@@ -130,6 +132,7 @@ export const UserScalarFieldEnum = {
   tokenVersion: 'tokenVersion',
   offlineUntil: 'offlineUntil',
   language: 'language',
+  medicineRemindersEnabled: 'medicineRemindersEnabled',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -489,6 +492,7 @@ export const AppointmentScalarFieldEnum = {
   followUpDate: 'followUpDate',
   followUpNote: 'followUpNote',
   followUpReminderSentAt: 'followUpReminderSentAt',
+  medicineRefillSentAt: 'medicineRefillSentAt',
   payReminderSentAt: 'payReminderSentAt',
   bookedById: 'bookedById',
   adminActionBy: 'adminActionBy',
@@ -653,6 +657,40 @@ export const PrescriptionMedicineScalarFieldEnum = {
 } as const
 
 export type PrescriptionMedicineScalarFieldEnum = (typeof PrescriptionMedicineScalarFieldEnum)[keyof typeof PrescriptionMedicineScalarFieldEnum]
+
+
+export const MedicineReminderScalarFieldEnum = {
+  id: 'id',
+  appointmentId: 'appointmentId',
+  patientId: 'patientId',
+  name: 'name',
+  nameKey: 'nameKey',
+  dosage: 'dosage',
+  frequency: 'frequency',
+  duration: 'duration',
+  timesOfDay: 'timesOfDay',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  enabled: 'enabled',
+  setByPatient: 'setByPatient',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MedicineReminderScalarFieldEnum = (typeof MedicineReminderScalarFieldEnum)[keyof typeof MedicineReminderScalarFieldEnum]
+
+
+export const MedicineDoseScalarFieldEnum = {
+  id: 'id',
+  reminderId: 'reminderId',
+  doseDate: 'doseDate',
+  doseTime: 'doseTime',
+  notifiedAt: 'notifiedAt',
+  takenAt: 'takenAt',
+  createdAt: 'createdAt'
+} as const
+
+export type MedicineDoseScalarFieldEnum = (typeof MedicineDoseScalarFieldEnum)[keyof typeof MedicineDoseScalarFieldEnum]
 
 
 export const PrescriptionTestScalarFieldEnum = {

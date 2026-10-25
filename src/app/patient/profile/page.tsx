@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Loader2, MapPin, HeartPulse, PhoneCall, Compass, Bell, Wallet as WalletIcon,
-  LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2, Lock, FileCheck, FolderHeart, Activity, Users,
+  LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2, Lock, FileCheck, FolderHeart, Activity, Users, Pill,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -260,6 +260,8 @@ export default function PatientProfilePage() {
             title={t("documents")} />
           <Row href="/patient/profile/vitals" tint="bg-rose-50 text-rose-500" icon={<Activity className="w-4 h-4" />}
             title={t("vitals")} />
+          <Row href="/patient/profile/medicines" tint="bg-teal-50 text-teal-600" icon={<Pill className="w-4 h-4" />}
+            title={t("medicines")} />
         </Group>
 
         <Group label={t("groupPreferences")}>

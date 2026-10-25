@@ -47,6 +47,7 @@ export type UserMinAggregateOutputType = {
   tokenVersion: number | null
   offlineUntil: Date | null
   language: string | null
+  medicineRemindersEnabled: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -64,6 +65,7 @@ export type UserMaxAggregateOutputType = {
   tokenVersion: number | null
   offlineUntil: Date | null
   language: string | null
+  medicineRemindersEnabled: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -81,6 +83,7 @@ export type UserCountAggregateOutputType = {
   tokenVersion: number
   offlineUntil: number
   language: number
+  medicineRemindersEnabled: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -108,6 +111,7 @@ export type UserMinAggregateInputType = {
   tokenVersion?: true
   offlineUntil?: true
   language?: true
+  medicineRemindersEnabled?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -125,6 +129,7 @@ export type UserMaxAggregateInputType = {
   tokenVersion?: true
   offlineUntil?: true
   language?: true
+  medicineRemindersEnabled?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -142,6 +147,7 @@ export type UserCountAggregateInputType = {
   tokenVersion?: true
   offlineUntil?: true
   language?: true
+  medicineRemindersEnabled?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -246,6 +252,7 @@ export type UserGroupByOutputType = {
   tokenVersion: number
   offlineUntil: Date | null
   language: string
+  medicineRemindersEnabled: boolean
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -286,6 +293,7 @@ export type UserWhereInput = {
   tokenVersion?: Prisma.IntFilter<"User"> | number
   offlineUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   language?: Prisma.StringFilter<"User"> | string
+  medicineRemindersEnabled?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   patientProfile?: Prisma.XOR<Prisma.PatientProfileNullableScalarRelationFilter, Prisma.PatientProfileWhereInput> | null
@@ -323,6 +331,7 @@ export type UserWhereInput = {
   documents?: Prisma.PatientDocumentListRelationFilter
   nursePaymentLogs?: Prisma.NursePaymentLogListRelationFilter
   vitals?: Prisma.VitalReadingListRelationFilter
+  medicineReminders?: Prisma.MedicineReminderListRelationFilter
   vitalsRecorded?: Prisma.VitalReadingListRelationFilter
   staffAccount?: Prisma.XOR<Prisma.StaffProfileNullableScalarRelationFilter, Prisma.StaffProfileWhereInput> | null
   staffMembers?: Prisma.StaffProfileListRelationFilter
@@ -345,6 +354,7 @@ export type UserOrderByWithRelationInput = {
   tokenVersion?: Prisma.SortOrder
   offlineUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   language?: Prisma.SortOrder
+  medicineRemindersEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   patientProfile?: Prisma.PatientProfileOrderByWithRelationInput
@@ -382,6 +392,7 @@ export type UserOrderByWithRelationInput = {
   documents?: Prisma.PatientDocumentOrderByRelationAggregateInput
   nursePaymentLogs?: Prisma.NursePaymentLogOrderByRelationAggregateInput
   vitals?: Prisma.VitalReadingOrderByRelationAggregateInput
+  medicineReminders?: Prisma.MedicineReminderOrderByRelationAggregateInput
   vitalsRecorded?: Prisma.VitalReadingOrderByRelationAggregateInput
   staffAccount?: Prisma.StaffProfileOrderByWithRelationInput
   staffMembers?: Prisma.StaffProfileOrderByRelationAggregateInput
@@ -407,6 +418,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   tokenVersion?: Prisma.IntFilter<"User"> | number
   offlineUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   language?: Prisma.StringFilter<"User"> | string
+  medicineRemindersEnabled?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   patientProfile?: Prisma.XOR<Prisma.PatientProfileNullableScalarRelationFilter, Prisma.PatientProfileWhereInput> | null
@@ -444,6 +456,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   documents?: Prisma.PatientDocumentListRelationFilter
   nursePaymentLogs?: Prisma.NursePaymentLogListRelationFilter
   vitals?: Prisma.VitalReadingListRelationFilter
+  medicineReminders?: Prisma.MedicineReminderListRelationFilter
   vitalsRecorded?: Prisma.VitalReadingListRelationFilter
   staffAccount?: Prisma.XOR<Prisma.StaffProfileNullableScalarRelationFilter, Prisma.StaffProfileWhereInput> | null
   staffMembers?: Prisma.StaffProfileListRelationFilter
@@ -466,6 +479,7 @@ export type UserOrderByWithAggregationInput = {
   tokenVersion?: Prisma.SortOrder
   offlineUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   language?: Prisma.SortOrder
+  medicineRemindersEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -491,6 +505,7 @@ export type UserScalarWhereWithAggregatesInput = {
   tokenVersion?: Prisma.IntWithAggregatesFilter<"User"> | number
   offlineUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   language?: Prisma.StringWithAggregatesFilter<"User"> | string
+  medicineRemindersEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -508,6 +523,7 @@ export type UserCreateInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -545,6 +561,7 @@ export type UserCreateInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -567,6 +584,7 @@ export type UserUncheckedCreateInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -604,6 +622,7 @@ export type UserUncheckedCreateInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -626,6 +645,7 @@ export type UserUpdateInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -663,6 +683,7 @@ export type UserUpdateInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -685,6 +706,7 @@ export type UserUncheckedUpdateInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -722,6 +744,7 @@ export type UserUncheckedUpdateInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -744,6 +767,7 @@ export type UserCreateManyInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -761,6 +785,7 @@ export type UserUpdateManyMutationInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -778,6 +803,7 @@ export type UserUncheckedUpdateManyInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -795,6 +821,7 @@ export type UserCountOrderByAggregateInput = {
   tokenVersion?: Prisma.SortOrder
   offlineUntil?: Prisma.SortOrder
   language?: Prisma.SortOrder
+  medicineRemindersEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -816,6 +843,7 @@ export type UserMaxOrderByAggregateInput = {
   tokenVersion?: Prisma.SortOrder
   offlineUntil?: Prisma.SortOrder
   language?: Prisma.SortOrder
+  medicineRemindersEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -833,6 +861,7 @@ export type UserMinOrderByAggregateInput = {
   tokenVersion?: Prisma.SortOrder
   offlineUntil?: Prisma.SortOrder
   language?: Prisma.SortOrder
+  medicineRemindersEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -869,6 +898,10 @@ export type IntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -1261,6 +1294,20 @@ export type UserUpdateOneRequiredWithoutMessagesSentNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMessagesSentInput, Prisma.UserUpdateWithoutMessagesSentInput>, Prisma.UserUncheckedUpdateWithoutMessagesSentInput>
 }
 
+export type UserCreateNestedOneWithoutMedicineRemindersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMedicineRemindersInput, Prisma.UserUncheckedCreateWithoutMedicineRemindersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMedicineRemindersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutMedicineRemindersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMedicineRemindersInput, Prisma.UserUncheckedCreateWithoutMedicineRemindersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMedicineRemindersInput
+  upsert?: Prisma.UserUpsertWithoutMedicineRemindersInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMedicineRemindersInput, Prisma.UserUpdateWithoutMedicineRemindersInput>, Prisma.UserUncheckedUpdateWithoutMedicineRemindersInput>
+}
+
 export type UserCreateNestedOneWithoutFavouriteMedicinesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutFavouriteMedicinesInput, Prisma.UserUncheckedCreateWithoutFavouriteMedicinesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutFavouriteMedicinesInput
@@ -1490,6 +1537,7 @@ export type UserCreateWithoutPushTokensInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -1526,6 +1574,7 @@ export type UserCreateWithoutPushTokensInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -1548,6 +1597,7 @@ export type UserUncheckedCreateWithoutPushTokensInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1584,6 +1634,7 @@ export type UserUncheckedCreateWithoutPushTokensInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -1622,6 +1673,7 @@ export type UserUpdateWithoutPushTokensInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -1658,6 +1710,7 @@ export type UserUpdateWithoutPushTokensInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -1680,6 +1733,7 @@ export type UserUncheckedUpdateWithoutPushTokensInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1716,6 +1770,7 @@ export type UserUncheckedUpdateWithoutPushTokensInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -1738,6 +1793,7 @@ export type UserCreateWithoutNotificationsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -1774,6 +1830,7 @@ export type UserCreateWithoutNotificationsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -1796,6 +1853,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1832,6 +1890,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -1870,6 +1929,7 @@ export type UserUpdateWithoutNotificationsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -1906,6 +1966,7 @@ export type UserUpdateWithoutNotificationsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -1928,6 +1989,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1964,6 +2026,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -1986,6 +2049,7 @@ export type UserCreateWithoutSavedDoctorsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -2022,6 +2086,7 @@ export type UserCreateWithoutSavedDoctorsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -2044,6 +2109,7 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -2080,6 +2146,7 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -2107,6 +2174,7 @@ export type UserCreateWithoutSavedByPatientsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -2143,6 +2211,7 @@ export type UserCreateWithoutSavedByPatientsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -2165,6 +2234,7 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -2201,6 +2271,7 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -2239,6 +2310,7 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -2275,6 +2347,7 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -2297,6 +2370,7 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -2333,6 +2407,7 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -2366,6 +2441,7 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -2402,6 +2478,7 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -2424,6 +2501,7 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -2460,6 +2538,7 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -2482,6 +2561,7 @@ export type UserCreateWithoutPatientProfileInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
@@ -2518,6 +2598,7 @@ export type UserCreateWithoutPatientProfileInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -2540,6 +2621,7 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
@@ -2576,6 +2658,7 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -2614,6 +2697,7 @@ export type UserUpdateWithoutPatientProfileInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
@@ -2650,6 +2734,7 @@ export type UserUpdateWithoutPatientProfileInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -2672,6 +2757,7 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -2708,6 +2794,7 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -2730,6 +2817,7 @@ export type UserCreateWithoutDocumentsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -2766,6 +2854,7 @@ export type UserCreateWithoutDocumentsInput = {
   paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -2788,6 +2877,7 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -2824,6 +2914,7 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -2862,6 +2953,7 @@ export type UserUpdateWithoutDocumentsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -2898,6 +2990,7 @@ export type UserUpdateWithoutDocumentsInput = {
   paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -2920,6 +3013,7 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -2956,6 +3050,7 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -2978,6 +3073,7 @@ export type UserCreateWithoutDoctorProfileInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -3014,6 +3110,7 @@ export type UserCreateWithoutDoctorProfileInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -3036,6 +3133,7 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -3072,6 +3170,7 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -3110,6 +3209,7 @@ export type UserUpdateWithoutDoctorProfileInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -3146,6 +3246,7 @@ export type UserUpdateWithoutDoctorProfileInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -3168,6 +3269,7 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -3204,6 +3306,7 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -3226,6 +3329,7 @@ export type UserCreateWithoutNurseProfileInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -3262,6 +3366,7 @@ export type UserCreateWithoutNurseProfileInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -3284,6 +3389,7 @@ export type UserUncheckedCreateWithoutNurseProfileInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -3320,6 +3426,7 @@ export type UserUncheckedCreateWithoutNurseProfileInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -3358,6 +3465,7 @@ export type UserUpdateWithoutNurseProfileInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -3394,6 +3502,7 @@ export type UserUpdateWithoutNurseProfileInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -3416,6 +3525,7 @@ export type UserUncheckedUpdateWithoutNurseProfileInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -3452,6 +3562,7 @@ export type UserUncheckedUpdateWithoutNurseProfileInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -3474,6 +3585,7 @@ export type UserCreateWithoutVitalsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -3510,6 +3622,7 @@ export type UserCreateWithoutVitalsInput = {
   paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -3532,6 +3645,7 @@ export type UserUncheckedCreateWithoutVitalsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -3568,6 +3682,7 @@ export type UserUncheckedCreateWithoutVitalsInput = {
   paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -3595,6 +3710,7 @@ export type UserCreateWithoutVitalsRecordedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -3632,6 +3748,7 @@ export type UserCreateWithoutVitalsRecordedInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
   changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
@@ -3653,6 +3770,7 @@ export type UserUncheckedCreateWithoutVitalsRecordedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -3690,6 +3808,7 @@ export type UserUncheckedCreateWithoutVitalsRecordedInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
   changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
@@ -3727,6 +3846,7 @@ export type UserUpdateWithoutVitalsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -3763,6 +3883,7 @@ export type UserUpdateWithoutVitalsInput = {
   paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -3785,6 +3906,7 @@ export type UserUncheckedUpdateWithoutVitalsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -3821,6 +3943,7 @@ export type UserUncheckedUpdateWithoutVitalsInput = {
   paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -3854,6 +3977,7 @@ export type UserUpdateWithoutVitalsRecordedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -3891,6 +4015,7 @@ export type UserUpdateWithoutVitalsRecordedInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
   changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
@@ -3912,6 +4037,7 @@ export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -3949,6 +4075,7 @@ export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
   changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
@@ -3970,6 +4097,7 @@ export type UserCreateWithoutNursePaymentLogsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -4006,6 +4134,7 @@ export type UserCreateWithoutNursePaymentLogsInput = {
   paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -4028,6 +4157,7 @@ export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -4064,6 +4194,7 @@ export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
   paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -4102,6 +4233,7 @@ export type UserUpdateWithoutNursePaymentLogsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -4138,6 +4270,7 @@ export type UserUpdateWithoutNursePaymentLogsInput = {
   paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -4160,6 +4293,7 @@ export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -4196,6 +4330,7 @@ export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
   paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -4218,6 +4353,7 @@ export type UserCreateWithoutChangeRequestsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -4255,6 +4391,7 @@ export type UserCreateWithoutChangeRequestsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -4276,6 +4413,7 @@ export type UserUncheckedCreateWithoutChangeRequestsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -4313,6 +4451,7 @@ export type UserUncheckedCreateWithoutChangeRequestsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -4339,6 +4478,7 @@ export type UserCreateWithoutChangeRequestsResolvedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -4376,6 +4516,7 @@ export type UserCreateWithoutChangeRequestsResolvedInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -4397,6 +4538,7 @@ export type UserUncheckedCreateWithoutChangeRequestsResolvedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -4434,6 +4576,7 @@ export type UserUncheckedCreateWithoutChangeRequestsResolvedInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -4471,6 +4614,7 @@ export type UserUpdateWithoutChangeRequestsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -4508,6 +4652,7 @@ export type UserUpdateWithoutChangeRequestsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -4529,6 +4674,7 @@ export type UserUncheckedUpdateWithoutChangeRequestsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -4566,6 +4712,7 @@ export type UserUncheckedUpdateWithoutChangeRequestsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -4598,6 +4745,7 @@ export type UserUpdateWithoutChangeRequestsResolvedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -4635,6 +4783,7 @@ export type UserUpdateWithoutChangeRequestsResolvedInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -4656,6 +4805,7 @@ export type UserUncheckedUpdateWithoutChangeRequestsResolvedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -4693,6 +4843,7 @@ export type UserUncheckedUpdateWithoutChangeRequestsResolvedInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -4714,6 +4865,7 @@ export type UserCreateWithoutStaffAccountInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -4751,6 +4903,7 @@ export type UserCreateWithoutStaffAccountInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
   changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
@@ -4772,6 +4925,7 @@ export type UserUncheckedCreateWithoutStaffAccountInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -4809,6 +4963,7 @@ export type UserUncheckedCreateWithoutStaffAccountInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
   changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
@@ -4835,6 +4990,7 @@ export type UserCreateWithoutStaffMembersInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -4872,6 +5028,7 @@ export type UserCreateWithoutStaffMembersInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
@@ -4893,6 +5050,7 @@ export type UserUncheckedCreateWithoutStaffMembersInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -4930,6 +5088,7 @@ export type UserUncheckedCreateWithoutStaffMembersInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
@@ -4967,6 +5126,7 @@ export type UserUpdateWithoutStaffAccountInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -5004,6 +5164,7 @@ export type UserUpdateWithoutStaffAccountInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
   changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
@@ -5025,6 +5186,7 @@ export type UserUncheckedUpdateWithoutStaffAccountInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -5062,6 +5224,7 @@ export type UserUncheckedUpdateWithoutStaffAccountInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
   changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
@@ -5094,6 +5257,7 @@ export type UserUpdateWithoutStaffMembersInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -5131,6 +5295,7 @@ export type UserUpdateWithoutStaffMembersInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
@@ -5152,6 +5317,7 @@ export type UserUncheckedUpdateWithoutStaffMembersInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -5189,6 +5355,7 @@ export type UserUncheckedUpdateWithoutStaffMembersInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
@@ -5210,6 +5377,7 @@ export type UserCreateWithoutAsPatientInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -5246,6 +5414,7 @@ export type UserCreateWithoutAsPatientInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -5268,6 +5437,7 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -5304,6 +5474,7 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -5331,6 +5502,7 @@ export type UserCreateWithoutAsDoctorInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -5367,6 +5539,7 @@ export type UserCreateWithoutAsDoctorInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -5389,6 +5562,7 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -5425,6 +5599,7 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -5463,6 +5638,7 @@ export type UserUpdateWithoutAsPatientInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -5499,6 +5675,7 @@ export type UserUpdateWithoutAsPatientInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -5521,6 +5698,7 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -5557,6 +5735,7 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -5590,6 +5769,7 @@ export type UserUpdateWithoutAsDoctorInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -5626,6 +5806,7 @@ export type UserUpdateWithoutAsDoctorInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -5648,6 +5829,7 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -5684,6 +5866,7 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -5706,6 +5889,7 @@ export type UserCreateWithoutWalletInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -5742,6 +5926,7 @@ export type UserCreateWithoutWalletInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -5764,6 +5949,7 @@ export type UserUncheckedCreateWithoutWalletInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -5800,6 +5986,7 @@ export type UserUncheckedCreateWithoutWalletInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -5838,6 +6025,7 @@ export type UserUpdateWithoutWalletInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -5874,6 +6062,7 @@ export type UserUpdateWithoutWalletInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -5896,6 +6085,7 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -5932,6 +6122,7 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -5954,6 +6145,7 @@ export type UserCreateWithoutWalletTransactionsAdjustedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -5990,6 +6182,7 @@ export type UserCreateWithoutWalletTransactionsAdjustedInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -6012,6 +6205,7 @@ export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -6048,6 +6242,7 @@ export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -6086,6 +6281,7 @@ export type UserUpdateWithoutWalletTransactionsAdjustedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -6122,6 +6318,7 @@ export type UserUpdateWithoutWalletTransactionsAdjustedInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -6144,6 +6341,7 @@ export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -6180,6 +6378,7 @@ export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -6202,6 +6401,7 @@ export type UserCreateWithoutSettlementsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -6238,6 +6438,7 @@ export type UserCreateWithoutSettlementsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -6260,6 +6461,7 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -6296,6 +6498,7 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -6323,6 +6526,7 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -6359,6 +6563,7 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -6381,6 +6586,7 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -6417,6 +6623,7 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -6444,6 +6651,7 @@ export type UserCreateWithoutSettlementsPaidInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -6480,6 +6688,7 @@ export type UserCreateWithoutSettlementsPaidInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -6502,6 +6711,7 @@ export type UserUncheckedCreateWithoutSettlementsPaidInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -6538,6 +6748,7 @@ export type UserUncheckedCreateWithoutSettlementsPaidInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -6576,6 +6787,7 @@ export type UserUpdateWithoutSettlementsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -6612,6 +6824,7 @@ export type UserUpdateWithoutSettlementsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -6634,6 +6847,7 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -6670,6 +6884,7 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -6703,6 +6918,7 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -6739,6 +6955,7 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -6761,6 +6978,7 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -6797,6 +7015,7 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -6830,6 +7049,7 @@ export type UserUpdateWithoutSettlementsPaidInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -6866,6 +7086,7 @@ export type UserUpdateWithoutSettlementsPaidInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -6888,6 +7109,7 @@ export type UserUncheckedUpdateWithoutSettlementsPaidInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -6924,6 +7146,7 @@ export type UserUncheckedUpdateWithoutSettlementsPaidInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -6946,6 +7169,7 @@ export type UserCreateWithoutTimeOffInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -6982,6 +7206,7 @@ export type UserCreateWithoutTimeOffInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -7004,6 +7229,7 @@ export type UserUncheckedCreateWithoutTimeOffInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -7040,6 +7266,7 @@ export type UserUncheckedCreateWithoutTimeOffInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -7078,6 +7305,7 @@ export type UserUpdateWithoutTimeOffInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -7114,6 +7342,7 @@ export type UserUpdateWithoutTimeOffInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -7136,6 +7365,7 @@ export type UserUncheckedUpdateWithoutTimeOffInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -7172,6 +7402,7 @@ export type UserUncheckedUpdateWithoutTimeOffInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -7194,6 +7425,7 @@ export type UserCreateWithoutDuesPaymentsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -7230,6 +7462,7 @@ export type UserCreateWithoutDuesPaymentsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -7252,6 +7485,7 @@ export type UserUncheckedCreateWithoutDuesPaymentsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -7288,6 +7522,7 @@ export type UserUncheckedCreateWithoutDuesPaymentsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -7326,6 +7561,7 @@ export type UserUpdateWithoutDuesPaymentsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -7362,6 +7598,7 @@ export type UserUpdateWithoutDuesPaymentsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -7384,6 +7621,7 @@ export type UserUncheckedUpdateWithoutDuesPaymentsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -7420,6 +7658,7 @@ export type UserUncheckedUpdateWithoutDuesPaymentsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -7442,6 +7681,7 @@ export type UserCreateWithoutPayoutRequestsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -7478,6 +7718,7 @@ export type UserCreateWithoutPayoutRequestsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -7500,6 +7741,7 @@ export type UserUncheckedCreateWithoutPayoutRequestsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -7536,6 +7778,7 @@ export type UserUncheckedCreateWithoutPayoutRequestsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -7574,6 +7817,7 @@ export type UserUpdateWithoutPayoutRequestsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -7610,6 +7854,7 @@ export type UserUpdateWithoutPayoutRequestsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -7632,6 +7877,7 @@ export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -7668,6 +7914,7 @@ export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -7690,6 +7937,7 @@ export type UserCreateWithoutPaymentLogsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -7726,6 +7974,7 @@ export type UserCreateWithoutPaymentLogsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -7748,6 +7997,7 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -7784,6 +8034,7 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -7822,6 +8073,7 @@ export type UserUpdateWithoutPaymentLogsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -7858,6 +8110,7 @@ export type UserUpdateWithoutPaymentLogsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -7880,6 +8133,7 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -7916,6 +8170,7 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -7938,6 +8193,7 @@ export type UserCreateWithoutMessagesSentInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -7974,6 +8230,7 @@ export type UserCreateWithoutMessagesSentInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -7996,6 +8253,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -8032,6 +8290,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -8070,6 +8329,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -8106,6 +8366,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -8128,6 +8389,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -8140,6 +8402,263 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUncheckedUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+}
+
+export type UserCreateWithoutMedicineRemindersInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  medicineRemindersEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+}
+
+export type UserUncheckedCreateWithoutMedicineRemindersInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  medicineRemindersEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementUncheckedCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+}
+
+export type UserCreateOrConnectWithoutMedicineRemindersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMedicineRemindersInput, Prisma.UserUncheckedCreateWithoutMedicineRemindersInput>
+}
+
+export type UserUpsertWithoutMedicineRemindersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMedicineRemindersInput, Prisma.UserUncheckedUpdateWithoutMedicineRemindersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMedicineRemindersInput, Prisma.UserUncheckedCreateWithoutMedicineRemindersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMedicineRemindersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMedicineRemindersInput, Prisma.UserUncheckedUpdateWithoutMedicineRemindersInput>
+}
+
+export type UserUpdateWithoutMedicineRemindersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMedicineRemindersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
   settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
   settlementsPaid?: Prisma.SettlementUncheckedUpdateManyWithoutPaidByAdminNestedInput
@@ -8186,6 +8705,7 @@ export type UserCreateWithoutFavouriteMedicinesInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -8223,6 +8743,7 @@ export type UserCreateWithoutFavouriteMedicinesInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -8244,6 +8765,7 @@ export type UserUncheckedCreateWithoutFavouriteMedicinesInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -8281,6 +8803,7 @@ export type UserUncheckedCreateWithoutFavouriteMedicinesInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -8318,6 +8841,7 @@ export type UserUpdateWithoutFavouriteMedicinesInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -8355,6 +8879,7 @@ export type UserUpdateWithoutFavouriteMedicinesInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -8376,6 +8901,7 @@ export type UserUncheckedUpdateWithoutFavouriteMedicinesInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -8413,6 +8939,7 @@ export type UserUncheckedUpdateWithoutFavouriteMedicinesInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -8434,6 +8961,7 @@ export type UserCreateWithoutPrescriptionTemplatesInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -8471,6 +8999,7 @@ export type UserCreateWithoutPrescriptionTemplatesInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -8492,6 +9021,7 @@ export type UserUncheckedCreateWithoutPrescriptionTemplatesInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -8529,6 +9059,7 @@ export type UserUncheckedCreateWithoutPrescriptionTemplatesInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -8566,6 +9097,7 @@ export type UserUpdateWithoutPrescriptionTemplatesInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -8603,6 +9135,7 @@ export type UserUpdateWithoutPrescriptionTemplatesInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -8624,6 +9157,7 @@ export type UserUncheckedUpdateWithoutPrescriptionTemplatesInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -8661,6 +9195,7 @@ export type UserUncheckedUpdateWithoutPrescriptionTemplatesInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -8682,6 +9217,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -8718,6 +9254,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -8740,6 +9277,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -8776,6 +9314,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -8803,6 +9342,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -8839,6 +9379,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -8861,6 +9402,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -8897,6 +9439,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -8935,6 +9478,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -8971,6 +9515,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -8993,6 +9538,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -9029,6 +9575,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -9062,6 +9609,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -9098,6 +9646,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -9120,6 +9669,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -9156,6 +9706,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -9178,6 +9729,7 @@ export type UserCreateWithoutComplaintsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -9214,6 +9766,7 @@ export type UserCreateWithoutComplaintsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -9236,6 +9789,7 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -9272,6 +9826,7 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -9299,6 +9854,7 @@ export type UserCreateWithoutComplaintsAssignedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -9335,6 +9891,7 @@ export type UserCreateWithoutComplaintsAssignedInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -9357,6 +9914,7 @@ export type UserUncheckedCreateWithoutComplaintsAssignedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -9393,6 +9951,7 @@ export type UserUncheckedCreateWithoutComplaintsAssignedInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -9431,6 +9990,7 @@ export type UserUpdateWithoutComplaintsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -9467,6 +10027,7 @@ export type UserUpdateWithoutComplaintsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -9489,6 +10050,7 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -9525,6 +10087,7 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -9558,6 +10121,7 @@ export type UserUpdateWithoutComplaintsAssignedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -9594,6 +10158,7 @@ export type UserUpdateWithoutComplaintsAssignedInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -9616,6 +10181,7 @@ export type UserUncheckedUpdateWithoutComplaintsAssignedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -9652,6 +10218,7 @@ export type UserUncheckedUpdateWithoutComplaintsAssignedInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -9674,6 +10241,7 @@ export type UserCreateWithoutComplaintMessagesInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -9710,6 +10278,7 @@ export type UserCreateWithoutComplaintMessagesInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -9732,6 +10301,7 @@ export type UserUncheckedCreateWithoutComplaintMessagesInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -9768,6 +10338,7 @@ export type UserUncheckedCreateWithoutComplaintMessagesInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -9806,6 +10377,7 @@ export type UserUpdateWithoutComplaintMessagesInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -9842,6 +10414,7 @@ export type UserUpdateWithoutComplaintMessagesInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -9864,6 +10437,7 @@ export type UserUncheckedUpdateWithoutComplaintMessagesInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -9900,6 +10474,7 @@ export type UserUncheckedUpdateWithoutComplaintMessagesInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -9922,6 +10497,7 @@ export type UserCreateWithoutClinicsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -9958,6 +10534,7 @@ export type UserCreateWithoutClinicsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -9980,6 +10557,7 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -10016,6 +10594,7 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -10054,6 +10633,7 @@ export type UserUpdateWithoutClinicsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -10090,6 +10670,7 @@ export type UserUpdateWithoutClinicsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -10112,6 +10693,7 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -10148,6 +10730,7 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -10170,6 +10753,7 @@ export type UserCreateWithoutAnnouncementsCreatedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -10206,6 +10790,7 @@ export type UserCreateWithoutAnnouncementsCreatedInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -10228,6 +10813,7 @@ export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -10264,6 +10850,7 @@ export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -10302,6 +10889,7 @@ export type UserUpdateWithoutAnnouncementsCreatedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -10338,6 +10926,7 @@ export type UserUpdateWithoutAnnouncementsCreatedInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -10360,6 +10949,7 @@ export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -10396,6 +10986,7 @@ export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -10418,6 +11009,7 @@ export type UserCreateWithoutAnnouncementRecipientsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -10454,6 +11046,7 @@ export type UserCreateWithoutAnnouncementRecipientsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -10476,6 +11069,7 @@ export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -10512,6 +11106,7 @@ export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -10550,6 +11145,7 @@ export type UserUpdateWithoutAnnouncementRecipientsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -10586,6 +11182,7 @@ export type UserUpdateWithoutAnnouncementRecipientsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -10608,6 +11205,7 @@ export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -10644,6 +11242,7 @@ export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -10666,6 +11265,7 @@ export type UserCreateWithoutImpersonationsStartedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -10702,6 +11302,7 @@ export type UserCreateWithoutImpersonationsStartedInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -10724,6 +11325,7 @@ export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -10760,6 +11362,7 @@ export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -10787,6 +11390,7 @@ export type UserCreateWithoutImpersonationsReceivedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -10823,6 +11427,7 @@ export type UserCreateWithoutImpersonationsReceivedInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -10845,6 +11450,7 @@ export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -10881,6 +11487,7 @@ export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -10919,6 +11526,7 @@ export type UserUpdateWithoutImpersonationsStartedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -10955,6 +11563,7 @@ export type UserUpdateWithoutImpersonationsStartedInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -10977,6 +11586,7 @@ export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -11013,6 +11623,7 @@ export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -11046,6 +11657,7 @@ export type UserUpdateWithoutImpersonationsReceivedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -11082,6 +11694,7 @@ export type UserUpdateWithoutImpersonationsReceivedInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -11104,6 +11717,7 @@ export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -11140,6 +11754,7 @@ export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -11162,6 +11777,7 @@ export type UserCreateWithoutCouponsCreatedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -11198,6 +11814,7 @@ export type UserCreateWithoutCouponsCreatedInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -11220,6 +11837,7 @@ export type UserUncheckedCreateWithoutCouponsCreatedInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -11256,6 +11874,7 @@ export type UserUncheckedCreateWithoutCouponsCreatedInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -11294,6 +11913,7 @@ export type UserUpdateWithoutCouponsCreatedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -11330,6 +11950,7 @@ export type UserUpdateWithoutCouponsCreatedInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -11352,6 +11973,7 @@ export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -11388,6 +12010,7 @@ export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -11410,6 +12033,7 @@ export type UserCreateWithoutCouponRedemptionsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -11446,6 +12070,7 @@ export type UserCreateWithoutCouponRedemptionsInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -11468,6 +12093,7 @@ export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -11504,6 +12130,7 @@ export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -11542,6 +12169,7 @@ export type UserUpdateWithoutCouponRedemptionsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -11578,6 +12206,7 @@ export type UserUpdateWithoutCouponRedemptionsInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -11600,6 +12229,7 @@ export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -11636,6 +12266,7 @@ export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -11658,6 +12289,7 @@ export type UserCreateWithoutPaymentOrdersInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
@@ -11694,6 +12326,7 @@ export type UserCreateWithoutPaymentOrdersInput = {
   documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
@@ -11716,6 +12349,7 @@ export type UserUncheckedCreateWithoutPaymentOrdersInput = {
   tokenVersion?: number
   offlineUntil?: Date | string | null
   language?: string
+  medicineRemindersEnabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
@@ -11752,6 +12386,7 @@ export type UserUncheckedCreateWithoutPaymentOrdersInput = {
   documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
   vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
   staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
   staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
@@ -11790,6 +12425,7 @@ export type UserUpdateWithoutPaymentOrdersInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
@@ -11826,6 +12462,7 @@ export type UserUpdateWithoutPaymentOrdersInput = {
   documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
@@ -11848,6 +12485,7 @@ export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
   tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -11884,6 +12522,7 @@ export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
   documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
   vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
   vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
   staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
   staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
@@ -11930,6 +12569,7 @@ export type UserCountOutputType = {
   documents: number
   nursePaymentLogs: number
   vitals: number
+  medicineReminders: number
   vitalsRecorded: number
   staffMembers: number
   changeRequests: number
@@ -11970,6 +12610,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   documents?: boolean | UserCountOutputTypeCountDocumentsArgs
   nursePaymentLogs?: boolean | UserCountOutputTypeCountNursePaymentLogsArgs
   vitals?: boolean | UserCountOutputTypeCountVitalsArgs
+  medicineReminders?: boolean | UserCountOutputTypeCountMedicineRemindersArgs
   vitalsRecorded?: boolean | UserCountOutputTypeCountVitalsRecordedArgs
   staffMembers?: boolean | UserCountOutputTypeCountStaffMembersArgs
   changeRequests?: boolean | UserCountOutputTypeCountChangeRequestsArgs
@@ -12208,6 +12849,13 @@ export type UserCountOutputTypeCountVitalsArgs<ExtArgs extends runtime.Types.Ext
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountMedicineRemindersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MedicineReminderWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountVitalsRecordedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.VitalReadingWhereInput
 }
@@ -12261,6 +12909,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   tokenVersion?: boolean
   offlineUntil?: boolean
   language?: boolean
+  medicineRemindersEnabled?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   patientProfile?: boolean | Prisma.User$patientProfileArgs<ExtArgs>
@@ -12298,6 +12947,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   documents?: boolean | Prisma.User$documentsArgs<ExtArgs>
   nursePaymentLogs?: boolean | Prisma.User$nursePaymentLogsArgs<ExtArgs>
   vitals?: boolean | Prisma.User$vitalsArgs<ExtArgs>
+  medicineReminders?: boolean | Prisma.User$medicineRemindersArgs<ExtArgs>
   vitalsRecorded?: boolean | Prisma.User$vitalsRecordedArgs<ExtArgs>
   staffAccount?: boolean | Prisma.User$staffAccountArgs<ExtArgs>
   staffMembers?: boolean | Prisma.User$staffMembersArgs<ExtArgs>
@@ -12321,6 +12971,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   tokenVersion?: boolean
   offlineUntil?: boolean
   language?: boolean
+  medicineRemindersEnabled?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -12338,6 +12989,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   tokenVersion?: boolean
   offlineUntil?: boolean
   language?: boolean
+  medicineRemindersEnabled?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -12355,11 +13007,12 @@ export type UserSelectScalar = {
   tokenVersion?: boolean
   offlineUntil?: boolean
   language?: boolean
+  medicineRemindersEnabled?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "mobile" | "email" | "password" | "role" | "photoUrl" | "termsAcceptedAt" | "deletedAt" | "tokenVersion" | "offlineUntil" | "language" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "mobile" | "email" | "password" | "role" | "photoUrl" | "termsAcceptedAt" | "deletedAt" | "tokenVersion" | "offlineUntil" | "language" | "medicineRemindersEnabled" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patientProfile?: boolean | Prisma.User$patientProfileArgs<ExtArgs>
   doctorProfile?: boolean | Prisma.User$doctorProfileArgs<ExtArgs>
@@ -12396,6 +13049,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   documents?: boolean | Prisma.User$documentsArgs<ExtArgs>
   nursePaymentLogs?: boolean | Prisma.User$nursePaymentLogsArgs<ExtArgs>
   vitals?: boolean | Prisma.User$vitalsArgs<ExtArgs>
+  medicineReminders?: boolean | Prisma.User$medicineRemindersArgs<ExtArgs>
   vitalsRecorded?: boolean | Prisma.User$vitalsRecordedArgs<ExtArgs>
   staffAccount?: boolean | Prisma.User$staffAccountArgs<ExtArgs>
   staffMembers?: boolean | Prisma.User$staffMembersArgs<ExtArgs>
@@ -12446,6 +13100,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     documents: Prisma.$PatientDocumentPayload<ExtArgs>[]
     nursePaymentLogs: Prisma.$NursePaymentLogPayload<ExtArgs>[]
     vitals: Prisma.$VitalReadingPayload<ExtArgs>[]
+    medicineReminders: Prisma.$MedicineReminderPayload<ExtArgs>[]
     vitalsRecorded: Prisma.$VitalReadingPayload<ExtArgs>[]
     staffAccount: Prisma.$StaffProfilePayload<ExtArgs> | null
     staffMembers: Prisma.$StaffProfilePayload<ExtArgs>[]
@@ -12467,6 +13122,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     tokenVersion: number
     offlineUntil: Date | null
     language: string
+    medicineRemindersEnabled: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -12898,6 +13554,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   documents<T extends Prisma.User$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   nursePaymentLogs<T extends Prisma.User$nursePaymentLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$nursePaymentLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NursePaymentLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   vitals<T extends Prisma.User$vitalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vitalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VitalReadingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  medicineReminders<T extends Prisma.User$medicineRemindersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$medicineRemindersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MedicineReminderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   vitalsRecorded<T extends Prisma.User$vitalsRecordedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vitalsRecordedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VitalReadingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   staffAccount<T extends Prisma.User$staffAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$staffAccountArgs<ExtArgs>>): Prisma.Prisma__StaffProfileClient<runtime.Types.Result.GetResult<Prisma.$StaffProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   staffMembers<T extends Prisma.User$staffMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$staffMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StaffProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -12946,6 +13603,7 @@ export interface UserFieldRefs {
   readonly tokenVersion: Prisma.FieldRef<"User", 'Int'>
   readonly offlineUntil: Prisma.FieldRef<"User", 'DateTime'>
   readonly language: Prisma.FieldRef<"User", 'String'>
+  readonly medicineRemindersEnabled: Prisma.FieldRef<"User", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -14158,6 +14816,30 @@ export type User$vitalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.VitalReadingScalarFieldEnum | Prisma.VitalReadingScalarFieldEnum[]
+}
+
+/**
+ * User.medicineReminders
+ */
+export type User$medicineRemindersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MedicineReminder
+   */
+  select?: Prisma.MedicineReminderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MedicineReminder
+   */
+  omit?: Prisma.MedicineReminderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MedicineReminderInclude<ExtArgs> | null
+  where?: Prisma.MedicineReminderWhereInput
+  orderBy?: Prisma.MedicineReminderOrderByWithRelationInput | Prisma.MedicineReminderOrderByWithRelationInput[]
+  cursor?: Prisma.MedicineReminderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MedicineReminderScalarFieldEnum | Prisma.MedicineReminderScalarFieldEnum[]
 }
 
 /**

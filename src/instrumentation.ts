@@ -15,12 +15,19 @@ export async function register() {
   if (g.__appointmentReminderInterval) return;
 
   const { sendDueAppointmentReminders, sendDueFollowUpReminders } = await import("@/lib/appointmentReminders");
+  const { sendDueMedicineReminders, sendDueRefillReminders } = await import("@/lib/medicineReminders");
   g.__appointmentReminderInterval = setInterval(() => {
     sendDueAppointmentReminders().catch((err) => {
       console.error("Appointment reminder sweep failed:", err);
     });
     sendDueFollowUpReminders().catch((err) => {
       console.error("Follow-up reminder sweep failed:", err);
+    });
+    sendDueMedicineReminders().catch((err) => {
+      console.error("Medicine reminder sweep failed:", err);
+    });
+    sendDueRefillReminders().catch((err) => {
+      console.error("Medicine refill reminder sweep failed:", err);
     });
   }, SWEEP_INTERVAL_MS);
 }

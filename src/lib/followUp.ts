@@ -26,3 +26,13 @@ export function followUpLabel(date: Date | string, locale: string): string {
   const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
   return `${get("weekday")}, ${get("day")} ${get("month")} ${get("year")}`;
 }
+
+/**
+ * The one-tap rebook link for a past visit: the same doctor, clinic and
+ * consult type, as a follow-up of it — the patient still picks the slot and pays.
+ */
+export function followUpBookHref(a: { id: string; doctorId: string; consultType: string; clinicId?: string | null }): string {
+  return `/patient/book?${new URLSearchParams({
+    doctorId: a.doctorId, followUpOf: a.id, consultType: a.consultType, ...(a.clinicId ? { clinicId: a.clinicId } : {}),
+  })}`;
+}

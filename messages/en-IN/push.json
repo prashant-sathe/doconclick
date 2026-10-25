@@ -299,6 +299,14 @@
     "title": "Time for your follow-up",
     "body": "{doctor} suggested a follow-up visit on {date, date, ::EEEdMMM}. Tap to book a time."
   },
+  "medicineDose": {
+    "title": "Time for your medicines",
+    "body": "{count, plural, =1 {1 medicine is} other {# medicines are}} due at {time, time, short}. Tap to see which and mark them taken."
+  },
+  "medicineRefill": {
+    "title": "Your medicines are running out",
+    "body": "Your course is ending soon. Tap to book a follow-up with {doctor}."
+  },
   "apptExpired": {
     "title": "No response from {providerType, select, NURSE {nurse} other {doctor}}",
     "body": "{refunded, select, yes {{doctor} didn't confirm your new time. ₹{amount} was refunded to your wallet.} other {{doctor} didn't respond in time.}}"

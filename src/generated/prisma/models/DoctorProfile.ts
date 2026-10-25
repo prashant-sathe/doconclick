@@ -1198,10 +1198,6 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type DoctorProfileCreateWithoutUserInput = {
   id?: string
   photoUrl?: string | null

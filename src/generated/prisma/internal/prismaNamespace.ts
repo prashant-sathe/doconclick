@@ -425,6 +425,8 @@ export const ModelName = {
   DoctorPaymentLog: 'DoctorPaymentLog',
   Message: 'Message',
   PrescriptionMedicine: 'PrescriptionMedicine',
+  MedicineReminder: 'MedicineReminder',
+  MedicineDose: 'MedicineDose',
   PrescriptionTest: 'PrescriptionTest',
   PrescriptionVersion: 'PrescriptionVersion',
   DoctorFavouriteMedicine: 'DoctorFavouriteMedicine',
@@ -460,7 +462,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "notification" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "providerTimeOff" | "duesPayment" | "payoutRequest" | "settlementPayoutCorrection" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionVersion" | "doctorFavouriteMedicine" | "prescriptionTemplate" | "prescriptionAttachment" | "review" | "complaint" | "complaintMessage" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
+    modelProps: "user" | "pushToken" | "notification" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "providerTimeOff" | "duesPayment" | "payoutRequest" | "settlementPayoutCorrection" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "medicineReminder" | "medicineDose" | "prescriptionTest" | "prescriptionVersion" | "doctorFavouriteMedicine" | "prescriptionTemplate" | "prescriptionAttachment" | "review" | "complaint" | "complaintMessage" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2536,6 +2538,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MedicineReminder: {
+      payload: Prisma.$MedicineReminderPayload<ExtArgs>
+      fields: Prisma.MedicineReminderFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MedicineReminderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MedicineReminderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload>
+        }
+        findFirst: {
+          args: Prisma.MedicineReminderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MedicineReminderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload>
+        }
+        findMany: {
+          args: Prisma.MedicineReminderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload>[]
+        }
+        create: {
+          args: Prisma.MedicineReminderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload>
+        }
+        createMany: {
+          args: Prisma.MedicineReminderCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MedicineReminderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload>[]
+        }
+        delete: {
+          args: Prisma.MedicineReminderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload>
+        }
+        update: {
+          args: Prisma.MedicineReminderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload>
+        }
+        deleteMany: {
+          args: Prisma.MedicineReminderDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MedicineReminderUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MedicineReminderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload>[]
+        }
+        upsert: {
+          args: Prisma.MedicineReminderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineReminderPayload>
+        }
+        aggregate: {
+          args: Prisma.MedicineReminderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMedicineReminder>
+        }
+        groupBy: {
+          args: Prisma.MedicineReminderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MedicineReminderGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MedicineReminderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MedicineReminderCountAggregateOutputType> | number
+        }
+      }
+    }
+    MedicineDose: {
+      payload: Prisma.$MedicineDosePayload<ExtArgs>
+      fields: Prisma.MedicineDoseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MedicineDoseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MedicineDoseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload>
+        }
+        findFirst: {
+          args: Prisma.MedicineDoseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MedicineDoseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload>
+        }
+        findMany: {
+          args: Prisma.MedicineDoseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload>[]
+        }
+        create: {
+          args: Prisma.MedicineDoseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload>
+        }
+        createMany: {
+          args: Prisma.MedicineDoseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MedicineDoseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload>[]
+        }
+        delete: {
+          args: Prisma.MedicineDoseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload>
+        }
+        update: {
+          args: Prisma.MedicineDoseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload>
+        }
+        deleteMany: {
+          args: Prisma.MedicineDoseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MedicineDoseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MedicineDoseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload>[]
+        }
+        upsert: {
+          args: Prisma.MedicineDoseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineDosePayload>
+        }
+        aggregate: {
+          args: Prisma.MedicineDoseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMedicineDose>
+        }
+        groupBy: {
+          args: Prisma.MedicineDoseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MedicineDoseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MedicineDoseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MedicineDoseCountAggregateOutputType> | number
+        }
+      }
+    }
     PrescriptionTest: {
       payload: Prisma.$PrescriptionTestPayload<ExtArgs>
       fields: Prisma.PrescriptionTestFieldRefs
@@ -4068,6 +4218,7 @@ export const UserScalarFieldEnum = {
   tokenVersion: 'tokenVersion',
   offlineUntil: 'offlineUntil',
   language: 'language',
+  medicineRemindersEnabled: 'medicineRemindersEnabled',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4427,6 +4578,7 @@ export const AppointmentScalarFieldEnum = {
   followUpDate: 'followUpDate',
   followUpNote: 'followUpNote',
   followUpReminderSentAt: 'followUpReminderSentAt',
+  medicineRefillSentAt: 'medicineRefillSentAt',
   payReminderSentAt: 'payReminderSentAt',
   bookedById: 'bookedById',
   adminActionBy: 'adminActionBy',
@@ -4591,6 +4743,40 @@ export const PrescriptionMedicineScalarFieldEnum = {
 } as const
 
 export type PrescriptionMedicineScalarFieldEnum = (typeof PrescriptionMedicineScalarFieldEnum)[keyof typeof PrescriptionMedicineScalarFieldEnum]
+
+
+export const MedicineReminderScalarFieldEnum = {
+  id: 'id',
+  appointmentId: 'appointmentId',
+  patientId: 'patientId',
+  name: 'name',
+  nameKey: 'nameKey',
+  dosage: 'dosage',
+  frequency: 'frequency',
+  duration: 'duration',
+  timesOfDay: 'timesOfDay',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  enabled: 'enabled',
+  setByPatient: 'setByPatient',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MedicineReminderScalarFieldEnum = (typeof MedicineReminderScalarFieldEnum)[keyof typeof MedicineReminderScalarFieldEnum]
+
+
+export const MedicineDoseScalarFieldEnum = {
+  id: 'id',
+  reminderId: 'reminderId',
+  doseDate: 'doseDate',
+  doseTime: 'doseTime',
+  notifiedAt: 'notifiedAt',
+  takenAt: 'takenAt',
+  createdAt: 'createdAt'
+} as const
+
+export type MedicineDoseScalarFieldEnum = (typeof MedicineDoseScalarFieldEnum)[keyof typeof MedicineDoseScalarFieldEnum]
 
 
 export const PrescriptionTestScalarFieldEnum = {
@@ -4979,6 +5165,13 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -4989,13 +5182,6 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -5191,6 +5377,8 @@ export type GlobalOmitConfig = {
   doctorPaymentLog?: Prisma.DoctorPaymentLogOmit
   message?: Prisma.MessageOmit
   prescriptionMedicine?: Prisma.PrescriptionMedicineOmit
+  medicineReminder?: Prisma.MedicineReminderOmit
+  medicineDose?: Prisma.MedicineDoseOmit
   prescriptionTest?: Prisma.PrescriptionTestOmit
   prescriptionVersion?: Prisma.PrescriptionVersionOmit
   doctorFavouriteMedicine?: Prisma.DoctorFavouriteMedicineOmit

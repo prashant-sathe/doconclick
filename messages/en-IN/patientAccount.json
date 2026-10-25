@@ -41,7 +41,8 @@
     "km": "{km} km",
     "anyDistance": "Any distance",
     "signOut": "Sign Out",
-    "family": "Family Members"
+    "family": "Family Members",
+    "medicines": "Medicine Reminders"
   },
   "personal": {
     "title": "Personal & Medical Info",
@@ -156,6 +157,46 @@
     "title": "Vitals",
     "subtitle": "Recorded by nurses at home visits — your doctor sees these too.",
     "empty": "No vitals yet — they appear here after a nurse records them at a visit."
+  },
+  "medicines": {
+    "title": "Medicine Reminders",
+    "description": "Reminders for the medicines your doctor prescribed. Tick each dose once you've taken it.",
+    "masterTitle": "Medicine reminders",
+    "masterOn": "You'll get a reminder at each dose time — never between 10 pm and 6 am.",
+    "masterOff": "Reminders are off. Your medicines are still listed here.",
+    "todayTitle": "Today's doses",
+    "noDosesToday": "No doses to take today.",
+    "taken": "Taken",
+    "medicinesTitle": "Your medicines",
+    "empty": "No medicines yet — when a doctor prescribes medicines, they appear here with reminders.",
+    "forPerson": "For {name} ({relation})",
+    "byDoctor": "Prescribed by {doctor}",
+    "prescribed": "Doctor's advice: {text}",
+    "toggleAria": "Reminders for {name}",
+    "needsSetup": "Set the dose times and number of days to get reminders for this medicine.",
+    "daysLeft": "{count, plural, =0 {Last day today} =1 {1 more day} other {# more days}}",
+    "startsOn": "Starts {date}",
+    "setTimes": "Set times",
+    "changeTimes": "Change times",
+    "timesLabel": "When do you take it?",
+    "slot": {
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening",
+      "night": "Night"
+    },
+    "otherTime": "Other time",
+    "addTime": "Add",
+    "removeTime": "Remove {time}",
+    "quietHours": "Reminders can be set between 6 am and 10 pm.",
+    "daysLabel": "For how many days?",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saveFailed": "Couldn't save. Please try again.",
+    "loadFailed": "Couldn't load your medicines. Please try again.",
+    "refillTitle": "Medicines running out — see your doctor again",
+    "refillBody": "{ended, select, yes {The course from {doctor} ended on {date}.} other {The course from {doctor} ends on {date}.}} Book a follow-up if you still need care.",
+    "rebook": "Show the doctor again"
   },
   "documents": {
     "title": "Health Documents",
