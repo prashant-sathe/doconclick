@@ -134,7 +134,7 @@ export default function PatientTrackDoctor() {
   const eta = distance != null ? estimateArrivalMinutes(distance) : null;
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-slate-900">
+    <div className="relative w-full h-screen overflow-hidden bg-slate-900">
       <div ref={mapRef} className="absolute inset-0 z-0" />
 
       <div className="absolute top-[calc(1rem_+_var(--safe-area-inset-top,env(safe-area-inset-top)))] left-4 z-20">

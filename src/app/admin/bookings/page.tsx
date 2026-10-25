@@ -440,9 +440,9 @@ function Section({ title, icon: Icon, children }: { title: string; icon: React.E
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between px-4 py-3 gap-4">
+    <div className="flex items-start justify-between px-4 py-3 gap-4 min-w-0">
       <span className="text-sm text-slate-500 flex-shrink-0">{label}</span>
-      <span className="text-sm text-slate-800 text-right">{value}</span>
+      <span className="text-sm text-slate-800 text-right min-w-0 break-words">{value}</span>
     </div>
   );
 }
