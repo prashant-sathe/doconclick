@@ -68,6 +68,7 @@
     "test:admin-polish": "tsx tests/admin-polish.ts",
     "test:visit-verify": "tsx tests/visit-verify.ts",
     "test:walk-in": "tsx tests/walk-in.ts",
+    "test:register-rate-limit": "tsx tests/register-rate-limit.ts",
     "test:walkin-privacy": "tsx tests/walkin-privacy.ts",
     "test:nurse-fee-coupons": "tsx tests/nurse-fee-coupons.ts",
     "test:dues": "tsx tests/dues-payments.ts",

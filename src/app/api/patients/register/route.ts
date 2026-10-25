@@ -3,15 +3,23 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword, signToken, sessionPayload, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
 import { validateQuickRegistration } from "@/lib/validation";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { createRateLimiter, clientIp } from "@/lib/rateLimit";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
+
+// Per IP, before any DB work or admin push — stops scripted signups.
+const checkIpLimit = createRateLimiter(10, 10 * 60 * 1000);
+const RATE_LIMITED = "Too many sign-up attempts. Please wait 10 minutes and try again.";
 
 // POST: Register a new patient with just mobile + password, and sign them
 // in. Name, age and gender are collected at the first booking (see
 // src/lib/bookingProfile.ts) — the profile starts with the same "not filled"
 // placeholders Google signup uses.
 export const POST = withErrorLocale(async function POST(req: Request) {
+  if (!checkIpLimit(clientIp(req))) {
+    return NextResponse.json({ error: RATE_LIMITED }, { status: 429 });
+  }
   const body = await req.json().catch(() => ({}));
 
   const result = validateQuickRegistration(body);

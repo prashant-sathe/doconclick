@@ -15,6 +15,7 @@
   "unknownCursor": "Unknown cursor — reload the list.",
   "notWhileImpersonating": "Not available while impersonating.",
   "authLoginRateLimited": "Too many sign-in attempts. Please wait 15 minutes and try again.",
+  "authRegisterRateLimited": "Too many sign-up attempts. Please wait 10 minutes and try again.",
   "authMobilePasswordRequired": "Mobile number and password are required.",
   "authInvalidMobile": "Enter a valid 10-digit mobile number.",
   "authInvalidMobileIndian": "Enter a valid 10-digit Indian mobile number.",
