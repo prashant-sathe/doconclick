@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT } from "@/lib/doctorBookable";
+import { formatDoctorName } from "@/lib/utils";
 
 // Remind roughly an hour before the visit.
 const REMINDER_LEAD_MS = 60 * 60 * 1000;
@@ -57,4 +59,64 @@ export async function sendDueAppointmentReminders() {
       url: a.providerType === "NURSE" ? "/nurse/dashboard" : "/doctor/dashboard",
     });
   }
+}
+
+// The follow-up reminder goes out from 6 pm IST the evening before the day
+// the doctor suggested (followUpDate is that day's first instant, IST) —
+// time enough to book — and no later than the end of that day.
+const FOLLOW_UP_LEAD_MS = 6 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const LIVE_STATUSES = ["PENDING_APPROVAL", "SCHEDULED"];
+
+// "Time for your follow-up with Dr X" — once per completed consultation
+// (followUpReminderSentAt, claimed row by row so two sweeps can't both
+// send). Skipped, but still marked, when the patient has already booked this
+// doctor again (a follow-up of this visit, or any live booking on/after the
+// day), the patient's account is deleted, or the doctor can't be booked.
+// Same 5-minute sweep as above (src/instrumentation.ts).
+export async function sendDueFollowUpReminders(now: Date = new Date()) {
+  const due = await prisma.appointment.findMany({
+    where: {
+      status: "COMPLETED",
+      providerType: "DOCTOR",
+      followUpReminderSentAt: null,
+      followUpDate: { lte: new Date(now.getTime() + FOLLOW_UP_LEAD_MS), gt: new Date(now.getTime() - DAY_MS) },
+    },
+    select: {
+      id: true,
+      patientId: true,
+      doctorId: true,
+      followUpDate: true,
+      patient: { select: { deletedAt: true } },
+      doctor: { select: { name: true, ...DOCTOR_BOOKABLE_SELECT } },
+    },
+  });
+  let sent = 0;
+  for (const a of due) {
+    const { count } = await prisma.appointment.updateMany({
+      where: { id: a.id, followUpReminderSentAt: null, followUpDate: a.followUpDate },
+      data: { followUpReminderSentAt: now },
+    });
+    if (count === 0) continue;
+    if (a.patient.deletedAt || !isDoctorBookable(a.doctor)) continue;
+    const rebooked = await prisma.appointment.findFirst({
+      where: {
+        patientId: a.patientId,
+        doctorId: a.doctorId,
+        OR: [
+          { followUpOfId: a.id, status: { in: [...LIVE_STATUSES, "COMPLETED"] } },
+          { status: { in: LIVE_STATUSES }, scheduledAt: { gte: a.followUpDate! } },
+        ],
+      },
+      select: { id: true },
+    });
+    if (rebooked) continue;
+    await sendPushToUser(a.patientId, {
+      key: "followUpReminder",
+      values: { doctor: formatDoctorName(a.doctor.name), date: a.followUpDate! },
+      url: "/patient/appointments",
+    });
+    sent++;
+  }
+  return sent;
 }

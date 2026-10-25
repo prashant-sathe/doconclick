@@ -260,7 +260,8 @@
       "followUpUnavailableHint": "यह डॉक्टर अभी बुकिंग नहीं ले रहे हैं",
       "followUpUnavailable": "फ़ॉलो-अप उपलब्ध नहीं",
       "bookAgain": "फिर से बुक करें",
-      "bookFollowUp": "फ़ॉलो-अप बुक करें"
+      "bookFollowUp": "फ़ॉलो-अप बुक करें",
+      "followUpSuggested": "{date} को फॉलो-अप की सलाह"
     },
     "cancelDialog": {
       "titleAppointment": "यह अपॉइंटमेंट रद्द करें?",

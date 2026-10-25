@@ -138,6 +138,8 @@ function PatientBookInner() {
   const followUpOfId = searchParams.get("followUpOf");
   const preselectDoctorId = searchParams.get("doctorId");
   const preselectClinicId = searchParams.get("clinicId");
+  // "Book follow-up" passes the original visit's consult type too.
+  const preselectConsultType = searchParams.get("consultType");
   const t = useTranslations("booking.book");
   const tf = useTranslations("booking.form");
   const tc = useTranslations("booking.common");
@@ -189,12 +191,18 @@ function PatientBookInner() {
   // Point the form at a doctor: pick an open clinic (else the first), the best
   // consult type, and — when that clinic is closed right now — pre-arm "Schedule
   // Later" with its next opening so the patient never lands on a disabled Confirm.
-  const selectDoctor = (doc: Doctor | null | undefined, preferredClinicId?: string) => {
+  const selectDoctor = (doc: Doctor | null | undefined, preferredClinicId?: string, preferredConsultType?: string) => {
     if (!doc) { setForm((f) => ({ ...f, doctorId: "", clinicId: "" })); return; }
     const clinicId = (preferredClinicId && doc.clinics.some((c) => c.id === preferredClinicId) ? preferredClinicId : null)
       ?? (findOpenClinic(doc.clinics) ?? doc.clinics[0])?.id
       ?? "";
-    const consultType = defaultConsultType(doc, userPos);
+    const profile = doc.doctorProfile;
+    const offered =
+      preferredConsultType === "CLINIC" ? profile?.offersClinic !== false
+        : preferredConsultType === "HOME" ? !!profile?.offersHomeVisit
+          : preferredConsultType === "VIDEO" ? !!profile?.offersVideo
+            : false;
+    const consultType = offered ? preferredConsultType! : defaultConsultType(doc, userPos);
     setForm((f) => ({ ...f, doctorId: doc.id, clinicId, consultType }));
 
     const chosenClinic = doc.clinics.find((c) => c.id === clinicId);
@@ -214,7 +222,7 @@ function PatientBookInner() {
     fetch("/api/doctors").then((r) => (r.ok ? r.json() : [])).then((data: Doctor[]) => {
       setDoctors(data);
       const preselected = preselectDoctorId && data.find((d) => d.id === preselectDoctorId);
-      if (preselected) selectDoctor(preselected, preselectClinicId ?? undefined);
+      if (preselected) selectDoctor(preselected, preselectClinicId ?? undefined, preselectConsultType ?? undefined);
     }).catch(() => {});
     // A location the patient pinned on the map (e.g. for a relative in another
     // city) takes precedence over this device's GPS.

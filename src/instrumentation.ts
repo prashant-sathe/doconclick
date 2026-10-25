@@ -14,10 +14,13 @@ export async function register() {
   const g = globalThis as unknown as { __appointmentReminderInterval?: ReturnType<typeof setInterval> };
   if (g.__appointmentReminderInterval) return;
 
-  const { sendDueAppointmentReminders } = await import("@/lib/appointmentReminders");
+  const { sendDueAppointmentReminders, sendDueFollowUpReminders } = await import("@/lib/appointmentReminders");
   g.__appointmentReminderInterval = setInterval(() => {
     sendDueAppointmentReminders().catch((err) => {
       console.error("Appointment reminder sweep failed:", err);
+    });
+    sendDueFollowUpReminders().catch((err) => {
+      console.error("Follow-up reminder sweep failed:", err);
     });
   }, SWEEP_INTERVAL_MS);
 }

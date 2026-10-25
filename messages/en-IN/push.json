@@ -279,6 +279,10 @@
     "title": "Upcoming appointment",
     "body": "You have an appointment with {patient} in about an hour."
   },
+  "followUpReminder": {
+    "title": "Time for your follow-up",
+    "body": "{doctor} suggested a follow-up visit on {date, date, ::EEEdMMM}. Tap to book a time."
+  },
   "apptExpired": {
     "title": "No response from {providerType, select, NURSE {nurse} other {doctor}}",
     "body": "{refunded, select, yes {{doctor} didn't confirm your new time. ₹{amount} was refunded to your wallet.} other {{doctor} didn't respond in time.}}"

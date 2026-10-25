@@ -279,6 +279,10 @@
     "title": "आगामी अपॉइंटमेंट",
     "body": "सुमारे एका तासात {patient} यांच्यासोबत तुमची अपॉइंटमेंट आहे."
   },
+  "followUpReminder": {
+    "title": "फॉलो-अपची वेळ",
+    "body": "{doctor} यांनी {date, date, ::EEEdMMM} रोजी फॉलो-अप भेटीचा सल्ला दिला आहे. वेळ बुक करण्यासाठी टॅप करा."
+  },
   "apptExpired": {
     "title": "{providerType, select, NURSE {नर्स} other {डॉक्टरां}}कडून प्रतिसाद नाही",
     "body": "{refunded, select, yes {{doctor} यांनी तुमची नवीन वेळ कन्फर्म केली नाही. ₹{amount} तुमच्या वॉलेटमध्ये परत जमा केले आहेत.} other {{doctor} यांनी वेळेत प्रतिसाद दिला नाही.}}"

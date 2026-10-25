@@ -20,6 +20,7 @@ import { referralPushCopy } from "@/lib/nurseReferral";
 import { settleIfFreeOnAccept } from "@/lib/paymentOrders";
 import { GATEWAY_OMIT, LIVE_LOCATION_CLEARED, withLiveLocationOnlyWhileLive } from "@/lib/appointmentView";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { parseFollowUp } from "@/lib/consultation";
 
 // Patient push per new status (messages/<locale>/push.json). The confirmed
 // copy adds "Nothing to pay" when `free` is "yes" (a ₹0 booking marked PAID on accept).
@@ -124,7 +125,7 @@ export const PATCH = withErrorLocale(async function PATCH(
     return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
   }
 
-  const { status, doctorNotes, scheduledAt, reschedule, withdrawReschedule } = await req.json();
+  const { status, doctorNotes, scheduledAt, reschedule, withdrawReschedule, followUp } = await req.json();
 
   // Nurse bookings share this table — "provider" below is the doctor or nurse.
   const providerWord = appointment.providerType === "NURSE" ? "nurse" : "doctor";
@@ -144,6 +145,26 @@ export const PATCH = withErrorLocale(async function PATCH(
     // staff can manage the queue but not close out a consultation.
     if (authUser.role === "STAFF" && status === "COMPLETED") {
       return NextResponse.json({ error: "Only the doctor can mark a visit complete." }, { status: 403 });
+    }
+    // Set, change or clear the follow-up the doctor suggested ({ followUp:
+    // { date, note } | null }) on their own completed consultation. Clinical
+    // advice like the prescription — the doctor only, not their front desk.
+    if (followUp !== undefined) {
+      if (authUser.role !== "DOCTOR" || appointment.providerType !== "DOCTOR") {
+        return NextResponse.json({ error: "Only the doctor can set a follow-up." }, { status: 403 });
+      }
+      const parsed = await parseFollowUp(followUp);
+      if ("error" in parsed) return NextResponse.json({ error: parsed.error, code: parsed.code }, { status: 400 });
+      const { count } = await prisma.appointment.updateMany({
+        where: { id, doctorId: authUser.id, status: "COMPLETED" },
+        // A new date gets its own reminder.
+        data: { ...parsed, followUpReminderSentAt: null },
+      });
+      if (count === 0) {
+        return NextResponse.json({ error: "A follow-up can only be set on a completed consultation.", code: "NOT_COMPLETED" }, { status: 409 });
+      }
+      const updated = await prisma.appointment.findUniqueOrThrow({ where: { id }, omit: GATEWAY_OMIT });
+      return NextResponse.json(withoutVisitCode(updated));
     }
     const actingDoctorName = authUser.role === "DOCTOR" || authUser.role === "NURSE"
       ? authUser.name

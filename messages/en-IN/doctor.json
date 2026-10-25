@@ -246,6 +246,18 @@
       "other": "Other"
     }
   },
+  "followUp": {
+    "title": "Follow-up",
+    "none": "None",
+    "inDays": "{n} days",
+    "otherDate": "Other date",
+    "on": "Follow-up on {date}",
+    "notePlaceholder": "Note for the patient (optional, e.g. bring blood report)",
+    "saveFailed": "Couldn't save the follow-up. Please try again.",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
   "docSlot": {
     "readFailed": "Couldn't read that file — please pick it again.",
     "uploadFailed": "Upload failed.",

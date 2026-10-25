@@ -8,8 +8,8 @@ import { LIVE_LOCATION_CLEARED } from "@/lib/appointmentView";
 import { formatDoctorName } from "@/lib/utils";
 import {
   completionProblem, COMPLETABLE_WHERE, normalizePrescription, replacePrescription,
-  checkPrescriptionFiles, uploadPrescriptionFiles, discardPrescriptionFiles, parseReferral, NOTES_MAX, badRequest,
-  type ReferralInput,
+  checkPrescriptionFiles, uploadPrescriptionFiles, discardPrescriptionFiles, parseReferral, parseFollowUp, NOTES_MAX, badRequest,
+  type ReferralInput, type FollowUpInput,
 } from "@/lib/consultation";
 import { withErrorLocale } from "@/lib/apiErrors";
 
@@ -23,7 +23,8 @@ class LostRaceError extends Error {}
 //
 // Body: multipart/form-data with a `data` field (JSON) and any number of
 // `file` parts — or plain JSON when there are no files:
-//   { doctorNotes?, medicines?, tests?, nurseReferral?: { serviceId, visits, intervalDays, instructions } | null }
+//   { doctorNotes?, medicines?, tests?, nurseReferral?: { serviceId, visits, intervalDays, instructions } | null,
+//     followUp?: { date: "YYYY-MM-DD", note? } | null }
 // medicines/tests, when sent, replace the current lists (kept as a version).
 //
 // Everything is validated first; files are uploaded before the transaction
@@ -80,6 +81,14 @@ export const POST = withErrorLocale(async function POST(req: Request, { params }
     referral = parsed;
   }
 
+  // Optional "review in N days" (src/lib/consultation.ts parseFollowUp).
+  let followUp: FollowUpInput | null = null;
+  if (data.followUp != null) {
+    const parsed = await parseFollowUp(data.followUp);
+    if ("error" in parsed) return badRequest(parsed.error, parsed.code);
+    followUp = parsed;
+  }
+
   const checked = await checkPrescriptionFiles(files);
   if ("error" in checked) return badRequest(checked.error, "INVALID_FILE");
 
@@ -104,6 +113,7 @@ export const POST = withErrorLocale(async function POST(req: Request, { params }
           completedAt: new Date(),
           requestedScheduledAt: null,
           ...(notes !== null ? { doctorNotes: notes || null } : {}),
+          ...(followUp ? { ...followUp, followUpReminderSentAt: null } : {}),
           ...LIVE_LOCATION_CLEARED,
           // Cash is collected at the visit, so completing it is when it was paid.
           ...(appt.paymentMethod === "CASH" ? { paymentStatus: "PAID", paidAt: appt.paidAt ?? new Date() } : {}),

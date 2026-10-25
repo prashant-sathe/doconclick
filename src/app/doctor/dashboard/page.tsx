@@ -19,6 +19,8 @@ import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import PaymentQrPanel from "@/components/doctor/PaymentQrPanel";
 import PrescriptionViewer from "@/components/doctor/PrescriptionViewer";
+import FollowUpPicker, { FollowUpEditDialog, NO_FOLLOW_UP, followUpBody, type FollowUpValue } from "@/components/doctor/FollowUpPicker";
+import { followUpLabel } from "@/lib/followUp";
 import UnpaidJourneyWarning, { type UnpaidStart } from "@/components/UnpaidJourneyWarning";
 import { OfflineToggle } from "@/components/ProviderAway";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
@@ -86,6 +88,9 @@ interface Appointment {
   bookedById: string | null;
   clinicId: string | null;
   clinic: { name: string } | null;
+  // Follow-up suggested at completion (IST day's first instant) + note for the patient.
+  followUpDate?: string | null;
+  followUpNote?: string | null;
   patient: {
     name: string;
     mobile: string;
@@ -265,7 +270,7 @@ function draftKeyFor(appointmentId: string) {
 type NurseCareDraft = { on: boolean; serviceId: string; visits: number; intervalDays: number; instructions: string };
 const EMPTY_NURSE_CARE: NurseCareDraft = { on: false, serviceId: "", visits: 1, intervalDays: 1, instructions: "" };
 
-function loadDraft(appointmentId: string): { medicines?: MedicineRow[]; tests?: TestRow[]; notes?: string; confirmed?: boolean; nurseCare?: NurseCareDraft } {
+function loadDraft(appointmentId: string): { medicines?: MedicineRow[]; tests?: TestRow[]; notes?: string; confirmed?: boolean; nurseCare?: NurseCareDraft; followUp?: FollowUpValue } {
   try {
     const raw = localStorage.getItem(draftKeyFor(appointmentId));
     return raw ? JSON.parse(raw) : {};
@@ -281,6 +286,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 }) {
   const t = useTranslations("doctor.completeVisit");
   const tc = useTranslations("doctor.common");
+  const tf = useTranslations("doctor.followUp");
   const draftKey = draftKeyFor(appt.id);
   const [notes, setNotes] = useState(() => {
     const draft = loadDraft(appt.id).notes;
@@ -299,9 +305,12 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   const [confirmed, setConfirmed] = useState(() => loadDraft(appt.id).confirmed === true);
   // Doctor -> nurse referral: "this patient needs nurse care at home".
   const [nurseCare, setNurseCare] = useState<NurseCareDraft>(() => ({ ...EMPTY_NURSE_CARE, ...(loadDraft(appt.id).nurseCare ?? {}) }));
+  // Optional "review in N days" (src/components/doctor/FollowUpPicker.tsx).
+  const [followUp, setFollowUp] = useState<FollowUpValue>(() => ({ ...NO_FOLLOW_UP, ...(loadDraft(appt.id).followUp ?? {}) }));
   const servicesLoad = useLoad<{ id: string; name: string; requiresPrescription: boolean }[]>("/api/nurse-services", { fallback: t("servicesLoadFailed") });
   const nurseServices = servicesLoad.data ?? [];
   const [referralError, setReferralError] = useState("");
+  const [followUpError, setFollowUpError] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [busy, setBusy] = useState(false);
   const [confirmingComplete, setConfirmingComplete] = useState(false);
@@ -313,11 +322,11 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
   useEffect(() => {
     try {
-      localStorage.setItem(draftKey, JSON.stringify({ medicines, tests, notes, confirmed, nurseCare }));
+      localStorage.setItem(draftKey, JSON.stringify({ medicines, tests, notes, confirmed, nurseCare, followUp }));
     } catch {
       // ignore unavailable storage
     }
-  }, [draftKey, medicines, tests, notes, confirmed, nurseCare]);
+  }, [draftKey, medicines, tests, notes, confirmed, nurseCare, followUp]);
   const clearDraft = () => {
     try {
       localStorage.removeItem(draftKey);
@@ -382,6 +391,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         nurseReferral: nurseCare.on
           ? { serviceId: nurseCare.serviceId, visits: nurseCare.visits, intervalDays: nurseCare.intervalDays, instructions: nurseCare.instructions }
           : null,
+        followUp: followUpBody(followUp),
       }));
       // Re-read each picked File into memory before appending: on Android the
       // WebView can't stream a content:// -backed File into a fetch() multipart
@@ -402,6 +412,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         const message = body.error ?? t("completeFailed");
         if (body.code === "INVALID_FILE") setFileError(message);
         else if (body.code === "INVALID_REFERRAL") setReferralError(message);
+        else if (body.code === "INVALID_FOLLOW_UP") setFollowUpError(message);
         else setSubmitError(message);
         return;
       }
@@ -524,6 +535,14 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
           </div>
         )}
         {referralError && <p className="text-xs text-red-500 mt-2">{referralError}</p>}
+      </div>
+
+      <div className="rounded-xl border border-teal-100 bg-white p-3">
+        <p className="text-sm font-semibold text-slate-800 flex items-center gap-2 mb-2">
+          <CalendarClock className="w-4 h-4 text-teal-600" /> {tf("title")}
+        </p>
+        <FollowUpPicker value={followUp} onChange={(v) => { setFollowUp(v); if (followUpError) setFollowUpError(""); }} />
+        {followUpError && <p className="text-xs text-red-500 mt-2">{followUpError}</p>}
       </div>
 
       {hasPrescriptionItems && (
@@ -684,6 +703,7 @@ function VisitAddressLine({ visit }: { visit: VisitLocation | null }) {
 export default function DoctorDashboard() {
   const router = useRouter();
   const t = useTranslations("doctor.dashboard");
+  const tfu = useTranslations("doctor.followUp");
   const tc = useTranslations("doctor.common");
   const locale = formattingLocale(useLocale());
   const { user, loading: authLoading } = useAuth();
@@ -731,6 +751,8 @@ export default function DoctorDashboard() {
   const [payQrFor, setPayQrFor] = useState<Appointment | null>(null);
   // Prescription preview / download / WhatsApp for a completed consultation.
   const [rxFor, setRxFor] = useState<{ id: string; patientId: string; justCompleted?: boolean } | null>(null);
+  // Change / remove the follow-up on a completed consultation.
+  const [followUpFor, setFollowUpFor] = useState<Appointment | null>(null);
   const [markingNoShow, setMarkingNoShow] = useState(false);
   const [rejectTarget, setRejectTarget] = useState<Appointment | null>(null);
   const [rejecting, setRejecting] = useState(false);
@@ -1773,9 +1795,19 @@ export default function DoctorDashboard() {
                     <div className="text-xs text-slate-400">
                       {new Date(a.scheduledAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {tc("typeShort", { type: a.consultType })}
                     </div>
+                    {a.followUpDate && (
+                      <div className="text-xs text-teal-700 font-semibold flex items-center gap-1 mt-0.5">
+                        <CalendarClock className="w-3.5 h-3.5" /> {tfu("on", { date: followUpLabel(a.followUpDate, locale) })}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
                     {!isStaff && <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>}
+                    {!isStaff && (
+                      <button type="button" onClick={() => setFollowUpFor(a)} className="w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={tfu("title")} aria-label={tfu("title")}>
+                        <CalendarClock className="w-4 h-4 text-teal-600" />
+                      </button>
+                    )}
                     {!isStaff && (
                       <button type="button" onClick={() => setRxFor({ id: a.id, patientId: a.patientId })} className="w-9 h-9 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("prescriptionTitle")} aria-label={t("prescription")}>
                         <FileText className="w-4 h-4 text-teal-600" />
@@ -1926,6 +1958,15 @@ export default function DoctorDashboard() {
 
       {rxFor && (
         <PrescriptionViewer appointmentId={rxFor.id} patientId={rxFor.patientId} justCompleted={rxFor.justCompleted} onClose={() => setRxFor(null)} />
+      )}
+
+      {followUpFor && (
+        <FollowUpEditDialog
+          appointmentId={followUpFor.id}
+          current={{ followUpDate: followUpFor.followUpDate ?? null, followUpNote: followUpFor.followUpNote ?? null }}
+          onClose={() => setFollowUpFor(null)}
+          onSaved={() => { setFollowUpFor(null); loadAppointments(); }}
+        />
       )}
 
       {/* Pay-by-phone QR for an unpaid online visit */}

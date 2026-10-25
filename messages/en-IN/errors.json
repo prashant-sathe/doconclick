@@ -507,5 +507,13 @@
   "feedLimitInvalid": "limit must be a whole number from 1 to {max}",
   "feedStatusInvalid": "status must be one or more of {statuses}",
   "feedConsultTypeInvalid": "consultType must be one of {types}",
-  "feedDateInvalid": "from / to must be dates written YYYY-MM-DD"
+  "feedDateInvalid": "from / to must be dates written YYYY-MM-DD",
+  "followUpDoctorOnly": "Only the doctor can set a follow-up.",
+  "followUpNotCompleted": "A follow-up can only be set on a completed consultation.",
+  "followUpInvalid": "Invalid follow-up.",
+  "followUpInvalidDate": "Pick a valid follow-up date.",
+  "followUpNotFuture": "The follow-up date must be after today.",
+  "followUpTooFar": "The follow-up can be at most {days} days ahead.",
+  "followUpNoteTooLong": "Keep the follow-up note under {max} characters.",
+  "followUpNoteNotText": "The follow-up note must be text."
 }

@@ -260,7 +260,8 @@
       "followUpUnavailableHint": "This doctor isn't taking bookings right now",
       "followUpUnavailable": "Follow-up unavailable",
       "bookAgain": "Book Again",
-      "bookFollowUp": "Book Follow-up"
+      "bookFollowUp": "Book Follow-up",
+      "followUpSuggested": "Follow-up suggested on {date}"
     },
     "cancelDialog": {
       "titleAppointment": "Cancel this appointment?",

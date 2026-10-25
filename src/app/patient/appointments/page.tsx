@@ -21,6 +21,7 @@ import PullToRefresh from "@/components/PullToRefresh";
 import TimeSlotPicker from "@/components/patient/TimeSlotPicker";
 import { useLocale, useTranslations } from "next-intl";
 import { formattingLocale } from "@/lib/appLanguage";
+import { followUpLabel } from "@/lib/followUp";
 
 interface Medicine {
   id: string;
@@ -57,6 +58,9 @@ interface Appointment {
   unreadMessageCount: number;
   attachments: Attachment[];
   doctorNotes: string | null;
+  // Follow-up the doctor suggested at completion (IST day) + their note.
+  followUpDate?: string | null;
+  followUpNote?: string | null;
   scheduledAt: string;
   requestedScheduledAt?: string | null; // pending new time for an accepted appointment
   createdAt: string;
@@ -233,6 +237,12 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
   // isn't on the 30-min accept clock — the doctor has until the slot time.
   const scheduledForLater =
     new Date(a.scheduledAt).getTime() > new Date(a.createdAt).getTime() + REQUEST_TIMEOUT_MS;
+  // The doctor's "review in N days" — shown with its own Book follow-up.
+  const suggestedFollowUp = a.status === "COMPLETED" && a.providerType !== "NURSE" && !!a.followUpDate;
+  // Same doctor, clinic and consult type as this visit; the patient still picks the slot and pays.
+  const followUpHref = `/patient/book?${new URLSearchParams({
+    doctorId: a.doctorId, followUpOf: a.id, consultType: a.consultType, ...(a.clinicId ? { clinicId: a.clinicId } : {}),
+  })}`;
   const [downloadingAtt, setDownloadingAtt] = useState<string | null>(null);
   const [withdrawing, setWithdrawing] = useState(false);
   const [withdrawError, setWithdrawError] = useState("");
@@ -455,6 +465,22 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         </div>
       )}
 
+      {suggestedFollowUp && (
+        <div className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 mb-3">
+          <p className="text-sm font-semibold text-teal-800 flex items-center gap-1.5">
+            <CalendarClock className="w-4 h-4 flex-shrink-0" />{t("followUpSuggested", { date: followUpLabel(a.followUpDate ?? "", locale) })}
+          </p>
+          {a.followUpNote && <p className="text-xs text-teal-900/80 mt-0.5 break-words">{a.followUpNote}</p>}
+          {a.doctorBookable === false ? (
+            <p className="text-xs text-slate-500 mt-2">{t("followUpUnavailableHint")}</p>
+          ) : (
+            <button onClick={() => router.push(followUpHref)} className="tap-44-y btn-primary py-2 px-3 text-xs mt-2 inline-flex">
+              <RotateCcw className="w-3.5 h-3.5" /> {t("bookFollowUp")}
+            </button>
+          )}
+        </div>
+      )}
+
       {pendingNewTime && (
         <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
           <p className="font-semibold flex items-center gap-1.5">
@@ -554,7 +580,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {t("youRated", { rating: a.review.rating })}
           </span>
         )}
-        {a.status === "COMPLETED" && a.providerType !== "NURSE" && a.doctorBookable === false ? (
+        {suggestedFollowUp ? null : a.status === "COMPLETED" && a.providerType !== "NURSE" && a.doctorBookable === false ? (
           <span
             title={t("followUpUnavailableHint")}
             className="tap-44-y btn-secondary py-2 px-3 text-xs opacity-50 cursor-not-allowed"
@@ -566,7 +592,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
             onClick={() => router.push(
               a.providerType === "NURSE"
                 ? `/patient/nurse?nurseId=${a.doctorId}${a.nurseServiceId ? `&serviceId=${a.nurseServiceId}` : ""}`
-                : `/patient/book?doctorId=${a.doctorId}&followUpOf=${a.id}`
+                : followUpHref
             )}
             className="tap-44-y btn-secondary py-2 px-3 text-xs"
           >

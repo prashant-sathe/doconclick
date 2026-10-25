@@ -507,5 +507,13 @@
   "feedLimitInvalid": "limit ही 1 ते {max} मधील पूर्ण संख्या असावी",
   "feedStatusInvalid": "status खालीलपैकी एक किंवा अधिक असावा: {statuses}",
   "feedConsultTypeInvalid": "consultType खालीलपैकी एक असावा: {types}",
-  "feedDateInvalid": "from / to तारखा YYYY-MM-DD या स्वरूपात लिहिलेल्या असाव्यात"
+  "feedDateInvalid": "from / to तारखा YYYY-MM-DD या स्वरूपात लिहिलेल्या असाव्यात",
+  "followUpDoctorOnly": "फक्त डॉक्टरच फॉलो-अप ठरवू शकतात.",
+  "followUpNotCompleted": "फॉलो-अप फक्त पूर्ण झालेल्या कन्सल्टेशनवरच ठरवता येतो.",
+  "followUpInvalid": "फॉलो-अप योग्य नाही.",
+  "followUpInvalidDate": "फॉलो-अपची योग्य तारीख निवडा.",
+  "followUpNotFuture": "फॉलो-अपची तारीख आजनंतरची असायला हवी.",
+  "followUpTooFar": "फॉलो-अप जास्तीत जास्त {days} दिवस पुढचा असू शकतो.",
+  "followUpNoteTooLong": "फॉलो-अपची टीप {max} अक्षरांपेक्षा कमी ठेवा.",
+  "followUpNoteNotText": "फॉलो-अपची टीप मजकूर स्वरूपात असायला हवी."
 }

@@ -5,6 +5,9 @@ import { uploadToS3, deleteFromS3 } from "@/lib/s3";
 import { verifyUpload } from "@/lib/fileSniff";
 import { recordPrescriptionVersion } from "@/lib/prescriptionLock";
 import { PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS } from "@/lib/nursePackage";
+import { getBookingHorizonDays } from "@/lib/bookingLimits";
+import { addDaysYmd, istDayKey, isValidYmd } from "@/lib/istDate";
+import { FOLLOW_UP_NOTE_MAX, followUpInstant } from "@/lib/followUp";
 
 // The pieces of closing a doctor's consultation — prescription items, files,
 // a nurse referral and the completion guards — shared by the one-shot
@@ -153,6 +156,34 @@ export async function parseReferral(body: Record<string, unknown>): Promise<Refe
   if (!service) return { error: "Pick a nurse service." };
   const instructions = typeof body.instructions === "string" ? body.instructions.trim().slice(0, 1000) || null : null;
   return { serviceId: service.id, serviceName: service.name, visits, intervalDays, instructions };
+}
+
+// ── Follow-up ──
+
+export type FollowUpInput = { followUpDate: Date | null; followUpNote: string | null };
+
+/**
+ * Validates { date: "YYYY-MM-DD" (IST day), note? } — or null to clear. The
+ * day must be after today (IST) and within the booking horizon, so the
+ * patient can actually book it.
+ */
+export async function parseFollowUp(raw: unknown, now: Date = new Date()): Promise<FollowUpInput | { error: string; code: string }> {
+  if (raw === null) return { followUpDate: null, followUpNote: null };
+  if (typeof raw !== "object" || Array.isArray(raw)) return { error: "Invalid follow-up.", code: "INVALID_FOLLOW_UP" };
+  const { date, note } = raw as Record<string, unknown>;
+  if (typeof date !== "string" || !isValidYmd(date)) return { error: "Pick a valid follow-up date.", code: "INVALID_FOLLOW_UP" };
+  const today = istDayKey(now);
+  if (date <= today) return { error: "The follow-up date must be after today.", code: "INVALID_FOLLOW_UP" };
+  const horizon = await getBookingHorizonDays();
+  if (date > addDaysYmd(today, horizon)) {
+    return { error: `The follow-up can be at most ${horizon} days ahead.`, code: "INVALID_FOLLOW_UP" };
+  }
+  if (note !== undefined && note !== null && typeof note !== "string") return { error: "The follow-up note must be text.", code: "INVALID_FOLLOW_UP" };
+  const text = typeof note === "string" ? note.trim() : "";
+  if (text.length > FOLLOW_UP_NOTE_MAX) {
+    return { error: `Keep the follow-up note under ${FOLLOW_UP_NOTE_MAX} characters.`, code: "INVALID_FOLLOW_UP" };
+  }
+  return { followUpDate: followUpInstant(date), followUpNote: text || null };
 }
 
 export const NOTES_MAX = 5000;

@@ -504,6 +504,15 @@ model Appointment {
   // src/lib/appointmentReminders.ts), so the periodic sweep never reminds
   // the same appointment twice.
   reminderSentAt DateTime?
+  // Follow-up the doctor suggested when completing this consultation
+  // ("review in N days") — the first instant of that IST day, plus an
+  // optional short note for the patient. Only the patient and the doctor
+  // see them. followUpReminderSentAt is set once the "time for your
+  // follow-up" push has gone out (src/lib/appointmentReminders.ts), and
+  // cleared again when the doctor changes the date.
+  followUpDate          DateTime?
+  followUpNote          String?
+  followUpReminderSentAt DateTime?
   // Last "please pay" push for an unpaid online visit — sent when the
   // provider tries to set off, or taps "Remind to pay" (src/lib/payReminder.ts).
   // Throttled on this, so a patient isn't pushed again within minutes.
@@ -532,6 +541,8 @@ model Appointment {
   // /api/appointments/me pages and polls by owner + visit time (src/lib/appointmentFeed.ts).
   @@index([patientId, scheduledAt])
   @@index([doctorId, scheduledAt])
+  // The follow-up reminder sweep (src/lib/appointmentReminders.ts).
+  @@index([followUpDate])
 }
 
 model Wallet {
