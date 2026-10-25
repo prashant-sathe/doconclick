@@ -3,6 +3,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { netPayable, releaseCouponRedemption } from "@/lib/coupons";
 import { refundAppointmentToWallet } from "@/lib/wallet";
 import { Prisma } from "@/generated/prisma/client";
+import { VISIT_START_LATE_MS } from "@/lib/nursePackage";
 
 export const APPOINTMENT_REQUEST_TIMEOUT_MS = 30 * 60 * 1000;
 
@@ -19,10 +20,14 @@ export async function expireStalePendingRequests() {
     // For a "book now" request scheduledAt ≈ createdAt, so the second clause
     // is a no-op and behaviour is unchanged. For a request scheduled days
     // out, the doctor has until the appointment time to respond — no timer.
+    // A nurse visit can't be started more than VISIT_START_LATE_MS after its
+    // time, so one that far past expires whatever its createdAt (P3-23).
     where: {
       status: "PENDING_APPROVAL",
-      createdAt: { lt: cutoff },
-      scheduledAt: { lt: now },
+      OR: [
+        { createdAt: { lt: cutoff }, scheduledAt: { lt: now } },
+        { providerType: "NURSE", scheduledAt: { lt: new Date(now.getTime() - VISIT_START_LATE_MS) } },
+      ],
     },
     select: { id: true, patientId: true, providerType: true, packageId: true, doctor: { select: { name: true } } },
   });

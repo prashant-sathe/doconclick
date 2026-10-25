@@ -12,6 +12,7 @@
     "migrate:uploads-to-s3": "tsx prisma/migrate-uploads-to-s3.ts",
     "backfill:paid-at": "tsx prisma/backfill-paid-at.ts",
     "test:cancel-race": "tsx tests/cancel-race.ts",
+    "test:nurse-accept-expired": "tsx tests/nurse-accept-expired.ts",
     "test:expire-refund": "tsx tests/expire-refund.ts",
     "test:reschedule": "tsx tests/reschedule-request.ts",
     "test:slots": "tsx tests/slot-booking.ts",

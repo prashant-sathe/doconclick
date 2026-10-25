@@ -9,7 +9,7 @@ import { refundAppointmentToWallet } from "@/lib/wallet";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { resolveProviderScope } from "@/lib/providerGuard";
 import { nurseSlotProblem } from "@/lib/nurseSchedule";
-import { shiftCompleteProblem, isShift, SHIFT_MIN_LEAD_MS } from "@/lib/nursePackage";
+import { shiftCompleteProblem, isShift, SHIFT_MIN_LEAD_MS, VISIT_START_LATE_MS } from "@/lib/nursePackage";
 import { netPayable } from "@/lib/coupons";
 import { cancelAndRefund, claimStatusChange, isAlreadyClosed, ALREADY_CLOSED_MESSAGE } from "@/lib/appointmentCancel";
 import { cancelAndReassign } from "@/lib/reassignment";
@@ -238,6 +238,14 @@ export const PATCH = withErrorLocale(async function PATCH(
       if (!group.some((g) => g.id === appointment.id)) group.push(appointment);
 
       if (status === "SCHEDULED") {
+        // Too far past its time to ever be started — the sweep above expires
+        // (and refunds) these; this only catches one that slipped past it.
+        if (group.some((g) => g.scheduledAt.getTime() < Date.now() - VISIT_START_LATE_MS)) {
+          return NextResponse.json(
+            { error: "This request timed out and the patient has already been notified — it can no longer be accepted." },
+            { status: 409 }
+          );
+        }
         // A nurse is one person on the road — don't let her confirm two
         // overlapping home visits.
         const svc = appointment.nurseServiceId
