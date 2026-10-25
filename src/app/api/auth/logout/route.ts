@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME, verifyToken } from "@/lib/auth";
 import { endImpersonation } from "@/lib/impersonation";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { APP_LANGUAGE_COOKIE } from "@/lib/appLanguage";
 
 const COOKIE_NAME = "doconclick_token";
 
@@ -27,5 +28,7 @@ export const POST = withErrorLocale(async function POST() {
   // Also clear any stashed impersonator session — logging out fully ends
   // impersonation too, rather than leaving it to resurface on the next login.
   response.cookies.set(IMPERSONATOR_COOKIE_NAME, "", clearOpts);
+  // One user's language must not carry over to the next sign-in here.
+  response.cookies.set(APP_LANGUAGE_COOKIE, "", { path: "/", maxAge: 0, sameSite: "lax", secure: COOKIE_SECURE });
   return response;
 });

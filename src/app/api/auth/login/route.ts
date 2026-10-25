@@ -4,6 +4,7 @@ import { verifyPassword, signToken, sessionPayload, COOKIE_SECURE, IMPERSONATOR_
 import { normalizeMobile, MOBILE_REGEX } from "@/lib/validation";
 import { createRateLimiter, createFailureLimiter, clientIp } from "@/lib/rateLimit";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { APP_LANGUAGE_COOKIE, DEFAULT_APP_LANGUAGE, isAppLanguage } from "@/lib/appLanguage";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -78,6 +79,14 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       sameSite: "lax",
       maxAge: COOKIE_MAX_AGE,
       path: "/",
+    });
+    // The page language is this account's own (default en-IN), never whatever
+    // the previous user of this browser left in the cookie.
+    response.cookies.set(APP_LANGUAGE_COOKIE, isAppLanguage(user.language) ? user.language : DEFAULT_APP_LANGUAGE, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+      secure: COOKIE_SECURE,
     });
     // A fresh login should never inherit a leftover impersonation stash from
     // a previous session that didn't exit cleanly.

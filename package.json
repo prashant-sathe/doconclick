@@ -82,6 +82,7 @@
     "test:complete-consultation": "tsx tests/complete-consultation.ts",
     "test:unpaid-journey": "tsx tests/unpaid-journey.ts",
     "test:i18n": "tsx tests/i18n.ts",
+    "test:lang-session": "tsx tests/lang-session.ts",
     "test:inbox": "tsx tests/notification-inbox.ts",
     "test:family": "tsx tests/family-members.ts",
     "test:receipts": "tsx tests/receipts.ts",

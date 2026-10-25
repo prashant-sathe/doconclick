@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAuthUser, revokeSessions, COOKIE_SECURE, IMPERSONATOR_COOKIE_NAME } from "@/lib/auth";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { APP_LANGUAGE_COOKIE } from "@/lib/appLanguage";
 
 const COOKIE_NAME = "doconclick_token";
 
@@ -21,5 +22,6 @@ export const POST = withErrorLocale(async function POST() {
 
   const response = NextResponse.json({ success: true });
   response.cookies.set(COOKIE_NAME, "", { httpOnly: true, secure: COOKIE_SECURE, sameSite: "lax", maxAge: 0, path: "/" });
+  response.cookies.set(APP_LANGUAGE_COOKIE, "", { path: "/", maxAge: 0, sameSite: "lax", secure: COOKIE_SECURE });
   return response;
 });
