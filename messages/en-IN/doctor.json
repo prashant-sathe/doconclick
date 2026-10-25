@@ -363,5 +363,31 @@
     "wait": "Wait for payment",
     "remindAgain": "Remind again",
     "goAnyway": "Go anyway"
+  },
+  "prescriptionKit": {
+    "favouriteSaved": "Saved to your favourite medicines.",
+    "addFavourite": "Save as a favourite medicine",
+    "removeFavourite": "Remove from favourite medicines",
+    "removeFavouriteNamed": "Remove {name} from favourites",
+    "addFavouriteRow": "Add this medicine",
+    "favourites": "Favourite medicines",
+    "rowAllergy": "May clash with the patient's allergy: {list}. Check before prescribing.",
+    "allergiesOnRecord": "Allergies on record:",
+    "repeatLast": "Repeat last prescription ({date})",
+    "useTemplate": "Use a template…",
+    "saveAsTemplate": "Save as template",
+    "saveTemplateNeedsItems": "Add a medicine or a test first",
+    "manage": "Manage",
+    "doneManaging": "Done",
+    "templateNamePlaceholder": "Template name (e.g. Viral fever – adult)",
+    "save": "Save",
+    "replacesTemplate": "A template with this name exists — saving replaces it.",
+    "templateSaved": "Template “{name}” saved.",
+    "templateCounts": "{medicines, plural, one {# medicine} other {# medicines}}, {tests, plural, one {# test} other {# tests}}",
+    "deleteTemplate": "Delete",
+    "replaceTitle": "Replace the current prescription?",
+    "replaceBody": "The medicines and tests you've entered here will be replaced. You can still edit everything before completing.",
+    "replace": "Replace",
+    "allergyNote": "This check uses a limited built-in list and can miss clashes — always verify allergies yourself."
   }
 }

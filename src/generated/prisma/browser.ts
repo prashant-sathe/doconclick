@@ -168,6 +168,16 @@ export type PrescriptionTest = Prisma.PrescriptionTestModel
  */
 export type PrescriptionVersion = Prisma.PrescriptionVersionModel
 /**
+ * Model DoctorFavouriteMedicine
+ * 
+ */
+export type DoctorFavouriteMedicine = Prisma.DoctorFavouriteMedicineModel
+/**
+ * Model PrescriptionTemplate
+ * 
+ */
+export type PrescriptionTemplate = Prisma.PrescriptionTemplateModel
+/**
  * Model PrescriptionAttachment
  * 
  */

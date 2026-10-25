@@ -72,6 +72,8 @@ model User {
   staffMembers           StaffProfile[]          @relation("DoctorStaff")
   changeRequests         DoctorChangeRequest[]   @relation("DoctorChangeRequests")
   changeRequestsResolved DoctorChangeRequest[]   @relation("ChangeRequestsResolvedBy")
+  favouriteMedicines     DoctorFavouriteMedicine[] @relation("DoctorFavouriteMedicines")
+  prescriptionTemplates  PrescriptionTemplate[]    @relation("DoctorPrescriptionTemplates")
 }
 
 model PushToken {
@@ -753,6 +755,40 @@ model PrescriptionVersion {
   createdAt     DateTime    @default(now())
 
   @@unique([appointmentId, version])
+}
+
+// A doctor's own quick-pick medicines in the prescription editor — tapping one
+// adds a row pre-filled with their usual dosage/frequency/duration. Only the
+// doctor who saved it can see or change it (never their front-desk staff).
+model DoctorFavouriteMedicine {
+  id           String   @id @default(cuid())
+  doctorId     String
+  doctor       User     @relation("DoctorFavouriteMedicines", fields: [doctorId], references: [id], onDelete: Cascade)
+  name         String
+  nameKey      String   // lower-cased name — one favourite per medicine name
+  dosage       String   @default("")
+  frequency    String   @default("")
+  duration     String   @default("")
+  instructions String?
+  createdAt    DateTime @default(now())
+
+  @@unique([doctorId, nameKey])
+}
+
+// A doctor's named set of medicines + tests (e.g. "Viral fever — adult") that
+// fills the prescription editor in one tap. Same shapes as PrescriptionVersion.
+model PrescriptionTemplate {
+  id        String   @id @default(cuid())
+  doctorId  String
+  doctor    User     @relation("DoctorPrescriptionTemplates", fields: [doctorId], references: [id], onDelete: Cascade)
+  name      String
+  nameKey   String   // lower-cased name — template names are unique per doctor
+  medicines Json     // [{ name, dosage, frequency, duration, instructions }]
+  tests     Json     // [{ name, instructions }]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([doctorId, nameKey])
 }
 
 model PrescriptionAttachment {

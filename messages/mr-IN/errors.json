@@ -515,5 +515,13 @@
   "followUpNotFuture": "फॉलो-अपची तारीख आजनंतरची असायला हवी.",
   "followUpTooFar": "फॉलो-अप जास्तीत जास्त {days} दिवस पुढचा असू शकतो.",
   "followUpNoteTooLong": "फॉलो-अपची टीप {max} अक्षरांपेक्षा कमी ठेवा.",
-  "followUpNoteNotText": "फॉलो-अपची टीप मजकूर स्वरूपात असायला हवी."
+  "followUpNoteNotText": "फॉलो-अपची टीप मजकूर स्वरूपात असायला हवी.",
+  "favouriteNotFound": "आवडते औषध सापडले नाही",
+  "favouritesFull": "तुम्ही जास्तीत जास्त {maxFavouriteMedicines} आवडती औषधे ठेवू शकता. आधी एखादे काढा.",
+  "templateNotFound": "टेम्पलेट सापडले नाही",
+  "templatesFull": "तुम्ही जास्तीत जास्त {maxPrescriptionTemplates} टेम्पलेट ठेवू शकता. आधी एखादे काढून टाका.",
+  "favouriteNeedsName": "औषधाचे नाव लिहा.",
+  "templateNeedsName": "टेम्पलेटला नाव द्या.",
+  "templateNameTooLong": "टेम्पलेटचे नाव {templateNameMax} अक्षरांपेक्षा कमी ठेवा.",
+  "templateEmpty": "टेम्पलेट म्हणून सेव्ह करण्यासाठी एखादे औषध किंवा तपासणी जोडा."
 }

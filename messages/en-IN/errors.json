@@ -515,5 +515,13 @@
   "followUpNotFuture": "The follow-up date must be after today.",
   "followUpTooFar": "The follow-up can be at most {days} days ahead.",
   "followUpNoteTooLong": "Keep the follow-up note under {max} characters.",
-  "followUpNoteNotText": "The follow-up note must be text."
+  "followUpNoteNotText": "The follow-up note must be text.",
+  "favouriteNotFound": "Favourite not found",
+  "favouritesFull": "You can keep at most {maxFavouriteMedicines} favourite medicines. Remove one first.",
+  "templateNotFound": "Template not found",
+  "templatesFull": "You can keep at most {maxPrescriptionTemplates} templates. Delete one first.",
+  "favouriteNeedsName": "Enter the medicine name.",
+  "templateNeedsName": "Give the template a name.",
+  "templateNameTooLong": "Keep the template name under {templateNameMax} characters.",
+  "templateEmpty": "Add a medicine or a test to save as a template."
 }

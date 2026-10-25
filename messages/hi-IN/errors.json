@@ -515,5 +515,13 @@
   "followUpNotFuture": "फॉलो-अप की तारीख आज के बाद की होनी चाहिए।",
   "followUpTooFar": "फॉलो-अप ज़्यादा से ज़्यादा {days} दिन आगे का हो सकता है।",
   "followUpNoteTooLong": "फॉलो-अप नोट {max} अक्षरों से कम रखें।",
-  "followUpNoteNotText": "फॉलो-अप नोट टेक्स्ट होना चाहिए।"
+  "followUpNoteNotText": "फॉलो-अप नोट टेक्स्ट होना चाहिए।",
+  "favouriteNotFound": "पसंदीदा दवा नहीं मिली",
+  "favouritesFull": "आप ज़्यादा से ज़्यादा {maxFavouriteMedicines} पसंदीदा दवाएँ रख सकते हैं। पहले कोई एक हटाएँ।",
+  "templateNotFound": "टेम्पलेट नहीं मिला",
+  "templatesFull": "आप ज़्यादा से ज़्यादा {maxPrescriptionTemplates} टेम्पलेट रख सकते हैं। पहले कोई एक हटाएँ।",
+  "favouriteNeedsName": "दवा का नाम लिखें।",
+  "templateNeedsName": "टेम्पलेट को एक नाम दें।",
+  "templateNameTooLong": "टेम्पलेट का नाम {templateNameMax} अक्षरों से कम रखें।",
+  "templateEmpty": "टेम्पलेट सेव करने के लिए कोई दवा या जाँच जोड़ें।"
 }

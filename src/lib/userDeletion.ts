@@ -137,6 +137,9 @@ async function anonymize(tx: Prisma.TransactionClient, userId: string, role: str
     });
     await tx.clinic.updateMany({ where: { doctorId: userId }, data: { isActive: false } });
     await tx.savedDoctor.deleteMany({ where: { doctorId: userId } });
+    // Their prescription shortcuts (favourite medicines, templates) go too.
+    await tx.doctorFavouriteMedicine.deleteMany({ where: { doctorId: userId } });
+    await tx.prescriptionTemplate.deleteMany({ where: { doctorId: userId } });
   }
 
   if (role === "NURSE") {

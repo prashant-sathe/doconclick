@@ -363,5 +363,31 @@
     "wait": "पेमेंट का इंतज़ार करें",
     "remindAgain": "फिर याद दिलाएँ",
     "goAnyway": "फिर भी जाएँ"
+  },
+  "prescriptionKit": {
+    "favouriteSaved": "आपकी पसंदीदा दवाओं में सेव हो गई।",
+    "addFavourite": "पसंदीदा दवा के रूप में सेव करें",
+    "removeFavourite": "पसंदीदा दवाओं से हटाएँ",
+    "removeFavouriteNamed": "{name} को पसंदीदा से हटाएँ",
+    "addFavouriteRow": "यह दवा जोड़ें",
+    "favourites": "पसंदीदा दवाएँ",
+    "rowAllergy": "मरीज़ की एलर्जी से टकराव हो सकता है: {list}। लिखने से पहले जाँच लें।",
+    "allergiesOnRecord": "दर्ज एलर्जी:",
+    "repeatLast": "पिछला पर्चा दोहराएँ ({date})",
+    "useTemplate": "टेम्पलेट चुनें…",
+    "saveAsTemplate": "टेम्पलेट के रूप में सेव करें",
+    "saveTemplateNeedsItems": "पहले कोई दवा या जाँच जोड़ें",
+    "manage": "संपादन",
+    "doneManaging": "हो गया",
+    "templateNamePlaceholder": "टेम्पलेट का नाम (जैसे वायरल बुखार – वयस्क)",
+    "save": "सेव करें",
+    "replacesTemplate": "इस नाम का टेम्पलेट पहले से है — सेव करने पर वह बदल जाएगा।",
+    "templateSaved": "टेम्पलेट “{name}” सेव हो गया।",
+    "templateCounts": "{medicines, plural, one {# दवा} other {# दवाएँ}}, {tests, plural, one {# जाँच} other {# जाँचें}}",
+    "deleteTemplate": "हटाएँ",
+    "replaceTitle": "मौजूदा पर्चा बदलें?",
+    "replaceBody": "यहाँ लिखी दवाएँ और जाँचें बदल जाएँगी। पूरा करने से पहले आप सब कुछ बदल सकते हैं।",
+    "replace": "बदलें",
+    "allergyNote": "यह जाँच एक सीमित सूची पर आधारित है और कुछ टकराव छूट सकते हैं — एलर्जी हमेशा खुद जाँचें।"
   }
 }

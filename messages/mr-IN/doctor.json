@@ -363,5 +363,31 @@
     "wait": "पेमेंटची वाट पाहा",
     "remindAgain": "पुन्हा आठवण करा",
     "goAnyway": "तरीही जा"
+  },
+  "prescriptionKit": {
+    "favouriteSaved": "तुमच्या आवडत्या औषधांमध्ये सेव्ह झाले.",
+    "addFavourite": "आवडते औषध म्हणून सेव्ह करा",
+    "removeFavourite": "आवडत्या औषधांतून काढा",
+    "removeFavouriteNamed": "{name} आवडत्यांमधून काढा",
+    "addFavouriteRow": "हे औषध जोडा",
+    "favourites": "आवडती औषधे",
+    "rowAllergy": "रुग्णाच्या ॲलर्जीशी जुळू शकते: {list}. लिहिण्याआधी तपासा.",
+    "allergiesOnRecord": "नोंदवलेली ॲलर्जी:",
+    "repeatLast": "मागील प्रिस्क्रिप्शन पुन्हा वापरा ({date})",
+    "useTemplate": "टेम्पलेट निवडा…",
+    "saveAsTemplate": "टेम्पलेट म्हणून सेव्ह करा",
+    "saveTemplateNeedsItems": "आधी एखादे औषध किंवा तपासणी जोडा",
+    "manage": "संपादन",
+    "doneManaging": "झाले",
+    "templateNamePlaceholder": "टेम्पलेटचे नाव (उदा. व्हायरल ताप – प्रौढ)",
+    "save": "सेव्ह करा",
+    "replacesTemplate": "या नावाचे टेम्पलेट आधीच आहे — सेव्ह केल्यावर ते बदलले जाईल.",
+    "templateSaved": "टेम्पलेट “{name}” सेव्ह झाले.",
+    "templateCounts": "{medicines, plural, one {# औषध} other {# औषधे}}, {tests, plural, one {# तपासणी} other {# तपासण्या}}",
+    "deleteTemplate": "काढून टाका",
+    "replaceTitle": "सध्याचे प्रिस्क्रिप्शन बदलायचे?",
+    "replaceBody": "इथे लिहिलेली औषधे आणि तपासण्या बदलल्या जातील. पूर्ण करण्याआधी तुम्ही सर्व काही बदलू शकता.",
+    "replace": "बदला",
+    "allergyNote": "ही तपासणी मर्यादित यादीवर आधारित आहे आणि काही धोके सुटू शकतात — ॲलर्जी नेहमी स्वतः तपासा."
   }
 }

@@ -19,6 +19,7 @@ import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import PaymentQrPanel from "@/components/doctor/PaymentQrPanel";
 import PrescriptionViewer from "@/components/doctor/PrescriptionViewer";
+import { FavouriteStar, MedicineDatalist, PrescriptionToolbar, RowAllergyWarning, medicineFromRow, rowFromMedicine, usePrescriptionKit } from "@/components/doctor/PrescriptionShortcuts";
 import FollowUpPicker, { FollowUpEditDialog, NO_FOLLOW_UP, followUpBody, type FollowUpValue } from "@/components/doctor/FollowUpPicker";
 import { followUpLabel } from "@/lib/followUp";
 import UnpaidJourneyWarning, { type UnpaidStart } from "@/components/UnpaidJourneyWarning";
@@ -316,6 +317,8 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   const [confirmingComplete, setConfirmingComplete] = useState(false);
   const [confirmingCancel, setConfirmingCancel] = useState(false);
 
+  // Favourites, templates, repeat last, allergy warning (src/components/doctor/PrescriptionShortcuts.tsx).
+  const kit = usePrescriptionKit(appt.id);
   const hasMedicines = medicines.some((m) => m.name.trim());
   const hasTests = tests.some((row) => row.name.trim());
   const hasPrescriptionItems = hasMedicines || hasTests;
@@ -344,6 +347,11 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   const setMed = (i: number, k: keyof MedicineRow, v: string) => {
     setMedicines((rows) => rows.map((r, idx) => {
       if (idx !== i) return r;
+      // Picking a favourite from the autocomplete fills its usual values into a blank row.
+      if (k === "name" && !r.dosage && !r.frequency && !r.duration && !r.instructions) {
+        const fav = kit.favourites.find((f) => f.name.toLowerCase() === v.trim().toLowerCase());
+        if (fav) return rowFromMedicine(fav);
+      }
       const next = { ...r, [k]: v };
       if (k === "frequency" && v !== "Other") next.frequencyOther = "";
       if (k === "duration" && v !== "Other") next.durationOther = "";
@@ -351,6 +359,11 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
     }));
   };
   const addRow = () => setMedicines((rows) => [...rows, { ...EMPTY_ROW }]);
+  // A favourite chip fills the first empty row, or adds one.
+  const addFilledRow = (row: MedicineRow) => setMedicines((rows) => {
+    const empty = rows.findIndex((r) => !r.name.trim());
+    return empty === -1 ? [...rows, row] : rows.map((r, idx) => (idx === empty ? row : r));
+  });
   const removeRow = (i: number) => setMedicines((rows) => rows.filter((_, idx) => idx !== i));
 
   const setTest = (i: number, k: keyof TestRow, v: string) => {
@@ -370,13 +383,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
     try {
       const validMedicines = medicines
         .filter((m) => m.name.trim())
-        .map((m) => ({
-          name: m.name,
-          dosage: m.dosage,
-          frequency: m.frequency === "Other" ? m.frequencyOther.trim() : m.frequency,
-          duration: m.duration === "Other" ? m.durationOther.trim() : m.duration,
-          instructions: m.instructions,
-        }));
+        .map(medicineFromRow);
       const validTests = tests
         .filter((row) => row.name.trim())
         .map((row) => ({ name: row.name, instructions: row.instructions }));
@@ -437,10 +444,21 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
       <div>
         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t("prescription")}</p>
+        <PrescriptionToolbar
+          kit={kit}
+          medicines={medicines}
+          tests={tests}
+          onReplace={(m, tst) => { setMedicines(m); setTests(tst); }}
+          onAddMedicine={addFilledRow}
+        />
+        <MedicineDatalist id={`medicine-suggestions-${appt.id}`} kit={kit} />
         <div className="space-y-2">
           {medicines.map((m, i) => (
-            <div key={i} className="bg-white rounded-lg border border-slate-200 p-2.5 grid grid-cols-2 sm:grid-cols-5 gap-1.5 items-center">
-              <input className="input-field text-xs py-1.5 col-span-2 sm:col-span-1" placeholder={t("medicineName")} value={m.name} onChange={(e) => setMed(i, "name", e.target.value)} />
+            <div key={i} className="bg-white rounded-lg border border-slate-200 p-2.5 grid grid-cols-2 sm:grid-cols-6 gap-1.5 items-center">
+              <div className="col-span-2 flex items-center gap-1">
+                <input className="input-field text-xs py-1.5 flex-1 min-w-0" placeholder={t("medicineName")} list={`medicine-suggestions-${appt.id}`} value={m.name} onChange={(e) => setMed(i, "name", e.target.value)} />
+                <FavouriteStar row={m} kit={kit} />
+              </div>
               <input className="input-field text-xs py-1.5" placeholder={t("dosage")} value={m.dosage} onChange={(e) => setMed(i, "dosage", e.target.value)} />
               <div className="space-y-1">
                 <select className="input-field text-xs py-1.5" value={m.frequency} onChange={(e) => setMed(i, "frequency", e.target.value)}>
@@ -468,6 +486,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
                   </button>
                 )}
               </div>
+              <RowAllergyWarning name={m.name} kit={kit} />
             </div>
           ))}
         </div>

@@ -123,5 +123,8 @@
   "fieldNotNumberGeneric": "{field}: English word/label inserted by the code — form field label",
   "feedLimitInvalid": "{max}: the largest page size allowed",
   "feedStatusInvalid": "{statuses}: comma-separated English status codes, e.g. COMPLETED, CANCELLED (stay English)",
-  "feedConsultTypeInvalid": "{types}: comma-separated English consult type codes: CLINIC, HOME, VIDEO (stay English)"
+  "feedConsultTypeInvalid": "{types}: comma-separated English consult type codes: CLINIC, HOME, VIDEO (stay English)",
+  "favouritesFull": "{maxFavouriteMedicines}: a number",
+  "templatesFull": "{maxPrescriptionTemplates}: a number",
+  "templateNameTooLong": "{templateNameMax}: number of characters"
 }
