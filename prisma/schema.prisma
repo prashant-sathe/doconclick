@@ -40,6 +40,8 @@ model User {
   asPatient      Appointment[]   @relation("PatientAppointments")
   asDoctor       Appointment[]   @relation("DoctorAppointments")
   complaints     Complaint[]
+  complaintsAssigned Complaint[] @relation("ComplaintAssignee")
+  complaintMessages  ComplaintMessage[] @relation("ComplaintMessagesWritten")
   reviewsGiven   Review[]        @relation("PatientReviews")
   reviewsReceived Review[]       @relation("DoctorReviews")
   messagesSent   Message[]       @relation("SentMessages")
@@ -447,6 +449,7 @@ model Appointment {
   // On a doctor's consultation: the nurse care the doctor recommended.
   referralGiven     NurseReferral? @relation("ReferralSource")
   vitals            VitalReading[]
+  complaints        Complaint[]
   status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED, NO_SHOW
   acceptedAt    DateTime? // set when the doctor accepts (PENDING_APPROVAL → SCHEDULED); used for the late-cancellation warning
   videoStartedPushAt DateTime? // set when the "video consultation started" push goes out — once per appointment
@@ -816,6 +819,10 @@ model Review {
   createdAt     DateTime    @default(now())
 }
 
+// A support ticket (FP1-17). Filed by a patient, nurse or doctor; worked by
+// admins. The filer sees the subject/description, status and the public
+// messages only — priority, assignee and internal notes are admin-only
+// (src/lib/complaints.ts holds the shared rules and the SLA hours).
 model Complaint {
   id          String   @id @default(cuid())
   userId      String
@@ -823,7 +830,42 @@ model Complaint {
   subject     String
   description String
   status      String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
+  priority    String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  assigneeId  String?
+  assignee    User?    @relation("ComplaintAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  // The booking the ticket is about — the filer's own (checked on create),
+  // or set by an admin.
+  appointmentId String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  // A callback number other than the account mobile, if the filer gave one.
+  contactMobile String?
+  // SLA: first public admin reply, and when it was last marked resolved.
+  firstResponseAt DateTime?
+  resolvedAt      DateTime?
+  // Last public message from either side — list ordering and "waiting on" status.
+  lastActivityAt  DateTime @default(now())
   createdAt   DateTime @default(now())
+  messages    ComplaintMessage[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([assigneeId])
+}
+
+// One message on a ticket's thread. `internal` notes are admin-to-admin and
+// never leave the admin API.
+model ComplaintMessage {
+  id          String    @id @default(cuid())
+  complaintId String
+  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  authorId    String?
+  author      User?     @relation("ComplaintMessagesWritten", fields: [authorId], references: [id], onDelete: SetNull)
+  fromSupport Boolean   @default(false) // true = written by an admin
+  internal    Boolean   @default(false)
+  body        String
+  createdAt   DateTime  @default(now())
+
+  @@index([complaintId, createdAt])
 }
 
 model Clinic {

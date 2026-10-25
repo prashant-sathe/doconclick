@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, LifeBuoy, AlertCircle, Clock, CheckCheck, Sparkles } from "lucide-react";
+import { Loader2, LifeBuoy, AlertCircle, Clock, CheckCheck, Sparkles, ChevronRight, MessageSquareReply } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { formatDoctorName } from "@/lib/utils";
 import DoctorHeader from "@/components/doctor/DoctorHeader";
@@ -16,6 +16,8 @@ interface Ticket {
   description: string;
   status: string;
   createdAt: string;
+  replyCount: number;
+  supportRepliedLast: boolean;
 }
 
 const STATUS_BADGE: Record<string, string> = {
@@ -35,6 +37,7 @@ const STATUS_ICON: Record<string, React.ElementType> = {
 
 export default function DoctorSupportTicketsPage() {
   const t = useTranslations("doctorAccount.tickets");
+  const tc = useTranslations("shared.complaints");
   const locale = formattingLocale(useLocale());
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -95,7 +98,7 @@ export default function DoctorSupportTicketsPage() {
             {tickets.map((ticket) => {
               const Icon = STATUS_ICON[ticket.status] ?? AlertCircle;
               return (
-                <div key={ticket.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                <Link key={ticket.id} href={`/doctor/support/tickets/${ticket.id}`} className="block bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-3">
                     <div className={
                       "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 " +
@@ -108,11 +111,18 @@ export default function DoctorSupportTicketsPage() {
                         <span className="font-bold text-slate-900 truncate">{ticket.subject}</span>
                         <span className={STATUS_BADGE[ticket.status] ?? "badge badge-gray"}>{isStatusKey(ticket.status) ? t(`status.${ticket.status}`) : ticket.status.replace("_", " ")}</span>
                       </div>
-                      <p className="text-sm text-slate-600 mb-1 whitespace-pre-wrap">{ticket.description}</p>
+                      <p className="text-sm text-slate-600 mb-1 whitespace-pre-wrap line-clamp-3 break-words">{ticket.description}</p>
                       <p className="text-xs text-slate-400">{new Date(ticket.createdAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</p>
+                      <p className="text-xs mt-1.5 flex items-center gap-1.5 flex-wrap">
+                        {ticket.supportRepliedLast && (
+                          <span className="inline-flex items-center gap-1 font-semibold text-teal-600"><MessageSquareReply className="w-3.5 h-3.5" /> {tc("supportReplied")}</span>
+                        )}
+                        <span className="text-slate-400">{tc("replies", { count: ticket.replyCount })}</span>
+                      </p>
                     </div>
+                    <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0 self-center" aria-label={tc("view")} />
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

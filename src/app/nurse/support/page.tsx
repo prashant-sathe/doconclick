@@ -1,11 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2, LifeBuoy, AlertCircle, Clock, CheckCheck, Send } from "lucide-react";
+import { Loader2, LifeBuoy, AlertCircle, Clock, CheckCheck, Send, ChevronRight, MessageSquareReply } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import NurseSubShell from "@/components/nurse/NurseSubShell";
 import { formattingLocale } from "@/lib/appLanguage";
+import { isValidMobile } from "@/lib/validation";
+import ComplaintFormExtras from "@/components/support/ComplaintFormExtras";
 
 interface Ticket {
   id: string;
@@ -13,6 +16,8 @@ interface Ticket {
   description: string;
   status: string;
   createdAt: string;
+  replyCount: number;
+  supportRepliedLast: boolean;
 }
 
 const STATUS_BADGE: Record<string, string> = {
@@ -35,11 +40,14 @@ export default function NurseSupportPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const t = useTranslations("nurse.support");
+  const tc = useTranslations("shared.complaints");
   const locale = formattingLocale(useLocale());
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
+  const [appointmentId, setAppointmentId] = useState("");
+  const [contactMobile, setContactMobile] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,19 +68,22 @@ export default function NurseSupportPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!subject.trim() || !description.trim() || submitting) return;
+    if (contactMobile.trim() && !isValidMobile(contactMobile)) { setError(tc("contactInvalid")); return; }
     setSubmitting(true);
     setError(null);
     try {
       const res = await fetch("/api/patient/complaints", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject, description }),
+        body: JSON.stringify({ subject, description, appointmentId: appointmentId || null, contactMobile: contactMobile.trim() || null }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t("failed"));
       setTickets((prev) => [data, ...prev]);
       setSubject("");
       setDescription("");
+      setAppointmentId("");
+      setContactMobile("");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("failed"));
     } finally {
@@ -111,12 +122,18 @@ export default function NurseSupportPage() {
           <label className="input-label">{t("details")}</label>
           <textarea
             rows={4}
-            className="input-field resize-none mb-4"
+            className="input-field resize-none mb-3"
             placeholder={t("detailsPlaceholder")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={4000}
             required
+          />
+          <ComplaintFormExtras
+            appointmentId={appointmentId}
+            onAppointmentId={setAppointmentId}
+            contactMobile={contactMobile}
+            onContactMobile={setContactMobile}
           />
           {error && (
             <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mb-3">{error}</div>
@@ -145,7 +162,7 @@ export default function NurseSupportPage() {
             {tickets.map((tk) => {
               const Icon = STATUS_ICON[tk.status] ?? AlertCircle;
               return (
-                <div key={tk.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                <Link key={tk.id} href={`/nurse/support/${tk.id}`} className="block bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-3">
                     <div className={
                       "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 " +
@@ -158,11 +175,18 @@ export default function NurseSupportPage() {
                         <span className="font-bold text-slate-900 truncate">{tk.subject}</span>
                         <span className={STATUS_BADGE[tk.status] ?? "badge badge-gray"}>{isStatusKey(tk.status) ? t(`status.${tk.status}`) : tk.status.replace("_", " ")}</span>
                       </div>
-                      <p className="text-sm text-slate-600 mb-1 whitespace-pre-wrap">{tk.description}</p>
+                      <p className="text-sm text-slate-600 mb-1 whitespace-pre-wrap line-clamp-3 break-words">{tk.description}</p>
                       <p className="text-xs text-slate-400">{new Date(tk.createdAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</p>
+                      <p className="text-xs mt-1.5 flex items-center gap-1.5 flex-wrap">
+                        {tk.supportRepliedLast && (
+                          <span className="inline-flex items-center gap-1 font-semibold text-rose-600"><MessageSquareReply className="w-3.5 h-3.5" /> {tc("supportReplied")}</span>
+                        )}
+                        <span className="text-slate-400">{tc("replies", { count: tk.replyCount })}</span>
+                      </p>
                     </div>
+                    <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0 self-center" aria-label={tc("view")} />
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

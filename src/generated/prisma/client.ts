@@ -217,6 +217,11 @@ export type Review = Prisma.ReviewModel
  */
 export type Complaint = Prisma.ComplaintModel
 /**
+ * Model ComplaintMessage
+ * 
+ */
+export type ComplaintMessage = Prisma.ComplaintMessageModel
+/**
  * Model Clinic
  * 
  */

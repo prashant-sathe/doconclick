@@ -432,6 +432,7 @@ export const ModelName = {
   PrescriptionAttachment: 'PrescriptionAttachment',
   Review: 'Review',
   Complaint: 'Complaint',
+  ComplaintMessage: 'ComplaintMessage',
   Clinic: 'Clinic',
   ClinicSlot: 'ClinicSlot',
   ClinicLeave: 'ClinicLeave',
@@ -459,7 +460,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "notification" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "providerTimeOff" | "duesPayment" | "payoutRequest" | "settlementPayoutCorrection" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionVersion" | "doctorFavouriteMedicine" | "prescriptionTemplate" | "prescriptionAttachment" | "review" | "complaint" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
+    modelProps: "user" | "pushToken" | "notification" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "providerTimeOff" | "duesPayment" | "payoutRequest" | "settlementPayoutCorrection" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "prescriptionTest" | "prescriptionVersion" | "doctorFavouriteMedicine" | "prescriptionTemplate" | "prescriptionAttachment" | "review" | "complaint" | "complaintMessage" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3053,6 +3054,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ComplaintMessage: {
+      payload: Prisma.$ComplaintMessagePayload<ExtArgs>
+      fields: Prisma.ComplaintMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ComplaintMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ComplaintMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.ComplaintMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ComplaintMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload>
+        }
+        findMany: {
+          args: Prisma.ComplaintMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload>[]
+        }
+        create: {
+          args: Prisma.ComplaintMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload>
+        }
+        createMany: {
+          args: Prisma.ComplaintMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ComplaintMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.ComplaintMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload>
+        }
+        update: {
+          args: Prisma.ComplaintMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.ComplaintMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ComplaintMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ComplaintMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.ComplaintMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ComplaintMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.ComplaintMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateComplaintMessage>
+        }
+        groupBy: {
+          args: Prisma.ComplaintMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ComplaintMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ComplaintMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ComplaintMessageCountAggregateOutputType> | number
+        }
+      }
+    }
     Clinic: {
       payload: Prisma.$ClinicPayload<ExtArgs>
       fields: Prisma.ClinicFieldRefs
@@ -4600,10 +4675,30 @@ export const ComplaintScalarFieldEnum = {
   subject: 'subject',
   description: 'description',
   status: 'status',
+  priority: 'priority',
+  assigneeId: 'assigneeId',
+  appointmentId: 'appointmentId',
+  contactMobile: 'contactMobile',
+  firstResponseAt: 'firstResponseAt',
+  resolvedAt: 'resolvedAt',
+  lastActivityAt: 'lastActivityAt',
   createdAt: 'createdAt'
 } as const
 
 export type ComplaintScalarFieldEnum = (typeof ComplaintScalarFieldEnum)[keyof typeof ComplaintScalarFieldEnum]
+
+
+export const ComplaintMessageScalarFieldEnum = {
+  id: 'id',
+  complaintId: 'complaintId',
+  authorId: 'authorId',
+  fromSupport: 'fromSupport',
+  internal: 'internal',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type ComplaintMessageScalarFieldEnum = (typeof ComplaintMessageScalarFieldEnum)[keyof typeof ComplaintMessageScalarFieldEnum]
 
 
 export const ClinicScalarFieldEnum = {
@@ -5103,6 +5198,7 @@ export type GlobalOmitConfig = {
   prescriptionAttachment?: Prisma.PrescriptionAttachmentOmit
   review?: Prisma.ReviewOmit
   complaint?: Prisma.ComplaintOmit
+  complaintMessage?: Prisma.ComplaintMessageOmit
   clinic?: Prisma.ClinicOmit
   clinicSlot?: Prisma.ClinicSlotOmit
   clinicLeave?: Prisma.ClinicLeaveOmit

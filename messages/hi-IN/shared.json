@@ -194,5 +194,37 @@
     "earlier": "पिछले सुधार",
     "entry": "{when}: {from} → {to} · {admin} — {reason}",
     "unknownAdmin": "एडमिन"
+  },
+  "complaints": {
+    "allTickets": "सभी टिकट",
+    "notFound": "यह टिकट नहीं मिला।",
+    "you": "आप",
+    "support": "DocOnClick सपोर्ट",
+    "raisedOn": "{date} को दर्ज किया",
+    "aboutBooking": "बुकिंग",
+    "bookingWith": "{name} के साथ · {date}",
+    "callback": "कॉलबैक नंबर: {mobile}",
+    "conversation": "बातचीत",
+    "replyLabel": "आपका जवाब",
+    "replyPlaceholder": "जवाब लिखें…",
+    "send": "भेजें",
+    "sending": "भेज रहे हैं…",
+    "sendFailed": "आपका जवाब नहीं भेजा जा सका। कृपया फिर से कोशिश करें।",
+    "resolvedNote": "यह टिकट हल हो चुका है। अगर समस्या अभी भी है, तो जवाब दें — हम इसे फिर से खोल देंगे।",
+    "noReplies": "अभी तक कोई जवाब नहीं — हमारी टीम यहीं जवाब देगी और आपको सूचना मिलेगी।",
+    "supportReplied": "सपोर्ट ने जवाब दिया",
+    "replies": "{count, plural, =0 {अभी कोई जवाब नहीं} one {# संदेश} other {# संदेश}}",
+    "view": "बातचीत देखें",
+    "linkLabel": "यह किस बुकिंग के बारे में है? (वैकल्पिक)",
+    "linkNone": "किसी बुकिंग के बारे में नहीं",
+    "linkOption": "{name} · {date}",
+    "contactLabel": "कॉलबैक नंबर (वैकल्पिक)",
+    "contactPlaceholder": "सिर्फ़ तभी, जब यह आपके अकाउंट नंबर से अलग हो",
+    "contactInvalid": "10 अंकों का सही मोबाइल नंबर डालें",
+    "status": {
+      "OPEN": "खुला",
+      "IN_PROGRESS": "काम चल रहा है",
+      "RESOLVED": "हल हो गया"
+    }
   }
 }

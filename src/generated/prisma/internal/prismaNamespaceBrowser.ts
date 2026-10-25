@@ -86,6 +86,7 @@ export const ModelName = {
   PrescriptionAttachment: 'PrescriptionAttachment',
   Review: 'Review',
   Complaint: 'Complaint',
+  ComplaintMessage: 'ComplaintMessage',
   Clinic: 'Clinic',
   ClinicSlot: 'ClinicSlot',
   ClinicLeave: 'ClinicLeave',
@@ -736,10 +737,30 @@ export const ComplaintScalarFieldEnum = {
   subject: 'subject',
   description: 'description',
   status: 'status',
+  priority: 'priority',
+  assigneeId: 'assigneeId',
+  appointmentId: 'appointmentId',
+  contactMobile: 'contactMobile',
+  firstResponseAt: 'firstResponseAt',
+  resolvedAt: 'resolvedAt',
+  lastActivityAt: 'lastActivityAt',
   createdAt: 'createdAt'
 } as const
 
 export type ComplaintScalarFieldEnum = (typeof ComplaintScalarFieldEnum)[keyof typeof ComplaintScalarFieldEnum]
+
+
+export const ComplaintMessageScalarFieldEnum = {
+  id: 'id',
+  complaintId: 'complaintId',
+  authorId: 'authorId',
+  fromSupport: 'fromSupport',
+  internal: 'internal',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type ComplaintMessageScalarFieldEnum = (typeof ComplaintMessageScalarFieldEnum)[keyof typeof ComplaintMessageScalarFieldEnum]
 
 
 export const ClinicScalarFieldEnum = {

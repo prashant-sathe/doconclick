@@ -294,6 +294,8 @@ export type UserWhereInput = {
   asPatient?: Prisma.AppointmentListRelationFilter
   asDoctor?: Prisma.AppointmentListRelationFilter
   complaints?: Prisma.ComplaintListRelationFilter
+  complaintsAssigned?: Prisma.ComplaintListRelationFilter
+  complaintMessages?: Prisma.ComplaintMessageListRelationFilter
   reviewsGiven?: Prisma.ReviewListRelationFilter
   reviewsReceived?: Prisma.ReviewListRelationFilter
   messagesSent?: Prisma.MessageListRelationFilter
@@ -351,6 +353,8 @@ export type UserOrderByWithRelationInput = {
   asPatient?: Prisma.AppointmentOrderByRelationAggregateInput
   asDoctor?: Prisma.AppointmentOrderByRelationAggregateInput
   complaints?: Prisma.ComplaintOrderByRelationAggregateInput
+  complaintsAssigned?: Prisma.ComplaintOrderByRelationAggregateInput
+  complaintMessages?: Prisma.ComplaintMessageOrderByRelationAggregateInput
   reviewsGiven?: Prisma.ReviewOrderByRelationAggregateInput
   reviewsReceived?: Prisma.ReviewOrderByRelationAggregateInput
   messagesSent?: Prisma.MessageOrderByRelationAggregateInput
@@ -411,6 +415,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   asPatient?: Prisma.AppointmentListRelationFilter
   asDoctor?: Prisma.AppointmentListRelationFilter
   complaints?: Prisma.ComplaintListRelationFilter
+  complaintsAssigned?: Prisma.ComplaintListRelationFilter
+  complaintMessages?: Prisma.ComplaintMessageListRelationFilter
   reviewsGiven?: Prisma.ReviewListRelationFilter
   reviewsReceived?: Prisma.ReviewListRelationFilter
   messagesSent?: Prisma.MessageListRelationFilter
@@ -510,6 +516,8 @@ export type UserCreateInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -567,6 +575,8 @@ export type UserUncheckedCreateInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -624,6 +634,8 @@ export type UserUpdateInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -681,6 +693,8 @@ export type UserUncheckedUpdateInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -1309,12 +1323,44 @@ export type UserCreateNestedOneWithoutComplaintsInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
+export type UserCreateNestedOneWithoutComplaintsAssignedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutComplaintsAssignedInput, Prisma.UserUncheckedCreateWithoutComplaintsAssignedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutComplaintsAssignedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
 export type UserUpdateOneRequiredWithoutComplaintsNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutComplaintsInput, Prisma.UserUncheckedCreateWithoutComplaintsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutComplaintsInput
   upsert?: Prisma.UserUpsertWithoutComplaintsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutComplaintsInput, Prisma.UserUpdateWithoutComplaintsInput>, Prisma.UserUncheckedUpdateWithoutComplaintsInput>
+}
+
+export type UserUpdateOneWithoutComplaintsAssignedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutComplaintsAssignedInput, Prisma.UserUncheckedCreateWithoutComplaintsAssignedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutComplaintsAssignedInput
+  upsert?: Prisma.UserUpsertWithoutComplaintsAssignedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutComplaintsAssignedInput, Prisma.UserUpdateWithoutComplaintsAssignedInput>, Prisma.UserUncheckedUpdateWithoutComplaintsAssignedInput>
+}
+
+export type UserCreateNestedOneWithoutComplaintMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutComplaintMessagesInput, Prisma.UserUncheckedCreateWithoutComplaintMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutComplaintMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutComplaintMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutComplaintMessagesInput, Prisma.UserUncheckedCreateWithoutComplaintMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutComplaintMessagesInput
+  upsert?: Prisma.UserUpsertWithoutComplaintMessagesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutComplaintMessagesInput, Prisma.UserUpdateWithoutComplaintMessagesInput>, Prisma.UserUncheckedUpdateWithoutComplaintMessagesInput>
 }
 
 export type UserCreateNestedOneWithoutClinicsInput = {
@@ -1452,6 +1498,8 @@ export type UserCreateWithoutPushTokensInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -1508,6 +1556,8 @@ export type UserUncheckedCreateWithoutPushTokensInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -1580,6 +1630,8 @@ export type UserUpdateWithoutPushTokensInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -1636,6 +1688,8 @@ export type UserUncheckedUpdateWithoutPushTokensInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -1692,6 +1746,8 @@ export type UserCreateWithoutNotificationsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -1748,6 +1804,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -1820,6 +1878,8 @@ export type UserUpdateWithoutNotificationsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -1876,6 +1936,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -1932,6 +1994,8 @@ export type UserCreateWithoutSavedDoctorsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -1988,6 +2052,8 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -2049,6 +2115,8 @@ export type UserCreateWithoutSavedByPatientsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -2105,6 +2173,8 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -2177,6 +2247,8 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -2233,6 +2305,8 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -2300,6 +2374,8 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -2356,6 +2432,8 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -2411,6 +2489,8 @@ export type UserCreateWithoutPatientProfileInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -2467,6 +2547,8 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -2539,6 +2621,8 @@ export type UserUpdateWithoutPatientProfileInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -2595,6 +2679,8 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -2652,6 +2738,8 @@ export type UserCreateWithoutDocumentsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -2708,6 +2796,8 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -2780,6 +2870,8 @@ export type UserUpdateWithoutDocumentsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -2836,6 +2928,8 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -2891,6 +2985,8 @@ export type UserCreateWithoutDoctorProfileInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -2947,6 +3043,8 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -3019,6 +3117,8 @@ export type UserUpdateWithoutDoctorProfileInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -3075,6 +3175,8 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -3131,6 +3233,8 @@ export type UserCreateWithoutNurseProfileInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -3187,6 +3291,8 @@ export type UserUncheckedCreateWithoutNurseProfileInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -3259,6 +3365,8 @@ export type UserUpdateWithoutNurseProfileInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -3315,6 +3423,8 @@ export type UserUncheckedUpdateWithoutNurseProfileInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -3372,6 +3482,8 @@ export type UserCreateWithoutVitalsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -3428,6 +3540,8 @@ export type UserUncheckedCreateWithoutVitalsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -3489,6 +3603,8 @@ export type UserCreateWithoutVitalsRecordedInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -3545,6 +3661,8 @@ export type UserUncheckedCreateWithoutVitalsRecordedInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -3617,6 +3735,8 @@ export type UserUpdateWithoutVitalsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -3673,6 +3793,8 @@ export type UserUncheckedUpdateWithoutVitalsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -3740,6 +3862,8 @@ export type UserUpdateWithoutVitalsRecordedInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -3796,6 +3920,8 @@ export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -3852,6 +3978,8 @@ export type UserCreateWithoutNursePaymentLogsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -3908,6 +4036,8 @@ export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -3980,6 +4110,8 @@ export type UserUpdateWithoutNursePaymentLogsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -4036,6 +4168,8 @@ export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -4092,6 +4226,8 @@ export type UserCreateWithoutChangeRequestsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -4148,6 +4284,8 @@ export type UserUncheckedCreateWithoutChangeRequestsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -4209,6 +4347,8 @@ export type UserCreateWithoutChangeRequestsResolvedInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -4265,6 +4405,8 @@ export type UserUncheckedCreateWithoutChangeRequestsResolvedInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -4337,6 +4479,8 @@ export type UserUpdateWithoutChangeRequestsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -4393,6 +4537,8 @@ export type UserUncheckedUpdateWithoutChangeRequestsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -4460,6 +4606,8 @@ export type UserUpdateWithoutChangeRequestsResolvedInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -4516,6 +4664,8 @@ export type UserUncheckedUpdateWithoutChangeRequestsResolvedInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -4572,6 +4722,8 @@ export type UserCreateWithoutStaffAccountInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -4628,6 +4780,8 @@ export type UserUncheckedCreateWithoutStaffAccountInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -4689,6 +4843,8 @@ export type UserCreateWithoutStaffMembersInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -4745,6 +4901,8 @@ export type UserUncheckedCreateWithoutStaffMembersInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -4817,6 +4975,8 @@ export type UserUpdateWithoutStaffAccountInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -4873,6 +5033,8 @@ export type UserUncheckedUpdateWithoutStaffAccountInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -4940,6 +5102,8 @@ export type UserUpdateWithoutStaffMembersInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -4996,6 +5160,8 @@ export type UserUncheckedUpdateWithoutStaffMembersInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -5051,6 +5217,8 @@ export type UserCreateWithoutAsPatientInput = {
   nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -5107,6 +5275,8 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -5168,6 +5338,8 @@ export type UserCreateWithoutAsDoctorInput = {
   nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -5224,6 +5396,8 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -5296,6 +5470,8 @@ export type UserUpdateWithoutAsPatientInput = {
   nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -5352,6 +5528,8 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -5419,6 +5597,8 @@ export type UserUpdateWithoutAsDoctorInput = {
   nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -5475,6 +5655,8 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -5532,6 +5714,8 @@ export type UserCreateWithoutWalletInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -5588,6 +5772,8 @@ export type UserUncheckedCreateWithoutWalletInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -5660,6 +5846,8 @@ export type UserUpdateWithoutWalletInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -5716,6 +5904,8 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -5772,6 +5962,8 @@ export type UserCreateWithoutWalletTransactionsAdjustedInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -5828,6 +6020,8 @@ export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -5900,6 +6094,8 @@ export type UserUpdateWithoutWalletTransactionsAdjustedInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -5956,6 +6152,8 @@ export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -6012,6 +6210,8 @@ export type UserCreateWithoutSettlementsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -6068,6 +6268,8 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -6129,6 +6331,8 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -6185,6 +6389,8 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -6246,6 +6452,8 @@ export type UserCreateWithoutSettlementsPaidInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -6302,6 +6510,8 @@ export type UserUncheckedCreateWithoutSettlementsPaidInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -6374,6 +6584,8 @@ export type UserUpdateWithoutSettlementsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -6430,6 +6642,8 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -6497,6 +6711,8 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -6553,6 +6769,8 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -6620,6 +6838,8 @@ export type UserUpdateWithoutSettlementsPaidInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -6676,6 +6896,8 @@ export type UserUncheckedUpdateWithoutSettlementsPaidInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -6732,6 +6954,8 @@ export type UserCreateWithoutTimeOffInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -6788,6 +7012,8 @@ export type UserUncheckedCreateWithoutTimeOffInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -6860,6 +7086,8 @@ export type UserUpdateWithoutTimeOffInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -6916,6 +7144,8 @@ export type UserUncheckedUpdateWithoutTimeOffInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -6972,6 +7202,8 @@ export type UserCreateWithoutDuesPaymentsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -7028,6 +7260,8 @@ export type UserUncheckedCreateWithoutDuesPaymentsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -7100,6 +7334,8 @@ export type UserUpdateWithoutDuesPaymentsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -7156,6 +7392,8 @@ export type UserUncheckedUpdateWithoutDuesPaymentsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -7212,6 +7450,8 @@ export type UserCreateWithoutPayoutRequestsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -7268,6 +7508,8 @@ export type UserUncheckedCreateWithoutPayoutRequestsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -7340,6 +7582,8 @@ export type UserUpdateWithoutPayoutRequestsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -7396,6 +7640,8 @@ export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -7452,6 +7698,8 @@ export type UserCreateWithoutPaymentLogsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -7508,6 +7756,8 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -7580,6 +7830,8 @@ export type UserUpdateWithoutPaymentLogsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -7636,6 +7888,8 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -7692,6 +7946,8 @@ export type UserCreateWithoutMessagesSentInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
@@ -7748,6 +8004,8 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
@@ -7820,6 +8078,8 @@ export type UserUpdateWithoutMessagesSentInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
@@ -7876,6 +8136,8 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
@@ -7932,6 +8194,8 @@ export type UserCreateWithoutFavouriteMedicinesInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -7988,6 +8252,8 @@ export type UserUncheckedCreateWithoutFavouriteMedicinesInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -8060,6 +8326,8 @@ export type UserUpdateWithoutFavouriteMedicinesInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -8116,6 +8384,8 @@ export type UserUncheckedUpdateWithoutFavouriteMedicinesInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -8172,6 +8442,8 @@ export type UserCreateWithoutPrescriptionTemplatesInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -8228,6 +8500,8 @@ export type UserUncheckedCreateWithoutPrescriptionTemplatesInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -8300,6 +8574,8 @@ export type UserUpdateWithoutPrescriptionTemplatesInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -8356,6 +8632,8 @@ export type UserUncheckedUpdateWithoutPrescriptionTemplatesInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -8412,6 +8690,8 @@ export type UserCreateWithoutReviewsGivenInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
@@ -8468,6 +8748,8 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
@@ -8529,6 +8811,8 @@ export type UserCreateWithoutReviewsReceivedInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
@@ -8585,6 +8869,8 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
@@ -8657,6 +8943,8 @@ export type UserUpdateWithoutReviewsGivenInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
@@ -8713,6 +9001,8 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
@@ -8780,6 +9070,8 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
@@ -8836,6 +9128,8 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
@@ -8891,6 +9185,8 @@ export type UserCreateWithoutComplaintsInput = {
   nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -8947,6 +9243,8 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -8988,6 +9286,127 @@ export type UserCreateOrConnectWithoutComplaintsInput = {
   create: Prisma.XOR<Prisma.UserCreateWithoutComplaintsInput, Prisma.UserUncheckedCreateWithoutComplaintsInput>
 }
 
+export type UserCreateWithoutComplaintsAssignedInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+}
+
+export type UserUncheckedCreateWithoutComplaintsAssignedInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementUncheckedCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+}
+
+export type UserCreateOrConnectWithoutComplaintsAssignedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutComplaintsAssignedInput, Prisma.UserUncheckedCreateWithoutComplaintsAssignedInput>
+}
+
 export type UserUpsertWithoutComplaintsInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutComplaintsInput, Prisma.UserUncheckedUpdateWithoutComplaintsInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutComplaintsInput, Prisma.UserUncheckedCreateWithoutComplaintsInput>
@@ -9019,6 +9438,8 @@ export type UserUpdateWithoutComplaintsInput = {
   nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -9075,6 +9496,383 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUncheckedUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+}
+
+export type UserUpsertWithoutComplaintsAssignedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutComplaintsAssignedInput, Prisma.UserUncheckedUpdateWithoutComplaintsAssignedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutComplaintsAssignedInput, Prisma.UserUncheckedCreateWithoutComplaintsAssignedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutComplaintsAssignedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutComplaintsAssignedInput, Prisma.UserUncheckedUpdateWithoutComplaintsAssignedInput>
+}
+
+export type UserUpdateWithoutComplaintsAssignedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutComplaintsAssignedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUncheckedUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+}
+
+export type UserCreateWithoutComplaintMessagesInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+}
+
+export type UserUncheckedCreateWithoutComplaintMessagesInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementUncheckedCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+}
+
+export type UserCreateOrConnectWithoutComplaintMessagesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutComplaintMessagesInput, Prisma.UserUncheckedCreateWithoutComplaintMessagesInput>
+}
+
+export type UserUpsertWithoutComplaintMessagesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutComplaintMessagesInput, Prisma.UserUncheckedUpdateWithoutComplaintMessagesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutComplaintMessagesInput, Prisma.UserUncheckedCreateWithoutComplaintMessagesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutComplaintMessagesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutComplaintMessagesInput, Prisma.UserUncheckedUpdateWithoutComplaintMessagesInput>
+}
+
+export type UserUpdateWithoutComplaintMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutComplaintMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -9132,6 +9930,8 @@ export type UserCreateWithoutClinicsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -9188,6 +9988,8 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -9260,6 +10062,8 @@ export type UserUpdateWithoutClinicsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -9316,6 +10120,8 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -9372,6 +10178,8 @@ export type UserCreateWithoutAnnouncementsCreatedInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -9428,6 +10236,8 @@ export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -9500,6 +10310,8 @@ export type UserUpdateWithoutAnnouncementsCreatedInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -9556,6 +10368,8 @@ export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -9612,6 +10426,8 @@ export type UserCreateWithoutAnnouncementRecipientsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -9668,6 +10484,8 @@ export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -9740,6 +10558,8 @@ export type UserUpdateWithoutAnnouncementRecipientsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -9796,6 +10616,8 @@ export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -9852,6 +10674,8 @@ export type UserCreateWithoutImpersonationsStartedInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -9908,6 +10732,8 @@ export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -9969,6 +10795,8 @@ export type UserCreateWithoutImpersonationsReceivedInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -10025,6 +10853,8 @@ export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -10097,6 +10927,8 @@ export type UserUpdateWithoutImpersonationsStartedInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -10153,6 +10985,8 @@ export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -10220,6 +11054,8 @@ export type UserUpdateWithoutImpersonationsReceivedInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -10276,6 +11112,8 @@ export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -10332,6 +11170,8 @@ export type UserCreateWithoutCouponsCreatedInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -10388,6 +11228,8 @@ export type UserUncheckedCreateWithoutCouponsCreatedInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -10460,6 +11302,8 @@ export type UserUpdateWithoutCouponsCreatedInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -10516,6 +11360,8 @@ export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -10572,6 +11418,8 @@ export type UserCreateWithoutCouponRedemptionsInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -10628,6 +11476,8 @@ export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -10700,6 +11550,8 @@ export type UserUpdateWithoutCouponRedemptionsInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -10756,6 +11608,8 @@ export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -10812,6 +11666,8 @@ export type UserCreateWithoutPaymentOrdersInput = {
   asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -10868,6 +11724,8 @@ export type UserUncheckedCreateWithoutPaymentOrdersInput = {
   asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -10940,6 +11798,8 @@ export type UserUpdateWithoutPaymentOrdersInput = {
   asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -10996,6 +11856,8 @@ export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
   asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -11040,6 +11902,8 @@ export type UserCountOutputType = {
   asPatient: number
   asDoctor: number
   complaints: number
+  complaintsAssigned: number
+  complaintMessages: number
   reviewsGiven: number
   reviewsReceived: number
   messagesSent: number
@@ -11078,6 +11942,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   asPatient?: boolean | UserCountOutputTypeCountAsPatientArgs
   asDoctor?: boolean | UserCountOutputTypeCountAsDoctorArgs
   complaints?: boolean | UserCountOutputTypeCountComplaintsArgs
+  complaintsAssigned?: boolean | UserCountOutputTypeCountComplaintsAssignedArgs
+  complaintMessages?: boolean | UserCountOutputTypeCountComplaintMessagesArgs
   reviewsGiven?: boolean | UserCountOutputTypeCountReviewsGivenArgs
   reviewsReceived?: boolean | UserCountOutputTypeCountReviewsReceivedArgs
   messagesSent?: boolean | UserCountOutputTypeCountMessagesSentArgs
@@ -11141,6 +12007,20 @@ export type UserCountOutputTypeCountAsDoctorArgs<ExtArgs extends runtime.Types.E
  */
 export type UserCountOutputTypeCountComplaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ComplaintWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountComplaintsAssignedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComplaintWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountComplaintMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComplaintMessageWhereInput
 }
 
 /**
@@ -11389,6 +12269,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   asPatient?: boolean | Prisma.User$asPatientArgs<ExtArgs>
   asDoctor?: boolean | Prisma.User$asDoctorArgs<ExtArgs>
   complaints?: boolean | Prisma.User$complaintsArgs<ExtArgs>
+  complaintsAssigned?: boolean | Prisma.User$complaintsAssignedArgs<ExtArgs>
+  complaintMessages?: boolean | Prisma.User$complaintMessagesArgs<ExtArgs>
   reviewsGiven?: boolean | Prisma.User$reviewsGivenArgs<ExtArgs>
   reviewsReceived?: boolean | Prisma.User$reviewsReceivedArgs<ExtArgs>
   messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
@@ -11485,6 +12367,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   asPatient?: boolean | Prisma.User$asPatientArgs<ExtArgs>
   asDoctor?: boolean | Prisma.User$asDoctorArgs<ExtArgs>
   complaints?: boolean | Prisma.User$complaintsArgs<ExtArgs>
+  complaintsAssigned?: boolean | Prisma.User$complaintsAssignedArgs<ExtArgs>
+  complaintMessages?: boolean | Prisma.User$complaintMessagesArgs<ExtArgs>
   reviewsGiven?: boolean | Prisma.User$reviewsGivenArgs<ExtArgs>
   reviewsReceived?: boolean | Prisma.User$reviewsReceivedArgs<ExtArgs>
   messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
@@ -11533,6 +12417,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     asPatient: Prisma.$AppointmentPayload<ExtArgs>[]
     asDoctor: Prisma.$AppointmentPayload<ExtArgs>[]
     complaints: Prisma.$ComplaintPayload<ExtArgs>[]
+    complaintsAssigned: Prisma.$ComplaintPayload<ExtArgs>[]
+    complaintMessages: Prisma.$ComplaintMessagePayload<ExtArgs>[]
     reviewsGiven: Prisma.$ReviewPayload<ExtArgs>[]
     reviewsReceived: Prisma.$ReviewPayload<ExtArgs>[]
     messagesSent: Prisma.$MessagePayload<ExtArgs>[]
@@ -11983,6 +12869,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   asPatient<T extends Prisma.User$asPatientArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$asPatientArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   asDoctor<T extends Prisma.User$asDoctorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$asDoctorArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   complaints<T extends Prisma.User$complaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$complaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  complaintsAssigned<T extends Prisma.User$complaintsAssignedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$complaintsAssignedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  complaintMessages<T extends Prisma.User$complaintMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$complaintMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewsGiven<T extends Prisma.User$reviewsGivenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewsGivenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewsReceived<T extends Prisma.User$reviewsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messagesSent<T extends Prisma.User$messagesSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -12579,6 +13467,54 @@ export type User$complaintsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
+}
+
+/**
+ * User.complaintsAssigned
+ */
+export type User$complaintsAssignedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Complaint
+   */
+  select?: Prisma.ComplaintSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Complaint
+   */
+  omit?: Prisma.ComplaintOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ComplaintInclude<ExtArgs> | null
+  where?: Prisma.ComplaintWhereInput
+  orderBy?: Prisma.ComplaintOrderByWithRelationInput | Prisma.ComplaintOrderByWithRelationInput[]
+  cursor?: Prisma.ComplaintWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
+}
+
+/**
+ * User.complaintMessages
+ */
+export type User$complaintMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ComplaintMessage
+   */
+  select?: Prisma.ComplaintMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ComplaintMessage
+   */
+  omit?: Prisma.ComplaintMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ComplaintMessageInclude<ExtArgs> | null
+  where?: Prisma.ComplaintMessageWhereInput
+  orderBy?: Prisma.ComplaintMessageOrderByWithRelationInput | Prisma.ComplaintMessageOrderByWithRelationInput[]
+  cursor?: Prisma.ComplaintMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ComplaintMessageScalarFieldEnum | Prisma.ComplaintMessageScalarFieldEnum[]
 }
 
 /**

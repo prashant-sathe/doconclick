@@ -30,6 +30,13 @@ export type ComplaintMinAggregateOutputType = {
   subject: string | null
   description: string | null
   status: string | null
+  priority: string | null
+  assigneeId: string | null
+  appointmentId: string | null
+  contactMobile: string | null
+  firstResponseAt: Date | null
+  resolvedAt: Date | null
+  lastActivityAt: Date | null
   createdAt: Date | null
 }
 
@@ -39,6 +46,13 @@ export type ComplaintMaxAggregateOutputType = {
   subject: string | null
   description: string | null
   status: string | null
+  priority: string | null
+  assigneeId: string | null
+  appointmentId: string | null
+  contactMobile: string | null
+  firstResponseAt: Date | null
+  resolvedAt: Date | null
+  lastActivityAt: Date | null
   createdAt: Date | null
 }
 
@@ -48,6 +62,13 @@ export type ComplaintCountAggregateOutputType = {
   subject: number
   description: number
   status: number
+  priority: number
+  assigneeId: number
+  appointmentId: number
+  contactMobile: number
+  firstResponseAt: number
+  resolvedAt: number
+  lastActivityAt: number
   createdAt: number
   _all: number
 }
@@ -59,6 +80,13 @@ export type ComplaintMinAggregateInputType = {
   subject?: true
   description?: true
   status?: true
+  priority?: true
+  assigneeId?: true
+  appointmentId?: true
+  contactMobile?: true
+  firstResponseAt?: true
+  resolvedAt?: true
+  lastActivityAt?: true
   createdAt?: true
 }
 
@@ -68,6 +96,13 @@ export type ComplaintMaxAggregateInputType = {
   subject?: true
   description?: true
   status?: true
+  priority?: true
+  assigneeId?: true
+  appointmentId?: true
+  contactMobile?: true
+  firstResponseAt?: true
+  resolvedAt?: true
+  lastActivityAt?: true
   createdAt?: true
 }
 
@@ -77,6 +112,13 @@ export type ComplaintCountAggregateInputType = {
   subject?: true
   description?: true
   status?: true
+  priority?: true
+  assigneeId?: true
+  appointmentId?: true
+  contactMobile?: true
+  firstResponseAt?: true
+  resolvedAt?: true
+  lastActivityAt?: true
   createdAt?: true
   _all?: true
 }
@@ -159,6 +201,13 @@ export type ComplaintGroupByOutputType = {
   subject: string
   description: string
   status: string
+  priority: string
+  assigneeId: string | null
+  appointmentId: string | null
+  contactMobile: string | null
+  firstResponseAt: Date | null
+  resolvedAt: Date | null
+  lastActivityAt: Date
   createdAt: Date
   _count: ComplaintCountAggregateOutputType | null
   _min: ComplaintMinAggregateOutputType | null
@@ -189,8 +238,18 @@ export type ComplaintWhereInput = {
   subject?: Prisma.StringFilter<"Complaint"> | string
   description?: Prisma.StringFilter<"Complaint"> | string
   status?: Prisma.StringFilter<"Complaint"> | string
+  priority?: Prisma.StringFilter<"Complaint"> | string
+  assigneeId?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  appointmentId?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  contactMobile?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  firstResponseAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  resolvedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  assignee?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  appointment?: Prisma.XOR<Prisma.AppointmentNullableScalarRelationFilter, Prisma.AppointmentWhereInput> | null
+  messages?: Prisma.ComplaintMessageListRelationFilter
 }
 
 export type ComplaintOrderByWithRelationInput = {
@@ -199,8 +258,18 @@ export type ComplaintOrderByWithRelationInput = {
   subject?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  assigneeId?: Prisma.SortOrderInput | Prisma.SortOrder
+  appointmentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  contactMobile?: Prisma.SortOrderInput | Prisma.SortOrder
+  firstResponseAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  assignee?: Prisma.UserOrderByWithRelationInput
+  appointment?: Prisma.AppointmentOrderByWithRelationInput
+  messages?: Prisma.ComplaintMessageOrderByRelationAggregateInput
 }
 
 export type ComplaintWhereUniqueInput = Prisma.AtLeast<{
@@ -212,8 +281,18 @@ export type ComplaintWhereUniqueInput = Prisma.AtLeast<{
   subject?: Prisma.StringFilter<"Complaint"> | string
   description?: Prisma.StringFilter<"Complaint"> | string
   status?: Prisma.StringFilter<"Complaint"> | string
+  priority?: Prisma.StringFilter<"Complaint"> | string
+  assigneeId?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  appointmentId?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  contactMobile?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  firstResponseAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  resolvedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  assignee?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  appointment?: Prisma.XOR<Prisma.AppointmentNullableScalarRelationFilter, Prisma.AppointmentWhereInput> | null
+  messages?: Prisma.ComplaintMessageListRelationFilter
 }, "id">
 
 export type ComplaintOrderByWithAggregationInput = {
@@ -222,6 +301,13 @@ export type ComplaintOrderByWithAggregationInput = {
   subject?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  assigneeId?: Prisma.SortOrderInput | Prisma.SortOrder
+  appointmentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  contactMobile?: Prisma.SortOrderInput | Prisma.SortOrder
+  firstResponseAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ComplaintCountOrderByAggregateInput
   _max?: Prisma.ComplaintMaxOrderByAggregateInput
@@ -237,6 +323,13 @@ export type ComplaintScalarWhereWithAggregatesInput = {
   subject?: Prisma.StringWithAggregatesFilter<"Complaint"> | string
   description?: Prisma.StringWithAggregatesFilter<"Complaint"> | string
   status?: Prisma.StringWithAggregatesFilter<"Complaint"> | string
+  priority?: Prisma.StringWithAggregatesFilter<"Complaint"> | string
+  assigneeId?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  appointmentId?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  contactMobile?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  firstResponseAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Complaint"> | Date | string | null
+  resolvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Complaint"> | Date | string | null
+  lastActivityAt?: Prisma.DateTimeWithAggregatesFilter<"Complaint"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Complaint"> | Date | string
 }
 
@@ -245,8 +338,16 @@ export type ComplaintCreateInput = {
   subject: string
   description: string
   status?: string
+  priority?: string
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutComplaintsInput
+  assignee?: Prisma.UserCreateNestedOneWithoutComplaintsAssignedInput
+  appointment?: Prisma.AppointmentCreateNestedOneWithoutComplaintsInput
+  messages?: Prisma.ComplaintMessageCreateNestedManyWithoutComplaintInput
 }
 
 export type ComplaintUncheckedCreateInput = {
@@ -255,7 +356,15 @@ export type ComplaintUncheckedCreateInput = {
   subject: string
   description: string
   status?: string
+  priority?: string
+  assigneeId?: string | null
+  appointmentId?: string | null
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
   createdAt?: Date | string
+  messages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutComplaintInput
 }
 
 export type ComplaintUpdateInput = {
@@ -263,8 +372,16 @@ export type ComplaintUpdateInput = {
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
+  assignee?: Prisma.UserUpdateOneWithoutComplaintsAssignedNestedInput
+  appointment?: Prisma.AppointmentUpdateOneWithoutComplaintsNestedInput
+  messages?: Prisma.ComplaintMessageUpdateManyWithoutComplaintNestedInput
 }
 
 export type ComplaintUncheckedUpdateInput = {
@@ -273,7 +390,15 @@ export type ComplaintUncheckedUpdateInput = {
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  assigneeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutComplaintNestedInput
 }
 
 export type ComplaintCreateManyInput = {
@@ -282,6 +407,13 @@ export type ComplaintCreateManyInput = {
   subject: string
   description: string
   status?: string
+  priority?: string
+  assigneeId?: string | null
+  appointmentId?: string | null
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
   createdAt?: Date | string
 }
 
@@ -290,6 +422,11 @@ export type ComplaintUpdateManyMutationInput = {
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -299,6 +436,13 @@ export type ComplaintUncheckedUpdateManyInput = {
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  assigneeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -318,6 +462,13 @@ export type ComplaintCountOrderByAggregateInput = {
   subject?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  assigneeId?: Prisma.SortOrder
+  appointmentId?: Prisma.SortOrder
+  contactMobile?: Prisma.SortOrder
+  firstResponseAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -327,6 +478,13 @@ export type ComplaintMaxOrderByAggregateInput = {
   subject?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  assigneeId?: Prisma.SortOrder
+  appointmentId?: Prisma.SortOrder
+  contactMobile?: Prisma.SortOrder
+  firstResponseAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -336,7 +494,19 @@ export type ComplaintMinOrderByAggregateInput = {
   subject?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  assigneeId?: Prisma.SortOrder
+  appointmentId?: Prisma.SortOrder
+  contactMobile?: Prisma.SortOrder
+  firstResponseAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type ComplaintScalarRelationFilter = {
+  is?: Prisma.ComplaintWhereInput
+  isNot?: Prisma.ComplaintWhereInput
 }
 
 export type ComplaintCreateNestedManyWithoutUserInput = {
@@ -346,10 +516,24 @@ export type ComplaintCreateNestedManyWithoutUserInput = {
   connect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
 }
 
+export type ComplaintCreateNestedManyWithoutAssigneeInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutAssigneeInput, Prisma.ComplaintUncheckedCreateWithoutAssigneeInput> | Prisma.ComplaintCreateWithoutAssigneeInput[] | Prisma.ComplaintUncheckedCreateWithoutAssigneeInput[]
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutAssigneeInput | Prisma.ComplaintCreateOrConnectWithoutAssigneeInput[]
+  createMany?: Prisma.ComplaintCreateManyAssigneeInputEnvelope
+  connect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+}
+
 export type ComplaintUncheckedCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.ComplaintCreateWithoutUserInput, Prisma.ComplaintUncheckedCreateWithoutUserInput> | Prisma.ComplaintCreateWithoutUserInput[] | Prisma.ComplaintUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutUserInput | Prisma.ComplaintCreateOrConnectWithoutUserInput[]
   createMany?: Prisma.ComplaintCreateManyUserInputEnvelope
+  connect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+}
+
+export type ComplaintUncheckedCreateNestedManyWithoutAssigneeInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutAssigneeInput, Prisma.ComplaintUncheckedCreateWithoutAssigneeInput> | Prisma.ComplaintCreateWithoutAssigneeInput[] | Prisma.ComplaintUncheckedCreateWithoutAssigneeInput[]
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutAssigneeInput | Prisma.ComplaintCreateOrConnectWithoutAssigneeInput[]
+  createMany?: Prisma.ComplaintCreateManyAssigneeInputEnvelope
   connect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
 }
 
@@ -367,6 +551,20 @@ export type ComplaintUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.ComplaintScalarWhereInput | Prisma.ComplaintScalarWhereInput[]
 }
 
+export type ComplaintUpdateManyWithoutAssigneeNestedInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutAssigneeInput, Prisma.ComplaintUncheckedCreateWithoutAssigneeInput> | Prisma.ComplaintCreateWithoutAssigneeInput[] | Prisma.ComplaintUncheckedCreateWithoutAssigneeInput[]
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutAssigneeInput | Prisma.ComplaintCreateOrConnectWithoutAssigneeInput[]
+  upsert?: Prisma.ComplaintUpsertWithWhereUniqueWithoutAssigneeInput | Prisma.ComplaintUpsertWithWhereUniqueWithoutAssigneeInput[]
+  createMany?: Prisma.ComplaintCreateManyAssigneeInputEnvelope
+  set?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  disconnect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  delete?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  connect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  update?: Prisma.ComplaintUpdateWithWhereUniqueWithoutAssigneeInput | Prisma.ComplaintUpdateWithWhereUniqueWithoutAssigneeInput[]
+  updateMany?: Prisma.ComplaintUpdateManyWithWhereWithoutAssigneeInput | Prisma.ComplaintUpdateManyWithWhereWithoutAssigneeInput[]
+  deleteMany?: Prisma.ComplaintScalarWhereInput | Prisma.ComplaintScalarWhereInput[]
+}
+
 export type ComplaintUncheckedUpdateManyWithoutUserNestedInput = {
   create?: Prisma.XOR<Prisma.ComplaintCreateWithoutUserInput, Prisma.ComplaintUncheckedCreateWithoutUserInput> | Prisma.ComplaintCreateWithoutUserInput[] | Prisma.ComplaintUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutUserInput | Prisma.ComplaintCreateOrConnectWithoutUserInput[]
@@ -381,12 +579,90 @@ export type ComplaintUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.ComplaintScalarWhereInput | Prisma.ComplaintScalarWhereInput[]
 }
 
+export type ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutAssigneeInput, Prisma.ComplaintUncheckedCreateWithoutAssigneeInput> | Prisma.ComplaintCreateWithoutAssigneeInput[] | Prisma.ComplaintUncheckedCreateWithoutAssigneeInput[]
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutAssigneeInput | Prisma.ComplaintCreateOrConnectWithoutAssigneeInput[]
+  upsert?: Prisma.ComplaintUpsertWithWhereUniqueWithoutAssigneeInput | Prisma.ComplaintUpsertWithWhereUniqueWithoutAssigneeInput[]
+  createMany?: Prisma.ComplaintCreateManyAssigneeInputEnvelope
+  set?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  disconnect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  delete?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  connect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  update?: Prisma.ComplaintUpdateWithWhereUniqueWithoutAssigneeInput | Prisma.ComplaintUpdateWithWhereUniqueWithoutAssigneeInput[]
+  updateMany?: Prisma.ComplaintUpdateManyWithWhereWithoutAssigneeInput | Prisma.ComplaintUpdateManyWithWhereWithoutAssigneeInput[]
+  deleteMany?: Prisma.ComplaintScalarWhereInput | Prisma.ComplaintScalarWhereInput[]
+}
+
+export type ComplaintCreateNestedManyWithoutAppointmentInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutAppointmentInput, Prisma.ComplaintUncheckedCreateWithoutAppointmentInput> | Prisma.ComplaintCreateWithoutAppointmentInput[] | Prisma.ComplaintUncheckedCreateWithoutAppointmentInput[]
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutAppointmentInput | Prisma.ComplaintCreateOrConnectWithoutAppointmentInput[]
+  createMany?: Prisma.ComplaintCreateManyAppointmentInputEnvelope
+  connect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+}
+
+export type ComplaintUncheckedCreateNestedManyWithoutAppointmentInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutAppointmentInput, Prisma.ComplaintUncheckedCreateWithoutAppointmentInput> | Prisma.ComplaintCreateWithoutAppointmentInput[] | Prisma.ComplaintUncheckedCreateWithoutAppointmentInput[]
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutAppointmentInput | Prisma.ComplaintCreateOrConnectWithoutAppointmentInput[]
+  createMany?: Prisma.ComplaintCreateManyAppointmentInputEnvelope
+  connect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+}
+
+export type ComplaintUpdateManyWithoutAppointmentNestedInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutAppointmentInput, Prisma.ComplaintUncheckedCreateWithoutAppointmentInput> | Prisma.ComplaintCreateWithoutAppointmentInput[] | Prisma.ComplaintUncheckedCreateWithoutAppointmentInput[]
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutAppointmentInput | Prisma.ComplaintCreateOrConnectWithoutAppointmentInput[]
+  upsert?: Prisma.ComplaintUpsertWithWhereUniqueWithoutAppointmentInput | Prisma.ComplaintUpsertWithWhereUniqueWithoutAppointmentInput[]
+  createMany?: Prisma.ComplaintCreateManyAppointmentInputEnvelope
+  set?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  disconnect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  delete?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  connect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  update?: Prisma.ComplaintUpdateWithWhereUniqueWithoutAppointmentInput | Prisma.ComplaintUpdateWithWhereUniqueWithoutAppointmentInput[]
+  updateMany?: Prisma.ComplaintUpdateManyWithWhereWithoutAppointmentInput | Prisma.ComplaintUpdateManyWithWhereWithoutAppointmentInput[]
+  deleteMany?: Prisma.ComplaintScalarWhereInput | Prisma.ComplaintScalarWhereInput[]
+}
+
+export type ComplaintUncheckedUpdateManyWithoutAppointmentNestedInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutAppointmentInput, Prisma.ComplaintUncheckedCreateWithoutAppointmentInput> | Prisma.ComplaintCreateWithoutAppointmentInput[] | Prisma.ComplaintUncheckedCreateWithoutAppointmentInput[]
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutAppointmentInput | Prisma.ComplaintCreateOrConnectWithoutAppointmentInput[]
+  upsert?: Prisma.ComplaintUpsertWithWhereUniqueWithoutAppointmentInput | Prisma.ComplaintUpsertWithWhereUniqueWithoutAppointmentInput[]
+  createMany?: Prisma.ComplaintCreateManyAppointmentInputEnvelope
+  set?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  disconnect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  delete?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  connect?: Prisma.ComplaintWhereUniqueInput | Prisma.ComplaintWhereUniqueInput[]
+  update?: Prisma.ComplaintUpdateWithWhereUniqueWithoutAppointmentInput | Prisma.ComplaintUpdateWithWhereUniqueWithoutAppointmentInput[]
+  updateMany?: Prisma.ComplaintUpdateManyWithWhereWithoutAppointmentInput | Prisma.ComplaintUpdateManyWithWhereWithoutAppointmentInput[]
+  deleteMany?: Prisma.ComplaintScalarWhereInput | Prisma.ComplaintScalarWhereInput[]
+}
+
+export type ComplaintCreateNestedOneWithoutMessagesInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutMessagesInput, Prisma.ComplaintUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.ComplaintWhereUniqueInput
+}
+
+export type ComplaintUpdateOneRequiredWithoutMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutMessagesInput, Prisma.ComplaintUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.ComplaintUpsertWithoutMessagesInput
+  connect?: Prisma.ComplaintWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ComplaintUpdateToOneWithWhereWithoutMessagesInput, Prisma.ComplaintUpdateWithoutMessagesInput>, Prisma.ComplaintUncheckedUpdateWithoutMessagesInput>
+}
+
 export type ComplaintCreateWithoutUserInput = {
   id?: string
   subject: string
   description: string
   status?: string
+  priority?: string
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
   createdAt?: Date | string
+  assignee?: Prisma.UserCreateNestedOneWithoutComplaintsAssignedInput
+  appointment?: Prisma.AppointmentCreateNestedOneWithoutComplaintsInput
+  messages?: Prisma.ComplaintMessageCreateNestedManyWithoutComplaintInput
 }
 
 export type ComplaintUncheckedCreateWithoutUserInput = {
@@ -394,7 +670,15 @@ export type ComplaintUncheckedCreateWithoutUserInput = {
   subject: string
   description: string
   status?: string
+  priority?: string
+  assigneeId?: string | null
+  appointmentId?: string | null
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
   createdAt?: Date | string
+  messages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutComplaintInput
 }
 
 export type ComplaintCreateOrConnectWithoutUserInput = {
@@ -404,6 +688,48 @@ export type ComplaintCreateOrConnectWithoutUserInput = {
 
 export type ComplaintCreateManyUserInputEnvelope = {
   data: Prisma.ComplaintCreateManyUserInput | Prisma.ComplaintCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type ComplaintCreateWithoutAssigneeInput = {
+  id?: string
+  subject: string
+  description: string
+  status?: string
+  priority?: string
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  createdAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutComplaintsInput
+  appointment?: Prisma.AppointmentCreateNestedOneWithoutComplaintsInput
+  messages?: Prisma.ComplaintMessageCreateNestedManyWithoutComplaintInput
+}
+
+export type ComplaintUncheckedCreateWithoutAssigneeInput = {
+  id?: string
+  userId: string
+  subject: string
+  description: string
+  status?: string
+  priority?: string
+  appointmentId?: string | null
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  createdAt?: Date | string
+  messages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutComplaintInput
+}
+
+export type ComplaintCreateOrConnectWithoutAssigneeInput = {
+  where: Prisma.ComplaintWhereUniqueInput
+  create: Prisma.XOR<Prisma.ComplaintCreateWithoutAssigneeInput, Prisma.ComplaintUncheckedCreateWithoutAssigneeInput>
+}
+
+export type ComplaintCreateManyAssigneeInputEnvelope = {
+  data: Prisma.ComplaintCreateManyAssigneeInput | Prisma.ComplaintCreateManyAssigneeInput[]
   skipDuplicates?: boolean
 }
 
@@ -432,7 +758,168 @@ export type ComplaintScalarWhereInput = {
   subject?: Prisma.StringFilter<"Complaint"> | string
   description?: Prisma.StringFilter<"Complaint"> | string
   status?: Prisma.StringFilter<"Complaint"> | string
+  priority?: Prisma.StringFilter<"Complaint"> | string
+  assigneeId?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  appointmentId?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  contactMobile?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  firstResponseAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  resolvedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
+}
+
+export type ComplaintUpsertWithWhereUniqueWithoutAssigneeInput = {
+  where: Prisma.ComplaintWhereUniqueInput
+  update: Prisma.XOR<Prisma.ComplaintUpdateWithoutAssigneeInput, Prisma.ComplaintUncheckedUpdateWithoutAssigneeInput>
+  create: Prisma.XOR<Prisma.ComplaintCreateWithoutAssigneeInput, Prisma.ComplaintUncheckedCreateWithoutAssigneeInput>
+}
+
+export type ComplaintUpdateWithWhereUniqueWithoutAssigneeInput = {
+  where: Prisma.ComplaintWhereUniqueInput
+  data: Prisma.XOR<Prisma.ComplaintUpdateWithoutAssigneeInput, Prisma.ComplaintUncheckedUpdateWithoutAssigneeInput>
+}
+
+export type ComplaintUpdateManyWithWhereWithoutAssigneeInput = {
+  where: Prisma.ComplaintScalarWhereInput
+  data: Prisma.XOR<Prisma.ComplaintUpdateManyMutationInput, Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeInput>
+}
+
+export type ComplaintCreateWithoutAppointmentInput = {
+  id?: string
+  subject: string
+  description: string
+  status?: string
+  priority?: string
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  createdAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutComplaintsInput
+  assignee?: Prisma.UserCreateNestedOneWithoutComplaintsAssignedInput
+  messages?: Prisma.ComplaintMessageCreateNestedManyWithoutComplaintInput
+}
+
+export type ComplaintUncheckedCreateWithoutAppointmentInput = {
+  id?: string
+  userId: string
+  subject: string
+  description: string
+  status?: string
+  priority?: string
+  assigneeId?: string | null
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  createdAt?: Date | string
+  messages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutComplaintInput
+}
+
+export type ComplaintCreateOrConnectWithoutAppointmentInput = {
+  where: Prisma.ComplaintWhereUniqueInput
+  create: Prisma.XOR<Prisma.ComplaintCreateWithoutAppointmentInput, Prisma.ComplaintUncheckedCreateWithoutAppointmentInput>
+}
+
+export type ComplaintCreateManyAppointmentInputEnvelope = {
+  data: Prisma.ComplaintCreateManyAppointmentInput | Prisma.ComplaintCreateManyAppointmentInput[]
+  skipDuplicates?: boolean
+}
+
+export type ComplaintUpsertWithWhereUniqueWithoutAppointmentInput = {
+  where: Prisma.ComplaintWhereUniqueInput
+  update: Prisma.XOR<Prisma.ComplaintUpdateWithoutAppointmentInput, Prisma.ComplaintUncheckedUpdateWithoutAppointmentInput>
+  create: Prisma.XOR<Prisma.ComplaintCreateWithoutAppointmentInput, Prisma.ComplaintUncheckedCreateWithoutAppointmentInput>
+}
+
+export type ComplaintUpdateWithWhereUniqueWithoutAppointmentInput = {
+  where: Prisma.ComplaintWhereUniqueInput
+  data: Prisma.XOR<Prisma.ComplaintUpdateWithoutAppointmentInput, Prisma.ComplaintUncheckedUpdateWithoutAppointmentInput>
+}
+
+export type ComplaintUpdateManyWithWhereWithoutAppointmentInput = {
+  where: Prisma.ComplaintScalarWhereInput
+  data: Prisma.XOR<Prisma.ComplaintUpdateManyMutationInput, Prisma.ComplaintUncheckedUpdateManyWithoutAppointmentInput>
+}
+
+export type ComplaintCreateWithoutMessagesInput = {
+  id?: string
+  subject: string
+  description: string
+  status?: string
+  priority?: string
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  createdAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutComplaintsInput
+  assignee?: Prisma.UserCreateNestedOneWithoutComplaintsAssignedInput
+  appointment?: Prisma.AppointmentCreateNestedOneWithoutComplaintsInput
+}
+
+export type ComplaintUncheckedCreateWithoutMessagesInput = {
+  id?: string
+  userId: string
+  subject: string
+  description: string
+  status?: string
+  priority?: string
+  assigneeId?: string | null
+  appointmentId?: string | null
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  createdAt?: Date | string
+}
+
+export type ComplaintCreateOrConnectWithoutMessagesInput = {
+  where: Prisma.ComplaintWhereUniqueInput
+  create: Prisma.XOR<Prisma.ComplaintCreateWithoutMessagesInput, Prisma.ComplaintUncheckedCreateWithoutMessagesInput>
+}
+
+export type ComplaintUpsertWithoutMessagesInput = {
+  update: Prisma.XOR<Prisma.ComplaintUpdateWithoutMessagesInput, Prisma.ComplaintUncheckedUpdateWithoutMessagesInput>
+  create: Prisma.XOR<Prisma.ComplaintCreateWithoutMessagesInput, Prisma.ComplaintUncheckedCreateWithoutMessagesInput>
+  where?: Prisma.ComplaintWhereInput
+}
+
+export type ComplaintUpdateToOneWithWhereWithoutMessagesInput = {
+  where?: Prisma.ComplaintWhereInput
+  data: Prisma.XOR<Prisma.ComplaintUpdateWithoutMessagesInput, Prisma.ComplaintUncheckedUpdateWithoutMessagesInput>
+}
+
+export type ComplaintUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  subject?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
+  assignee?: Prisma.UserUpdateOneWithoutComplaintsAssignedNestedInput
+  appointment?: Prisma.AppointmentUpdateOneWithoutComplaintsNestedInput
+}
+
+export type ComplaintUncheckedUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  subject?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  assigneeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ComplaintCreateManyUserInput = {
@@ -440,6 +927,28 @@ export type ComplaintCreateManyUserInput = {
   subject: string
   description: string
   status?: string
+  priority?: string
+  assigneeId?: string | null
+  appointmentId?: string | null
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  createdAt?: Date | string
+}
+
+export type ComplaintCreateManyAssigneeInput = {
+  id?: string
+  userId: string
+  subject: string
+  description: string
+  status?: string
+  priority?: string
+  appointmentId?: string | null
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
   createdAt?: Date | string
 }
 
@@ -448,7 +957,15 @@ export type ComplaintUpdateWithoutUserInput = {
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignee?: Prisma.UserUpdateOneWithoutComplaintsAssignedNestedInput
+  appointment?: Prisma.AppointmentUpdateOneWithoutComplaintsNestedInput
+  messages?: Prisma.ComplaintMessageUpdateManyWithoutComplaintNestedInput
 }
 
 export type ComplaintUncheckedUpdateWithoutUserInput = {
@@ -456,7 +973,15 @@ export type ComplaintUncheckedUpdateWithoutUserInput = {
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  assigneeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutComplaintNestedInput
 }
 
 export type ComplaintUncheckedUpdateManyWithoutUserInput = {
@@ -464,9 +989,154 @@ export type ComplaintUncheckedUpdateManyWithoutUserInput = {
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  assigneeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type ComplaintUpdateWithoutAssigneeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  subject?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
+  appointment?: Prisma.AppointmentUpdateOneWithoutComplaintsNestedInput
+  messages?: Prisma.ComplaintMessageUpdateManyWithoutComplaintNestedInput
+}
+
+export type ComplaintUncheckedUpdateWithoutAssigneeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  subject?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutComplaintNestedInput
+}
+
+export type ComplaintUncheckedUpdateManyWithoutAssigneeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  subject?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  appointmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ComplaintCreateManyAppointmentInput = {
+  id?: string
+  userId: string
+  subject: string
+  description: string
+  status?: string
+  priority?: string
+  assigneeId?: string | null
+  contactMobile?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  createdAt?: Date | string
+}
+
+export type ComplaintUpdateWithoutAppointmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  subject?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
+  assignee?: Prisma.UserUpdateOneWithoutComplaintsAssignedNestedInput
+  messages?: Prisma.ComplaintMessageUpdateManyWithoutComplaintNestedInput
+}
+
+export type ComplaintUncheckedUpdateWithoutAppointmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  subject?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  assigneeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutComplaintNestedInput
+}
+
+export type ComplaintUncheckedUpdateManyWithoutAppointmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  subject?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  assigneeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactMobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type ComplaintCountOutputType
+ */
+
+export type ComplaintCountOutputType = {
+  messages: number
+}
+
+export type ComplaintCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  messages?: boolean | ComplaintCountOutputTypeCountMessagesArgs
+}
+
+/**
+ * ComplaintCountOutputType without action
+ */
+export type ComplaintCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ComplaintCountOutputType
+   */
+  select?: Prisma.ComplaintCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ComplaintCountOutputType without action
+ */
+export type ComplaintCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComplaintMessageWhereInput
+}
 
 
 export type ComplaintSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -475,8 +1145,19 @@ export type ComplaintSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   subject?: boolean
   description?: boolean
   status?: boolean
+  priority?: boolean
+  assigneeId?: boolean
+  appointmentId?: boolean
+  contactMobile?: boolean
+  firstResponseAt?: boolean
+  resolvedAt?: boolean
+  lastActivityAt?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.Complaint$assigneeArgs<ExtArgs>
+  appointment?: boolean | Prisma.Complaint$appointmentArgs<ExtArgs>
+  messages?: boolean | Prisma.Complaint$messagesArgs<ExtArgs>
+  _count?: boolean | Prisma.ComplaintCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["complaint"]>
 
 export type ComplaintSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -485,8 +1166,17 @@ export type ComplaintSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   subject?: boolean
   description?: boolean
   status?: boolean
+  priority?: boolean
+  assigneeId?: boolean
+  appointmentId?: boolean
+  contactMobile?: boolean
+  firstResponseAt?: boolean
+  resolvedAt?: boolean
+  lastActivityAt?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.Complaint$assigneeArgs<ExtArgs>
+  appointment?: boolean | Prisma.Complaint$appointmentArgs<ExtArgs>
 }, ExtArgs["result"]["complaint"]>
 
 export type ComplaintSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -495,8 +1185,17 @@ export type ComplaintSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   subject?: boolean
   description?: boolean
   status?: boolean
+  priority?: boolean
+  assigneeId?: boolean
+  appointmentId?: boolean
+  contactMobile?: boolean
+  firstResponseAt?: boolean
+  resolvedAt?: boolean
+  lastActivityAt?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.Complaint$assigneeArgs<ExtArgs>
+  appointment?: boolean | Prisma.Complaint$appointmentArgs<ExtArgs>
 }, ExtArgs["result"]["complaint"]>
 
 export type ComplaintSelectScalar = {
@@ -505,24 +1204,42 @@ export type ComplaintSelectScalar = {
   subject?: boolean
   description?: boolean
   status?: boolean
+  priority?: boolean
+  assigneeId?: boolean
+  appointmentId?: boolean
+  contactMobile?: boolean
+  firstResponseAt?: boolean
+  resolvedAt?: boolean
+  lastActivityAt?: boolean
   createdAt?: boolean
 }
 
-export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "subject" | "description" | "status" | "createdAt", ExtArgs["result"]["complaint"]>
+export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "subject" | "description" | "status" | "priority" | "assigneeId" | "appointmentId" | "contactMobile" | "firstResponseAt" | "resolvedAt" | "lastActivityAt" | "createdAt", ExtArgs["result"]["complaint"]>
 export type ComplaintInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.Complaint$assigneeArgs<ExtArgs>
+  appointment?: boolean | Prisma.Complaint$appointmentArgs<ExtArgs>
+  messages?: boolean | Prisma.Complaint$messagesArgs<ExtArgs>
+  _count?: boolean | Prisma.ComplaintCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ComplaintIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.Complaint$assigneeArgs<ExtArgs>
+  appointment?: boolean | Prisma.Complaint$appointmentArgs<ExtArgs>
 }
 export type ComplaintIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.Complaint$assigneeArgs<ExtArgs>
+  appointment?: boolean | Prisma.Complaint$appointmentArgs<ExtArgs>
 }
 
 export type $ComplaintPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Complaint"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    assignee: Prisma.$UserPayload<ExtArgs> | null
+    appointment: Prisma.$AppointmentPayload<ExtArgs> | null
+    messages: Prisma.$ComplaintMessagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -530,6 +1247,13 @@ export type $ComplaintPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     subject: string
     description: string
     status: string
+    priority: string
+    assigneeId: string | null
+    appointmentId: string | null
+    contactMobile: string | null
+    firstResponseAt: Date | null
+    resolvedAt: Date | null
+    lastActivityAt: Date
     createdAt: Date
   }, ExtArgs["result"]["complaint"]>
   composites: {}
@@ -926,6 +1650,9 @@ readonly fields: ComplaintFieldRefs;
 export interface Prisma__ComplaintClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  assignee<T extends Prisma.Complaint$assigneeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Complaint$assigneeArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  appointment<T extends Prisma.Complaint$appointmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Complaint$appointmentArgs<ExtArgs>>): Prisma.Prisma__AppointmentClient<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  messages<T extends Prisma.Complaint$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Complaint$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -960,6 +1687,13 @@ export interface ComplaintFieldRefs {
   readonly subject: Prisma.FieldRef<"Complaint", 'String'>
   readonly description: Prisma.FieldRef<"Complaint", 'String'>
   readonly status: Prisma.FieldRef<"Complaint", 'String'>
+  readonly priority: Prisma.FieldRef<"Complaint", 'String'>
+  readonly assigneeId: Prisma.FieldRef<"Complaint", 'String'>
+  readonly appointmentId: Prisma.FieldRef<"Complaint", 'String'>
+  readonly contactMobile: Prisma.FieldRef<"Complaint", 'String'>
+  readonly firstResponseAt: Prisma.FieldRef<"Complaint", 'DateTime'>
+  readonly resolvedAt: Prisma.FieldRef<"Complaint", 'DateTime'>
+  readonly lastActivityAt: Prisma.FieldRef<"Complaint", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Complaint", 'DateTime'>
 }
     
@@ -1359,6 +2093,68 @@ export type ComplaintDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Limit how many Complaints to delete.
    */
   limit?: number
+}
+
+/**
+ * Complaint.assignee
+ */
+export type Complaint$assigneeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * Complaint.appointment
+ */
+export type Complaint$appointmentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Appointment
+   */
+  select?: Prisma.AppointmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Appointment
+   */
+  omit?: Prisma.AppointmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppointmentInclude<ExtArgs> | null
+  where?: Prisma.AppointmentWhereInput
+}
+
+/**
+ * Complaint.messages
+ */
+export type Complaint$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ComplaintMessage
+   */
+  select?: Prisma.ComplaintMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ComplaintMessage
+   */
+  omit?: Prisma.ComplaintMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ComplaintMessageInclude<ExtArgs> | null
+  where?: Prisma.ComplaintMessageWhereInput
+  orderBy?: Prisma.ComplaintMessageOrderByWithRelationInput | Prisma.ComplaintMessageOrderByWithRelationInput[]
+  cursor?: Prisma.ComplaintMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ComplaintMessageScalarFieldEnum | Prisma.ComplaintMessageScalarFieldEnum[]
 }
 
 /**

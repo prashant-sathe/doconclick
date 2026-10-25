@@ -155,6 +155,22 @@
     "title": "तक्रारीबद्दल अपडेट",
     "body": "तुमची तक्रार \"{subject}\" {status, select, OPEN {पुन्हा उघडण्यात आली आहे} IN_PROGRESS {वर काम सुरू आहे} other {सोडवण्यात आली आहे}}."
   },
+  "complaintReply": {
+    "title": "DocOnClick सपोर्टकडून उत्तर",
+    "body": "तुमच्या \"{subject}\" या तक्रारीवर आम्ही उत्तर दिले आहे. वाचण्यासाठी टॅप करा."
+  },
+  "adminComplaintNew": {
+    "title": "नवीन तक्रार",
+    "body": "{name} यांनी तक्रार नोंदवली: \"{subject}\"."
+  },
+  "adminComplaintReply": {
+    "title": "तक्रारीवर नवीन उत्तर",
+    "body": "{name} यांनी \"{subject}\" वर उत्तर दिले."
+  },
+  "adminComplaintAssigned": {
+    "title": "तक्रार तुमच्याकडे सोपवली",
+    "body": "\"{subject}\" ही तक्रार आता तुमच्याकडे सोपवली आहे."
+  },
   "profileChangeApproved": {
     "title": "प्रोफाइलमधील बदल मंजूर",
     "body": "तुमचा नवीन {field1}{field2}{field3} आता तुमच्या प्रोफाइलवर लाइव्ह आहे."

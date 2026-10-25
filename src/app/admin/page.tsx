@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { Users, Stethoscope, HeartPulse, CalendarCheck, IndianRupee, AlertCircle, Clock, TrendingUp } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueFormatterParams } from "ag-grid-community";
@@ -172,7 +173,7 @@ export default function AdminOverview() {
             <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-xl px-5 py-3 text-sm text-red-700 font-medium">
               <AlertCircle className="w-4 h-4" />
               {data.openComplaints} open complaint{data.openComplaints > 1 ? "s" : ""}
-              <a href="/admin/complaints" className="underline ml-1 hover:text-red-800">View →</a>
+              <Link href="/admin/complaints" className="underline ml-1 hover:text-red-800">View →</Link>
             </div>
           )}
         </div>

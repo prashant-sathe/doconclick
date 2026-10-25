@@ -155,6 +155,22 @@
     "title": "शिकायत अपडेट",
     "body": "आपकी शिकायत \"{subject}\" {status, select, OPEN {फिर से खोली गई है} IN_PROGRESS {पर काम चल रहा है} other {का समाधान हो गया है}}।"
   },
+  "complaintReply": {
+    "title": "DocOnClick सपोर्ट का जवाब",
+    "body": "आपकी शिकायत \"{subject}\" पर हमने जवाब दिया है। पढ़ने के लिए टैप करें।"
+  },
+  "adminComplaintNew": {
+    "title": "नई शिकायत",
+    "body": "{name} ने शिकायत दर्ज की: \"{subject}\"।"
+  },
+  "adminComplaintReply": {
+    "title": "शिकायत पर नया जवाब",
+    "body": "{name} ने \"{subject}\" पर जवाब दिया।"
+  },
+  "adminComplaintAssigned": {
+    "title": "शिकायत आपको सौंपी गई",
+    "body": "\"{subject}\" अब आपको सौंपी गई है।"
+  },
   "profileChangeApproved": {
     "title": "प्रोफ़ाइल बदलाव स्वीकृत",
     "body": "आपका नया {field1}{field2}{field3} अब आपकी प्रोफ़ाइल पर लाइव है।"

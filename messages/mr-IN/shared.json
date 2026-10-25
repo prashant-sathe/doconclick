@@ -194,5 +194,37 @@
     "earlier": "आधीच्या दुरुस्त्या",
     "entry": "{when}: {from} → {to} · {admin} — {reason}",
     "unknownAdmin": "ॲडमिन"
+  },
+  "complaints": {
+    "allTickets": "सर्व तिकिटे",
+    "notFound": "हे तिकीट सापडले नाही.",
+    "you": "तुम्ही",
+    "support": "DocOnClick सपोर्ट",
+    "raisedOn": "{date} रोजी नोंदवले",
+    "aboutBooking": "बुकिंग",
+    "bookingWith": "{name} यांच्यासोबत · {date}",
+    "callback": "कॉलबॅक नंबर: {mobile}",
+    "conversation": "संभाषण",
+    "replyLabel": "तुमचे उत्तर",
+    "replyPlaceholder": "उत्तर लिहा…",
+    "send": "पाठवा",
+    "sending": "पाठवत आहे…",
+    "sendFailed": "तुमचे उत्तर पाठवता आले नाही. कृपया पुन्हा प्रयत्न करा.",
+    "resolvedNote": "हे तिकीट सोडवले गेले आहे. अडचण अजून असेल तर उत्तर द्या — आम्ही ते पुन्हा उघडू.",
+    "noReplies": "अजून उत्तर आलेले नाही — आमची टीम इथेच उत्तर देईल आणि तुम्हाला सूचना मिळेल.",
+    "supportReplied": "सपोर्टने उत्तर दिले",
+    "replies": "{count, plural, =0 {अजून उत्तर नाही} one {# संदेश} other {# संदेश}}",
+    "view": "संभाषण पाहा",
+    "linkLabel": "हे कोणत्या बुकिंगबद्दल आहे? (ऐच्छिक)",
+    "linkNone": "कोणत्याही बुकिंगबद्दल नाही",
+    "linkOption": "{name} · {date}",
+    "contactLabel": "कॉलबॅक नंबर (ऐच्छिक)",
+    "contactPlaceholder": "तुमच्या अकाउंटच्या नंबरपेक्षा वेगळा असेल तरच",
+    "contactInvalid": "10 अंकी योग्य मोबाइल नंबर टाका",
+    "status": {
+      "OPEN": "उघडे",
+      "IN_PROGRESS": "काम सुरू आहे",
+      "RESOLVED": "सोडवले"
+    }
   }
 }

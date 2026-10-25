@@ -155,6 +155,22 @@
     "title": "Complaint update",
     "body": "Your complaint \"{subject}\" {status, select, OPEN {was reopened} IN_PROGRESS {is being looked into} other {has been resolved}}."
   },
+  "complaintReply": {
+    "title": "Reply from DocOnClick Support",
+    "body": "We've replied to your complaint \"{subject}\". Tap to read it."
+  },
+  "adminComplaintNew": {
+    "title": "New complaint",
+    "body": "{name} raised a complaint: \"{subject}\"."
+  },
+  "adminComplaintReply": {
+    "title": "New reply on a complaint",
+    "body": "{name} replied on \"{subject}\"."
+  },
+  "adminComplaintAssigned": {
+    "title": "Complaint assigned to you",
+    "body": "\"{subject}\" is now assigned to you."
+  },
   "profileChangeApproved": {
     "title": "Profile change approved",
     "body": "Your new {field1}{field2}{field3} {count, plural, one {is} other {are}} now live on your profile."

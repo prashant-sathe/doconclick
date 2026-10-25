@@ -194,5 +194,37 @@
     "earlier": "Earlier corrections",
     "entry": "{when}: {from} → {to} · {admin} — {reason}",
     "unknownAdmin": "admin"
+  },
+  "complaints": {
+    "allTickets": "All tickets",
+    "notFound": "This ticket wasn't found.",
+    "you": "You",
+    "support": "DocOnClick Support",
+    "raisedOn": "Raised {date}",
+    "aboutBooking": "Booking",
+    "bookingWith": "With {name} · {date}",
+    "callback": "Callback number: {mobile}",
+    "conversation": "Conversation",
+    "replyLabel": "Your reply",
+    "replyPlaceholder": "Write a reply…",
+    "send": "Send",
+    "sending": "Sending…",
+    "sendFailed": "Couldn't send your reply. Please try again.",
+    "resolvedNote": "This ticket is resolved. If the problem isn't over, reply and we'll reopen it.",
+    "noReplies": "No replies yet — our team will answer here, and you'll get a notification.",
+    "supportReplied": "Support replied",
+    "replies": "{count, plural, =0 {No replies yet} one {# message} other {# messages}}",
+    "view": "View conversation",
+    "linkLabel": "Which booking is this about? (optional)",
+    "linkNone": "Not about a booking",
+    "linkOption": "{name} · {date}",
+    "contactLabel": "Callback number (optional)",
+    "contactPlaceholder": "Only if different from your account number",
+    "contactInvalid": "Enter a valid 10-digit mobile number",
+    "status": {
+      "OPEN": "Open",
+      "IN_PROGRESS": "In progress",
+      "RESOLVED": "Resolved"
+    }
   }
 }
