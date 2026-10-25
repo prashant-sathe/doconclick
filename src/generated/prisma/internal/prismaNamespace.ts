@@ -3931,6 +3931,8 @@ export const NurseProfileScalarFieldEnum = {
   radius: 'radius',
   lat: 'lat',
   lng: 'lng',
+  approvedLat: 'approvedLat',
+  approvedLng: 'approvedLng',
   address: 'address',
   availability: 'availability',
   isVerified: 'isVerified',

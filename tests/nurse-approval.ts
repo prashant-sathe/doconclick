@@ -127,6 +127,29 @@ async function main() {
     check("base moved <2 km → 200, stays APPROVED", res.status === 200 && (await statusNow()) === "APPROVED", `${res.status} ${await statusNow()}`);
     res = await as("PATCH", "/api/nurses/me", { lat: 18.62, lng: 73.95 });
     check("base moved >2 km → 200, back to PENDING", res.status === 200 && (await statusNow()) === "PENDING", `${res.status} ${await statusNow()}`);
+    // ── P3-28: small steps are measured from the approved point, not the last one ──
+    await setDocs({ ...complete, status: "PENDING" });
+    r = await approve();
+    const ap = await prisma.nurseProfile.findUniqueOrThrow({ where: { userId: nurse.id } });
+    check("approval stores approvedLat/Lng", r.status === 200 && ap.approvedLat === 18.52 && ap.approvedLng === 73.85, `${ap.approvedLat},${ap.approvedLng}`);
+    // three ~0.8 km steps: each is <2 km from the last point, the third is ~2.3 km from the approved one
+    const seen: string[] = [];
+    for (const lat of [18.527, 18.534, 18.541]) {
+      await as("PATCH", "/api/nurses/me", { lat, lng: 73.85 });
+      seen.push(await statusNow());
+    }
+    check("3 small steps (<2 km each, >2 km total) → first two APPROVED, third → PENDING", seen.join() === "APPROVED,APPROVED,PENDING", seen.join());
+    await setDocs({ ...complete, status: "APPROVED", approvedLat: 18.52, approvedLng: 73.85 });
+    res = await as("PATCH", "/api/nurses/me", { lat: 18.5205, lng: 73.8505 });
+    check("within 2 km of approved point → stays APPROVED", (await statusNow()) === "APPROVED", await statusNow());
+    // legacy row (no approved point) still compares with the current base
+    await setDocs({ ...complete, status: "APPROVED", approvedLat: null, approvedLng: null });
+    const leg: string[] = [];
+    for (const lat of [18.527, 18.534, 18.541]) {
+      await as("PATCH", "/api/nurses/me", { lat, lng: 73.85 });
+      leg.push(await statusNow());
+    }
+    check("legacy row (no approved point): compares with current base as before", leg.join() === "APPROVED,APPROVED,APPROVED", leg.join());
     await reapprove();
     res = await as("PATCH", "/api/nurses/me", { councilRegNo: "FAKE-9999" });
     check("approved nurse changes councilRegNo → PENDING", res.status === 200 && (await statusNow()) === "PENDING", `${res.status} ${await statusNow()}`);

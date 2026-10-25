@@ -31,6 +31,8 @@ export type NurseProfileAvgAggregateOutputType = {
   radius: number | null
   lat: number | null
   lng: number | null
+  approvedLat: number | null
+  approvedLng: number | null
   avgRating: number | null
   totalReviews: number | null
   pendingOrderAmount: number | null
@@ -41,6 +43,8 @@ export type NurseProfileSumAggregateOutputType = {
   radius: number | null
   lat: number | null
   lng: number | null
+  approvedLat: number | null
+  approvedLng: number | null
   avgRating: number | null
   totalReviews: number | null
   pendingOrderAmount: number | null
@@ -60,6 +64,8 @@ export type NurseProfileMinAggregateOutputType = {
   radius: number | null
   lat: number | null
   lng: number | null
+  approvedLat: number | null
+  approvedLng: number | null
   address: string | null
   availability: string | null
   isVerified: boolean | null
@@ -93,6 +99,8 @@ export type NurseProfileMaxAggregateOutputType = {
   radius: number | null
   lat: number | null
   lng: number | null
+  approvedLat: number | null
+  approvedLng: number | null
   address: string | null
   availability: string | null
   isVerified: boolean | null
@@ -126,6 +134,8 @@ export type NurseProfileCountAggregateOutputType = {
   radius: number
   lat: number
   lng: number
+  approvedLat: number
+  approvedLng: number
   address: number
   availability: number
   isVerified: number
@@ -152,6 +162,8 @@ export type NurseProfileAvgAggregateInputType = {
   radius?: true
   lat?: true
   lng?: true
+  approvedLat?: true
+  approvedLng?: true
   avgRating?: true
   totalReviews?: true
   pendingOrderAmount?: true
@@ -162,6 +174,8 @@ export type NurseProfileSumAggregateInputType = {
   radius?: true
   lat?: true
   lng?: true
+  approvedLat?: true
+  approvedLng?: true
   avgRating?: true
   totalReviews?: true
   pendingOrderAmount?: true
@@ -181,6 +195,8 @@ export type NurseProfileMinAggregateInputType = {
   radius?: true
   lat?: true
   lng?: true
+  approvedLat?: true
+  approvedLng?: true
   address?: true
   availability?: true
   isVerified?: true
@@ -214,6 +230,8 @@ export type NurseProfileMaxAggregateInputType = {
   radius?: true
   lat?: true
   lng?: true
+  approvedLat?: true
+  approvedLng?: true
   address?: true
   availability?: true
   isVerified?: true
@@ -247,6 +265,8 @@ export type NurseProfileCountAggregateInputType = {
   radius?: true
   lat?: true
   lng?: true
+  approvedLat?: true
+  approvedLng?: true
   address?: true
   availability?: true
   isVerified?: true
@@ -367,6 +387,8 @@ export type NurseProfileGroupByOutputType = {
   radius: number
   lat: number | null
   lng: number | null
+  approvedLat: number | null
+  approvedLng: number | null
   address: string | null
   availability: string
   isVerified: boolean
@@ -423,6 +445,8 @@ export type NurseProfileWhereInput = {
   radius?: Prisma.IntFilter<"NurseProfile"> | number
   lat?: Prisma.FloatNullableFilter<"NurseProfile"> | number | null
   lng?: Prisma.FloatNullableFilter<"NurseProfile"> | number | null
+  approvedLat?: Prisma.FloatNullableFilter<"NurseProfile"> | number | null
+  approvedLng?: Prisma.FloatNullableFilter<"NurseProfile"> | number | null
   address?: Prisma.StringNullableFilter<"NurseProfile"> | string | null
   availability?: Prisma.StringFilter<"NurseProfile"> | string
   isVerified?: Prisma.BoolFilter<"NurseProfile"> | boolean
@@ -458,6 +482,8 @@ export type NurseProfileOrderByWithRelationInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedLat?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedLng?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   availability?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
@@ -496,6 +522,8 @@ export type NurseProfileWhereUniqueInput = Prisma.AtLeast<{
   radius?: Prisma.IntFilter<"NurseProfile"> | number
   lat?: Prisma.FloatNullableFilter<"NurseProfile"> | number | null
   lng?: Prisma.FloatNullableFilter<"NurseProfile"> | number | null
+  approvedLat?: Prisma.FloatNullableFilter<"NurseProfile"> | number | null
+  approvedLng?: Prisma.FloatNullableFilter<"NurseProfile"> | number | null
   address?: Prisma.StringNullableFilter<"NurseProfile"> | string | null
   availability?: Prisma.StringFilter<"NurseProfile"> | string
   isVerified?: Prisma.BoolFilter<"NurseProfile"> | boolean
@@ -531,6 +559,8 @@ export type NurseProfileOrderByWithAggregationInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedLat?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedLng?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   availability?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
@@ -572,6 +602,8 @@ export type NurseProfileScalarWhereWithAggregatesInput = {
   radius?: Prisma.IntWithAggregatesFilter<"NurseProfile"> | number
   lat?: Prisma.FloatNullableWithAggregatesFilter<"NurseProfile"> | number | null
   lng?: Prisma.FloatNullableWithAggregatesFilter<"NurseProfile"> | number | null
+  approvedLat?: Prisma.FloatNullableWithAggregatesFilter<"NurseProfile"> | number | null
+  approvedLng?: Prisma.FloatNullableWithAggregatesFilter<"NurseProfile"> | number | null
   address?: Prisma.StringNullableWithAggregatesFilter<"NurseProfile"> | string | null
   availability?: Prisma.StringWithAggregatesFilter<"NurseProfile"> | string
   isVerified?: Prisma.BoolWithAggregatesFilter<"NurseProfile"> | boolean
@@ -604,6 +636,8 @@ export type NurseProfileCreateInput = {
   radius?: number
   lat?: number | null
   lng?: number | null
+  approvedLat?: number | null
+  approvedLng?: number | null
   address?: string | null
   availability?: string
   isVerified?: boolean
@@ -639,6 +673,8 @@ export type NurseProfileUncheckedCreateInput = {
   radius?: number
   lat?: number | null
   lng?: number | null
+  approvedLat?: number | null
+  approvedLng?: number | null
   address?: string | null
   availability?: string
   isVerified?: boolean
@@ -672,6 +708,8 @@ export type NurseProfileUpdateInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -707,6 +745,8 @@ export type NurseProfileUncheckedUpdateInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -741,6 +781,8 @@ export type NurseProfileCreateManyInput = {
   radius?: number
   lat?: number | null
   lng?: number | null
+  approvedLat?: number | null
+  approvedLng?: number | null
   address?: string | null
   availability?: string
   isVerified?: boolean
@@ -773,6 +815,8 @@ export type NurseProfileUpdateManyMutationInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -806,6 +850,8 @@ export type NurseProfileUncheckedUpdateManyInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -844,6 +890,8 @@ export type NurseProfileCountOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  approvedLat?: Prisma.SortOrder
+  approvedLng?: Prisma.SortOrder
   address?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
@@ -868,6 +916,8 @@ export type NurseProfileAvgOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  approvedLat?: Prisma.SortOrder
+  approvedLng?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
   pendingOrderAmount?: Prisma.SortOrder
@@ -887,6 +937,8 @@ export type NurseProfileMaxOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  approvedLat?: Prisma.SortOrder
+  approvedLng?: Prisma.SortOrder
   address?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
@@ -920,6 +972,8 @@ export type NurseProfileMinOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  approvedLat?: Prisma.SortOrder
+  approvedLng?: Prisma.SortOrder
   address?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
@@ -944,6 +998,8 @@ export type NurseProfileSumOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
+  approvedLat?: Prisma.SortOrder
+  approvedLng?: Prisma.SortOrder
   avgRating?: Prisma.SortOrder
   totalReviews?: Prisma.SortOrder
   pendingOrderAmount?: Prisma.SortOrder
@@ -1013,6 +1069,8 @@ export type NurseProfileCreateWithoutUserInput = {
   radius?: number
   lat?: number | null
   lng?: number | null
+  approvedLat?: number | null
+  approvedLng?: number | null
   address?: string | null
   availability?: string
   isVerified?: boolean
@@ -1046,6 +1104,8 @@ export type NurseProfileUncheckedCreateWithoutUserInput = {
   radius?: number
   lat?: number | null
   lng?: number | null
+  approvedLat?: number | null
+  approvedLng?: number | null
   address?: string | null
   availability?: string
   isVerified?: boolean
@@ -1095,6 +1155,8 @@ export type NurseProfileUpdateWithoutUserInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1128,6 +1190,8 @@ export type NurseProfileUncheckedUpdateWithoutUserInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1161,6 +1225,8 @@ export type NurseProfileCreateWithoutServicesInput = {
   radius?: number
   lat?: number | null
   lng?: number | null
+  approvedLat?: number | null
+  approvedLng?: number | null
   address?: string | null
   availability?: string
   isVerified?: boolean
@@ -1195,6 +1261,8 @@ export type NurseProfileUncheckedCreateWithoutServicesInput = {
   radius?: number
   lat?: number | null
   lng?: number | null
+  approvedLat?: number | null
+  approvedLng?: number | null
   address?: string | null
   availability?: string
   isVerified?: boolean
@@ -1243,6 +1311,8 @@ export type NurseProfileUpdateWithoutServicesInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1277,6 +1347,8 @@ export type NurseProfileUncheckedUpdateWithoutServicesInput = {
   radius?: Prisma.IntFieldUpdateOperationsInput | number
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approvedLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.StringFieldUpdateOperationsInput | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1341,6 +1413,8 @@ export type NurseProfileSelect<ExtArgs extends runtime.Types.Extensions.Internal
   radius?: boolean
   lat?: boolean
   lng?: boolean
+  approvedLat?: boolean
+  approvedLng?: boolean
   address?: boolean
   availability?: boolean
   isVerified?: boolean
@@ -1377,6 +1451,8 @@ export type NurseProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   radius?: boolean
   lat?: boolean
   lng?: boolean
+  approvedLat?: boolean
+  approvedLng?: boolean
   address?: boolean
   availability?: boolean
   isVerified?: boolean
@@ -1411,6 +1487,8 @@ export type NurseProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   radius?: boolean
   lat?: boolean
   lng?: boolean
+  approvedLat?: boolean
+  approvedLng?: boolean
   address?: boolean
   availability?: boolean
   isVerified?: boolean
@@ -1445,6 +1523,8 @@ export type NurseProfileSelectScalar = {
   radius?: boolean
   lat?: boolean
   lng?: boolean
+  approvedLat?: boolean
+  approvedLng?: boolean
   address?: boolean
   availability?: boolean
   isVerified?: boolean
@@ -1464,7 +1544,7 @@ export type NurseProfileSelectScalar = {
   createdAt?: boolean
 }
 
-export type NurseProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "councilRegNo" | "councilState" | "experience" | "gender" | "languages" | "bio" | "radius" | "lat" | "lng" | "address" | "availability" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "councilCertUrl" | "degreeCertUrl" | "kycDocUrl" | "policeVerifUrl" | "registrationFeePaid" | "subscriptionPaidUntil" | "cashfreeOrderId" | "cashfreePaymentId" | "pendingOrderAmount" | "createdAt", ExtArgs["result"]["nurseProfile"]>
+export type NurseProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "photoUrl" | "qualification" | "councilRegNo" | "councilState" | "experience" | "gender" | "languages" | "bio" | "radius" | "lat" | "lng" | "approvedLat" | "approvedLng" | "address" | "availability" | "isVerified" | "avgRating" | "totalReviews" | "bankDetails" | "status" | "councilCertUrl" | "degreeCertUrl" | "kycDocUrl" | "policeVerifUrl" | "registrationFeePaid" | "subscriptionPaidUntil" | "cashfreeOrderId" | "cashfreePaymentId" | "pendingOrderAmount" | "createdAt", ExtArgs["result"]["nurseProfile"]>
 export type NurseProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   services?: boolean | Prisma.NurseProfile$servicesArgs<ExtArgs>
@@ -1497,6 +1577,8 @@ export type $NurseProfilePayload<ExtArgs extends runtime.Types.Extensions.Intern
     radius: number
     lat: number | null
     lng: number | null
+    approvedLat: number | null
+    approvedLng: number | null
     address: string | null
     availability: string
     isVerified: boolean
@@ -1952,6 +2034,8 @@ export interface NurseProfileFieldRefs {
   readonly radius: Prisma.FieldRef<"NurseProfile", 'Int'>
   readonly lat: Prisma.FieldRef<"NurseProfile", 'Float'>
   readonly lng: Prisma.FieldRef<"NurseProfile", 'Float'>
+  readonly approvedLat: Prisma.FieldRef<"NurseProfile", 'Float'>
+  readonly approvedLng: Prisma.FieldRef<"NurseProfile", 'Float'>
   readonly address: Prisma.FieldRef<"NurseProfile", 'String'>
   readonly availability: Prisma.FieldRef<"NurseProfile", 'String'>
   readonly isVerified: Prisma.FieldRef<"NurseProfile", 'Boolean'>

@@ -11,13 +11,18 @@ export const BASE_LOCATION_FREE_KM = 2;
 
 /** True when the new base location is far enough from the old one to need re-review. */
 export function baseLocationMovedFar(
-  old: { lat: number | null; lng: number | null },
+  old: { lat: number | null; lng: number | null; approvedLat?: number | null; approvedLng?: number | null },
   next: { lat?: number | null; lng?: number | null },
 ): boolean {
   if (next.lat === undefined || next.lng === undefined) return false;
-  if (next.lat === old.lat && next.lng === old.lng) return false;
-  if (old.lat == null || old.lng == null || next.lat == null || next.lng == null) return true;
-  return haversine(old.lat, old.lng, next.lat, next.lng) >= BASE_LOCATION_FREE_KM;
+  // Compare with the admin-approved point so many small steps can't add up;
+  // legacy rows without one fall back to the current base.
+  const hasApproved = old.approvedLat != null && old.approvedLng != null;
+  const baseLat = hasApproved ? old.approvedLat! : old.lat;
+  const baseLng = hasApproved ? old.approvedLng! : old.lng;
+  if (next.lat === baseLat && next.lng === baseLng) return false;
+  if (baseLat == null || baseLng == null || next.lat == null || next.lng == null) return true;
+  return haversine(baseLat, baseLng, next.lat, next.lng) >= BASE_LOCATION_FREE_KM;
 }
 
 export function notifyAdminNurseReReview(name: string) {

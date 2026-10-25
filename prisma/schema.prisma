@@ -251,6 +251,8 @@ model NurseProfile {
   radius           Int     @default(10) // km the nurse will travel for a home visit
   lat              Float?
   lng              Float?
+  approvedLat      Float? // base point the admin approved (re-review compares against this)
+  approvedLng      Float?
   address          String?
   availability     String  @default("Mon-Sat, 8AM-8PM")
   isVerified       Boolean @default(false)

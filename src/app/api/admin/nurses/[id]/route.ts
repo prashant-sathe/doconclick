@@ -60,7 +60,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const profile = await prisma.nurseProfile.findFirst({ where: { userId: id, user: { role: "NURSE", deletedAt: null } } });
   if (!profile) return NextResponse.json({ error: "Nurse not found" }, { status: 404 });
 
-  const data: { status?: string; isVerified?: boolean } = {};
+  const data: { status?: string; isVerified?: boolean; approvedLat?: number | null; approvedLng?: number | null } = {};
   if (status !== undefined) {
     if (!["APPROVED", "REJECTED", "SUSPENDED", "PENDING"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
@@ -79,6 +79,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       }
     }
     data.status = status;
+    // Remember the base point being approved (re-review compares against it).
+    if (status === "APPROVED" && profile.status !== "APPROVED") {
+      data.approvedLat = profile.lat;
+      data.approvedLng = profile.lng;
+    }
   }
   if (isVerified !== undefined) {
     // "Credentials verified" locks her documents — only for an approved nurse
