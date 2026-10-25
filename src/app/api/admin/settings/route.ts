@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { isOwnUploadUrl } from "@/lib/s3";
-import { DOCTOR_REGISTRATION_FEE_MAX } from "@/lib/doctorFees";
+import { DOCTOR_REGISTRATION_FEE_MAX, DEFAULT_DOCTOR_REGISTRATION_ORIGINAL_FEE } from "@/lib/doctorFeePricing";
 import { CASH_DUE_LIMIT_MAX } from "@/lib/duesPayments";
 import { BOOKING_HORIZON_MIN_DAYS, BOOKING_HORIZON_MAX_DAYS, CHAT_FOLLOW_UP_MIN_DAYS, CHAT_FOLLOW_UP_MAX_DAYS } from "@/lib/bookingHorizon";
 
@@ -73,14 +73,40 @@ export async function PATCH(req: Request) {
     data[key] = Math.round(value);
   }
 
-  // Doctors' one-time registration fee; ₹0 = free (activated without paying).
-  // Orders already open keep the amount they were created for.
-  if (body.doctorRegistrationFee !== undefined) {
-    const value = finiteNumber(body.doctorRegistrationFee);
-    if (value === null || value < 0 || value > DOCTOR_REGISTRATION_FEE_MAX) {
-      return NextResponse.json({ error: "The doctor registration fee must be between ₹0 and ₹1,00,000." }, { status: 400 });
+  // Doctors' one-time registration fee: an original price (> ₹0) and an
+  // optional discounted price that is charged instead (null = no discount;
+  // an explicit ₹0 = free, activated without paying). Orders already open
+  // keep the amount they were created for.
+  if (body.doctorRegistrationOriginalFee !== undefined) {
+    const value = finiteNumber(body.doctorRegistrationOriginalFee);
+    if (value === null || Math.round(value) < 1 || value > DOCTOR_REGISTRATION_FEE_MAX) {
+      return NextResponse.json({ error: "The original registration fee must be between ₹1 and ₹1,00,000." }, { status: 400 });
     }
-    data.doctorRegistrationFee = Math.round(value);
+    data.doctorRegistrationOriginalFee = Math.round(value);
+  }
+  if (body.doctorRegistrationFee !== undefined) {
+    // null clears the discount; anything else must be a real number (a blank
+    // field is never silently "₹0 = free").
+    if (body.doctorRegistrationFee === null) {
+      data.doctorRegistrationFee = null;
+    } else {
+      const value = finiteNumber(body.doctorRegistrationFee);
+      if (value === null || value < 0 || value > DOCTOR_REGISTRATION_FEE_MAX) {
+        return NextResponse.json({ error: "The discounted registration fee must be between ₹0 and ₹1,00,000." }, { status: 400 });
+      }
+      data.doctorRegistrationFee = Math.round(value);
+    }
+  }
+  if (data.doctorRegistrationOriginalFee !== undefined || typeof data.doctorRegistrationFee === "number") {
+    const current = await prisma.platformSettings.findFirst({ select: { doctorRegistrationOriginalFee: true, doctorRegistrationFee: true } });
+    const original = (data.doctorRegistrationOriginalFee as number | undefined) ?? current?.doctorRegistrationOriginalFee ?? DEFAULT_DOCTOR_REGISTRATION_ORIGINAL_FEE;
+    const discounted = data.doctorRegistrationFee !== undefined ? (data.doctorRegistrationFee as number | null) : current?.doctorRegistrationFee ?? null;
+    if (discounted !== null && discounted >= original) {
+      return NextResponse.json(
+        { error: "The discounted registration fee must be less than the original fee — or leave it empty for no discount." },
+        { status: 400 }
+      );
+    }
   }
 
   // Most a doctor may owe on cash visits before cash bookings pause; ₹0 = no limit.

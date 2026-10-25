@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDoctorRegistrationFee } from "@/lib/doctorFees";
+import { getDoctorRegistrationPricing } from "@/lib/doctorFees";
 import { availabilityProblem, availabilityFromBlocks, availabilityToBlocks } from "@/lib/availability";
 import { prisma } from "@/lib/prisma";
 import { requireRole, readJson } from "@/lib/routeGuards";
@@ -44,8 +44,17 @@ export const GET = withErrorLocale(async function GET() {
   }
 
   const { changeRequests, ...rest } = doctor;
-  // The admin-set registration fee, for the activation banner and payment page.
-  return NextResponse.json({ ...rest, changeRequest: changeRequests[0] ?? null, registrationFee: await getDoctorRegistrationFee() });
+  // The admin-set registration price, for the activation banner and payment
+  // page: registrationFee is what is charged; the original is struck through
+  // only when registrationFeeHasDiscount.
+  const pricing = await getDoctorRegistrationPricing();
+  return NextResponse.json({
+    ...rest,
+    changeRequest: changeRequests[0] ?? null,
+    registrationFee: pricing.payable,
+    registrationFeeOriginal: pricing.original,
+    registrationFeeHasDiscount: pricing.hasDiscount,
+  });
 });
 
 // Free edits. medRegNo/qualification/specialty are handled separately (they

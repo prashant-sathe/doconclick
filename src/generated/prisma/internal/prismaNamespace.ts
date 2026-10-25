@@ -4422,6 +4422,7 @@ export const PlatformSettingsScalarFieldEnum = {
   homeCommissionPercent: 'homeCommissionPercent',
   nurseCommissionPercent: 'nurseCommissionPercent',
   nurseRegistrationFee: 'nurseRegistrationFee',
+  doctorRegistrationOriginalFee: 'doctorRegistrationOriginalFee',
   doctorRegistrationFee: 'doctorRegistrationFee',
   nurseSubscriptionFee: 'nurseSubscriptionFee',
   nurseShiftServicesSeeded: 'nurseShiftServicesSeeded',

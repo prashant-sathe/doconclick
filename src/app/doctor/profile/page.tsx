@@ -107,7 +107,7 @@ export default function DoctorProfilePage() {
   const { user, loading: authLoading, logout, refresh } = useAuth();
   const t = useTranslations("doctorAccount.hub");
   const router = useRouter();
-  const { profile, clinicCount, registrationFee, loading } = useDoctorProfile();
+  const { profile, clinicCount, registrationFee, registrationFeeOriginal, registrationFeeHasDiscount, loading } = useDoctorProfile();
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -184,7 +184,7 @@ export default function DoctorProfilePage() {
                 {registrationFee === 0
                   ? t("activateFree")
                   : t.rich("activatePay", {
-                      strike: () => (registrationFee ?? 0) < 499 ? <span className="line-through text-slate-400">₹499</span> : null,
+                      strike: () => registrationFeeHasDiscount && registrationFeeOriginal != null ? <span className="line-through text-slate-400">₹{registrationFeeOriginal}</span> : null,
                       fee: () => <span className="font-semibold">₹{registrationFee ?? "…"}</span>,
                     })}
               </p>

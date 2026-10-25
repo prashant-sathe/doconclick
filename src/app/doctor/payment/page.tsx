@@ -6,9 +6,8 @@ import { useAuth } from "@/components/AuthProvider";
 import { useTranslations } from "next-intl";
 import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
 
-// The fee itself is admin-set (Settings) and comes from /api/doctors/me; this
-// is only the "was" price shown struck through when the fee is below it.
-const REGISTRATION_FEE_ORIGINAL = 499;
+// The fee and its original ("was") price are admin-set (Settings) and come
+// from /api/doctors/me; the original is struck through only when discounted.
 const FREE_TRIAL_MONTHS = 6;
 const TRIAL_VALUE = DOCTOR_SUBSCRIPTION_FEE * FREE_TRIAL_MONTHS;
 
@@ -25,6 +24,7 @@ export default function DoctorPayment() {
   const [couponError, setCouponError] = useState("");
   const [coupon, setCoupon] = useState<{ code: string; discountAmount: number; netAmount: number } | null>(null);
   const [fee, setFee] = useState<number | null>(null);
+  const [originalFee, setOriginalFee] = useState<number | null>(null);
   const [activatedFree, setActivatedFree] = useState(false);
 
   useEffect(() => {
@@ -41,6 +41,7 @@ export default function DoctorPayment() {
       .then((d) => {
         setAlreadyPaid(!!d?.doctorProfile?.registrationFeePaid);
         setFee(typeof d?.registrationFee === "number" ? d.registrationFee : null);
+        setOriginalFee(d?.registrationFeeHasDiscount === true && typeof d?.registrationFeeOriginal === "number" ? d.registrationFeeOriginal : null);
       })
       .finally(() => setChecking(false));
   }, [isDoctor]);
@@ -133,7 +134,7 @@ export default function DoctorPayment() {
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 text-sm">{t("registrationFee")}</span>
                 <span className="flex items-baseline gap-2">
-                  {(fee ?? 0) < REGISTRATION_FEE_ORIGINAL && <span className="text-slate-400 text-sm line-through">₹{REGISTRATION_FEE_ORIGINAL}</span>}
+                  {originalFee != null && <span className="text-slate-400 text-sm line-through">₹{originalFee}</span>}
                   <span className={`font-extrabold text-xl ${coupon ? "text-slate-400 line-through" : "text-blue-600"}`}>{free ? t("free") : `₹${fee}`}</span>
                 </span>
               </div>

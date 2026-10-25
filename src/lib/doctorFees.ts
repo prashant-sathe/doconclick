@@ -1,14 +1,27 @@
 import { prisma } from "@/lib/prisma";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { DEFAULT_DOCTOR_REGISTRATION_FEE } from "@/lib/cashfree";
+import {
+  resolveDoctorRegistrationPricing,
+  DEFAULT_DOCTOR_REGISTRATION_ORIGINAL_FEE,
+  type DoctorRegistrationPricing,
+} from "@/lib/doctorFeePricing";
 
-export const DOCTOR_REGISTRATION_FEE_MAX = 100000;
+export { DOCTOR_REGISTRATION_FEE_MAX, resolveDoctorRegistrationPricing, type DoctorRegistrationPricing } from "@/lib/doctorFeePricing";
 
-/** The doctor registration fee the admin set in Settings (₹0 = free). */
+/** The admin-set registration price: original, what is charged, and whether it's discounted. */
+export async function getDoctorRegistrationPricing(): Promise<DoctorRegistrationPricing> {
+  const settings = await prisma.platformSettings.findFirst({
+    select: { doctorRegistrationOriginalFee: true, doctorRegistrationFee: true },
+  });
+  // No settings row yet = the schema defaults (₹499, discounted to ₹99).
+  if (!settings) return resolveDoctorRegistrationPricing(DEFAULT_DOCTOR_REGISTRATION_ORIGINAL_FEE, DEFAULT_DOCTOR_REGISTRATION_FEE);
+  return resolveDoctorRegistrationPricing(settings.doctorRegistrationOriginalFee, settings.doctorRegistrationFee);
+}
+
+/** What a doctor is charged for registration before any coupon (₹0 = free). */
 export async function getDoctorRegistrationFee(): Promise<number> {
-  const settings = await prisma.platformSettings.findFirst({ select: { doctorRegistrationFee: true } });
-  const fee = settings?.doctorRegistrationFee;
-  return typeof fee === "number" && Number.isFinite(fee) && fee >= 0 ? fee : DEFAULT_DOCTOR_REGISTRATION_FEE;
+  return (await getDoctorRegistrationPricing()).payable;
 }
 
 /** "₹99" — or "free" when the admin set it to ₹0. */

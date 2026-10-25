@@ -45,8 +45,11 @@ export type DoctorMe = {
   doctorProfile: RawDoctorProfile;
   clinics: unknown[];
   changeRequest: DoctorChangeRequest | null;
-  /** The admin-set one-time registration fee (₹0 = free). */
+  /** The admin-set one-time registration fee that is charged (₹0 = free). */
   registrationFee: number | null;
+  /** The original price — shown struck through only when registrationFeeHasDiscount. */
+  registrationFeeOriginal: number | null;
+  registrationFeeHasDiscount: boolean;
 };
 
 /** Loads the signed-in doctor's `/api/doctors/me` once. */
@@ -60,7 +63,7 @@ export function useDoctorProfile() {
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (cancelled) return;
-        setData({ doctorProfile: (d?.doctorProfile ?? {}) as RawDoctorProfile, clinics: d?.clinics ?? [], changeRequest: d?.changeRequest ?? null, registrationFee: typeof d?.registrationFee === "number" ? d.registrationFee : null });
+        setData({ doctorProfile: (d?.doctorProfile ?? {}) as RawDoctorProfile, clinics: d?.clinics ?? [], changeRequest: d?.changeRequest ?? null, registrationFee: typeof d?.registrationFee === "number" ? d.registrationFee : null, registrationFeeOriginal: typeof d?.registrationFeeOriginal === "number" ? d.registrationFeeOriginal : null, registrationFeeHasDiscount: d?.registrationFeeHasDiscount === true });
         setLoading(false);
       })
       .catch(() => { if (!cancelled) setLoading(false); });
@@ -72,6 +75,8 @@ export function useDoctorProfile() {
     clinicCount: data?.clinics.length ?? 0,
     changeRequest: data?.changeRequest ?? null,
     registrationFee: data?.registrationFee ?? null,
+    registrationFeeOriginal: data?.registrationFeeOriginal ?? null,
+    registrationFeeHasDiscount: data?.registrationFeeHasDiscount ?? false,
     loading,
   };
 }

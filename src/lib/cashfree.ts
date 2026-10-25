@@ -1,7 +1,8 @@
 import crypto from "crypto";
 
-// The registration fee is admin-set (PlatformSettings.doctorRegistrationFee,
-// read via src/lib/doctorFees.ts); this is only its default. The subscription
+// The registration fee is admin-set (PlatformSettings.doctorRegistrationFee =
+// the discounted price charged, doctorRegistrationOriginalFee = the original;
+// resolved in src/lib/doctorFees.ts); this is only the discount's default. The subscription
 // fee is shared with the webhook's amount-match check — keep in one place.
 export const DEFAULT_DOCTOR_REGISTRATION_FEE = 99;
 export const DOCTOR_SUBSCRIPTION_FEE = 499;

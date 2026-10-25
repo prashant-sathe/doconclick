@@ -85,11 +85,14 @@ async function main() {
 
   try {
     // ── Registration fee from Settings ──
-    for (const [label, value] of [["negative", -1], ["too big", 100001], ["text", "99"], ["blank", null]] as const) {
+    for (const [label, value] of [["negative", -1], ["too big", 100001], ["text", "99"], ["blank", ""]] as const) {
       const r = await setFee(value as number);
       check(`settings: doctor fee ${label} → 400`, r.status === 400, `${r.status} ${r.json.error}`);
     }
-    let r = await setFee(250);
+    // F44: null = "no discount" (the original price is charged), not ₹0.
+    let r = await setFee(null as unknown as number);
+    check("settings: discounted fee null → cleared (no discount), not ₹0", r.status === 200 && r.json.doctorRegistrationFee === null, `${r.status} ${r.json.doctorRegistrationFee}`);
+    r = await setFee(250);
     check("settings: doctor fee ₹250 → saved", r.status === 200 && r.json.doctorRegistrationFee === 250, `${r.status} ${r.json.doctorRegistrationFee}`);
     const me = await call(as(midDoc), "GET", "/api/doctors/me");
     check("the doctor's own profile reports the ₹250 fee", me.json.registrationFee === 250, String(me.json.registrationFee));

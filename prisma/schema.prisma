@@ -843,10 +843,14 @@ model PlatformSettings {
   // registration / no monthly subscription gate.
   nurseCommissionPercent  Float    @default(10)
   nurseRegistrationFee    Float    @default(0)
-  // Doctors' one-time registration fee (₹0 = free: activated without a
-  // payment step) — read by checkout, coupons and the approve gate
-  // (src/lib/doctorFees.ts). The monthly subscription is still a constant.
-  doctorRegistrationFee   Float    @default(99)
+  // Doctors' one-time registration fee — read by checkout, coupons and the
+  // approve gate (src/lib/doctorFees.ts). Original = the "MRP" (struck
+  // through when discounted); doctorRegistrationFee = the optional discounted
+  // price that is charged (null / ≥ original = no discount, the original is
+  // charged; an explicit ₹0 = free: activated without a payment step). The
+  // monthly subscription is still a constant.
+  doctorRegistrationOriginalFee Float @default(499)
+  doctorRegistrationFee   Float?   @default(99)
   nurseSubscriptionFee    Float    @default(0)
   // One-time: the starter 12h/24h shift services were added to an existing
   // catalogue (so an admin deleting them later doesn't bring them back).
