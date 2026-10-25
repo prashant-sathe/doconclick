@@ -1212,7 +1212,7 @@ function PatientDashboardInner() {
   );
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-slate-900">
+    <div className="relative w-full h-screen overflow-hidden bg-slate-900">
       {/* ── Map container (always mounted so Leaflet can find it) ──────── */}
       <div ref={mapRef} className="absolute inset-0 z-0" />
 
@@ -2062,7 +2062,7 @@ function PatientDashboardInner() {
 export default function PatientDashboard() {
   return (
     <Suspense fallback={
-      <div className="w-screen h-screen flex items-center justify-center gradient-surface">
+      <div className="w-full h-screen flex items-center justify-center gradient-surface">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
       </div>
     }>
