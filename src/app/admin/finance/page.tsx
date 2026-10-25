@@ -1,5 +1,6 @@
 "use client";
-import { useState, useMemo, useRef } from "react";
+import { Suspense, useState, useMemo, useRef } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { IndianRupee, TrendingUp, Save, Wallet, BadgeCheck, XCircle, PencilLine } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { AgGridReact } from "ag-grid-react";
@@ -12,6 +13,10 @@ import { brandGridTheme } from "@/lib/agGridTheme";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import LoadError from "@/components/LoadError";
 import DuesReviewPanel from "@/components/admin/DuesReviewPanel";
+import CashDueSettings from "@/components/admin/CashDueSettings";
+import DoctorFeeSettings from "@/components/admin/DoctorFeeSettings";
+import NurseSettings from "@/components/admin/NurseSettings";
+import ReceiptSettings from "@/components/admin/ReceiptSettings";
 import { useToast } from "@/components/Toast";
 import { useLoad } from "@/lib/apiClient";
 import { istDayKey } from "@/lib/istDate";
@@ -86,7 +91,30 @@ function newIdempotencyKey(): string {
   return Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+const TABS = [
+  { id: "payouts", label: "Payouts" },
+  { id: "dues", label: "Cash dues" },
+  { id: "fees", label: "Fees & commission" },
+  { id: "receipts", label: "Receipts & tax" },
+] as const;
+type TabId = (typeof TABS)[number]["id"];
+
+// Suspense is required around useSearchParams (the ?tab= deep link).
 export default function AdminFinance() {
+  return (
+    <Suspense fallback={null}>
+      <FinanceContent />
+    </Suspense>
+  );
+}
+
+function FinanceContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const tabParam = searchParams.get("tab");
+  const tab: TabId = TABS.find((t) => t.id === tabParam)?.id ?? "payouts";
+  const selectTab = (id: TabId) => router.replace(id === "payouts" ? pathname : `${pathname}?tab=${id}`, { scroll: false });
   const toast = useToast();
   const tFix = useTranslations("shared.adminPayoutFix");
   // Each section loads on its own, so one failing endpoint doesn't hide the rest.
@@ -538,8 +566,8 @@ export default function AdminFinance() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-extrabold text-slate-900">Finance & Commission</h1>
-        <p className="text-slate-500 text-sm mt-1">Manage platform earnings and commission settings.</p>
+        <h1 className="text-2xl font-extrabold text-slate-900">Finance</h1>
+        <p className="text-slate-500 text-sm mt-1">Payouts, cash dues, fees and commission, and receipt details.</p>
       </div>
 
       {/* Revenue Cards */}
@@ -595,6 +623,86 @@ export default function AdminFinance() {
         </div>
       )}
 
+      {/* Tabs — money configuration lives here; Settings keeps the non-financial bits. */}
+      <div role="tablist" className="flex gap-1 overflow-x-auto border-b border-slate-200 mb-6">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            role="tab"
+            aria-selected={tab === t.id}
+            onClick={() => selectTab(t.id)}
+            className={`px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 -mb-px transition-colors ${tab === t.id ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "payouts" && (
+        <>
+      {/* Pending Settlements */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-8">
+        <h2 className="font-bold text-slate-800 mb-1 text-lg">Pending Settlements</h2>
+        {settleError && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 my-3">{settleError}</p>}
+        <p className="text-xs text-slate-400 mb-5">
+          Cash fee owed = commission the doctor collected in cash and owes the platform. Online payout owed = money the platform holds and owes the doctor.
+        </p>
+        {pendingLoad.error && (
+          <LoadError error={pendingLoad.error} onRetry={pendingLoad.reload} retrying={pendingLoad.reloading} hasData={!!pendingLoad.data} />
+        )}
+        {pendingLoad.loading ? (
+          <div className="skeleton h-24 rounded-xl" />
+        ) : !pendingLoad.data ? null : pending.length === 0 ? (
+          <p className="text-sm text-slate-400 text-center py-8">Nothing to settle right now.</p>
+        ) : (
+          <AgGridReact<PendingSettlement>
+            theme={brandGridTheme}
+            rowData={pending}
+            columnDefs={pendingColumnDefs}
+            defaultColDef={defaultColDef}
+            domLayout="autoHeight"
+            animateRows
+          />
+        )}
+      </div>
+
+      {/* Settlement History */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-6">
+        <h2 className="font-bold text-slate-800 mb-5 text-lg">Settlement History</h2>
+        {historyLoad.error && (
+          <LoadError error={historyLoad.error} onRetry={historyLoad.reload} retrying={historyLoad.reloading} hasData={!!historyLoad.data} />
+        )}
+        {historyLoad.loading ? (
+          <div className="skeleton h-24 rounded-xl" />
+        ) : !historyLoad.data ? null : history.length === 0 ? (
+          <p className="text-sm text-slate-400 text-center py-8">No settlements recorded yet.</p>
+        ) : (
+          <AgGridReact<SettlementRecord>
+            theme={brandGridTheme}
+            rowData={history}
+            columnDefs={historyColumnDefs}
+            defaultColDef={defaultColDef}
+            domLayout="autoHeight"
+            pagination
+            paginationPageSize={10}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            animateRows
+          />
+        )}
+      </div>
+
+        </>
+      )}
+
+      {tab === "dues" && (
+        <div className="space-y-6">
+  <DuesReviewPanel />
+          <CashDueSettings />
+        </div>
+      )}
+
+      {tab === "fees" && (
+        <div className="space-y-6">
       {/* Commission Settings */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 max-w-lg">
         <h2 className="font-bold text-slate-800 mb-1 text-lg">Commission Settings</h2>
@@ -664,58 +772,12 @@ export default function AdminFinance() {
         )}
       </div>
 
-      <DuesReviewPanel />
+          <DoctorFeeSettings />
+          <NurseSettings />
+        </div>
+      )}
 
-      {/* Pending Settlements */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-8">
-        <h2 className="font-bold text-slate-800 mb-1 text-lg">Pending Settlements</h2>
-        {settleError && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 my-3">{settleError}</p>}
-        <p className="text-xs text-slate-400 mb-5">
-          Cash fee owed = commission the doctor collected in cash and owes the platform. Online payout owed = money the platform holds and owes the doctor.
-        </p>
-        {pendingLoad.error && (
-          <LoadError error={pendingLoad.error} onRetry={pendingLoad.reload} retrying={pendingLoad.reloading} hasData={!!pendingLoad.data} />
-        )}
-        {pendingLoad.loading ? (
-          <div className="skeleton h-24 rounded-xl" />
-        ) : !pendingLoad.data ? null : pending.length === 0 ? (
-          <p className="text-sm text-slate-400 text-center py-8">Nothing to settle right now.</p>
-        ) : (
-          <AgGridReact<PendingSettlement>
-            theme={brandGridTheme}
-            rowData={pending}
-            columnDefs={pendingColumnDefs}
-            defaultColDef={defaultColDef}
-            domLayout="autoHeight"
-            animateRows
-          />
-        )}
-      </div>
-
-      {/* Settlement History */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-6">
-        <h2 className="font-bold text-slate-800 mb-5 text-lg">Settlement History</h2>
-        {historyLoad.error && (
-          <LoadError error={historyLoad.error} onRetry={historyLoad.reload} retrying={historyLoad.reloading} hasData={!!historyLoad.data} />
-        )}
-        {historyLoad.loading ? (
-          <div className="skeleton h-24 rounded-xl" />
-        ) : !historyLoad.data ? null : history.length === 0 ? (
-          <p className="text-sm text-slate-400 text-center py-8">No settlements recorded yet.</p>
-        ) : (
-          <AgGridReact<SettlementRecord>
-            theme={brandGridTheme}
-            rowData={history}
-            columnDefs={historyColumnDefs}
-            defaultColDef={defaultColDef}
-            domLayout="autoHeight"
-            pagination
-            paginationPageSize={10}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            animateRows
-          />
-        )}
-      </div>
+      {tab === "receipts" && <ReceiptSettings />}
 
       {/* Negative-net confirmation */}
       {confirmNegative && (

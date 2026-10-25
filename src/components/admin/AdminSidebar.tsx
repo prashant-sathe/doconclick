@@ -14,7 +14,9 @@ import { useAuth } from "@/components/AuthProvider";
 import InboxButton from "@/components/InboxButton";
 import { useInboxUnread } from "@/hooks/useInboxUnread";
 
-const navItems = [
+type NavItem = { href: string; label: string; icon: typeof LayoutDashboard };
+
+const topItems: NavItem[] = [
   { href: "/admin",            label: "Overview",    icon: LayoutDashboard },
   { href: "/admin/inbox",      label: "Notifications", icon: Inbox },
   { href: "/admin/doctors",    label: "Doctors",     icon: Stethoscope },
@@ -23,10 +25,17 @@ const navItems = [
   { href: "/admin/nurse-services", label: "Nurse Services", icon: ClipboardList },
   { href: "/admin/patients",   label: "Patients",    icon: Users },
   { href: "/admin/bookings",   label: "Bookings",    icon: CalendarCheck },
+];
+
+// Everything that moves or configures money, under one heading.
+const moneyItems: NavItem[] = [
   { href: "/admin/finance",    label: "Finance",     icon: DollarSign },
   { href: "/admin/wallets",    label: "Wallets",     icon: Wallet },
-  { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/coupons",    label: "Coupons",     icon: TicketPercent },
+];
+
+const bottomItems: NavItem[] = [
+  { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/reports",    label: "Reports",     icon: FileBarChart },
   { href: "/admin/complaints", label: "Complaints",  icon: MessageCircle },
   { href: "/admin/settings",   label: "Settings",    icon: Settings },
@@ -41,6 +50,28 @@ function SidebarContents({ pathname, user, logout, onNavigate, inboxUnread }: {
   onNavigate?: () => void;
   inboxUnread: number;
 }) {
+  const renderItem = ({ href, label, icon: Icon }: NavItem) => {
+      // Sub-pages count too (/admin/settings/admins → Settings); Overview
+      // (/admin) only on itself, or it would match every page.
+      const isActive = href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`);
+      return (
+        <Link
+          key={href}
+          href={href}
+          onClick={onNavigate}
+          className={cn("sidebar-item", isActive && "active")}
+        >
+          <Icon className="w-4 h-4 flex-shrink-0" />
+          <span className="flex-1">{label}</span>
+          {href === "/admin/inbox" && inboxUnread > 0 && (
+            <span className="min-w-5 h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+              {inboxUnread > 99 ? "99+" : inboxUnread}
+            </span>
+          )}
+          {isActive && <ChevronRight className="w-3.5 h-3.5 opacity-50" />}
+        </Link>
+      );
+  };
   return (
     <>
       <div className="px-6 py-5 border-b border-slate-200/70">
@@ -54,28 +85,10 @@ function SidebarContents({ pathname, user, logout, onNavigate, inboxUnread }: {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        {navItems.map(({ href, label, icon: Icon }) => {
-          // Sub-pages count too (/admin/settings/admins → Settings); Overview
-          // (/admin) only on itself, or it would match every page.
-          const isActive = href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`);
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={onNavigate}
-              className={cn("sidebar-item", isActive && "active")}
-            >
-              <Icon className="w-4 h-4 flex-shrink-0" />
-              <span className="flex-1">{label}</span>
-              {href === "/admin/inbox" && inboxUnread > 0 && (
-                <span className="min-w-5 h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                  {inboxUnread > 99 ? "99+" : inboxUnread}
-                </span>
-              )}
-              {isActive && <ChevronRight className="w-3.5 h-3.5 opacity-50" />}
-            </Link>
-          );
-        })}
+        {topItems.map(renderItem)}
+        <div className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Money</div>
+        {moneyItems.map(renderItem)}
+        <div className="pt-2 space-y-1">{bottomItems.map(renderItem)}</div>
       </nav>
 
       <div className="px-3 py-4 border-t border-slate-200/70 space-y-2">

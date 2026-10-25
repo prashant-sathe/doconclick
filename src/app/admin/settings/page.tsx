@@ -3,11 +3,7 @@ import Link from "next/link";
 import { Settings, Info, ShieldCheck, ChevronRight } from "lucide-react";
 import NotificationSettings from "@/components/NotificationSettings";
 import SplashSettings from "@/components/SplashSettings";
-import NurseSettings from "@/components/admin/NurseSettings";
-import DoctorFeeSettings from "@/components/admin/DoctorFeeSettings";
-import CashDueSettings from "@/components/admin/CashDueSettings";
 import BookingSettings from "@/components/admin/BookingSettings";
-import ReceiptSettings from "@/components/admin/ReceiptSettings";
 
 export default function AdminSettings() {
   return (
@@ -27,7 +23,7 @@ export default function AdminSettings() {
           <div className="flex items-start gap-3 text-sm text-slate-600 bg-blue-50 border border-blue-100 rounded-xl p-4">
             <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p>Commission settings are managed in the <a href="/admin/finance" className="text-blue-600 font-semibold underline">Finance section</a>.</p>
+              <p>Fees, commission, cash dues and receipt details are managed in the <Link href="/admin/finance" className="text-blue-600 font-semibold underline">Finance section</Link>.</p>
               <p className="mt-1">Notification templates, branding and advanced settings will be available in future releases.</p>
             </div>
           </div>
@@ -48,14 +44,6 @@ export default function AdminSettings() {
         </Link>
 
         <BookingSettings />
-
-        <DoctorFeeSettings />
-
-        <CashDueSettings />
-
-        <ReceiptSettings />
-
-        <NurseSettings />
 
         <NotificationSettings />
 
