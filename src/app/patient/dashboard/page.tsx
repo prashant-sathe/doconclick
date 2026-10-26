@@ -26,6 +26,7 @@ import { cn, formatDoctorName } from "@/lib/utils";
 import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
+import ServiceFees from "@/components/patient/ServiceFees";
 import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
 import DoctorFilters from "@/components/patient/DoctorFilters";
 import {
@@ -274,6 +275,14 @@ function DoctorListCard({
             <span className="text-[11px] text-slate-400">· {distanceKm.toFixed(1)} km</span>
           )}
         </div>
+        <ServiceFees
+          offersClinic={profile.offersClinic !== false}
+          offersVideo={profile.offersVideo === true}
+          offersHomeVisit={profile.offersHomeVisit}
+          consultFee={profile.consultFee}
+          videoFee={profile.videoFee}
+          homeVisitFee={profile.homeVisitFee}
+        />
       </div>
       <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
         <span
@@ -283,9 +292,6 @@ function DoctorListCard({
           )}
         >
           {isOpen ? td("listOpen") : td("listClosed")}
-        </span>
-        <span className="text-xs font-bold text-slate-700 flex items-center">
-          <IndianRupee className="w-3 h-3" />{profile.consultFee}
         </span>
       </div>
     </button>

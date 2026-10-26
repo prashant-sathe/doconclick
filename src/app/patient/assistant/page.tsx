@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp, MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck, Building2, Video, Home, Ticket, Clock, LifeBuoy, HeartPulse,
+  ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp, MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck, Ticket, Clock, LifeBuoy, HeartPulse,
 } from "lucide-react";
+import ServiceFees from "@/components/patient/ServiceFees";
 import RatingStars from "@/components/patient/RatingStars";
 import { isDoctorAvailableNow, formatAvailability } from "@/lib/availability";
 import { useAuth } from "@/components/AuthProvider";
@@ -41,6 +42,9 @@ interface AssistantDoctor {
   totalReviews: number;
   distanceKm: number | null;
   fee: number;
+  clinicFee: number;
+  videoFee: number;
+  homeVisitFee: number;
   availability: string;
   offersHomeVisit: boolean;
   offersClinic: boolean;
@@ -309,29 +313,19 @@ function DoctorCard({ doctor }: { doctor: AssistantDoctor }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm font-bold text-slate-900 truncate">{formatDoctorName(doctor.name)}</span>
-            <span className="text-sm font-bold text-slate-900 flex-shrink-0">₹{doctor.fee}</span>
           </div>
           <span className="badge badge-info mt-1.5">{doctor.specialty}</span>
           <div className="mt-1.5">
             <RatingStars avgRating={doctor.avgRating} totalReviews={doctor.totalReviews} />
           </div>
-          <div className="flex flex-wrap gap-1.5 mt-1.5">
-            {doctor.offersClinic && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 rounded-full px-2 py-0.5">
-                <Building2 className="w-3 h-3" /> {t("clinic")}
-              </span>
-            )}
-            {doctor.offersVideo && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 bg-blue-50 rounded-full px-2 py-0.5">
-                <Video className="w-3 h-3" /> {t("videoCall")}
-              </span>
-            )}
-            {doctor.offersHomeVisit && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 rounded-full px-2 py-0.5">
-                <Home className="w-3 h-3" /> {t("homeVisit")}
-              </span>
-            )}
-          </div>
+          <ServiceFees
+            offersClinic={doctor.offersClinic}
+            offersVideo={doctor.offersVideo}
+            offersHomeVisit={doctor.offersHomeVisit}
+            consultFee={doctor.clinicFee}
+            videoFee={doctor.videoFee}
+            homeVisitFee={doctor.homeVisitFee}
+          />
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[11px]">
             {doctor.distanceKm != null && (
               <span className="flex items-center gap-1 text-slate-500">

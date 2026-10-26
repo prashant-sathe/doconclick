@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,7 +23,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
@@ -28,7 +34,23 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    ".next/test-qa336/types/**/*.ts",
+    ".next/test-qa336/dev/types/**/*.ts",
+    ".next-uiv/types/**/*.ts",
+    ".next-uiv/dev/types/**/*.ts",
+    ".next/ui-fp123/types/**/*.ts",
+    ".next/ui-fp123/dev/types/**/*.ts",
+    ".next/qa-fp22/types/**/*.ts",
+    ".next/qa-fp22/dev/types/**/*.ts",
+    ".next/uiv-fp22/types/**/*.ts",
+    ".next/uiv-fp22/dev/types/**/*.ts",
+    ".next/rel-build/types/**/*.ts",
+    ".next/rel-build/dev/types/**/*.ts",
+    ".next/uiv-fpfees/types/**/*.ts",
+    ".next/uiv-fpfees/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
