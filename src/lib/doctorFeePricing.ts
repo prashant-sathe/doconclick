@@ -18,10 +18,10 @@ const validNumber = (v: unknown): v is number => typeof v === "number" && Number
  * Admin sets an original price and an optional discounted one. A discounted
  * price below the original is charged (original struck through); a missing
  * (null) one, or one ≥ the original, means no discount — the original is
- * charged. ₹0 is only "free" when the admin entered it as the discount.
+ * charged. ₹0 (as the original or as the discount) means free.
  */
 export function resolveDoctorRegistrationPricing(original: unknown, discounted: unknown): DoctorRegistrationPricing {
-  const base = validNumber(original) && original > 0 ? original : DEFAULT_DOCTOR_REGISTRATION_ORIGINAL_FEE;
+  const base = validNumber(original) ? original : DEFAULT_DOCTOR_REGISTRATION_ORIGINAL_FEE;
   if (validNumber(discounted) && discounted < base) {
     return { original: base, payable: discounted, hasDiscount: true };
   }

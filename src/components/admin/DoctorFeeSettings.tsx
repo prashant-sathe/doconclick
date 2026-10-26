@@ -30,8 +30,8 @@ export default function DoctorFeeSettings() {
   const originalValue = original === null ? null : parse(original);
   const discountedValue = parse(discounted);
   const validationError = (() => {
-    if (originalValue === null || !Number.isFinite(originalValue) || Math.round(originalValue) < 1 || originalValue > DOCTOR_REGISTRATION_FEE_MAX) {
-      return "The original fee must be between ₹1 and ₹1,00,000.";
+    if (originalValue === null || !Number.isFinite(originalValue) || originalValue < 0 || originalValue > DOCTOR_REGISTRATION_FEE_MAX) {
+      return "The original fee must be between ₹0 and ₹1,00,000.";
     }
     if (discountedValue !== null && (!Number.isFinite(discountedValue) || discountedValue < 0)) {
       return "The discounted fee must be ₹0 or more — or leave it empty for no discount.";
@@ -75,7 +75,7 @@ export default function DoctorFeeSettings() {
         </div>
         <div>
           <h2 className="font-bold text-slate-800">Doctor registration fee</h2>
-          <p className="text-xs text-slate-500">One-time, paid before a doctor&apos;s dashboard unlocks. Set a discounted price of ₹0 to make it free.</p>
+          <p className="text-xs text-slate-500">One-time, paid before a doctor&apos;s dashboard unlocks. Set the price (or the discounted price) to ₹0 to make it free.</p>
         </div>
       </div>
       {original === null ? (
@@ -85,7 +85,7 @@ export default function DoctorFeeSettings() {
           <div className="grid sm:grid-cols-2 gap-4 max-w-lg">
             <div>
               <label className="input-label" htmlFor="doctor-reg-fee-original">Original price (₹)</label>
-              <input id="doctor-reg-fee-original" type="number" min={1} className="input-field" value={original} onChange={(e) => setOriginal(e.target.value)} />
+              <input id="doctor-reg-fee-original" type="number" min={0} className="input-field" value={original} onChange={(e) => setOriginal(e.target.value)} />
             </div>
             <div>
               <label className="input-label" htmlFor="doctor-reg-fee">Discounted price (₹, optional)</label>

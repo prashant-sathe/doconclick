@@ -74,14 +74,14 @@ export async function PATCH(req: Request) {
     data[key] = Math.round(value);
   }
 
-  // Doctors' one-time registration fee: an original price (> ₹0) and an
+  // Doctors' one-time registration fee: an original price (₹0 = free) and an
   // optional discounted price that is charged instead (null = no discount;
   // an explicit ₹0 = free, activated without paying). Orders already open
   // keep the amount they were created for.
   if (body.doctorRegistrationOriginalFee !== undefined) {
     const value = finiteNumber(body.doctorRegistrationOriginalFee);
-    if (value === null || Math.round(value) < 1 || value > DOCTOR_REGISTRATION_FEE_MAX) {
-      return NextResponse.json({ error: "The original registration fee must be between ₹1 and ₹1,00,000." }, { status: 400 });
+    if (value === null || value < 0 || value > DOCTOR_REGISTRATION_FEE_MAX) {
+      return NextResponse.json({ error: "The original registration fee must be between ₹0 and ₹1,00,000." }, { status: 400 });
     }
     data.doctorRegistrationOriginalFee = Math.round(value);
   }

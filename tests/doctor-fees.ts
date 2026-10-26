@@ -83,7 +83,8 @@ function pure() {
   check("pure: discount > original → no discount, original charged", eq(r(499, 600), 499, 499, false), JSON.stringify(r(499, 600)));
   check("pure: explicit ₹0 discount → free", eq(r(499, 0), 499, 0, true), JSON.stringify(r(499, 0)));
   check("pure: negative / NaN discount ignored", eq(r(499, -5), 499, 499, false) && eq(r(499, NaN), 499, 499, false), "ok");
-  check("pure: bad original falls back to ₹499", eq(r(0, 99), 499, 99, true) && eq(r(null, null), 499, 499, false), JSON.stringify(r(0, 99)));
+  check("pure: missing original falls back to ₹499", eq(r(null, 99), 499, 99, true) && eq(r(null, null), 499, 499, false), JSON.stringify(r(null, 99)));
+  check("pure: original ₹0 → free", eq(r(0, null), 0, 0, false) && eq(r(0, 99), 0, 0, false), JSON.stringify([r(0, null), r(0, 99)]));
 }
 
 async function main() {
@@ -126,7 +127,7 @@ async function main() {
 
     // ── Admin validation ──
     for (const [label, body] of [
-      ["original ₹0", { doctorRegistrationOriginalFee: 0 }],
+      ["original negative", { doctorRegistrationOriginalFee: -1 }],
       ["original as text", { doctorRegistrationOriginalFee: "499" }],
       ["original null", { doctorRegistrationOriginalFee: null }],
       ["discounted blank string", { doctorRegistrationFee: "" }],
@@ -175,6 +176,8 @@ async function main() {
     check("an already-paid doctor → 400, no new order, still paid", r.status === 400 && mock.createdOrders.length === ordersBefore && pPaid.registrationFeePaid, `${r.status}`);
 
     // ── Explicit ₹0 discount = free ──
+    r = await patch({ doctorRegistrationOriginalFee: 0, doctorRegistrationFee: null });
+    check("settings: original ₹0 (no discount) → saved", r.status === 200 && r.json.doctorRegistrationOriginalFee === 0, `${r.status} ${JSON.stringify(r.json.error ?? "")}`);
     r = await patch({ doctorRegistrationOriginalFee: 499, doctorRegistrationFee: 0 });
     check("settings: discounted ₹0 (entered) → saved", r.status === 200 && r.json.doctorRegistrationFee === 0, `${r.status}`);
     r = await call(docD, "POST", "/api/doctors/registration-fee/create-order", {});
