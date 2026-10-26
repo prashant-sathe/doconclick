@@ -105,6 +105,8 @@ export type AppointmentMinAggregateOutputType = {
   scheduledAt: Date | null
   requestedScheduledAt: Date | null
   reminderSentAt: Date | null
+  patientRemindersSent: string | null
+  patientRemindersFor: Date | null
   followUpDate: Date | null
   followUpNote: string | null
   followUpReminderSentAt: Date | null
@@ -172,6 +174,8 @@ export type AppointmentMaxAggregateOutputType = {
   scheduledAt: Date | null
   requestedScheduledAt: Date | null
   reminderSentAt: Date | null
+  patientRemindersSent: string | null
+  patientRemindersFor: Date | null
   followUpDate: Date | null
   followUpNote: string | null
   followUpReminderSentAt: Date | null
@@ -239,6 +243,8 @@ export type AppointmentCountAggregateOutputType = {
   scheduledAt: number
   requestedScheduledAt: number
   reminderSentAt: number
+  patientRemindersSent: number
+  patientRemindersFor: number
   followUpDate: number
   followUpNote: number
   followUpReminderSentAt: number
@@ -332,6 +338,8 @@ export type AppointmentMinAggregateInputType = {
   scheduledAt?: true
   requestedScheduledAt?: true
   reminderSentAt?: true
+  patientRemindersSent?: true
+  patientRemindersFor?: true
   followUpDate?: true
   followUpNote?: true
   followUpReminderSentAt?: true
@@ -399,6 +407,8 @@ export type AppointmentMaxAggregateInputType = {
   scheduledAt?: true
   requestedScheduledAt?: true
   reminderSentAt?: true
+  patientRemindersSent?: true
+  patientRemindersFor?: true
   followUpDate?: true
   followUpNote?: true
   followUpReminderSentAt?: true
@@ -466,6 +476,8 @@ export type AppointmentCountAggregateInputType = {
   scheduledAt?: true
   requestedScheduledAt?: true
   reminderSentAt?: true
+  patientRemindersSent?: true
+  patientRemindersFor?: true
   followUpDate?: true
   followUpNote?: true
   followUpReminderSentAt?: true
@@ -620,6 +632,8 @@ export type AppointmentGroupByOutputType = {
   scheduledAt: Date
   requestedScheduledAt: Date | null
   reminderSentAt: Date | null
+  patientRemindersSent: string
+  patientRemindersFor: Date | null
   followUpDate: Date | null
   followUpNote: string | null
   followUpReminderSentAt: Date | null
@@ -710,6 +724,8 @@ export type AppointmentWhereInput = {
   scheduledAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   requestedScheduledAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   reminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  patientRemindersSent?: Prisma.StringFilter<"Appointment"> | string
+  patientRemindersFor?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   followUpDate?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   followUpNote?: Prisma.StringNullableFilter<"Appointment"> | string | null
   followUpReminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -804,6 +820,8 @@ export type AppointmentOrderByWithRelationInput = {
   scheduledAt?: Prisma.SortOrder
   requestedScheduledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   reminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  patientRemindersSent?: Prisma.SortOrder
+  patientRemindersFor?: Prisma.SortOrderInput | Prisma.SortOrder
   followUpDate?: Prisma.SortOrderInput | Prisma.SortOrder
   followUpNote?: Prisma.SortOrderInput | Prisma.SortOrder
   followUpReminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -901,6 +919,8 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   scheduledAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   requestedScheduledAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   reminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  patientRemindersSent?: Prisma.StringFilter<"Appointment"> | string
+  patientRemindersFor?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   followUpDate?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   followUpNote?: Prisma.StringNullableFilter<"Appointment"> | string | null
   followUpReminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -995,6 +1015,8 @@ export type AppointmentOrderByWithAggregationInput = {
   scheduledAt?: Prisma.SortOrder
   requestedScheduledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   reminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  patientRemindersSent?: Prisma.SortOrder
+  patientRemindersFor?: Prisma.SortOrderInput | Prisma.SortOrder
   followUpDate?: Prisma.SortOrderInput | Prisma.SortOrder
   followUpNote?: Prisma.SortOrderInput | Prisma.SortOrder
   followUpReminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -1070,6 +1092,8 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   scheduledAt?: Prisma.DateTimeWithAggregatesFilter<"Appointment"> | Date | string
   requestedScheduledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   reminderSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
+  patientRemindersSent?: Prisma.StringWithAggregatesFilter<"Appointment"> | string
+  patientRemindersFor?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   followUpDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
   followUpNote?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   followUpReminderSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appointment"> | Date | string | null
@@ -1125,6 +1149,8 @@ export type AppointmentCreateInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -1219,6 +1245,8 @@ export type AppointmentUncheckedCreateInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -1289,6 +1317,8 @@ export type AppointmentUpdateInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1383,6 +1413,8 @@ export type AppointmentUncheckedUpdateInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1465,6 +1497,8 @@ export type AppointmentCreateManyInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -1520,6 +1554,8 @@ export type AppointmentUpdateManyMutationInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1587,6 +1623,8 @@ export type AppointmentUncheckedUpdateManyInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1674,6 +1712,8 @@ export type AppointmentCountOrderByAggregateInput = {
   scheduledAt?: Prisma.SortOrder
   requestedScheduledAt?: Prisma.SortOrder
   reminderSentAt?: Prisma.SortOrder
+  patientRemindersSent?: Prisma.SortOrder
+  patientRemindersFor?: Prisma.SortOrder
   followUpDate?: Prisma.SortOrder
   followUpNote?: Prisma.SortOrder
   followUpReminderSentAt?: Prisma.SortOrder
@@ -1753,6 +1793,8 @@ export type AppointmentMaxOrderByAggregateInput = {
   scheduledAt?: Prisma.SortOrder
   requestedScheduledAt?: Prisma.SortOrder
   reminderSentAt?: Prisma.SortOrder
+  patientRemindersSent?: Prisma.SortOrder
+  patientRemindersFor?: Prisma.SortOrder
   followUpDate?: Prisma.SortOrder
   followUpNote?: Prisma.SortOrder
   followUpReminderSentAt?: Prisma.SortOrder
@@ -1820,6 +1862,8 @@ export type AppointmentMinOrderByAggregateInput = {
   scheduledAt?: Prisma.SortOrder
   requestedScheduledAt?: Prisma.SortOrder
   reminderSentAt?: Prisma.SortOrder
+  patientRemindersSent?: Prisma.SortOrder
+  patientRemindersFor?: Prisma.SortOrder
   followUpDate?: Prisma.SortOrder
   followUpNote?: Prisma.SortOrder
   followUpReminderSentAt?: Prisma.SortOrder
@@ -2603,6 +2647,8 @@ export type AppointmentCreateWithoutPatientInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -2695,6 +2741,8 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -2775,6 +2823,8 @@ export type AppointmentCreateWithoutDoctorInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -2867,6 +2917,8 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -2978,6 +3030,8 @@ export type AppointmentScalarWhereInput = {
   scheduledAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   requestedScheduledAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   reminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
+  patientRemindersSent?: Prisma.StringFilter<"Appointment"> | string
+  patientRemindersFor?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   followUpDate?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
   followUpNote?: Prisma.StringNullableFilter<"Appointment"> | string | null
   followUpReminderSentAt?: Prisma.DateTimeNullableFilter<"Appointment"> | Date | string | null
@@ -3049,6 +3103,8 @@ export type AppointmentCreateWithoutDependentInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -3141,6 +3197,8 @@ export type AppointmentUncheckedCreateWithoutDependentInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -3237,6 +3295,8 @@ export type AppointmentCreateWithoutPrescriptionDocInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -3329,6 +3389,8 @@ export type AppointmentUncheckedCreateWithoutPrescriptionDocInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -3425,6 +3487,8 @@ export type AppointmentCreateWithoutNurseServiceInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -3517,6 +3581,8 @@ export type AppointmentUncheckedCreateWithoutNurseServiceInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -3613,6 +3679,8 @@ export type AppointmentCreateWithoutVitalsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -3706,6 +3774,8 @@ export type AppointmentUncheckedCreateWithoutVitalsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -3791,6 +3861,8 @@ export type AppointmentUpdateWithoutVitalsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3884,6 +3956,8 @@ export type AppointmentUncheckedUpdateWithoutVitalsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3953,6 +4027,8 @@ export type AppointmentCreateWithoutPackageInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -4045,6 +4121,8 @@ export type AppointmentUncheckedCreateWithoutPackageInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -4141,6 +4219,8 @@ export type AppointmentCreateWithoutReferralGivenInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -4234,6 +4314,8 @@ export type AppointmentUncheckedCreateWithoutReferralGivenInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -4308,6 +4390,8 @@ export type AppointmentCreateWithoutNurseReferralInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -4400,6 +4484,8 @@ export type AppointmentUncheckedCreateWithoutNurseReferralInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -4491,6 +4577,8 @@ export type AppointmentUpdateWithoutReferralGivenInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4584,6 +4672,8 @@ export type AppointmentUncheckedUpdateWithoutReferralGivenInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4669,6 +4759,8 @@ export type AppointmentCreateWithoutFollowUpsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -4762,6 +4854,8 @@ export type AppointmentUncheckedCreateWithoutFollowUpsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -4836,6 +4930,8 @@ export type AppointmentCreateWithoutFollowUpOfInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -4928,6 +5024,8 @@ export type AppointmentUncheckedCreateWithoutFollowUpOfInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -5008,6 +5106,8 @@ export type AppointmentCreateWithoutReassignedToInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -5101,6 +5201,8 @@ export type AppointmentUncheckedCreateWithoutReassignedToInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -5175,6 +5277,8 @@ export type AppointmentCreateWithoutReassignedFromInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -5267,6 +5371,8 @@ export type AppointmentUncheckedCreateWithoutReassignedFromInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -5353,6 +5459,8 @@ export type AppointmentUpdateWithoutFollowUpsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5446,6 +5554,8 @@ export type AppointmentUncheckedUpdateWithoutFollowUpsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5542,6 +5652,8 @@ export type AppointmentUpdateWithoutReassignedToInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5635,6 +5747,8 @@ export type AppointmentUncheckedUpdateWithoutReassignedToInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5715,6 +5829,8 @@ export type AppointmentUpdateWithoutReassignedFromInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5807,6 +5923,8 @@ export type AppointmentUncheckedUpdateWithoutReassignedFromInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5877,6 +5995,8 @@ export type AppointmentCreateWithoutWalletTransactionInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -5970,6 +6090,8 @@ export type AppointmentUncheckedCreateWithoutWalletTransactionInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -6055,6 +6177,8 @@ export type AppointmentUpdateWithoutWalletTransactionInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6148,6 +6272,8 @@ export type AppointmentUncheckedUpdateWithoutWalletTransactionInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6217,6 +6343,8 @@ export type AppointmentCreateWithoutSettlementInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -6309,6 +6437,8 @@ export type AppointmentUncheckedCreateWithoutSettlementInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -6405,6 +6535,8 @@ export type AppointmentCreateWithoutMessagesInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -6498,6 +6630,8 @@ export type AppointmentUncheckedCreateWithoutMessagesInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -6583,6 +6717,8 @@ export type AppointmentUpdateWithoutMessagesInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6676,6 +6812,8 @@ export type AppointmentUncheckedUpdateWithoutMessagesInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6745,6 +6883,8 @@ export type AppointmentCreateWithoutMedicinesInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -6838,6 +6978,8 @@ export type AppointmentUncheckedCreateWithoutMedicinesInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -6923,6 +7065,8 @@ export type AppointmentUpdateWithoutMedicinesInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7016,6 +7160,8 @@ export type AppointmentUncheckedUpdateWithoutMedicinesInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7085,6 +7231,8 @@ export type AppointmentCreateWithoutMedicineRemindersInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -7178,6 +7326,8 @@ export type AppointmentUncheckedCreateWithoutMedicineRemindersInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -7263,6 +7413,8 @@ export type AppointmentUpdateWithoutMedicineRemindersInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7356,6 +7508,8 @@ export type AppointmentUncheckedUpdateWithoutMedicineRemindersInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7425,6 +7579,8 @@ export type AppointmentCreateWithoutTestsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -7518,6 +7674,8 @@ export type AppointmentUncheckedCreateWithoutTestsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -7603,6 +7761,8 @@ export type AppointmentUpdateWithoutTestsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7696,6 +7856,8 @@ export type AppointmentUncheckedUpdateWithoutTestsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7765,6 +7927,8 @@ export type AppointmentCreateWithoutPrescriptionVersionsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -7858,6 +8022,8 @@ export type AppointmentUncheckedCreateWithoutPrescriptionVersionsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -7943,6 +8109,8 @@ export type AppointmentUpdateWithoutPrescriptionVersionsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8036,6 +8204,8 @@ export type AppointmentUncheckedUpdateWithoutPrescriptionVersionsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8105,6 +8275,8 @@ export type AppointmentCreateWithoutAttachmentsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -8198,6 +8370,8 @@ export type AppointmentUncheckedCreateWithoutAttachmentsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -8283,6 +8457,8 @@ export type AppointmentUpdateWithoutAttachmentsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8376,6 +8552,8 @@ export type AppointmentUncheckedUpdateWithoutAttachmentsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8445,6 +8623,8 @@ export type AppointmentCreateWithoutReviewInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -8538,6 +8718,8 @@ export type AppointmentUncheckedCreateWithoutReviewInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -8623,6 +8805,8 @@ export type AppointmentUpdateWithoutReviewInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8716,6 +8900,8 @@ export type AppointmentUncheckedUpdateWithoutReviewInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8785,6 +8971,8 @@ export type AppointmentCreateWithoutComplaintsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -8878,6 +9066,8 @@ export type AppointmentUncheckedCreateWithoutComplaintsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -8963,6 +9153,8 @@ export type AppointmentUpdateWithoutComplaintsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9056,6 +9248,8 @@ export type AppointmentUncheckedUpdateWithoutComplaintsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9125,6 +9319,8 @@ export type AppointmentCreateWithoutClinicInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -9217,6 +9413,8 @@ export type AppointmentUncheckedCreateWithoutClinicInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -9313,6 +9511,8 @@ export type AppointmentCreateWithoutCouponInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -9405,6 +9605,8 @@ export type AppointmentUncheckedCreateWithoutCouponInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -9501,6 +9703,8 @@ export type AppointmentCreateWithoutCouponRedemptionInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -9594,6 +9798,8 @@ export type AppointmentUncheckedCreateWithoutCouponRedemptionInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -9679,6 +9885,8 @@ export type AppointmentUpdateWithoutCouponRedemptionInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9772,6 +9980,8 @@ export type AppointmentUncheckedUpdateWithoutCouponRedemptionInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9841,6 +10051,8 @@ export type AppointmentCreateWithoutPaymentOrderItemsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -9934,6 +10146,8 @@ export type AppointmentUncheckedCreateWithoutPaymentOrderItemsInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -10019,6 +10233,8 @@ export type AppointmentUpdateWithoutPaymentOrderItemsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10112,6 +10328,8 @@ export type AppointmentUncheckedUpdateWithoutPaymentOrderItemsInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10192,6 +10410,8 @@ export type AppointmentCreateManyPatientInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -10258,6 +10478,8 @@ export type AppointmentCreateManyDoctorInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -10313,6 +10535,8 @@ export type AppointmentUpdateWithoutPatientInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10405,6 +10629,8 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10486,6 +10712,8 @@ export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10541,6 +10769,8 @@ export type AppointmentUpdateWithoutDoctorInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10633,6 +10863,8 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10714,6 +10946,8 @@ export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10780,6 +11014,8 @@ export type AppointmentCreateManyDependentInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -10835,6 +11071,8 @@ export type AppointmentUpdateWithoutDependentInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10927,6 +11165,8 @@ export type AppointmentUncheckedUpdateWithoutDependentInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11008,6 +11248,8 @@ export type AppointmentUncheckedUpdateManyWithoutDependentInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11074,6 +11316,8 @@ export type AppointmentCreateManyPrescriptionDocInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -11129,6 +11373,8 @@ export type AppointmentUpdateWithoutPrescriptionDocInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11221,6 +11467,8 @@ export type AppointmentUncheckedUpdateWithoutPrescriptionDocInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11302,6 +11550,8 @@ export type AppointmentUncheckedUpdateManyWithoutPrescriptionDocInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11368,6 +11618,8 @@ export type AppointmentCreateManyNurseServiceInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -11423,6 +11675,8 @@ export type AppointmentUpdateWithoutNurseServiceInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11515,6 +11769,8 @@ export type AppointmentUncheckedUpdateWithoutNurseServiceInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11596,6 +11852,8 @@ export type AppointmentUncheckedUpdateManyWithoutNurseServiceInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11662,6 +11920,8 @@ export type AppointmentCreateManyPackageInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -11717,6 +11977,8 @@ export type AppointmentUpdateWithoutPackageInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11809,6 +12071,8 @@ export type AppointmentUncheckedUpdateWithoutPackageInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11890,6 +12154,8 @@ export type AppointmentUncheckedUpdateManyWithoutPackageInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11956,6 +12222,8 @@ export type AppointmentCreateManyNurseReferralInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -12011,6 +12279,8 @@ export type AppointmentUpdateWithoutNurseReferralInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12103,6 +12373,8 @@ export type AppointmentUncheckedUpdateWithoutNurseReferralInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12184,6 +12456,8 @@ export type AppointmentUncheckedUpdateManyWithoutNurseReferralInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12250,6 +12524,8 @@ export type AppointmentCreateManyFollowUpOfInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -12305,6 +12581,8 @@ export type AppointmentUpdateWithoutFollowUpOfInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12397,6 +12675,8 @@ export type AppointmentUncheckedUpdateWithoutFollowUpOfInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12478,6 +12758,8 @@ export type AppointmentUncheckedUpdateManyWithoutFollowUpOfInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12544,6 +12826,8 @@ export type AppointmentCreateManySettlementInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -12599,6 +12883,8 @@ export type AppointmentUpdateWithoutSettlementInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12691,6 +12977,8 @@ export type AppointmentUncheckedUpdateWithoutSettlementInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12772,6 +13060,8 @@ export type AppointmentUncheckedUpdateManyWithoutSettlementInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12838,6 +13128,8 @@ export type AppointmentCreateManyClinicInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -12893,6 +13185,8 @@ export type AppointmentUpdateWithoutClinicInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12985,6 +13279,8 @@ export type AppointmentUncheckedUpdateWithoutClinicInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13066,6 +13362,8 @@ export type AppointmentUncheckedUpdateManyWithoutClinicInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13132,6 +13430,8 @@ export type AppointmentCreateManyCouponInput = {
   scheduledAt?: Date | string
   requestedScheduledAt?: Date | string | null
   reminderSentAt?: Date | string | null
+  patientRemindersSent?: string
+  patientRemindersFor?: Date | string | null
   followUpDate?: Date | string | null
   followUpNote?: string | null
   followUpReminderSentAt?: Date | string | null
@@ -13187,6 +13487,8 @@ export type AppointmentUpdateWithoutCouponInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13279,6 +13581,8 @@ export type AppointmentUncheckedUpdateWithoutCouponInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13360,6 +13664,8 @@ export type AppointmentUncheckedUpdateManyWithoutCouponInput = {
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedScheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  patientRemindersSent?: Prisma.StringFieldUpdateOperationsInput | string
+  patientRemindersFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   followUpNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUpReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13539,6 +13845,8 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   scheduledAt?: boolean
   requestedScheduledAt?: boolean
   reminderSentAt?: boolean
+  patientRemindersSent?: boolean
+  patientRemindersFor?: boolean
   followUpDate?: boolean
   followUpNote?: boolean
   followUpReminderSentAt?: boolean
@@ -13634,6 +13942,8 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   scheduledAt?: boolean
   requestedScheduledAt?: boolean
   reminderSentAt?: boolean
+  patientRemindersSent?: boolean
+  patientRemindersFor?: boolean
   followUpDate?: boolean
   followUpNote?: boolean
   followUpReminderSentAt?: boolean
@@ -13713,6 +14023,8 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   scheduledAt?: boolean
   requestedScheduledAt?: boolean
   reminderSentAt?: boolean
+  patientRemindersSent?: boolean
+  patientRemindersFor?: boolean
   followUpDate?: boolean
   followUpNote?: boolean
   followUpReminderSentAt?: boolean
@@ -13792,6 +14104,8 @@ export type AppointmentSelectScalar = {
   scheduledAt?: boolean
   requestedScheduledAt?: boolean
   reminderSentAt?: boolean
+  patientRemindersSent?: boolean
+  patientRemindersFor?: boolean
   followUpDate?: boolean
   followUpNote?: boolean
   followUpReminderSentAt?: boolean
@@ -13804,7 +14118,7 @@ export type AppointmentSelectScalar = {
   createdAt?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "providerType" | "nurseServiceId" | "serviceName" | "prescriptionDocId" | "visitOtp" | "visitOtpAttempts" | "visitStartedAt" | "visitStartNote" | "packageId" | "packageIndex" | "nurseReferralId" | "status" | "acceptedAt" | "videoStartedPushAt" | "completedAt" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "couponId" | "couponCode" | "discountAmount" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "visitAddress" | "visitLandmark" | "visitPinCode" | "visitLat" | "visitLng" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "reassignedFromId" | "clinicId" | "scheduledAt" | "requestedScheduledAt" | "reminderSentAt" | "followUpDate" | "followUpNote" | "followUpReminderSentAt" | "medicineRefillSentAt" | "payReminderSentAt" | "bookedById" | "adminActionBy" | "adminActionReason" | "adminActionAt" | "createdAt", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "patientId" | "doctorId" | "symptoms" | "patientName" | "relation" | "allergies" | "dependentId" | "consentGiven" | "consultType" | "providerType" | "nurseServiceId" | "serviceName" | "prescriptionDocId" | "visitOtp" | "visitOtpAttempts" | "visitStartedAt" | "visitStartNote" | "packageId" | "packageIndex" | "nurseReferralId" | "status" | "acceptedAt" | "videoStartedPushAt" | "completedAt" | "paymentMethod" | "paymentStatus" | "paidAt" | "isEmergency" | "amount" | "platformFee" | "couponId" | "couponCode" | "discountAmount" | "cashfreeOrderId" | "cashfreePaymentId" | "settlementId" | "prescriptionUrl" | "doctorNotes" | "travelStatus" | "visitAddress" | "visitLandmark" | "visitPinCode" | "visitLat" | "visitLng" | "doctorLat" | "doctorLng" | "doctorLocationUpdatedAt" | "followUpOfId" | "reassignedFromId" | "clinicId" | "scheduledAt" | "requestedScheduledAt" | "reminderSentAt" | "patientRemindersSent" | "patientRemindersFor" | "followUpDate" | "followUpNote" | "followUpReminderSentAt" | "medicineRefillSentAt" | "payReminderSentAt" | "bookedById" | "adminActionBy" | "adminActionReason" | "adminActionAt" | "createdAt", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   doctor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -13950,6 +14264,8 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
     scheduledAt: Date
     requestedScheduledAt: Date | null
     reminderSentAt: Date | null
+    patientRemindersSent: string
+    patientRemindersFor: Date | null
     followUpDate: Date | null
     followUpNote: string | null
     followUpReminderSentAt: Date | null
@@ -14464,6 +14780,8 @@ export interface AppointmentFieldRefs {
   readonly scheduledAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly requestedScheduledAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly reminderSentAt: Prisma.FieldRef<"Appointment", 'DateTime'>
+  readonly patientRemindersSent: Prisma.FieldRef<"Appointment", 'String'>
+  readonly patientRemindersFor: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly followUpDate: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly followUpNote: Prisma.FieldRef<"Appointment", 'String'>
   readonly followUpReminderSentAt: Prisma.FieldRef<"Appointment", 'DateTime'>

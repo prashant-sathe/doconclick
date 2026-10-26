@@ -14,7 +14,7 @@ import { netPayable } from "@/lib/coupons";
 import { cancelAndRefund, claimStatusChange, isAlreadyClosed, ALREADY_CLOSED_MESSAGE } from "@/lib/appointmentCancel";
 import { cancelAndReassign } from "@/lib/reassignment";
 import { isDoctorBookable, DOCTOR_BOOKABLE_SELECT, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
-import { doctorSlotProblem, snapToClinicGrid, isTimedBooking, isSlotIndexViolation, acceptTimeProblem } from "@/lib/doctorSlots";
+import { doctorSlotProblem, snapToClinicGrid, snapToDoctorHours, isTimedBooking, isSlotIndexViolation, acceptTimeProblem } from "@/lib/doctorSlots";
 import { getBookingHorizonDays, horizonProblem, doctorHoursProblem } from "@/lib/bookingLimits";
 import { referralPushCopy } from "@/lib/nurseReferral";
 import { settleIfFreeOnAccept } from "@/lib/paymentOrders";
@@ -656,6 +656,9 @@ export const PATCH = withErrorLocale(async function PATCH(
         const profile = await prisma.doctorProfile.findUnique({ where: { userId: appointment.doctorId }, select: { availability: true } });
         const outside = doctorHoursProblem(profile?.availability, when);
         if (outside) return NextResponse.json({ error: outside, code: "OUTSIDE_HOURS" }, { status: 400 });
+        const snapped = snapToDoctorHours(profile?.availability, when);
+        if (snapped.error !== null) return NextResponse.json({ error: snapped.error }, { status: 400 });
+        when = snapped.when;
       }
       if (appointment.providerType !== "NURSE") {
         const problem = await doctorSlotProblem({

@@ -74,10 +74,12 @@ export const PATCH = withErrorLocale(async function PATCH(req: Request) {
       updated = await prisma.patientProfile.update({ where: { userId: authUser.id }, data });
     } catch (err) {
       // A dev server still running against a pre-migration Prisma client will
-      // reject the newer `searchRadiusKm` field — save the rest rather than
-      // failing the whole request. Self-heals once the server is restarted.
-      if ("searchRadiusKm" in data) {
+      // reject the newer `searchRadiusKm` / `reminderLeadMinutes` fields — save
+      // the rest rather than failing the whole request. Self-heals once the
+      // server is restarted.
+      if ("searchRadiusKm" in data || "reminderLeadMinutes" in data) {
         delete data.searchRadiusKm;
+        delete data.reminderLeadMinutes;
         updated = await prisma.patientProfile.update({ where: { userId: authUser.id }, data });
       } else {
         throw err;

@@ -43,6 +43,7 @@ interface Appointment {
   doctorId: string;
   doctorBookable?: boolean;
   clinicId?: string | null;
+  dependentId?: string | null;
   status: string;
   consultType: string;
   symptoms: string;
@@ -239,9 +240,11 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
     new Date(a.scheduledAt).getTime() > new Date(a.createdAt).getTime() + REQUEST_TIMEOUT_MS;
   // The doctor's "review in N days" — shown with its own Book follow-up.
   const suggestedFollowUp = a.status === "COMPLETED" && a.providerType !== "NURSE" && !!a.followUpDate;
-  // Same doctor, clinic and consult type as this visit; the patient still picks the slot and pays.
+  // Same doctor, clinic, consult type and family member as this visit; the
+  // patient still picks the time (or "now") and pays — nothing is booked here.
   const followUpHref = `/patient/book?${new URLSearchParams({
     doctorId: a.doctorId, followUpOf: a.id, consultType: a.consultType, ...(a.clinicId ? { clinicId: a.clinicId } : {}),
+    ...(a.dependentId ? { dependentId: a.dependentId, relation: a.relation } : {}),
   })}`;
   const [downloadingAtt, setDownloadingAtt] = useState<string | null>(null);
   const [withdrawing, setWithdrawing] = useState(false);
@@ -596,7 +599,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
             )}
             className="tap-44-y btn-secondary py-2 px-3 text-xs"
           >
-            <RotateCcw className="w-3.5 h-3.5" /> {a.providerType === "NURSE" ? t("bookAgain") : t("bookFollowUp")}
+            <RotateCcw className="w-3.5 h-3.5" /> {t("bookAgain")}
           </button>
         )}
       </div>
@@ -900,12 +903,14 @@ export default function PatientAppointments() {
                 })}
               </p>
             )}
-            {rescheduleTarget.consultType === "CLINIC" && rescheduleTarget.clinicId ? (
-              // Same slot grid as booking — the API only accepts these times.
+            {rescheduleTarget.providerType !== "NURSE" && (rescheduleTarget.consultType !== "CLINIC" || rescheduleTarget.clinicId) ? (
+              // Same slot grid as booking — the API only accepts these times
+              // (a clinic's slots, or the doctor's hours for home/video).
               <div className="mb-3">
                 <TimeSlotPicker
                   doctorId={rescheduleTarget.doctorId}
-                  clinicId={rescheduleTarget.clinicId}
+                  clinicId={rescheduleTarget.consultType === "CLINIC" ? rescheduleTarget.clinicId : null}
+                  consultType={rescheduleTarget.consultType}
                   value={newScheduledAt}
                   onChange={setNewScheduledAt}
                 />

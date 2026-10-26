@@ -140,6 +140,11 @@ function PatientBookInner() {
   const preselectClinicId = searchParams.get("clinicId");
   // "Book follow-up" passes the original visit's consult type too.
   const preselectConsultType = searchParams.get("consultType");
+  // "Book again" also passes who the visit was for (a saved family member).
+  const preselectDependentId = searchParams.get("dependentId");
+  const preselectRelation = searchParams.get("relation");
+  const prefillFor = preselectDependentId && preselectRelation && preselectRelation !== "Self"
+    && (RELATIONS as readonly string[]).includes(preselectRelation) ? preselectRelation : null;
   const t = useTranslations("booking.book");
   const tf = useTranslations("booking.form");
   const tc = useTranslations("booking.common");
@@ -174,9 +179,9 @@ function PatientBookInner() {
   const [searchRadiusKm, setSearchRadiusKm] = useState<number | null>(null);
   const [radiusOverride, setRadiusOverride] = useState(false);
   const [pinnedLocationLabel, setPinnedLocationLabel] = useState<string | null>(null);
-  const [form, setForm] = useState({ doctorId: "", clinicId: "", symptoms: "", allergies: "", consultType: "CLINIC", relation: "Self" });
+  const [form, setForm] = useState({ doctorId: "", clinicId: "", symptoms: "", allergies: "", consultType: "CLINIC", relation: prefillFor ?? "Self" });
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
-  const [dependentId, setDependentId] = useState<string | null>(null);
+  const [dependentId, setDependentId] = useState<string | null>(prefillFor ? preselectDependentId : null);
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
   const [consentGiven, setConsentGiven] = useState(false);
@@ -530,7 +535,11 @@ function PatientBookInner() {
               <label className="input-label mb-2 block">{t("consultTypeLabel")}</label>
               <div className={cn("grid gap-3", availableTypes.length === 3 ? "grid-cols-3" : "grid-cols-2")}>
                 {availableTypes.map(({ id, icon: Icon }) => (
-                  <button key={id} type="button" onClick={() => set("consultType", id)}
+                  <button key={id} type="button" onClick={() => {
+                    // Clinic slots and the doctor's home/video hours are different grids.
+                    if ((id === "CLINIC") !== (form.consultType === "CLINIC")) setScheduledAt("");
+                    set("consultType", id);
+                  }}
                     className={cn("relative flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border text-xs font-semibold transition-all",
                       form.consultType === id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                     )}>
@@ -695,11 +704,14 @@ function PatientBookInner() {
                 </button>
               </div>
               {scheduleMode === "LATER" && (
-                form.consultType === "CLINIC" && form.clinicId ? (
+                form.doctorId && ((form.consultType === "CLINIC" && form.clinicId) || form.consultType !== "CLINIC") ? (
+                  // Clinic: that clinic's slots; home/video: the doctor's own hours.
                   <div className="mt-3">
                     <TimeSlotPicker
+                      key={form.consultType === "CLINIC" ? form.clinicId : "hours"}
                       doctorId={form.doctorId}
-                      clinicId={form.clinicId}
+                      clinicId={form.consultType === "CLINIC" ? form.clinicId : null}
+                      consultType={form.consultType}
                       value={scheduledAt}
                       onChange={setScheduledAt}
                     />

@@ -154,6 +154,11 @@ model PatientProfile {
   // are always shown (video doesn't depend on distance).
   searchRadiusKm        Int?
 
+  // When to push "your appointment is coming up" before a scheduled visit:
+  // CSV of minutes before it, from APPOINTMENT_REMINDER_LEADS
+  // (src/lib/appointmentReminderLeads.ts). "" = no reminders.
+  reminderLeadMinutes   String  @default("60")
+
   dependents PatientDependent[]
 }
 
@@ -512,10 +517,16 @@ model Appointment {
   // provider accepts the new time (moves scheduledAt) or keeps the original
   // (clears this). Lapses on its own once either time passes.
   requestedScheduledAt DateTime?
-  // Set once the "your appointment is coming up" push has gone out (see
-  // src/lib/appointmentReminders.ts), so the periodic sweep never reminds
-  // the same appointment twice.
+  // Set once the provider's "your appointment is coming up" push has gone
+  // out (see src/lib/appointmentReminders.ts), so the periodic sweep never
+  // reminds the same appointment twice.
   reminderSentAt DateTime?
+  // The patient's reminders (their PatientProfile.reminderLeadMinutes):
+  // the lead times already pushed, CSV of minutes ("1440,60"), and the
+  // scheduledAt they were for — a moved appointment (any reschedule path)
+  // no longer matches, so its reminders start over.
+  patientRemindersSent String    @default("")
+  patientRemindersFor  DateTime?
   // Follow-up the doctor suggested when completing this consultation
   // ("review in N days") — the first instant of that IST day, plus an
   // optional short note for the patient. Only the patient and the doctor

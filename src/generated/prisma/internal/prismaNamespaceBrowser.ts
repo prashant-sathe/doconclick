@@ -198,7 +198,8 @@ export const PatientProfileScalarFieldEnum = {
   photoUrl: 'photoUrl',
   lat: 'lat',
   lng: 'lng',
-  searchRadiusKm: 'searchRadiusKm'
+  searchRadiusKm: 'searchRadiusKm',
+  reminderLeadMinutes: 'reminderLeadMinutes'
 } as const
 
 export type PatientProfileScalarFieldEnum = (typeof PatientProfileScalarFieldEnum)[keyof typeof PatientProfileScalarFieldEnum]
@@ -491,6 +492,8 @@ export const AppointmentScalarFieldEnum = {
   scheduledAt: 'scheduledAt',
   requestedScheduledAt: 'requestedScheduledAt',
   reminderSentAt: 'reminderSentAt',
+  patientRemindersSent: 'patientRemindersSent',
+  patientRemindersFor: 'patientRemindersFor',
   followUpDate: 'followUpDate',
   followUpNote: 'followUpNote',
   followUpReminderSentAt: 'followUpReminderSentAt',

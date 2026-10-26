@@ -10,7 +10,7 @@ import { isDoctorBookable, UNBOOKABLE_MESSAGE } from "@/lib/doctorBookable";
 import { parseVisitInput, snapshotFromProfile, type VisitSnapshot } from "@/lib/visitAddress";
 import { verifyVisitCoordinates } from "@/lib/visitVerify";
 import { parseBody, appointmentBookingSchema } from "@/lib/schemas";
-import { doctorSlotProblem, snapToClinicGrid, isSlotIndexViolation } from "@/lib/doctorSlots";
+import { doctorSlotProblem, snapToClinicGrid, snapToDoctorHours, isSlotIndexViolation } from "@/lib/doctorSlots";
 import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, doctorHoursProblem, openRequestsProblem } from "@/lib/bookingLimits";
 import { timeOffProblem, TIME_OFF_CODE } from "@/lib/timeOff";
 import { withErrorLocale } from "@/lib/apiErrors";
@@ -238,6 +238,10 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     if (bookAt && consultType !== "CLINIC") {
       const outside = doctorHoursProblem(doctor.doctorProfile.availability, bookAt);
       if (outside) return NextResponse.json({ error: outside, code: "OUTSIDE_HOURS" }, { status: 400 });
+      // …and one of the slots the slots API offers for those hours.
+      const snapped = snapToDoctorHours(doctor.doctorProfile.availability, bookAt);
+      if (snapped.error !== null) return NextResponse.json({ error: snapped.error }, { status: 400 });
+      bookAt = snapped.when;
     }
 
     const tooMany = await openRequestsProblem(authUser.id, doctorId);

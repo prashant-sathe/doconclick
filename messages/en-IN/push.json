@@ -291,6 +291,10 @@
     "title": "Upcoming appointment",
     "body": "{consultType, select, HOME {{doctor} is visiting you in about an hour.} VIDEO {Your video consultation with {doctor} is in about an hour.} other {Your clinic visit with {doctor} is in about an hour.}}"
   },
+  "reminderPatientLead": {
+    "title": "Upcoming appointment",
+    "body": "{consultType, select, HOME {{doctor} is visiting you {lead, select, 1440 {in about a day} 120 {in about 2 hours} 60 {in about an hour} 30 {in about 30 minutes} other {soon}}} VIDEO {Your video consultation with {doctor} is {lead, select, 1440 {in about a day} 120 {in about 2 hours} 60 {in about an hour} 30 {in about 30 minutes} other {soon}}} other {Your clinic visit with {doctor} is {lead, select, 1440 {in about a day} 120 {in about 2 hours} 60 {in about an hour} 30 {in about 30 minutes} other {soon}}}} — {when, date, ::EEEdMMM}, {when, time, short}."
+  },
   "reminderProvider": {
     "title": "Upcoming appointment",
     "body": "You have an appointment with {patient} in about an hour."

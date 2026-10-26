@@ -82,8 +82,11 @@ async function main() {
     // 2. Overlap across clinics and consult types; adjacent slot is fine
     const otherClinic = await book(patients[1], clinicVisit(clinicB.id, at("10:00")));
     check("same time at another clinic refused", otherClinic.status === 409, `${otherClinic.status} ${otherClinic.error}`);
-    const video = await book(patients[1], { consultType: "VIDEO", scheduledAt: at("10:05").toISOString() });
+    const video = await book(patients[1], { consultType: "VIDEO", scheduledAt: at("10:00").toISOString() });
     check("overlapping video call refused", video.status === 409, `${video.status} ${video.error}`);
+    // Video times sit on the doctor's hours grid too (FP2-3).
+    const offVideo = await book(patients[1], { consultType: "VIDEO", scheduledAt: at("10:05").toISOString() });
+    check("off-grid video time refused", offVideo.status === 400, `${offVideo.status} ${offVideo.error}`);
     const adjacent = await book(patients[1], { consultType: "VIDEO", scheduledAt: at("10:10").toISOString() });
     check("back-to-back video at 10:10 allowed", adjacent.status === 200, `${adjacent.status} ${adjacent.error ?? ""}`);
 

@@ -1370,7 +1370,11 @@ function PatientDashboardInner() {
                       <button
                         key={id}
                         type="button"
-                        onClick={() => setConsultType(id)}
+                        onClick={() => {
+                          // Clinic slots and the doctor's home/video hours are different grids.
+                          if ((id === "CLINIC") !== (consultType === "CLINIC")) setScheduledAt("");
+                          setConsultType(id);
+                        }}
                         className={`relative flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
                           consultType === id
                             ? "border-blue-500 bg-blue-50 text-blue-700"
@@ -1535,11 +1539,14 @@ function PatientDashboardInner() {
                     </button>
                   </div>
                   {scheduleMode === "LATER" && (
-                    consultType === "CLINIC" && selectedClinicId ? (
+                    (consultType === "CLINIC" && selectedClinicId) || consultType !== "CLINIC" ? (
+                      // Clinic: that clinic's slots; home/video: the doctor's own hours.
                       <div className="mb-4">
                         <TimeSlotPicker
+                          key={consultType === "CLINIC" ? selectedClinicId : "hours"}
                           doctorId={selectedDoctor.id}
-                          clinicId={selectedClinicId}
+                          clinicId={consultType === "CLINIC" ? selectedClinicId : null}
+                          consultType={consultType}
                           value={scheduledAt}
                           onChange={setScheduledAt}
                         />

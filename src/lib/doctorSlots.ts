@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { generateSlotsForDate, todayIsoDateIst, SLOT_INTERVAL_MINUTES, type ClinicSlotLike } from "@/lib/clinicAvailability";
 import { timeOffProblem } from "@/lib/timeOff";
+import { parseAvailabilityString, isDoctorAvailableNow } from "@/lib/availability";
 
 // A timed booking holds the doctor for one slot: [scheduledAt, +SLOT_INTERVAL).
 // A doctor is one person, so the slot is held across ALL their clinics and
@@ -50,6 +51,36 @@ export function snapToClinicGrid(
         ? "Please pick a time in the future."
         : "That time isn't one of this clinic's open slots. Please pick a slot from the list.",
     };
+  }
+  return { when: floored, error: null };
+}
+
+/**
+ * Discrete start times for a scheduled HOME/VIDEO visit on one date: the
+ * doctor's "Available Timings" (DoctorProfile.availability) cut into the same
+ * 10-minute grid as clinic hours. Only times doctorHoursProblem also accepts
+ * are kept (a legacy overnight range reads slightly differently there), so
+ * the picker never offers a time the booking route would refuse.
+ */
+export function doctorHoursSlotsForDate(availability: string | null | undefined, date: string, now: Date = new Date()) {
+  return generateSlotsForDate(parseAvailabilityString(availability), date, now)
+    .filter((s) => isDoctorAvailableNow(availability, new Date(`${date}T${s.time}:00+05:30`)));
+}
+
+/**
+ * A scheduled HOME/VIDEO time must be one of the slots the slots API offers
+ * for the doctor's hours (doctorHoursSlotsForDate) — never an arbitrary
+ * minute between two of them, so two racing requests for one slot collide on
+ * the live (doctorId, scheduledAt) unique index. Run after doctorHoursProblem.
+ */
+export function snapToDoctorHours(
+  availability: string | null | undefined,
+  when: Date,
+): { when: Date; error: null } | { when: null; error: string } {
+  const floored = new Date(Math.floor(when.getTime() / 60_000) * 60_000);
+  const { date, time } = istParts(floored);
+  if (!doctorHoursSlotsForDate(availability, date, new Date(0)).some((s) => s.time === time)) {
+    return { when: null, error: "That time isn't one of the doctor's open slots. Please pick a slot from the list." };
   }
   return { when: floored, error: null };
 }

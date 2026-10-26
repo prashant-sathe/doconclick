@@ -12,6 +12,7 @@ import { BLOOD_GROUPS } from "@/lib/medicalOptions";
 import { RELATIONS } from "@/lib/relations";
 import { NURSE_QUALIFICATIONS } from "@/lib/nurseConstants";
 import { normalizeSearchRadiusKm } from "@/lib/geo";
+import { normalizeReminderLeads } from "@/lib/appointmentReminderLeads";
 import { ASSISTANT_MAX_MESSAGES, ASSISTANT_MAX_TOTAL_CHARS, ASSISTANT_MAX_MESSAGE_CHARS } from "@/lib/assistantInput";
 
 /**
@@ -182,6 +183,15 @@ export const patientProfilePatchSchema = z
         toNumberOrNull,
         z.number({ error: "Search range must be a number of km." }).nullable().transform(normalizeSearchRadiusKm),
       ),
+      // Minutes before a scheduled visit to remind (array or CSV); [] = off.
+      reminderLeadMinutes: z.unknown().transform((v, ctx) => {
+        const csv = normalizeReminderLeads(v);
+        if (csv === null) {
+          ctx.addIssue({ code: "custom", message: "Pick reminder times from the list." });
+          return z.NEVER;
+        }
+        return csv;
+      }),
       // age/gender are required to book (see src/lib/bookingProfile.ts) — once
       // set they can be changed but not cleared, and 0 is the "not filled"
       // sentinel, so the account holder's own age starts at 1.

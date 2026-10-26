@@ -118,7 +118,16 @@
   },
   "notifications": {
     "title": "Notifications",
-    "description": "Get alerts for appointment updates, doctor replies and wallet activity."
+    "description": "Get alerts for appointment updates, doctor replies and wallet activity.",
+    "remindersTitle": "Appointment reminders",
+    "remindersHint": "When to remind you before a booked visit. Choose one or more.",
+    "remindersOff": "No reminders — you won't be reminded before your visits.",
+    "lead": {
+      "1440": "1 day before",
+      "120": "2 hours before",
+      "60": "1 hour before",
+      "30": "30 minutes before"
+    }
   },
   "searchRange": {
     "title": "Doctor Search Range",

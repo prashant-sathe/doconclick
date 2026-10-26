@@ -10,20 +10,22 @@ interface TimeSlot {
   label: string; // "2:00 PM"
 }
 
-// Date picker + fetched slot grid for booking a CLINIC visit at a specific
-// time — used instead of the free datetime-local input whenever the doctor's
-// hours are structured (has ClinicSlot ranges configured for this clinic).
-// Emits the same "YYYY-MM-DDTHH:MM" datetime-local shape the free picker
+// Date picker + fetched slot grid for booking a doctor at a specific time —
+// a CLINIC visit (that clinic's hours, pass `clinicId`) or a HOME/VIDEO visit
+// (the doctor's own Available Timings, pass `consultType`). The booking API
+// only accepts these times. Emits the same "YYYY-MM-DDTHH:MM" datetime-local shape the free picker
 // produced, so callers (submitBooking etc.) don't need to know which picker
 // is active.
 export default function TimeSlotPicker({
   doctorId,
   clinicId,
+  consultType,
   value,
   onChange,
 }: {
   doctorId: string;
-  clinicId: string;
+  clinicId?: string | null;
+  consultType?: string;
   value: string;
   onChange: (v: string) => void;
 }) {
@@ -42,13 +44,14 @@ export default function TimeSlotPicker({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError(false);
-    fetch(`/api/doctors/${doctorId}/slots?clinicId=${clinicId}&date=${date}`)
+    const query = clinicId ? `clinicId=${clinicId}` : `consultType=${consultType}`;
+    fetch(`/api/doctors/${doctorId}/slots?${query}&date=${date}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => { if (!cancelled) setSlots(d.slots ?? []); })
       .catch(() => { if (!cancelled) { setSlots([]); setError(true); } })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [doctorId, clinicId, date]);
+  }, [doctorId, clinicId, consultType, date]);
 
   return (
     <div>

@@ -16,6 +16,7 @@
     "test:expire-refund": "tsx tests/expire-refund.ts",
     "test:reschedule": "tsx tests/reschedule-request.ts",
     "test:slots": "tsx tests/slot-booking.ts",
+    "test:home-video-slots": "tsx tests/home-video-slots.ts",
     "test:settlements": "tsx tests/settlement-idempotency.ts",
     "test:payout-utr": "tsx tests/payout-utr.ts",
     "test:auth": "tsx tests/auth-sessions.ts",
