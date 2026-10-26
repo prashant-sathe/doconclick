@@ -29,6 +29,7 @@ export interface CouponData {
   startsAt: string | null;
   expiresAt: string | null;
   isActive: boolean;
+  isPublic: boolean;
   redemptionCount?: number;
 }
 
@@ -64,6 +65,7 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
   const [startsAt, setStartsAt] = useState(toLocalInput(coupon?.startsAt ?? null));
   const [expiresAt, setExpiresAt] = useState(toLocalInput(coupon?.expiresAt ?? null));
   const [isActive, setIsActive] = useState(coupon?.isActive ?? true);
+  const [isPublic, setIsPublic] = useState(coupon?.isPublic ?? false);
 
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -92,6 +94,7 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
       startsAt: startsAt ? new Date(startsAt).toISOString() : null,
       expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
       isActive,
+      isPublic,
     };
     const res = await fetch(isEdit ? `/api/admin/coupons/${coupon.id}` : "/api/admin/coupons", {
       method: isEdit ? "PATCH" : "POST",
@@ -305,6 +308,19 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
           <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="w-4 h-4 rounded" />
           <span className="text-sm font-medium text-slate-700">Active</span>
         </label>
+
+        {appliesToAppointments && (
+          <label className="flex items-start gap-2.5 cursor-pointer">
+            <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} className="w-4 h-4 rounded mt-0.5" />
+            <span>
+              <span className="block text-sm font-medium text-slate-700">Show on the payment page</span>
+              <span className="block text-xs text-slate-400">
+                Lists this code for every patient whose booking qualifies, so they can tap to apply it. Leave off for
+                codes you share privately.
+              </span>
+            </span>
+          </label>
+        )}
 
         {error && (
           <span className="text-sm text-red-500 flex items-center gap-1">

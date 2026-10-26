@@ -20,6 +20,7 @@ interface CouponRow {
   startsAt: string | null;
   expiresAt: string | null;
   isActive: boolean;
+  isPublic: boolean;
   redemptionCount: number;
   confirmedCount: number;
   totalDiscountGiven: number;
@@ -98,6 +99,7 @@ export default function AdminCoupons() {
                     <span className={c.isActive ? "badge badge-success" : "badge badge-gray"}>
                       {c.isActive ? "Active" : "Inactive"}
                     </span>
+                    {c.isPublic && <span className="badge badge-info">Public</span>}
                   </div>
                   <div className="text-xs text-slate-500 mt-1">
                     {discountLabel(c)}

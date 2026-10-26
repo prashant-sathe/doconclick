@@ -60,6 +60,7 @@ export type CouponMinAggregateOutputType = {
   startsAt: Date | null
   expiresAt: Date | null
   isActive: boolean | null
+  isPublic: boolean | null
   createdByAdminId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -81,6 +82,7 @@ export type CouponMaxAggregateOutputType = {
   startsAt: Date | null
   expiresAt: Date | null
   isActive: boolean | null
+  isPublic: boolean | null
   createdByAdminId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -102,6 +104,7 @@ export type CouponCountAggregateOutputType = {
   startsAt: number
   expiresAt: number
   isActive: number
+  isPublic: number
   createdByAdminId: number
   createdAt: number
   updatedAt: number
@@ -143,6 +146,7 @@ export type CouponMinAggregateInputType = {
   startsAt?: true
   expiresAt?: true
   isActive?: true
+  isPublic?: true
   createdByAdminId?: true
   createdAt?: true
   updatedAt?: true
@@ -164,6 +168,7 @@ export type CouponMaxAggregateInputType = {
   startsAt?: true
   expiresAt?: true
   isActive?: true
+  isPublic?: true
   createdByAdminId?: true
   createdAt?: true
   updatedAt?: true
@@ -185,6 +190,7 @@ export type CouponCountAggregateInputType = {
   startsAt?: true
   expiresAt?: true
   isActive?: true
+  isPublic?: true
   createdByAdminId?: true
   createdAt?: true
   updatedAt?: true
@@ -293,6 +299,7 @@ export type CouponGroupByOutputType = {
   startsAt: Date | null
   expiresAt: Date | null
   isActive: boolean
+  isPublic: boolean
   createdByAdminId: string | null
   createdAt: Date
   updatedAt: Date
@@ -337,6 +344,7 @@ export type CouponWhereInput = {
   startsAt?: Prisma.DateTimeNullableFilter<"Coupon"> | Date | string | null
   expiresAt?: Prisma.DateTimeNullableFilter<"Coupon"> | Date | string | null
   isActive?: Prisma.BoolFilter<"Coupon"> | boolean
+  isPublic?: Prisma.BoolFilter<"Coupon"> | boolean
   createdByAdminId?: Prisma.StringNullableFilter<"Coupon"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Coupon"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Coupon"> | Date | string
@@ -361,6 +369,7 @@ export type CouponOrderByWithRelationInput = {
   startsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdByAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -388,6 +397,7 @@ export type CouponWhereUniqueInput = Prisma.AtLeast<{
   startsAt?: Prisma.DateTimeNullableFilter<"Coupon"> | Date | string | null
   expiresAt?: Prisma.DateTimeNullableFilter<"Coupon"> | Date | string | null
   isActive?: Prisma.BoolFilter<"Coupon"> | boolean
+  isPublic?: Prisma.BoolFilter<"Coupon"> | boolean
   createdByAdminId?: Prisma.StringNullableFilter<"Coupon"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Coupon"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Coupon"> | Date | string
@@ -412,6 +422,7 @@ export type CouponOrderByWithAggregationInput = {
   startsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdByAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -441,6 +452,7 @@ export type CouponScalarWhereWithAggregatesInput = {
   startsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Coupon"> | Date | string | null
   expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Coupon"> | Date | string | null
   isActive?: Prisma.BoolWithAggregatesFilter<"Coupon"> | boolean
+  isPublic?: Prisma.BoolWithAggregatesFilter<"Coupon"> | boolean
   createdByAdminId?: Prisma.StringNullableWithAggregatesFilter<"Coupon"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Coupon"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Coupon"> | Date | string
@@ -462,6 +474,7 @@ export type CouponCreateInput = {
   startsAt?: Date | string | null
   expiresAt?: Date | string | null
   isActive?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   createdByAdmin?: Prisma.UserCreateNestedOneWithoutCouponsCreatedInput
@@ -485,6 +498,7 @@ export type CouponUncheckedCreateInput = {
   startsAt?: Date | string | null
   expiresAt?: Date | string | null
   isActive?: boolean
+  isPublic?: boolean
   createdByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -508,6 +522,7 @@ export type CouponUpdateInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdByAdmin?: Prisma.UserUpdateOneWithoutCouponsCreatedNestedInput
@@ -531,6 +546,7 @@ export type CouponUncheckedUpdateInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -554,6 +570,7 @@ export type CouponCreateManyInput = {
   startsAt?: Date | string | null
   expiresAt?: Date | string | null
   isActive?: boolean
+  isPublic?: boolean
   createdByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -575,6 +592,7 @@ export type CouponUpdateManyMutationInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -595,6 +613,7 @@ export type CouponUncheckedUpdateManyInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -631,6 +650,7 @@ export type CouponCountOrderByAggregateInput = {
   startsAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdByAdminId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -661,6 +681,7 @@ export type CouponMaxOrderByAggregateInput = {
   startsAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdByAdminId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -682,6 +703,7 @@ export type CouponMinOrderByAggregateInput = {
   startsAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdByAdminId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -789,6 +811,7 @@ export type CouponCreateWithoutCreatedByAdminInput = {
   startsAt?: Date | string | null
   expiresAt?: Date | string | null
   isActive?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   redemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutCouponInput
@@ -811,6 +834,7 @@ export type CouponUncheckedCreateWithoutCreatedByAdminInput = {
   startsAt?: Date | string | null
   expiresAt?: Date | string | null
   isActive?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   redemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutCouponInput
@@ -862,6 +886,7 @@ export type CouponScalarWhereInput = {
   startsAt?: Prisma.DateTimeNullableFilter<"Coupon"> | Date | string | null
   expiresAt?: Prisma.DateTimeNullableFilter<"Coupon"> | Date | string | null
   isActive?: Prisma.BoolFilter<"Coupon"> | boolean
+  isPublic?: Prisma.BoolFilter<"Coupon"> | boolean
   createdByAdminId?: Prisma.StringNullableFilter<"Coupon"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Coupon"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Coupon"> | Date | string
@@ -883,6 +908,7 @@ export type CouponCreateWithoutAppointmentsInput = {
   startsAt?: Date | string | null
   expiresAt?: Date | string | null
   isActive?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   createdByAdmin?: Prisma.UserCreateNestedOneWithoutCouponsCreatedInput
@@ -905,6 +931,7 @@ export type CouponUncheckedCreateWithoutAppointmentsInput = {
   startsAt?: Date | string | null
   expiresAt?: Date | string | null
   isActive?: boolean
+  isPublic?: boolean
   createdByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -943,6 +970,7 @@ export type CouponUpdateWithoutAppointmentsInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdByAdmin?: Prisma.UserUpdateOneWithoutCouponsCreatedNestedInput
@@ -965,6 +993,7 @@ export type CouponUncheckedUpdateWithoutAppointmentsInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -987,6 +1016,7 @@ export type CouponCreateWithoutRedemptionsInput = {
   startsAt?: Date | string | null
   expiresAt?: Date | string | null
   isActive?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   createdByAdmin?: Prisma.UserCreateNestedOneWithoutCouponsCreatedInput
@@ -1009,6 +1039,7 @@ export type CouponUncheckedCreateWithoutRedemptionsInput = {
   startsAt?: Date | string | null
   expiresAt?: Date | string | null
   isActive?: boolean
+  isPublic?: boolean
   createdByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1047,6 +1078,7 @@ export type CouponUpdateWithoutRedemptionsInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdByAdmin?: Prisma.UserUpdateOneWithoutCouponsCreatedNestedInput
@@ -1069,6 +1101,7 @@ export type CouponUncheckedUpdateWithoutRedemptionsInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1091,6 +1124,7 @@ export type CouponCreateManyCreatedByAdminInput = {
   startsAt?: Date | string | null
   expiresAt?: Date | string | null
   isActive?: boolean
+  isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1111,6 +1145,7 @@ export type CouponUpdateWithoutCreatedByAdminInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   redemptions?: Prisma.CouponRedemptionUpdateManyWithoutCouponNestedInput
@@ -1133,6 +1168,7 @@ export type CouponUncheckedUpdateWithoutCreatedByAdminInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   redemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutCouponNestedInput
@@ -1155,6 +1191,7 @@ export type CouponUncheckedUpdateManyWithoutCreatedByAdminInput = {
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1215,6 +1252,7 @@ export type CouponSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   startsAt?: boolean
   expiresAt?: boolean
   isActive?: boolean
+  isPublic?: boolean
   createdByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1240,6 +1278,7 @@ export type CouponSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   startsAt?: boolean
   expiresAt?: boolean
   isActive?: boolean
+  isPublic?: boolean
   createdByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1262,6 +1301,7 @@ export type CouponSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   startsAt?: boolean
   expiresAt?: boolean
   isActive?: boolean
+  isPublic?: boolean
   createdByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1284,12 +1324,13 @@ export type CouponSelectScalar = {
   startsAt?: boolean
   expiresAt?: boolean
   isActive?: boolean
+  isPublic?: boolean
   createdByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CouponOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "description" | "discountType" | "discountValue" | "maxDiscount" | "minAmount" | "appliesTo" | "consultTypes" | "maxRedemptions" | "perUserLimit" | "usedCount" | "startsAt" | "expiresAt" | "isActive" | "createdByAdminId" | "createdAt" | "updatedAt", ExtArgs["result"]["coupon"]>
+export type CouponOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "description" | "discountType" | "discountValue" | "maxDiscount" | "minAmount" | "appliesTo" | "consultTypes" | "maxRedemptions" | "perUserLimit" | "usedCount" | "startsAt" | "expiresAt" | "isActive" | "isPublic" | "createdByAdminId" | "createdAt" | "updatedAt", ExtArgs["result"]["coupon"]>
 export type CouponInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdByAdmin?: boolean | Prisma.Coupon$createdByAdminArgs<ExtArgs>
   redemptions?: boolean | Prisma.Coupon$redemptionsArgs<ExtArgs>
@@ -1326,6 +1367,7 @@ export type $CouponPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     startsAt: Date | null
     expiresAt: Date | null
     isActive: boolean
+    isPublic: boolean
     createdByAdminId: string | null
     createdAt: Date
     updatedAt: Date
@@ -1770,6 +1812,7 @@ export interface CouponFieldRefs {
   readonly startsAt: Prisma.FieldRef<"Coupon", 'DateTime'>
   readonly expiresAt: Prisma.FieldRef<"Coupon", 'DateTime'>
   readonly isActive: Prisma.FieldRef<"Coupon", 'Boolean'>
+  readonly isPublic: Prisma.FieldRef<"Coupon", 'Boolean'>
   readonly createdByAdminId: Prisma.FieldRef<"Coupon", 'String'>
   readonly createdAt: Prisma.FieldRef<"Coupon", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Coupon", 'DateTime'>

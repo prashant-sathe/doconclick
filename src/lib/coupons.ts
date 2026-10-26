@@ -143,6 +143,7 @@ type CouponInput = {
   startsAt: Date | null;
   expiresAt: Date | null;
   isActive: boolean;
+  isPublic: boolean;
 };
 
 function optionalNumber(v: unknown): number | null {
@@ -258,8 +259,85 @@ export function parseCouponInput(
   if (has("isActive")) {
     data.isActive = Boolean(body.isActive);
   }
+  if (has("isPublic")) {
+    data.isPublic = Boolean(body.isPublic);
+  }
 
   return { data };
+}
+
+/** What a patient sees of a public coupon — no usage counts or admin fields. */
+export type PublicCoupon = {
+  code: string;
+  description: string | null;
+  discountType: string;
+  discountValue: number;
+  maxDiscount: number | null;
+  expiresAt: Date | null;
+  discountAmount: number;
+  netPayable: number;
+};
+
+/**
+ * Public coupons this patient could apply to this appointment right now:
+ * active, in date, slots left, matching consult type and minimum amount, and
+ * under their per-user limit. Read-only — /api/coupons/apply re-validates
+ * and reserves, so this list is a hint, not the authority.
+ */
+export async function listPublicCouponsForAppointment(
+  client: PrismaClientOrTx,
+  args: { appointment: { id: string; amount: number; consultType: string }; userId: string; now?: Date },
+): Promise<PublicCoupon[]> {
+  const now = args.now ?? new Date();
+  const candidates = await client.coupon.findMany({
+    where: {
+      isPublic: true,
+      isActive: true,
+      AND: [
+        { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+        { OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] },
+      ],
+    },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+  // Slots left: usedCount vs maxRedemptions can't be compared in a Prisma where.
+  const open = candidates.filter((c) => c.maxRedemptions == null || c.usedCount < c.maxRedemptions);
+  if (!open.length) return [];
+
+  // Same count as the apply route: a redemption on *this* appointment (a
+  // re-apply of the same code) doesn't count against the patient.
+  const used = await client.couponRedemption.groupBy({
+    by: ["couponId"],
+    where: { userId: args.userId, couponId: { in: open.map((c) => c.id) }, appointmentId: { not: args.appointment.id } },
+    _count: { _all: true },
+  });
+  const usedBy = new Map(used.map((u) => [u.couponId, u._count._all]));
+
+  const list: PublicCoupon[] = [];
+  for (const c of open) {
+    const result = validateCoupon({
+      coupon: c,
+      context: "APPOINTMENT",
+      baseAmount: args.appointment.amount,
+      consultType: args.appointment.consultType,
+      redemptionCountForUser: usedBy.get(c.id) ?? 0,
+      now,
+    });
+    if (!result.ok) continue;
+    list.push({
+      code: c.code,
+      description: c.description,
+      discountType: c.discountType,
+      discountValue: c.discountValue,
+      maxDiscount: c.maxDiscount,
+      expiresAt: c.expiresAt,
+      discountAmount: result.discountAmount,
+      netPayable: netPayable({ amount: args.appointment.amount, discountAmount: result.discountAmount }),
+    });
+  }
+  // Biggest saving first.
+  return list.sort((a, b) => b.discountAmount - a.discountAmount);
 }
 
 type CouponConfig = Pick<CouponInput, "discountType" | "discountValue" | "maxDiscount" | "startsAt" | "expiresAt">;

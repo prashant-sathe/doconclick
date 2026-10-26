@@ -52,7 +52,7 @@ async function main() {
   const w50 = cfg({ discountValue: 50 });
   check("50% → no warning", !("error" in w50) && w50.warnings.length === 0, "ok");
 
-  const base = { id: "c", code: "X", description: null, discountType: "FLAT", discountValue: 299.5, maxDiscount: null, minAmount: 0, appliesTo: "APPOINTMENT", consultTypes: null, maxRedemptions: null, perUserLimit: 1, usedCount: 0, startsAt: null, expiresAt: null, isActive: true, createdByAdminId: null, createdAt: new Date(), updatedAt: new Date() };
+  const base = { id: "c", code: "X", description: null, discountType: "FLAT", discountValue: 299.5, maxDiscount: null, minAmount: 0, appliesTo: "APPOINTMENT", consultTypes: null, maxRedemptions: null, perUserLimit: 1, usedCount: 0, startsAt: null, expiresAt: null, isActive: true, isPublic: false, createdByAdminId: null, createdAt: new Date(), updatedAt: new Date() };
   const sub1 = validateCoupon({ coupon: base, context: "APPOINTMENT", baseAmount: 300, consultType: "VIDEO", redemptionCountForUser: 0 });
   check("coupon leaving ₹0.50 to pay → refused (gateway minimum ₹1)", !sub1.ok && sub1.error.includes("less than ₹1"), sub1.ok ? "accepted" : sub1.error);
   const free = validateCoupon({ coupon: { ...base, discountValue: 300 }, context: "APPOINTMENT", baseAmount: 300, consultType: "VIDEO", redemptionCountForUser: 0 });

@@ -971,6 +971,7 @@ export const CouponScalarFieldEnum = {
   startsAt: 'startsAt',
   expiresAt: 'expiresAt',
   isActive: 'isActive',
+  isPublic: 'isPublic',
   createdByAdminId: 'createdByAdminId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

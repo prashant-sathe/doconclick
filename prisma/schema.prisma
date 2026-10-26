@@ -1151,6 +1151,9 @@ model Coupon {
   startsAt       DateTime?
   expiresAt      DateTime?
   isActive       Boolean  @default(true)
+  // Listed to patients on /patient/payment (tap to apply). Off by default so
+  // a code handed out privately never shows up for everyone.
+  isPublic       Boolean  @default(false)
   createdByAdminId String?
   createdByAdmin   User?  @relation("CouponsCreatedByAdmin", fields: [createdByAdminId], references: [id], onDelete: SetNull)
   createdAt      DateTime @default(now())

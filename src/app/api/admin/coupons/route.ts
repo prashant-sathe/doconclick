@@ -83,6 +83,7 @@ export async function POST(req: Request) {
       startsAt: parsed.data.startsAt ?? null,
       expiresAt: parsed.data.expiresAt ?? null,
       isActive: parsed.data.isActive ?? true,
+      isPublic: parsed.data.isPublic ?? false,
       createdByAdminId: admin.id,
     },
   });

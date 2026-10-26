@@ -204,7 +204,7 @@
 | Sr. | Feature | Side | Claude Code command | Status |
 |---|---|---|---|---|
 | FP2-1 | Patient ला स्वतः vitals (BP, sugar) नोंदवता यावेत | 👤 Patient | `Let patients self-log vitals (POST /api/vitals for own records) with charts in profile/vitals.` | ⬜ |
-| FP2-2 | Payment page वर available coupons दिसावेत | 👤 Patient | `Show applicable public coupons on the payment page.` | ⬜ Open ✔COE |
+| FP2-2 | Payment page वर available coupons दिसावेत | 👤 Patient | `Show applicable public coupons on the payment page.` | ✅ Fixed (HASH) — payment पानावर "तुमच्यासाठी ऑफर" (public coupons, tap-to-apply); Coupon.isPublic (default false) + admin checkbox; prod वर db:push हवा; लांब कोडचा 360px wrap fix फक्त कोडने तपासला, पुन्हा screen वर नाही |
 | FP2-3 | HOME/VIDEO साठी slot picker, reminders आणि "Book again" | 👤 Patient | `Slot picker for HOME/VIDEO based on provider availability, configurable reminders, and "Book again" on completed visits.` | ⬜ Open ✔COE |
 | FP2-4 | Review edit/delete आणि "UPI/GPay ने pay करा" wording | 👤 Patient | `Allow editing/deleting own review and use UPI-first payment wording.` | ⬜ |
 | FP2-5 | Bank verification (IFSC, penny-drop) आणि automated payouts | 🩺 Doctor, 👩‍⚕️ Nurse, 🛠️ Admin | `Validate bank details (IFSC lookup) and plan automated payouts via Cashfree Payouts with UTR recorded on Settlement (no real calls in dev).` | ⬜ |

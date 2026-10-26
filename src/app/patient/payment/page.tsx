@@ -21,6 +21,13 @@ interface AppointmentSummary {
   doctor: { name: string };
 }
 
+// A public coupon this booking qualifies for (GET /api/coupons/available).
+interface OfferedCoupon {
+  code: string;
+  description: string | null;
+  discountAmount: number;
+}
+
 // `onFreeChange`: whether there's nothing to pay, so the page header can drop
 // the "Complete Payment / Secured by Cashfree" framing for a ₹0 booking.
 function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => void }) {
@@ -40,6 +47,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
   const [couponInput, setCouponInput] = useState("");
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
+  const [offers, setOffers] = useState<OfferedCoupon[]>([]);
 
   useEffect(() => {
     if (!apptId) return;
@@ -96,14 +104,28 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
   const free = !!appt && netPayable === 0;
   useEffect(() => { onFreeChange(free); }, [free, onFreeChange]);
 
-  const applyCoupon = async () => {
-    if (!apptId || !couponInput.trim()) return;
+  // Public offers — only while the coupon box is showing (single unpaid visit,
+  // no coupon on it yet). Re-fetched after a coupon is removed.
+  const showOffers = !!appt && appt.status === "SCHEDULED" && appt.paymentStatus !== "PAID"
+    && !isPackage && !appt.couponCode && appt.amount > 0;
+  useEffect(() => {
+    if (!apptId || !showOffers) return;
+    let cancelled = false;
+    fetch(`/api/coupons/available?appointmentId=${encodeURIComponent(apptId)}`)
+      .then((r) => (r.ok ? r.json() : { coupons: [] }))
+      .then((d) => { if (!cancelled) setOffers(Array.isArray(d.coupons) ? d.coupons : []); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [apptId, showOffers]);
+
+  const applyCoupon = async (code = couponInput.trim()) => {
+    if (!apptId || !code) return;
     setApplyingCoupon(true);
     setCouponError("");
     const res = await fetch("/api/coupons/apply", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ appointmentId: apptId, code: couponInput.trim() }),
+      body: JSON.stringify({ appointmentId: apptId, code }),
     });
     const data = await res.json().catch(() => ({}));
     setApplyingCoupon(false);
@@ -254,7 +276,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
               onKeyDown={(e) => { if (e.key === "Enter") applyCoupon(); }}
             />
             <button
-              onClick={applyCoupon}
+              onClick={() => applyCoupon()}
               disabled={applyingCoupon || !couponInput.trim()}
               className="btn-secondary px-4 disabled:opacity-60"
             >
@@ -263,6 +285,35 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
           </div>
         )}
         {couponError && <p className="text-xs text-red-500 mt-1.5">{couponError}</p>}
+        {showOffers && offers.length > 0 && (
+          <div className="mt-3">
+            <p className="text-xs font-semibold text-slate-500 mb-1.5">{t("offersTitle")}</p>
+            <ul className="space-y-2">
+              {offers.map((o) => (
+                <li key={o.code}>
+                  <button
+                    type="button"
+                    onClick={() => applyCoupon(o.code)}
+                    disabled={applyingCoupon}
+                    className="w-full flex items-center justify-between gap-3 text-left border border-dashed border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50 rounded-xl px-3 py-2.5 disabled:opacity-60"
+                    aria-label={t("applyOffer", { code: o.code })}
+                  >
+                    <span className="min-w-0">
+                      <span className="flex items-center gap-1.5 font-mono font-bold text-sm text-emerald-700">
+                        <TicketPercent className="w-4 h-4 flex-shrink-0" /> <span className="min-w-0 break-all">{o.code}</span>
+                      </span>
+                      {o.description && <span className="block text-xs text-slate-500 mt-0.5 truncate">{o.description}</span>}
+                    </span>
+                    <span className="flex-shrink-0 text-right">
+                      <span className="block text-sm font-semibold text-emerald-700">{t("offerSave", { amount: o.discountAmount })}</span>
+                      <span className="block text-xs text-blue-600 font-semibold">{t("apply")}</span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {error && (
