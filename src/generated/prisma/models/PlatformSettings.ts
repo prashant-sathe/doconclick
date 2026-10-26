@@ -38,6 +38,9 @@ export type PlatformSettingsAvgAggregateOutputType = {
   bookingHorizonDays: number | null
   chatFollowUpDays: number | null
   cashDueLimit: number | null
+  referralRewardPatient: number | null
+  referralRewardProvider: number | null
+  referralMonthlyCap: number | null
 }
 
 export type PlatformSettingsSumAggregateOutputType = {
@@ -52,6 +55,9 @@ export type PlatformSettingsSumAggregateOutputType = {
   bookingHorizonDays: number | null
   chatFollowUpDays: number | null
   cashDueLimit: number | null
+  referralRewardPatient: number | null
+  referralRewardProvider: number | null
+  referralMonthlyCap: number | null
 }
 
 export type PlatformSettingsMinAggregateOutputType = {
@@ -75,6 +81,9 @@ export type PlatformSettingsMinAggregateOutputType = {
   splashImageUrl: string | null
   splashFit: string | null
   splashBgColor: string | null
+  referralRewardPatient: number | null
+  referralRewardProvider: number | null
+  referralMonthlyCap: number | null
   updatedAt: Date | null
 }
 
@@ -99,6 +108,9 @@ export type PlatformSettingsMaxAggregateOutputType = {
   splashImageUrl: string | null
   splashFit: string | null
   splashBgColor: string | null
+  referralRewardPatient: number | null
+  referralRewardProvider: number | null
+  referralMonthlyCap: number | null
   updatedAt: Date | null
 }
 
@@ -123,6 +135,9 @@ export type PlatformSettingsCountAggregateOutputType = {
   splashImageUrl: number
   splashFit: number
   splashBgColor: number
+  referralRewardPatient: number
+  referralRewardProvider: number
+  referralMonthlyCap: number
   updatedAt: number
   _all: number
 }
@@ -140,6 +155,9 @@ export type PlatformSettingsAvgAggregateInputType = {
   bookingHorizonDays?: true
   chatFollowUpDays?: true
   cashDueLimit?: true
+  referralRewardPatient?: true
+  referralRewardProvider?: true
+  referralMonthlyCap?: true
 }
 
 export type PlatformSettingsSumAggregateInputType = {
@@ -154,6 +172,9 @@ export type PlatformSettingsSumAggregateInputType = {
   bookingHorizonDays?: true
   chatFollowUpDays?: true
   cashDueLimit?: true
+  referralRewardPatient?: true
+  referralRewardProvider?: true
+  referralMonthlyCap?: true
 }
 
 export type PlatformSettingsMinAggregateInputType = {
@@ -177,6 +198,9 @@ export type PlatformSettingsMinAggregateInputType = {
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
+  referralRewardPatient?: true
+  referralRewardProvider?: true
+  referralMonthlyCap?: true
   updatedAt?: true
 }
 
@@ -201,6 +225,9 @@ export type PlatformSettingsMaxAggregateInputType = {
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
+  referralRewardPatient?: true
+  referralRewardProvider?: true
+  referralMonthlyCap?: true
   updatedAt?: true
 }
 
@@ -225,6 +252,9 @@ export type PlatformSettingsCountAggregateInputType = {
   splashImageUrl?: true
   splashFit?: true
   splashBgColor?: true
+  referralRewardPatient?: true
+  referralRewardProvider?: true
+  referralMonthlyCap?: true
   updatedAt?: true
   _all?: true
 }
@@ -336,6 +366,9 @@ export type PlatformSettingsGroupByOutputType = {
   splashImageUrl: string | null
   splashFit: string
   splashBgColor: string
+  referralRewardPatient: number
+  referralRewardProvider: number
+  referralMonthlyCap: number
   updatedAt: Date
   _count: PlatformSettingsCountAggregateOutputType | null
   _avg: PlatformSettingsAvgAggregateOutputType | null
@@ -383,6 +416,9 @@ export type PlatformSettingsWhereInput = {
   splashImageUrl?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringFilter<"PlatformSettings"> | string
+  referralRewardPatient?: Prisma.FloatFilter<"PlatformSettings"> | number
+  referralRewardProvider?: Prisma.FloatFilter<"PlatformSettings"> | number
+  referralMonthlyCap?: Prisma.IntFilter<"PlatformSettings"> | number
   updatedAt?: Prisma.DateTimeFilter<"PlatformSettings"> | Date | string
 }
 
@@ -407,6 +443,9 @@ export type PlatformSettingsOrderByWithRelationInput = {
   splashImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
+  referralRewardPatient?: Prisma.SortOrder
+  referralRewardProvider?: Prisma.SortOrder
+  referralMonthlyCap?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -434,6 +473,9 @@ export type PlatformSettingsWhereUniqueInput = Prisma.AtLeast<{
   splashImageUrl?: Prisma.StringNullableFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringFilter<"PlatformSettings"> | string
+  referralRewardPatient?: Prisma.FloatFilter<"PlatformSettings"> | number
+  referralRewardProvider?: Prisma.FloatFilter<"PlatformSettings"> | number
+  referralMonthlyCap?: Prisma.IntFilter<"PlatformSettings"> | number
   updatedAt?: Prisma.DateTimeFilter<"PlatformSettings"> | Date | string
 }, "id">
 
@@ -458,6 +500,9 @@ export type PlatformSettingsOrderByWithAggregationInput = {
   splashImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
+  referralRewardPatient?: Prisma.SortOrder
+  referralRewardProvider?: Prisma.SortOrder
+  referralMonthlyCap?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PlatformSettingsCountOrderByAggregateInput
   _avg?: Prisma.PlatformSettingsAvgOrderByAggregateInput
@@ -490,6 +535,9 @@ export type PlatformSettingsScalarWhereWithAggregatesInput = {
   splashImageUrl?: Prisma.StringNullableWithAggregatesFilter<"PlatformSettings"> | string | null
   splashFit?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
   splashBgColor?: Prisma.StringWithAggregatesFilter<"PlatformSettings"> | string
+  referralRewardPatient?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  referralRewardProvider?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
+  referralMonthlyCap?: Prisma.IntWithAggregatesFilter<"PlatformSettings"> | number
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PlatformSettings"> | Date | string
 }
 
@@ -514,6 +562,9 @@ export type PlatformSettingsCreateInput = {
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
+  referralRewardPatient?: number
+  referralRewardProvider?: number
+  referralMonthlyCap?: number
   updatedAt?: Date | string
 }
 
@@ -538,6 +589,9 @@ export type PlatformSettingsUncheckedCreateInput = {
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
+  referralRewardPatient?: number
+  referralRewardProvider?: number
+  referralMonthlyCap?: number
   updatedAt?: Date | string
 }
 
@@ -562,6 +616,9 @@ export type PlatformSettingsUpdateInput = {
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
+  referralRewardPatient?: Prisma.FloatFieldUpdateOperationsInput | number
+  referralRewardProvider?: Prisma.FloatFieldUpdateOperationsInput | number
+  referralMonthlyCap?: Prisma.IntFieldUpdateOperationsInput | number
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -586,6 +643,9 @@ export type PlatformSettingsUncheckedUpdateInput = {
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
+  referralRewardPatient?: Prisma.FloatFieldUpdateOperationsInput | number
+  referralRewardProvider?: Prisma.FloatFieldUpdateOperationsInput | number
+  referralMonthlyCap?: Prisma.IntFieldUpdateOperationsInput | number
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -610,6 +670,9 @@ export type PlatformSettingsCreateManyInput = {
   splashImageUrl?: string | null
   splashFit?: string
   splashBgColor?: string
+  referralRewardPatient?: number
+  referralRewardProvider?: number
+  referralMonthlyCap?: number
   updatedAt?: Date | string
 }
 
@@ -634,6 +697,9 @@ export type PlatformSettingsUpdateManyMutationInput = {
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
+  referralRewardPatient?: Prisma.FloatFieldUpdateOperationsInput | number
+  referralRewardProvider?: Prisma.FloatFieldUpdateOperationsInput | number
+  referralMonthlyCap?: Prisma.IntFieldUpdateOperationsInput | number
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -658,6 +724,9 @@ export type PlatformSettingsUncheckedUpdateManyInput = {
   splashImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   splashFit?: Prisma.StringFieldUpdateOperationsInput | string
   splashBgColor?: Prisma.StringFieldUpdateOperationsInput | string
+  referralRewardPatient?: Prisma.FloatFieldUpdateOperationsInput | number
+  referralRewardProvider?: Prisma.FloatFieldUpdateOperationsInput | number
+  referralMonthlyCap?: Prisma.IntFieldUpdateOperationsInput | number
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -682,6 +751,9 @@ export type PlatformSettingsCountOrderByAggregateInput = {
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
+  referralRewardPatient?: Prisma.SortOrder
+  referralRewardProvider?: Prisma.SortOrder
+  referralMonthlyCap?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -697,6 +769,9 @@ export type PlatformSettingsAvgOrderByAggregateInput = {
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
+  referralRewardPatient?: Prisma.SortOrder
+  referralRewardProvider?: Prisma.SortOrder
+  referralMonthlyCap?: Prisma.SortOrder
 }
 
 export type PlatformSettingsMaxOrderByAggregateInput = {
@@ -720,6 +795,9 @@ export type PlatformSettingsMaxOrderByAggregateInput = {
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
+  referralRewardPatient?: Prisma.SortOrder
+  referralRewardProvider?: Prisma.SortOrder
+  referralMonthlyCap?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -744,6 +822,9 @@ export type PlatformSettingsMinOrderByAggregateInput = {
   splashImageUrl?: Prisma.SortOrder
   splashFit?: Prisma.SortOrder
   splashBgColor?: Prisma.SortOrder
+  referralRewardPatient?: Prisma.SortOrder
+  referralRewardProvider?: Prisma.SortOrder
+  referralMonthlyCap?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -759,6 +840,9 @@ export type PlatformSettingsSumOrderByAggregateInput = {
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
+  referralRewardPatient?: Prisma.SortOrder
+  referralRewardProvider?: Prisma.SortOrder
+  referralMonthlyCap?: Prisma.SortOrder
 }
 
 
@@ -784,6 +868,9 @@ export type PlatformSettingsSelect<ExtArgs extends runtime.Types.Extensions.Inte
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
+  referralRewardPatient?: boolean
+  referralRewardProvider?: boolean
+  referralMonthlyCap?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["platformSettings"]>
 
@@ -808,6 +895,9 @@ export type PlatformSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
+  referralRewardPatient?: boolean
+  referralRewardProvider?: boolean
+  referralMonthlyCap?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["platformSettings"]>
 
@@ -832,6 +922,9 @@ export type PlatformSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
+  referralRewardPatient?: boolean
+  referralRewardProvider?: boolean
+  referralMonthlyCap?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["platformSettings"]>
 
@@ -856,10 +949,13 @@ export type PlatformSettingsSelectScalar = {
   splashImageUrl?: boolean
   splashFit?: boolean
   splashBgColor?: boolean
+  referralRewardPatient?: boolean
+  referralRewardProvider?: boolean
+  referralMonthlyCap?: boolean
   updatedAt?: boolean
 }
 
-export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "doctorRegistrationOriginalFee" | "doctorRegistrationFee" | "nurseSubscriptionFee" | "nurseShiftServicesSeeded" | "bookingHorizonDays" | "chatFollowUpDays" | "cashDueLimit" | "receiptLegalName" | "receiptAddress" | "receiptGstin" | "receiptTaxNote" | "splashImageUrl" | "splashFit" | "splashBgColor" | "updatedAt", ExtArgs["result"]["platformSettings"]>
+export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "doctorRegistrationOriginalFee" | "doctorRegistrationFee" | "nurseSubscriptionFee" | "nurseShiftServicesSeeded" | "bookingHorizonDays" | "chatFollowUpDays" | "cashDueLimit" | "receiptLegalName" | "receiptAddress" | "receiptGstin" | "receiptTaxNote" | "splashImageUrl" | "splashFit" | "splashBgColor" | "referralRewardPatient" | "referralRewardProvider" | "referralMonthlyCap" | "updatedAt", ExtArgs["result"]["platformSettings"]>
 
 export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlatformSettings"
@@ -885,6 +981,9 @@ export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.In
     splashImageUrl: string | null
     splashFit: string
     splashBgColor: string
+    referralRewardPatient: number
+    referralRewardProvider: number
+    referralMonthlyCap: number
     updatedAt: Date
   }, ExtArgs["result"]["platformSettings"]>
   composites: {}
@@ -1329,6 +1428,9 @@ export interface PlatformSettingsFieldRefs {
   readonly splashImageUrl: Prisma.FieldRef<"PlatformSettings", 'String'>
   readonly splashFit: Prisma.FieldRef<"PlatformSettings", 'String'>
   readonly splashBgColor: Prisma.FieldRef<"PlatformSettings", 'String'>
+  readonly referralRewardPatient: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly referralRewardProvider: Prisma.FieldRef<"PlatformSettings", 'Float'>
+  readonly referralMonthlyCap: Prisma.FieldRef<"PlatformSettings", 'Int'>
   readonly updatedAt: Prisma.FieldRef<"PlatformSettings", 'DateTime'>
 }
     

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import AuthPageShell from "@/components/AuthPageShell";
 import { Heart, Phone, Lock, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
+import ReferralCapture from "@/components/ReferralCapture";
 import { useAuth } from "@/components/AuthProvider";
 import { isValidMobile, normalizeMobile, PASSWORD_MIN_LENGTH } from "@/lib/validation";
 import { safeNext } from "@/lib/roleHome";
@@ -62,6 +63,7 @@ export default function PatientRegisterClient({ next: rawNext }: { next?: string
 
   return (
     <AuthPageShell backHref={loginHref}>
+      <ReferralCapture />
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

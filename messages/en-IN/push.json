@@ -386,5 +386,9 @@
   "payoutReferenceCorrected": {
     "title": "Payout reference updated",
     "body": "Your payout reference was corrected. The new UTR is {reference}."
+  },
+  "referralRewarded": {
+    "title": "Referral reward added",
+    "body": "Someone you invited is now on DocOnClick — ₹{amount} has been added to your wallet."
   }
 }

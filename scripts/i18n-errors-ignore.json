@@ -91,5 +91,7 @@
   "Nothing to update.",
   "Name is required",
   "Name must be at most {specialtyNameMax} characters.",
-  "Color must be a hex value like #2563eb."
+  "Color must be a hex value like #2563eb.",
+  "Could not allocate a referral code",
+  "Referrer wallet missing"
 ]

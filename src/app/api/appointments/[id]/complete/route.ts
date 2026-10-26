@@ -12,6 +12,7 @@ import {
   type ReferralInput, type FollowUpInput,
 } from "@/lib/consultation";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { rewardPatientReferral } from "@/lib/referrals";
 
 class LostRaceError extends Error {}
 
@@ -157,6 +158,8 @@ export const POST = withErrorLocale(async function POST(req: Request, { params }
   // Nurse care recommended here is bookable from now on (src/lib/nurseReferral.ts).
   const referralName = completed.referralGiven?.service.name;
   if (referralName) void sendPushToUser(appt.patientId, referralPushCopy(authUser.name, referralName));
+  // A referred patient's first paid visit pays whoever invited them (src/lib/referrals.ts).
+  void rewardPatientReferral(appt.patientId);
 
   return NextResponse.json(completed);
 });

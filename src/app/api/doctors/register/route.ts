@@ -5,6 +5,7 @@ import { sendPushToAdmins } from "@/lib/firebaseAdmin";
 import { validateRegistration } from "@/lib/validation";
 import { withErrorLocale } from "@/lib/apiErrors";
 import { createRateLimiter, clientIp } from "@/lib/rateLimit";
+import { readReferralCookies, recordReferralSignup, REFERRAL_COOKIE } from "@/lib/referrals";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -54,6 +55,9 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       },
     });
 
+    // Came through someone's invite link? Rewarded on approval (src/lib/referrals.ts).
+    await recordReferralSignup(user, await readReferralCookies());
+
     void sendPushToAdmins({
       key: "adminDoctorRegistered",
       values: { name },
@@ -71,6 +75,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       maxAge: COOKIE_MAX_AGE,
       path: "/",
     });
+    response.cookies.set(REFERRAL_COOKIE, "", { maxAge: 0, path: "/" });
     return response;
   } catch (err) {
     if (err && typeof err === "object" && "code" in err && (err as { code?: string }).code === "P2002") {

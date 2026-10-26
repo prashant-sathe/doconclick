@@ -248,6 +248,16 @@ export type ImpersonationLog = Prisma.ImpersonationLogModel
  */
 export type PlatformSettings = Prisma.PlatformSettingsModel
 /**
+ * Model Referral
+ * 
+ */
+export type Referral = Prisma.ReferralModel
+/**
+ * Model ReferralCode
+ * 
+ */
+export type ReferralCode = Prisma.ReferralCodeModel
+/**
  * Model Coupon
  * 
  */

@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { isOwnUploadUrl } from "@/lib/s3";
 import { DOCTOR_REGISTRATION_FEE_MAX, DEFAULT_DOCTOR_REGISTRATION_ORIGINAL_FEE } from "@/lib/doctorFeePricing";
 import { CASH_DUE_LIMIT_MAX } from "@/lib/duesPayments";
+import { REFERRAL_REWARD_MAX, REFERRAL_CAP_MIN, REFERRAL_CAP_MAX } from "@/lib/referralLimits";
 import { BOOKING_HORIZON_MIN_DAYS, BOOKING_HORIZON_MAX_DAYS, CHAT_FOLLOW_UP_MIN_DAYS, CHAT_FOLLOW_UP_MAX_DAYS } from "@/lib/bookingHorizon";
 
 async function requireAdmin() {
@@ -116,6 +117,26 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "The cash-due limit must be between ₹0 and ₹10,00,000." }, { status: 400 });
     }
     data.cashDueLimit = Math.round(value);
+  }
+
+  // Invite & earn rewards (src/lib/referrals.ts); ₹0 switches that side off.
+  for (const key of ["referralRewardPatient", "referralRewardProvider"] as const) {
+    if (body[key] === undefined) continue;
+    const value = finiteNumber(body[key]);
+    if (value === null || value < 0 || value > REFERRAL_REWARD_MAX) {
+      return NextResponse.json({ error: `Referral rewards must be between ₹0 and ₹${REFERRAL_REWARD_MAX.toLocaleString("en-IN")}.` }, { status: 400 });
+    }
+    data[key] = Math.round(value);
+  }
+  if (body.referralMonthlyCap !== undefined) {
+    const value = finiteNumber(body.referralMonthlyCap);
+    if (value === null || !Number.isInteger(value) || value < REFERRAL_CAP_MIN || value > REFERRAL_CAP_MAX) {
+      return NextResponse.json(
+        { error: `The monthly referral cap must be a whole number between ${REFERRAL_CAP_MIN} and ${REFERRAL_CAP_MAX}.` },
+        { status: 400 }
+      );
+    }
+    data.referralMonthlyCap = value;
   }
 
   if (body.bookingHorizonDays !== undefined) {

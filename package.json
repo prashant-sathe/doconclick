@@ -91,6 +91,7 @@
     "test:doctor-fees": "tsx tests/doctor-fees.ts",
     "test:payout-correction": "tsx tests/payout-correction.ts",
     "test:medicine-reminders": "tsx tests/medicine-reminders.ts",
+    "test:referrals": "tsx tests/referrals.ts",
     "i18n:errors": "tsx scripts/i18n-errors.ts"
   },
   "prisma": {

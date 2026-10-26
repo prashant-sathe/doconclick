@@ -45,9 +45,10 @@ const TYPE_LABEL: Record<string, string> = {
   REASSIGNMENT_CREDIT: "Cancelled appointment refund",
   CANCELLATION_REFUND: "Cancellation refund",
   PAYMENT_CREDIT: "Unapplied payment credit",
+  REFERRAL_BONUS: "Referral reward",
 };
 
-const CREDIT_TYPES = new Set(["TOPUP", "ADMIN_CREDIT", "REASSIGNMENT_CREDIT", "CANCELLATION_REFUND", "PAYMENT_CREDIT"]);
+const CREDIT_TYPES = new Set(["TOPUP", "ADMIN_CREDIT", "REASSIGNMENT_CREDIT", "CANCELLATION_REFUND", "PAYMENT_CREDIT", "REFERRAL_BONUS"]);
 
 // ── Wallet Detail Drawer ─────────────────────────────────────
 function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose: () => void; onAdjusted: () => void }) {

@@ -17,6 +17,7 @@ import CashDueSettings from "@/components/admin/CashDueSettings";
 import DoctorFeeSettings from "@/components/admin/DoctorFeeSettings";
 import NurseSettings from "@/components/admin/NurseSettings";
 import ReceiptSettings from "@/components/admin/ReceiptSettings";
+import ReferralSettings from "@/components/admin/ReferralSettings";
 import { useToast } from "@/components/Toast";
 import { useLoad } from "@/lib/apiClient";
 import { istDayKey } from "@/lib/istDate";
@@ -96,6 +97,7 @@ const TABS = [
   { id: "dues", label: "Cash dues" },
   { id: "fees", label: "Fees & commission" },
   { id: "receipts", label: "Receipts & tax" },
+  { id: "referrals", label: "Referrals" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
 
@@ -567,7 +569,7 @@ function FinanceContent() {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-slate-900">Finance</h1>
-        <p className="text-slate-500 text-sm mt-1">Payouts, cash dues, fees and commission, and receipt details.</p>
+        <p className="text-slate-500 text-sm mt-1">Payouts, cash dues, fees and commission, receipt details and referral rewards.</p>
       </div>
 
       {/* Revenue Cards */}
@@ -778,6 +780,8 @@ function FinanceContent() {
       )}
 
       {tab === "receipts" && <ReceiptSettings />}
+
+      {tab === "referrals" && <ReferralSettings />}
 
       {/* Negative-net confirmation */}
       {confirmNegative && (

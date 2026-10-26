@@ -6,6 +6,7 @@ import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { deleteAccount, DeletionBlockedError, accountDeletionPreview } from "@/lib/userDeletion";
 import { accountImpact, impactConfirmationResponse, resolveProviderBookings } from "@/lib/accountImpact";
 import { nurseApprovalChecklist } from "@/lib/nurseApproval";
+import { rewardProviderReferral } from "@/lib/referrals";
 
 const STATUS_PUSH_KEY = {
   APPROVED: "nurseApplicationApproved",
@@ -125,6 +126,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (statusChanged && data.status && data.status in STATUS_PUSH_KEY) {
     void sendPushToUser(id, { key: STATUS_PUSH_KEY[data.status as keyof typeof STATUS_PUSH_KEY], url: "/nurse/dashboard" });
   }
+  // Approved through someone's invite link — pay the referrer (src/lib/referrals.ts).
+  if (statusChanged && data.status === "APPROVED") await rewardProviderReferral(id);
   const bookings = leavingApproved ? await resolveProviderBookings(id, "NURSE", "CANCEL", "suspended") : null;
   return NextResponse.json({ ...updated, bookings });
 }

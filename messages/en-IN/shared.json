@@ -226,5 +226,22 @@
       "IN_PROGRESS": "In progress",
       "RESOLVED": "Resolved"
     }
+  },
+  "referral": {
+    "title": "Invite & earn",
+    "bodyPatient": "Share your link with friends and family. When one of them joins and completes their first paid visit, ₹{amount} is added to your DocOnClick wallet.",
+    "bodyProvider": "Know a doctor or nurse who should be on DocOnClick? Share your link. When they join and are approved, ₹{amount} is added to your DocOnClick wallet.",
+    "yourCode": "Your code",
+    "shareWhatsApp": "Share on WhatsApp",
+    "inviteDoctor": "Invite a doctor",
+    "inviteNurse": "Invite a nurse",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "stats": "{joined, plural, =0 {No one has joined yet} other {# joined}} · {rewarded} rewarded · ₹{earned} earned",
+    "capNote": "Up to {cap} rewards a month. One reward per new account.",
+    "walletNote": "Wallet balance: ₹{balance}",
+    "waPatient": "Book doctors on DocOnClick — clinic, home and video visits. Join with my link: {link}",
+    "waDoctor": "Join DocOnClick as a doctor and get patients for clinic, home and video visits. Sign up with my link: {link}",
+    "waNurse": "Join DocOnClick as a nurse and get home-visit bookings. Sign up with my link: {link}"
   }
 }

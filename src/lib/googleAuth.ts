@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sessionPayload, type JWTPayload } from "@/lib/auth";
 import type { OAuthRole, OAuthIntent } from "@/lib/googleOAuth";
 import { ROLE_HOME, safeNext } from "@/lib/roleHome";
+import { readReferralCookies, recordReferralSignup } from "@/lib/referrals";
 
 /**
  * Shared "a Google identity signed in — find or create the account and decide
@@ -42,6 +43,10 @@ export async function resolveGoogleUser(params: {
             : { patientProfile: { create: { age: 0, gender: "" } } }),
       },
     });
+    // A Google sign-up from an invite link (the register page left the
+    // code in a cookie) — src/lib/referrals.ts. No mobile yet; it's checked
+    // when the reward is paid.
+    await recordReferralSignup(user, await readReferralCookies());
   }
 
   const payload: JWTPayload = sessionPayload(user);

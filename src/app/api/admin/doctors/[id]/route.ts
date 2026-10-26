@@ -6,6 +6,7 @@ import { deleteAccount, DeletionBlockedError, accountDeletionPreview } from "@/l
 import { accountImpact, impactConfirmationResponse, resolveProviderBookings, type BookingAction } from "@/lib/accountImpact";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { getDoctorRegistrationFee, registrationFeeLabel } from "@/lib/doctorFees";
+import { rewardProviderReferral } from "@/lib/referrals";
 
 const MAX_REASON_LENGTH = 500;
 
@@ -213,6 +214,8 @@ export async function PATCH(
   if (data.isVerified === true && !profile.isVerified) {
     void sendPushToUser(id, { key: "doctorVerified", url: "/doctor/dashboard" });
   }
+  // Approved through someone's invite link — pay the referrer (src/lib/referrals.ts).
+  if (statusChanged && data.status === "APPROVED") await rewardProviderReferral(id);
 
   // Now hidden from new bookings, so handle the ones they had (re-read, in
   // case one landed after the review).

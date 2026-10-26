@@ -97,6 +97,8 @@ export const ModelName = {
   AnnouncementRecipient: 'AnnouncementRecipient',
   ImpersonationLog: 'ImpersonationLog',
   PlatformSettings: 'PlatformSettings',
+  Referral: 'Referral',
+  ReferralCode: 'ReferralCode',
   Coupon: 'Coupon',
   CouponRedemption: 'CouponRedemption',
   PaymentOrder: 'PaymentOrder',
@@ -525,6 +527,7 @@ export const WalletTransactionScalarFieldEnum = {
   appointmentId: 'appointmentId',
   refundOfAppointmentId: 'refundOfAppointmentId',
   creditOfPaymentId: 'creditOfPaymentId',
+  referralId: 'referralId',
   cashfreeOrderId: 'cashfreeOrderId',
   cashfreePaymentId: 'cashfreePaymentId',
   adminId: 'adminId',
@@ -911,10 +914,45 @@ export const PlatformSettingsScalarFieldEnum = {
   splashImageUrl: 'splashImageUrl',
   splashFit: 'splashFit',
   splashBgColor: 'splashBgColor',
+  referralRewardPatient: 'referralRewardPatient',
+  referralRewardProvider: 'referralRewardProvider',
+  referralMonthlyCap: 'referralMonthlyCap',
   updatedAt: 'updatedAt'
 } as const
 
 export type PlatformSettingsScalarFieldEnum = (typeof PlatformSettingsScalarFieldEnum)[keyof typeof PlatformSettingsScalarFieldEnum]
+
+
+export const ReferralScalarFieldEnum = {
+  id: 'id',
+  referrerId: 'referrerId',
+  inviteeId: 'inviteeId',
+  inviteeRole: 'inviteeRole',
+  status: 'status',
+  rejectReason: 'rejectReason',
+  mobileHash: 'mobileHash',
+  deviceId: 'deviceId',
+  rewardAmount: 'rewardAmount',
+  rewardedAt: 'rewardedAt',
+  walletTransactionId: 'walletTransactionId',
+  qualifyingAppointmentId: 'qualifyingAppointmentId',
+  lastCheckedAt: 'lastCheckedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReferralScalarFieldEnum = (typeof ReferralScalarFieldEnum)[keyof typeof ReferralScalarFieldEnum]
+
+
+export const ReferralCodeScalarFieldEnum = {
+  userId: 'userId',
+  code: 'code',
+  deviceId: 'deviceId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReferralCodeScalarFieldEnum = (typeof ReferralCodeScalarFieldEnum)[keyof typeof ReferralCodeScalarFieldEnum]
 
 
 export const CouponScalarFieldEnum = {

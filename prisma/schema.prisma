@@ -80,6 +80,9 @@ model User {
   changeRequestsResolved DoctorChangeRequest[]   @relation("ChangeRequestsResolvedBy")
   favouriteMedicines     DoctorFavouriteMedicine[] @relation("DoctorFavouriteMedicines")
   prescriptionTemplates  PrescriptionTemplate[]    @relation("DoctorPrescriptionTemplates")
+  referralCode           ReferralCode?
+  referralsMade          Referral[]                @relation("ReferralsMade")
+  referredBy             Referral?                 @relation("ReferralInvitee")
 }
 
 model PushToken {
@@ -573,7 +576,7 @@ model WalletTransaction {
   id                String       @id @default(cuid())
   walletId          String
   wallet            Wallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
-  type              String       // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT, REASSIGNMENT_CREDIT, CANCELLATION_REFUND, PAYMENT_CREDIT
+  type              String       // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT, REASSIGNMENT_CREDIT, CANCELLATION_REFUND, PAYMENT_CREDIT, REFERRAL_BONUS
   amount            Float        // always positive; direction implied by `type`
   balanceAfter      Float?       // wallet.balance immediately after this row settled; null until status = SUCCESS
   status            String       @default("SUCCESS") // PENDING, SUCCESS, FAILED — only TOPUP rows are ever created PENDING
@@ -585,6 +588,10 @@ model WalletTransaction {
   // be applied — unique, so a webhook retry or a racing verify-order can
   // never credit the same payment twice.
   creditOfPaymentId String?      @unique
+  // Set on the REFERRAL_BONUS row. One per referral: the reward claims the
+  // Referral row (PENDING → REWARDED) in the same transaction, and
+  // Referral.walletTransactionId is unique.
+  referralId        String?
   appointment       Appointment? @relation(fields: [appointmentId], references: [id])
   cashfreeOrderId   String?      // set for TOPUP rows
   cashfreePaymentId String?
@@ -1065,7 +1072,59 @@ model PlatformSettings {
   splashImageUrl          String?
   splashFit               String   @default("cover") // "cover", "contain"
   splashBgColor           String   @default("#F8FAFC")
+  // Invite & earn (FP1-23, src/lib/referrals.ts): wallet credit to the
+  // referrer when a referred patient completes a first paid visit / a
+  // referred doctor or nurse is approved. ₹0 = that side of the programme
+  // is off. Cap = most rewards one referrer can earn per IST calendar month.
+  referralRewardPatient   Float    @default(0)
+  referralRewardProvider  Float    @default(0)
+  referralMonthlyCap      Int      @default(10)
   updatedAt               DateTime @updatedAt
+}
+
+// One row per referred account (FP1-23): inviteeId is unique, so an account
+// can only ever be someone's invitee once. PENDING until the reward is paid
+// (REWARDED, with the REFERRAL_BONUS wallet row in the same transaction) or
+// refused (REJECTED + rejectReason). See src/lib/referrals.ts.
+model Referral {
+  id            String    @id @default(cuid())
+  referrerId    String
+  referrer      User      @relation("ReferralsMade", fields: [referrerId], references: [id], onDelete: Cascade)
+  inviteeId     String    @unique
+  invitee       User      @relation("ReferralInvitee", fields: [inviteeId], references: [id], onDelete: Cascade)
+  inviteeRole   String    // PATIENT, DOCTOR, NURSE — picks the reward amount
+  status        String    @default("PENDING") // PENDING, REWARDED, REJECTED
+  rejectReason  String?   // SAME_MOBILE, SAME_DEVICE, NO_DEVICE, MONTHLY_CAP, ACCOUNT_DELETED
+  // HMAC of the invitee's mobile (not the number itself — it outlives an
+  // account deletion), so a number can only ever earn one reward.
+  mobileHash    String?
+  deviceId      String?   // the invitee's device cookie at signup
+  rewardAmount  Float?
+  rewardedAt    DateTime?
+  walletTransactionId     String? @unique // the REFERRAL_BONUS ledger row
+  qualifyingAppointmentId String? // the patient's first paid + completed visit
+  lastCheckedAt DateTime? // last looked at by the reward sweep (it takes the least recent first)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([referrerId, status, rewardedAt])
+  @@index([status, inviteeRole, lastCheckedAt])
+  @@index([mobileHash])
+  @@index([deviceId])
+}
+
+// A user's own invite code (FP1-23) — made the first time they open their
+// invite card. Its own table rather than a User column so the unique code is
+// added without touching the existing User table.
+model ReferralCode {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code      String   @unique // uppercase, see src/lib/referrals.ts
+  // Device cookie seen when they last opened the card — an account created
+  // from that same device isn't counted as their invitee.
+  deviceId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Promotional discount code, created by an admin and applied by a patient at

@@ -4,6 +4,7 @@ import { hashPassword, signToken, sessionPayload, COOKIE_SECURE, IMPERSONATOR_CO
 import { validateQuickRegistration } from "@/lib/validation";
 import { withErrorLocale } from "@/lib/apiErrors";
 import { createRateLimiter, clientIp } from "@/lib/rateLimit";
+import { readReferralCookies, recordReferralSignup, REFERRAL_COOKIE } from "@/lib/referrals";
 
 const COOKIE_NAME = "doconclick_token";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -58,6 +59,10 @@ export const POST = withErrorLocale(async function POST(req: Request) {
           },
         });
 
+    // Only a brand-new account can be someone's invitee (a claimed walk-in
+    // already had visits here) — src/lib/referrals.ts.
+    if (!unclaimedWalkIn) await recordReferralSignup(user, await readReferralCookies());
+
     const payload = sessionPayload(user);
     const response = NextResponse.json({ id: user.id, name: user.name, role: user.role });
     response.cookies.set(COOKIE_NAME, signToken(payload), {
@@ -67,6 +72,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       maxAge: COOKIE_MAX_AGE,
       path: "/",
     });
+    response.cookies.set(REFERRAL_COOKIE, "", { maxAge: 0, path: "/" });
     // Same as login: a new session never inherits a leftover impersonation stash.
     response.cookies.set(IMPERSONATOR_COOKIE_NAME, "", {
       httpOnly: true,

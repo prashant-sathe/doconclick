@@ -285,7 +285,8 @@
       "ADMIN_DEBIT": "ऐडमिन द्वारा काटे गए",
       "REASSIGNMENT_CREDIT": "अपॉइंटमेंट रद्द — पैसे वापस",
       "CANCELLATION_REFUND": "अपॉइंटमेंट रद्द — पैसे वापस",
-      "PAYMENT_CREDIT": "पेमेंट वॉलेट में जमा"
+      "PAYMENT_CREDIT": "पेमेंट वॉलेट में जमा",
+      "REFERRAL_BONUS": "रेफ़रल इनाम"
     },
     "status": {
       "PENDING": "प्रोसेस हो रहा है",

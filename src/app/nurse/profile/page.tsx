@@ -1,5 +1,6 @@
 "use client";
 import LanguageSwitch from "@/components/LanguageSwitch";
+import ReferralInviteCard from "@/components/ReferralInviteCard";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -578,6 +579,8 @@ function NurseProfileContent() {
           </div>
           <SaveRow {...locSaver} onSave={saveLocation} />
         </Section>
+
+        <ReferralInviteCard />
 
         <LanguageSwitch />
 

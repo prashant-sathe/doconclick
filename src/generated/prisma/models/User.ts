@@ -339,6 +339,9 @@ export type UserWhereInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestListRelationFilter
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineListRelationFilter
   prescriptionTemplates?: Prisma.PrescriptionTemplateListRelationFilter
+  referralCode?: Prisma.XOR<Prisma.ReferralCodeNullableScalarRelationFilter, Prisma.ReferralCodeWhereInput> | null
+  referralsMade?: Prisma.ReferralListRelationFilter
+  referredBy?: Prisma.XOR<Prisma.ReferralNullableScalarRelationFilter, Prisma.ReferralWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -400,6 +403,9 @@ export type UserOrderByWithRelationInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestOrderByRelationAggregateInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineOrderByRelationAggregateInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateOrderByRelationAggregateInput
+  referralCode?: Prisma.ReferralCodeOrderByWithRelationInput
+  referralsMade?: Prisma.ReferralOrderByRelationAggregateInput
+  referredBy?: Prisma.ReferralOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -464,6 +470,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   changeRequestsResolved?: Prisma.DoctorChangeRequestListRelationFilter
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineListRelationFilter
   prescriptionTemplates?: Prisma.PrescriptionTemplateListRelationFilter
+  referralCode?: Prisma.XOR<Prisma.ReferralCodeNullableScalarRelationFilter, Prisma.ReferralCodeWhereInput> | null
+  referralsMade?: Prisma.ReferralListRelationFilter
+  referredBy?: Prisma.XOR<Prisma.ReferralNullableScalarRelationFilter, Prisma.ReferralWhereInput> | null
 }, "id" | "mobile" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -569,6 +578,9 @@ export type UserCreateInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -630,6 +642,9 @@ export type UserUncheckedCreateInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUpdateInput = {
@@ -691,6 +706,9 @@ export type UserUpdateInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -752,6 +770,9 @@ export type UserUncheckedUpdateInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1480,6 +1501,48 @@ export type UserUpdateOneRequiredWithoutImpersonationsReceivedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutImpersonationsReceivedInput, Prisma.UserUpdateWithoutImpersonationsReceivedInput>, Prisma.UserUncheckedUpdateWithoutImpersonationsReceivedInput>
 }
 
+export type UserCreateNestedOneWithoutReferralsMadeInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferralsMadeInput, Prisma.UserUncheckedCreateWithoutReferralsMadeInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferralsMadeInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutReferredByInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferredByInput, Prisma.UserUncheckedCreateWithoutReferredByInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferredByInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReferralsMadeNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferralsMadeInput, Prisma.UserUncheckedCreateWithoutReferralsMadeInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferralsMadeInput
+  upsert?: Prisma.UserUpsertWithoutReferralsMadeInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReferralsMadeInput, Prisma.UserUpdateWithoutReferralsMadeInput>, Prisma.UserUncheckedUpdateWithoutReferralsMadeInput>
+}
+
+export type UserUpdateOneRequiredWithoutReferredByNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferredByInput, Prisma.UserUncheckedCreateWithoutReferredByInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferredByInput
+  upsert?: Prisma.UserUpsertWithoutReferredByInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReferredByInput, Prisma.UserUpdateWithoutReferredByInput>, Prisma.UserUncheckedUpdateWithoutReferredByInput>
+}
+
+export type UserCreateNestedOneWithoutReferralCodeInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferralCodeInput, Prisma.UserUncheckedCreateWithoutReferralCodeInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferralCodeInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReferralCodeNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferralCodeInput, Prisma.UserUncheckedCreateWithoutReferralCodeInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferralCodeInput
+  upsert?: Prisma.UserUpsertWithoutReferralCodeInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReferralCodeInput, Prisma.UserUpdateWithoutReferralCodeInput>, Prisma.UserUncheckedUpdateWithoutReferralCodeInput>
+}
+
 export type UserCreateNestedOneWithoutCouponsCreatedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutCouponsCreatedInput, Prisma.UserUncheckedCreateWithoutCouponsCreatedInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutCouponsCreatedInput
@@ -1582,6 +1645,9 @@ export type UserCreateWithoutPushTokensInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutPushTokensInput = {
@@ -1642,6 +1708,9 @@ export type UserUncheckedCreateWithoutPushTokensInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutPushTokensInput = {
@@ -1718,6 +1787,9 @@ export type UserUpdateWithoutPushTokensInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPushTokensInput = {
@@ -1778,6 +1850,9 @@ export type UserUncheckedUpdateWithoutPushTokensInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -1838,6 +1913,9 @@ export type UserCreateWithoutNotificationsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -1898,6 +1976,9 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -1974,6 +2055,9 @@ export type UserUpdateWithoutNotificationsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -2034,6 +2118,9 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutSavedDoctorsInput = {
@@ -2094,6 +2181,9 @@ export type UserCreateWithoutSavedDoctorsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutSavedDoctorsInput = {
@@ -2154,6 +2244,9 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutSavedDoctorsInput = {
@@ -2219,6 +2312,9 @@ export type UserCreateWithoutSavedByPatientsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutSavedByPatientsInput = {
@@ -2279,6 +2375,9 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutSavedByPatientsInput = {
@@ -2355,6 +2454,9 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
@@ -2415,6 +2517,9 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUpsertWithoutSavedByPatientsInput = {
@@ -2486,6 +2591,9 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
@@ -2546,6 +2654,9 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutPatientProfileInput = {
@@ -2606,6 +2717,9 @@ export type UserCreateWithoutPatientProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutPatientProfileInput = {
@@ -2666,6 +2780,9 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutPatientProfileInput = {
@@ -2742,6 +2859,9 @@ export type UserUpdateWithoutPatientProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPatientProfileInput = {
@@ -2802,6 +2922,9 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutDocumentsInput = {
@@ -2862,6 +2985,9 @@ export type UserCreateWithoutDocumentsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutDocumentsInput = {
@@ -2922,6 +3048,9 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutDocumentsInput = {
@@ -2998,6 +3127,9 @@ export type UserUpdateWithoutDocumentsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDocumentsInput = {
@@ -3058,6 +3190,9 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutDoctorProfileInput = {
@@ -3118,6 +3253,9 @@ export type UserCreateWithoutDoctorProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutDoctorProfileInput = {
@@ -3178,6 +3316,9 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutDoctorProfileInput = {
@@ -3254,6 +3395,9 @@ export type UserUpdateWithoutDoctorProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDoctorProfileInput = {
@@ -3314,6 +3458,9 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutNurseProfileInput = {
@@ -3374,6 +3521,9 @@ export type UserCreateWithoutNurseProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutNurseProfileInput = {
@@ -3434,6 +3584,9 @@ export type UserUncheckedCreateWithoutNurseProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutNurseProfileInput = {
@@ -3510,6 +3663,9 @@ export type UserUpdateWithoutNurseProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNurseProfileInput = {
@@ -3570,6 +3726,9 @@ export type UserUncheckedUpdateWithoutNurseProfileInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutVitalsInput = {
@@ -3630,6 +3789,9 @@ export type UserCreateWithoutVitalsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutVitalsInput = {
@@ -3690,6 +3852,9 @@ export type UserUncheckedCreateWithoutVitalsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutVitalsInput = {
@@ -3755,6 +3920,9 @@ export type UserCreateWithoutVitalsRecordedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutVitalsRecordedInput = {
@@ -3815,6 +3983,9 @@ export type UserUncheckedCreateWithoutVitalsRecordedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutVitalsRecordedInput = {
@@ -3891,6 +4062,9 @@ export type UserUpdateWithoutVitalsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVitalsInput = {
@@ -3951,6 +4125,9 @@ export type UserUncheckedUpdateWithoutVitalsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUpsertWithoutVitalsRecordedInput = {
@@ -4022,6 +4199,9 @@ export type UserUpdateWithoutVitalsRecordedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
@@ -4082,6 +4262,9 @@ export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutNursePaymentLogsInput = {
@@ -4142,6 +4325,9 @@ export type UserCreateWithoutNursePaymentLogsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
@@ -4202,6 +4388,9 @@ export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutNursePaymentLogsInput = {
@@ -4278,6 +4467,9 @@ export type UserUpdateWithoutNursePaymentLogsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
@@ -4338,6 +4530,9 @@ export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutChangeRequestsInput = {
@@ -4398,6 +4593,9 @@ export type UserCreateWithoutChangeRequestsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutChangeRequestsInput = {
@@ -4458,6 +4656,9 @@ export type UserUncheckedCreateWithoutChangeRequestsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutChangeRequestsInput = {
@@ -4523,6 +4724,9 @@ export type UserCreateWithoutChangeRequestsResolvedInput = {
   changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutChangeRequestsResolvedInput = {
@@ -4583,6 +4787,9 @@ export type UserUncheckedCreateWithoutChangeRequestsResolvedInput = {
   changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutChangeRequestsResolvedInput = {
@@ -4659,6 +4866,9 @@ export type UserUpdateWithoutChangeRequestsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChangeRequestsInput = {
@@ -4719,6 +4929,9 @@ export type UserUncheckedUpdateWithoutChangeRequestsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUpsertWithoutChangeRequestsResolvedInput = {
@@ -4790,6 +5003,9 @@ export type UserUpdateWithoutChangeRequestsResolvedInput = {
   changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChangeRequestsResolvedInput = {
@@ -4850,6 +5066,9 @@ export type UserUncheckedUpdateWithoutChangeRequestsResolvedInput = {
   changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutStaffAccountInput = {
@@ -4910,6 +5129,9 @@ export type UserCreateWithoutStaffAccountInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutStaffAccountInput = {
@@ -4970,6 +5192,9 @@ export type UserUncheckedCreateWithoutStaffAccountInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutStaffAccountInput = {
@@ -5035,6 +5260,9 @@ export type UserCreateWithoutStaffMembersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutStaffMembersInput = {
@@ -5095,6 +5323,9 @@ export type UserUncheckedCreateWithoutStaffMembersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutStaffMembersInput = {
@@ -5171,6 +5402,9 @@ export type UserUpdateWithoutStaffAccountInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStaffAccountInput = {
@@ -5231,6 +5465,9 @@ export type UserUncheckedUpdateWithoutStaffAccountInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUpsertWithoutStaffMembersInput = {
@@ -5302,6 +5539,9 @@ export type UserUpdateWithoutStaffMembersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStaffMembersInput = {
@@ -5362,6 +5602,9 @@ export type UserUncheckedUpdateWithoutStaffMembersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutAsPatientInput = {
@@ -5422,6 +5665,9 @@ export type UserCreateWithoutAsPatientInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutAsPatientInput = {
@@ -5482,6 +5728,9 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutAsPatientInput = {
@@ -5547,6 +5796,9 @@ export type UserCreateWithoutAsDoctorInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutAsDoctorInput = {
@@ -5607,6 +5859,9 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutAsDoctorInput = {
@@ -5683,6 +5938,9 @@ export type UserUpdateWithoutAsPatientInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsPatientInput = {
@@ -5743,6 +6001,9 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUpsertWithoutAsDoctorInput = {
@@ -5814,6 +6075,9 @@ export type UserUpdateWithoutAsDoctorInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsDoctorInput = {
@@ -5874,6 +6138,9 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutWalletInput = {
@@ -5934,6 +6201,9 @@ export type UserCreateWithoutWalletInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutWalletInput = {
@@ -5994,6 +6264,9 @@ export type UserUncheckedCreateWithoutWalletInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutWalletInput = {
@@ -6070,6 +6343,9 @@ export type UserUpdateWithoutWalletInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletInput = {
@@ -6130,6 +6406,9 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutWalletTransactionsAdjustedInput = {
@@ -6190,6 +6469,9 @@ export type UserCreateWithoutWalletTransactionsAdjustedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
@@ -6250,6 +6532,9 @@ export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutWalletTransactionsAdjustedInput = {
@@ -6326,6 +6611,9 @@ export type UserUpdateWithoutWalletTransactionsAdjustedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
@@ -6386,6 +6674,9 @@ export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutSettlementsInput = {
@@ -6446,6 +6737,9 @@ export type UserCreateWithoutSettlementsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsInput = {
@@ -6506,6 +6800,9 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsInput = {
@@ -6571,6 +6868,9 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
@@ -6631,6 +6931,9 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsAdminedInput = {
@@ -6696,6 +6999,9 @@ export type UserCreateWithoutSettlementsPaidInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsPaidInput = {
@@ -6756,6 +7062,9 @@ export type UserUncheckedCreateWithoutSettlementsPaidInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsPaidInput = {
@@ -6832,6 +7141,9 @@ export type UserUpdateWithoutSettlementsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsInput = {
@@ -6892,6 +7204,9 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUpsertWithoutSettlementsAdminedInput = {
@@ -6963,6 +7278,9 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
@@ -7023,6 +7341,9 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUpsertWithoutSettlementsPaidInput = {
@@ -7094,6 +7415,9 @@ export type UserUpdateWithoutSettlementsPaidInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsPaidInput = {
@@ -7154,6 +7478,9 @@ export type UserUncheckedUpdateWithoutSettlementsPaidInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutTimeOffInput = {
@@ -7214,6 +7541,9 @@ export type UserCreateWithoutTimeOffInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutTimeOffInput = {
@@ -7274,6 +7604,9 @@ export type UserUncheckedCreateWithoutTimeOffInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutTimeOffInput = {
@@ -7350,6 +7683,9 @@ export type UserUpdateWithoutTimeOffInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTimeOffInput = {
@@ -7410,6 +7746,9 @@ export type UserUncheckedUpdateWithoutTimeOffInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutDuesPaymentsInput = {
@@ -7470,6 +7809,9 @@ export type UserCreateWithoutDuesPaymentsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutDuesPaymentsInput = {
@@ -7530,6 +7872,9 @@ export type UserUncheckedCreateWithoutDuesPaymentsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutDuesPaymentsInput = {
@@ -7606,6 +7951,9 @@ export type UserUpdateWithoutDuesPaymentsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDuesPaymentsInput = {
@@ -7666,6 +8014,9 @@ export type UserUncheckedUpdateWithoutDuesPaymentsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutPayoutRequestsInput = {
@@ -7726,6 +8077,9 @@ export type UserCreateWithoutPayoutRequestsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutPayoutRequestsInput = {
@@ -7786,6 +8140,9 @@ export type UserUncheckedCreateWithoutPayoutRequestsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutPayoutRequestsInput = {
@@ -7862,6 +8219,9 @@ export type UserUpdateWithoutPayoutRequestsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
@@ -7922,6 +8282,9 @@ export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutPaymentLogsInput = {
@@ -7982,6 +8345,9 @@ export type UserCreateWithoutPaymentLogsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutPaymentLogsInput = {
@@ -8042,6 +8408,9 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutPaymentLogsInput = {
@@ -8118,6 +8487,9 @@ export type UserUpdateWithoutPaymentLogsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentLogsInput = {
@@ -8178,6 +8550,9 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -8238,6 +8613,9 @@ export type UserCreateWithoutMessagesSentInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -8298,6 +8676,9 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -8374,6 +8755,9 @@ export type UserUpdateWithoutMessagesSentInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -8434,6 +8818,9 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutMedicineRemindersInput = {
@@ -8494,6 +8881,9 @@ export type UserCreateWithoutMedicineRemindersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutMedicineRemindersInput = {
@@ -8554,6 +8944,9 @@ export type UserUncheckedCreateWithoutMedicineRemindersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutMedicineRemindersInput = {
@@ -8630,6 +9023,9 @@ export type UserUpdateWithoutMedicineRemindersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMedicineRemindersInput = {
@@ -8690,6 +9086,9 @@ export type UserUncheckedUpdateWithoutMedicineRemindersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutFavouriteMedicinesInput = {
@@ -8750,6 +9149,9 @@ export type UserCreateWithoutFavouriteMedicinesInput = {
   changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutFavouriteMedicinesInput = {
@@ -8810,6 +9212,9 @@ export type UserUncheckedCreateWithoutFavouriteMedicinesInput = {
   changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutFavouriteMedicinesInput = {
@@ -8886,6 +9291,9 @@ export type UserUpdateWithoutFavouriteMedicinesInput = {
   changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFavouriteMedicinesInput = {
@@ -8946,6 +9354,9 @@ export type UserUncheckedUpdateWithoutFavouriteMedicinesInput = {
   changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutPrescriptionTemplatesInput = {
@@ -9006,6 +9417,9 @@ export type UserCreateWithoutPrescriptionTemplatesInput = {
   changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutPrescriptionTemplatesInput = {
@@ -9066,6 +9480,9 @@ export type UserUncheckedCreateWithoutPrescriptionTemplatesInput = {
   changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutPrescriptionTemplatesInput = {
@@ -9142,6 +9559,9 @@ export type UserUpdateWithoutPrescriptionTemplatesInput = {
   changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPrescriptionTemplatesInput = {
@@ -9202,6 +9622,9 @@ export type UserUncheckedUpdateWithoutPrescriptionTemplatesInput = {
   changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutReviewsGivenInput = {
@@ -9262,6 +9685,9 @@ export type UserCreateWithoutReviewsGivenInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutReviewsGivenInput = {
@@ -9322,6 +9748,9 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutReviewsGivenInput = {
@@ -9387,6 +9816,9 @@ export type UserCreateWithoutReviewsReceivedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutReviewsReceivedInput = {
@@ -9447,6 +9879,9 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutReviewsReceivedInput = {
@@ -9523,6 +9958,9 @@ export type UserUpdateWithoutReviewsGivenInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsGivenInput = {
@@ -9583,6 +10021,9 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUpsertWithoutReviewsReceivedInput = {
@@ -9654,6 +10095,9 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
@@ -9714,6 +10158,9 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutComplaintsInput = {
@@ -9774,6 +10221,9 @@ export type UserCreateWithoutComplaintsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsInput = {
@@ -9834,6 +10284,9 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsInput = {
@@ -9899,6 +10352,9 @@ export type UserCreateWithoutComplaintsAssignedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsAssignedInput = {
@@ -9959,6 +10415,9 @@ export type UserUncheckedCreateWithoutComplaintsAssignedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsAssignedInput = {
@@ -10035,6 +10494,9 @@ export type UserUpdateWithoutComplaintsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsInput = {
@@ -10095,6 +10557,9 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUpsertWithoutComplaintsAssignedInput = {
@@ -10166,6 +10631,9 @@ export type UserUpdateWithoutComplaintsAssignedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsAssignedInput = {
@@ -10226,6 +10694,9 @@ export type UserUncheckedUpdateWithoutComplaintsAssignedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutComplaintMessagesInput = {
@@ -10286,6 +10757,9 @@ export type UserCreateWithoutComplaintMessagesInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutComplaintMessagesInput = {
@@ -10346,6 +10820,9 @@ export type UserUncheckedCreateWithoutComplaintMessagesInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutComplaintMessagesInput = {
@@ -10422,6 +10899,9 @@ export type UserUpdateWithoutComplaintMessagesInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintMessagesInput = {
@@ -10482,6 +10962,9 @@ export type UserUncheckedUpdateWithoutComplaintMessagesInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutClinicsInput = {
@@ -10542,6 +11025,9 @@ export type UserCreateWithoutClinicsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutClinicsInput = {
@@ -10602,6 +11088,9 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutClinicsInput = {
@@ -10678,6 +11167,9 @@ export type UserUpdateWithoutClinicsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClinicsInput = {
@@ -10738,6 +11230,9 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutAnnouncementsCreatedInput = {
@@ -10798,6 +11293,9 @@ export type UserCreateWithoutAnnouncementsCreatedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
@@ -10858,6 +11356,9 @@ export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementsCreatedInput = {
@@ -10934,6 +11435,9 @@ export type UserUpdateWithoutAnnouncementsCreatedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
@@ -10994,6 +11498,9 @@ export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutAnnouncementRecipientsInput = {
@@ -11054,6 +11561,9 @@ export type UserCreateWithoutAnnouncementRecipientsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
@@ -11114,6 +11624,9 @@ export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementRecipientsInput = {
@@ -11190,6 +11703,9 @@ export type UserUpdateWithoutAnnouncementRecipientsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
@@ -11250,6 +11766,9 @@ export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutImpersonationsStartedInput = {
@@ -11310,6 +11829,9 @@ export type UserCreateWithoutImpersonationsStartedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
@@ -11370,6 +11892,9 @@ export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutImpersonationsStartedInput = {
@@ -11435,6 +11960,9 @@ export type UserCreateWithoutImpersonationsReceivedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
@@ -11495,6 +12023,9 @@ export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutImpersonationsReceivedInput = {
@@ -11571,6 +12102,9 @@ export type UserUpdateWithoutImpersonationsStartedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
@@ -11631,6 +12165,9 @@ export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUpsertWithoutImpersonationsReceivedInput = {
@@ -11702,6 +12239,9 @@ export type UserUpdateWithoutImpersonationsReceivedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
@@ -11762,6 +12302,813 @@ export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+}
+
+export type UserCreateWithoutReferralsMadeInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  medicineRemindersEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+}
+
+export type UserUncheckedCreateWithoutReferralsMadeInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  medicineRemindersEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementUncheckedCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+}
+
+export type UserCreateOrConnectWithoutReferralsMadeInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferralsMadeInput, Prisma.UserUncheckedCreateWithoutReferralsMadeInput>
+}
+
+export type UserCreateWithoutReferredByInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  medicineRemindersEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+}
+
+export type UserUncheckedCreateWithoutReferredByInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  medicineRemindersEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementUncheckedCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+}
+
+export type UserCreateOrConnectWithoutReferredByInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferredByInput, Prisma.UserUncheckedCreateWithoutReferredByInput>
+}
+
+export type UserUpsertWithoutReferralsMadeInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReferralsMadeInput, Prisma.UserUncheckedUpdateWithoutReferralsMadeInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferralsMadeInput, Prisma.UserUncheckedCreateWithoutReferralsMadeInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReferralsMadeInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReferralsMadeInput, Prisma.UserUncheckedUpdateWithoutReferralsMadeInput>
+}
+
+export type UserUpdateWithoutReferralsMadeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReferralsMadeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUncheckedUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+}
+
+export type UserUpsertWithoutReferredByInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReferredByInput, Prisma.UserUncheckedUpdateWithoutReferredByInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferredByInput, Prisma.UserUncheckedCreateWithoutReferredByInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReferredByInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReferredByInput, Prisma.UserUncheckedUpdateWithoutReferredByInput>
+}
+
+export type UserUpdateWithoutReferredByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReferredByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUncheckedUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+}
+
+export type UserCreateWithoutReferralCodeInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  medicineRemindersEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+}
+
+export type UserUncheckedCreateWithoutReferralCodeInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  medicineRemindersEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementUncheckedCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+}
+
+export type UserCreateOrConnectWithoutReferralCodeInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferralCodeInput, Prisma.UserUncheckedCreateWithoutReferralCodeInput>
+}
+
+export type UserUpsertWithoutReferralCodeInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReferralCodeInput, Prisma.UserUncheckedUpdateWithoutReferralCodeInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferralCodeInput, Prisma.UserUncheckedCreateWithoutReferralCodeInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReferralCodeInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReferralCodeInput, Prisma.UserUncheckedUpdateWithoutReferralCodeInput>
+}
+
+export type UserUpdateWithoutReferralCodeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReferralCodeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUncheckedUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutCouponsCreatedInput = {
@@ -11822,6 +13169,9 @@ export type UserCreateWithoutCouponsCreatedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutCouponsCreatedInput = {
@@ -11882,6 +13232,9 @@ export type UserUncheckedCreateWithoutCouponsCreatedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutCouponsCreatedInput = {
@@ -11958,6 +13311,9 @@ export type UserUpdateWithoutCouponsCreatedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
@@ -12018,6 +13374,9 @@ export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutCouponRedemptionsInput = {
@@ -12078,6 +13437,9 @@ export type UserCreateWithoutCouponRedemptionsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
@@ -12138,6 +13500,9 @@ export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutCouponRedemptionsInput = {
@@ -12214,6 +13579,9 @@ export type UserUpdateWithoutCouponRedemptionsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
@@ -12274,6 +13642,9 @@ export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserCreateWithoutPaymentOrdersInput = {
@@ -12334,6 +13705,9 @@ export type UserCreateWithoutPaymentOrdersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
 }
 
 export type UserUncheckedCreateWithoutPaymentOrdersInput = {
@@ -12394,6 +13768,9 @@ export type UserUncheckedCreateWithoutPaymentOrdersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
 }
 
 export type UserCreateOrConnectWithoutPaymentOrdersInput = {
@@ -12470,6 +13847,9 @@ export type UserUpdateWithoutPaymentOrdersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
@@ -12530,6 +13910,9 @@ export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
   changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
   favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 
@@ -12576,6 +13959,7 @@ export type UserCountOutputType = {
   changeRequestsResolved: number
   favouriteMedicines: number
   prescriptionTemplates: number
+  referralsMade: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -12617,6 +14001,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   changeRequestsResolved?: boolean | UserCountOutputTypeCountChangeRequestsResolvedArgs
   favouriteMedicines?: boolean | UserCountOutputTypeCountFavouriteMedicinesArgs
   prescriptionTemplates?: boolean | UserCountOutputTypeCountPrescriptionTemplatesArgs
+  referralsMade?: boolean | UserCountOutputTypeCountReferralsMadeArgs
 }
 
 /**
@@ -12895,6 +14280,13 @@ export type UserCountOutputTypeCountPrescriptionTemplatesArgs<ExtArgs extends ru
   where?: Prisma.PrescriptionTemplateWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReferralsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReferralWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -12955,6 +14347,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   changeRequestsResolved?: boolean | Prisma.User$changeRequestsResolvedArgs<ExtArgs>
   favouriteMedicines?: boolean | Prisma.User$favouriteMedicinesArgs<ExtArgs>
   prescriptionTemplates?: boolean | Prisma.User$prescriptionTemplatesArgs<ExtArgs>
+  referralCode?: boolean | Prisma.User$referralCodeArgs<ExtArgs>
+  referralsMade?: boolean | Prisma.User$referralsMadeArgs<ExtArgs>
+  referredBy?: boolean | Prisma.User$referredByArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -13057,6 +14452,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   changeRequestsResolved?: boolean | Prisma.User$changeRequestsResolvedArgs<ExtArgs>
   favouriteMedicines?: boolean | Prisma.User$favouriteMedicinesArgs<ExtArgs>
   prescriptionTemplates?: boolean | Prisma.User$prescriptionTemplatesArgs<ExtArgs>
+  referralCode?: boolean | Prisma.User$referralCodeArgs<ExtArgs>
+  referralsMade?: boolean | Prisma.User$referralsMadeArgs<ExtArgs>
+  referredBy?: boolean | Prisma.User$referredByArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -13108,6 +14506,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     changeRequestsResolved: Prisma.$DoctorChangeRequestPayload<ExtArgs>[]
     favouriteMedicines: Prisma.$DoctorFavouriteMedicinePayload<ExtArgs>[]
     prescriptionTemplates: Prisma.$PrescriptionTemplatePayload<ExtArgs>[]
+    referralCode: Prisma.$ReferralCodePayload<ExtArgs> | null
+    referralsMade: Prisma.$ReferralPayload<ExtArgs>[]
+    referredBy: Prisma.$ReferralPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -13562,6 +14963,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   changeRequestsResolved<T extends Prisma.User$changeRequestsResolvedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$changeRequestsResolvedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DoctorChangeRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   favouriteMedicines<T extends Prisma.User$favouriteMedicinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$favouriteMedicinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DoctorFavouriteMedicinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   prescriptionTemplates<T extends Prisma.User$prescriptionTemplatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$prescriptionTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrescriptionTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referralCode<T extends Prisma.User$referralCodeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referralCodeArgs<ExtArgs>>): Prisma.Prisma__ReferralCodeClient<runtime.Types.Result.GetResult<Prisma.$ReferralCodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  referralsMade<T extends Prisma.User$referralsMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referralsMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referredBy<T extends Prisma.User$referredByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referredByArgs<ExtArgs>>): Prisma.Prisma__ReferralClient<runtime.Types.Result.GetResult<Prisma.$ReferralPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -15003,6 +16407,68 @@ export type User$prescriptionTemplatesArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.PrescriptionTemplateScalarFieldEnum | Prisma.PrescriptionTemplateScalarFieldEnum[]
+}
+
+/**
+ * User.referralCode
+ */
+export type User$referralCodeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReferralCode
+   */
+  select?: Prisma.ReferralCodeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReferralCode
+   */
+  omit?: Prisma.ReferralCodeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReferralCodeInclude<ExtArgs> | null
+  where?: Prisma.ReferralCodeWhereInput
+}
+
+/**
+ * User.referralsMade
+ */
+export type User$referralsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Referral
+   */
+  select?: Prisma.ReferralSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Referral
+   */
+  omit?: Prisma.ReferralOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReferralInclude<ExtArgs> | null
+  where?: Prisma.ReferralWhereInput
+  orderBy?: Prisma.ReferralOrderByWithRelationInput | Prisma.ReferralOrderByWithRelationInput[]
+  cursor?: Prisma.ReferralWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReferralScalarFieldEnum | Prisma.ReferralScalarFieldEnum[]
+}
+
+/**
+ * User.referredBy
+ */
+export type User$referredByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Referral
+   */
+  select?: Prisma.ReferralSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Referral
+   */
+  omit?: Prisma.ReferralOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReferralInclude<ExtArgs> | null
+  where?: Prisma.ReferralWhereInput
 }
 
 /**

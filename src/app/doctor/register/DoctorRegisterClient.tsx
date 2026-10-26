@@ -8,6 +8,7 @@ import {
   Loader2, ArrowRight,
 } from "lucide-react";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
+import ReferralCapture from "@/components/ReferralCapture";
 import { useAuth } from "@/components/AuthProvider";
 import { isValidMobile, isValidEmail, normalizeMobile, nameErrorCode, PASSWORD_MIN_LENGTH } from "@/lib/validation";
 import { useTranslations } from "next-intl";
@@ -60,6 +61,7 @@ export default function DoctorRegisterClient() {
 
   return (
     <AuthPageShell backHref="/login">
+      <ReferralCapture />
       <div className="max-w-lg mx-auto">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center mx-auto mb-4 shadow-lg">

@@ -18,6 +18,7 @@ import PatientMobileNav from "@/components/patient/PatientMobileNav";
 import ImageCropModal from "@/components/ImageCropModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import EditableName from "@/components/EditableName";
+import ReferralInviteCard from "@/components/ReferralInviteCard";
 import { prepareBlobUpload } from "@/lib/compressImage";
 import { useTranslations } from "next-intl";
 
@@ -271,6 +272,8 @@ export default function PatientProfilePage() {
           <Row href="/patient/profile/notifications" tint="bg-amber-50 text-amber-500" icon={<Bell className="w-4 h-4" />}
             title={t("notifications")} />
         </Group>
+
+        <ReferralInviteCard />
 
         <LanguageSwitch />
 

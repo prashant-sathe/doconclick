@@ -386,5 +386,9 @@
   "payoutReferenceCorrected": {
     "title": "पेआउट संदर्भ अपडेट हुआ",
     "body": "आपके पेआउट का संदर्भ सही किया गया है। नया UTR {reference} है।"
+  },
+  "referralRewarded": {
+    "title": "रेफ़रल इनाम जुड़ा",
+    "body": "आपके आमंत्रित व्यक्ति अब DocOnClick पर हैं — आपके वॉलेट में ₹{amount} जोड़ दिए गए हैं।"
   }
 }

@@ -285,7 +285,8 @@
       "ADMIN_DEBIT": "Debited by admin",
       "REASSIGNMENT_CREDIT": "Appointment cancelled — refunded",
       "CANCELLATION_REFUND": "Appointment cancelled — refunded",
-      "PAYMENT_CREDIT": "Payment credited to wallet"
+      "PAYMENT_CREDIT": "Payment credited to wallet",
+      "REFERRAL_BONUS": "Referral reward"
     },
     "status": {
       "PENDING": "Processing",

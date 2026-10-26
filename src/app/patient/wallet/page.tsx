@@ -10,11 +10,11 @@ import { useLocale, useTranslations } from "next-intl";
 import { formattingLocale } from "@/lib/appLanguage";
 
 // Labels are message keys (patientAccount.wallet.type / .status).
-const TYPES = ["TOPUP", "BOOKING_PAYMENT", "ADMIN_CREDIT", "ADMIN_DEBIT", "REASSIGNMENT_CREDIT", "CANCELLATION_REFUND", "PAYMENT_CREDIT"] as const;
+const TYPES = ["TOPUP", "BOOKING_PAYMENT", "ADMIN_CREDIT", "ADMIN_DEBIT", "REASSIGNMENT_CREDIT", "CANCELLATION_REFUND", "PAYMENT_CREDIT", "REFERRAL_BONUS"] as const;
 const STATUSES = ["PENDING", "SUCCESS", "FAILED"] as const;
 const isOneOf = <T extends string>(list: readonly T[], v: string): v is T => (list as readonly string[]).includes(v);
 
-const CREDIT_TYPES = new Set(["TOPUP", "ADMIN_CREDIT", "REASSIGNMENT_CREDIT", "CANCELLATION_REFUND", "PAYMENT_CREDIT"]);
+const CREDIT_TYPES = new Set(["TOPUP", "ADMIN_CREDIT", "REASSIGNMENT_CREDIT", "CANCELLATION_REFUND", "PAYMENT_CREDIT", "REFERRAL_BONUS"]);
 
 export default function WalletPage() {
   const t = useTranslations("patientAccount.wallet");

@@ -18,6 +18,7 @@ import DoctorHeader from "@/components/doctor/DoctorHeader";
 import DoctorMobileNav from "@/components/doctor/DoctorMobileNav";
 import ImageCropModal from "@/components/ImageCropModal";
 import EditableName from "@/components/EditableName";
+import ReferralInviteCard from "@/components/ReferralInviteCard";
 import { prepareBlobUpload } from "@/lib/compressImage";
 import { useTranslations } from "next-intl";
 
@@ -245,6 +246,8 @@ export default function DoctorProfilePage() {
           <Row href="/doctor/profile/qr" tint="bg-teal-50 text-teal-600" icon={<QrCode className="w-4 h-4" />}
             title={t("qr")} />
         </Group>
+
+        <ReferralInviteCard />
 
         <LanguageSwitch />
 

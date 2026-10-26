@@ -16,6 +16,7 @@ export async function register() {
 
   const { sendDueAppointmentReminders, sendDueFollowUpReminders } = await import("@/lib/appointmentReminders");
   const { sendDueMedicineReminders, sendDueRefillReminders } = await import("@/lib/medicineReminders");
+  const { sweepDueReferrals } = await import("@/lib/referrals");
   g.__appointmentReminderInterval = setInterval(() => {
     sendDueAppointmentReminders().catch((err) => {
       console.error("Appointment reminder sweep failed:", err);
@@ -28,6 +29,9 @@ export async function register() {
     });
     sendDueRefillReminders().catch((err) => {
       console.error("Medicine refill reminder sweep failed:", err);
+    });
+    sweepDueReferrals().catch((err) => {
+      console.error("Referral reward sweep failed:", err);
     });
   }, SWEEP_INTERVAL_MS);
 }

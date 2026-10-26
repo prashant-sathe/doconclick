@@ -21,6 +21,7 @@ import { settleIfFreeOnAccept } from "@/lib/paymentOrders";
 import { GATEWAY_OMIT, LIVE_LOCATION_CLEARED, withLiveLocationOnlyWhileLive } from "@/lib/appointmentView";
 import { withErrorLocale } from "@/lib/apiErrors";
 import { parseFollowUp } from "@/lib/consultation";
+import { rewardPatientReferral } from "@/lib/referrals";
 
 // Patient push per new status (messages/<locale>/push.json). The confirmed
 // copy adds "Nothing to pay" when `free` is "yes" (a ₹0 booking marked PAID on accept).
@@ -550,6 +551,8 @@ export const PATCH = withErrorLocale(async function PATCH(
     if (status === "COMPLETED") {
       const referral = await prisma.nurseReferral.findUnique({ where: { appointmentId: id }, select: { service: { select: { name: true } } } });
       if (referral) void sendPushToUser(appointment.patientId, referralPushCopy(actingDoctorName, referral.service.name));
+      // A referred patient's first paid visit pays whoever invited them (src/lib/referrals.ts).
+      void rewardPatientReferral(appointment.patientId);
     }
     return NextResponse.json(withoutVisitCode(free ? await prisma.appointment.findUniqueOrThrow({ where: { id } }) : updated));
   }

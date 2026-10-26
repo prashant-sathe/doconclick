@@ -21,7 +21,7 @@ const fmtDateTime = (v: unknown) => (v ? new Date(v as string).toLocaleString("e
 const str = (v: unknown) => (v === null || v === undefined || v === "" ? "—" : String(v));
 
 const STATUS_TONE: Record<string, string> = {
-  PAID: "badge badge-success", ACTIVE: "badge badge-success", COMPLETED: "badge badge-success",
+  PAID: "badge badge-success", REWARDED: "badge badge-success", ACTIVE: "badge badge-success", COMPLETED: "badge badge-success",
   PENDING: "badge badge-warning", EXPIRING_SOON: "badge badge-warning", PENDING_APPROVAL: "badge badge-warning", SCHEDULED: "badge badge-info",
   EXPIRED: "badge badge-danger", REJECTED: "badge badge-danger", CANCELLED: "badge badge-danger",
   NEVER_ACTIVATED: "badge badge-gray",
@@ -239,6 +239,34 @@ export const REPORT_CONFIGS: ReportConfig[] = [
       { label: "Active Doctors", value: str(data.summary?.activeDoctors) },
       { label: "Total Gross Earnings", value: fmtCurrency(data.summary?.totalGrossEarnings) },
       { label: "Total Net To Doctors", value: fmtCurrency(data.summary?.totalNetToDoctor), tone: "purple" },
+    ],
+  },
+
+  {
+    slug: "referrals",
+    title: "Referrals (Invite & Earn)",
+    description: "Sign-ups through a referral link, which ones earned the referrer a wallet reward, and the total paid. Reward amounts are set in Finance → Referrals.",
+    category: "Platform Revenue & Bookings",
+    endpoint: "/api/admin/reports/referrals",
+    dateFilter: true,
+    statusFilter: { param: "status", label: "Status", options: [{ value: "ALL", label: "All" }, { value: "PENDING", label: "Pending" }, { value: "REWARDED", label: "Rewarded" }, { value: "REJECTED", label: "Rejected" }] },
+    columns: [
+      { key: "referrerName", label: "Referrer", render: (r) => `${str(r.referrerName)} (${str(r.referrerRole)})`, csvValue: (r) => str(r.referrerName) },
+      { key: "referrerMobile", label: "Referrer Mobile", render: (r) => str(r.referrerMobile) },
+      { key: "inviteeName", label: "Invitee", render: (r) => `${str(r.inviteeName)} (${str(r.inviteeRole)})`, csvValue: (r) => str(r.inviteeName) },
+      { key: "inviteeMobile", label: "Invitee Mobile", render: (r) => str(r.inviteeMobile) },
+      { key: "status", label: "Status", render: (r) => <StatusBadge value={r.status} /> },
+      { key: "rejectReason", label: "Why Rejected", render: (r) => str(r.rejectReason) },
+      { key: "rewardAmount", label: "Reward", align: "right", render: (r) => (r.rewardAmount == null ? "—" : fmtCurrency(r.rewardAmount)), csvValue: (r) => Number(r.rewardAmount ?? 0) },
+      { key: "signedUpAt", label: "Signed Up", render: (r) => fmtDate(r.signedUpAt), csvValue: (r) => fmtDate(r.signedUpAt) },
+      { key: "rewardedAt", label: "Rewarded On", render: (r) => fmtDate(r.rewardedAt), csvValue: (r) => fmtDate(r.rewardedAt) },
+    ],
+    summaryCards: (data) => [
+      { label: "Invites (sign-ups)", value: str(data.summary?.invites) },
+      { label: "Conversions (rewarded)", value: str(data.summary?.conversions), tone: "success" },
+      { label: "Pending", value: str(data.summary?.pending), tone: "warning" },
+      { label: "Rejected", value: str(data.summary?.rejected), tone: "danger" },
+      { label: "Total Paid Out (wallet)", value: fmtCurrency(data.summary?.payout), tone: "purple" },
     ],
   },
 
