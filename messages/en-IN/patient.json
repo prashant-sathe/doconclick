@@ -10,11 +10,15 @@
     "summary": "{rating} ({count, plural, one {# review} other {# reviews}})"
   },
   "prescriptionDownload": {
+    "previewTitle": "Prescription",
+    "close": "Close",
     "generating": "Generating…",
     "download": "Download Prescription",
     "failed": "Failed to generate PDF"
   },
   "receiptDownload": {
+    "previewTitle": "Receipt",
+    "close": "Close",
     "generating": "Generating…",
     "download": "Download Receipt",
     "short": "Receipt",

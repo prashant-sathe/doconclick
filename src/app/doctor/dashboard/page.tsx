@@ -268,10 +268,17 @@ const EMPTY_TEST_ROW: TestRow = { name: "", instructions: "" };
 function draftKeyFor(appointmentId: string) {
   return `prescriptionDraft:${appointmentId}`;
 }
+// Optional clinical record shown on the prescription. Findings + diagnosis are
+// kept in capitals as the doctor types (the server upper-cases them too).
+const CLINICAL_KEYS = ["chiefComplaints", "history", "examination", "findings", "diagnosis"] as const;
+type ClinicalKey = (typeof CLINICAL_KEYS)[number];
+type ClinicalDraft = Record<ClinicalKey, string>;
+const EMPTY_CLINICAL: ClinicalDraft = { chiefComplaints: "", history: "", examination: "", findings: "", diagnosis: "" };
+const UPPERCASE_KEYS: ClinicalKey[] = ["findings", "diagnosis"];
 type NurseCareDraft = { on: boolean; serviceId: string; visits: number; intervalDays: number; instructions: string };
 const EMPTY_NURSE_CARE: NurseCareDraft = { on: false, serviceId: "", visits: 1, intervalDays: 1, instructions: "" };
 
-function loadDraft(appointmentId: string): { medicines?: MedicineRow[]; tests?: TestRow[]; notes?: string; confirmed?: boolean; nurseCare?: NurseCareDraft; followUp?: FollowUpValue } {
+function loadDraft(appointmentId: string): { medicines?: MedicineRow[]; tests?: TestRow[]; notes?: string; clinical?: Partial<ClinicalDraft>; confirmed?: boolean; nurseCare?: NurseCareDraft; followUp?: FollowUpValue } {
   try {
     const raw = localStorage.getItem(draftKeyFor(appointmentId));
     return raw ? JSON.parse(raw) : {};
@@ -293,6 +300,15 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
     const draft = loadDraft(appt.id).notes;
     return typeof draft === "string" ? draft : "";
   });
+  const [clinical, setClinical] = useState<ClinicalDraft>(() => ({ ...EMPTY_CLINICAL, ...(loadDraft(appt.id).clinical ?? {}) }));
+  const setClinicalField = (key: ClinicalKey, e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const el = e.target;
+    const caret = el.selectionStart;
+    const value = UPPERCASE_KEYS.includes(key) ? el.value.toUpperCase() : el.value;
+    setClinical((c) => ({ ...c, [key]: value }));
+    // Rewriting the value can send the caret to the end — put it back.
+    requestAnimationFrame(() => { try { el.setSelectionRange(caret, caret); } catch { /* element gone */ } });
+  };
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState("");
   const [medicines, setMedicines] = useState<MedicineRow[]>(() => {
@@ -325,11 +341,11 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
   useEffect(() => {
     try {
-      localStorage.setItem(draftKey, JSON.stringify({ medicines, tests, notes, confirmed, nurseCare, followUp }));
+      localStorage.setItem(draftKey, JSON.stringify({ medicines, tests, notes, clinical, confirmed, nurseCare, followUp }));
     } catch {
       // ignore unavailable storage
     }
-  }, [draftKey, medicines, tests, notes, confirmed, nurseCare, followUp]);
+  }, [draftKey, medicines, tests, notes, clinical, confirmed, nurseCare, followUp]);
   const clearDraft = () => {
     try {
       localStorage.removeItem(draftKey);
@@ -393,6 +409,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       const form = new FormData();
       form.append("data", JSON.stringify({
         doctorNotes: notes,
+        ...clinical,
         medicines: validMedicines,
         tests: validTests,
         nurseReferral: nurseCare.on
@@ -434,6 +451,22 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
   return (
     <div className="mt-3 bg-teal-50 border border-teal-100 rounded-xl p-4 space-y-3">
+      <div className="space-y-2">
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t("clinicalTitle")}</p>
+        {CLINICAL_KEYS.map((key) => (
+          <label key={key} className="block">
+            <span className="text-xs font-semibold text-slate-600">{t(`clinical.${key}`)}</span>
+            <textarea
+              rows={2}
+              className={`input-field resize-none mt-0.5${UPPERCASE_KEYS.includes(key) ? " uppercase" : ""}`}
+              placeholder={t("optional")}
+              value={clinical[key]}
+              onChange={(e) => setClinicalField(key, e)}
+            />
+          </label>
+        ))}
+      </div>
+
       <textarea
         rows={2}
         className="input-field resize-none"

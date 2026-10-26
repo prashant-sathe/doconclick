@@ -10,11 +10,15 @@
     "summary": "{rating} ({count} रिव्यू)"
   },
   "prescriptionDownload": {
+    "previewTitle": "प्रिस्क्रिप्शन",
+    "close": "बंद करें",
     "generating": "बन रहा है…",
     "download": "प्रिस्क्रिप्शन डाउनलोड करें",
     "failed": "PDF नहीं बन सका"
   },
   "receiptDownload": {
+    "previewTitle": "रसीद",
+    "close": "बंद करें",
     "generating": "बन रही है…",
     "download": "रसीद डाउनलोड करें",
     "short": "रसीद",

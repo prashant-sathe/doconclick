@@ -83,6 +83,7 @@ async function main() {
   };
   const full = {
     doctorNotes: "Viral fever. Rest and fluids.",
+    chiefComplaints: "Fever for 3 days", history: "No known allergies", examination: "Throat congested", findings: "temp 101 f", diagnosis: "viral fever",
     medicines: [
       { name: "Paracetamol 650", dosage: "1 tab", frequency: "Thrice a day", duration: "3 days", instructions: "After food" },
       { name: "  ", dosage: "dropped — no name" },
@@ -141,13 +142,14 @@ async function main() {
     check("complete with notes, items, 2 files and a referral → 200", r.status === 200 && r.json.status === "COMPLETED", `${r.status} ${r.json.error ?? ""}`);
     check("…COMPLETED with completedAt, cash marked PAID", done.status === "COMPLETED" && !!done.completedAt && done.paymentStatus === "PAID" && !!done.paidAt, `${done.status}/${done.paymentStatus}`);
     check("…notes saved", done.doctorNotes === full.doctorNotes, String(done.doctorNotes));
+    check("…clinical fields saved; findings + diagnosis upper-cased, the rest as typed", done.chiefComplaints === "Fever for 3 days" && done.history === "No known allergies" && done.examination === "Throat congested" && done.findings === "TEMP 101 F" && done.diagnosis === "VIRAL FEVER", `${done.findings}/${done.diagnosis}`);
     check("…2 medicines (blank row dropped) and 1 test", done.medicines.length === 2 && done.tests.length === 1 && done.medicines.some((m) => m.name === "Paracetamol 650" && m.instructions === "After food"), `${done.medicines.length}/${done.tests.length}`);
     check("…kept as prescription version 1", done.prescriptionVersions.length === 1 && done.prescriptionVersions[0].version === 1, `${done.prescriptionVersions.length}`);
     check("…2 files on S3, with their names", done.attachments.length === 2 && done.attachments.every((x) => x.url.startsWith("https://")) && done.attachments.some((x) => x.fileName === "report.pdf"), `${done.attachments.length}`);
     check("…nurse referral saved", done.referralGiven?.serviceId === service.id && done.referralGiven.visits === 3, `${done.referralGiven?.visits}`);
     check("…response carries the saved prescription", (r.json.medicines as unknown[])?.length === 2 && (r.json.attachments as unknown[])?.length === 2 && !("visitOtp" in r.json), "ok");
     const rx = await call(patient, "GET", `/api/appointments/${a.id}/prescription`);
-    check("patient can now open the prescription", rx.status === 200 && (rx.json.medicines as unknown[]).length === 2 && rx.json.doctorNotes === full.doctorNotes, `${rx.status}`);
+    check("patient can now open the prescription", rx.status === 200 && (rx.json.medicines as unknown[]).length === 2 && rx.json.doctorNotes === full.doctorNotes && rx.json.diagnosis === "VIRAL FEVER", `${rx.status}`);
     const ref = await call(patient, "GET", `/api/nurse-referrals/${done.referralGiven!.id}`);
     check("…and the referral is usable (consult completed)", ref.status === 200, `${ref.status} ${ref.json.error ?? ""}`);
 

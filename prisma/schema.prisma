@@ -486,6 +486,13 @@ model Appointment {
   settlement    Settlement? @relation(fields: [settlementId], references: [id])
   prescriptionUrl String? // deprecated — superseded by `attachments`; kept so existing data isn't dropped
   doctorNotes   String?
+  // Clinical record the doctor fills when completing the visit — all optional.
+  // findings + diagnosis are stored upper-case (src/lib/consultation.ts).
+  chiefComplaints String?
+  history         String?
+  examination     String?
+  findings        String?
+  diagnosis       String?
   travelStatus  String    @default("NOT_STARTED") // NOT_STARTED, ON_THE_WAY, ARRIVED
   // Where a HOME visit happens, copied from the booking — so editing the
   // profile address later never sends the doctor/nurse to the wrong house.

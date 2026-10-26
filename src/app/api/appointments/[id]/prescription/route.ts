@@ -78,6 +78,11 @@ export const GET = withErrorLocale(async function GET(
     // So the doctor can send it on WhatsApp — never needed by the patient themselves.
     ...(isOwnDoctor || isAdmin ? { patientMobile: appointment.patient.mobile } : {}),
     doctorNotes: appointment.doctorNotes,
+    chiefComplaints: appointment.chiefComplaints,
+    history: appointment.history,
+    examination: appointment.examination,
+    findings: appointment.findings,
+    diagnosis: appointment.diagnosis,
     doctorSignatureUrl: appointment.doctor.doctorProfile?.signatureUrl ?? null,
     medicines: appointment.medicines.map((m) => ({
       name: m.name,

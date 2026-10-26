@@ -1,11 +1,14 @@
 "use client";
-import { useState } from "react";
-import { Download, Loader2, AlertCircle } from "lucide-react";
-import type { PrescriptionData } from "./PrescriptionDocument";
+import { useEffect, useState } from "react";
+import { FileText } from "lucide-react";
+import PrescriptionDocument, { type PrescriptionData } from "./PrescriptionDocument";
+import DocumentPreviewModal from "@/components/DocumentPreviewModal";
 import { buildPrescriptionPdf, loadPrescription, prescriptionFileName } from "@/lib/prescriptionPdf";
 import { saveOrShareFile } from "@/lib/nativeDownload";
 import { useTranslations } from "next-intl";
 
+// "Download Prescription" opens the in-app preview; the PDF is downloaded
+// from there.
 export default function PrescriptionDownloadButton({
   appointmentId,
   patientId,
@@ -18,14 +21,26 @@ export default function PrescriptionDownloadButton({
   data?: PrescriptionData;
 }) {
   const t = useTranslations("patient.prescriptionDownload");
+  const [open, setOpen] = useState(false);
+  const [data, setData] = useState<PrescriptionData | null>(providedData ?? null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!open || data) return;
+    let cancelled = false;
+    loadPrescription(appointmentId)
+      .then((d) => { if (!cancelled) setData(d); })
+      .catch((e: Error) => { if (!cancelled) setLoadError(e.message); });
+    return () => { cancelled = true; };
+  }, [open, data, appointmentId]);
+
   const download = async () => {
+    if (!data) return;
     setBusy(true);
     setError(null);
     try {
-      const data = providedData ?? await loadPrescription(appointmentId);
       const pdf = await buildPrescriptionPdf(data, patientId);
       const fileName = prescriptionFileName(appointmentId);
       // `pdf.save()` is a no-op inside the Capacitor WebView — on native, write
@@ -40,23 +55,25 @@ export default function PrescriptionDownloadButton({
   };
 
   return (
-    <div className="flex flex-col items-start gap-1">
-      <button onClick={download} disabled={busy} className="btn-secondary py-2 px-3 text-xs">
-        {busy ? (
-          <>
-            <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t("generating")}
-          </>
-        ) : (
-          <>
-            <Download className="w-3.5 h-3.5" /> {t("download")}
-          </>
-        )}
+    <>
+      <button onClick={() => setOpen(true)} className="btn-secondary py-2 px-3 text-xs">
+        <FileText className="w-3.5 h-3.5" /> {t("download")}
       </button>
-      {error && (
-        <span className="text-xs text-red-500 flex items-center gap-1">
-          <AlertCircle className="w-3 h-3" /> {error}
-        </span>
+      {open && (
+        <DocumentPreviewModal
+          title={t("previewTitle")}
+          closeLabel={t("close")}
+          downloadLabel={t("download")}
+          generatingLabel={t("generating")}
+          loadError={loadError}
+          busy={busy}
+          error={error}
+          onClose={() => setOpen(false)}
+          onDownload={download}
+        >
+          {data && <PrescriptionDocument data={data} patientId={patientId} />}
+        </DocumentPreviewModal>
       )}
-    </div>
+    </>
   );
 }

@@ -10,11 +10,15 @@
     "summary": "{rating} ({count} रिव्ह्यू)"
   },
   "prescriptionDownload": {
+    "previewTitle": "प्रिस्क्रिप्शन",
+    "close": "बंद करा",
     "generating": "तयार होत आहे…",
     "download": "प्रिस्क्रिप्शन डाउनलोड करा",
     "failed": "PDF तयार करता आले नाही"
   },
   "receiptDownload": {
+    "previewTitle": "पावती",
+    "close": "बंद करा",
     "generating": "तयार होत आहे…",
     "download": "पावती डाउनलोड करा",
     "short": "पावती",

@@ -8,7 +8,7 @@ import { LIVE_LOCATION_CLEARED } from "@/lib/appointmentView";
 import { formatDoctorName } from "@/lib/utils";
 import {
   completionProblem, COMPLETABLE_WHERE, normalizePrescription, replacePrescription,
-  checkPrescriptionFiles, uploadPrescriptionFiles, discardPrescriptionFiles, parseReferral, parseFollowUp, NOTES_MAX, badRequest,
+  checkPrescriptionFiles, uploadPrescriptionFiles, discardPrescriptionFiles, parseReferral, parseFollowUp, parseClinicalFields, NOTES_MAX, badRequest,
   type ReferralInput, type FollowUpInput,
 } from "@/lib/consultation";
 import { withErrorLocale } from "@/lib/apiErrors";
@@ -24,7 +24,7 @@ class LostRaceError extends Error {}
 //
 // Body: multipart/form-data with a `data` field (JSON) and any number of
 // `file` parts — or plain JSON when there are no files:
-//   { doctorNotes?, medicines?, tests?, nurseReferral?: { serviceId, visits, intervalDays, instructions } | null,
+//   { doctorNotes?, chiefComplaints?, history?, examination?, findings?, diagnosis?, medicines?, tests?, nurseReferral?: { serviceId, visits, intervalDays, instructions } | null,
 //     followUp?: { date: "YYYY-MM-DD", note? } | null }
 // medicines/tests, when sent, replace the current lists (kept as a version).
 //
@@ -70,6 +70,9 @@ export const POST = withErrorLocale(async function POST(req: Request, { params }
   const notes = typeof data.doctorNotes === "string" ? data.doctorNotes.trim() : null;
   if (notes && notes.length > NOTES_MAX) return badRequest(`Keep the notes under ${NOTES_MAX} characters.`);
 
+  const clinical = parseClinicalFields(data);
+  if ("error" in clinical) return badRequest(clinical.error);
+
   const replaceItems = data.medicines !== undefined || data.tests !== undefined;
   const items = normalizePrescription(data.medicines, data.tests);
   if ("error" in items) return badRequest(items.error);
@@ -114,6 +117,7 @@ export const POST = withErrorLocale(async function POST(req: Request, { params }
           completedAt: new Date(),
           requestedScheduledAt: null,
           ...(notes !== null ? { doctorNotes: notes || null } : {}),
+          ...clinical.values,
           ...(followUp ? { ...followUp, followUpReminderSentAt: null } : {}),
           ...LIVE_LOCATION_CLEARED,
           // Cash is collected at the visit, so completing it is when it was paid.

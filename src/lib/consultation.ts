@@ -194,4 +194,26 @@ export async function parseFollowUp(raw: unknown, now: Date = new Date()): Promi
 
 export const NOTES_MAX = 5000;
 
+// The optional clinical record on a prescription. findings + diagnosis are
+// always stored in capitals (the form upper-cases as the doctor types; this
+// keeps API callers consistent).
+export const CLINICAL_FIELDS = ["chiefComplaints", "history", "examination", "findings", "diagnosis"] as const;
+export type ClinicalField = (typeof CLINICAL_FIELDS)[number];
+const UPPERCASE_FIELDS: ClinicalField[] = ["findings", "diagnosis"];
+
+// Fields absent from the body are left out (untouched); a sent blank clears.
+export function parseClinicalFields(data: Record<string, unknown>): { error: string } | { values: Partial<Record<ClinicalField, string | null>> } {
+  const values: Partial<Record<ClinicalField, string | null>> = {};
+  for (const f of CLINICAL_FIELDS) {
+    const v = data[f];
+    if (v === undefined) continue;
+    if (v !== null && typeof v !== "string") return { error: "Consultation details must be text." };
+    let text = (v ?? "").trim();
+    if (text.length > NOTES_MAX) return { error: `Keep each consultation detail under ${NOTES_MAX} characters.` };
+    if (UPPERCASE_FIELDS.includes(f)) text = text.toUpperCase();
+    values[f] = text || null;
+  }
+  return { values };
+}
+
 export const badRequest = (error: string, code?: string) => NextResponse.json({ error, ...(code ? { code } : {}) }, { status: 400 });

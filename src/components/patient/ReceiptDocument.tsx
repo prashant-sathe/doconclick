@@ -1,5 +1,4 @@
 "use client";
-import { Stethoscope } from "lucide-react";
 import type { ReceiptData, ReceiptPaymentMode } from "@/lib/receipts";
 
 // A4 @ 96dpi — same page as PrescriptionDocument.
@@ -9,7 +8,10 @@ const PAGE_H = 1123;
 const INK = "#0f172a";
 const MUTED = "#64748b";
 const BORDER = "#e2e8f0";
-const TEAL = "#14b8a6";
+// DocOnClick brand: primary-600 blue, accent-400 green, accent-500 dark green (see globals.css)
+const TEAL = "#1d8767";
+const GREEN = "#2bab85";
+const NAVY = "#1a489e";
 const SURFACE = "#f8fafc";
 
 const MODE_LABEL: Record<ReceiptPaymentMode, string> = {
@@ -58,25 +60,26 @@ export default function ReceiptDocument({ data }: { data: ReceiptData }) {
         background: "#ffffff",
         color: INK,
         fontFamily: "Arial, Helvetica, sans-serif",
-        padding: 40,
+        padding: "36px 40px 0",
         boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       {/* Supplier block + receipt id */}
-      <div style={{ borderBottom: `3px solid ${TEAL}`, paddingBottom: 18, marginBottom: 24 }}>
+      <div style={{ borderBottom: `4px solid ${GREEN}`, paddingBottom: 18, marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 20 }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 26, height: 26, borderRadius: 7, background: TEAL, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Stethoscope color="#ffffff" size={15} />
-              </div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: INK }}>{data.supplier.name}</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-icon.png" alt="DocOnClick" style={{ width: 52, height: 44, objectFit: "contain" }} />
+              <div style={{ fontSize: 22, fontWeight: 800, color: NAVY }}>{data.supplier.name}</div>
             </div>
             {data.supplier.address && <div style={{ fontSize: 12, color: MUTED, marginTop: 6, maxWidth: 380, whiteSpace: "pre-line" }}>{data.supplier.address}</div>}
             {data.supplier.gstin && <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginTop: 4 }}>GSTIN: {data.supplier.gstin}</div>}
           </div>
           <div style={{ textAlign: "right", flexShrink: 0 }}>
-            <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: 1 }}>PAYMENT RECEIPT</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: NAVY, letterSpacing: 1 }}>PAYMENT RECEIPT</div>
             <div style={{ fontSize: 11, color: MUTED, marginTop: 4 }}>Receipt No.: {data.receiptNo}</div>
             <div style={{ fontSize: 11, color: MUTED }}>Date: {istDate(data.issuedAt)}</div>
           </div>
@@ -180,15 +183,18 @@ export default function ReceiptDocument({ data }: { data: ReceiptData }) {
         {data.taxNote}
       </div>
 
+      <div style={{ flex: 1 }} />
+
       {/* Footer */}
-      <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 12, textAlign: "center" }}>
-        <div style={{ fontSize: 10, color: MUTED }}>
-          This is a computer-generated receipt from DocOnClick and does not require a signature.
-        </div>
-        <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, marginTop: 4 }}>
+      <div style={{ paddingBottom: 14 }}>
+        <div style={{ background: NAVY, color: "#ffffff", borderRadius: 18, padding: "8px 18px", fontSize: 12, fontWeight: 700, textAlign: "center" }}>
           DocOnClick · Your Health. Our Priority.
         </div>
+        <div style={{ fontSize: 9, color: MUTED, textAlign: "center", marginTop: 8 }}>
+          This is a computer-generated receipt from DocOnClick and does not require a signature.
+        </div>
       </div>
+      <div style={{ height: 10, background: GREEN, margin: "0 -40px" }} />
     </div>
   );
 }

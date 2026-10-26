@@ -1,5 +1,4 @@
 "use client";
-import { Stethoscope } from "lucide-react";
 import { formatDoctorName } from "@/lib/utils";
 
 export interface PrescriptionMedicineData {
@@ -33,6 +32,11 @@ export interface PrescriptionData {
   consultType?: string;
   patientMobile?: string;
   doctorNotes: string | null;
+  chiefComplaints?: string | null;
+  history?: string | null;
+  examination?: string | null;
+  findings?: string | null;
+  diagnosis?: string | null;
   doctorSignatureUrl: string | null;
   medicines: PrescriptionMedicineData[];
   tests: PrescriptionTestData[];
@@ -45,7 +49,10 @@ const PAGE_H = 1123;
 const INK = "#0f172a";
 const MUTED = "#64748b";
 const BORDER = "#e2e8f0";
-const TEAL = "#14b8a6";
+// DocOnClick brand: primary-600 blue, accent-400 green (see globals.css)
+const TEAL = "#1d8767";
+const GREEN = "#2bab85";
+const NAVY = "#1a489e";
 const SURFACE = "#f8fafc";
 
 function Watermark() {
@@ -98,10 +105,6 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Value({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 13, fontWeight: 600, color: INK, marginBottom: 8 }}>{children}</div>;
-}
-
 export default function PrescriptionDocument({
   data,
   patientId,
@@ -123,6 +126,29 @@ export default function PrescriptionDocument({
     timeZone: "Asia/Kolkata",
   });
 
+  // Qualification is stored as one string; the letterhead lists it a line at a time.
+  const qualLines = (data.doctorQualification ?? "")
+    .split(/[\n,]+/)
+    .map((q) => q.trim())
+    .filter(Boolean);
+  const patientFields: [string, string][] = [
+    ["Patient", displayName],
+    ["Age / Sex", ageGender || "—"],
+    ["Patient ID", ptId],
+    ["Date", formattedDate],
+    ["Rx ID", rxId],
+  ];
+
+  const clinicalRows = (
+    [
+      ["Chief Complaints", data.chiefComplaints],
+      ["History", data.history],
+      ["Examination", data.examination],
+      ["Findings", data.findings],
+      ["Diagnosis", data.diagnosis],
+    ] as [string, string | null | undefined][]
+  ).filter((r): r is [string, string] => !!r[1]?.trim());
+
   return (
     <div
       style={{
@@ -133,66 +159,70 @@ export default function PrescriptionDocument({
         fontFamily: "Arial, Helvetica, sans-serif",
         position: "relative",
         overflow: "hidden",
-        padding: 40,
         boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Watermark />
 
-      <div style={{ position: "relative", zIndex: 1 }}>
-        {/* Letterhead — the doctor's practice, with DocOnClick as the issuer */}
-        <div style={{ borderBottom: `3px solid ${TEAL}`, paddingBottom: 18, marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 20 }}>
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: INK }}>{data.clinicName || formatDoctorName(data.doctorName)}</div>
-              {data.clinicAddress && <div style={{ fontSize: 12, color: MUTED, marginTop: 3 }}>{data.clinicAddress}</div>}
-              <div style={{ fontSize: 13, fontWeight: 700, color: TEAL, marginTop: 8 }}>
-                {formatDoctorName(data.doctorName)}
-                {data.doctorQualification ? <span style={{ fontWeight: 600, color: INK }}>{` · ${data.doctorQualification}`}</span> : null}
-              </div>
-              <div style={{ fontSize: 11, color: MUTED, marginTop: 2 }}>
-                {data.doctorSpecialty}{` · Reg. No. ${data.doctorRegNo || "—"}`}
-              </div>
+      {/* Letterhead — practice on the left, doctor on the right, split by a thin rule */}
+      <div style={{ position: "relative", zIndex: 1, padding: "28px 40px 0" }}>
+        <div style={{ display: "flex", alignItems: "stretch", gap: 18, paddingBottom: 14 }}>
+          <div style={{ width: 190, flexShrink: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-icon.png" alt="DocOnClick" style={{ width: 60, height: 50, objectFit: "contain", marginBottom: 6 }} />
+            <div style={{ fontSize: 16, fontWeight: 800, color: NAVY, lineHeight: 1.2 }}>
+              {data.clinicName || formatDoctorName(data.doctorName)}
             </div>
-            <div style={{ textAlign: "right", flexShrink: 0 }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: 1 }}>PRESCRIPTION</div>
-              <div style={{ fontSize: 11, color: MUTED, marginTop: 4 }}>Prescription ID: {rxId}</div>
-              <div style={{ fontSize: 11, color: MUTED }}>Date: {formattedDate}</div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 5, marginTop: 8 }}>
-                <div style={{ width: 18, height: 18, borderRadius: 5, background: TEAL, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Stethoscope color="#ffffff" size={11} />
-                </div>
-                <span style={{ fontSize: 11, fontWeight: 700, color: MUTED }}>via DocOnClick</span>
-              </div>
-            </div>
+            <div style={{ fontSize: 9, fontWeight: 700, color: GREEN, marginTop: 4, letterSpacing: 0.4 }}>via DocOnClick</div>
           </div>
+          <div style={{ width: 1, background: BORDER, flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 26, fontWeight: 800, color: INK, lineHeight: 1.15 }}>{formatDoctorName(data.doctorName)}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: GREEN, marginTop: 3 }}>{data.doctorSpecialty}</div>
+            <div style={{ fontSize: 11, color: INK, marginTop: 4, lineHeight: 1.45 }}>
+              {qualLines.map((q, i) => (
+                <div key={i}>{q}</div>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: MUTED, marginTop: 3 }}>Reg. No. {data.doctorRegNo || "—"}</div>
+          </div>
+        </div>
+      </div>
+      <div style={{ position: "relative", zIndex: 1, height: 4, background: GREEN }} />
+
+      <div style={{ position: "relative", zIndex: 1, padding: "16px 40px 0", flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* Patient details — one full-width row */}
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            border: `1px solid ${GREEN}`,
+            borderRadius: 8,
+            padding: "10px 14px",
+            marginBottom: 22,
+          }}
+        >
+          {patientFields.map(([label, value], i) => (
+            <div key={label} style={{ flex: i === 0 ? 2 : 1, minWidth: 0 }}>
+              <Label>{label}</Label>
+              <div style={{ fontSize: 13, fontWeight: 700, color: INK, wordBreak: "break-word" }}>{value}</div>
+            </div>
+          ))}
         </div>
 
-        {/* Patient / Doctor boxes */}
-        <div style={{ display: "flex", gap: 20, marginBottom: 24 }}>
-          <div style={{ flex: 1, border: `1px solid ${BORDER}`, borderRadius: 10, padding: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: TEAL, marginBottom: 10 }}>Patient Details</div>
-            <Label>Name</Label>
-            <Value>{displayName}</Value>
-            <Label>Age / Gender</Label>
-            <Value>{ageGender || "—"}</Value>
-            <Label>Address</Label>
-            <Value>{data.patientAddress || "—"}</Value>
-            <Label>Patient ID</Label>
-            <div style={{ fontSize: 13, fontWeight: 600, color: INK }}>{ptId}</div>
+        {/* Clinical record — only the fields the doctor filled in */}
+        {clinicalRows.length > 0 && (
+          <div style={{ marginBottom: 22 }}>
+            {clinicalRows.map(([label, value]) => (
+              <div key={label} style={{ display: "flex", gap: 10, padding: "5px 0", borderBottom: `1px dashed ${BORDER}` }}>
+                <div style={{ width: 120, flexShrink: 0, fontSize: 11, fontWeight: 700, color: NAVY, textTransform: "uppercase", letterSpacing: 0.4 }}>{label}</div>
+                <div style={{ flex: 1, fontSize: 12.5, color: INK, lineHeight: 1.5, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{value}</div>
+              </div>
+            ))}
           </div>
-          <div style={{ flex: 1, border: `1px solid ${BORDER}`, borderRadius: 10, padding: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: TEAL, marginBottom: 10 }}>Doctor Details</div>
-            <Label>Name</Label>
-            <Value>{formatDoctorName(data.doctorName)}</Value>
-            <Label>Qualification</Label>
-            <Value>{data.doctorQualification || "—"}</Value>
-            <Label>Reg. No.</Label>
-            <Value>{data.doctorRegNo || "—"}</Value>
-            <Label>Specialization</Label>
-            <div style={{ fontSize: 13, fontWeight: 600, color: INK }}>{data.doctorSpecialty}</div>
-          </div>
-        </div>
+        )}
 
         {/* Rx list */}
         <div style={{ marginBottom: 24 }}>
@@ -256,16 +286,23 @@ export default function PrescriptionDocument({
           </div>
         </div>
 
-        {/* Footer */}
-        <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 12, textAlign: "center" }}>
-          <div style={{ fontSize: 10, color: MUTED }}>
-            This is a digitally generated prescription from DocOnClick and does not require a physical signature.
-          </div>
-          <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, marginTop: 4 }}>
-            Watermarked by DocOnClick · Your Health. Our Priority.
-          </div>
+        <div style={{ flex: 1 }} />
+      </div>
+
+      {/* Footer — visit location, pinned to the foot of the page */}
+      <div style={{ position: "relative", zIndex: 1, padding: "0 40px 14px" }}>
+        <div style={{ background: NAVY, color: "#ffffff", borderRadius: 18, padding: "8px 18px", fontSize: 12, fontWeight: 700, textAlign: "center" }}>
+          {data.clinicName || formatDoctorName(data.doctorName)}
+          {data.consultType ? ` · ${data.consultType === "CLINIC" ? "Clinic visit" : data.consultType === "VIDEO" ? "Video consultation" : "Home visit"}` : ""}
+        </div>
+        {data.clinicAddress && (
+          <div style={{ fontSize: 11, color: INK, textAlign: "center", marginTop: 8 }}>{data.clinicAddress}</div>
+        )}
+        <div style={{ fontSize: 9, color: MUTED, textAlign: "center", marginTop: 6 }}>
+          Digitally generated prescription via DocOnClick — no physical signature required.
         </div>
       </div>
+      <div style={{ position: "relative", zIndex: 1, height: 10, background: GREEN }} />
     </div>
   );
 }
