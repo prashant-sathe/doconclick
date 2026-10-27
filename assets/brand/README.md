@@ -3,9 +3,12 @@
 The DocOnClick logo: a rounded **plus with a heart** (the mark) and the
 **Doc·On·Click** wordmark, with a plus inside the "O" of "On".
 
-These files are the source of truth for marketing images, store listings and
-any future in-app or website logo update. The app and website still use the
-older logo in `public/` and `assets/icon-*.png` — they are not switched over yet.
+These files are the source of truth for the logo everywhere: the website and
+app (`public/logo.png`, `logo-dark.png`, `logo-icon.png`, `public/icons/`),
+favicons (`src/app/favicon.ico`, `icon.png`, `apple-icon.png`), receipts,
+prescriptions and the doctor QR poster (which use those `public/` files), the
+native app icons/splash, and marketing images. After changing the logo, copy
+the new PNGs to those places — see "Updating the app" below.
 
 ## Which file to use
 
@@ -45,6 +48,31 @@ use. Use the same family for headlines in marketing material.
 - Don't recolour, stretch, rotate or add effects; use the `-dark` versions on
   dark backgrounds instead of placing the light logo there.
 - Minimum size: horizontal logo 120 px wide on screen; below that use the mark.
+
+## Updating the app
+
+| Brand file | Copy to |
+|---|---|
+| `png/logo/logo-horizontal-1200.png` | `public/logo.png` |
+| `png/logo/logo-horizontal-dark-1200.png` | `public/logo-dark.png` |
+| `png/mark/mark-512.png` | `public/logo-icon.png` |
+| `png/app-icon/app-icon-192.png`, `-512.png` | `public/icons/` (PWA manifest) |
+| `png/favicon/favicon.ico`, `favicon-512.png` | `src/app/favicon.ico`, `src/app/icon.png` |
+| `png/app-icon/app-icon-180.png` | `src/app/apple-icon.png` |
+| `png/app-icon/app-icon-1024.png` | `assets/icon-only.png` |
+| `png/native/icon-foreground-1024.png`, `icon-background-1024.png` | `assets/icon-foreground.png`, `assets/icon-background.png` |
+| `png/native/splash-2732.png` | `assets/splash.png` |
+| `png/native/notification-{24,36,48,72,96}.png` | `android/app/src/main/res/drawable-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/ic_stat_notify.png` |
+
+Then regenerate the Android/iOS launcher icons and splash from `assets/`:
+
+```sh
+npx @capacitor/assets@3.0.5 generate --android --ios --splashBackgroundColor "#F8FAFC"
+git checkout android/app/src/main/AndroidManifest.xml   # the tool only reformats it
+```
+
+The in-app splash (shown after the plain native one) is the image uploaded in
+Admin → Settings, stored outside the repo; re-upload it when the logo changes.
 
 ## Regenerating
 

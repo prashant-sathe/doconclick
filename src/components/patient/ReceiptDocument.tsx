@@ -72,7 +72,7 @@ export default function ReceiptDocument({ data }: { data: ReceiptData }) {
           <div style={{ minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-icon.png" alt="DocOnClick" style={{ width: 52, height: 44, objectFit: "contain" }} />
+              <img src="/logo-icon.png" alt="DocOnClick" style={{ width: 46, height: 46, objectFit: "contain" }} />
               <div style={{ fontSize: 22, fontWeight: 800, color: NAVY }}>{data.supplier.name}</div>
             </div>
             {data.supplier.address && <div style={{ fontSize: 12, color: MUTED, marginTop: 6, maxWidth: 380, whiteSpace: "pre-line" }}>{data.supplier.address}</div>}

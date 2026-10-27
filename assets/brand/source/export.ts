@@ -17,9 +17,17 @@ const JOBS: [string, string, number[]][] = [
   ["logo-stacked-dark", "logo", [600, 1200, 2400]],
   ["mark", "mark", [256, 512, 1024, 2048]],
   ["mark-white", "mark", [256, 512, 1024, 2048]],
-  ["app-icon", "app-icon", [192, 512, 1024]],
+  ["app-icon", "app-icon", [180, 192, 512, 1024]],
   ["favicon", "favicon", [16, 32, 48, 180, 192, 512]],
+  // Native app sources: assets/ (for @capacitor/assets) and the Android
+  // status-bar icon at mdpi..xxxhdpi.
+  ["native/icon-background", "native", [1024]],
+  ["native/icon-foreground", "native", [1024]],
+  ["native/splash", "native", [2732]],
+  ["native/notification", "native", [24, 36, 48, 72, 96]],
 ];
+// Full-bleed squares with no transparency.
+const OPAQUE = new Set(["app-icon", "native/icon-background", "native/splash"]);
 
 // ICO with embedded PNG images (supported by every current browser).
 function ico(pngs: Buffer[], sizes: number[]) {
@@ -47,9 +55,8 @@ function ico(pngs: Buffer[], sizes: number[]) {
       const page = await browser.newPage({ viewport: { width: w, height: h } });
       const sized = svg.replace(/width="[\d.]+" height="[\d.]+"/, `width="${w}" height="${h}"`);
       await page.setContent(`<html><body style="margin:0;background:transparent">${sized}</body></html>`);
-      const out = path.join(PNG, folder, `${name}-${w}.png`);
-      // App icons are full-bleed squares; everything else keeps transparency.
-      await page.screenshot({ path: out, omitBackground: name !== "app-icon" });
+      const out = path.join(PNG, folder, `${path.basename(name)}-${w}.png`);
+      await page.screenshot({ path: out, omitBackground: !OPAQUE.has(name) });
       await page.close();
       console.log(path.relative(BRAND, out));
     }

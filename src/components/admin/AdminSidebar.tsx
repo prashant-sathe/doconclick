@@ -76,7 +76,7 @@ function SidebarContents({ pathname, user, logout, onNavigate, inboxUnread }: {
     <>
       <div className="px-6 py-5 border-b border-slate-200/70">
         <div className="flex items-center gap-2.5">
-          <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-9 h-9 object-contain" />
+          <Image src="/logo-icon.png" alt="DocOnClick" width={512} height={512} className="w-9 h-9 object-contain" />
           <div>
             <div className="font-bold text-slate-900 leading-tight">DocOnClick</div>
             <div className="text-xs text-slate-400 font-medium">Admin Panel</div>
@@ -143,7 +143,7 @@ export default function AdminSidebar() {
         >
           <Menu className="w-5 h-5" />
         </button>
-        <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-6 h-6 object-contain flex-shrink-0" />
+        <Image src="/logo-icon.png" alt="DocOnClick" width={512} height={512} className="w-6 h-6 object-contain flex-shrink-0" />
         <span className="font-bold text-slate-900 text-sm truncate flex-1">Admin Panel</span>
         <InboxButton />
       </header>

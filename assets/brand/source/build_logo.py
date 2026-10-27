@@ -133,6 +133,38 @@ def app_icon(mark):
 def favicon(mark):
     return svg(1024, 1024, f'<rect width="1024" height="1024" rx="230" fill="url(#tile)"/><g transform="translate(512 512) scale(.68) translate(-512 -512)">{mark(True)}</g>')
 
+# Native app sources (assets/brand/native -> assets/ for @capacitor/assets).
+SPLASH_BG = "#F8FAFC"  # = splashBackground in android colors.xml / Capacitor SplashScreen
+
+def app_icon_background():
+    return svg(1024, 1024, '<rect width="1024" height="1024" fill="url(#tile)"/>')
+
+def app_icon_foreground(mark):
+    # Android adaptive foreground, same placement as app_icon() so the
+    # composed launcher icon matches the store icon.
+    return svg(1024, 1024, f'<g transform="translate(512 512) scale(.6) translate(-512 -512)">{mark(True)}</g>')
+
+def notification_icon():
+    # Status-bar icon: one flat white silhouette (Android tints it) — the plus
+    # with the heart cut out. Kept inside the 20/24 dp live area.
+    a, b = 512 - 150, 512 + 150
+    plus = (f'<rect x="{a}" y="102" width="300" height="820" rx="112" fill="#fff"/>'
+            f'<rect x="102" y="{a}" width="820" height="300" rx="112" fill="#fff"/>')
+    heart = f'<g transform="translate(512 512) scale(.42) translate(-512 -524)"><path d="{HEART}" fill="#000"/></g>'
+    body = (f'<mask id="m"><g transform="translate(512 512) scale(.9) translate(-512 -512)">{plus}{heart}</g></mask>'
+            f'<rect width="1024" height="1024" fill="#fff" mask="url(#m)"/>')
+    return svg(1024, 1024, body)
+
+def splash(mark):
+    # 2732 square; @capacitor/assets centre-crops it for every screen, so the
+    # logo stays inside the middle ~1100 px.
+    inner = lockup_v(mark)
+    vw, vh = (float(v) for v in inner.split('viewBox="0 0 ')[1].split('"')[0].split())
+    w = 1000
+    h = w * vh / vw
+    body = inner.split("</defs>", 1)[1].rsplit("</svg>", 1)[0]
+    return svg(2732, 2732, f'<g transform="translate({(2732-w)/2:.1f} {(2732-h)/2:.1f}) scale({w/vw:.4f})">{body}</g>', bg=SPLASH_BG)
+
 for name, m in MARKS.items():
     d = OUT
     files = {
@@ -144,7 +176,12 @@ for name, m in MARKS.items():
         "logo-stacked-dark.svg": lockup_v(m, True),
         "app-icon.svg": app_icon(m),
         "favicon.svg": favicon(m),
+        "native/icon-background.svg": app_icon_background(),
+        "native/icon-foreground.svg": app_icon_foreground(m),
+        "native/notification.svg": notification_icon(),
+        "native/splash.svg": splash(m),
     }
+    os.makedirs(os.path.join(d, "native"), exist_ok=True)
     for fn, s in files.items():
         open(os.path.join(d, fn), "w").write(s)
     print("\n".join(sorted(files)))

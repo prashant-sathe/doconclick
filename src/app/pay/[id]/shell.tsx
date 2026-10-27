@@ -24,7 +24,7 @@ export interface GuestBill {
 export function PayShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen gradient-surface flex flex-col items-center justify-center px-4 py-10 safe-screen">
-      <Image src="/logo.png" alt="DocOnClick" width={431} height={102} className="h-8 w-auto object-contain mb-8" priority />
+      <Image src="/logo.png" alt="DocOnClick" width={1200} height={242} className="h-8 w-auto object-contain mb-8" priority />
       <div className="w-full max-w-md">{children}</div>
     </div>
   );

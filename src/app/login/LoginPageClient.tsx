@@ -71,7 +71,7 @@ function LoginForm() {
     <div className="w-full max-w-md mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-16 h-16 object-contain mx-auto mb-4" loading="eager" />
+        <Image src="/logo-icon.png" alt="DocOnClick" width={512} height={512} className="w-16 h-16 object-contain mx-auto mb-4" loading="eager" />
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t("title")}</h1>
         <p className="text-slate-500 mt-2 text-sm">{t("subtitle")}</p>
       </div>
@@ -202,7 +202,12 @@ export default function LoginPageClient() {
   useEffect(() => setNative(isNative()), []);
 
   return (
-    <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
+    // Extra top padding keeps the logo clear of the fixed Home / language bar
+    // when the centred form is taller than a phone screen.
+    <div
+      className="min-h-screen gradient-surface flex items-center justify-center safe-screen"
+      style={{ paddingTop: "calc(4.5rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
+    >
       {!native && (
         <div className="fixed top-5 left-6">
           <Link href="/" className="btn-ghost gap-1.5 text-sm">← {tc("home")}</Link>

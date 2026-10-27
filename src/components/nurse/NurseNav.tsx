@@ -34,7 +34,7 @@ export function NurseHeader() {
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <Link href="/nurse/dashboard" className="flex items-center flex-shrink-0">
-          <Image src="/logo.png" alt="DocOnClick" width={431} height={102} className="h-7 sm:h-8 w-auto object-contain" />
+          <Image src="/logo.png" alt="DocOnClick" width={1200} height={242} className="h-7 sm:h-8 w-auto object-contain" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">

@@ -28,28 +28,31 @@ export default function BookingQRPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const buildCanvas = (): Promise<HTMLCanvasElement> =>
-    new Promise((resolve, reject) => {
-      if (!qrDataUrl || !user) { reject(new Error("QR not ready")); return; }
-      const W = 420, H = 560, QR_SIZE = 300, QR_Y = 155;
-      const canvas = document.createElement("canvas");
-      canvas.width = W; canvas.height = H;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) { reject(new Error("Canvas not supported")); return; }
-      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H); ctx.textAlign = "center";
-      ctx.fillStyle = "#0d9488"; ctx.font = "bold 28px Arial, sans-serif"; ctx.fillText("DocOnClick", W / 2, 50);
-      ctx.fillStyle = "#0f172a"; ctx.font = "bold 24px Arial, sans-serif"; ctx.fillText(formatDoctorName(user.name), W / 2, 95);
-      if (profile?.specialty) { ctx.fillStyle = "#64748b"; ctx.font = "16px Arial, sans-serif"; ctx.fillText(String(profile.specialty), W / 2, 122); }
+  const loadImage = (src: string) =>
+    new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, (W - QR_SIZE) / 2, QR_Y, QR_SIZE, QR_SIZE);
-        ctx.fillStyle = "#475569"; ctx.font = "16px Arial, sans-serif";
-        ctx.fillText(t("scanToBook"), W / 2, QR_Y + QR_SIZE + 35);
-        resolve(canvas);
-      };
-      img.onerror = () => reject(new Error("Failed to load QR image"));
-      img.src = qrDataUrl;
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error(`Failed to load ${src.slice(0, 40)}`));
+      img.src = src;
     });
+
+  const buildCanvas = async (): Promise<HTMLCanvasElement> => {
+    if (!qrDataUrl || !user) throw new Error("QR not ready");
+    const W = 420, H = 560, QR_SIZE = 300, QR_Y = 155, LOGO_W = 220;
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas not supported");
+    const [logo, qr] = await Promise.all([loadImage("/logo.png"), loadImage(qrDataUrl)]);
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H); ctx.textAlign = "center";
+    ctx.drawImage(logo, (W - LOGO_W) / 2, 16, LOGO_W, (LOGO_W * logo.naturalHeight) / logo.naturalWidth);
+    ctx.fillStyle = "#0f172a"; ctx.font = "bold 24px Arial, sans-serif"; ctx.fillText(formatDoctorName(user.name), W / 2, 95);
+    if (profile?.specialty) { ctx.fillStyle = "#64748b"; ctx.font = "16px Arial, sans-serif"; ctx.fillText(String(profile.specialty), W / 2, 122); }
+    ctx.drawImage(qr, (W - QR_SIZE) / 2, QR_Y, QR_SIZE, QR_SIZE);
+    ctx.fillStyle = "#475569"; ctx.font = "16px Arial, sans-serif";
+    ctx.fillText(t("scanToBook"), W / 2, QR_Y + QR_SIZE + 35);
+    return canvas;
+  };
 
   const triggerDownload = (href: string, filename: string) => {
     const a = document.createElement("a");

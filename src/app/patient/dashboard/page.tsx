@@ -1047,7 +1047,7 @@ function PatientDashboardInner() {
         className="glass-card rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 pointer-events-auto shadow-lg min-w-0 text-left"
       >
         <div className="min-w-0">
-          <Image src="/logo.png" alt="DocOnClick" width={431} height={102} className="h-6 sm:h-7 w-auto object-contain" />
+          <Image src="/logo.png" alt="DocOnClick" width={1200} height={242} className="h-6 sm:h-7 w-auto object-contain" />
           <p className={cn("text-xs mt-0.5 truncate", customLabel ? "text-blue-600 font-semibold" : "text-slate-500")}>
             {customLabel ? `📍 ${customLabel}` : posError ? `📍 ${td("setYourLocation")}` : `📍 ${td("yourLocationChange")}`}
           </p>

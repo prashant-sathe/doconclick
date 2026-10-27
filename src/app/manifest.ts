@@ -11,7 +11,11 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#ffffff",
     theme_color: "#235dc7",
     icons: [
-      { src: "/logo-icon.png", sizes: "110x92", type: "image/png" },
+      // Full-bleed brand tile with the mark in the safe zone, so the same
+      // file works as a regular and a maskable (Android-shaped) icon.
+      { src: "/icons/app-icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icons/app-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icons/app-icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }

@@ -171,7 +171,7 @@ export default function PrescriptionDocument({
         <div style={{ display: "flex", alignItems: "stretch", gap: 18, paddingBottom: 14 }}>
           <div style={{ width: 190, flexShrink: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="DocOnClick" style={{ width: 60, height: 50, objectFit: "contain", marginBottom: 6 }} />
+            <img src="/logo-icon.png" alt="DocOnClick" style={{ width: 54, height: 54, objectFit: "contain", marginBottom: 6 }} />
             <div style={{ fontSize: 16, fontWeight: 800, color: NAVY, lineHeight: 1.2 }}>
               {data.clinicName || formatDoctorName(data.doctorName)}
             </div>

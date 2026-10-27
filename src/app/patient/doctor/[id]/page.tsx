@@ -82,7 +82,7 @@ function Header() {
     <header className="safe-top sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <Link href="/" className="tap-44-y flex items-center gap-2">
-          <Image src="/logo-icon.png" alt="DocOnClick" width={110} height={92} className="w-8 h-8 object-contain" />
+          <Image src="/logo-icon.png" alt="DocOnClick" width={512} height={512} className="w-8 h-8 object-contain" />
           <span className="font-extrabold text-slate-900">DocOnClick</span>
         </Link>
         <Link href={user ? "/patient/dashboard" : `/login?next=${encodeURIComponent(`/patient/doctor/${id}`)}`} className="tap-44-y btn-secondary py-2 px-3.5 text-sm">
