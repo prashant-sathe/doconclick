@@ -100,6 +100,8 @@ export default function NurseDashboardPage() {
   const startJourney = async (id: string, acknowledgeUnpaid = false) => {
     setBusyId(id); setError("");
     try {
+      // Play policy: explain background location before the OS prompt.
+      if (!(await journey.ensureDisclosure())) { fail(t("locationNeeded")); return false; }
       const pos = await getCurrentPositionCompat({ enableHighAccuracy: true });
       const res = await fetch(`/api/appointments/${id}/travel`, {
         method: "PATCH",

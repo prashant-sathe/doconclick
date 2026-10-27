@@ -1034,6 +1034,11 @@ export default function DoctorDashboard() {
     setStartingJourneyId(apptId);
     setJourneyError(null);
     try {
+      // Play policy: explain background location before the OS prompt.
+      if (!(await journey.ensureDisclosure())) {
+        setJourneyError({ id: apptId, message: t("locationNeeded") });
+        return;
+      }
       const pos = await getCurrentPositionCompat({ enableHighAccuracy: true });
       const res = await fetch(`/api/appointments/${apptId}/travel`, {
         method: "PATCH",

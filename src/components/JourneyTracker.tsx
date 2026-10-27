@@ -2,6 +2,9 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { isNative } from "@/lib/platform";
+import { MapPin } from "lucide-react";
+import { useTranslations } from "next-intl";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib/backgroundLocation";
 
 // Owns the live-location watcher for a doctor's/nurse's home-visit journey.
@@ -16,6 +19,13 @@ import { startBackgroundLocationWatch, stopBackgroundLocationWatch } from "@/lib
 
 const SEND_EVERY_MS = 10_000; // ~1 position update / 10s
 
+// Play Store "prominent disclosure": before the first OS location prompt the
+// app must say, in its own UI, that location is also used in the background.
+const DISCLOSURE_KEY = "doconclick.bgLocationDisclosure.v1";
+const disclosureAccepted = () => {
+  try { return localStorage.getItem(DISCLOSURE_KEY) === "1"; } catch { return false; }
+};
+
 type JourneyTrackerContextType = {
   /** The visit whose journey is being shared right now, if any. */
   activeId: string | null;
@@ -27,16 +37,26 @@ type JourneyTrackerContextType = {
   track: (appointmentId: string, opts?: { justSent?: boolean }) => Promise<void>;
   /** Stop sharing location (before "arrived" / "stop journey"). */
   stop: () => Promise<void>;
+  /**
+   * Native only: show the background-location disclosure (once) and resolve
+   * true when accepted. Call before anything that triggers the OS location
+   * prompt. Resolves true straight away on web or if already accepted.
+   */
+  ensureDisclosure: () => Promise<boolean>;
 };
 
 const JourneyTrackerContext = createContext<JourneyTrackerContextType>({
   activeId: null,
   track: async () => {},
   stop: async () => {},
+  ensureDisclosure: async () => true,
 });
 
 export function JourneyTrackerProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
+  const t = useTranslations("shared.journeyDisclosure");
+  const [disclosureOpen, setDisclosureOpen] = useState(false);
+  const disclosureResolveRef = useRef<((ok: boolean) => void) | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const activeRef = useRef<string | null>(null);
   const webWatchRef = useRef<number | null>(null);
@@ -64,8 +84,25 @@ export function JourneyTrackerProvider({ children }: { children: React.ReactNode
     await clearWatch();
   }, [clearWatch]);
 
+  const ensureDisclosure = useCallback((): Promise<boolean> => {
+    if (!isNative() || disclosureAccepted()) return Promise.resolve(true);
+    disclosureResolveRef.current?.(false);
+    return new Promise<boolean>((resolve) => {
+      disclosureResolveRef.current = resolve;
+      setDisclosureOpen(true);
+    });
+  }, []);
+
+  const answerDisclosure = (ok: boolean) => {
+    if (ok) { try { localStorage.setItem(DISCLOSURE_KEY, "1"); } catch {} }
+    setDisclosureOpen(false);
+    disclosureResolveRef.current?.(ok);
+    disclosureResolveRef.current = null;
+  };
+
   const track = useCallback(async (appointmentId: string, opts: { justSent?: boolean } = {}) => {
     if (activeRef.current === appointmentId) return;
+    if (!(await ensureDisclosure())) return;
     // One journey at a time — and the native helper ignores a second
     // addWatcher, so always clear the old one first.
     await clearWatch();
@@ -110,7 +147,7 @@ export function JourneyTrackerProvider({ children }: { children: React.ReactNode
         { enableHighAccuracy: true }
       );
     }
-  }, [clearWatch, stop]);
+  }, [clearWatch, stop, ensureDisclosure]);
 
   // Resume a journey that's already under way.
   const isProvider = user?.role === "DOCTOR" || user?.role === "NURSE";
@@ -133,8 +170,19 @@ export function JourneyTrackerProvider({ children }: { children: React.ReactNode
   }, [isProvider, stop]);
 
   return (
-    <JourneyTrackerContext.Provider value={{ activeId, track, stop }}>
+    <JourneyTrackerContext.Provider value={{ activeId, track, stop, ensureDisclosure }}>
       {children}
+      {disclosureOpen && (
+        <ConfirmDialog
+          icon={MapPin}
+          title={t("title")}
+          message={t("message")}
+          confirmLabel={t("agree")}
+          cancelLabel={t("decline")}
+          onConfirm={() => answerDisclosure(true)}
+          onCancel={() => answerDisclosure(false)}
+        />
+      )}
     </JourneyTrackerContext.Provider>
   );
 }

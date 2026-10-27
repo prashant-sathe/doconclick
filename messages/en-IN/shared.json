@@ -243,5 +243,11 @@
     "waPatient": "Book doctors on DocOnClick — clinic, home and video visits. Join with my link: {link}",
     "waDoctor": "Join DocOnClick as a doctor and get patients for clinic, home and video visits. Sign up with my link: {link}",
     "waNurse": "Join DocOnClick as a nurse and get home-visit bookings. Sign up with my link: {link}"
+  },
+  "journeyDisclosure": {
+    "title": "Location sharing during your visit",
+    "message": "When you tap Start journey, DocOnClick shares your live location with the patient so they can see when you will arrive. This continues even when the app is closed or your screen is locked, and a \"Sharing your location\" notification stays visible. Sharing stops when you mark Arrived or stop the journey. Your location is used only for this and is not sold or used for ads.",
+    "agree": "Agree and continue",
+    "decline": "No thanks"
   }
 }
