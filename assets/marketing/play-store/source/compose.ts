@@ -1,8 +1,8 @@
-// Composes Play Store screenshots (phone 1080x1920, tablet 1600x2560) and the
-// 1024x500 feature graphic from the raw captures that capture.ts writes to the
+// Composes Play Store screenshots (phone 1080x1920, tablet 1600x2560, 10-inch
+// tablet 2560x1440 landscape) and the 1024x500 feature graphic from the raw captures that capture.ts writes to the
 // gitignored .pipeline/playstore/raw/<kind>/. Output goes to
 // assets/marketing/play-store/ (override with PLAYSTORE_OUT=<dir>).
-//   npx tsx assets/marketing/play-store/source/compose.ts [phone|tablet|feature|all]
+//   npx tsx assets/marketing/play-store/source/compose.ts [phone|tablet|tablet10|feature|all]
 import fs from "node:fs";
 import path from "node:path";
 import { chromium } from "playwright";
@@ -89,6 +89,54 @@ ${kind === "tablet" ? `.cam{position:absolute;left:50%;top:${T.bez / 2}px;width:
 </div></body></html>`;
 }
 
+// 10-inch tablet, landscape 16:9 (Play Console wants 16:9 or 9:16): copy on the
+// left, a landscape tablet on the right.
+function pageLandscape(s: Slide) {
+  const W = 2560, H = 1440, SCR_W = 1360, BEZ = 30, RAD = 56, SBAR = 34;
+  const shot = path.join(RAW, "tablet10", `${s.shot}.png`);
+  const font = s.deva ? `'Outfit','Noto Sans Devanagari',sans-serif` : `'Outfit',sans-serif`;
+  return `<!doctype html><html><head>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@500;700;800&display=block" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:${W}px;height:${H}px;overflow:hidden;position:relative;font-family:'Outfit','Noto Sans Devanagari',sans-serif;
+  background:linear-gradient(115deg,#e9f6f0 0%,#f4faf8 40%,#ffffff 65%,#eef4fb 100%)}
+.blob{position:absolute;border-radius:50%}
+.b1{width:1500px;height:1500px;left:-700px;top:300px;background:radial-gradient(circle at 60% 40%,#d6efe5 0%,#e4f5ee 55%,rgba(228,245,238,0) 72%)}
+.b2{width:1300px;height:1300px;right:-380px;top:-420px;background:radial-gradient(circle,#dbe6f7 0%,rgba(219,230,247,0) 70%)}
+.heart{position:absolute;width:560px;height:560px;left:620px;top:-150px;opacity:.06;transform:rotate(12deg)}
+.heart2{position:absolute;width:320px;height:320px;left:-80px;bottom:-60px;opacity:.05;transform:rotate(-14deg)}
+.dots{position:absolute;left:120px;top:1080px;width:260px;height:200px;
+  background-image:radial-gradient(#9fd8c1 3px,transparent 3.2px);background-size:40px 40px;opacity:.7}
+.left{position:absolute;left:150px;top:0;bottom:0;width:820px;display:flex;flex-direction:column;justify-content:center;z-index:2}
+.brand{display:block;width:560px;height:auto}
+h1{margin-top:64px;font-family:${font};font-weight:800;font-size:112px;line-height:1.08;letter-spacing:-2px}
+h1 .a{color:${NAVY};display:block} h1 .c{color:${GREEN};display:block}
+.sub{margin-top:40px;max-width:760px;font-family:${font};font-size:46px;line-height:1.32;color:${NAVY};font-weight:400}
+.devL{position:absolute;right:100px;top:50%;transform:translateY(-50%);z-index:2;padding:${BEZ}px;border-radius:${RAD}px;
+  background:linear-gradient(145deg,#3a4049,#14171b 40%,#2b3037 75%,#0e1013);
+  box-shadow:0 0 0 4px #5b626c inset,0 70px 140px rgba(15,42,92,.28),0 18px 36px rgba(15,42,92,.18)}
+.cam{position:absolute;left:${BEZ / 2}px;top:50%;width:10px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 35%,#3b4a63,#05070a 60%)}
+.scr{position:relative;width:${SCR_W}px;border-radius:${RAD - BEZ}px;overflow:hidden;background:#fff}
+.sbar{height:${SBAR}px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-family:'Outfit';font-weight:600;font-size:16px;color:#111;background:#fff}
+.sbar .ic{height:13px}
+.scr img{display:block;width:100%}
+</style></head><body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="dots"></div>
+<img class="heart" src="${MARK}"><img class="heart2" src="${MARK}">
+<div class="left">
+  <img class="brand" src="${LOGO}" alt="DocOnClick">
+  <h1><span class="a">${s.l1}</span><span class="c">${s.l2}</span></h1>
+  <div class="sub">${s.sub}</div>
+</div>
+<div class="devL"><div class="cam"></div>
+  <div class="scr">
+    <div class="sbar"><span>9:41</span><span class="ic">${STATUS_ICONS}</span></div>
+    <img src="${b64(shot)}">
+  </div>
+</div></body></html>`;
+}
+
 function feature() {
   const shot = b64(path.join(RAW, "phone", "patient_patient_book.png"));
   const map = b64(path.join(RAW, "phone", "patient_patient_dashboard.png"));
@@ -123,8 +171,9 @@ p{margin-top:18px;font-size:22px;color:${NAVY}}
     await p.evaluate(() => document.fonts.ready);
     // Shrink a headline line that would run into the edges.
     await p.evaluate(() => {
-      const max = document.body.clientWidth * 0.86;
       for (const el of Array.from(document.querySelectorAll<HTMLElement>("h1 span"))) {
+        // Phone/tablet: the full width; 10-inch: the copy column.
+        const max = Math.min(document.body.clientWidth * 0.86, el.parentElement?.parentElement?.clientWidth ?? Infinity);
         el.style.whiteSpace = "nowrap"; el.style.display = "inline-block";
         let size = parseFloat(getComputedStyle(el).fontSize);
         while (el.getBoundingClientRect().width > max && size > 20) el.style.fontSize = `${(size -= 2)}px`;
@@ -156,6 +205,9 @@ p{margin-top:18px;font-size:22px;color:${NAVY}}
     if (which !== "all" && which !== kind) continue;
     const [w, h] = kind === "phone" ? [1080, 1920] : [1600, 2560];
     for (const s of SLIDES) await render(page(kind, s), w, h, path.join(OUT, kind, `${s.file}.png`));
+  }
+  if (which === "all" || which === "tablet10") {
+    for (const s of SLIDES) await render(pageLandscape(s), 2560, 1440, path.join(OUT, "tablet-10in", `${s.file}.png`));
   }
   if (which === "all" || which === "feature") await render(feature(), 1024, 500, path.join(OUT, "feature-graphic-1024x500.png"));
   await browser.close();

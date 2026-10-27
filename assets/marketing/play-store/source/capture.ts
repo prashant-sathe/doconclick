@@ -1,7 +1,8 @@
 // Captures real app screens for Play Store art from the running dev server
 // (http://localhost:3000). Raw captures go to the gitignored
 // .pipeline/playstore/raw/<kind>/ folder; compose.ts frames them. Usage:
-//   npx tsx assets/marketing/play-store/source/capture.ts <phone|tablet> <role> <route[,route...]>
+//   npx tsx assets/marketing/play-store/source/capture.ts <phone|tablet|tablet10> <role> <route[,route...]>
+// tablet = 7" portrait, tablet10 = 10" landscape (wide enough for the desktop nav).
 // Set LANG_CODE=mr-IN (or hi-IN) to show another language. The language is
 // faked in the browser only; nothing is written to the database.
 import fs from "node:fs";
@@ -13,7 +14,12 @@ const LOGINS: Record<string, [string, string]> = {
   patient: ["9876543210", "Patient@2025"],
   doctor: ["9000000001", "Doctor@2025"],
 };
-const VP = kind === "tablet" ? { width: 800, height: 1200, dpr: 2 } : { width: 390, height: 800, dpr: 2 };
+const VIEWPORTS: Record<string, { width: number; height: number; dpr: number }> = {
+  phone: { width: 390, height: 800, dpr: 2 },
+  tablet: { width: 800, height: 1200, dpr: 2 },
+  tablet10: { width: 1280, height: 800, dpr: 2 },
+};
+const VP = VIEWPORTS[kind] ?? VIEWPORTS.phone;
 const DEMO_TEXT: Record<string, string> = {
   "test": "Follow-up for skin allergy",
   "i have fever": "Fever and body ache since 2 days",
@@ -22,7 +28,7 @@ const DEMO_TEXT: Record<string, string> = {
   "Son · 21 yrs · Male · A-": "Son · 12 yrs · Male · B+",
 };
 if (!kind || !role || !routesArg) {
-  console.error("usage: capture.ts <phone|tablet> <patient|doctor> <route[,route...]>");
+  console.error("usage: capture.ts <phone|tablet|tablet10> <patient|doctor> <route[,route...]>");
   process.exit(1);
 }
 const ROOT = path.join(__dirname, "..", "..", "..", "..");
