@@ -61,7 +61,7 @@ export default function Footer() {
               {t("tagline")}
             </p>
             <div className="space-y-2 text-sm">
-              <a href="mailto:support@doconclick.com" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors">
+              <a href="mailto:support@doconclick.com" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors tap-44-y">
                 <Mail className="w-4 h-4 text-blue-400" /> support@doconclick.com
               </a>
             </div>
@@ -87,7 +87,7 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {links.map(({ href, key }) => (
                   <li key={key}>
-                    <Link href={href} className="text-slate-400 text-sm hover:text-white transition-colors hover:pl-1 duration-200 block">
+                    <Link href={href} className="text-slate-400 text-sm hover:text-white transition-colors hover:pl-1 duration-200 block tap-44-y">
                       {t(key)}
                     </Link>
                   </li>
@@ -113,9 +113,9 @@ export default function Footer() {
         <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
           <p>{t("copyright")}</p>
           <div className="flex gap-5">
-            <Link href="/privacy-policy#privacy-policy" className="hover:text-slate-300 transition-colors">{t("privacy")}</Link>
-            <Link href="/privacy-policy#terms-of-service" className="hover:text-slate-300 transition-colors">{t("terms")}</Link>
-            <Link href="/data-deletion" className="hover:text-slate-300 transition-colors">{t("deleteData")}</Link>
+            <Link href="/privacy-policy#privacy-policy" className="hover:text-slate-300 transition-colors tap-44-y">{t("privacy")}</Link>
+            <Link href="/privacy-policy#terms-of-service" className="hover:text-slate-300 transition-colors tap-44-y">{t("terms")}</Link>
+            <Link href="/data-deletion" className="hover:text-slate-300 transition-colors tap-44-y">{t("deleteData")}</Link>
           </div>
         </div>
       </div>

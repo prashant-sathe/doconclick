@@ -105,7 +105,7 @@ function LoginForm() {
                 <Lock className="inline w-3.5 h-3.5 mr-1.5" />
                 {tc("password")}
               </label>
-              <Link href="/forgot-password" className="text-xs font-semibold text-blue-600 hover:underline">
+              <Link href="/forgot-password" className="text-xs font-semibold text-blue-600 hover:underline tap-44-y">
                 {t("forgotPassword")}
               </Link>
             </div>
@@ -123,7 +123,7 @@ function LoginForm() {
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? tc("hidePassword") : tc("showPassword")}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors tap-44"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -162,19 +162,19 @@ function LoginForm() {
         <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-2 text-sm text-slate-400">
           <p>
             {t("newPatient")}{" "}
-            <Link href={nextUrl ? `/patient/register?next=${encodeURIComponent(nextUrl)}` : "/patient/register"} className="text-blue-600 font-semibold hover:underline">
+            <Link href={nextUrl ? `/patient/register?next=${encodeURIComponent(nextUrl)}` : "/patient/register"} className="text-blue-600 font-semibold hover:underline tap-44-y">
               {t("createAccount")}
             </Link>
           </p>
           <p>
             {t("areYouDoctor")}{" "}
-            <Link href="/doctor/register" className="text-teal-600 font-semibold hover:underline">
+            <Link href="/doctor/register" className="text-teal-600 font-semibold hover:underline tap-44-y">
               {t("joinNetwork")}
             </Link>
           </p>
           <p>
             {t("areYouNurse")}{" "}
-            <Link href="/nurse/register" className="text-rose-600 font-semibold hover:underline">
+            <Link href="/nurse/register" className="text-rose-600 font-semibold hover:underline tap-44-y">
               {t("joinAsNurse")}
             </Link>
           </p>
@@ -210,7 +210,7 @@ export default function LoginPageClient() {
     >
       {!native && (
         <div className="fixed top-5 left-6">
-          <Link href="/" className="btn-ghost gap-1.5 text-sm">← {tc("home")}</Link>
+          <Link href="/" className="btn-ghost gap-1.5 text-sm tap-44-y">← {tc("home")}</Link>
         </div>
       )}
       {/* Before signing in: the choice is kept and adopted by the account. */}

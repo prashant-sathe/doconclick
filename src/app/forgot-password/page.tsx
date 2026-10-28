@@ -50,7 +50,7 @@ function ForgotPasswordContent() {
 
       <p className="text-center text-sm text-slate-400 mt-5">
         {t("remembered")}{" "}
-        <Link href="/login" className="text-blue-600 font-semibold hover:underline">{t("signIn")}</Link>
+        <Link href="/login" className="text-blue-600 font-semibold hover:underline tap-44-y">{t("signIn")}</Link>
       </p>
 
       <p className="text-center text-xs text-slate-400 mt-5 flex items-center justify-center gap-1.5">
@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       <div className="fixed top-[calc(1.25rem_+_var(--safe-area-inset-top,env(safe-area-inset-top)))] left-6 z-10">
-        <Link href={native ? "/login" : "/"} className="btn-ghost gap-1.5 text-sm">
+        <Link href={native ? "/login" : "/"} className="btn-ghost gap-1.5 text-sm tap-44-y">
           ← {native ? tc("back") : tc("home")}
         </Link>
       </div>

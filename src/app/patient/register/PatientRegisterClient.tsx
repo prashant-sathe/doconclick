@@ -86,7 +86,7 @@ export default function PatientRegisterClient({ next: rawNext }: { next?: string
               <div className="relative">
                 <input required type={showPw ? "text" : "password"} autoComplete="new-password" className="input-field pr-10"
                   placeholder={tc("minChars", { min: PASSWORD_MIN_LENGTH })} value={form.password} onChange={(e) => set("password", e.target.value)} />
-                <button aria-label={showPw ? tc("hidePassword") : tc("showPassword")} aria-pressed={showPw} type="button" onClick={() => setShowPw((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <button aria-label={showPw ? tc("hidePassword") : tc("showPassword")} aria-pressed={showPw} type="button" onClick={() => setShowPw((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 tap-44">
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
@@ -114,7 +114,7 @@ export default function PatientRegisterClient({ next: rawNext }: { next?: string
 
         <p className="text-center text-sm text-slate-400 mt-4">
           {t("haveAccount")}{" "}
-          <Link href={loginHref} className="text-blue-600 font-semibold hover:underline">{tr("signIn")}</Link>
+          <Link href={loginHref} className="text-blue-600 font-semibold hover:underline tap-44-y">{tr("signIn")}</Link>
         </p>
       </div>
     </AuthPageShell>

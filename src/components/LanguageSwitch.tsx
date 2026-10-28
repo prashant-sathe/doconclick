@@ -49,7 +49,7 @@ export default function LanguageSwitch({ compact = false }: { compact?: boolean 
           lang={lang}
           onClick={() => choose(lang)}
           className={cn(
-            "rounded-xl border font-semibold transition-colors inline-flex items-center justify-center gap-1",
+            "rounded-xl border font-semibold transition-colors inline-flex items-center justify-center gap-1 tap-44-y",
             compact ? "px-2.5 py-1.5 text-xs" : "py-2.5 text-sm",
             lang === current ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
           )}

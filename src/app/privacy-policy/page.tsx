@@ -28,7 +28,7 @@ export default async function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-slate-50 safe-screen">
       <div className="mx-auto max-w-3xl px-6 py-12">
-        <Link href="/" className="text-sm font-semibold text-blue-600 hover:underline">{t("back")}</Link>
+        <Link href="/" className="text-sm font-semibold text-blue-600 hover:underline tap-44-y">{t("back")}</Link>
 
         <div className="mt-6 mb-8 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
