@@ -8,6 +8,7 @@ import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard } from "lucide-react"
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
 import { ROLE_HOME } from "@/lib/roleHome";
+import LanguageSwitch from "@/components/LanguageSwitch";
 
 const NAV_LINKS = [
   { href: "/", key: "home" },
@@ -33,7 +34,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-1">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
@@ -51,7 +52,8 @@ export default function Navbar() {
         </div>
 
         {/* CTA */}
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden lg:flex items-center gap-2">
+          <LanguageSwitch compact />
           {loading ? null : user ? (
             <>
               <Link href={dashboardHref} className="btn-ghost gap-1.5">
@@ -74,14 +76,14 @@ export default function Navbar() {
         </div>
 
         {/* Mobile hamburger */}
-        <button aria-label={open ? t("closeMenu") : t("openMenu")} aria-expanded={open} onClick={() => setOpen(v => !v)} className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
+        <button aria-label={open ? t("closeMenu") : t("openMenu")} aria-expanded={open} onClick={() => setOpen(v => !v)} className="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden border-t border-slate-100 bg-white px-6 py-4 space-y-1">
+        <div className="lg:hidden border-t border-slate-100 bg-white px-6 py-4 space-y-1">
           {navLinks.map(({ href, label }) => (
             <Link key={href} href={href} onClick={() => setOpen(false)}
               className={cn("block px-4 py-3 rounded-xl text-sm font-medium transition-colors",
@@ -90,6 +92,9 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
+          <div className="pt-3">
+            <LanguageSwitch compact />
+          </div>
           <div className="pt-3 flex flex-col gap-2">
             {loading ? null : user ? (
               <>

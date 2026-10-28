@@ -15,11 +15,46 @@ export function OfflineBanner() {
   const [offline, setOffline] = useState(false);
 
   useEffect(() => {
-    const update = () => setOffline(!navigator.onLine);
+    let cancelled = false;
+    let retry: ReturnType<typeof setInterval> | undefined;
+
+    // `navigator.onLine` can be stuck at false on some desktop browsers
+    // (VPN / virtual adapters), so only trust "offline" once a real request
+    // to our own server also fails.
+    const probe = async () => {
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 5000);
+        const res = await fetch("/api/health", { cache: "no-store", signal: ctrl.signal });
+        clearTimeout(timer);
+        return res.ok;
+      } catch {
+        return false;
+      }
+    };
+
+    const update = async () => {
+      if (navigator.onLine) {
+        clearInterval(retry);
+        retry = undefined;
+        if (!cancelled) setOffline(false);
+        return;
+      }
+      const reachable = await probe();
+      if (cancelled) return;
+      setOffline(!reachable);
+      // While the banner is up, keep re-checking — the "online" event may
+      // never fire if the browser's flag is the thing that's wrong.
+      if (!reachable && !retry) retry = setInterval(update, 15000);
+      if (reachable) { clearInterval(retry); retry = undefined; }
+    };
+
     update();
     window.addEventListener("online", update);
     window.addEventListener("offline", update);
     return () => {
+      cancelled = true;
+      clearInterval(retry);
       window.removeEventListener("online", update);
       window.removeEventListener("offline", update);
     };
