@@ -395,6 +395,14 @@
   background-clip: text;
 }
 
+/* Same effect for dark backgrounds (landing hero): light stops, >= 4.5:1 on the navy. */
+.gradient-text-on-dark {
+  background: linear-gradient(135deg, #7dd3fc 0%, #6ee7b7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Section */
 .section-tag {
   @apply inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider;

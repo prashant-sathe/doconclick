@@ -26,7 +26,7 @@ function RotatingTagline() {
 
   return (
     <span
-      className="gradient-text block"
+      className="gradient-text-on-dark block"
       style={{ transition: "opacity 0.4s, transform 0.4s", opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(10px)" }}
     >
       {t(TAGLINES[idx])}
