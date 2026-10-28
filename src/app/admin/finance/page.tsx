@@ -626,7 +626,7 @@ function FinanceContent() {
       )}
 
       {/* Tabs — money configuration lives here; Settings keeps the non-financial bits. */}
-      <div role="tablist" className="flex gap-1 overflow-x-auto border-b border-slate-200 mb-6">
+      <div role="tablist" className="flex gap-1 max-w-full min-w-0 overflow-x-auto border-b border-slate-200 mb-6">
         {TABS.map((t) => (
           <button
             key={t.id}

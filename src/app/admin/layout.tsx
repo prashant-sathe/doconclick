@@ -29,7 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           offset (absent on lg: and up, where the sidebar itself starts below
           the banner) has to be expressed as an arbitrary-value class instead
           — same --imp-banner-h var, just gated per breakpoint. */}
-      <main className="flex-1 lg:ml-64 min-h-screen pt-[calc(3.5rem+var(--imp-banner-h,0px))] lg:pt-[var(--imp-banner-h,0px)]">
+      <main className="flex-1 min-w-0 max-w-full lg:ml-64 min-h-screen pt-[calc(3.5rem+var(--imp-banner-h,0px))] lg:pt-[var(--imp-banner-h,0px)]">
         {children}
       </main>
     </div>
