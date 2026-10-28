@@ -437,7 +437,9 @@
   },
   "terms": {
     "title": "नियम और प्राइवेसी पॉलिसी",
-    "lastUpdated": "आख़िरी अपडेट: {date}"
+    "lastUpdated": "आख़िरी अपडेट: {date}",
+    "termsOfService": "सेवा की शर्तें",
+    "privacyPolicy": "गोपनीयता नीति"
   },
   "tickets": {
     "status": {

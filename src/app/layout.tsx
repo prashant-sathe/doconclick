@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_Devanagari } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { baseLanguage } from "@/lib/appLanguage";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
@@ -24,29 +24,33 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: { default: `${SITE_NAME} | Healthcare Platform`, template: `%s | ${SITE_NAME}` },
-  description: SITE_DESCRIPTION,
-  keywords: [
-    "online doctor consultation", "book doctor appointment", "video consultation doctor",
-    "doctor near me", "home visit doctor", "DocOnClick",
-  ],
-  openGraph: {
-    type: "website",
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    title: `${SITE_NAME} | Healthcare Platform`,
-    description: SITE_DESCRIPTION,
-    locale: "en_IN",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${SITE_NAME} | Healthcare Platform`,
-    description: SITE_DESCRIPTION,
-  },
-  robots: { index: true, follow: true },
-};
+// Locale-aware: the default title/description follow the saved language
+// (messages/<locale>/public.json -> siteMeta). Page-level titles still use the
+// "%s | SITE_NAME" template.
+export async function generateMetadata(): Promise<Metadata> {
+  const [t, locale] = await Promise.all([getTranslations("public.siteMeta"), getLocale()]);
+  const title = `${SITE_NAME} | ${t("title")}`;
+  const description = t("description");
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: { default: title, template: `%s | ${SITE_NAME}` },
+    description,
+    keywords: [
+      "online doctor consultation", "book doctor appointment", "video consultation doctor",
+      "doctor near me", "home visit doctor", "DocOnClick",
+    ],
+    openGraph: {
+      type: "website",
+      url: SITE_URL,
+      siteName: SITE_NAME,
+      title,
+      description,
+      locale: locale.split("-u-")[0].replace("-", "_"), // "mr-IN-u-nu-latn" -> "mr_IN"
+    },
+    twitter: { card: "summary_large_image", title, description },
+    robots: { index: true, follow: true },
+  };
+}
 
 const ORGANIZATION_JSON_LD = {
   "@context": "https://schema.org",

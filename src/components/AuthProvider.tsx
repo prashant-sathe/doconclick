@@ -8,6 +8,7 @@ import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 import { isAppLanguage, languageFromCookieHeader, setLanguageCookie, DEFAULT_APP_LANGUAGE, formattingLocale } from "@/lib/appLanguage";
 import LegalContent from "@/components/LegalContent";
 import { TERMS_OF_SERVICE, PRIVACY_POLICY, LEGAL_LAST_UPDATED } from "@/lib/legalContent";
+import { localizeLegal } from "@/lib/localizeLegal";
 import { useLocale, useTranslations } from "next-intl";
 
 // How often an already-open tab re-checks whether it's been suspended —
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const onTermsAccepted = useRef<(() => void) | undefined>(undefined);
   const router = useRouter();
   const t = useTranslations("shared.auth");
+  const legalT = useTranslations("legal");
   const locale = useLocale();
 
   const refresh = useCallback(async () => {
@@ -209,8 +211,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         </p>
       </div>
       <div className="flex-1 overflow-y-auto px-6 sm:px-8 space-y-8">
-        <LegalContent title={t("termsOfService")} sections={TERMS_OF_SERVICE} />
-        <LegalContent title={t("privacyPolicy")} sections={PRIVACY_POLICY} />
+        <LegalContent title={t("termsOfService")} sections={localizeLegal("tos", TERMS_OF_SERVICE, legalT)} />
+        <LegalContent title={t("privacyPolicy")} sections={localizeLegal("privacy", PRIVACY_POLICY, legalT)} />
       </div>
       <div className="p-6 sm:p-8 pt-4 flex-shrink-0 border-t border-slate-100 space-y-3">
         <label className="flex items-start gap-2.5 text-sm text-slate-700 cursor-pointer">

@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { FileCheck } from "lucide-react";
 import LegalContent from "@/components/LegalContent";
-import { TERMS_OF_SERVICE, PRIVACY_POLICY, type LegalSection } from "@/lib/legalContent";
+import { TERMS_OF_SERVICE, PRIVACY_POLICY } from "@/lib/legalContent";
+import { localizeLegal } from "@/lib/localizeLegal";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("public.privacyPage");
@@ -18,12 +19,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PrivacyPolicyPage() {
   const t = await getTranslations("public.privacyPage");
   const l = await getTranslations("legal");
-  const text = (key: string) => l(key as never);
-  const localize = (group: "tos" | "privacy", sections: LegalSection[]): LegalSection[] =>
-    sections.map((s, i) => ({
-      heading: text(`${group}.s${i + 1}.heading`),
-      body: s.body.map((_, j) => text(`${group}.s${i + 1}.p${j + 1}`)),
-    }));
 
   return (
     <div className="min-h-screen bg-slate-50 safe-screen">
@@ -42,10 +37,10 @@ export default async function PrivacyPolicyPage() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 space-y-10">
           <div id="privacy-policy">
-            <LegalContent title={t("privacyTitle")} sections={localize("privacy", PRIVACY_POLICY)} />
+            <LegalContent title={t("privacyTitle")} sections={localizeLegal("privacy", PRIVACY_POLICY, l)} />
           </div>
           <div id="terms-of-service" className="pt-8 border-t border-slate-100">
-            <LegalContent title={t("termsTitle")} sections={localize("tos", TERMS_OF_SERVICE)} />
+            <LegalContent title={t("termsTitle")} sections={localizeLegal("tos", TERMS_OF_SERVICE, l)} />
           </div>
         </div>
       </div>

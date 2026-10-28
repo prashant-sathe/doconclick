@@ -6,13 +6,14 @@ import { useAuth } from "@/components/AuthProvider";
 import ProfileSubShell from "@/components/patient/ProfileSubShell";
 import LegalContent from "@/components/LegalContent";
 import { TERMS_OF_SERVICE, PRIVACY_POLICY, LEGAL_LAST_UPDATED } from "@/lib/legalContent";
+import { localizeLegal } from "@/lib/localizeLegal";
 import { useTranslations } from "next-intl";
 
 export default function PatientTermsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const t = useTranslations("patientAccount.terms");
-  // The legal text itself stays English (src/lib/legalContent.ts); only the chrome is translated.
+  const l = useTranslations("legal");
   const updated = new Date(LEGAL_LAST_UPDATED);
 
   useEffect(() => {
@@ -29,8 +30,8 @@ export default function PatientTermsPage() {
       loading={authLoading || !user}
     >
       <div className="space-y-8">
-        <LegalContent title={t("tos")} sections={TERMS_OF_SERVICE} />
-        <LegalContent title={t("privacy")} sections={PRIVACY_POLICY} />
+        <LegalContent title={t("tos")} sections={localizeLegal("tos", TERMS_OF_SERVICE, l)} />
+        <LegalContent title={t("privacy")} sections={localizeLegal("privacy", PRIVACY_POLICY, l)} />
       </div>
     </ProfileSubShell>
   );

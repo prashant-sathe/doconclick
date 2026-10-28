@@ -1,4 +1,8 @@
 {
+  "siteMeta": {
+    "title": "Healthcare Platform",
+    "description": "Book verified doctors near you for clinic visits, home visits, or video consultations — instantly, on DocOnClick."
+  },
   "navbar": {
     "home": "Home",
     "about": "About Us",
@@ -242,7 +246,7 @@
     "send": "Send Message"
   },
   "privacyPage": {
-    "metaTitle": "Privacy Policy & Terms of Service | DocOnClick",
+    "metaTitle": "Privacy Policy & Terms of Service",
     "metaDescription": "DocOnClick's Privacy Policy and Terms of Service.",
     "back": "← Back to DocOnClick",
     "title": "Privacy Policy & Terms of Service",
