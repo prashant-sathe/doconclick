@@ -22,7 +22,9 @@ import { withErrorLocale } from "@/lib/apiErrors";
 import { isKnownPatient } from "@/lib/knownPatient";
 
 // A busy front desk books a few patients an hour, not dozens a minute.
-const checkLimit = createRateLimiter(30, 10 * 60_000);
+// Keyed on the doctor (not the signed-in user) so a doctor's staff share one budget.
+// WALKIN_BOOKING_LIMIT only exists so tests/walk-in.ts (many bookings for one doctor) can raise it.
+const checkLimit = createRateLimiter(Number(process.env.WALKIN_BOOKING_LIMIT) || 30, 10 * 60_000);
 
 const FIELD_LABEL = { name: "name", age: "age", gender: "gender" } as const;
 const TYPE_LABEL: Record<string, string> = { CLINIC: "clinic visit", HOME: "home visit", VIDEO: "video consultation" };
@@ -109,7 +111,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   if (scope.denied) return scope.denied;
   const doctorId = scope.doctorId;
 
-  if (!checkLimit(authUser.id)) {
+  if (!checkLimit(doctorId)) {
     return NextResponse.json({ error: "Too many bookings in a short time. Please wait a few minutes and try again." }, { status: 429 });
   }
 

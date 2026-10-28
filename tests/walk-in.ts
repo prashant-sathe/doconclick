@@ -22,6 +22,8 @@ import { prisma } from "../src/lib/prisma";
 import { addDaysYmd } from "../src/lib/istDate";
 import { todayIsoDateIst } from "../src/lib/clinicAvailability";
 
+// Raised from the real 30/10 min because this suite books many visits for one doctor.
+const BOOKING_LIMIT = 150;
 let MOCK_PORT = 0; // mock Cashfree: free port picked in main()
 let BASE = ""; // set by startServer (MOCK_PORT env, default 3100, else a free port)
 const TEST_SECRET = "test-only-cashfree-secret";
@@ -60,7 +62,7 @@ const mockServer = http.createServer((req, res) => {
 async function startServer(): Promise<ChildProcess> {
   const { child, base } = await startDevServer({
     label: "walk-in",
-    env: { CASHFREE_API_BASE: `http://127.0.0.1:${MOCK_PORT}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET },
+    env: { WALKIN_BOOKING_LIMIT: String(BOOKING_LIMIT), CASHFREE_API_BASE: `http://127.0.0.1:${MOCK_PORT}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET },
   });
   BASE = base;
   return child;
@@ -467,6 +469,17 @@ async function main() {
     const extra = await lookupFrom(ipDocs[0], "10.37.9.9");
     check("one IP: 120 lookups across 3 doctors succeed, the 121st → 429", ipBudget.every((s) => s === 200) && extra === 429, `${ipBudget.filter((s) => s === 200).length} ok, next ${extra}`);
     check("…the same doctor from another IP still works", (await lookupFrom(ipDocs[0], "10.37.9.10")) === 200, "IP bucket only");
+
+    // ── Booking budget (P3-41): per doctor, shared by all their staff (limit raised to BOOKING_LIMIT here) ──
+    const bookDoc = await mk({ name: "Budget Doc", role: "DOCTOR", doctorProfile: doctorProfile() });
+    const bookDesks = [await mkStaff(bookDoc.id), await mkStaff(bookDoc.id)];
+    const bookStatus: number[] = [];
+    for (let i = 0; i < BOOKING_LIMIT; i++) bookStatus.push((await call(bookDesks[i % 2], "POST", "/api/doctor/walk-in-appointments", {})).status);
+    check(`2 staff of one doctor: ${BOOKING_LIMIT} booking attempts between them are not rate limited`, bookStatus.every((s) => s !== 429), JSON.stringify([...new Set(bookStatus)]));
+    const bookOver = [(await call(bookDesks[0], "POST", "/api/doctor/walk-in-appointments", {})).status, (await call(bookDesks[1], "POST", "/api/doctor/walk-in-appointments", {})).status, (await call(bookDoc, "POST", "/api/doctor/walk-in-appointments", {})).status];
+    check("…the next one (either staff, or the doctor) → 429: one shared budget", bookOver.every((s) => s === 429), JSON.stringify(bookOver));
+    const otherBook = (await call(desk2, "POST", "/api/doctor/walk-in-appointments", {})).status;
+    check("…another doctor's desk is unaffected", otherBook !== 429, `${otherBook}`);
 
     // ── Pages ──
     const page = await fetch(`${BASE}/doctor/walk-in`, { headers: { Cookie: cookieFor(desk) }, redirect: "manual" });
