@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -70,7 +70,12 @@
     <!-- Doctor home-visit live location tracking (Phase 4) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!-- No ACCESS_BACKGROUND_LOCATION: the watcher runs as a location-type foreground
+         service started while the app is visible, which keeps receiving location with
+         the screen off / app in the background on "While using the app" alone. Dropping
+         it avoids Play's separate background-location review. Removed explicitly in case
+         a plugin manifest ever adds it back. -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:node="remove" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
 </manifest>
