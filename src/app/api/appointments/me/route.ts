@@ -116,7 +116,8 @@ export const GET = withErrorLocale(async function GET(req: Request) {
         referralGiven: { select: { id: true, service: { select: { name: true } } } },
         // The dashboard's clinic filter.
         clinic: { select: { name: true } },
-        _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
+        // The doctor and their staff are one side: only the patient's messages count as unread.
+        _count: { select: { messages: { where: { sender: { role: "PATIENT" }, readAt: null } } } },
       },
     });
     // Vitals nurses recorded for these patients in the last 30 days — so at

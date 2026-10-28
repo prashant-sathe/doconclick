@@ -17,13 +17,23 @@ export const PATCH = withErrorLocale(async function PATCH(
   }
 
   const { id } = await params;
-  const { error } = await loadAndAuthorize(id, authUser, "read");
+  const { error, appointment } = await loadAndAuthorize(id, authUser, "read");
   if (error) return error;
 
-  await prisma.message.updateMany({
-    where: { appointmentId: id, senderId: { not: authUser.id }, readAt: null },
-    data: { readAt: new Date() },
-  });
+  // The doctor and their staff are one side. Staff opening the thread must not
+  // clear the doctor's unread badge (readAt is shared), so only the patient and
+  // the provider mark; the provider marks only the patient's messages.
+  if (authUser.id === appointment!.patientId) {
+    await prisma.message.updateMany({
+      where: { appointmentId: id, senderId: { not: authUser.id }, readAt: null },
+      data: { readAt: new Date() },
+    });
+  } else if (authUser.id === appointment!.doctorId) {
+    await prisma.message.updateMany({
+      where: { appointmentId: id, sender: { role: "PATIENT" }, readAt: null },
+      data: { readAt: new Date() },
+    });
+  }
 
   return NextResponse.json({ ok: true });
 });

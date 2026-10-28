@@ -127,6 +127,27 @@ async function main() {
     r = await send(doctor, cancelled.id, "hello?");
     check("cancelled: send → 403", r.status === 403, `${r.status}`);
 
+    // ── Doctor + staff are one side (P2-38) ──
+    const desk = await mk({ name: "Chat Desk", role: "STAFF", staffAccount: { create: { doctorId: doctor.id } } });
+    const rs = await appt("SCHEDULED");
+    await send(patient, rs.id, "patient question");
+    await send(doctor, rs.id, "doctor answer");
+    const unread = async (u: U) => {
+      const l = await call(u, "GET", "/api/appointments/me?view=active");
+      const rows = (Array.isArray(l.json) ? l.json : (l.json.appointments ?? l.json.items ?? [])) as { id: string; unreadMessageCount: number }[];
+      return rows.find((a) => a.id === rs.id)?.unreadMessageCount;
+    };
+    check("doctor: only the patient's message is unread", (await unread(doctor)) === 1, `${await unread(doctor)}`);
+    check("staff: doctor's own message is not unread (only patient's)", (await unread(desk)) === 1, `${await unread(desk)}`);
+    r = await call(desk, "PATCH", `/api/appointments/${rs.id}/messages/read`);
+    check("staff opens the chat → 200", r.status === 200, `${r.status}`);
+    check("…doctor's unread stays 1", (await unread(doctor)) === 1, `${await unread(doctor)}`);
+    r = await call(doctor, "PATCH", `/api/appointments/${rs.id}/messages/read`);
+    check("doctor opens the chat → 200, unread clears", r.status === 200 && (await unread(doctor)) === 0, `${r.status} ${await unread(doctor)}`);
+    check("patient still sees the doctor's message unread", (await unread(patient)) === 1, `${await unread(patient)}`);
+    await call(patient, "PATCH", `/api/appointments/${rs.id}/messages/read`);
+    check("patient opens → 0", (await unread(patient)) === 0, `${await unread(patient)}`);
+
     // ── Admin setting (validation only — the live value is left alone) ──
     const st = await call(admin, "GET", "/api/admin/settings");
     check("admin settings expose chatFollowUpDays", st.json.chatFollowUpDays === window, `${st.json.chatFollowUpDays}`);
@@ -135,6 +156,7 @@ async function main() {
       check(`admin follow-up ${JSON.stringify(bad)} → 400`, r.status === 400, `${r.status} ${r.json.error}`);
     }
   } finally {
+    await prisma.staffProfile.deleteMany({ where: { OR: [{ userId: { in: ids } }, { doctorId: { in: ids } }] } });
     await prisma.appointment.deleteMany({ where: { OR: [{ patientId: { in: ids } }, { doctorId: { in: ids } }] } });
     await prisma.user.deleteMany({ where: { id: { in: ids } } });
   }
