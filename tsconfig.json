@@ -48,7 +48,9 @@
     ".next/rel-build/types/**/*.ts",
     ".next/rel-build/dev/types/**/*.ts",
     ".next/uiv-fpfees/types/**/*.ts",
-    ".next/uiv-fpfees/dev/types/**/*.ts"
+    ".next/uiv-fpfees/dev/types/**/*.ts",
+    ".next/test-reel/types/**/*.ts",
+    ".next/test-reel/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
