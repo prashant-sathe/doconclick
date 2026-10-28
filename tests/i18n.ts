@@ -71,6 +71,24 @@ async function main() {
     }
   }
 
+  // ── Legal text: en-IN/legal.json must match src/lib/legalContent.ts ──
+  {
+    const { TERMS_OF_SERVICE, PRIVACY_POLICY, LEGAL_LAST_UPDATED } = await import("../src/lib/legalContent");
+    const legal = read("en-IN", "legal") as unknown as { lastUpdatedDate: string } & Record<"tos" | "privacy", Record<string, Record<string, string>>>;
+    const drift: string[] = [];
+    for (const [group, sections] of [["tos", TERMS_OF_SERVICE], ["privacy", PRIVACY_POLICY]] as const) {
+      if (Object.keys(legal[group]).length !== sections.length) drift.push(`${group}: section count`);
+      sections.forEach((sec, i) => {
+        const j = legal[group][`s${i + 1}`] ?? {};
+        if (j.heading !== sec.heading) drift.push(`${group}.s${i + 1}.heading`);
+        if (Object.keys(j).length !== sec.body.length + 1) drift.push(`${group}.s${i + 1}: paragraph count`);
+        sec.body.forEach((p, k) => { if (j[`p${k + 1}`] !== p) drift.push(`${group}.s${i + 1}.p${k + 1}`); });
+      });
+    }
+    if (legal.lastUpdatedDate !== LEGAL_LAST_UPDATED) drift.push("lastUpdatedDate");
+    check("legal: en-IN/legal.json matches src/lib/legalContent.ts", drift.length === 0, drift.slice(0, 5).join(", ") || "in sync");
+  }
+
   // ── Every message formats in every language ──
   const { loadMessages } = await import("../src/i18n/messages");
   for (const locale of LOCALES) {

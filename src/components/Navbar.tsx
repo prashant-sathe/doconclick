@@ -3,19 +3,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard } from "lucide-react";
 import { cn, formatDoctorName } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
 import { ROLE_HOME } from "@/lib/roleHome";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About Us" },
-  { href: "/contact", label: "Contact" },
-];
+const NAV_LINKS = [
+  { href: "/", key: "home" },
+  { href: "/about", key: "about" },
+  { href: "/contact", key: "contact" },
+] as const;
 
 export default function Navbar() {
+  const t = useTranslations("public.navbar");
   const pathname = usePathname();
+  const navLinks = NAV_LINKS.map(({ href, key }) => ({ href, label: t(key) }));
   const [open, setOpen] = useState(false);
   const { user, loading, logout } = useAuth();
   const dashboardHref = user ? ROLE_HOME[user.role] ?? "/" : "/";
@@ -55,23 +58,23 @@ export default function Navbar() {
                 <LayoutDashboard className="w-4 h-4" /> {displayName}
               </Link>
               <button onClick={logout} className="btn-primary gap-1.5">
-                <LogOut className="w-4 h-4" /> Sign Out
+                <LogOut className="w-4 h-4" /> {t("signOut")}
               </button>
             </>
           ) : (
             <>
               <Link href="/login" className="btn-ghost gap-1.5">
-                <LogIn className="w-4 h-4" /> Sign In
+                <LogIn className="w-4 h-4" /> {t("signIn")}
               </Link>
               <Link href="/patient/register" className="btn-primary gap-1.5">
-                <UserPlus className="w-4 h-4" /> Register Free
+                <UserPlus className="w-4 h-4" /> {t("registerFree")}
               </Link>
             </>
           )}
         </div>
 
         {/* Mobile hamburger */}
-        <button aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(v => !v)} className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
+        <button aria-label={open ? t("closeMenu") : t("openMenu")} aria-expanded={open} onClick={() => setOpen(v => !v)} className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
@@ -91,19 +94,19 @@ export default function Navbar() {
             {loading ? null : user ? (
               <>
                 <Link href={dashboardHref} onClick={() => setOpen(false)} className="btn-secondary justify-center">
-                  {displayName}&apos;s Dashboard
+                  {t("dashboardOf", { name: displayName })}
                 </Link>
                 <button
                   onClick={() => { setOpen(false); logout(); }}
                   className="btn-primary justify-center"
                 >
-                  Sign Out
+                  {t("signOut")}
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary justify-center">Sign In</Link>
-                <Link href="/patient/register" onClick={() => setOpen(false)} className="btn-primary justify-center">Register Free</Link>
+                <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary justify-center">{t("signIn")}</Link>
+                <Link href="/patient/register" onClick={() => setOpen(false)} className="btn-primary justify-center">{t("registerFree")}</Link>
               </>
             )}
           </div>

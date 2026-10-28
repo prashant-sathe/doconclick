@@ -10,6 +10,8 @@ import enPatientAccount from "../../messages/en-IN/patientAccount.json";
 import enDoctor from "../../messages/en-IN/doctor.json";
 import enDoctorAccount from "../../messages/en-IN/doctorAccount.json";
 import enNurse from "../../messages/en-IN/nurse.json";
+import enPublic from "../../messages/en-IN/public.json";
+import enLegal from "../../messages/en-IN/legal.json";
 
 // One JSON file per namespace per language: messages/<locale>/<namespace>.json.
 // English is the source of truth (and the type every t() key is checked
@@ -18,6 +20,7 @@ import enNurse from "../../messages/en-IN/nurse.json";
 export const NAMESPACES = [
   "common", "nav", "booking", "push",
   "auth", "shared", "patient", "patientAccount", "doctor", "doctorAccount", "nurse",
+  "public", "legal",
 ] as const;
 type Namespace = (typeof NAMESPACES)[number];
 
@@ -25,6 +28,7 @@ const en = {
   common: enCommon, nav: enNav, booking: enBooking, push: enPush,
   auth: enAuth, shared: enShared, patient: enPatient, patientAccount: enPatientAccount,
   doctor: enDoctor, doctorAccount: enDoctorAccount, nurse: enNurse,
+  public: enPublic, legal: enLegal,
 };
 export type Messages = typeof en;
 

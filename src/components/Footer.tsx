@@ -1,47 +1,49 @@
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Mail, ArrowRight } from "lucide-react";
 
-const footerLinks = {
-  "Platform": [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About Us" },
-    { href: "/contact", label: "Contact" },
-    { href: "/login", label: "Sign In" },
-  ],
-  "For Patients": [
-    { href: "/patient/register", label: "Register" },
-    { href: "/patient/book", label: "Book Appointment" },
-    { href: "/login", label: "Patient Login" },
-  ],
-  "For Doctors": [
-    { href: "/doctor/register", label: "Join as Doctor" },
-    { href: "/doctor/dashboard", label: "Doctor Dashboard" },
-    { href: "/login", label: "Doctor Login" },
-  ],
-};
+const FOOTER_LINKS = [
+  { title: "groupPlatform", links: [
+    { href: "/", key: "linkHome" },
+    { href: "/about", key: "linkAbout" },
+    { href: "/contact", key: "linkContact" },
+    { href: "/login", key: "linkSignIn" },
+  ] },
+  { title: "groupPatients", links: [
+    { href: "/patient/register", key: "linkRegister" },
+    { href: "/patient/book", key: "linkBook" },
+    { href: "/login", key: "linkPatientLogin" },
+  ] },
+  { title: "groupDoctors", links: [
+    { href: "/doctor/register", key: "linkJoinDoctor" },
+    { href: "/doctor/dashboard", key: "linkDoctorDashboard" },
+    { href: "/login", key: "linkDoctorLogin" },
+  ] },
+] as const;
 
 const SPECIALTIES = [
-  "Cardiologist", "Dermatologist", "Pediatrician",
-  "General Physician", "Orthopedic", "Neurologist",
-];
+  "spCardiologist", "spDermatologist", "spPediatrician",
+  "spGeneral", "spOrthopedic", "spNeurologist",
+] as const;
 
 export default function Footer() {
+  const t = useTranslations("public.footer");
   return (
     <footer className="bg-slate-900 text-slate-300">
       {/* Top CTA strip */}
       <div className="gradient-primary">
         <div className="mx-auto max-w-7xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <h2 className="text-2xl font-extrabold text-white">Ready to book your doctor?</h2>
-            <p className="text-blue-100 mt-1 text-sm">Get quality healthcare at your doorstep in minutes.</p>
+            <h2 className="text-2xl font-extrabold text-white">{t("ctaTitle")}</h2>
+            <p className="text-blue-100 mt-1 text-sm">{t("ctaSub")}</p>
           </div>
           <div className="flex gap-3">
             <Link href="/patient/register" className="inline-flex items-center gap-2 bg-white text-blue-600 font-bold rounded-xl px-6 py-3 text-sm hover:bg-blue-50 transition-all shadow-lg">
-              Register as Patient <ArrowRight className="w-4 h-4" />
+              {t("registerPatient")} <ArrowRight className="w-4 h-4" />
             </Link>
             <Link href="/doctor/register" className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/30 text-white font-semibold rounded-xl px-6 py-3 text-sm hover:bg-white/20 transition-all">
-              Join as Doctor
+              {t("joinDoctor")}
             </Link>
           </div>
         </div>
@@ -56,7 +58,7 @@ export default function Footer() {
               <Image src="/logo-dark.png" alt="DocOnClick" width={1200} height={242} className="h-9 w-auto" />
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">
-              On-demand healthcare platform connecting patients with verified doctors for home visits, video consultations, and clinic appointments.
+              {t("tagline")}
             </p>
             <div className="space-y-2 text-sm">
               <a href="mailto:support@doconclick.com" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors">
@@ -79,14 +81,14 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          {Object.entries(footerLinks).map(([title, links]) => (
+          {FOOTER_LINKS.map(({ title, links }) => (
             <div key={title}>
-              <h3 className="text-white font-bold text-sm mb-4">{title}</h3>
+              <h3 className="text-white font-bold text-sm mb-4">{t(title)}</h3>
               <ul className="space-y-2.5">
-                {links.map(({ href, label }) => (
-                  <li key={label}>
+                {links.map(({ href, key }) => (
+                  <li key={key}>
                     <Link href={href} className="text-slate-400 text-sm hover:text-white transition-colors hover:pl-1 duration-200 block">
-                      {label}
+                      {t(key)}
                     </Link>
                   </li>
                 ))}
@@ -97,11 +99,11 @@ export default function Footer() {
 
         {/* Specialties strip */}
         <div className="mt-12 pt-8 border-t border-slate-800">
-          <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-3">Popular Specialties</p>
+          <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-3">{t("popularSpecialties")}</p>
           <div className="flex flex-wrap gap-2">
             {SPECIALTIES.map((s) => (
               <span key={s} className="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs hover:bg-slate-700 hover:text-white transition-colors cursor-pointer">
-                {s}
+                {t(s)}
               </span>
             ))}
           </div>
@@ -109,11 +111,11 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-          <p>© 2025 DocOnClick. All rights reserved. Built with ❤️ in India.</p>
+          <p>{t("copyright")}</p>
           <div className="flex gap-5">
-            <Link href="/privacy-policy#privacy-policy" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
-            <Link href="/privacy-policy#terms-of-service" className="hover:text-slate-300 transition-colors">Terms of Service</Link>
-            <Link href="/data-deletion" className="hover:text-slate-300 transition-colors">Delete My Data</Link>
+            <Link href="/privacy-policy#privacy-policy" className="hover:text-slate-300 transition-colors">{t("privacy")}</Link>
+            <Link href="/privacy-policy#terms-of-service" className="hover:text-slate-300 transition-colors">{t("terms")}</Link>
+            <Link href="/data-deletion" className="hover:text-slate-300 transition-colors">{t("deleteData")}</Link>
           </div>
         </div>
       </div>
