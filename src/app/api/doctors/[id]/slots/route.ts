@@ -6,6 +6,7 @@ import { isTimedBooking, doctorHoursSlotsForDate } from "@/lib/doctorSlots";
 import { getBookingHorizonDays, horizonProblem } from "@/lib/bookingLimits";
 import { providerOffOnDate } from "@/lib/timeOff";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { isValidYmd, istDayKey } from "@/lib/istDate";
 
 // GET /api/doctors/[id]/slots?clinicId=X&date=YYYY-MM-DD
 // GET /api/doctors/[id]/slots?consultType=HOME|VIDEO&date=YYYY-MM-DD
@@ -29,8 +30,13 @@ export const GET = withErrorLocale(async function GET(
   const consultType = searchParams.get("consultType");
   const date = searchParams.get("date");
   const forHours = !clinicId && (consultType === "HOME" || consultType === "VIDEO");
-  if ((!clinicId && !forHours) || !date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  if ((!clinicId && !forHours) || !date || !isValidYmd(date)) {
     return NextResponse.json({ error: "clinicId and date (YYYY-MM-DD) are required" }, { status: 400 });
+  }
+
+  // A day before today (IST) has nothing to book.
+  if (date < istDayKey(new Date())) {
+    return NextResponse.json({ slots: [] });
   }
 
   // The open times for that date, before bookings are taken out.

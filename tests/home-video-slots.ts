@@ -122,6 +122,16 @@ async function main() {
     s = await slotsOf("VIDEO", beyond);
     check("slots API: past the booking horizon → no slots", s.status === 200 && s.times.length === 0, `${s.times.length}`);
 
+    // P3-40: impossible dates → 400, past IST dates → empty, today/future unchanged.
+    for (const badDate of ["9999-99-99", "2026-02-31"]) {
+      const b = await slotsOf("VIDEO", badDate);
+      check(`slots API: date ${badDate} → 400`, b.status === 400, `${b.status}`);
+    }
+    for (const past of [addDaysYmd(istDayKey(new Date()), -1), "2020-01-01"]) {
+      const b = await slotsOf("VIDEO", past);
+      check(`slots API: past date ${past} → 200, no slots`, b.status === 200 && b.times.length === 0, `${b.status} ${b.times.length}`);
+    }
+
     // ── Booking a slot ──
     let r = await book(patients[0], { consultType: "VIDEO", scheduledAt: at(day, "09:00").toISOString() });
     check("VIDEO at 09:00 booked", r.status === 200, `${r.status} ${r.json.error ?? ""}`);

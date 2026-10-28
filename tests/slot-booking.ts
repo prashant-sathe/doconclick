@@ -96,6 +96,13 @@ async function main() {
     check("clinic B hides 10:00 (clinic A) and 10:10 (video)", !slots.includes("10:00") && !slots.includes("10:10") && slots.includes("10:20"),
       `10:00 ${slots.includes("10:00") ? "shown" : "hidden"}, 10:10 ${slots.includes("10:10") ? "shown" : "hidden"}, 10:20 ${slots.includes("10:20") ? "shown" : "hidden"}`);
 
+    // P3-40: clinic slots reject impossible dates and return nothing for past days
+    for (const [d, want] of [["9999-99-99", 400], ["2026-02-31", 400], ["2020-01-01", 200]] as const) {
+      const res = await fetch(`${BASE}/api/doctors/${doc1.id}/slots?clinicId=${clinicB.id}&date=${d}`, { headers: { cookie: cookie(patients[2]) } });
+      const j = await res.json();
+      check(`clinic slots: date ${d} → ${want}${want === 200 ? ", no slots" : ""}`, res.status === want && (want !== 200 || j.slots.length === 0), `${res.status}`);
+    }
+
     // 4. Eight patients race for one slot
     const race = await Promise.all(patients.map((p) => book(p, clinicVisit(clinicA.id, at("11:00")))));
     const wins = race.filter((r) => r.status === 200).length;
