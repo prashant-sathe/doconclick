@@ -127,6 +127,10 @@ async function main() {
   const desk2 = await mkStaff(doctor.id);
   const otherDesk = await mkStaff(other.id);
   const expiredDesk = await mkStaff(expired.id);
+  // Just registered, not yet approved by the admin (BUG-TRACKER P2-37).
+  const pending = await mk({ name: "Pending Doctor", role: "DOCTOR", doctorProfile: doctorProfile({ status: "PENDING", isVerified: false }) });
+  const pendingDesk = await mkStaff(pending.id);
+  const approvedUnverified = await mk({ name: "Unverified Doctor", role: "DOCTOR", doctorProfile: doctorProfile({ isVerified: false }) });
   const revokedDesk = await mkStaff(doctor.id, false);
   const regular = await mk({ name: "Regular Patient", role: "PATIENT", password: "x", patientProfile: { create: { age: 40, gender: "Female", allergies: "Penicillin", homeAddress: "12 MG Road, Pune", lat: 18.51, lng: 73.86, dependents: { create: { name: "Riya", relation: "Daughter", age: 8, gender: "Female" } } } } });
   const quick = await mk({ name: "", role: "PATIENT", password: "x", patientProfile: { create: { age: 0, gender: "" } } });
@@ -159,6 +163,10 @@ async function main() {
     check("…an expired doctor's desk sees why it's closed", r.status === 200 && /plan has expired/.test(String(r.json.blocked)), String(r.json.blocked));
     r = await call(regular, "GET", "/api/doctor/walk-in-appointments");
     check("…a patient → 403", r.status === 403, `${r.status}`);
+    r = await call(pending, "GET", "/api/doctor/walk-in-appointments");
+    check("…an unapproved doctor sees why it's closed and gets no types/clinics", r.status === 200 && /verified/.test(String(r.json.blocked)) && (r.json.types as unknown[]).length === 0 && (r.json.clinics as unknown[]).length === 0, JSON.stringify(r.json));
+    r = await call(expiredDesk, "GET", "/api/doctor/walk-in-appointments");
+    check("…an expired doctor's desk gets no types/clinics either", (r.json.types as unknown[]).length === 0 && (r.json.clinics as unknown[]).length === 0, JSON.stringify(r.json));
 
     // ── Lookup ──
     r = await call(null, "GET", `/api/doctor/patients/lookup?mobile=${newMobile}`);
@@ -167,6 +175,14 @@ async function main() {
     check("lookup as a patient → 403", r.status === 403, `${r.status}`);
     r = await call(revokedDesk, "GET", `/api/doctor/patients/lookup?mobile=${newMobile}`);
     check("lookup as revoked staff → 403", r.status === 403, `${r.status} ${r.json.error}`);
+    r = await call(pending, "GET", `/api/doctor/patients/lookup?mobile=${regular.mobile}`);
+    check("lookup as a PENDING doctor → 403, no name", r.status === 403 && !r.json.patient && !("exists" in r.json), `${r.status} ${JSON.stringify(r.json)}`);
+    r = await call(pendingDesk, "GET", `/api/doctor/patients/lookup?mobile=${regular.mobile}`);
+    check("lookup as a PENDING doctor's staff → 403", r.status === 403 && !r.json.patient, `${r.status}`);
+    r = await call(approvedUnverified, "GET", `/api/doctor/patients/lookup?mobile=${regular.mobile}`);
+    check("lookup as an APPROVED but unverified doctor → 403", r.status === 403, `${r.status}`);
+    r = await call(expiredDesk, "GET", `/api/doctor/patients/lookup?mobile=${regular.mobile}`);
+    check("lookup as an expired doctor's staff → 403 SUBSCRIPTION_EXPIRED", r.status === 403 && r.json.code === "SUBSCRIPTION_EXPIRED", `${r.status} ${r.json.code}`);
     r = await call(desk, "GET", `/api/doctor/patients/lookup?mobile=12345`);
     check("lookup with a bad number → 400", r.status === 400, `${r.status}`);
     r = await call(desk, "GET", `/api/doctor/patients/lookup?mobile=${encodeURIComponent(`+91 ${newMobile.slice(0, 5)} ${newMobile.slice(5)}`)}`);
@@ -428,6 +444,29 @@ async function main() {
     const google = await mk({ name: "Google User", role: "PATIENT", email: `g${stamp}@example.com`, password: "", patientProfile: { create: { age: 0, gender: "" } } });
     const gReg = await fetch(`${BASE}/api/patients/register`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mobile: google.mobile, password: "secret123", confirmPassword: "secret123", acceptTerms: true }) });
     check("a Google account (has email) can't be taken over → 409", gReg.status === 409, `${gReg.status}`);
+
+    // ── Lookup budget (P2-37) ──
+    // Per doctor, shared by all their staff: 60 per 10 min. A fresh IP per
+    // call so only the doctor bucket is in play.
+    let ipN = 0;
+    const lookupFrom = async (as: U, ip: string) =>
+      (await fetch(`${BASE}/api/doctor/patients/lookup?mobile=${regular.mobile}`, { headers: { Cookie: cookieFor(as), "X-Real-IP": ip } })).status;
+    const otherDesk2 = await mkStaff(other.id);
+    const otherDesk3 = await mkStaff(other.id);
+    const trio = [otherDesk, otherDesk2, otherDesk3];
+    const budget: number[] = [];
+    for (let i = 0; i < 60; i++) budget.push(await lookupFrom(trio[i % 3], `10.37.0.${ipN++ % 250}`));
+    check("3 staff of one doctor: 60 lookups between them all succeed", budget.every((s) => s === 200), JSON.stringify([...new Set(budget)]));
+    const over = await Promise.all([lookupFrom(otherDesk3, "10.37.1.1"), lookupFrom(other, "10.37.1.2")]);
+    check("…the 61st (any staff, or the doctor) → 429: one shared budget", over.every((s) => s === 429), JSON.stringify(over));
+    check("…another doctor's desk is unaffected", (await lookupFrom(desk2, "10.37.1.3")) === 200, "own budget");
+    // Per IP: 120 per 10 min across doctor accounts (each stays under its own 60).
+    const ipDocs = [await mk({ name: "IP Doc A", role: "DOCTOR", doctorProfile: doctorProfile() }), await mk({ name: "IP Doc B", role: "DOCTOR", doctorProfile: doctorProfile() }), await mk({ name: "IP Doc C", role: "DOCTOR", doctorProfile: doctorProfile() })];
+    const ipBudget: number[] = [];
+    for (let i = 0; i < 120; i++) ipBudget.push(await lookupFrom(ipDocs[i % 3], "10.37.9.9"));
+    const extra = await lookupFrom(ipDocs[0], "10.37.9.9");
+    check("one IP: 120 lookups across 3 doctors succeed, the 121st → 429", ipBudget.every((s) => s === 200) && extra === 429, `${ipBudget.filter((s) => s === 200).length} ok, next ${extra}`);
+    check("…the same doctor from another IP still works", (await lookupFrom(ipDocs[0], "10.37.9.10")) === 200, "IP bucket only");
 
     // ── Pages ──
     const page = await fetch(`${BASE}/doctor/walk-in`, { headers: { Cookie: cookieFor(desk) }, redirect: "manual" });

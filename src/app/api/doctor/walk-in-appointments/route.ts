@@ -56,17 +56,27 @@ export const GET = withErrorLocale(async function GET() {
   const p = doctor?.doctorProfile;
   if (!doctor || !p) return NextResponse.json({ error: "Doctor account not found." }, { status: 404 });
 
+  // Why booking is closed, if it is — the form shows this instead.
+  const blocked = p.status !== "APPROVED" || !p.isVerified
+    ? "Walk-in booking opens once the doctor's profile is verified."
+    : !hasActiveDoctorSubscription(p)
+      ? authUser.role === "STAFF"
+        ? "Your doctor's DocOnClick plan has expired. Ask them to renew it to book patients."
+        : "Your DocOnClick plan has expired. Renew it to book patients."
+      : null;
+  // A closed form gets only the reason — nothing it could book with
+  // (BUG-TRACKER P2-37: unverified/out-of-plan doctors get no walk-in data).
+  if (blocked) {
+    return NextResponse.json({
+      doctorId: scope.doctorId, doctorName: doctor.name, blocked,
+      types: [], clinics: [], horizonDays: 0, cashBlocked: null,
+    });
+  }
+
   return NextResponse.json({
     doctorId: scope.doctorId,
     doctorName: doctor.name,
-    // Why booking is closed, if it is — the form shows this instead.
-    blocked: p.status !== "APPROVED" || !p.isVerified
-      ? "Walk-in booking opens once the doctor's profile is verified."
-      : !hasActiveDoctorSubscription(p)
-        ? authUser.role === "STAFF"
-          ? "Your doctor's DocOnClick plan has expired. Ask them to renew it to book patients."
-          : "Your DocOnClick plan has expired. Renew it to book patients."
-        : null,
+    blocked,
     types: [
       ...(p.offersClinic ? [{ type: "CLINIC", fee: p.consultFee }] : []),
       ...(p.offersHomeVisit ? [{ type: "HOME", fee: p.homeVisitFee }] : []),

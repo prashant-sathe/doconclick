@@ -3,13 +3,17 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { resolveDoctorScope } from "@/lib/staffGuard";
 import { normalizeMobile, MOBILE_REGEX } from "@/lib/validation";
-import { createRateLimiter } from "@/lib/rateLimit";
+import { createRateLimiter, clientIp } from "@/lib/rateLimit";
 import { withErrorLocale } from "@/lib/apiErrors";
 import { isKnownPatient } from "@/lib/knownPatient";
 
 // A front desk looks up a handful of patients an hour; this stops anyone
-// walking the number space to find out who has an account.
+// walking the number space to find out who has an account. Keyed on the
+// scoped doctor, so a doctor's staff accounts share one budget instead of
+// each getting their own; the IP bucket (room for a couple of doctors behind
+// one clinic network) catches anyone spreading lookups across doctor accounts.
 const checkLimit = createRateLimiter(60, 10 * 60_000);
+const checkIpLimit = createRateLimiter(120, 10 * 60_000);
 
 // GET ?mobile= — the walk-in form's first step (/doctor/walk-in): is this
 // number already a patient (book under their account, offer their family
@@ -18,10 +22,20 @@ const checkLimit = createRateLimiter(60, 10 * 60_000);
 export const GET = withErrorLocale(async function GET(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  const scope = await resolveDoctorScope(authUser);
+  // Same gate as booking a walk-in: an in-plan doctor the admin has approved.
+  // A just-registered (unverified) account must not be able to ask who a
+  // mobile number belongs to.
+  const scope = await resolveDoctorScope(authUser, { requireSubscription: true });
   if (scope.denied) return scope.denied;
+  const profile = await prisma.doctorProfile.findUnique({
+    where: { userId: scope.doctorId },
+    select: { status: true, isVerified: true },
+  });
+  if (!profile || profile.status !== "APPROVED" || !profile.isVerified) {
+    return NextResponse.json({ error: "Bookings open once the doctor's profile is verified." }, { status: 403 });
+  }
 
-  if (!checkLimit(authUser.id)) {
+  if (!checkIpLimit(clientIp(req)) || !checkLimit(scope.doctorId)) {
     return NextResponse.json({ error: "Too many lookups. Please wait a few minutes and try again." }, { status: 429 });
   }
 
