@@ -21,6 +21,7 @@
     "test:payout-utr": "tsx tests/payout-utr.ts",
     "test:auth": "tsx tests/auth-sessions.ts",
     "test:admin-delete": "tsx tests/admin-delete-guards.ts",
+    "test:admin-last-admin-race": "tsx tests/admin-last-admin-race.ts",
     "test:payments": "tsx tests/payment-orders.ts",
     "test:account-deletion": "tsx tests/account-deletion.ts",
     "test:doctor-bookable": "tsx tests/doctor-bookable.ts",

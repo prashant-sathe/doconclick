@@ -1,11 +1,27 @@
 import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/routeGuards";
 import { isValidYmd, istStartOfDay, istEndOfDay } from "@/lib/istDate";
+import type { Prisma } from "@/generated/prisma/client";
 
 // Shared by the admin routes — returns the authenticated admin, or a 401 (no
 // session) / 403 (not an admin) response to return immediately.
 export function requireAdmin() {
   return requireRole("ADMIN");
+}
+
+// Advisory lock key for serializing admin deletions
+const ADMIN_DELETE_LOCK = 999999;
+
+// Guard for preventing deletion of the last admin. Returns a function suitable
+// for deleteAccount's guard parameter. The optional scope narrows the admin
+// count (e.g., for testing with throwaway admins).
+export function lastAdminGuard(scope: Prisma.UserWhereInput = {}) {
+  return async (tx: Prisma.TransactionClient) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(${ADMIN_DELETE_LOCK})`;
+    const count = await tx.user.count({ where: { role: "ADMIN", deletedAt: null, ...scope } });
+    if (count <= 1) return { error: "Can't remove the last remaining admin.", status: 400 };
+    return null;
+  };
 }
 
 // A handful of legacy Appointment rows have NaN stored for amount/platformFee

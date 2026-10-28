@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/adminAuth";
+import { requireAdmin, lastAdminGuard } from "@/lib/adminAuth";
 import { deleteAccount } from "@/lib/userDeletion";
 
 // DELETE: remove an admin account. Blocked for the caller's own account and
@@ -23,12 +23,12 @@ export async function DELETE(
     return NextResponse.json({ error: "Admin not found." }, { status: 404 });
   }
 
-  const adminCount = await prisma.user.count({ where: { role: "ADMIN", deletedAt: null } });
-  if (adminCount <= 1) {
-    return NextResponse.json({ error: "Can't remove the last remaining admin." }, { status: 400 });
-  }
+  const result = await deleteAccount(id, "ADMIN", { guard: lastAdminGuard() });
 
-  const deleted = await deleteAccount(id, "ADMIN");
-  if (!deleted) return NextResponse.json({ error: "Admin not found." }, { status: 404 });
-  return NextResponse.json({ ...deleted.user, password: undefined });
+  if (!result) return NextResponse.json({ error: "Admin not found." }, { status: 404 });
+  if ("refused" in result) {
+    const { error, status } = result.refused!;
+    return NextResponse.json({ error }, { status });
+  }
+  return NextResponse.json({ ...result.user, password: undefined });
 }

@@ -166,11 +166,32 @@ async function anonymize(tx: Prisma.TransactionClient, userId: string, role: str
 // role (so e.g. the patients route can't remove an admin and bypass the
 // last-admin guard), an unknown id, or an already deleted user. Throws
 // DeletionBlockedError while a visit is in progress.
-export async function deleteAccount(userId: string, role: string) {
+type DeleteResult = { user: Awaited<ReturnType<typeof prisma.user.findUniqueOrThrow>>; cancelledBookings: number; refundTotal: number };
+
+// Overload: when called without a guard, refused is not possible
+export async function deleteAccount(userId: string, role: string): Promise<DeleteResult | null>;
+// Overload: when called with opts, refused is possible
+export async function deleteAccount(
+  userId: string,
+  role: string,
+  opts: { guard: (tx: Prisma.TransactionClient) => Promise<{ error: string; status: number } | null> }
+): Promise<DeleteResult | null | { refused: { error: string; status: number } }>;
+// Implementation
+export async function deleteAccount(
+  userId: string,
+  role: string,
+  opts?: { guard?: (tx: Prisma.TransactionClient) => Promise<{ error: string; status: number } | null> }
+): Promise<DeleteResult | null | { refused: { error: string; status: number } }> {
   const user = await prisma.user.findFirst({ where: { id: userId, role, deletedAt: null } });
   if (!user) return null;
 
   const result = await prisma.$transaction(async (tx) => {
+    // Run the guard first if provided (e.g., last-admin check for admin deletions)
+    if (opts?.guard) {
+      const guardResult = await opts.guard(tx);
+      if (guardResult) return { refused: guardResult } as const;
+    }
+
     // Claimed first and conditionally, so two concurrent deletes can't both
     // run, and the account stops accepting new bookings before the sweep.
     const claimed = await tx.user.updateMany({
@@ -189,21 +210,23 @@ export async function deleteAccount(userId: string, role: string) {
       await tx.user.updateMany({ where: { id: { in: staffIds }, deletedAt: null }, data: { deletedAt: new Date() } });
       for (const staffId of staffIds) await anonymize(tx, staffId, "STAFF");
     }
-    return { cancelled, staffIds };
+    return { cancelled, staffIds } as const;
   }, { timeout: 30_000 });
   if (!result) return null;
+  if ("refused" in result) return result as { refused: { error: string; status: number } };
 
   // deletedAt alone already fails verifySession, but this also evicts the
   // cached session state so they're signed out immediately.
-  for (const id of [userId, ...result.staffIds]) await revokeSessions(id);
+  const { cancelled, staffIds } = result;
+  for (const id of [userId, ...staffIds]) await revokeSessions(id);
 
-  for (const a of result.cancelled) notifyCancelled(a, user.name, role);
+  for (const a of cancelled) notifyCancelled(a, user.name, role);
 
   const deleted = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
   return {
     user: deleted,
-    cancelledBookings: result.cancelled.length,
-    refundTotal: result.cancelled.reduce((sum, a) => sum + a.refund, 0),
+    cancelledBookings: cancelled.length,
+    refundTotal: cancelled.reduce((sum, a) => sum + a.refund, 0),
   };
 }
 
