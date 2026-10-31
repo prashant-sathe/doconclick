@@ -1,7 +1,7 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getOrCreateWallet } from "@/lib/wallet";
-import { netPayable, confirmCouponRedemption } from "@/lib/coupons";
+import { netPayable, confirmCouponRedemption, releaseCouponRedemption } from "@/lib/coupons";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 
 // Shared by create-order (which generates `appt<appointmentId>_<ts>`) and the
@@ -299,6 +299,47 @@ async function adoptUnrecordedOrder(
     },
     include: { items: true },
   });
+}
+
+/**
+ * A doctor/nurse fee payment (registration or plan) whose charged amount
+ * doesn't match the order: nothing is activated, the whole payment goes to the
+ * payer's wallet and the order's reserved coupon slot is freed, so they can
+ * simply pay again. At most once per payment (creditOfPaymentId is unique) —
+ * a webhook retry returns null instead of crediting twice.
+ */
+export async function creditFeePaymentToWallet(payment: {
+  userId: string;
+  orderId: string;
+  amount: number; // what the gateway actually charged
+  cfPaymentId: string;
+  note: string;
+}): Promise<{ amount: number; balance: number } | null> {
+  const { userId, orderId, amount, cfPaymentId, note } = payment;
+  try {
+    return await prisma.$transaction(async (tx) => {
+      await releaseCouponRedemption(tx, { orderId });
+      const wallet = await getOrCreateWallet(tx, userId);
+      const updated = await tx.wallet.update({ where: { id: wallet.id }, data: { balance: { increment: amount } } });
+      await tx.walletTransaction.create({
+        data: {
+          walletId: wallet.id,
+          type: "PAYMENT_CREDIT",
+          amount,
+          balanceAfter: updated.balance,
+          status: "SUCCESS",
+          cashfreeOrderId: orderId,
+          cashfreePaymentId: cfPaymentId,
+          creditOfPaymentId: cfPaymentId,
+          note: note.slice(0, 1000),
+        },
+      });
+      return { amount, balance: updated.balance };
+    });
+  } catch (err) {
+    if (isUniqueViolation(err)) return null; // this payment was already credited
+    throw err;
+  }
 }
 
 function isUniqueViolation(err: unknown) {

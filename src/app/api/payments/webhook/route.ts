@@ -5,7 +5,7 @@ import { getDoctorRegistrationFee, activateRegistration } from "@/lib/doctorFees
 import { sendPushToUser } from "@/lib/firebaseAdmin";
 import { WALLET_TOPUP_ORDER_PREFIX } from "@/lib/wallet";
 import { releaseCouponRedemption } from "@/lib/coupons";
-import { settleAppointmentPayment, notifySettlement } from "@/lib/paymentOrders";
+import { settleAppointmentPayment, notifySettlement, creditFeePaymentToWallet } from "@/lib/paymentOrders";
 import { NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX } from "@/lib/nurseConstants";
 import { DUES_ORDER_PREFIX, settleDuesPayment, notifyDuesSettled } from "@/lib/duesPayments";
 import { withErrorLocale } from "@/lib/apiErrors";
@@ -18,6 +18,30 @@ interface CashfreeWebhookPayload {
     payment: { cf_payment_id: string; payment_status: string };
     customer_details?: { customer_id?: string };
   };
+}
+
+// A fee payment charged at a different amount than its order (e.g. the admin
+// changed the fee mid-checkout): log it, activate nothing, and credit every
+// rupee to the payer's wallet — once per payment — so it's never lost.
+async function creditMismatchedFee(
+  payload: CashfreeWebhookPayload,
+  userId: string,
+  label: string,
+  expected: number | null,
+  url: string,
+) {
+  const { order_id: orderId, order_amount: amount } = payload.data.order;
+  console.error("Cashfree webhook amount mismatch for", label, userId, "expected", expected, "got", amount);
+  const credited = await creditFeePaymentToWallet({
+    userId,
+    orderId,
+    amount,
+    cfPaymentId: String(payload.data.payment.cf_payment_id),
+    note: `Charged ₹${amount} for ${label} order ${orderId} created for ₹${expected ?? "unknown"}`,
+  });
+  if (credited) {
+    void sendPushToUser(userId, { key: "feePaymentCreditedToWallet", values: { amount: credited.amount }, url });
+  }
 }
 
 // POST: Cashfree calls this server-to-server when a payment succeeds/fails.
@@ -117,10 +141,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     // the current fee.
     const expected = profile.registrationOrderAmount ?? Math.round(((await getDoctorRegistrationFee()) - discount) * 100) / 100;
     if (payload.data.order.order_amount !== expected) {
-      console.error(
-        "Cashfree webhook amount mismatch for doctor registration", profile.id,
-        "expected", expected, "got", payload.data.order.order_amount
-      );
+      await creditMismatchedFee(payload, profile.userId, "doctor registration", expected, "/doctor/payment");
       return NextResponse.json({ ok: true });
     }
     await activateRegistration(profile, {
@@ -139,17 +160,27 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       console.error("Cashfree webhook: no doctor profile found for order", orderId);
       return NextResponse.json({ ok: true });
     }
+    // Already applied (Cashfree retries) — checked before the amount, or a
+    // retry of a coupon order would look like a mismatch and be credited to
+    // the wallet on top of the extended plan (and a plain retry would extend
+    // the plan twice).
+    const cfPaymentId = payload.data.payment.cf_payment_id;
+    if (
+      profile.cashfreePaymentId === cfPaymentId ||
+      (await prisma.doctorPaymentLog.findFirst({ where: { cashfreePaymentId: cfPaymentId }, select: { id: true } }))
+    ) {
+      return NextResponse.json({ ok: true });
+    }
     const redemption = await prisma.couponRedemption.findUnique({
       where: { orderId },
       include: { coupon: { select: { code: true } } },
     });
-    const discount = redemption?.status === "RESERVED" ? redemption.discountAmount : 0;
+    // The redemption is keyed by this order id, so a CONFIRMED one is this
+    // order's own coupon — still part of what the order was created for.
+    const discount = redemption && (redemption.status === "RESERVED" || redemption.status === "CONFIRMED") ? redemption.discountAmount : 0;
     const expected = Math.round((DOCTOR_SUBSCRIPTION_FEE - discount) * 100) / 100;
     if (payload.data.order.order_amount !== expected) {
-      console.error(
-        "Cashfree webhook amount mismatch for doctor subscription", profile.id,
-        "expected", expected, "got", payload.data.order.order_amount
-      );
+      await creditMismatchedFee(payload, profile.userId, "doctor subscription", expected, "/doctor/subscribe");
       return NextResponse.json({ ok: true });
     }
     // Extend from whichever is later — "now" for a lapsed renewal, or the
@@ -198,10 +229,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       return NextResponse.json({ ok: true });
     }
     if (profile.pendingOrderAmount == null || payload.data.order.order_amount !== profile.pendingOrderAmount) {
-      console.error(
-        "Cashfree webhook amount mismatch for nurse fee", profile.id,
-        "expected", profile.pendingOrderAmount, "got", payload.data.order.order_amount
-      );
+      await creditMismatchedFee(payload, profile.userId, isRegistration ? "nurse registration" : "nurse subscription", profile.pendingOrderAmount, "/nurse/profile");
       return NextResponse.json({ ok: true });
     }
     // The order was created for the coupon-discounted amount (checked above);

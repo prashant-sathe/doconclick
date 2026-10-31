@@ -82,6 +82,7 @@
     "test:register-rate-limit": "tsx tests/register-rate-limit.ts",
     "test:walkin-privacy": "tsx tests/walkin-privacy.ts",
     "test:nurse-fee-coupons": "tsx tests/nurse-fee-coupons.ts",
+    "test:fee-mismatch": "tsx tests/fee-mismatch-credit.ts",
     "test:dues": "tsx tests/dues-payments.ts",
     "test:time-off": "tsx tests/time-off.ts",
     "test:doctor-earnings": "tsx tests/doctor-earnings.ts",

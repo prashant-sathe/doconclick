@@ -394,5 +394,9 @@
   "referralRewarded": {
     "title": "Referral reward added",
     "body": "Someone you invited is now on DocOnClick — ₹{amount} has been added to your wallet."
+  },
+  "feePaymentCreditedToWallet": {
+    "title": "Payment credited to wallet",
+    "body": "The fee changed while you were paying, so your ₹{amount} payment was credited to your wallet. Please pay the fee again."
   }
 }
