@@ -5,7 +5,7 @@ import { refundAppointmentToWallet } from "@/lib/wallet";
 import { Prisma } from "@/generated/prisma/client";
 import { VISIT_START_LATE_MS } from "@/lib/nursePackage";
 
-export const APPOINTMENT_REQUEST_TIMEOUT_MS = 30 * 60 * 1000;
+export const APPOINTMENT_REQUEST_TIMEOUT_MS = 60 * 60 * 1000;
 
 // Auto-expires appointment requests the doctor never responded to within
 // the timeout window. Called lazily from read/write routes rather than a
@@ -15,7 +15,7 @@ export async function expireStalePendingRequests() {
   const now = new Date();
   const cutoff = new Date(now.getTime() - APPOINTMENT_REQUEST_TIMEOUT_MS);
   const stale = await prisma.appointment.findMany({
-    // A request expires only once BOTH are true: the 30-min response window
+    // A request expires only once BOTH are true: the 60-min response window
     // has passed AND the appointment's own scheduled time is in the past.
     // For a "book now" request scheduledAt ≈ createdAt, so the second clause
     // is a no-op and behaviour is unchanged. For a request scheduled days

@@ -114,7 +114,8 @@ const isRelationKey = (v: string): v is RelationKey => (RELATION_KEYS as readonl
 
 const DATE_TIME: Intl.DateTimeFormatOptions = { dateStyle: "medium", timeStyle: "short" };
 
-const REQUEST_TIMEOUT_MS = 30 * 60 * 1000;
+// Mirrors APPOINTMENT_REQUEST_TIMEOUT_MS in lib/expireAppointments (server-only).
+const REQUEST_TIMEOUT_MS = 60 * 60 * 1000;
 
 function formatCountdown(ms: number): string {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
@@ -235,7 +236,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
   const nothingToPay = Math.max(0, a.amount - a.discountAmount) === 0;
   const timeLeftMs = REQUEST_TIMEOUT_MS - (now - new Date(a.createdAt).getTime());
   // A booking made for a future slot (more than the response window ahead)
-  // isn't on the 30-min accept clock — the doctor has until the slot time.
+  // isn't on the 60-min accept clock — the doctor has until the slot time.
   const scheduledForLater =
     new Date(a.scheduledAt).getTime() > new Date(a.createdAt).getTime() + REQUEST_TIMEOUT_MS;
   // The doctor's "review in N days" — shown with its own Book follow-up.
