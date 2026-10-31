@@ -44,6 +44,48 @@ async function creditMismatchedFee(
   }
 }
 
+// A fee payment for an order that is no longer the profile's current one
+// (they opened order A, then B, then paid A): nothing on the profile points
+// at it, so the payer comes from the signature-verified customer_id we sent
+// at create-order time. Only a live user of the right role whose id is also
+// the one embedded in the order id gets the full amount in their wallet —
+// once per payment; nothing is activated. Anything else stays a log line.
+async function creditOrphanFee(
+  payload: CashfreeWebhookPayload,
+  prefix: string,
+  role: "DOCTOR" | "NURSE",
+  label: string,
+  url: string,
+) {
+  const orderId = payload.data.order.order_id;
+  const cfPaymentId = String(payload.data.payment.cf_payment_id);
+  const customerId = payload.data.customer_details?.customer_id;
+  const user = customerId && orderId.startsWith(`${prefix}${customerId}_`)
+    ? await prisma.user.findFirst({ where: { id: customerId, role, deletedAt: null }, select: { id: true } })
+    : null;
+  if (!user) {
+    console.error("Cashfree webhook: no", label, "profile found for order", orderId, "and no valid payer", customerId);
+    return;
+  }
+  // A retry of a payment that was applied while this was still the current
+  // order (the profile has since moved on to a newer one) — already used.
+  const applied = role === "DOCTOR"
+    ? await prisma.doctorPaymentLog.findFirst({ where: { cashfreePaymentId: cfPaymentId }, select: { id: true } })
+    : await prisma.nursePaymentLog.findFirst({ where: { cashfreePaymentId: cfPaymentId }, select: { id: true } });
+  if (applied) return;
+  console.error("Cashfree webhook: payment for superseded", label, "order", orderId, "— crediting wallet of", user.id);
+  const credited = await creditFeePaymentToWallet({
+    userId: user.id,
+    orderId,
+    amount: payload.data.order.order_amount,
+    cfPaymentId,
+    note: `Paid ₹${payload.data.order.order_amount} for superseded ${label} order ${orderId}`,
+  });
+  if (credited) {
+    void sendPushToUser(user.id, { key: "feePaymentCreditedToWallet", values: { amount: credited.amount }, url });
+  }
+}
+
 // POST: Cashfree calls this server-to-server when a payment succeeds/fails.
 // No session auth here — trust comes entirely from the signature check below,
 // which is why the raw body must be verified before it's ever parsed as JSON.
@@ -125,7 +167,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   if (orderId.startsWith("docreg")) {
     const profile = await prisma.doctorProfile.findFirst({ where: { cashfreeOrderId: orderId } });
     if (!profile) {
-      console.error("Cashfree webhook: no doctor profile found for order", orderId);
+      await creditOrphanFee(payload, "docreg", "DOCTOR", "doctor registration", "/doctor/payment");
       return NextResponse.json({ ok: true });
     }
     // Cashfree retries webhooks — a second delivery must not log the
@@ -157,7 +199,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   if (orderId.startsWith("docsub")) {
     const profile = await prisma.doctorProfile.findFirst({ where: { cashfreeOrderId: orderId } });
     if (!profile) {
-      console.error("Cashfree webhook: no doctor profile found for order", orderId);
+      await creditOrphanFee(payload, "docsub", "DOCTOR", "doctor subscription", "/doctor/subscribe");
       return NextResponse.json({ ok: true });
     }
     // Already applied (Cashfree retries) — checked before the amount, or a
@@ -221,7 +263,13 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     const isRegistration = orderId.startsWith(NURSE_REGISTRATION_ORDER_PREFIX);
     const profile = await prisma.nurseProfile.findFirst({ where: { cashfreeOrderId: orderId } });
     if (!profile) {
-      console.error("Cashfree webhook: no nurse profile found for order", orderId);
+      await creditOrphanFee(
+        payload,
+        isRegistration ? NURSE_REGISTRATION_ORDER_PREFIX : NURSE_SUBSCRIPTION_ORDER_PREFIX,
+        "NURSE",
+        isRegistration ? "nurse registration" : "nurse subscription",
+        "/nurse/profile",
+      );
       return NextResponse.json({ ok: true });
     }
     // Already applied (Cashfree retries) — the payment id is set on success.

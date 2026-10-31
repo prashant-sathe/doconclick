@@ -7,6 +7,13 @@
 // doctor plan payment (with or without a coupon) is a no-op: no wallet credit,
 // plan extended exactly once, one DoctorPaymentLog.
 //
+// P1-21 — paying an older fee order A after opening order B (the profile now
+// points at B): the payer is taken from the signed customer_id (must be a live
+// user of the right role, matching the id in the order id) and the full amount
+// goes to their wallet once; nothing is activated and B still pays normally.
+// An unknown / wrong-role / mismatched customer_id credits nothing, and a retry
+// of a payment that was already applied credits nothing.
+//
 // Like test:nurse-fee-coupons, this starts its OWN dev server (tests/devServer.ts)
 // with Cashfree pointed at an in-process mock and a test-only secret, so no real
 // gateway order is ever created. Uses the DB in .env, throwaway users/coupons
@@ -32,7 +39,7 @@ function check(label: string, ok: boolean, detail: string) {
   if (!ok) failures++;
 }
 
-const created: { order_id: string; order_amount: number }[] = [];
+const created: { order_id: string; order_amount: number; customer_details?: { customer_id?: string } }[] = [];
 const mockServer = http.createServer((req, res) => {
   let body = "";
   req.on("data", (c) => (body += c));
@@ -50,11 +57,18 @@ const mockServer = http.createServer((req, res) => {
 });
 const lastOrder = () => created[created.length - 1];
 
-async function success(orderId: string, amount: number, paymentId: string) {
+// Like real Cashfree, the webhook echoes the customer_id the order was created
+// with (looked up from the mock's record) unless one is given explicitly.
+async function success(orderId: string, amount: number, paymentId: string, customerId?: string | null) {
+  const cid = customerId !== undefined ? customerId : created.find((o) => o.order_id === orderId)?.customer_details?.customer_id;
   const body = JSON.stringify({
     type: "PAYMENT_SUCCESS_WEBHOOK",
     event_time: new Date().toISOString(),
-    data: { order: { order_id: orderId, order_amount: amount }, payment: { cf_payment_id: paymentId, payment_status: "SUCCESS" } },
+    data: {
+      order: { order_id: orderId, order_amount: amount },
+      payment: { cf_payment_id: paymentId, payment_status: "SUCCESS" },
+      ...(cid ? { customer_details: { customer_id: cid } } : {}),
+    },
   });
   const ts = String(Math.floor(Date.now() / 1000));
   const sig = crypto.createHmac("sha256", TEST_SECRET).update(ts + body).digest("base64");
@@ -106,6 +120,40 @@ async function mismatch(label: string, user: U, orderId: string, orderAmount: nu
   return paid;
 }
 
+// P1-21: create order A, then B (profile now points at B), pay A.
+async function superseded(
+  label: string,
+  user: U,
+  create: () => Promise<{ status: number }>,
+  notActivated: () => Promise<boolean>,
+  activated: () => Promise<boolean>,
+) {
+  const rA = await create();
+  const a = lastOrder();
+  const rB = await create();
+  const b = lastOrder();
+  check(`${label}: order A then order B created`, rA.status === 200 && rB.status === 200 && a.order_id !== b.order_id && a.customer_details?.customer_id === user.id,
+    `${rA.status}/${rB.status}`);
+  const payA = `pay_p121_${label.replace(/\W/g, "")}_${Date.now()}`;
+  const s1 = await success(a.order_id, a.order_amount, payA);
+  let w = await walletOf(user.id);
+  check(`${label}: paying superseded A → full ₹${a.order_amount} credited once`,
+    s1 === 200 && w.balance === a.order_amount && w.credits.length === 1 && w.credits[0].creditOfPaymentId === payA && w.credits[0].cashfreeOrderId === a.order_id,
+    `${s1} balance ${w.balance} credits ${w.credits.length}`);
+  check(`${label}: …nothing activated`, await notActivated(), "profile unchanged");
+  const pushCount = await settledPushes(user.id);
+  check(`${label}: …one push to the payer`, pushCount === 1, `${pushCount}`);
+  const s2 = await success(a.order_id, a.order_amount, payA);
+  await new Promise((r) => setTimeout(r, 1000));
+  w = await walletOf(user.id);
+  check(`${label}: retry of A → no second credit, no second push`,
+    s2 === 200 && w.balance === a.order_amount && w.credits.length === 1 && (await pushes(user.id)) === 1, `balance ${w.balance} credits ${w.credits.length}`);
+  const s3 = await success(b.order_id, b.order_amount, `pay_p121_b_${label.replace(/\W/g, "")}_${Date.now()}`);
+  w = await walletOf(user.id);
+  check(`${label}: B still payable and activates normally, wallet untouched`,
+    s3 === 200 && (await activated()) && w.balance === a.order_amount && w.credits.length === 1, `${s3} balance ${w.balance}`);
+}
+
 async function main() {
   await new Promise<void>((r) => mockServer.listen(0, "127.0.0.1", r));
   const mockPort = (mockServer.address() as AddressInfo).port;
@@ -122,6 +170,11 @@ async function main() {
   const docSub = await mk({ name: "FMC Doctor Sub", role: "DOCTOR", doctorProfile: { create: { status: "APPROVED", registrationFeePaid: true, registrationFeeStatus: "PAID" } } });
   const docSubC = await mk({ name: "FMC Doctor Sub Coupon", role: "DOCTOR", doctorProfile: { create: { status: "APPROVED", registrationFeePaid: true, registrationFeeStatus: "PAID" } } });
   const nurse = await mk({ name: "FMC Nurse", role: "NURSE", nurseProfile: { create: { status: "APPROVED" } } });
+  const supReg = await mk({ name: "P121 Doctor Reg", role: "DOCTOR", doctorProfile: { create: { status: "APPROVED" } } });
+  const supSub = await mk({ name: "P121 Doctor Sub", role: "DOCTOR", doctorProfile: { create: { status: "APPROVED", registrationFeePaid: true, registrationFeeStatus: "PAID" } } });
+  const supNurse = await mk({ name: "P121 Nurse", role: "NURSE", nurseProfile: { create: { status: "APPROVED" } } });
+  const patient = await mk({ name: "P121 Patient", role: "PATIENT" });
+  const goneDoc = await mk({ name: "P121 Deleted Doctor", role: "DOCTOR", deletedAt: new Date(), doctorProfile: { create: { status: "APPROVED" } } });
   const mkCoupon = async (suffix: string, appliesTo: string) => {
     const code = `FM${suffix}${stamp}`;
     codes.push(code);
@@ -134,8 +187,8 @@ async function main() {
 
   const settings = await prisma.platformSettings.findFirst();
   if (!settings) throw new Error("no PlatformSettings row");
-  const before = { doctorRegistrationFee: settings.doctorRegistrationFee, doctorRegistrationOriginalFee: settings.doctorRegistrationOriginalFee, nurseRegistrationFee: settings.nurseRegistrationFee };
-  await prisma.platformSettings.update({ where: { id: settings.id }, data: { doctorRegistrationOriginalFee: 499, doctorRegistrationFee: 200, nurseRegistrationFee: 500 } });
+  const before = { doctorRegistrationFee: settings.doctorRegistrationFee, doctorRegistrationOriginalFee: settings.doctorRegistrationOriginalFee, nurseRegistrationFee: settings.nurseRegistrationFee, nurseSubscriptionFee: settings.nurseSubscriptionFee };
+  await prisma.platformSettings.update({ where: { id: settings.id }, data: { doctorRegistrationOriginalFee: 499, doctorRegistrationFee: 200, nurseRegistrationFee: 500, nurseSubscriptionFee: 300 } });
 
   let server: ChildProcess | null = null;
   try {
@@ -230,6 +283,71 @@ async function main() {
       r.status === 200 && order.order_amount === 500 && np.registrationFeePaid && np.pendingOrderAmount === null &&
         (await prisma.nursePaymentLog.count({ where: { nurseId: nurse.id, type: "REGISTRATION" } })) === 1 && (await walletOf(nurse.id)).balance === nurseCredit,
       `${np.registrationFeePaid} balance ${(await walletOf(nurse.id)).balance}`);
+
+    // ── P1-21: paying a superseded order A after opening B ──
+    await superseded("superseded doctor registration", supReg,
+      () => call(supReg, "/api/doctors/registration-fee/create-order", {}),
+      async () => {
+        const p = await prisma.doctorProfile.findUniqueOrThrow({ where: { userId: supReg.id } });
+        return !p.registrationFeePaid && p.trialEndsAt === null && (await prisma.doctorPaymentLog.count({ where: { doctorId: supReg.id } })) === 0;
+      },
+      async () => {
+        const p = await prisma.doctorProfile.findUniqueOrThrow({ where: { userId: supReg.id } });
+        return p.registrationFeePaid && !!p.trialEndsAt && (await prisma.doctorPaymentLog.count({ where: { doctorId: supReg.id, type: "REGISTRATION" } })) === 1;
+      });
+    await superseded("superseded doctor plan", supSub,
+      () => call(supSub, "/api/doctors/subscription/create-order", {}),
+      async () => {
+        const p = await prisma.doctorProfile.findUniqueOrThrow({ where: { userId: supSub.id } });
+        return p.subscriptionPaidUntil === null && (await prisma.doctorPaymentLog.count({ where: { doctorId: supSub.id } })) === 0;
+      },
+      async () => {
+        const p = await prisma.doctorProfile.findUniqueOrThrow({ where: { userId: supSub.id } });
+        return !!p.subscriptionPaidUntil && p.subscriptionPaidUntil.getTime() > Date.now() &&
+          (await prisma.doctorPaymentLog.count({ where: { doctorId: supSub.id, type: "SUBSCRIPTION" } })) === 1;
+      });
+    await superseded("superseded nurse registration", supNurse,
+      () => call(supNurse, "/api/nurses/fee-order", { kind: "REGISTRATION" }),
+      async () => {
+        const p = await prisma.nurseProfile.findUniqueOrThrow({ where: { userId: supNurse.id } });
+        return !p.registrationFeePaid && (await prisma.nursePaymentLog.count({ where: { nurseId: supNurse.id } })) === 0;
+      },
+      async () => {
+        const p = await prisma.nurseProfile.findUniqueOrThrow({ where: { userId: supNurse.id } });
+        return p.registrationFeePaid && p.pendingOrderAmount === null &&
+          (await prisma.nursePaymentLog.count({ where: { nurseId: supNurse.id, type: "REGISTRATION" } })) === 1;
+      });
+
+    // A retry of the nurse's applied registration payment after she opened a
+    // plan order (profile now points at that) → already applied, no credit.
+    const nurseRegOrder = [...created].reverse().find((o) => o.order_id.startsWith(`nurreg${supNurse.id}_`))!;
+    const nurseRegLog = await prisma.nursePaymentLog.findFirstOrThrow({ where: { nurseId: supNurse.id, type: "REGISTRATION" } });
+    r = await call(supNurse, "/api/nurses/fee-order", { kind: "SUBSCRIPTION" });
+    s = await success(nurseRegOrder.order_id, nurseRegOrder.order_amount, nurseRegLog.cashfreePaymentId!);
+    await new Promise((res) => setTimeout(res, 1000));
+    w = await walletOf(supNurse.id);
+    check("superseded nurse: retry of the already-applied registration payment after a plan order → no credit",
+      r.status === 200 && s === 200 && w.credits.length === 1 && (await pushes(supNurse.id)) === 1, `${r.status}/${s} credits ${w.credits.length}`);
+
+    // Invalid payers: nothing credited to anyone.
+    const fakeId = `nouser${stamp}`;
+    const bad: [string, string, string][] = [
+      ["unknown customer_id", `docreg${fakeId}_${Date.now()}`, fakeId],
+      ["patient customer_id on a doctor order", `docreg${patient.id}_${Date.now()}`, patient.id],
+      ["doctor customer_id on a nurse order", `nurreg${supReg.id}_${Date.now()}`, supReg.id],
+      ["nurse customer_id on a doctor plan order", `docsub${supNurse.id}_${Date.now()}`, supNurse.id],
+      ["deleted doctor customer_id", `docreg${goneDoc.id}_${Date.now()}`, goneDoc.id],
+      ["customer_id not matching the order id", `docsub${supSub.id}_${Date.now()}`, supReg.id],
+      ["no customer_id at all", `docsub${supSub.id}_${Date.now() + 1}`, ""],
+    ];
+    for (const [label, oid, cid] of bad) {
+      const payId = `pay_p121_bad_${label.replace(/\W/g, "")}_${Date.now()}`;
+      const st = await success(oid, 123, payId, cid || null);
+      const rows = await prisma.walletTransaction.count({ where: { creditOfPaymentId: payId } });
+      check(`invalid payer (${label}) → 200, nothing credited`, st === 200 && rows === 0, `${st} rows ${rows}`);
+    }
+    const others = await Promise.all([patient, goneDoc].map(async (u) => (await walletOf(u.id)).balance));
+    check("invalid payers: patient/deleted-doctor wallets untouched", others.every((b) => b === 0), others.join(","));
   } finally {
     server?.kill("SIGTERM");
     mockServer.close();
