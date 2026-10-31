@@ -69,7 +69,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>DocOnClick uses the camera for video consultations with your doctor and for taking profile or document photos.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>DocOnClick uses the microphone for video and audio consultations with your doctor.</string>
+	<string>DocOnClick uses the microphone for video and audio consultations with your doctor, and to let you speak your questions to the Health Assistant.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>DocOnClick uses your location to find nearby doctors and clinics and to share a doctor's live location with the patient during a home visit.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

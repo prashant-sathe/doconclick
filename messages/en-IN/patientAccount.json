@@ -530,6 +530,18 @@
     "disclaimer": "This assistant helps you find the right doctor or home nurse. It does not provide diagnosis or emergency care — for urgent symptoms, call 112 or go to the nearest hospital.",
     "placeholder": "Describe how you're feeling…",
     "send": "Send message",
-    "footer": "Health Assistant can make mistakes. Always consult a doctor for medical advice."
+    "footer": "Health Assistant can make mistakes. Always consult a doctor for medical advice.",
+    "voiceStart": "Speak your question",
+    "voiceStop": "Stop and send",
+    "voiceCancel": "Cancel",
+    "voiceListening": "Listening… {time}",
+    "voiceTranscribing": "Turning your voice into text…",
+    "voiceListen": "Listen",
+    "voiceStopListening": "Stop",
+    "voiceBlocked": "Microphone access is blocked. Allow it in your browser or phone settings to speak your question.",
+    "voiceUnsupported": "Voice input isn't available on this device. Please type your question.",
+    "voiceTooShort": "That was too short. Tap the mic and speak your question.",
+    "voicePlayFailed": "Couldn't play the reply aloud. You can still read it on screen.",
+    "voicePrivacy": "Your voice is turned into text by our AI provider and isn't stored."
   }
 }

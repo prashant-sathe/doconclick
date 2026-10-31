@@ -19,6 +19,14 @@ export const APP_LANGUAGE_LABELS: Record<AppLanguage, string> = {
   "kn-IN": "ಕನ್ನಡ",
 };
 
+/** Each language's English name — for prompts to AI models (e.g. voice). */
+export const APP_LANGUAGE_LABELS_EN: Record<AppLanguage, string> = {
+  "en-IN": "Indian English",
+  "hi-IN": "Hindi",
+  "mr-IN": "Marathi",
+  "kn-IN": "Kannada",
+};
+
 export function isAppLanguage(v: unknown): v is AppLanguage {
   return typeof v === "string" && (APP_LANGUAGES as readonly string[]).includes(v);
 }

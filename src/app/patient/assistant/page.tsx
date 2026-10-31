@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp, MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck, Ticket, Clock, LifeBuoy, HeartPulse,
+  Mic, X, Loader2, Volume2, Square,
 } from "lucide-react";
 import ServiceFees from "@/components/patient/ServiceFees";
 import RatingStars from "@/components/patient/RatingStars";
@@ -17,6 +18,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { formattingLocale } from "@/lib/appLanguage";
 import { GENDERS } from "@/lib/bookingProfile";
 import { ASSISTANT_MAX_MESSAGES, ASSISTANT_MAX_TOTAL_CHARS, ASSISTANT_MAX_MESSAGE_CHARS, type AssistantMessage } from "@/lib/assistantInput";
+import { useAssistantVoice, type VoiceError } from "@/hooks/useAssistantVoice";
 
 // Loosely typed mirror of the OpenAI Responses API's input/output items —
 // the client only needs enough shape to render them, not the full SDK
@@ -403,7 +405,27 @@ function TicketListCard({ tickets }: { tickets: SupportTicket[] }) {
   );
 }
 
-function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: string) => void }) {
+type Speaker = { speak: (text: string, key: string) => void; stop: () => void; speakingKey: string | null; loadingKey: string | null };
+
+// Under each reply: read it aloud (a spoken question's reply starts by itself).
+function ListenButton({ entryKey, text, speaker }: { entryKey: string; text: string; speaker: Speaker }) {
+  const t = useTranslations("patientAccount.assistant");
+  const playing = speaker.speakingKey === entryKey;
+  const loading = speaker.loadingKey === entryKey;
+  return (
+    <button
+      type="button"
+      onClick={() => (playing || loading ? speaker.stop() : speaker.speak(text, entryKey))}
+      aria-label={playing || loading ? t("voiceStopListening") : t("voiceListen")}
+      className="tap-44 mt-1 inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+    >
+      {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : playing ? <Square className="w-3 h-3 fill-current" /> : <Volume2 className="w-3.5 h-3.5" />}
+      {playing || loading ? t("voiceStopListening") : t("voiceListen")}
+    </button>
+  );
+}
+
+function EntryRow({ entry, onChip, speaker }: { entry: DisplayEntry; onChip: (text: string) => void; speaker: Speaker }) {
   if (entry.kind === "user") {
     return (
       <div className="flex justify-end">
@@ -417,8 +439,11 @@ function EntryRow({ entry, onChip }: { entry: DisplayEntry; onChip: (text: strin
     return (
       <div className="flex items-start gap-2.5">
         <BotAvatar />
-        <div className="max-w-[75%] bg-white border border-slate-200 text-slate-800 text-sm leading-relaxed rounded-2xl rounded-bl-md px-4 py-2.5 shadow-sm whitespace-pre-wrap">
-          {renderChatText(entry.text)}
+        <div className="max-w-[75%] flex flex-col items-start">
+          <div className="bg-white border border-slate-200 text-slate-800 text-sm leading-relaxed rounded-2xl rounded-bl-md px-4 py-2.5 shadow-sm whitespace-pre-wrap">
+            {renderChatText(entry.text)}
+          </div>
+          <ListenButton entryKey={entry.key} text={entry.text} speaker={speaker} />
         </div>
       </div>
     );
@@ -540,10 +565,12 @@ export default function HealthAssistantPage() {
     }
   }, [items, storageKey]);
 
+  const voiceRef = useRef<ReturnType<typeof useAssistantVoice> | null>(null);
   const send = useCallback(
-    async (text: string) => {
+    async (text: string, opts?: { spoken?: boolean }) => {
       const trimmed = text.trim();
       if (!trimmed || loading) return;
+      voiceRef.current?.stopSpeaking();
       setError(null);
       const nextItems: ConversationItem[] = [...items, { role: "user", content: trimmed }];
       setItems(nextItems);
@@ -561,7 +588,17 @@ export default function HealthAssistantPage() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || t("somethingWrong"));
-        setItems([...nextItems, ...(Array.isArray(data.items) ? data.items : [])]);
+        const newItems: ConversationItem[] = Array.isArray(data.items) ? data.items : [];
+        setItems([...nextItems, ...newItems]);
+        // A spoken question gets its answer read back — the last reply text,
+        // keyed like its bubble (buildDisplayEntries: `a-<index>`).
+        if (opts?.spoken) {
+          for (let i = newItems.length - 1; i >= 0; i--) {
+            const it = newItems[i];
+            const reply = it.role === "assistant" && (it.type === "message" || !it.type) ? extractText(it.content).trim() : "";
+            if (reply) { voiceRef.current?.speak(reply, `a-${nextItems.length + i}`); break; }
+          }
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : t("somethingWrong"));
       } finally {
@@ -570,6 +607,16 @@ export default function HealthAssistantPage() {
     },
     [items, loading, t]
   );
+
+  const voiceErrorText = (e: VoiceError) =>
+    e === "blocked" ? t("voiceBlocked") : e === "unsupported" ? t("voiceUnsupported") : e === "tooShort" ? t("voiceTooShort") : e === "playFailed" ? t("voicePlayFailed") : e.message || t("somethingWrong");
+  const voice = useAssistantVoice({
+    onTranscript: (text) => send(text, { spoken: true }),
+    onError: (e) => setError(voiceErrorText(e)),
+  });
+  useEffect(() => { voiceRef.current = voice; });
+  const speaker: Speaker = { speak: voice.speak, stop: voice.stopSpeaking, speakingKey: voice.speakingKey, loadingKey: voice.loadingKey };
+  const voiceBusy = voice.phase !== "idle";
 
   const entries = buildDisplayEntries(items);
 
@@ -607,7 +654,7 @@ export default function HealthAssistantPage() {
             )}
           </Link>
           <button aria-label={t("newChat")}
-            onClick={() => setItems([])}
+            onClick={() => { voice.stopSpeaking(); setItems([]); }}
             className="tap-44 flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-500 text-xs font-semibold hover:bg-slate-100 transition-colors"
           >
             <Plus className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t("newChat")}</span>
@@ -628,7 +675,7 @@ export default function HealthAssistantPage() {
         ) : (
           <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-4">
             {entries.map((entry) => (
-              <EntryRow key={entry.key} entry={entry} onChip={send} />
+              <EntryRow key={entry.key} entry={entry} onChip={send} speaker={speaker} />
             ))}
             {loading && <TypingIndicator />}
             {error && (
@@ -641,35 +688,70 @@ export default function HealthAssistantPage() {
         )}
       </div>
 
+      {entries.length === 0 && error && (
+        <div className="flex-shrink-0 px-4 pb-2">
+          <div className="max-w-2xl mx-auto text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5">{error}</div>
+        </div>
+      )}
       <div
         className="flex-shrink-0 border-t border-slate-100 bg-white px-4 sm:px-10 pt-4"
         style={{ paddingBottom: "calc(1rem + var(--safe-area-inset-bottom, env(safe-area-inset-bottom)))" }}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            send(input);
-          }}
-          className="max-w-2xl mx-auto flex items-center gap-2.5 bg-surface-50 border border-slate-200 rounded-2xl pl-4 pr-2 py-2"
-        >
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={t("placeholder")}
-            maxLength={ASSISTANT_MAX_MESSAGE_CHARS}
-            disabled={loading}
-            className="flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none disabled:opacity-60"
-          />
-          <button aria-label={t("send")}
-            type="submit"
-            disabled={loading || !input.trim()}
-            className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary text-white disabled:opacity-40 transition-opacity"
+        {voice.phase === "recording" ? (
+          <div className="max-w-2xl mx-auto flex items-center gap-2.5 bg-red-50 border border-red-100 rounded-2xl pl-4 pr-2 py-2" role="status" aria-live="polite">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+            <span className="flex-1 min-w-0 text-sm font-semibold text-red-700 truncate">
+              {t("voiceListening", { time: `${Math.floor(voice.seconds / 60)}:${String(voice.seconds % 60).padStart(2, "0")}` })}
+            </span>
+            <button type="button" aria-label={t("voiceCancel")} onClick={voice.cancel}
+              className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-slate-500 hover:bg-white transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+            <button type="button" aria-label={t("voiceStop")} onClick={voice.stop}
+              className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary text-white">
+              <ArrowUp className="w-4 h-4" />
+            </button>
+          </div>
+        ) : voice.phase === "transcribing" ? (
+          <div className="max-w-2xl mx-auto flex items-center gap-2.5 bg-surface-50 border border-slate-200 rounded-2xl px-4 py-3.5" role="status" aria-live="polite">
+            <Loader2 className="w-4 h-4 text-blue-600 animate-spin flex-shrink-0" />
+            <span className="text-sm text-slate-600">{t("voiceTranscribing")}</span>
+          </div>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              send(input);
+            }}
+            className="max-w-2xl mx-auto flex items-center gap-2.5 bg-surface-50 border border-slate-200 rounded-2xl pl-4 pr-2 py-2"
           >
-            <ArrowUp className="w-4 h-4" />
-          </button>
-        </form>
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={t("placeholder")}
+              maxLength={ASSISTANT_MAX_MESSAGE_CHARS}
+              disabled={loading}
+              className="flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none disabled:opacity-60"
+            />
+            <button aria-label={t("voiceStart")}
+              type="button"
+              onClick={() => { setError(null); void voice.start(); }}
+              disabled={loading || voiceBusy}
+              className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-blue-600 bg-blue-50 hover:bg-blue-100 disabled:opacity-40 transition-colors"
+            >
+              <Mic className="w-4 h-4" />
+            </button>
+            <button aria-label={t("send")}
+              type="submit"
+              disabled={loading || !input.trim()}
+              className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary text-white disabled:opacity-40 transition-opacity"
+            >
+              <ArrowUp className="w-4 h-4" />
+            </button>
+          </form>
+        )}
         <p className="text-center text-[11px] text-slate-400 mt-2">
-          {t("footer")}
+          {voice.phase === "idle" ? t("footer") : t("voicePrivacy")}
         </p>
       </div>
     </div>

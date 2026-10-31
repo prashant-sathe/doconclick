@@ -535,5 +535,12 @@
   "medicineReminderNotFound": "Medicine reminder not found.",
   "doseNotToday": "This dose isn't scheduled for today.",
   "doseTimesInvalid": "Pick 1 to 6 dose times between 6 am and 10 pm.",
-  "courseDaysInvalid": "The course can be 1 to {maxCourseDays} days."
+  "courseDaysInvalid": "The course can be 1 to {maxCourseDays} days.",
+  "voiceNoRecording": "No recording was received. Please try again.",
+  "voiceBadFormat": "This recording format isn't supported.",
+  "voiceTooLong": "That recording is too long. Please keep it under a minute.",
+  "voiceSilent": "We couldn't hear anything. Please try again, closer to the phone.",
+  "voiceTranscribeFailed": "We couldn't understand that recording. Please try again or type your question.",
+  "voiceNothingToRead": "Nothing to read out.",
+  "voiceSpeakFailed": "The reply couldn't be read out. You can still read it on screen."
 }
