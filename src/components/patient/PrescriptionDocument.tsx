@@ -291,6 +291,13 @@ export default function PrescriptionDocument({
 
       {/* Footer — visit location, pinned to the foot of the page */}
       <div style={{ position: "relative", zIndex: 1, padding: "0 40px 14px" }}>
+        {/* Telemedicine disclaimer — video consults only */}
+        {data.consultType === "VIDEO" && (
+          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 8, padding: "8px 14px", fontSize: 10, color: MUTED, textAlign: "center", lineHeight: 1.5, marginBottom: 10 }}>
+            Disclaimer: This prescription is based on the information provided by you in an online consultation and not on any
+            physical verification. Visit a doctor in case of emergency. This prescription is valid in India only.
+          </div>
+        )}
         <div style={{ background: NAVY, color: "#ffffff", borderRadius: 18, padding: "8px 18px", fontSize: 12, fontWeight: 700, textAlign: "center" }}>
           {data.clinicName || formatDoctorName(data.doctorName)}
           {data.consultType ? ` · ${data.consultType === "CLINIC" ? "Clinic visit" : data.consultType === "VIDEO" ? "Video consultation" : "Home visit"}` : ""}
