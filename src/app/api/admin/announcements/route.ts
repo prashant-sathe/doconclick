@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { readJson } from "@/lib/routeGuards";
 import { AUDIENCES, validateButtons } from "@/lib/announcements";
 import { isOwnUploadUrl } from "@/lib/s3";
 
@@ -30,7 +31,8 @@ export async function POST(req: Request) {
   if (denied) return denied;
   const authUser = (await getAuthUser())!;
 
-  const body = await req.json();
+  const { body, invalid } = await readJson(req);
+  if (invalid) return invalid;
   const title = String(body.title ?? "").trim();
   const message = String(body.message ?? "").trim();
   const bannerImageUrl = body.bannerImageUrl ? String(body.bannerImageUrl).trim() : null;

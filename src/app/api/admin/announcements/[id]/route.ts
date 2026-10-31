@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { AUDIENCES, validateButtons } from "@/lib/announcements";
+import { readJson } from "@/lib/routeGuards";
+import { AUDIENCES, validateButtons, audienceToRoles } from "@/lib/announcements";
 import { isOwnUploadUrl } from "@/lib/s3";
 
 async function requireAdmin() {
@@ -26,12 +27,17 @@ export async function GET(
     return NextResponse.json({ error: "Announcement not found" }, { status: 404 });
   }
 
-  const [totalRecipients, seenCount] = await Promise.all([
+  // For sent announcements, count the actual recipients. For drafts, count
+  // the live users that would receive it (so the send dialog can show "will be
+  // sent to N users" before the admin clicks Send).
+  const roles = audienceToRoles(announcement.audience);
+  const [totalRecipients, seenCount, recipientCount] = await Promise.all([
     prisma.announcementRecipient.count({ where: { announcementId: id } }),
     prisma.announcementRecipient.count({ where: { announcementId: id, seenAt: { not: null } } }),
+    prisma.user.count({ where: { role: { in: roles }, deletedAt: null } }),
   ]);
 
-  return NextResponse.json({ ...announcement, totalRecipients, seenCount });
+  return NextResponse.json({ ...announcement, totalRecipients, seenCount, recipientCount });
 }
 
 // PATCH: Update a draft announcement (sent announcements are immutable)
@@ -51,7 +57,8 @@ export async function PATCH(
     return NextResponse.json({ error: "Only draft announcements can be edited" }, { status: 409 });
   }
 
-  const body = await req.json();
+  const { body, invalid } = await readJson(req);
+  if (invalid) return invalid;
   const data: Record<string, unknown> = {};
 
   if (typeof body.title === "string") {

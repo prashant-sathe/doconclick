@@ -22,6 +22,7 @@ interface AnnouncementDetail {
   createdAt: string;
   totalRecipients: number;
   seenCount: number;
+  recipientCount: number;
 }
 
 const AUDIENCE_OPTIONS = [
@@ -354,15 +355,18 @@ export default function AnnouncementDetailPage() {
         </div>
       )}
 
-      {sendOpen && (
+      {sendOpen && announcement && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <Send className="w-5 h-5 text-blue-600" />
               <h3 className="font-bold text-slate-800">Send this announcement?</h3>
             </div>
-            <p className="text-sm text-slate-500 mb-5">
-              It will go out immediately to all <span className="font-semibold text-slate-700">{AUDIENCE_OPTIONS.find((o) => o.value === audience)?.label.toLowerCase()}</span> as a popup, notification, and push alert. This cannot be undone.
+            <p className="text-sm text-slate-500 mb-2">
+              It will go out immediately to all <span className="font-semibold text-slate-700">{AUDIENCE_OPTIONS.find((o) => o.value === audience)?.label.toLowerCase()}</span> as a popup, notification, and push alert.
+            </p>
+            <p className="text-sm text-slate-700 font-semibold mb-5">
+              This will be sent to {announcement.recipientCount.toLocaleString()} user{announcement.recipientCount !== 1 ? "s" : ""}. This cannot be undone.
             </p>
             {sendError && (
               <p className="text-xs text-red-500 flex items-center gap-1 mb-3">

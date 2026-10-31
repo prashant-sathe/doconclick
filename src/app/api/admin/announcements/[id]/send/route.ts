@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { sendPushToUsers } from "@/lib/firebaseAdmin";
+import { audienceToRoles } from "@/lib/announcements";
 
 async function requireAdmin() {
   const authUser = await getAuthUser();
@@ -34,8 +35,9 @@ export async function POST(
     return NextResponse.json({ error: "Announcement not found" }, { status: 404 });
   }
 
-  const roles =
-    announcement.audience === "BOTH" ? ["DOCTOR", "PATIENT"] : [announcement.audience];
+  // Use the same role filter that the GET recipientCount uses, so the count
+  // and the actual send never drift.
+  const roles = audienceToRoles(announcement.audience);
   const users = await prisma.user.findMany({
     where: { role: { in: roles }, deletedAt: null },
     select: { id: true, role: true },

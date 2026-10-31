@@ -3,6 +3,15 @@ export const AUDIENCES = ["DOCTOR", "PATIENT", "BOTH"];
 export type AnnouncementButton = { label: string; url: string };
 
 /**
+ * Convert an audience string to the matching role list. Returns the exact
+ * roles that will receive the announcement so the count and the actual send
+ * always use the same filter.
+ */
+export function audienceToRoles(audience: string): string[] {
+  return audience === "BOTH" ? ["DOCTOR", "PATIENT"] : [audience];
+}
+
+/**
  * A button link that stays where it says: an absolute http(s) URL, or a path
  * on this site. "//evil.com" and "/\\evil.com" start with "/" but browsers
  * treat them as another host (protocol-relative), so they're rejected — as
