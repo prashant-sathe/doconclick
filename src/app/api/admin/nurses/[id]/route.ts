@@ -8,6 +8,8 @@ import { accountImpact, impactConfirmationResponse, resolveProviderBookings } fr
 import { nurseApprovalChecklist } from "@/lib/nurseApproval";
 import { rewardProviderReferral } from "@/lib/referrals";
 
+const MAX_REASON_LENGTH = 500;
+
 const STATUS_PUSH_KEY = {
   APPROVED: "nurseApplicationApproved",
   REJECTED: "nurseApplicationRejected",
@@ -56,10 +58,22 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { denied } = await requireAdmin();
   if (denied) return denied;
   const { id } = await params;
-  const { status, isVerified, bookingAction, confirmBookingIds } = await req.json().catch(() => ({}));
+  const { status, isVerified, rejectionReason, bookingAction, confirmBookingIds } = await req.json().catch(() => ({}));
 
   const profile = await prisma.nurseProfile.findFirst({ where: { userId: id, user: { role: "NURSE", deletedAt: null } } });
   if (!profile) return NextResponse.json({ error: "Nurse not found" }, { status: 404 });
+
+  // Validate rejection reason (optional for nurses, but if provided must be valid)
+  let reason = "";
+  if (status === "REJECTED" && rejectionReason) {
+    reason = typeof rejectionReason === "string" ? rejectionReason.trim() : "";
+    if (reason && reason.length > MAX_REASON_LENGTH) {
+      return NextResponse.json(
+        { error: `Keep the reason under ${MAX_REASON_LENGTH} characters.` },
+        { status: 400 }
+      );
+    }
+  }
 
   const data: { status?: string; isVerified?: boolean; approvedLat?: number | null; approvedLng?: number | null } = {};
   if (status !== undefined) {
@@ -123,7 +137,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   // Sign them out everywhere; they can log back in, and then see the
   // suspended notice instead of a session that keeps working as before.
   if (statusChanged && data.status === "SUSPENDED") await revokeSessions(id);
-  if (statusChanged && data.status && data.status in STATUS_PUSH_KEY) {
+  if (statusChanged && data.status === "REJECTED" && reason) {
+    void sendPushToUser(id, { key: "nurseApplicationRejectedReason", values: { reason }, url: "/nurse/dashboard" });
+  } else if (statusChanged && data.status && data.status in STATUS_PUSH_KEY) {
     void sendPushToUser(id, { key: STATUS_PUSH_KEY[data.status as keyof typeof STATUS_PUSH_KEY], url: "/nurse/dashboard" });
   }
   // Approved through someone's invite link — pay the referrer (src/lib/referrals.ts).

@@ -56,6 +56,7 @@ export default function AdminNurses() {
   const [busy, setBusy] = useState(false);
   // status is SUSPENDED / REJECTED, or DELETE for removing the account.
   const [confirm, setConfirm] = useState<{ nurse: NurseRow; status: string } | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
   const [notice, setNotice] = useState("");
   const impact = useAccountImpact();
   const toast = useToast();
@@ -283,17 +284,38 @@ export default function AdminNurses() {
           icon={confirm.status === "DELETE" ? Trash2 : confirm.status === "SUSPENDED" ? Ban : XCircle}
           tone="danger"
           title={confirm.status === "DELETE" ? `Delete ${confirm.nurse.name}'s account?` : confirm.status === "SUSPENDED" ? `Suspend ${confirm.nurse.name}?` : `Reject ${confirm.nurse.name}?`}
-          message={confirm.status === "DELETE"
-            ? "She'll be permanently blocked from logging in and her mobile number freed for a new registration. Past visits and earnings history are kept. This cannot be undone."
-            : confirm.status === "SUSPENDED" ? "They'll be hidden from patients and locked out of their dashboard." : "They'll be told their application wasn't approved."}
+          message={
+            confirm.status === "DELETE" ? (
+              "She'll be permanently blocked from logging in and her mobile number freed for a new registration. Past visits and earnings history are kept. This cannot be undone."
+            ) : confirm.status === "SUSPENDED" ? (
+              "They'll be hidden from patients and locked out of their dashboard."
+            ) : (
+              <>
+                <p>{"They'll be told their application wasn't approved."}</p>
+                <div className="mt-3">
+                  <label className="input-label">Reason (optional, sent to the nurse)</label>
+                  <textarea
+                    className="input-field min-h-[80px]"
+                    maxLength={500}
+                    placeholder="e.g. Council certificate is unreadable, please re-upload a clear copy."
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                  />
+                </div>
+              </>
+            )
+          }
           confirmLabel={confirm.status === "DELETE" ? "Delete account" : confirm.status === "SUSPENDED" ? "Suspend" : "Reject"}
           busy={busy}
-          onCancel={() => setConfirm(null)}
+          onCancel={() => { setConfirm(null); setRejectReason(""); }}
           onConfirm={async () => {
             const { nurse, status } = confirm;
             setConfirm(null);
-            const done = status === "DELETE" ? await send(nurse, "DELETE", {}) : await update(nurse, { status });
+            const done = status === "DELETE"
+              ? await send(nurse, "DELETE", {})
+              : await update(nurse, status === "REJECTED" ? { status, rejectionReason: rejectReason.trim() || undefined } : { status });
             if (done && status === "DELETE") setOpenId(null);
+            setRejectReason("");
           }}
         />
       )}

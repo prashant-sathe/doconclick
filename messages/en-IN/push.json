@@ -131,6 +131,10 @@
     "title": "Application not approved",
     "body": "Your nurse application was not approved this time."
   },
+  "nurseApplicationRejectedReason": {
+    "title": "Application not approved",
+    "body": "Your nurse application was not approved this time. Reason: {reason}"
+  },
   "accountSuspended": {
     "title": "Account suspended",
     "body": "Your account has been suspended by the admin."
