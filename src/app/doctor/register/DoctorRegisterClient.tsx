@@ -8,7 +8,7 @@ import {
   Loader2, ArrowRight,
 } from "lucide-react";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
-import ReferralCapture from "@/components/ReferralCapture";
+import ReferralCodeField, { useReferralCode } from "@/components/ReferralCodeField";
 import { useAuth } from "@/components/AuthProvider";
 import { isValidMobile, isValidEmail, normalizeMobile, nameErrorCode, PASSWORD_MIN_LENGTH } from "@/lib/validation";
 import { useTranslations } from "next-intl";
@@ -23,6 +23,7 @@ export default function DoctorRegisterClient() {
   const tr = useTranslations("auth.register");
   const tc = useTranslations("auth.common");
   const tv = useTranslations("auth.validation");
+  const referral = useReferralCode("DOCTOR");
 
   const [form, setForm] = useState({
     name: "", mobile: "", email: "", password: "", confirmPassword: "",
@@ -42,6 +43,8 @@ export default function DoctorRegisterClient() {
     if (form.password !== form.confirmPassword) { setError(tv("passwordMismatch")); return; }
 
     setLoading(true);
+    // A code the server refused shows under the field; fix or clear it.
+    if (!(await referral.confirm())) { setLoading(false); return; }
     const res = await fetch("/api/doctors/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -61,7 +64,6 @@ export default function DoctorRegisterClient() {
 
   return (
     <AuthPageShell backHref="/login">
-      <ReferralCapture />
       <div className="max-w-lg mx-auto">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -100,6 +102,8 @@ export default function DoctorRegisterClient() {
               <input required type="password" autoComplete="new-password" className="input-field"
                 placeholder={tc("repeatPassword")} value={form.confirmPassword} onChange={(e) => set("confirmPassword", e.target.value)} />
             </div>
+
+            <ReferralCodeField referral={referral} />
 
             {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">{error}</div>}
 

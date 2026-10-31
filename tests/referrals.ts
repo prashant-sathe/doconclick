@@ -128,9 +128,16 @@ async function main() {
     r = await http("POST", "/api/referrals/capture", { body: { code: code.toLowerCase() } });
     check("capture a valid code → ok, httpOnly ref + device cookies", r.json.ok === true && cookieValue(r.setCookie, "doconclick_ref") === code && !!cookieValue(r.setCookie, "doconclick_did") && r.setCookie.every((c) => /HttpOnly/i.test(c)), r.setCookie.join(" | "));
     r = await http("POST", "/api/referrals/capture", { body: { code: "ZZZZ2222" } });
-    check("unknown code → ok:false, no cookie", r.json.ok === false && !cookieValue(r.setCookie, "doconclick_ref"), `${r.json.ok}`);
+    check("unknown code → ok:false INVALID, no cookie", r.json.ok === false && r.json.reason === "INVALID" && !cookieValue(r.setCookie, "doconclick_ref"), `${r.json.ok} ${r.json.reason}`);
     r = await http("POST", "/api/referrals/capture", { body: "nope" });
     check("garbage body → ok:false", r.status === 200 && r.json.ok === false, `${r.status}`);
+    // The register page's optional "Referral code" field.
+    r = await http("GET", "/api/referrals/capture?role=PATIENT", { cookies: [`doconclick_ref=${code}`] });
+    const fieldDoctor = await http("GET", "/api/referrals/capture?role=DOCTOR");
+    const fieldAdmin = await http("GET", "/api/referrals/capture?role=ADMIN");
+    check("field: shown for patient/doctor sign-ups, prefilled from the kept cookie; never for other roles", r.json.enabled === true && r.json.code === code && fieldDoctor.json.enabled === true && fieldDoctor.json.code === null && fieldAdmin.json.enabled === false, `${JSON.stringify(r.json)} ${JSON.stringify(fieldAdmin.json)}`);
+    r = await http("DELETE", "/api/referrals/capture", { cookies: [`doconclick_ref=${code}`] });
+    check("field cleared → ref cookie removed", r.json.ok === true && r.setCookie.some((c) => c.startsWith("doconclick_ref=;") && /Max-Age=0/i.test(c)), r.setCookie.join(" | "));
 
     // ── Sign-ups and abuse guards ──
     const d1 = randomUUID();
@@ -246,7 +253,7 @@ async function main() {
     r = await http("PATCH", `/api/admin/doctors/${dInv.id}`, { as: admin, body: { status: "APPROVED" } });
     ref = await refOf(dInv.id);
     check("admin approves the doctor → REWARDED ₹100 to the nurse's wallet", r.status === 200 && ref?.status === "REWARDED" && ref.rewardAmount === 100 && (await walletOf(nurseReferrer.id)) === 100, `${r.status} ${r.json.error ?? ""} ${ref?.status}`);
-    const nNote = await prisma.notification.findFirst({ where: { userId: nurseReferrer.id, kind: "referralRewarded" } });
+    const nNote = await waitFor(() => prisma.notification.findFirst({ where: { userId: nurseReferrer.id, kind: "referralRewarded" } }), (v) => !!v); // the push is fire-and-forget
     check("…push to the nurse links to her profile", nNote?.url === "/nurse/profile", `${nNote?.url}`);
     out = await rewardProviderReferral(dInv.id);
     check("…approving again / retry → nothing more", out.outcome === "SKIPPED" && (await bonusRows(nurseReferrer.id)).length === 1, out.outcome);
@@ -269,7 +276,8 @@ async function main() {
     r = await http("POST", "/api/referrals/capture", { body: { code } });
     const offSignup = await signUp("patients", code, randomUUID());
     const offCard = await http("GET", "/api/referrals/me", { as: referrer });
-    check("programme off → capture refused, sign-up not tracked, card hidden", r.json.ok === false && !(await refOf(offSignup.id)) && offCard.json.enabled === false, `${r.json.ok} ${offCard.json.enabled}`);
+    const offField = await http("GET", "/api/referrals/capture?role=PATIENT");
+    check("programme off → capture refused (OFF), sign-up not tracked, card + register field hidden", r.json.ok === false && r.json.reason === "OFF" && !(await refOf(offSignup.id)) && offCard.json.enabled === false && offField.json.enabled === false, `${r.json.ok} ${r.json.reason} ${offCard.json.enabled} ${offField.json.enabled}`);
     await setRewards({ referralRewardPatient: 50, referralRewardProvider: 100 });
 
     // ── Admin settings + report ──

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import AuthPageShell from "@/components/AuthPageShell";
 import { Heart, Phone, Lock, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
-import ReferralCapture from "@/components/ReferralCapture";
+import ReferralCodeField, { useReferralCode } from "@/components/ReferralCodeField";
 import { useAuth } from "@/components/AuthProvider";
 import { isValidMobile, normalizeMobile, PASSWORD_MIN_LENGTH } from "@/lib/validation";
 import { safeNext } from "@/lib/roleHome";
@@ -25,6 +25,7 @@ export default function PatientRegisterClient({ next: rawNext }: { next?: string
   const tr = useTranslations("auth.register");
   const tc = useTranslations("auth.common");
   const tv = useTranslations("auth.validation");
+  const referral = useReferralCode("PATIENT");
 
   const [form, setForm] = useState({ mobile: "", password: "", confirmPassword: "" });
 
@@ -47,6 +48,8 @@ export default function PatientRegisterClient({ next: rawNext }: { next?: string
     }
 
     setLoading(true);
+    // A code the server refused shows under the field; fix or clear it.
+    if (!(await referral.confirm())) { setLoading(false); return; }
     const res = await fetch("/api/patients/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -63,7 +66,6 @@ export default function PatientRegisterClient({ next: rawNext }: { next?: string
 
   return (
     <AuthPageShell backHref={loginHref}>
-      <ReferralCapture />
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -96,6 +98,8 @@ export default function PatientRegisterClient({ next: rawNext }: { next?: string
               <input required type="password" autoComplete="new-password" className="input-field"
                 placeholder={tc("repeatPassword")} value={form.confirmPassword} onChange={(e) => set("confirmPassword", e.target.value)} />
             </div>
+
+            <ReferralCodeField referral={referral} />
 
             {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">{error}</div>}
 
