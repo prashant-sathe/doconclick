@@ -50,7 +50,15 @@
     ".next/uiv-fpfees/types/**/*.ts",
     ".next/uiv-fpfees/dev/types/**/*.ts",
     ".next/test-reel/types/**/*.ts",
-    ".next/test-reel/dev/types/**/*.ts"
+    ".next/test-reel/dev/types/**/*.ts",
+    ".next/test-ui/types/**/*.ts",
+    ".next/test-ui/dev/types/**/*.ts",
+    ".next/test-qa/types/**/*.ts",
+    ".next/test-qa/dev/types/**/*.ts",
+    ".next/test-dev/types/**/*.ts",
+    ".next/test-dev/dev/types/**/*.ts",
+    ".next/test-fp123b/types/**/*.ts",
+    ".next/test-fp123b/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
