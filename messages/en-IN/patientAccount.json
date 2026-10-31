@@ -542,6 +542,19 @@
     "voiceUnsupported": "Voice input isn't available on this device. Please type your question.",
     "voiceTooShort": "That was too short. Tap the mic and speak your question.",
     "voicePlayFailed": "Couldn't play the reply aloud. You can still read it on screen.",
-    "voicePrivacy": "Your voice is turned into text by our AI provider and isn't stored."
+    "voicePrivacy": "Your voice is turned into text by our AI provider and isn't stored.",
+    "voiceMode": "Voice mode",
+    "voiceModeListening": "Listening…",
+    "voiceModeHearing": "Go on, I'm listening…",
+    "voiceModeThinking": "Thinking…",
+    "voiceModeSpeaking": "Speaking — tap the circle to interrupt",
+    "voiceModePaused": "Paused — tap the circle to talk",
+    "voiceModeHint": "Talk naturally. I'll answer when you pause.",
+    "voiceModeInterrupt": "Interrupt",
+    "voiceModeResume": "Start talking",
+    "voiceModeMute": "Mute",
+    "voiceModeUnmute": "Unmute",
+    "voiceModeEnd": "End voice mode",
+    "voiceModeSeeChat": "See suggestions in chat"
   }
 }

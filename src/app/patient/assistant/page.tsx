@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ChevronLeft, ChevronRight, Sparkles, Info, Plus, ArrowUp, MapPin, Thermometer, Baby, Activity, ClipboardCheck, BadgeCheck, Ticket, Clock, LifeBuoy, HeartPulse,
-  Mic, X, Loader2, Volume2, Square,
+  Mic, X, Loader2, Volume2, Square, AudioLines,
 } from "lucide-react";
 import ServiceFees from "@/components/patient/ServiceFees";
 import RatingStars from "@/components/patient/RatingStars";
@@ -19,6 +19,7 @@ import { formattingLocale } from "@/lib/appLanguage";
 import { GENDERS } from "@/lib/bookingProfile";
 import { ASSISTANT_MAX_MESSAGES, ASSISTANT_MAX_TOTAL_CHARS, ASSISTANT_MAX_MESSAGE_CHARS, type AssistantMessage } from "@/lib/assistantInput";
 import { useAssistantVoice, type VoiceError } from "@/hooks/useAssistantVoice";
+import VoiceModeOverlay, { type VoiceModeState } from "@/components/patient/VoiceModeOverlay";
 
 // Loosely typed mirror of the OpenAI Responses API's input/output items —
 // the client only needs enough shape to render them, not the full SDK
@@ -566,10 +567,13 @@ export default function HealthAssistantPage() {
   }, [items, storageKey]);
 
   const voiceRef = useRef<ReturnType<typeof useAssistantVoice> | null>(null);
+  type Reply = { text: string; key: string; suggestions: boolean };
+  // Resolves with the turn's last reply text (keyed like its bubble:
+  // buildDisplayEntries' `a-<index>`), or null if the turn failed.
   const send = useCallback(
-    async (text: string, opts?: { spoken?: boolean }) => {
+    async (text: string, opts?: { spoken?: boolean; voiceMode?: boolean }): Promise<Reply | null> => {
       const trimmed = text.trim();
-      if (!trimmed || loading) return;
+      if (!trimmed || loading) return null;
       voiceRef.current?.stopSpeaking();
       setError(null);
       const nextItems: ConversationItem[] = [...items, { role: "user", content: trimmed }];
@@ -584,23 +588,29 @@ export default function HealthAssistantPage() {
           body: JSON.stringify({
             messages: toTranscript(nextItems),
             ...(pinned ? { location: { lat: pinned.lat, lng: pinned.lng, label: pinned.label } } : {}),
+            ...(opts?.voiceMode ? { voice: true } : {}),
           }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || t("somethingWrong"));
         const newItems: ConversationItem[] = Array.isArray(data.items) ? data.items : [];
         setItems([...nextItems, ...newItems]);
-        // A spoken question gets its answer read back — the last reply text,
-        // keyed like its bubble (buildDisplayEntries: `a-<index>`).
-        if (opts?.spoken) {
-          for (let i = newItems.length - 1; i >= 0; i--) {
-            const it = newItems[i];
-            const reply = it.role === "assistant" && (it.type === "message" || !it.type) ? extractText(it.content).trim() : "";
-            if (reply) { voiceRef.current?.speak(reply, `a-${nextItems.length + i}`); break; }
-          }
+        let reply: Reply | null = null;
+        for (let i = newItems.length - 1; i >= 0 && !reply; i--) {
+          const it = newItems[i];
+          const text = it.role === "assistant" && (it.type === "message" || !it.type) ? extractText(it.content).trim() : "";
+          if (text) reply = { text, key: `a-${nextItems.length + i}`, suggestions: false };
         }
+        if (reply) {
+          const shown = buildDisplayEntries(newItems);
+          reply.suggestions = shown.some((e) => e.kind === "doctors" || e.kind === "nurses" || e.kind === "ticket-created");
+        }
+        // A dictated question gets its answer read back (voice mode reads it itself).
+        if (opts?.spoken && reply) void voiceRef.current?.speak(reply.text, reply.key);
+        return reply ?? { text: "", key: "", suggestions: false };
       } catch (err) {
         setError(err instanceof Error ? err.message : t("somethingWrong"));
+        return null;
       } finally {
         setLoading(false);
       }
@@ -610,11 +620,76 @@ export default function HealthAssistantPage() {
 
   const voiceErrorText = (e: VoiceError) =>
     e === "blocked" ? t("voiceBlocked") : e === "unsupported" ? t("voiceUnsupported") : e === "tooShort" ? t("voiceTooShort") : e === "playFailed" ? t("voicePlayFailed") : e.message || t("somethingWrong");
+  // Hands-free voice mode (VoiceModeOverlay): listen → reply aloud → listen
+  // again, until the patient mutes or ends it. Refs, because the loop's
+  // steps run after awaits, past the render that started them.
+  const [voiceMode, setVoiceMode] = useState(false);
+  const [voicePaused, setVoicePaused] = useState(false);
+  const [voiceTurnInfo, setVoiceTurnInfo] = useState<{ question: string; reply: string; suggestions: boolean }>({ question: "", reply: "", suggestions: false });
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const voiceModeRef = useRef(false);
+  const voicePausedRef = useRef(false);
+  const listenAgain = () => {
+    if (voiceModeRef.current && !voicePausedRef.current) void voiceRef.current?.start({ handsFree: true });
+  };
+  const pauseVoice = (paused: boolean) => { voicePausedRef.current = paused; setVoicePaused(paused); };
+  const voiceTurn = async (question: string) => {
+    setVoiceError(null);
+    setVoiceTurnInfo({ question, reply: "", suggestions: false });
+    const reply = await send(question, { voiceMode: true });
+    if (!voiceModeRef.current) return;
+    if (!reply) setVoiceError(t("somethingWrong"));
+    else if (reply.text) {
+      setVoiceTurnInfo({ question, reply: reply.text, suggestions: reply.suggestions });
+      await voiceRef.current?.speak(reply.text, reply.key);
+    }
+    listenAgain();
+  };
   const voice = useAssistantVoice({
-    onTranscript: (text) => send(text, { spoken: true }),
-    onError: (e) => setError(voiceErrorText(e)),
+    onTranscript: (text) => { if (voiceModeRef.current) void voiceTurn(text); else void send(text, { spoken: true }); },
+    onError: (e) => {
+      const msg = voiceErrorText(e);
+      if (!voiceModeRef.current) { setError(msg); return; }
+      setVoiceError(msg);
+      // Mic refused / unavailable: wait for the patient. Otherwise listen again.
+      if (e === "blocked" || e === "unsupported") pauseVoice(true);
+      else if (e !== "playFailed") setTimeout(listenAgain, 1200);
+    },
+    onIdle: () => { if (voiceModeRef.current) pauseVoice(true); },
   });
   useEffect(() => { voiceRef.current = voice; });
+  const openVoiceMode = () => {
+    voice.unlockAudio();
+    voice.stopSpeaking();
+    setError(null);
+    setVoiceError(null);
+    setVoiceTurnInfo({ question: "", reply: "", suggestions: false });
+    voiceModeRef.current = true;
+    pauseVoice(false);
+    setVoiceMode(true);
+    void voice.start({ handsFree: true });
+  };
+  const endVoiceMode = useCallback(() => {
+    voiceModeRef.current = false;
+    voiceRef.current?.cancel();
+    voiceRef.current?.stopSpeaking();
+    setVoiceMode(false);
+  }, []);
+  const voiceModeState: VoiceModeState = voicePaused ? "paused"
+    : voice.phase === "recording" ? "listening"
+    : voice.speakingKey ? "speaking"
+    : voice.phase === "transcribing" || loading || voice.loadingKey ? "thinking"
+    : "listening";
+  const onVoiceOrb = () => {
+    voice.unlockAudio();
+    if (voiceModeState === "listening") voice.stop(); // send now
+    else if (voiceModeState === "speaking") voice.stopSpeaking(); // the turn then listens again
+    else if (voiceModeState === "paused") { pauseVoice(false); setVoiceError(null); void voice.start({ handsFree: true }); }
+  };
+  const onVoiceMute = () => {
+    if (voicePausedRef.current) { voice.unlockAudio(); pauseVoice(false); setVoiceError(null); void voice.start({ handsFree: true }); }
+    else { pauseVoice(true); voice.cancel(); voice.stopSpeaking(); }
+  };
   const speaker: Speaker = { speak: voice.speak, stop: voice.stopSpeaking, speakingKey: voice.speakingKey, loadingKey: voice.loadingKey };
   const voiceBusy = voice.phase !== "idle";
 
@@ -735,25 +810,51 @@ export default function HealthAssistantPage() {
             />
             <button aria-label={t("voiceStart")}
               type="button"
-              onClick={() => { setError(null); void voice.start(); }}
+              onClick={() => { setError(null); voice.unlockAudio(); void voice.start(); }}
               disabled={loading || voiceBusy}
               className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-blue-600 bg-blue-50 hover:bg-blue-100 disabled:opacity-40 transition-colors"
             >
               <Mic className="w-4 h-4" />
             </button>
-            <button aria-label={t("send")}
-              type="submit"
-              disabled={loading || !input.trim()}
-              className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary text-white disabled:opacity-40 transition-opacity"
-            >
-              <ArrowUp className="w-4 h-4" />
-            </button>
+            {input.trim() ? (
+              <button aria-label={t("send")}
+                type="submit"
+                disabled={loading}
+                className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary text-white disabled:opacity-40 transition-opacity"
+              >
+                <ArrowUp className="w-4 h-4" />
+              </button>
+            ) : (
+              <button aria-label={t("voiceMode")}
+                type="button"
+                onClick={openVoiceMode}
+                disabled={loading || voiceBusy}
+                className="tap-44 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary text-white disabled:opacity-40 transition-opacity"
+              >
+                <AudioLines className="w-4 h-4" />
+              </button>
+            )}
           </form>
         )}
         <p className="text-center text-[11px] text-slate-400 mt-2">
           {voice.phase === "idle" ? t("footer") : t("voicePrivacy")}
         </p>
       </div>
+
+      {voiceMode && (
+        <VoiceModeOverlay
+          state={voiceModeState}
+          level={voice.level}
+          heard={voice.heard}
+          question={voiceTurnInfo.question}
+          reply={voiceTurnInfo.reply}
+          hasSuggestions={voiceTurnInfo.suggestions}
+          error={voiceError}
+          onOrb={onVoiceOrb}
+          onMute={onVoiceMute}
+          onEnd={endVoiceMode}
+        />
+      )}
     </div>
   );
 }

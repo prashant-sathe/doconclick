@@ -475,6 +475,8 @@ export const assistantRequestSchema = z.object(
       )
       .refine((msgs) => msgs[msgs.length - 1]?.role === "user", "The last message must be from you."),
     location: z.unknown().optional(),
+    // Hands-free voice mode: the reply will be spoken (see VOICE_MODE_NOTE).
+    voice: z.boolean().optional(),
   },
   BODY_ERROR,
 );

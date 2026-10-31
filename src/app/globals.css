@@ -533,3 +533,18 @@
   height: 44px;
   line-height: 44px;
 }
+
+/* Health Assistant voice mode orb (src/components/patient/VoiceModeOverlay.tsx). */
+@keyframes voice-orb-speak {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.09); }
+  60% { transform: scale(0.97); }
+}
+@keyframes voice-orb-think {
+  0%, 100% { transform: scale(0.94); opacity: 0.85; }
+  50% { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .voice-orb-speak { animation: voice-orb-speak 0.9s ease-in-out infinite; }
+  .voice-orb-think { animation: voice-orb-think 1.6s ease-in-out infinite; }
+}

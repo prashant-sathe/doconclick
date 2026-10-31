@@ -66,6 +66,12 @@ Rules:
 - New or worsening symptoms (fever, pain, breathlessness, a wound looking infected…) need a doctor, not a nurse — triage to a doctor as usual. Nurses never replace a doctor's diagnosis.
 - As with doctors, you never book nurses yourself; the patient taps a nurse card to book. Repeated care (e.g. an injection daily for 5 days) is booked in one go: on the booking screen they choose the number of visits (up to 14) and how often, and pay once — tell them that instead of suggesting separate bookings. Shifts (12h / 24h) can likewise be booked for several days back-to-back.`;
 
+// Added for a turn from hands-free voice mode, whose reply is read aloud.
+// The safety rules above still apply in full — only the delivery changes.
+const VOICE_MODE_NOTE = `
+
+Voice mode: the patient is talking to you hands-free and your reply will be read aloud. Answer like a person on a call — 1 to 3 short spoken sentences, no lists, headings, markdown or emoji. Still call tools exactly as usual. Doctor, nurse and ticket cards appear on their screen, so don't read out names, fees or distances one by one — say how many you found and that they can see them on screen (e.g. "I've found three general physicians near you — they're on your screen"). Emergency and self-harm guidance must still be given in full and clearly, including the number to call.`;
+
 const TOOLS: OpenAI.Responses.Tool[] = [
   {
     type: "function",
@@ -464,7 +470,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
       const response = await client.responses.create({
         model: ASSISTANT_MODEL,
-        instructions: SYSTEM_PROMPT,
+        instructions: body.voice ? SYSTEM_PROMPT + VOICE_MODE_NOTE : SYSTEM_PROMPT,
         input: [...priorItems, ...newItems],
         tools: TOOLS,
         reasoning: { effort: "low" },

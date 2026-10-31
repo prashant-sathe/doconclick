@@ -542,6 +542,19 @@
     "voiceUnsupported": "इस डिवाइस पर आवाज़ से सवाल पूछना उपलब्ध नहीं है। कृपया अपना सवाल टाइप करें।",
     "voiceTooShort": "यह बहुत छोटा था। माइक दबाएँ और अपना सवाल बोलें।",
     "voicePlayFailed": "जवाब सुनाया नहीं जा सका। आप इसे स्क्रीन पर पढ़ सकते हैं।",
-    "voicePrivacy": "आपकी आवाज़ हमारा AI प्रदाता टेक्स्ट में बदलता है, उसे सेव नहीं किया जाता।"
+    "voicePrivacy": "आपकी आवाज़ हमारा AI प्रदाता टेक्स्ट में बदलता है, उसे सेव नहीं किया जाता।",
+    "voiceMode": "वॉइस मोड",
+    "voiceModeListening": "सुन रहे हैं…",
+    "voiceModeHearing": "बोलते रहिए, सुन रहे हैं…",
+    "voiceModeThinking": "सोच रहे हैं…",
+    "voiceModeSpeaking": "बोल रहे हैं — रोकने के लिए गोले पर टैप करें",
+    "voiceModePaused": "रुका हुआ — बोलने के लिए गोले पर टैप करें",
+    "voiceModeHint": "आराम से बोलिए। आपके रुकते ही जवाब मिलेगा।",
+    "voiceModeInterrupt": "बीच में रोकें",
+    "voiceModeResume": "बोलना शुरू करें",
+    "voiceModeMute": "म्यूट करें",
+    "voiceModeUnmute": "अनम्यूट करें",
+    "voiceModeEnd": "वॉइस मोड बंद करें",
+    "voiceModeSeeChat": "सुझाव चैट में देखें"
   }
 }

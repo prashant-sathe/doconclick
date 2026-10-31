@@ -4,7 +4,9 @@
 // a Marathi and a Kannada sentence spoken by TTS come back as text in that
 // script. Then the page the way a patient uses it: Chromium's fake microphone
 // plays a spoken WAV, the patient taps the mic, stops, the question appears
-// as their message, the assistant replies and the reply is read aloud.
+// as their message, the assistant replies and the reply is read aloud; and
+// hands-free voice mode — it notices speech, stops at the pause, speaks the
+// reply, listens again, and can be interrupted, muted and ended.
 // Starts its own dev server (BASE_URL to use a running one) against the DB
 // and OPENAI_API_KEY in .env; one throwaway patient. Costs a few cents.
 //
@@ -130,6 +132,52 @@ async function main() {
       console.log(`      screenshot: ${path.join(tmp, "assistant-voice.png")}`);
     } finally {
       await browser.close();
+    }
+
+    // ── Hands-free voice mode: no taps between speaking and the reply ──
+    // A fresh browser, so the fake microphone plays the question once and
+    // then stays silent — the pause that ends the turn.
+    const handsFree = await chromium.launch({
+      args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream", `--use-file-for-fake-audio-capture=${wav}%noloop`, "--autoplay-policy=no-user-gesture-required"],
+    });
+    try {
+      const ctx = await handsFree.newContext({ viewport: { width: 390, height: 844 } });
+      await ctx.grantPermissions(["microphone"], { origin: BASE });
+      const token = jwt.sign({ id: patient.id, name: patient.name, role: patient.role, mobile: patient.mobile, tv: 0 }, SECRET);
+      await ctx.addCookies([{ name: "doconclick_token", value: token, url: BASE }, { name: "doconclick_lang", value: "mr-IN", url: BASE }]);
+      const page = await ctx.newPage();
+      await page.goto(`${BASE}/patient/assistant`, { waitUntil: "load", timeout: 120000 });
+      await page.evaluate((key) => sessionStorage.removeItem(key), `doconclick:assistant-chat:${patient.id}`);
+      await page.reload({ waitUntil: "load" });
+      const overlay = page.getByRole("dialog", { name: "व्हॉइस मोड" });
+      const status = overlay.locator("p.text-lg");
+      await page.getByRole("button", { name: "व्हॉइस मोड" }).click();
+      await overlay.waitFor({ timeout: 10000 });
+      check("voice mode opens full-screen and listens straight away", /ऐकत आहे|बोला, ऐकत आहे/.test((await status.textContent()) ?? ""), (await status.textContent()) ?? "");
+      await overlay.getByText("बोला, ऐकत आहे…").waitFor({ timeout: 15000 });
+      check("…notices the patient speaking", true, "बोला, ऐकत आहे…");
+      const transcribed = await page.waitForResponse((res) => res.url().endsWith("/api/patient/assistant/transcribe"), { timeout: 60000 });
+      check("…and stops by itself when they pause (no tap), then transcribes", transcribed.status() === 200, `${transcribed.status()}`);
+      const speech = await page.waitForResponse((res) => res.url().endsWith("/api/patient/assistant/speak"), { timeout: 120000 });
+      await overlay.getByText(/बोलत आहे/).waitFor({ timeout: 30000 });
+      const question = (await overlay.locator("p.italic").textContent()) ?? "";
+      const reply = (await overlay.locator("p.line-clamp-5").textContent()) ?? "";
+      check("the overlay shows the question and the reply, and speaks it", speech.status() === 200 && /ताप/.test(question) && /[ऀ-ॿ]/.test(reply), `"${question}" → "${reply.slice(0, 60)}"`);
+      check("…a short spoken-style reply (voice mode: no list, no markdown)", reply.length < 400 && !/\*\*|^\s*-\s/m.test(reply), `${reply.length} chars`);
+      await page.screenshot({ path: path.join(tmp, "voice-mode-speaking.png") });
+      await overlay.getByRole("button", { name: "मध्येच थांबवा" }).click();
+      await overlay.getByText(/^(ऐकत आहे…|बोला, ऐकत आहे…)$/).waitFor({ timeout: 10000 });
+      check("tapping the orb interrupts the reply and it listens again", true, (await status.textContent()) ?? "");
+      await page.screenshot({ path: path.join(tmp, "voice-mode-listening.png") });
+      await overlay.getByRole("button", { name: "म्यूट करा" }).click();
+      check("Mute pauses listening", /थांबवले आहे/.test((await status.textContent()) ?? ""), (await status.textContent()) ?? "");
+      await overlay.getByRole("button", { name: "व्हॉइस मोड बंद करा" }).first().click();
+      await overlay.waitFor({ state: "detached", timeout: 5000 });
+      const bubbles = await page.locator(".bg-primary-500").count();
+      check("ending voice mode leaves the conversation in the chat", bubbles >= 1 && (await page.locator(".rounded-bl-md").count()) >= 1, `${bubbles} question(s)`);
+      console.log(`      screenshots: ${path.join(tmp, "voice-mode-speaking.png")}, voice-mode-listening.png`);
+    } finally {
+      await handsFree.close();
     }
   } finally {
     await prisma.user.deleteMany({ where: { id: { in: [patient.id, doctor.id] } } });
