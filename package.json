@@ -74,6 +74,7 @@
     "test:admin-polish": "tsx tests/admin-polish.ts",
     "test:admin-nurses-cursor": "tsx tests/admin-nurses-cursor.ts",
     "test:announcements": "tsx tests/admin-announcements.ts",
+    "test:report-sums": "tsx tests/admin-report-sums.ts",
     "test:visit-verify": "tsx tests/visit-verify.ts",
     "test:walk-in": "tsx tests/walk-in.ts",
     "test:follow-up": "tsx tests/follow-up.ts",

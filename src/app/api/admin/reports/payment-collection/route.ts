@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { money, sumMoney } from "@/lib/money";
-import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
+import { requireAdmin, parseDateRange, finiteMoney, nonFiniteMoney } from "@/lib/adminAuth";
 
 // GET: Online vs Cash collection breakdown, plus the list of still-unpaid bookings.
 export async function GET(req: Request) {
@@ -15,14 +15,16 @@ export async function GET(req: Request) {
   const dateFilter = range.gte || range.lte ? range : undefined;
   const where = dateFilter ? { createdAt: dateFilter } : {};
 
-  // Summed in JS rather than via Prisma's groupBy/_sum: a single row with a
-  // corrupt (NaN) amount would otherwise poison the whole SQL-level SUM() for
-  // its (method, status) group, zeroing out every other appointment in it.
-  const [allForBreakdown, unpaid] = await Promise.all([
-    prisma.appointment.findMany({
-      where,
-      select: { paymentMethod: true, paymentStatus: true, amount: true },
+  // Summed in SQL; the rare legacy row with a NaN/Infinity amount is counted
+  // with ₹0 instead of turning its group's whole SUM() into NaN.
+  const [clean, odd, unpaid] = await Promise.all([
+    prisma.appointment.groupBy({
+      by: ["paymentMethod", "paymentStatus"],
+      where: { ...where, ...finiteMoney(["amount"]) },
+      _count: { _all: true },
+      _sum: { amount: true },
     }),
+    prisma.appointment.findMany({ where: { ...where, ...nonFiniteMoney(["amount"]) }, select: { paymentMethod: true, paymentStatus: true } }),
     prisma.appointment.findMany({
       where: { ...where, paymentStatus: "PENDING", amount: { gt: 0 }, status: { notIn: ["REJECTED", "CANCELLED", "EXPIRED", "NO_SHOW"] } },
       select: {
@@ -34,12 +36,13 @@ export async function GET(req: Request) {
     }),
   ]);
 
-  const byGroup = new Map<string, { paymentMethod: string; paymentStatus: string; count: number; total: number }>();
-  for (const a of allForBreakdown) {
+  const byGroup = new Map<string, { paymentMethod: string; paymentStatus: string; count: number; total: number }>(
+    clean.map((g) => [`${g.paymentMethod}::${g.paymentStatus}`, { paymentMethod: g.paymentMethod, paymentStatus: g.paymentStatus, count: g._count._all, total: g._sum.amount ?? 0 }]),
+  );
+  for (const a of odd) {
     const key = `${a.paymentMethod}::${a.paymentStatus}`;
     const e = byGroup.get(key) ?? { paymentMethod: a.paymentMethod, paymentStatus: a.paymentStatus, count: 0, total: 0 };
     e.count += 1;
-    e.total += safeNum(a.amount);
     byGroup.set(key, e);
   }
   const breakdown = [...byGroup.values()].map((b) => ({ ...b, total: money(b.total) }));

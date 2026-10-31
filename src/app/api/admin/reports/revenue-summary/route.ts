@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { money, sumMoney } from "@/lib/money";
-import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
-import { paidInRange, effectivePaidAt } from "@/lib/paidAt";
-import { istDayKey } from "@/lib/istDate";
+import { Prisma } from "@/generated/prisma/client";
+import { requireAdmin, parseDateRange } from "@/lib/adminAuth";
 
 // GET: platform-wide revenue — consultations (doctor and nurse visits) plus
 // doctor and nurse registration/subscription fees — as a total summary and a
@@ -23,37 +22,45 @@ export async function GET(req: Request) {
   const parsedRange = parseDateRange(searchParams);
   if (parsedRange.response) return parsedRange.response;
   const range = parsedRange.range;
-  const dateFilter = range.gte || range.lte ? range : undefined;
 
-  const [appointments, doctorLogs, nurseLogs] = await Promise.all([
-    prisma.appointment.findMany({
-      // Rows without paidAt (older ones) are dated by their visit instead of
-      // silently dropping out of every date range.
-      where: { status: "COMPLETED", paymentStatus: "PAID", ...(dateFilter ? paidInRange(dateFilter) : {}) },
-      select: { amount: true, platformFee: true, discountAmount: true, paidAt: true, scheduledAt: true },
-    }),
-    prisma.doctorPaymentLog.findMany({
-      where: dateFilter ? { createdAt: dateFilter } : undefined,
-      select: { type: true, amount: true, createdAt: true },
-    }),
-    prisma.nursePaymentLog.findMany({
-      where: dateFilter ? { createdAt: dateFilter } : undefined,
-      select: { type: true, amount: true, createdAt: true },
-    }),
+  // Summed in SQL per IST day (P3-47) instead of loading every row. Per day
+  // the plain sum, rounded on the way out (as before); for the summary each
+  // row in paise, like sumMoney (src/lib/money.ts). A legacy NaN/Infinity
+  // amount counts as 0, like safeNum.
+  const dayOf = (col: Prisma.Sql) => Prisma.sql`to_char((${col} AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`;
+  const inRange = (col: Prisma.Sql) => Prisma.sql`${range.gte ? Prisma.sql`AND ${col} >= ${range.gte}::timestamp` : Prisma.empty} ${range.lte ? Prisma.sql`AND ${col} <= ${range.lte}::timestamp` : Prisma.empty}`;
+  const finite = (col: string) => Prisma.sql`CASE WHEN ${Prisma.raw(col)} IN ('NaN'::float8, 'Infinity'::float8, '-Infinity'::float8) THEN 0 ELSE ${Prisma.raw(col)} END`;
+  const sums = (col: string, as: string) => Prisma.sql`COALESCE(SUM(${finite(col)}), 0)::float8 AS ${Prisma.raw(`"${as}"`)}, COALESCE(SUM(ROUND(${finite(col)}::numeric * 100)), 0)::float8 AS ${Prisma.raw(`"${as}Paise"`)}`;
+  // Rows without paidAt (older ones) are dated by their visit instead of
+  // silently dropping out of every date range (src/lib/paidAt.ts).
+  const visitAt = Prisma.sql`COALESCE("paidAt", "scheduledAt")`;
+  type Sums<K extends string> = { [P in K | `${K}Paise`]: number };
+  type LogDay = { day: string; type: string } & Sums<"amount">;
+  const logDays = (table: string) => prisma.$queryRaw<LogDay[]>`
+    SELECT ${dayOf(Prisma.sql`"createdAt"`)} AS day, type, ${sums('"amount"', "amount")}
+    FROM ${Prisma.raw(`"${table}"`)} WHERE TRUE ${inRange(Prisma.sql`"createdAt"`)}
+    GROUP BY 1, 2`;
+  const [visitDays, doctorLogs, nurseLogs] = await Promise.all([
+    prisma.$queryRaw<({ day: string } & Sums<"amount" | "platformFee" | "discountAmount">)[]>`
+      SELECT ${dayOf(visitAt)} AS day, ${sums('"amount"', "amount")}, ${sums('"platformFee"', "platformFee")}, ${sums('"discountAmount"', "discountAmount")}
+      FROM "Appointment" WHERE status = 'COMPLETED' AND "paymentStatus" = 'PAID' ${inRange(visitAt)}
+      GROUP BY 1`,
+    logDays("DoctorPaymentLog"),
+    logDays("NursePaymentLog"),
   ]);
 
-  // Summed in paise and rounded (src/lib/money.ts); derived figures come from
-  // the rounded parts, so the summary always adds up.
-  const sum = (rows: { amount: number }[]) => sumMoney(rows.map((r) => r.amount));
-  const grossConsultRevenue = sumMoney(appointments.map((a) => a.amount));
-  const commissionBeforeCoupons = sumMoney(appointments.map((a) => a.platformFee));
-  const couponDiscounts = sumMoney(appointments.map((a) => a.discountAmount));
+  // Derived figures come from the rounded parts, so the summary always adds up.
+  const paise = (rows: Record<string, unknown>[], key: string) => rows.reduce((t, r) => t + Number(r[key]), 0) / 100;
+  const ofType = (rows: LogDay[], type: string) => rows.filter((l) => l.type === type);
+  const grossConsultRevenue = paise(visitDays, "amountPaise");
+  const commissionBeforeCoupons = paise(visitDays, "platformFeePaise");
+  const couponDiscounts = paise(visitDays, "discountAmountPaise");
   const platformCommission = sumMoney([commissionBeforeCoupons, -couponDiscounts]);
   const doctorNetPayout = sumMoney([grossConsultRevenue, -commissionBeforeCoupons]);
-  const registrationRevenue = sum(doctorLogs.filter((l) => l.type === "REGISTRATION"));
-  const subscriptionRevenue = sum(doctorLogs.filter((l) => l.type === "SUBSCRIPTION"));
-  const nurseRegistrationRevenue = sum(nurseLogs.filter((l) => l.type === "REGISTRATION"));
-  const nurseSubscriptionRevenue = sum(nurseLogs.filter((l) => l.type === "SUBSCRIPTION"));
+  const registrationRevenue = paise(ofType(doctorLogs, "REGISTRATION"), "amountPaise");
+  const subscriptionRevenue = paise(ofType(doctorLogs, "SUBSCRIPTION"), "amountPaise");
+  const nurseRegistrationRevenue = paise(ofType(nurseLogs, "REGISTRATION"), "amountPaise");
+  const nurseSubscriptionRevenue = paise(ofType(nurseLogs, "SUBSCRIPTION"), "amountPaise");
 
   type Day = { date: string; consultRevenue: number; couponDiscounts: number; platformCommission: number; registrationRevenue: number; subscriptionRevenue: number; nurseRevenue: number };
   const byDay = new Map<string, Day>();
@@ -65,18 +72,18 @@ export async function GET(req: Request) {
     }
     return e;
   };
-  for (const a of appointments) {
-    const e = entry(istDayKey(effectivePaidAt(a)));
-    e.consultRevenue += safeNum(a.amount);
-    e.couponDiscounts += safeNum(a.discountAmount);
-    e.platformCommission += safeNum(a.platformFee) - safeNum(a.discountAmount);
+  for (const v of visitDays) {
+    const e = entry(v.day);
+    e.consultRevenue += v.amount;
+    e.couponDiscounts += v.discountAmount;
+    e.platformCommission += v.platformFee - v.discountAmount;
   }
   for (const l of doctorLogs) {
-    const e = entry(istDayKey(l.createdAt));
-    if (l.type === "REGISTRATION") e.registrationRevenue += safeNum(l.amount);
-    else e.subscriptionRevenue += safeNum(l.amount);
+    const e = entry(l.day);
+    if (l.type === "REGISTRATION") e.registrationRevenue += l.amount;
+    else e.subscriptionRevenue += l.amount;
   }
-  for (const l of nurseLogs) entry(istDayKey(l.createdAt)).nurseRevenue += safeNum(l.amount);
+  for (const l of nurseLogs) entry(l.day).nurseRevenue += l.amount;
 
   const rows = [...byDay.values()]
     .map((d) => ({

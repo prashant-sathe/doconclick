@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { money, sumMoney } from "@/lib/money";
-import { requireAdmin, parseDateRange, safeNum } from "@/lib/adminAuth";
+import { requireAdmin, parseDateRange, safeNum, finiteMoney, nonFiniteMoney } from "@/lib/adminAuth";
 import { paidInRange } from "@/lib/paidAt";
 
 // GET: per-doctor activity + earnings summary.
@@ -15,28 +15,28 @@ export async function GET(req: Request) {
   const range = parsedRange.range;
   const dateFilter = range.gte || range.lte ? range : undefined;
 
-  // Summed in JS rather than via Prisma's groupBy/_sum: a single row with a
-  // corrupt (NaN) amount would otherwise poison the whole SQL-level SUM() for
-  // that doctor, zeroing out every other completed appointment they have.
-  const appointments = await prisma.appointment.findMany({
-    // Rows without paidAt (older ones) are dated by their visit instead of
-    // silently dropping out of every date range.
-    where: { status: "COMPLETED", paymentStatus: "PAID", ...(dateFilter ? paidInRange(dateFilter) : {}) },
-    select: { doctorId: true, amount: true, platformFee: true },
-  });
-  const byDoctor = new Map<string, { count: number; amount: number; platformFee: number }>();
-  for (const a of appointments) {
+  // Summed in SQL; the rare legacy row with a NaN/Infinity amount is added
+  // by itself as 0 instead of turning its doctor's whole SUM() into NaN.
+  const where = { status: "COMPLETED", paymentStatus: "PAID", ...(dateFilter ? paidInRange(dateFilter) : {}) };
+  const SUMMED = ["amount", "platformFee"] as const;
+  const [clean, odd] = await Promise.all([
+    prisma.appointment.groupBy({
+      by: ["doctorId"],
+      where: { AND: [where, finiteMoney(SUMMED)] },
+      _count: { _all: true },
+      _sum: { amount: true, platformFee: true },
+    }),
+    prisma.appointment.findMany({ where: { AND: [where, nonFiniteMoney(SUMMED)] }, select: { doctorId: true, amount: true, platformFee: true } }),
+  ]);
+  const byDoctor = new Map(clean.map((g) => [g.doctorId, { count: g._count._all, amount: g._sum.amount ?? 0, platformFee: g._sum.platformFee ?? 0 }]));
+  for (const a of odd) {
     const e = byDoctor.get(a.doctorId) ?? { count: 0, amount: 0, platformFee: 0 };
     e.count += 1;
     e.amount += safeNum(a.amount);
     e.platformFee += safeNum(a.platformFee);
     byDoctor.set(a.doctorId, e);
   }
-  const grouped = [...byDoctor.entries()].map(([doctorId, e]) => ({
-    doctorId,
-    _sum: { amount: e.amount, platformFee: e.platformFee },
-    _count: e.count,
-  }));
+  const grouped = [...byDoctor.entries()].map(([doctorId, e]) => ({ doctorId, ...e }));
 
   const doctorIds = grouped.map((g) => g.doctorId);
   const doctors = await prisma.user.findMany({
@@ -52,8 +52,8 @@ export async function GET(req: Request) {
     .map((g) => {
       const d = byId.get(g.doctorId);
       // Rounded to paise; net from the rounded parts (src/lib/money.ts).
-      const grossEarnings = money(g._sum.amount);
-      const platformFeePaid = money(g._sum.platformFee);
+      const grossEarnings = money(g.amount);
+      const platformFeePaid = money(g.platformFee);
       return {
         doctorId: g.doctorId,
         doctorName: d?.name ?? "Unknown",
@@ -62,7 +62,7 @@ export async function GET(req: Request) {
         status: d?.doctorProfile?.status ?? null,
         avgRating: d?.doctorProfile?.avgRating ?? 0,
         totalReviews: d?.doctorProfile?.totalReviews ?? 0,
-        completedBookings: g._count,
+        completedBookings: g.count,
         grossEarnings,
         platformFeePaid,
         netEarnings: sumMoney([grossEarnings, -platformFeePaid]),

@@ -32,6 +32,20 @@ export function safeNum(v: number | null | undefined): number {
   return typeof v === "number" && Number.isFinite(v) ? v : 0;
 }
 
+// Report totals summed in SQL (P3-47) the same way as safeNum: a groupBy
+// _sum over only the rows whose summed columns are all finite, plus the few
+// legacy rows that aren't, fetched separately and added row by row.
+const NON_FINITE = [NaN, Infinity, -Infinity];
+type AppointmentMoneyColumn = "amount" | "platformFee" | "discountAmount";
+
+export function finiteMoney(cols: readonly AppointmentMoneyColumn[]): Prisma.AppointmentWhereInput {
+  return Object.fromEntries(cols.map((c) => [c, { notIn: NON_FINITE }]));
+}
+
+export function nonFiniteMoney(cols: readonly AppointmentMoneyColumn[]): Prisma.AppointmentWhereInput {
+  return { OR: cols.map((c) => ({ [c]: { in: NON_FINITE } })) };
+}
+
 /**
  * Parses optional ?from=&to= (YYYY-MM-DD, inclusive) into a Prisma-friendly
  * range covering whole IST days (src/lib/istDate.ts). A value that isn't a
