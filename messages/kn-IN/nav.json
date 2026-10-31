@@ -1,0 +1,68 @@
+{
+  "patient": {
+    "findDoctor": "ವೈದ್ಯರನ್ನು ಹುಡುಕಿ",
+    "bookNurse": "ನರ್ಸ್ ಬುಕ್ ಮಾಡಿ",
+    "askAi": "AI ಕೇಳಿ",
+    "appointments": "ಬುಕಿಂಗ್",
+    "saved": "ಉಳಿಸಿದ",
+    "profile": "ಪ್ರೊಫೈಲ್",
+    "tabDoctors": "ವೈದ್ಯರು",
+    "tabNurse": "ನರ್ಸ್",
+    "tabAssistant": "ಸಹಾಯಕ"
+  },
+  "doctor": {
+    "dashboard": "ಮುಖಪುಟ",
+    "earnings": "ಗಳಿಕೆ",
+    "clinics": "ಕ್ಲಿನಿಕ್‌ಗಳು",
+    "support": "ಸಹಾಯ",
+    "profile": "ಪ್ರೊಫೈಲ್",
+    "walkIn": "ವಾಕ್-ಇನ್"
+  },
+  "nurse": {
+    "visits": "ಭೇಟಿಗಳು",
+    "earnings": "ಗಳಿಕೆ",
+    "profile": "ಪ್ರೊಫೈಲ್",
+    "visitRequests": "ಭೇಟಿ ವಿನಂತಿಗಳು"
+  },
+  "header": {
+    "hi": "ನಮಸ್ಕಾರ, <strong>{name}</strong>",
+    "there": "ಸ್ನೇಹಿತರೇ",
+    "home": "DocOnClick ಮುಖಪುಟ",
+    "wallet": "ವಾಲೆಟ್",
+    "walletBalance": "ವಾಲೆಟ್, ಬ್ಯಾಲೆನ್ಸ್ ₹{balance}",
+    "notifications": "ಅಧಿಸೂಚನೆಗಳು",
+    "notificationsNew": "ಅಧಿಸೂಚನೆಗಳು (ಹೊಸದು)",
+    "signOut": "ಸೈನ್ ಔಟ್",
+    "appointmentUpdates": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಅಪ್‌ಡೇಟ್‌ಗಳು",
+    "noUpdates": "ಇನ್ನೂ ಯಾವುದೇ ಅಪ್‌ಡೇಟ್‌ಗಳಿಲ್ಲ.",
+    "walletSection": "ವಾಲೆಟ್",
+    "noWalletActivity": "ಇನ್ನೂ ಯಾವುದೇ ವಾಲೆಟ್ ಚಟುವಟಿಕೆ ಇಲ್ಲ.",
+    "topUpFailed": "ಟಾಪ್-ಅಪ್ ವಿಫಲವಾಗಿದೆ",
+    "walletAmount": "₹{amount}",
+    "walletAmountBalance": "₹{amount} · ಬ್ಯಾಲೆನ್ಸ್ ₹{balance}",
+    "announcements": "ಪ್ರಕಟಣೆಗಳು",
+    "noAnnouncements": "ಇನ್ನೂ ಯಾವುದೇ ಪ್ರಕಟಣೆಗಳಿಲ್ಲ.",
+    "viewAllAppointments": "ಎಲ್ಲಾ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗಳನ್ನು ನೋಡಿ",
+    "pendingRequests": "ಬಾಕಿ ಇರುವ ವಿನಂತಿಗಳು",
+    "noPendingRequests": "ಯಾವುದೇ ಬಾಕಿ ವಿನಂತಿಗಳಿಲ್ಲ.",
+    "viewAllInDashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ನಲ್ಲಿ ಎಲ್ಲವನ್ನೂ ನೋಡಿ",
+    "inbox": "ಇನ್‌ಬಾಕ್ಸ್",
+    "inboxUnread": "ಇನ್‌ಬಾಕ್ಸ್, {count} ಓದದವು"
+  },
+  "walletEvent": {
+    "TOPUP": "ವಾಲೆಟ್ ಟಾಪ್-ಅಪ್ ಆಗಿದೆ",
+    "BOOKING_PAYMENT": "ವಾಲೆಟ್‌ನಿಂದ ಕಡಿತಗೊಂಡಿದೆ",
+    "ADMIN_CREDIT": "ಅಡ್ಮಿನ್ ಜಮಾ ಮಾಡಿದ್ದಾರೆ",
+    "ADMIN_DEBIT": "ಅಡ್ಮಿನ್ ಕಡಿತಗೊಳಿಸಿದ್ದಾರೆ",
+    "REASSIGNMENT_CREDIT": "ರದ್ದಾದ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗೆ ಮರುಪಾವತಿ ಮಾಡಲಾಗಿದೆ"
+  },
+  "apptEvent": {
+    "SCHEDULED": "ದೃಢೀಕರಿಸಲಾಗಿದೆ",
+    "ON_THE_WAY": "ದಾರಿಯಲ್ಲಿದ್ದಾರೆ",
+    "ARRIVED": "ತಲುಪಿದ್ದಾರೆ",
+    "COMPLETED": "ಪೂರ್ಣಗೊಂಡಿದೆ",
+    "CANCELLED": "ರದ್ದಾಗಿದೆ",
+    "REJECTED": "ನಿರಾಕರಿಸಲಾಗಿದೆ",
+    "EXPIRED": "ವೈದ್ಯರು ಬ್ಯುಸಿಯಾಗಿದ್ದರು"
+  }
+}

@@ -27,7 +27,7 @@ model User {
   // anyone until this instant — the end of that IST day, so they're back
   // tomorrow without remembering to switch it off (src/lib/timeOff.ts).
   offlineUntil DateTime?
-  // UI and push language: "en-IN" | "hi-IN" | "mr-IN" (src/lib/appLanguage.ts).
+  // UI and push language: "en-IN" | "hi-IN" | "mr-IN" | "kn-IN" (src/lib/appLanguage.ts).
   // The `doconclick_lang` cookie mirrors it for page rendering; pushes —
   // often sent with no request from this user — read it from here.
   language     String  @default("en-IN")

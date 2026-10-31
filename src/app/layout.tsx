@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Noto_Sans_Devanagari } from "next/font/google";
+import { Inter, Noto_Sans_Devanagari, Noto_Sans_Kannada } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { baseLanguage } from "@/lib/appLanguage";
@@ -15,6 +15,8 @@ import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 // Hindi and Marathi (Devanagari) — Inter has no Devanagari glyphs.
 const devanagari = Noto_Sans_Devanagari({ subsets: ["devanagari"], variable: "--font-deva", weight: ["400", "500", "600", "700", "800"] });
+// Kannada — likewise not in Inter.
+const kannada = Noto_Sans_Kannada({ subsets: ["kannada"], variable: "--font-knda", weight: ["400", "500", "600", "700", "800"] });
 
 // viewportFit: "cover" lets content draw under the status bar/notch inside
 // the native app shell, so env(safe-area-inset-*) below actually activates.
@@ -85,7 +87,7 @@ export default async function RootLayout({
     // hydration fail silently app-wide inside the Android WebView.
     // lang: the user's language (src/lib/appLanguage.ts) — screen readers
     // pick a voice by it.
-    <html lang={baseLanguage(locale)} className={`${inter.variable} ${devanagari.variable}`} suppressHydrationWarning>
+    <html lang={baseLanguage(locale)} className={`${inter.variable} ${devanagari.variable} ${kannada.variable}`} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"

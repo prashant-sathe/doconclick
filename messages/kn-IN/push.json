@@ -1,0 +1,398 @@
+{
+  "apptConfirmed": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ದೃಢಪಟ್ಟಿದೆ!",
+    "body": "{doctor} ಅವರು ನಿಮ್ಮ ವಿನಂತಿಯನ್ನು ಸ್ವೀಕರಿಸಿದ್ದಾರೆ.{free, select, yes { ಏನನ್ನೂ ಪಾವತಿಸಬೇಕಿಲ್ಲ — ಎಲ್ಲವೂ ಸಿದ್ಧವಾಗಿದೆ.} other {}}"
+  },
+  "apptDeclined": {
+    "title": "ವಿನಂತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ",
+    "body": "{doctor} ಅವರಿಗೆ ನಿಮ್ಮ ವಿನಂತಿಯನ್ನು ಸ್ವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ."
+  },
+  "apptCompleted": {
+    "title": "ಸಮಾಲೋಚನೆ ಪೂರ್ಣಗೊಂಡಿದೆ",
+    "body": "{doctor} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ಭೇಟಿ ಪೂರ್ಣಗೊಂಡಿದೆ."
+  },
+  "apptCancelled": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "{doctor} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ."
+  },
+  "apptNoShow": {
+    "title": "ಗೈರುಹಾಜರಿ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ",
+    "body": "{doctor} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗೆ ನೀವು ಗೈರುಹಾಜರಾಗಿದ್ದೀರಿ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ."
+  },
+  "nursePackageAccepted": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ದೃಢಪಟ್ಟಿದೆ!",
+    "body": "{doctor} ಅವರು ನಿಮ್ಮ {count}-ಭೇಟಿಗಳ ಪ್ಯಾಕೇಜ್ ಅನ್ನು ಸ್ವೀಕರಿಸಿದ್ದಾರೆ.{free, select, yes { ಏನನ್ನೂ ಪಾವತಿಸಬೇಕಿಲ್ಲ — ಎಲ್ಲವೂ ಸಿದ್ಧವಾಗಿದೆ.} other {}}"
+  },
+  "nursePackageDeclined": {
+    "title": "ವಿನಂತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ",
+    "body": "{doctor} ಅವರಿಗೆ ನಿಮ್ಮ {count}-ಭೇಟಿಗಳ ಪ್ಯಾಕೇಜ್ ಅನ್ನು ಸ್ವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ."
+  },
+  "rescheduleAccepted": {
+    "title": "ಹೊಸ ಸಮಯ ದೃಢಪಟ್ಟಿದೆ",
+    "body": "{doctor} ಅವರು ನಿಮ್ಮ ಹೊಸ ಸಮಯವನ್ನು ದೃಢಪಡಿಸಿದ್ದಾರೆ: {when, date, medium}, {when, time, short}."
+  },
+  "rescheduleDeclined": {
+    "title": "ಹೊಸ ಸಮಯ ಲಭ್ಯವಿಲ್ಲ",
+    "body": "{doctor} ಅವರಿಗೆ ಹೊಸ ಸಮಯ ಹೊಂದುವುದಿಲ್ಲ — ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ {when, date, medium}, {when, time, short} ರಂದೇ ಇರುತ್ತದೆ."
+  },
+  "rescheduleDeclinedRefunded": {
+    "title": "ವಿನಂತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ",
+    "body": "{doctor} ಅವರಿಗೆ ನೀವು ಕೇಳಿದ ಹೊಸ ಸಮಯ ಹೊಂದಿಸಲು ಆಗಲಿಲ್ಲ. ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರುಪಾವತಿಸಲಾಗಿದೆ."
+  },
+  "rescheduleWithdrawn": {
+    "title": "ಸಮಯ ಬದಲಾವಣೆ ವಿನಂತಿ ಹಿಂಪಡೆಯಲಾಗಿದೆ",
+    "body": "{patient} ಅವರು ತಮ್ಮ ಮೂಲ ಸಮಯವನ್ನೇ ಉಳಿಸಿಕೊಂಡಿದ್ದಾರೆ ({when, date, medium}, {when, time, short})."
+  },
+  "rescheduleRequested": {
+    "title": "ಸಮಯ ಬದಲಾವಣೆ ವಿನಂತಿ",
+    "body": "{patient} ಅವರು ತಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಅನ್ನು {when, date, medium}, {when, time, short} ಕ್ಕೆ ಬದಲಿಸಲು ಕೇಳಿದ್ದಾರೆ — ಹೊಸ ಸಮಯವನ್ನು ಸ್ವೀಕರಿಸಿ ಅಥವಾ ಮೂಲ ಸಮಯವನ್ನೇ ಇರಿಸಿ."
+  },
+  "rescheduleRequestUpdated": {
+    "title": "ವಿನಂತಿಸಿದ ಸಮಯ ಬದಲಾಗಿದೆ",
+    "body": "{patient} ಅವರು ತಾವು ವಿನಂತಿಸಿದ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಸಮಯವನ್ನು ಬದಲಿಸಿದ್ದಾರೆ."
+  },
+  "reassignedRequestToDoctor": {
+    "title": "ಹೊಸ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ವಿನಂತಿ",
+    "body": "{named, select, yes {{patient} ಅವರಿಗೆ} other {ಒಬ್ಬ ರೋಗಿಗೆ}} {consultType, select, HOME {ಮನೆ} VIDEO {ವೀಡಿಯೊ} other {ಕ್ಲಿನಿಕ್}} ಸಮಾಲೋಚನೆ ಬೇಕಾಗಿದೆ."
+  },
+  "apptReassigned": {
+    "title": "ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬೇರೆಯವರಿಗೆ ವರ್ಗಾಯಿಸಲಾಗಿದೆ",
+    "body": "{doctor} ಅವರಿಗೆ ತುರ್ತು ಪರಿಸ್ಥಿತಿ ಎದುರಾದ ಕಾರಣ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಮುಂದುವರಿಸಲು ಆಗಲಿಲ್ಲ. ನಿಮ್ಮ ಹತ್ತಿರದಲ್ಲೇ Dr. {newDoctor} ಅವರನ್ನು ಹುಡುಕಿದ್ದೇವೆ ಮತ್ತು {paid, select, yes {₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಹಿಂತಿರುಗಿಸಿದ್ದೇವೆ — ಅವರು ಸ್ವೀಕರಿಸಿದ ನಂತರ ಮತ್ತೆ ಪಾವತಿಸಿ.} other {ನಿಮ್ಮ ವಿನಂತಿಯನ್ನು ಅವರಿಗೆ ಕಳುಹಿಸಿದ್ದೇವೆ.}}"
+  },
+  "apptCancelledNoReplacement": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "{doctor} ಅವರಿಗೆ ತುರ್ತು ಪರಿಸ್ಥಿತಿ ಎದುರಾದ ಕಾರಣ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಮುಂದುವರಿಸಲು ಆಗಲಿಲ್ಲ. ಸದ್ಯಕ್ಕೆ ಹತ್ತಿರದಲ್ಲಿ ಬೇರೆ {providerType, select, NURSE {ನರ್ಸ್} other {ವೈದ್ಯರು}} ಸಿಗಲಿಲ್ಲ — {paid, select, yes {₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಜಮಾ ಮಾಡಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಬುಕ್ ಮಾಡಿ.} other {ದಯವಿಟ್ಟು ಮತ್ತೆ ಬುಕ್ ಮಾಡಿ.}}"
+  },
+  "walkInCancelled": {
+    "title": "ಭೇಟಿ ರದ್ದಾಗಿದೆ",
+    "body": "{doctor} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ಭೇಟಿ ರದ್ದಾಗಿದೆ.{paid, select, yes { ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಜಮಾ ಮಾಡಲಾಗಿದೆ.} other {}}"
+  },
+  "apptCancelledByPatient": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "{paid, select, yes {{patient} ಅವರು ತಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದುಮಾಡಿದ್ದಾರೆ. ₹{amount} ಅವರ ವಾಲೆಟ್‌ಗೆ ಮರುಪಾವತಿಸಲಾಗಿದೆ.} other {{patient} ಅವರು ತಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ವಿನಂತಿಯನ್ನು ರದ್ದುಮಾಡಿದ್ದಾರೆ.}}"
+  },
+  "nurseReferralRecommended": {
+    "title": "ಮನೆಯಲ್ಲೇ ನರ್ಸಿಂಗ್ ಆರೈಕೆಗೆ ಶಿಫಾರಸು",
+    "body": "{doctor} ಅವರು ಮನೆಯಲ್ಲೇ {service} ಶಿಫಾರಸು ಮಾಡಿದ್ದಾರೆ. ನರ್ಸ್ ಬುಕ್ ಮಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ — ನಿಮ್ಮ ವೈದ್ಯರ ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಲಗತ್ತಿಸಲಾಗಿದೆ."
+  },
+  "travelOnTheWay": {
+    "title": "ನಿಮ್ಮ {providerType, select, NURSE {ನರ್ಸ್} other {ವೈದ್ಯರು}} ದಾರಿಯಲ್ಲಿದ್ದಾರೆ!",
+    "body": "{provider} ಅವರು ನಿಮ್ಮ ಬಳಿಗೆ ಹೊರಟಿದ್ದಾರೆ.{due, select, yes { ನಿಮ್ಮ ₹{amount} ಪಾವತಿ ಇನ್ನೂ ಬಾಕಿ ಇದೆ — ಅವರು ಬರುವ ಮೊದಲು ದಯವಿಟ್ಟು ಪಾವತಿಸಿ.} other {}}"
+  },
+  "travelArrived": {
+    "title": "ನಿಮ್ಮ {providerType, select, NURSE {ನರ್ಸ್} other {ವೈದ್ಯರು}} ಬಂದಿದ್ದಾರೆ!",
+    "body": "{provider} ಅವರು ನಿಮ್ಮ ಭೇಟಿಗಾಗಿ ಇಲ್ಲಿದ್ದಾರೆ."
+  },
+  "travelStopped": {
+    "title": "ನಿಮ್ಮ {providerType, select, NURSE {ನರ್ಸ್} other {ವೈದ್ಯರು}} ಪ್ರಯಾಣ ನಿಲ್ಲಿಸಿದ್ದಾರೆ",
+    "body": "{provider} ಅವರು ಸದ್ಯಕ್ಕೆ ದಾರಿಯಲ್ಲಿಲ್ಲ — ನಿಮ್ಮ ಭೇಟಿಗೆ ಮೊದಲು ಮತ್ತೆ ಹೊರಡುತ್ತಾರೆ ಅಥವಾ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತಾರೆ."
+  },
+  "vitalsCriticalPatient": {
+    "title": "⚠ ತುರ್ತು: {patient} ಅವರ ವೈಟಲ್ಸ್ ಕಡೆ ಗಮನ ಬೇಕು",
+    "body": "{alerts}. ನರ್ಸ್ {nurse} ಅವರು ಈಗಷ್ಟೇ ಇದನ್ನು ದಾಖಲಿಸಿದ್ದಾರೆ — ನಿಮ್ಮ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ."
+  },
+  "vitalsCriticalDoctor": {
+    "title": "⚠ ಗಂಭೀರ ವೈಟಲ್ಸ್: {patient}",
+    "body": "{alerts} ({summary}) — ನೀವು ರೆಫರ್ ಮಾಡಿದ ಭೇಟಿಯಲ್ಲಿ ನರ್ಸ್ {nurse} ಅವರು ದಾಖಲಿಸಿದ್ದಾರೆ."
+  },
+  "chatNewMessage": {
+    "title": "{sender} ಅವರಿಂದ ಹೊಸ ಸಂದೇಶ",
+    "body": "{hasText, select, yes {{text}} other {ಫೈಲ್ ಕಳುಹಿಸಿದ್ದಾರೆ}}"
+  },
+  "videoStarted": {
+    "title": "ವೀಡಿಯೊ ಸಮಾಲೋಚನೆ ಆರಂಭವಾಗಿದೆ",
+    "body": "{name} ಅವರು ವೀಡಿಯೊ ಸಮಾಲೋಚನೆಗೆ ಸೇರಿದ್ದಾರೆ."
+  },
+  "visitStartedWithoutCode": {
+    "title": "ನಿಮ್ಮ ಕೋಡ್ ಇಲ್ಲದೆ ಭೇಟಿ ಆರಂಭವಾಗಿದೆ",
+    "body": "{nurse} ಅವರು ಕೋಡ್ ಇಲ್ಲದೆ ಭೇಟಿ ಆರಂಭಿಸಿದ್ದಾರೆ: \"{reason}\". ಇದು ನೀವಲ್ಲದಿದ್ದರೆ, ಸಪೋರ್ಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ."
+  },
+  "adminVisitStartedWithoutCode": {
+    "title": "ಕೋಡ್ ಇಲ್ಲದೆ ನರ್ಸ್ ಭೇಟಿ ಆರಂಭವಾಗಿದೆ",
+    "body": "{nurse} → {patient}: {reason}"
+  },
+  "visitStarted": {
+    "title": "ನಿಮ್ಮ ನರ್ಸ್ ಭೇಟಿ ಆರಂಭವಾಗಿದೆ",
+    "body": "{nurse} ಅವರು ನಿಮ್ಮ ಕೋಡ್ ಪರಿಶೀಲಿಸಿ ಭೇಟಿ ಆರಂಭಿಸಿದ್ದಾರೆ."
+  },
+  "walkInBookedPatient": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಆಗಿದೆ",
+    "body": "{doctor} ಅವರು {forDependent, select, yes {{label} ಅವರಿಗಾಗಿ} other {ನಿಮಗಾಗಿ}} {scheduled, select, yes {{when, date, medium}, {when, time, short} ಕ್ಕೆ} other {ಇಂದು}} {consultType, select, HOME {ಮನೆ ಭೇಟಿ} VIDEO {ವೀಡಿಯೊ ಸಮಾಲೋಚನೆ} other {ಕ್ಲಿನಿಕ್ ಭೇಟಿ}} ಬುಕ್ ಮಾಡಿದ್ದಾರೆ.{payNow, select, yes { ₹{amount} ಅನ್ನು ಆ್ಯಪ್‌ನಲ್ಲಿ ಅಥವಾ ಕ್ಲಿನಿಕ್ ನೀಡಿದ ಲಿಂಕ್ ಮೂಲಕ ಪಾವತಿಸಿ.} other {}}"
+  },
+  "walkInBookedDoctor": {
+    "title": "ವಾಕ್-ಇನ್ ಬುಕ್ ಆಗಿದೆ",
+    "body": "{staff} ಅವರು {label} ಅವರಿಗಾಗಿ {scheduled, select, yes {{when, date, medium}, {when, time, short} ಕ್ಕೆ} other {ಈಗ}} {consultType, select, HOME {ಮನೆ ಭೇಟಿ} VIDEO {ವೀಡಿಯೊ ಸಮಾಲೋಚನೆ} other {ಕ್ಲಿನಿಕ್ ಭೇಟಿ}} ಬುಕ್ ಮಾಡಿದ್ದಾರೆ."
+  },
+  "nurseApplicationApproved": {
+    "title": "ಅರ್ಜಿ ಅನುಮೋದಿಸಲಾಗಿದೆ",
+    "body": "ನಿಮ್ಮ ನರ್ಸ್ ಅರ್ಜಿ ಅನುಮೋದನೆಗೊಂಡಿದೆ — ಈಗ ರೋಗಿಗಳು ನಿಮ್ಮನ್ನು ಬುಕ್ ಮಾಡಬಹುದು."
+  },
+  "nurseApplicationRejected": {
+    "title": "ಅರ್ಜಿ ಅನುಮೋದನೆಗೊಂಡಿಲ್ಲ",
+    "body": "ಈ ಬಾರಿ ನಿಮ್ಮ ನರ್ಸ್ ಅರ್ಜಿ ಅನುಮೋದನೆಗೊಂಡಿಲ್ಲ."
+  },
+  "accountSuspended": {
+    "title": "ಖಾತೆ ಅಮಾನತುಗೊಂಡಿದೆ",
+    "body": "ಅಡ್ಮಿನ್ ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಮಾನತುಗೊಳಿಸಿದ್ದಾರೆ."
+  },
+  "doctorApplicationApproved": {
+    "title": "ಅರ್ಜಿ ಅನುಮೋದಿಸಲಾಗಿದೆ",
+    "body": "ನಿಮ್ಮ ವೈದ್ಯರ ಅರ್ಜಿ ಅನುಮೋದನೆಗೊಂಡಿದೆ."
+  },
+  "doctorApplicationRejected": {
+    "title": "ಅರ್ಜಿ ಅನುಮೋದನೆಗೊಂಡಿಲ್ಲ",
+    "body": "ಈ ಬಾರಿ ನಿಮ್ಮ ವೈದ್ಯರ ಅರ್ಜಿ ಅನುಮೋದನೆಗೊಂಡಿಲ್ಲ."
+  },
+  "doctorApplicationRejectedReason": {
+    "title": "ಅರ್ಜಿ ಅನುಮೋದನೆಗೊಂಡಿಲ್ಲ",
+    "body": "ಈ ಬಾರಿ ನಿಮ್ಮ ವೈದ್ಯರ ಅರ್ಜಿ ಅನುಮೋದನೆಗೊಂಡಿಲ್ಲ. ಕಾರಣ: {reason}"
+  },
+  "doctorVerified": {
+    "title": "ನೀವು ಪರಿಶೀಲಿಸಲ್ಪಟ್ಟಿದ್ದೀರಿ!",
+    "body": "ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಈಗ ರೋಗಿಗಳಿಗೆ ಕಾಣಿಸುತ್ತದೆ."
+  },
+  "complaintUpdate": {
+    "title": "ದೂರಿನ ಅಪ್‌ಡೇಟ್",
+    "body": "ನಿಮ್ಮ \"{subject}\" ದೂರನ್ನು {status, select, OPEN {ಮತ್ತೆ ತೆರೆಯಲಾಗಿದೆ} IN_PROGRESS {ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ} other {ಪರಿಹರಿಸಲಾಗಿದೆ}}."
+  },
+  "complaintReply": {
+    "title": "DocOnClick ಸಪೋರ್ಟ್‌ನಿಂದ ಉತ್ತರ",
+    "body": "ನಿಮ್ಮ \"{subject}\" ದೂರಿಗೆ ನಾವು ಉತ್ತರಿಸಿದ್ದೇವೆ. ಓದಲು ಟ್ಯಾಪ್ ಮಾಡಿ."
+  },
+  "adminComplaintNew": {
+    "title": "ಹೊಸ ದೂರು",
+    "body": "{name} ಅವರು ದೂರು ಸಲ್ಲಿಸಿದ್ದಾರೆ: \"{subject}\"."
+  },
+  "adminComplaintReply": {
+    "title": "ದೂರಿನಲ್ಲಿ ಹೊಸ ಉತ್ತರ",
+    "body": "{name} ಅವರು \"{subject}\" ನಲ್ಲಿ ಉತ್ತರಿಸಿದ್ದಾರೆ."
+  },
+  "adminComplaintAssigned": {
+    "title": "ದೂರು ನಿಮಗೆ ವಹಿಸಲಾಗಿದೆ",
+    "body": "\"{subject}\" ಈಗ ನಿಮಗೆ ವಹಿಸಲಾಗಿದೆ."
+  },
+  "profileChangeApproved": {
+    "title": "ಪ್ರೊಫೈಲ್ ಬದಲಾವಣೆ ಅನುಮೋದಿಸಲಾಗಿದೆ",
+    "body": "ನಿಮ್ಮ ಹೊಸ {field1}{field2}{field3} ಈಗ ನಿಮ್ಮ ಪ್ರೊಫೈಲ್‌ನಲ್ಲಿ {count, plural, one {ಕಾಣಿಸುತ್ತಿದೆ} other {ಕಾಣಿಸುತ್ತಿವೆ}}."
+  },
+  "profileChangeRejected": {
+    "title": "ಪ್ರೊಫೈಲ್ ಬದಲಾವಣೆ ಅನುಮೋದನೆಗೊಂಡಿಲ್ಲ",
+    "body": "ನೀವು ಕೇಳಿದ {field1}{field2}{field3} ಬದಲಾವಣೆ ಅನುಮೋದನೆಗೊಂಡಿಲ್ಲ. ಕಾರಣ: {note}"
+  },
+  "walletAdminCredited": {
+    "title": "ವಾಲೆಟ್‌ಗೆ ಜಮಾ ಆಗಿದೆ",
+    "body": "ಅಡ್ಮಿನ್ ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ₹{amount} ಸೇರಿಸಿದ್ದಾರೆ. ಹೊಸ ಬ್ಯಾಲೆನ್ಸ್ ₹{balance}. ವಿವರಗಳಿಗೆ ನಿಮ್ಮ ವಾಲೆಟ್ ಇತಿಹಾಸ ನೋಡಿ."
+  },
+  "walletAdminDebited": {
+    "title": "ವಾಲೆಟ್‌ನಿಂದ ಕಡಿತವಾಗಿದೆ",
+    "body": "ಅಡ್ಮಿನ್ ನಿಮ್ಮ ವಾಲೆಟ್‌ನಿಂದ ₹{amount} ಕಡಿತಗೊಳಿಸಿದ್ದಾರೆ. ಹೊಸ ಬ್ಯಾಲೆನ್ಸ್ ₹{balance}. ವಿವರಗಳಿಗೆ ನಿಮ್ಮ ವಾಲೆಟ್ ಇತಿಹಾಸ ನೋಡಿ."
+  },
+  "fragments": {
+    "lockedField": {
+      "medRegNo": "ನೋಂದಣಿ ಸಂಖ್ಯೆ",
+      "qualification": "ವಿದ್ಯಾರ್ಹತೆ",
+      "specialty": "ವಿಶೇಷತೆ"
+    },
+    "lockedFieldNext": {
+      "medRegNo": ", ನೋಂದಣಿ ಸಂಖ್ಯೆ",
+      "qualification": ", ವಿದ್ಯಾರ್ಹತೆ",
+      "specialty": ", ವಿಶೇಷತೆ"
+    }
+  },
+  "nurseVisitRequest": {
+    "title": "ಹೊಸ ಭೇಟಿ ವಿನಂತಿ",
+    "body": "{patient} ಅವರು {service} ಗಾಗಿ ವಿನಂತಿಸಿದ್ದಾರೆ."
+  },
+  "nursePackageRequest": {
+    "title": "ಹೊಸ ಭೇಟಿ ಪ್ಯಾಕೇಜ್ ವಿನಂತಿ",
+    "body": "{patient} ಅವರು {service} ಗಾಗಿ ವಿನಂತಿಸಿದ್ದಾರೆ — {count} ಭೇಟಿಗಳು, {intervalDays, plural, =1 {ಪ್ರತಿದಿನ} other {ಪ್ರತಿ # ದಿನಗಳಿಗೊಮ್ಮೆ}}."
+  },
+  "nurseShiftRequest": {
+    "title": "ಹೊಸ ಭೇಟಿ ವಿನಂತಿ",
+    "body": "{patient} ಅವರು {count, plural, =1 {ಒಂದು } other {# × }}{hours} ಗಂಟೆಯ ಶಿಫ್ಟ್ ({service}) ಗಾಗಿ ವಿನಂತಿಸಿದ್ದಾರೆ."
+  },
+  "nurseShiftPackageRequest": {
+    "title": "ಹೊಸ ಭೇಟಿ ಪ್ಯಾಕೇಜ್ ವಿನಂತಿ",
+    "body": "{patient} ಅವರು {count, plural, =1 {ಒಂದು } other {# × }}{hours} ಗಂಟೆಯ ಶಿಫ್ಟ್ ({service}) ಗಾಗಿ ವಿನಂತಿಸಿದ್ದಾರೆ."
+  },
+  "adminDoctorRegistered": {
+    "title": "ಹೊಸ ವೈದ್ಯರ ನೋಂದಣಿ",
+    "body": "{name} ಅವರು ನೋಂದಾಯಿಸಿಕೊಂಡಿದ್ದಾರೆ ಮತ್ತು ಪರಿಶೀಲನೆಗಾಗಿ ಕಾಯುತ್ತಿದ್ದಾರೆ."
+  },
+  "adminNurseRegistered": {
+    "title": "ಹೊಸ ನರ್ಸ್ ನೋಂದಣಿ",
+    "body": "{name} ಅವರು ನೋಂದಾಯಿಸಿಕೊಂಡಿದ್ದಾರೆ ಮತ್ತು ಪರಿಶೀಲನೆಗಾಗಿ ಕಾಯುತ್ತಿದ್ದಾರೆ."
+  },
+  "bankDetailsChanged": {
+    "title": "ಬ್ಯಾಂಕ್ ವಿವರಗಳು ಬದಲಾಗಿವೆ",
+    "body": "ಇನ್ನು ಮುಂದೆ ನಿಮ್ಮ ಪೇಔಟ್‌ಗಳು {account} ಖಾತೆಗೆ ಹೋಗುತ್ತವೆ. ಈ ಬದಲಾವಣೆಯನ್ನು ನೀವು ಮಾಡಿಲ್ಲದಿದ್ದರೆ, ತಕ್ಷಣ ಸಪೋರ್ಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ."
+  },
+  "bankDetailsRemoved": {
+    "title": "ಬ್ಯಾಂಕ್ ವಿವರಗಳು ಬದಲಾಗಿವೆ",
+    "body": "ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ವಿವರಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ. ಈ ಬದಲಾವಣೆಯನ್ನು ನೀವು ಮಾಡಿಲ್ಲದಿದ್ದರೆ, ತಕ್ಷಣ ಸಪೋರ್ಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ."
+  },
+  "apptCancelledClinicClosed": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "{doctor} ಅವರು ಇನ್ನು ಮುಂದೆ {clinic} ನಲ್ಲಿ ರೋಗಿಗಳನ್ನು ನೋಡುವುದಿಲ್ಲ, ಆದ್ದರಿಂದ {when, date, ::EEEdMMM}, {when, time, short} ರ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ.{refunded, select, yes { ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರುಪಾವತಿಸಲಾಗಿದೆ.} other {}} ದಯವಿಟ್ಟು ಮತ್ತೆ ಬುಕ್ ಮಾಡಿ."
+  },
+  "apptCancelledClinicHours": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "{doctor} ಅವರು {clinic} ನ ಸಮಯವನ್ನು ಬದಲಿಸಿದ್ದಾರೆ, ಆದ್ದರಿಂದ {when, date, ::EEEdMMM}, {when, time, short} ರ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ.{refunded, select, yes { ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರುಪಾವತಿಸಲಾಗಿದೆ.} other {}} ದಯವಿಟ್ಟು ಮತ್ತೆ ಬುಕ್ ಮಾಡಿ."
+  },
+  "apptCancelledClinicLeave": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "{doctor} ಅವರು {when, date, ::EEEdMMM} ರಂದು {clinic} ನಲ್ಲಿ ಇರುವುದಿಲ್ಲ{hasReason, select, yes { ({reason})} other {}}, ಆದ್ದರಿಂದ {when, time, short} ರ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ.{refunded, select, yes { ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರುಪಾವತಿಸಲಾಗಿದೆ.} other {}} ದಯವಿಟ್ಟು ಬೇರೆ ದಿನಕ್ಕೆ ಬುಕ್ ಮಾಡಿ."
+  },
+  "walletPaidAppointment": {
+    "title": "ವಾಲೆಟ್‌ನಿಂದ ಕಡಿತವಾಗಿದೆ",
+    "body": "{count, plural, =1 {ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗಾಗಿ ₹{amount} ಕಡಿತಗೊಳಿಸಲಾಗಿದೆ.} other {ನಿಮ್ಮ {count}-ಭೇಟಿಗಳ ಪ್ಯಾಕೇಜ್‌ಗಾಗಿ ₹{amount} ಕಡಿತಗೊಳಿಸಲಾಗಿದೆ.}} ಹೊಸ ಬ್ಯಾಲೆನ್ಸ್ ₹{balance}."
+  },
+  "paymentReceivedNurse": {
+    "title": "ಪಾವತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    "body": "{count, plural, =1 {{patient} ಅವರು {hasService, select, yes {{service}} other {ಮನೆ}} ಭೇಟಿಗೆ ಪಾವತಿಸಿದ್ದಾರೆ — ಭೇಟಿ ಮುಗಿದ ನಂತರ ನೀವು ಅದನ್ನು ಪೂರ್ಣಗೊಳಿಸಬಹುದು.} other {{patient} ಅವರು ಎಲ್ಲಾ {count} {hasService, select, yes {{service}} other {ಮನೆ}} ಭೇಟಿಗಳಿಗೆ ಪಾವತಿಸಿದ್ದಾರೆ.}}"
+  },
+  "paymentReceivedDoctor": {
+    "title": "ಪಾವತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    "body": "{patient} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ಸಮಾಲೋಚನೆಗೆ ಪಾವತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ."
+  },
+  "reviewReceived": {
+    "title": "ಹೊಸ ವಿಮರ್ಶೆ",
+    "body": "{patient} ಅವರು {rating}★ ವಿಮರ್ಶೆ ನೀಡಿದ್ದಾರೆ."
+  },
+  "walletTopupFailed": {
+    "title": "ವಾಲೆಟ್ ಟಾಪ್-ಅಪ್ ವಿಫಲವಾಗಿದೆ",
+    "body": "ನಿಮ್ಮ ₹{amount} ಟಾಪ್-ಅಪ್ ಆಗಲಿಲ್ಲ. ಯಾವುದೇ ಮೊತ್ತ ಕಡಿತವಾಗಿಲ್ಲ."
+  },
+  "walletTopupSuccess": {
+    "title": "ವಾಲೆಟ್ ಟಾಪ್-ಅಪ್ ಯಶಸ್ವಿಯಾಗಿದೆ",
+    "body": "ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ₹{amount} ಸೇರಿಸಲಾಗಿದೆ. ಹೊಸ ಬ್ಯಾಲೆನ್ಸ್ ₹{balance}."
+  },
+  "subscriptionRenewed": {
+    "title": "ಚಂದಾದಾರಿಕೆ ನವೀಕರಿಸಲಾಗಿದೆ",
+    "body": "ನಿಮ್ಮ ಚಂದಾದಾರಿಕೆ ಸಕ್ರಿಯವಾಗಿದೆ."
+  },
+  "registrationFeeReceived": {
+    "title": "ನೋಂದಣಿ ಶುಲ್ಕ ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    "body": "ನಿಮ್ಮ ಅರ್ಜಿ ಈಗ ಪರಿಶೀಲನೆಯಲ್ಲಿದೆ."
+  },
+  "apptRequested": {
+    "title": "ಹೊಸ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ವಿನಂತಿ",
+    "body": "{patient} ಅವರು {consultType, select, HOME {ಮನೆ} VIDEO {ವೀಡಿಯೊ} other {ಕ್ಲಿನಿಕ್}} ಸಮಾಲೋಚನೆಗಾಗಿ ವಿನಂತಿಸಿದ್ದಾರೆ."
+  },
+  "apptCancelledProviderAway": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "{provider} ಅವರು {away, select, LEAVE {{sameDay, select, yes {{from, date, ::dMMM}} other {{from, date, ::dMMM} – {to, date, ::dMMM}}} ರಜೆಯಲ್ಲಿದ್ದಾರೆ} other {ಇಂದು ಉಳಿದ ಸಮಯ ಲಭ್ಯವಿಲ್ಲ}}, ಆದ್ದರಿಂದ {when, date, ::EEEdMMM}, {when, time, short} ರ ನಿಮ್ಮ {hasService, select, yes {{service}} other {ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್}} ರದ್ದಾಗಿದೆ.{refunded, select, yes { ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರುಪಾವತಿಸಲಾಗಿದೆ.} other {}} ದಯವಿಟ್ಟು ಬೇರೆ ಸಮಯಕ್ಕೆ ಬುಕ್ ಮಾಡಿ."
+  },
+  "rescheduleDeclinedProviderAway": {
+    "title": "ಹೊಸ ಸಮಯ ಲಭ್ಯವಿಲ್ಲ",
+    "body": "{provider} ಅವರು {away, select, LEAVE {{sameDay, select, yes {{from, date, ::dMMM}} other {{from, date, ::dMMM} – {to, date, ::dMMM}}} ರಜೆಯಲ್ಲಿದ್ದಾರೆ} other {ಇಂದು ಉಳಿದ ಸಮಯ ಲಭ್ಯವಿಲ್ಲ}}, ಆದ್ದರಿಂದ ನಿಮ್ಮ ಭೇಟಿ {when, date, ::EEEdMMM}, {when, time, short} ಕ್ಕೇ ಇರುತ್ತದೆ."
+  },
+  "reminderPatient": {
+    "title": "ಮುಂಬರುವ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್",
+    "body": "{consultType, select, HOME {{doctor} ಅವರು ಸುಮಾರು ಒಂದು ಗಂಟೆಯಲ್ಲಿ ನಿಮ್ಮ ಮನೆಗೆ ಬರಲಿದ್ದಾರೆ.} VIDEO {{doctor} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ವೀಡಿಯೊ ಸಮಾಲೋಚನೆ ಸುಮಾರು ಒಂದು ಗಂಟೆಯಲ್ಲಿ ಇದೆ.} other {{doctor} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ಕ್ಲಿನಿಕ್ ಭೇಟಿ ಸುಮಾರು ಒಂದು ಗಂಟೆಯಲ್ಲಿ ಇದೆ.}}"
+  },
+  "reminderPatientLead": {
+    "title": "ಮುಂಬರುವ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್",
+    "body": "{consultType, select, HOME {{doctor} ಅವರು {lead, select, 1440 {ಸುಮಾರು ಒಂದು ದಿನದಲ್ಲಿ} 120 {ಸುಮಾರು 2 ಗಂಟೆಗಳಲ್ಲಿ} 60 {ಸುಮಾರು ಒಂದು ಗಂಟೆಯಲ್ಲಿ} 30 {ಸುಮಾರು 30 ನಿಮಿಷಗಳಲ್ಲಿ} other {ಶೀಘ್ರದಲ್ಲೇ}} ನಿಮ್ಮ ಮನೆಗೆ ಬರಲಿದ್ದಾರೆ} VIDEO {{doctor} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ವೀಡಿಯೊ ಸಮಾಲೋಚನೆ {lead, select, 1440 {ಸುಮಾರು ಒಂದು ದಿನದಲ್ಲಿ} 120 {ಸುಮಾರು 2 ಗಂಟೆಗಳಲ್ಲಿ} 60 {ಸುಮಾರು ಒಂದು ಗಂಟೆಯಲ್ಲಿ} 30 {ಸುಮಾರು 30 ನಿಮಿಷಗಳಲ್ಲಿ} other {ಶೀಘ್ರದಲ್ಲೇ}} ಇದೆ} other {{doctor} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ಕ್ಲಿನಿಕ್ ಭೇಟಿ {lead, select, 1440 {ಸುಮಾರು ಒಂದು ದಿನದಲ್ಲಿ} 120 {ಸುಮಾರು 2 ಗಂಟೆಗಳಲ್ಲಿ} 60 {ಸುಮಾರು ಒಂದು ಗಂಟೆಯಲ್ಲಿ} 30 {ಸುಮಾರು 30 ನಿಮಿಷಗಳಲ್ಲಿ} other {ಶೀಘ್ರದಲ್ಲೇ}} ಇದೆ}} — {when, date, ::EEEdMMM}, {when, time, short}."
+  },
+  "reminderProvider": {
+    "title": "ಮುಂಬರುವ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್",
+    "body": "ಸುಮಾರು ಒಂದು ಗಂಟೆಯಲ್ಲಿ {patient} ಅವರೊಂದಿಗೆ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಇದೆ."
+  },
+  "followUpReminder": {
+    "title": "ನಿಮ್ಮ ಫಾಲೋ-ಅಪ್ ಸಮಯ",
+    "body": "{doctor} ಅವರು {date, date, ::EEEdMMM} ರಂದು ಫಾಲೋ-ಅಪ್ ಭೇಟಿ ಸೂಚಿಸಿದ್ದಾರೆ. ಸಮಯ ಬುಕ್ ಮಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ."
+  },
+  "medicineDose": {
+    "title": "ನಿಮ್ಮ ಔಷಧಿಗಳ ಸಮಯ",
+    "body": "{time, time, short} ಕ್ಕೆ {count, plural, =1 {1 ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳಬೇಕಿದೆ} other {# ಔಷಧಿಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳಬೇಕಿದೆ}}. ಯಾವುವು ಎಂದು ನೋಡಲು ಮತ್ತು ತೆಗೆದುಕೊಂಡಿದ್ದೀರಿ ಎಂದು ಗುರುತಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ."
+  },
+  "medicineRefill": {
+    "title": "ನಿಮ್ಮ ಔಷಧಿಗಳು ಮುಗಿಯುತ್ತಿವೆ",
+    "body": "ನಿಮ್ಮ ಔಷಧಿ ಕೋರ್ಸ್ ಶೀಘ್ರದಲ್ಲೇ ಮುಗಿಯಲಿದೆ. {doctor} ಅವರೊಂದಿಗೆ ಫಾಲೋ-ಅಪ್ ಬುಕ್ ಮಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ."
+  },
+  "apptExpired": {
+    "title": "{providerType, select, NURSE {ನರ್ಸ್ ಅವರಿಂದ} other {ವೈದ್ಯರಿಂದ}} ಪ್ರತಿಕ್ರಿಯೆ ಇಲ್ಲ",
+    "body": "{refunded, select, yes {{doctor} ಅವರು ನಿಮ್ಮ ಹೊಸ ಸಮಯವನ್ನು ದೃಢಪಡಿಸಲಿಲ್ಲ. ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರುಪಾವತಿಸಲಾಗಿದೆ.} other {{doctor} ಅವರು ಸಮಯಕ್ಕೆ ಪ್ರತಿಕ್ರಿಯಿಸಲಿಲ್ಲ.}}"
+  },
+  "rescheduleExpired": {
+    "title": "ಹೊಸ ಸಮಯ ದೃಢಪಡಲಿಲ್ಲ",
+    "body": "{doctor} ಅವರು ನೀವು ಕೇಳಿದ ಸಮಯವನ್ನು ದೃಢಪಡಿಸಲಿಲ್ಲ, ಆದ್ದರಿಂದ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ {when, date, medium}, {when, time, short} ರಂದೇ ಇರುತ್ತದೆ."
+  },
+  "payReminderLeaving": {
+    "title": "ನಿಮ್ಮ ಭೇಟಿಯ ಪಾವತಿ ಬಾಕಿ ಇದೆ",
+    "body": "{provider} ಅವರು ನಿಮ್ಮ {hasService, select, yes {{service}} other {ಮನೆ}} ಭೇಟಿಗೆ ಹೊರಡಲಿದ್ದಾರೆ. ಭೇಟಿ ನಡೆಯಲು ದಯವಿಟ್ಟು ಈಗಲೇ ₹{amount} ಪಾವತಿಸಿ."
+  },
+  "payReminderManual": {
+    "title": "ನಿಮ್ಮ ಭೇಟಿಯ ಪಾವತಿ ಬಾಕಿ ಇದೆ",
+    "body": "{provider} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ {hasService, select, yes {{service}} other {ಮನೆ}} ಭೇಟಿಗಾಗಿ ದಯವಿಟ್ಟು ₹{amount} ಪಾವತಿಸಿ — ಭೇಟಿ ದೃಢಪಟ್ಟಿದೆ, ಪಾವತಿಯೇ ಕೊನೆಯ ಹಂತ."
+  },
+  "apptCancelledProviderRemoved": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "{provider} ಅವರು ಇನ್ನು ಮುಂದೆ DocOnClick ನಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ, ಆದ್ದರಿಂದ {when, date, ::EEEdMMM}, {when, time, short} ರ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ.{refunded, select, yes { ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರುಪಾವತಿಸಲಾಗಿದೆ.} other {}} ದಯವಿಟ್ಟು ಮತ್ತೆ ಬುಕ್ ಮಾಡಿ."
+  },
+  "apptReassignedProviderRemoved": {
+    "title": "ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬೇರೆಯವರಿಗೆ ವರ್ಗಾಯಿಸಲಾಗಿದೆ",
+    "body": "{provider} ಅವರು ಇನ್ನು ಮುಂದೆ DocOnClick ನಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ, ಆದ್ದರಿಂದ {when, date, ::EEEdMMM}, {when, time, short} ರ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಅನ್ನು ಹತ್ತಿರದ {newDoctor} ಅವರಿಗೆ ಕಳುಹಿಸಿದ್ದೇವೆ.{refunded, select, yes { ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಹಿಂತಿರುಗಿಸಲಾಗಿದೆ — ಅವರು ಸ್ವೀಕರಿಸಿದ ನಂತರ ಮತ್ತೆ ಪಾವತಿಸಿ.} other {}}"
+  },
+  "paymentCredited": {
+    "title": "ಪಾವತಿ ವಾಲೆಟ್‌ಗೆ ಜಮಾ ಆಗಿದೆ",
+    "body": "ನಿಮ್ಮ ಪಾವತಿಯನ್ನು ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗೆ ಬಳಸಲು ಆಗಲಿಲ್ಲ, ಆದ್ದರಿಂದ ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಜಮಾ ಮಾಡಲಾಗಿದೆ. ಹೊಸ ಬ್ಯಾಲೆನ್ಸ್ ₹{balance}."
+  },
+  "paymentPartlyCredited": {
+    "title": "ಪಾವತಿ ವಾಲೆಟ್‌ಗೆ ಜಮಾ ಆಗಿದೆ",
+    "body": "ನಿಮ್ಮ ಪಾವತಿಯ ಒಂದು ಭಾಗವನ್ನು ಬಳಸಲು ಆಗಲಿಲ್ಲ, ಆದ್ದರಿಂದ ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಜಮಾ ಮಾಡಲಾಗಿದೆ. ಹೊಸ ಬ್ಯಾಲೆನ್ಸ್ ₹{balance}."
+  },
+  "accountActivated": {
+    "title": "ಖಾತೆ ಸಕ್ರಿಯವಾಗಿದೆ",
+    "body": "ನಿಮ್ಮ ಅರ್ಜಿ ಈಗ ಪರಿಶೀಲನೆಯಲ್ಲಿದೆ."
+  },
+  "duesPaid": {
+    "title": "ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಶುಲ್ಕ ಪಾವತಿಸಲಾಗಿದೆ",
+    "body": "₹{amount} ಸ್ವೀಕರಿಸಲಾಗಿದೆ — ನಿಮ್ಮ ನಗದು ಭೇಟಿಗಳ ಬಾಕಿ ಚುಕ್ತಾ ಆಗಿದೆ."
+  },
+  "duesNeedsReview": {
+    "title": "ಪಾವತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    "body": "ನಿಮ್ಮ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಶುಲ್ಕದ ಪಾವತಿ ನಮಗೆ ತಲುಪಿದೆ. ಅದು ಪ್ರಕ್ರಿಯೆಯಲ್ಲಿದ್ದಾಗ ನಿಮ್ಮ ಭೇಟಿಗಳು ಬದಲಾದ ಕಾರಣ, ಅಡ್ಮಿನ್ ಶೀಘ್ರದಲ್ಲೇ ಅದನ್ನು ಹೊಂದಿಸುತ್ತಾರೆ."
+  },
+  "apptCancelledPatientDeleted": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "{patient} ಅವರು ತಮ್ಮ DocOnClick ಖಾತೆಯನ್ನು ಮುಚ್ಚಿದ್ದಾರೆ, ಆದ್ದರಿಂದ {when, date, medium}, {when, time, short} ರ ಅವರ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ."
+  },
+  "apptCancelledProviderDeleted": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "{provider} ಅವರು ಇನ್ನು ಮುಂದೆ DocOnClick ನಲ್ಲಿ ಇಲ್ಲ, ಆದ್ದರಿಂದ {when, date, medium}, {when, time, short} ರ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ. {refunded, select, yes {₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರುಪಾವತಿಸಲಾಗಿದೆ — ದಯವಿಟ್ಟು ಮತ್ತೆ ಬುಕ್ ಮಾಡಿ.} other {ದಯವಿಟ್ಟು ಮತ್ತೆ ಬುಕ್ ಮಾಡಿ.}}"
+  },
+  "apptCancelledByAdmin": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "DocOnClick ಸಪೋರ್ಟ್ {when, date, ::EEEdMMM}, {when, time, short} ರ {provider} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಅನ್ನು ರದ್ದುಮಾಡಿದೆ.{refunded, select, yes { ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಮರುಪಾವತಿಸಲಾಗಿದೆ.} other {}} ನಿಮಗೆ ಇನ್ನೂ ಚಿಕಿತ್ಸೆ ಬೇಕಿದ್ದರೆ ದಯವಿಟ್ಟು ಮತ್ತೆ ಬುಕ್ ಮಾಡಿ."
+  },
+  "apptCancelledByAdminToProvider": {
+    "title": "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ರದ್ದಾಗಿದೆ",
+    "body": "DocOnClick ಸಪೋರ್ಟ್ {when, date, ::EEEdMMM}, {when, time, short} ರ {named, select, yes {{patient} ಅವರ} other {ಒಬ್ಬ ರೋಗಿಯ}} ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಅನ್ನು ರದ್ದುಮಾಡಿದೆ. ನೀವು ಅದಕ್ಕೆ ಹಾಜರಾಗಬೇಕಿಲ್ಲ."
+  },
+  "apptReassignedByAdmin": {
+    "title": "ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬೇರೆಯವರಿಗೆ ವರ್ಗಾಯಿಸಲಾಗಿದೆ",
+    "body": "DocOnClick ಸಪೋರ್ಟ್ {when, date, ::EEEdMMM}, {when, time, short} ರ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಅನ್ನು {provider} ಅವರಿಂದ {newDoctor} ಅವರಿಗೆ ವರ್ಗಾಯಿಸಿದೆ.{refunded, select, yes { ₹{amount} ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ಹಿಂತಿರುಗಿಸಲಾಗಿದೆ — ಅವರು ಸ್ವೀಕರಿಸಿದ ನಂತರ ಮತ್ತೆ ಪಾವತಿಸಿ.} other {}}"
+  },
+  "apptNoShowByAdmin": {
+    "title": "ಗೈರುಹಾಜರಿ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ",
+    "body": "DocOnClick ಸಪೋರ್ಟ್ {when, date, ::EEEdMMM}, {when, time, short} ರ {provider} ಅವರೊಂದಿಗಿನ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಅನ್ನು ಗೈರುಹಾಜರಿ ಎಂದು ಗುರುತಿಸಿದೆ."
+  },
+  "apptNoShowByAdminToProvider": {
+    "title": "ಗೈರುಹಾಜರಿ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ",
+    "body": "DocOnClick ಸಪೋರ್ಟ್ {when, date, ::EEEdMMM}, {when, time, short} ರ {named, select, yes {{patient} ಅವರ} other {ಒಬ್ಬ ರೋಗಿಯ}} ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಅನ್ನು ಗೈರುಹಾಜರಿ ಎಂದು ಗುರುತಿಸಿದೆ."
+  },
+  "payoutRequestDismissed": {
+    "title": "ಪೇಔಟ್ ವಿನಂತಿ ತಿರಸ್ಕರಿಸಲಾಗಿದೆ",
+    "body": "ನಿಮ್ಮ ₹{amount} ಪೇಔಟ್ ವಿನಂತಿಯನ್ನು ತಿರಸ್ಕರಿಸಲಾಗಿದೆ: {reason}. ಗಳಿಕೆ ವಿಭಾಗದಿಂದ ನೀವು ಮತ್ತೆ ವಿನಂತಿಸಬಹುದು."
+  },
+  "payoutReferenceCorrected": {
+    "title": "ಪೇಔಟ್ ರೆಫರೆನ್ಸ್ ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ",
+    "body": "ನಿಮ್ಮ ಪೇಔಟ್ ರೆಫರೆನ್ಸ್ ಸರಿಪಡಿಸಲಾಗಿದೆ. ಹೊಸ UTR {reference}."
+  },
+  "referralRewarded": {
+    "title": "ರೆಫರಲ್ ಬಹುಮಾನ ಸೇರಿಸಲಾಗಿದೆ",
+    "body": "ನೀವು ಆಹ್ವಾನಿಸಿದವರೊಬ್ಬರು ಈಗ DocOnClick ನಲ್ಲಿದ್ದಾರೆ — ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ₹{amount} ಸೇರಿಸಲಾಗಿದೆ."
+  }
+}

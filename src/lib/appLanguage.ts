@@ -1,11 +1,12 @@
 // The app's language — UI and push texts (next-intl, src/i18n). One of
-// en-IN / hi-IN / mr-IN (Marathi and Hindi in Devanagari). Stored on
+// en-IN / hi-IN / mr-IN / kn-IN (Marathi and Hindi in Devanagari, Kannada in
+// Kannada script). Stored on
 // User.language (pushes read it there) and mirrored to the `doconclick_lang`
 // cookie, which the server renders each page in (src/i18n/request.ts). It's
 // deliberately not taken from the device/browser language — a new user
 // starts in English and picks theirs in Profile (or on the sign-in page).
 
-export const APP_LANGUAGES = ["en-IN", "hi-IN", "mr-IN"] as const;
+export const APP_LANGUAGES = ["en-IN", "hi-IN", "mr-IN", "kn-IN"] as const;
 export type AppLanguage = (typeof APP_LANGUAGES)[number];
 export const DEFAULT_APP_LANGUAGE: AppLanguage = "en-IN";
 export const APP_LANGUAGE_COOKIE = "doconclick_lang";
@@ -15,6 +16,7 @@ export const APP_LANGUAGE_LABELS: Record<AppLanguage, string> = {
   "en-IN": "English",
   "hi-IN": "हिन्दी",
   "mr-IN": "मराठी",
+  "kn-IN": "ಕನ್ನಡ",
 };
 
 export function isAppLanguage(v: unknown): v is AppLanguage {
@@ -38,7 +40,8 @@ export function setLanguageCookie(lang: AppLanguage) {
  * The locale to format dates/numbers with. Marathi's default numbering is
  * Devanagari digits (३:०० PM) — but amounts, mobiles and slot times are in
  * Latin digits everywhere else in the app, as in most Marathi consumer apps,
- * so Marathi formats with Latin digits too. Hindi's default already is.
+ * so Marathi formats with Latin digits too. Hindi's and Kannada's defaults
+ * already are.
  */
 export function formattingLocale(lang: string): string {
   return lang === "mr-IN" ? "mr-IN-u-nu-latn" : lang;

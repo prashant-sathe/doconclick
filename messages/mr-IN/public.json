@@ -80,7 +80,7 @@
       "secureValue": "सुरक्षित",
       "secureLabel": "ऑनलाइन पेमेंट",
       "multiValue": "बहुभाषिक",
-      "multiLabel": "इंग्रजी, हिंदी आणि मराठी"
+      "multiLabel": "इंग्रजी, हिंदी, मराठी आणि कन्नड"
     },
     "counters": {
       "doctors": "पडताळणी केलेले डॉक्टर",
@@ -151,7 +151,7 @@
       "boxHomeLabel": "डॉक्टर तुमच्या दारात",
       "boxVideoValue": "व्हिडिओ",
       "boxVideoLabel": "कुठूनही सल्ला घ्या",
-      "boxLangValue": "3",
+      "boxLangValue": "4",
       "boxLangLabel": "उपलब्ध भाषा",
       "title": "आरोग्यसेवा, जिच्यावर तुम्ही <g>विश्वास ठेवू शकता</g>"
     },
@@ -185,7 +185,7 @@
     "boxHomeLabel": "डॉक्टर आणि नर्स व्हिजिट",
     "boxVideoValue": "व्हिडिओ",
     "boxVideoLabel": "ऑनलाइन कन्सल्टेशन",
-    "boxLangValue": "3",
+    "boxLangValue": "4",
     "boxLangLabel": "उपलब्ध भाषा",
     "leadershipTag": "नेतृत्व",
     "founderPhotoAlt": "डॉ. कल्पेश संदीप कल्याणी",

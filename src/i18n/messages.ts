@@ -15,7 +15,7 @@ import enLegal from "../../messages/en-IN/legal.json";
 
 // One JSON file per namespace per language: messages/<locale>/<namespace>.json.
 // English is the source of truth (and the type every t() key is checked
-// against); a key missing from hi/mr falls back to English, so an
+// against); a key missing from hi/mr/kn falls back to English, so an
 // untranslated string shows in English — never as a raw key.
 export const NAMESPACES = [
   "common", "nav", "booking", "push",
@@ -43,7 +43,7 @@ function merge<T>(base: T, over: unknown): T {
   return out as T;
 }
 
-async function load(locale: "hi-IN" | "mr-IN", ns: Namespace): Promise<unknown> {
+async function load(locale: Exclude<AppLanguage, "en-IN">, ns: Namespace): Promise<unknown> {
   try {
     return (await import(`../../messages/${locale}/${ns}.json`)).default;
   } catch {

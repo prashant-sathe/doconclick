@@ -56,7 +56,7 @@ export default function DoctorMobileNav() {
             key={href}
             href={href}
             className={cn(
-              "flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-semibold relative",
+              "flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 py-2.5 px-0.5 text-[11px] font-semibold whitespace-nowrap relative",
               active ? "text-teal-600" : "text-slate-400"
             )}
           >
@@ -80,7 +80,7 @@ export default function DoctorMobileNav() {
                 </span>
               </span>
             ) : (
-              t(label)
+              <span className="max-w-full truncate">{t(label)}</span>
             )}
           </Link>
         );

@@ -99,8 +99,9 @@
   }
 
   body {
-    /* Devanagari (hi/mr) glyphs come from --font-deva — Inter has none. */
-    font-family: var(--font-sans), var(--font-deva), system-ui, sans-serif;
+    /* Devanagari (hi/mr) and Kannada (kn) glyphs come from --font-deva /
+       --font-knda — Inter has none. */
+    font-family: var(--font-sans), var(--font-deva), var(--font-knda), system-ui, sans-serif;
     background-color: var(--color-surface-50);
     color: hsl(222, 47%, 11%);
     -webkit-font-smoothing: antialiased;

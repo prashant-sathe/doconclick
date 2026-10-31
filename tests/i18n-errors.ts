@@ -1,7 +1,7 @@
 // Server error messages in the user's language (src/lib/apiErrors.ts):
 // every user-facing message in the code has an entry in
-// messages/en-IN/errors.json; hi-IN and mr-IN translate every entry, in
-// Devanagari, with the same {placeholders}; each entry's English matches back
+// messages/en-IN/errors.json; hi-IN, mr-IN and kn-IN translate every entry,
+// in Devanagari (hi/mr) or Kannada script (kn), with the same {placeholders}; each entry's English matches back
 // to itself (no entry shadows another); and live API errors come back in the
 // language of the `doconclick_lang` cookie, with their status and other
 // fields unchanged. Pure checks, then against a live dev server.
@@ -48,7 +48,8 @@ async function main() {
   check("each entry's English matches that entry (nothing shadows it)", shadowed.length === 0, shadowed.slice(0, 4).map(([id]) => `${id} → ${matchError(sample(en[id]))?.id}`).join(", ") || "ok");
 
   // ── Translations ──
-  for (const locale of ["hi-IN", "mr-IN"] as const) {
+  for (const locale of ["hi-IN", "mr-IN", "kn-IN"] as const) {
+    const script = locale === "kn-IN" ? { name: "Kannada script", re: /[ಀ-೿]/ } : { name: "Devanagari", re: /[ऀ-ॿ]/ };
     const tr = read(locale);
     const absent = Object.keys(en).filter((id) => !tr[id]?.trim());
     const extra = Object.keys(tr).filter((id) => !(id in en));
@@ -62,8 +63,8 @@ async function main() {
       return want.sort().join() !== got.sort().join() || [...args(tr[id])].some((a) => !args(en[id]).has(a));
     });
     check(`${locale}: same {placeholders} as English`, argDiff.length === 0, argDiff.slice(0, 4).map((id) => `${id}: ${[...args(en[id])]} vs ${[...args(tr[id])]}`).join(" | ") || "ok");
-    const latin = Object.entries(tr).filter(([, v]) => !/[ऀ-ॿ]/.test(v.replace(/\{[^}]*\}/g, "")));
-    check(`${locale}: in Devanagari`, latin.length === 0, latin.slice(0, 4).map(([id, v]) => `${id}="${v}"`).join(" | ") || "ok");
+    const latin = Object.entries(tr).filter(([, v]) => !script.re.test(v.replace(/\{[^}]*\}/g, "")));
+    check(`${locale}: in ${script.name}`, latin.length === 0, latin.slice(0, 4).map(([id, v]) => `${id}="${v}"`).join(" | ") || "ok");
     if (locale === "mr-IN") {
       const broken = Object.keys(tr).filter((id) => /अॅ/.test(tr[id]));
       check("mr-IN: uses ॲ, not अॅ", broken.length === 0, broken.slice(0, 4).join(", ") || "ok");
@@ -73,7 +74,7 @@ async function main() {
       const out = await translateError(sample(english), locale);
       if (out === sample(english)) bad.push(`${id}: untranslated`);
       else if (/[{}]/.test(out)) bad.push(`${id}: left a placeholder → ${out}`);
-      else if (/[०-९]/.test(out)) bad.push(`${id}: Devanagari digits → ${out}`);
+      else if (/[०-९೦-೯]/.test(out)) bad.push(`${id}: non-Latin digits → ${out}`);
       else for (const v of english.matchAll(/\{([A-Za-z]\w*)\}/g)) {
         if (SUFFIXES.has(v[1])) continue;
         const s = sample(`{${v[1]}}`);

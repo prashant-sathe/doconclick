@@ -15,6 +15,7 @@ const FALLBACKS = {
   "en-IN": { failed: "Something went wrong. Please try again.", network: "Network error — check your connection and try again.", load: "Couldn't load this page." },
   "hi-IN": { failed: "कुछ गड़बड़ हो गई। कृपया फिर से कोशिश करें।", network: "नेटवर्क में दिक्कत — अपना कनेक्शन जाँचें और फिर से कोशिश करें।", load: "यह पेज लोड नहीं हो सका।" },
   "mr-IN": { failed: "काहीतरी चुकले. कृपया पुन्हा प्रयत्न करा.", network: "नेटवर्कमध्ये अडचण — तुमचे कनेक्शन तपासा आणि पुन्हा प्रयत्न करा.", load: "हे पेज लोड होऊ शकले नाही." },
+  "kn-IN": { failed: "ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.", network: "ನೆಟ್‌ವರ್ಕ್ ಸಮಸ್ಯೆ — ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.", load: "ಈ ಪುಟವನ್ನು ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ." },
 };
 
 function fallbackText(which: keyof (typeof FALLBACKS)["en-IN"]): string {

@@ -1,5 +1,6 @@
-// i18n (next-intl, src/i18n): every message key exists in en-IN, hi-IN and
-// mr-IN; Hindi and Marathi are written in Devanagari; every ICU message
+// i18n (next-intl, src/i18n): every message key exists in en-IN, hi-IN,
+// mr-IN and kn-IN; Hindi and Marathi are written in Devanagari, Kannada in
+// Kannada script; every ICU message
 // formats in every language (push texts with sample values included); the
 // language switch API saves the choice on the account and the cookie, and
 // pages render in it. Pure checks, then against a live dev server and the DB
@@ -17,7 +18,13 @@ import { uiLocale } from "../src/lib/appLanguage";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
-const LOCALES = ["en-IN", "hi-IN", "mr-IN"] as const;
+const LOCALES = ["en-IN", "hi-IN", "mr-IN", "kn-IN"] as const;
+// The script each translation must be written in.
+const SCRIPTS: Record<string, { name: string; re: RegExp }> = {
+  "hi-IN": { name: "Devanagari", re: /[\u0900-\u097F]/ },
+  "mr-IN": { name: "Devanagari", re: /[\u0900-\u097F]/ },
+  "kn-IN": { name: "Kannada script", re: /[\u0C80-\u0CFF]/ },
+};
 
 let failures = 0;
 function check(label: string, ok: boolean, detail: string) {
@@ -46,13 +53,13 @@ async function main() {
   for (const ns of NAMESPACES) {
     const en = leaves(read("en-IN", ns));
     const enKeys = new Set(en.map(([k]) => k));
-    for (const locale of ["hi-IN", "mr-IN"]) {
+    for (const locale of ["hi-IN", "mr-IN", "kn-IN"]) {
       const other = leaves(read(locale, ns));
       const keys = new Set(other.map(([k]) => k));
       const missing = [...enKeys].filter((k) => !keys.has(k));
       const extra = [...keys].filter((k) => !enKeys.has(k));
       check(`${ns}: ${locale} has every en-IN key, no extras`, missing.length === 0 && extra.length === 0, missing.length || extra.length ? `missing ${missing.slice(0, 5).join(", ")} extra ${extra.slice(0, 5).join(", ")}` : `${keys.size} keys`);
-      // Text outside {…} and <tags>, minus brand words/numbers, should contain Devanagari.
+      // Text outside {…} and <tags>, minus brand words/numbers, should be in the language's script.
       const latinOnly = other.filter(([, v]) => {
         // Drop ICU syntax — {placeholders}, "x, select/plural" headers and
         // "option {" labels — and tags, then brand words and punctuation.
@@ -63,9 +70,9 @@ async function main() {
           .replace(/[{}]/g, " ")
           .replace(/<\/?\w+>/g, "")
           .replace(/DocOnClick|Cashfree|UPI|WhatsApp|AI|OTP|PDF|JPG|PNG|SpO2|BP|CBC|COPD|ID|Dr\.|Nurse|km|pm|am|PM|AM|₹|#|[\d\s.,:;!?()/\-–—·'"%+*@&…→]/g, "");
-        return text.length > 0 && !/[\u0900-\u097F]/.test(text);
+        return text.length > 0 && !SCRIPTS[locale].re.test(text);
       });
-      check(`${ns}: ${locale} text is in Devanagari`, latinOnly.length === 0, latinOnly.slice(0, 4).map(([k, v]) => `${k}="${v}"`).join(" | ") || "ok");
+      check(`${ns}: ${locale} text is in ${SCRIPTS[locale].name}`, latinOnly.length === 0, latinOnly.slice(0, 4).map(([k, v]) => `${k}="${v}"`).join(" | ") || "ok");
       const broken = other.filter(([, v]) => /अॅ/.test(v));
       if (locale === "mr-IN") check(`${ns}: mr-IN uses ॲ, not अॅ`, broken.length === 0, broken.slice(0, 3).map(([k]) => k).join(", ") || "ok");
     }
@@ -104,7 +111,7 @@ async function main() {
           const out = /<\w+>/.test(en) ? JSON.stringify(t.rich(`${ns}.${key}`, values)) : t(`${ns}.${key}`, values);
           if (/\{\w+\}|\bns\.|^\s*$/.test(String(out)) && en.trim()) bad.push(`${ns}.${key} → ${out}`);
           // Digits stay Latin in every language (dates, plurals' #, numbers).
-          if (/[०-९]/.test(String(out))) bad.push(`${ns}.${key} has Devanagari digits → ${String(out).slice(0, 60)}`);
+          if (/[०-९೦-೯]/.test(String(out))) bad.push(`${ns}.${key} has non-Latin digits → ${String(out).slice(0, 60)}`);
         } catch (e) {
           bad.push(`${ns}.${key}: ${(e as Error).message.slice(0, 80)}`);
         }
@@ -128,7 +135,7 @@ async function main() {
     check("signed in → saved on the account + cookie", r.status === 200 && (await prisma.user.findUniqueOrThrow({ where: { id: user.id } })).language === "hi-IN" && /doconclick_lang=hi-IN/.test(r.headers.get("set-cookie") ?? ""), `${r.status}`);
     const me = await (await fetch(`${BASE}/api/auth/me`, { headers: { Cookie: cookie } })).json();
     check("/api/auth/me returns the account language", me.language === "hi-IN", String(me.language));
-    for (const [lang, word] of [["mr-IN", "डॉक्टर शोधा"], ["hi-IN", "डॉक्टर खोजें"], ["en-IN", "Find a Doctor"]] as const) {
+    for (const [lang, word] of [["mr-IN", "डॉक्टर शोधा"], ["hi-IN", "डॉक्टर खोजें"], ["kn-IN", "ವೈದ್ಯರನ್ನು ಹುಡುಕಿ"], ["en-IN", "Find a Doctor"]] as const) {
       const html = await (await fetch(`${BASE}/patient/appointments`, { headers: { Cookie: `${cookie}; doconclick_lang=${lang}` } })).text();
       check(`page renders in ${lang} (<html lang>, nav)`, html.includes(`lang="${lang}"`) && html.includes(word), `${html.includes(`lang="${lang}"`)} / ${html.includes(word)}`);
     }

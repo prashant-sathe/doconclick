@@ -39,7 +39,7 @@ export default function LanguageSwitch({ compact = false }: { compact?: boolean 
   };
 
   const pills = (
-    <div className={cn("grid grid-cols-3 gap-1.5", compact && "gap-1")} role="radiogroup" aria-label={t("title")}>
+    <div className={cn("grid grid-cols-4 gap-1.5", compact && "gap-1")} role="radiogroup" aria-label={t("title")}>
       {APP_LANGUAGES.map((lang) => (
         <button
           key={lang}

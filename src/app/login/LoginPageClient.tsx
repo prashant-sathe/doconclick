@@ -210,7 +210,8 @@ export default function LoginPageClient() {
     >
       {!native && (
         <div className="fixed top-5 left-6">
-          <Link href="/" className="btn-ghost gap-1.5 text-sm tap-44-y">← {tc("home")}</Link>
+          {/* Arrow only on phones — the language pills need the row (4 languages). */}
+          <Link href="/" aria-label={tc("home")} className="btn-ghost gap-1.5 text-sm tap-44-y">← <span className="hidden sm:inline">{tc("home")}</span></Link>
         </div>
       )}
       {/* Before signing in: the choice is kept and adopted by the account. */}

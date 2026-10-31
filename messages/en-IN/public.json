@@ -80,7 +80,7 @@
       "secureValue": "Secure",
       "secureLabel": "Online payments",
       "multiValue": "Multilingual",
-      "multiLabel": "English, Hindi & Marathi"
+      "multiLabel": "English, Hindi, Marathi & Kannada"
     },
     "counters": {
       "doctors": "Verified Doctors",
@@ -151,7 +151,7 @@
       "boxHomeLabel": "Doctor at your door",
       "boxVideoValue": "Video",
       "boxVideoLabel": "Consult from anywhere",
-      "boxLangValue": "3",
+      "boxLangValue": "4",
       "boxLangLabel": "Languages supported",
       "title": "Healthcare you can <g>Trust</g>"
     },
@@ -185,7 +185,7 @@
     "boxHomeLabel": "Doctor & nurse visits",
     "boxVideoValue": "Video",
     "boxVideoLabel": "Online consultations",
-    "boxLangValue": "3",
+    "boxLangValue": "4",
     "boxLangLabel": "Languages supported",
     "leadershipTag": "Leadership",
     "founderPhotoAlt": "Dr. Kalpesh Sandeep Kalyani",

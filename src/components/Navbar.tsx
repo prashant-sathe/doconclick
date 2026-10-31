@@ -27,7 +27,7 @@ export default function Navbar() {
 
   return (
     <nav className="safe-top fixed top-0 inset-x-0 z-50 border-b border-white/20 bg-white/90 backdrop-blur-xl">
-      <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between gap-6">
+      <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between gap-3 xl:gap-6">
         {/* Logo */}
         <Link href="/" className="flex items-center flex-shrink-0">
           <Image src="/logo.png" alt="DocOnClick" width={1200} height={242} className="h-9 w-auto" />
@@ -40,7 +40,7 @@ export default function Navbar() {
               key={href}
               href={href}
               className={cn(
-                "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                "px-2.5 xl:px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200",
                 pathname === href
                   ? "text-blue-600 bg-blue-50 font-semibold"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -66,7 +66,7 @@ export default function Navbar() {
           ) : (
             <>
               <Link href="/login" className="btn-ghost gap-1.5">
-                <LogIn className="w-4 h-4" /> {t("signIn")}
+                <LogIn className="w-4 h-4" /> <span className="whitespace-nowrap">{t("signIn")}</span>
               </Link>
               <Link href="/patient/register" className="btn-primary gap-1.5">
                 <UserPlus className="w-4 h-4" /> {t("registerFree")}
