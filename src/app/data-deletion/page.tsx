@@ -84,7 +84,7 @@ export default async function DataDeletionPage({
               ))}
             </ol>
             <a
-              href="mailto:support@doconclick.com?subject=Data%20Deletion%20Request"
+              href="mailto:doconclick.co@gmail.com?subject=Data%20Deletion%20Request"
               className="inline-flex items-center gap-2 rounded-xl bg-blue-600 text-white text-sm font-semibold px-5 py-3 hover:bg-blue-700 transition-colors"
             >
               <Mail className="w-4 h-4" /> {t("emailBtn")}

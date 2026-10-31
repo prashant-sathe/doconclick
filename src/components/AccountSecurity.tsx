@@ -165,7 +165,7 @@ export function DeleteAccount() {
                   {t.rich("walletLeft", {
                     amount: preview.walletBalanceAfter,
                     email: (chunks) => (
-                      <a href="mailto:support@doconclick.com?subject=Wallet%20balance%20before%20account%20deletion" className="font-semibold text-blue-600 hover:underline">
+                      <a href="mailto:doconclick.co@gmail.com?subject=Wallet%20balance%20before%20account%20deletion" className="font-semibold text-blue-600 hover:underline">
                         {chunks}
                       </a>
                     ),

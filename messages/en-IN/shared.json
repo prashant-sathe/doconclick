@@ -73,7 +73,7 @@
     "openBookingsCancelled": "{count, plural, one {Your # open booking will be cancelled and the {party, select, patient {patient} other {doctor or nurse}} notified.} other {Your # open bookings will be cancelled and the {party, select, patient {patient} other {doctor or nurse}} notified.}}",
     "refundToWallet": "₹{amount} already paid will be refunded to your wallet.",
     "refundToPatients": "Patients will get ₹{amount} refunded to their wallets.",
-    "walletLeft": "Your wallet will hold ₹{amount}, which you can't use once the account is deleted. Email <email>support@doconclick.com</email> before deleting if you want it paid back.",
+    "walletLeft": "Your wallet will hold ₹{amount}, which you can't use once the account is deleted. Email <email>doconclick.co@gmail.com</email> before deleting if you want it paid back.",
     "providerEarnings": "Earnings not yet settled are paid out as usual. Request a payout first if you're owed money.",
     "recordsKept": "Completed visit records and payment history are kept, as the law requires.",
     "password": "Password",

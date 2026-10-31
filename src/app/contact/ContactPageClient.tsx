@@ -51,7 +51,7 @@ export default function ContactPageClient() {
                 <p className="text-slate-500 text-sm leading-relaxed">{t("letsTalkSub")}</p>
               </div>
               {[
-                { icon: Mail,    title: t("emailTitle"), info: "support@doconclick.com", sub: t("emailSub"),    color: "text-teal-500",  bg: "bg-teal-50" },
+                { icon: Mail,    title: t("emailTitle"), info: "doconclick.co@gmail.com", sub: t("emailSub"),    color: "text-teal-500",  bg: "bg-teal-50" },
                 { icon: Clock,   title: t("hoursTitle"), info: t("hoursInfo"),          sub: t("hoursSub"),    color: "text-amber-500", bg: "bg-amber-50" },
               ].map(({ icon: Icon, title, info, sub, color, bg }) => (
                 <div key={title} className="stat-card flex items-start gap-4">
