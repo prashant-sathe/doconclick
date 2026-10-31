@@ -61,6 +61,8 @@
     "noPendingMatch": "तुमच्या शोधाशी किंवा फिल्टरशी जुळणारी प्रलंबित विनंती नाही.",
     "noPending": "कोणतीही प्रलंबित विनंती नाही.",
     "allergies": "ॲलर्जी: {list}",
+    "symptomPhotos": "रुग्णाचे फोटो",
+    "openPhoto": "फोटो {n} उघडा",
     "reject": "नाकारा",
     "accept": "स्वीकारा",
     "upcomingAppointments": "आगामी अपॉइंटमेंट्स",
@@ -193,7 +195,13 @@
     "notesPlaceholder": "कन्सल्टेशन नोट्स / माझे विचार (ऐच्छिक)…",
     "clinicalTitle": "कन्सल्टेशन तपशील (सर्व ऐच्छिक)",
     "optional": "ऐच्छिक",
-    "clinical": {"chiefComplaints": "मुख्य तक्रारी", "history": "इतिहास", "examination": "तपासणी", "findings": "निष्कर्ष (CAPITALS)", "diagnosis": "निदान (CAPITALS)"},
+    "clinical": {
+      "chiefComplaints": "मुख्य तक्रारी",
+      "history": "इतिहास",
+      "examination": "तपासणी",
+      "findings": "निष्कर्ष (CAPITALS)",
+      "diagnosis": "निदान (CAPITALS)"
+    },
     "prescription": "प्रिस्क्रिप्शन",
     "medicineName": "औषधाचे नाव",
     "dosage": "डोस",

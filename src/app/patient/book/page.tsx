@@ -39,6 +39,7 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import { useBookingProfileGate } from "@/components/patient/CompleteProfileSheet";
 import { useLocale, useTranslations } from "next-intl";
 import { formattingLocale } from "@/lib/appLanguage";
+import SymptomPhotoPicker, { type SymptomPhoto } from "@/components/patient/SymptomPhotoPicker";
 
 interface ClinicSlot {
   dayOfWeek: string;
@@ -185,6 +186,9 @@ function PatientBookInner() {
   const [scheduleMode, setScheduleMode] = useState<"NOW" | "LATER">("NOW");
   const [scheduledAt, setScheduledAt] = useState("");
   const [consentGiven, setConsentGiven] = useState(false);
+  // Photos under "Symptoms / Reason" — uploaded to the patient's vault right
+  // away; the booking just links their ids.
+  const [symptomPhotos, setSymptomPhotos] = useState<SymptomPhoto[]>([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const profileGate = useBookingProfileGate();
   const [loading, setLoading] = useState(false);
@@ -360,6 +364,7 @@ function PatientBookInner() {
         doctorId: form.doctorId,
         clinicId: form.consultType === "CLINIC" ? form.clinicId : undefined,
         symptoms: form.symptoms,
+        symptomPhotoIds: symptomPhotos.map((p) => p.id),
         allergies: form.allergies,
         consultType: form.consultType,
         dependentId,
@@ -748,6 +753,8 @@ function PatientBookInner() {
                 placeholder={tf("symptomsPlaceholder")}
                 value={form.symptoms} onChange={(e) => set("symptoms", e.target.value)} />
             </div>
+
+            <SymptomPhotoPicker photos={symptomPhotos} onChange={setSymptomPhotos} onError={setError} />
 
             <div>
               <label className="input-label"><AlertTriangle className="inline w-3.5 h-3.5 mr-1 text-amber-500" />{tf("allergies")}</label>

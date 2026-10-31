@@ -15,6 +15,8 @@ import { checkBookingRateLimit, getBookingHorizonDays, horizonProblem, doctorHou
 import { timeOffProblem, TIME_OFF_CODE } from "@/lib/timeOff";
 import { withErrorLocale } from "@/lib/apiErrors";
 
+const MAX_SYMPTOM_PHOTOS = 3;
+
 export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
   if (!authUser || authUser.role !== "PATIENT") {
@@ -39,6 +41,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       scheduledAt,
       followUpOfId,
       clinicId,
+      symptomPhotoIds,
     } = body;
 
     if (!doctorId || !symptoms || !consultType) {
@@ -46,6 +49,24 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     }
     if (!["CLINIC", "HOME", "VIDEO"].includes(consultType)) {
       return NextResponse.json({ error: "Invalid consultation type" }, { status: 400 });
+    }
+
+    // Photos attached under "Symptoms / Reason": already uploaded to the
+    // patient's own vault — only their own image documents are linked.
+    const photoIds = Array.isArray(symptomPhotoIds)
+      ? [...new Set(symptomPhotoIds.filter((id: unknown): id is string => typeof id === "string"))]
+      : [];
+    if (photoIds.length > MAX_SYMPTOM_PHOTOS) {
+      return NextResponse.json({ error: `You can attach at most ${MAX_SYMPTOM_PHOTOS} photos.` }, { status: 400 });
+    }
+    if (photoIds.length > 0) {
+      const owned = await prisma.patientDocument.findMany({
+        where: { id: { in: photoIds }, patientId: authUser.id },
+        select: { fileUrl: true },
+      });
+      if (owned.length !== photoIds.length || owned.some((d) => !/\.(jpe?g|png)$/i.test(d.fileUrl))) {
+        return NextResponse.json({ error: "That photo couldn't be attached. Please upload it again." }, { status: 400 });
+      }
     }
 
     // Booking for someone other than yourself always goes through a saved
@@ -298,6 +319,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
         clinicId: consultType === "CLINIC" && clinicId ? clinicId : undefined,
         ...(visit ?? {}),
         ...(bookAt ? { scheduledAt: bookAt } : {}),
+        ...(photoIds.length > 0 ? { symptomPhotos: { connect: photoIds.map((id) => ({ id })) } } : {}),
       },
       include: {
         patient: { select: { name: true } },

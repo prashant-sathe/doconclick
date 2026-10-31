@@ -75,6 +75,7 @@ interface Appointment {
   relation: string;
   dependentId: string | null;
   allergies: string | null;
+  symptomPhotos?: { id: string; fileUrl: string }[];
   amount: number;
   platformFee: number;
   paymentMethod: string;
@@ -731,6 +732,27 @@ function ContactLinks({ mobile }: { mobile: string }) {
       <a href={links.whatsapp} target="_blank" rel="noopener noreferrer" className={cn(pill, "border-emerald-200 text-emerald-700 hover:bg-emerald-50")} title={t("whatsappTitle", { mobile })}>
         <MessageCircle className="w-3 h-3" /> {t("whatsapp")}
       </a>
+    </div>
+  );
+}
+
+// Thumbnails of the photos the patient attached under "Symptoms / Reason";
+// each opens full size in a new tab.
+function SymptomPhotos({ photos }: { photos?: { id: string; fileUrl: string }[] }) {
+  const t = useTranslations("doctor.dashboard");
+  if (!photos?.length) return null;
+  return (
+    <div className="mt-1.5">
+      <div className="text-[11px] font-semibold text-slate-400 mb-1">{t("symptomPhotos")}</div>
+      <div className="flex gap-1.5 flex-wrap">
+        {photos.map((p, i) => (
+          <a key={p.id} href={p.fileUrl} target="_blank" rel="noopener noreferrer" title={t("openPhoto", { n: i + 1 })}
+            className="block w-14 h-14 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 hover:ring-2 hover:ring-teal-300">
+            {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary aspect ratio per upload, next/image needs a fixed intrinsic size */}
+            <img src={p.fileUrl} alt={t("openPhoto", { n: i + 1 })} className="w-full h-full object-cover" />
+          </a>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1546,6 +1568,7 @@ export default function DoctorDashboard() {
                           {new Date(a.scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })} · {tc("typeShort", { type: a.consultType })}
                         </div>
                         <div className="text-sm text-slate-600 mt-0.5">{a.symptoms}</div>
+                        <SymptomPhotos photos={a.symptomPhotos} />
                         <VitalsChip a={a} />
                         {a.allergies && (
                           <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
@@ -1638,6 +1661,7 @@ export default function DoctorDashboard() {
                             </div>
                             <div className="text-xs text-slate-400 mt-0.5">{tc("typeLong", { type: a.consultType })}</div>
                             <div className="text-sm text-slate-600 mt-0.5">{a.symptoms}</div>
+                            <SymptomPhotos photos={a.symptomPhotos} />
                             <VitalsChip a={a} />
                             {a.allergies && (
                               <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">

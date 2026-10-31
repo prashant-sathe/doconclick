@@ -61,6 +61,8 @@
     "noPendingMatch": "No pending requests match your search or filters.",
     "noPending": "No pending requests.",
     "allergies": "Allergies: {list}",
+    "symptomPhotos": "Patient's photos",
+    "openPhoto": "Open photo {n}",
     "reject": "Reject",
     "accept": "Accept",
     "upcomingAppointments": "Upcoming Appointments",
@@ -193,7 +195,13 @@
     "notesPlaceholder": "Consultation notes / my thoughts (optional)…",
     "clinicalTitle": "Consultation details (all optional)",
     "optional": "Optional",
-    "clinical": {"chiefComplaints": "Chief complaints", "history": "History", "examination": "Examination", "findings": "Findings (CAPITALS)", "diagnosis": "Diagnosis (CAPITALS)"},
+    "clinical": {
+      "chiefComplaints": "Chief complaints",
+      "history": "History",
+      "examination": "Examination",
+      "findings": "Findings (CAPITALS)",
+      "diagnosis": "Diagnosis (CAPITALS)"
+    },
     "prescription": "Prescription",
     "medicineName": "Medicine name",
     "dosage": "Dosage",

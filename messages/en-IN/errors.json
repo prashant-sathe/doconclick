@@ -463,6 +463,8 @@
   "servicePriceMin": "Every selected service needs a price of at least ₹1.",
   "servicePriceRequired": "Every selected service needs a price.",
   "symptomsTooLong": "Symptoms must be at most 1000 characters.",
+  "symptomPhotosMax": "You can attach at most {max} photos.",
+  "symptomPhotoInvalid": "That photo couldn't be attached. Please upload it again.",
   "symptomsTooShort": "Please describe your symptoms in a few words.",
   "symptomsRequired": "Please describe your symptoms.",
   "walkInEnterMobile": "Enter the patient's mobile number.",

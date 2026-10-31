@@ -116,6 +116,8 @@ export const GET = withErrorLocale(async function GET(req: Request) {
         referralGiven: { select: { id: true, service: { select: { name: true } } } },
         // The dashboard's clinic filter.
         clinic: { select: { name: true } },
+        // Photos the patient attached under "Symptoms / Reason".
+        symptomPhotos: { select: { id: true, fileUrl: true }, orderBy: { createdAt: "asc" } },
         // The doctor and their staff are one side: only the patient's messages count as unread.
         _count: { select: { messages: { where: { sender: { role: "PATIENT" }, readAt: null } } } },
       },

@@ -40,6 +40,7 @@
     "test:route-errors": "tsx tests/route-errors.ts",
     "test:terms": "tsx tests/terms-required.ts",
     "test:booking-limits": "tsx tests/booking-limits.ts",
+    "test:symptom-photos": "tsx tests/symptom-photos.ts",
     "test:assistant": "tsx tests/assistant-safety.ts",
     "test:care-access": "tsx tests/care-access.ts",
     "test:prescriptions": "tsx tests/prescriptions.ts",

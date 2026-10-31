@@ -200,6 +200,8 @@ model PatientDocument {
   createdAt DateTime @default(now())
   // Nurse bookings that attached this as the doctor's prescription.
   nurseBookings Appointment[] @relation("NurseBookingPrescription")
+  // Doctor bookings that attached this as a photo under "Symptoms / Reason".
+  symptomAppointments Appointment[] @relation("AppointmentSymptomPhotos")
 }
 
 model DoctorProfile {
@@ -441,6 +443,9 @@ model Appointment {
   serviceName    String?   // denormalised so it survives the service being renamed/removed
   prescriptionDocId String?
   prescriptionDoc   PatientDocument? @relation("NurseBookingPrescription", fields: [prescriptionDocId], references: [id], onDelete: SetNull)
+  // Photos the patient attached under "Symptoms / Reason" when booking a
+  // doctor (rash, wound, old report…). They live in the patient's vault.
+  symptomPhotos     PatientDocument[] @relation("AppointmentSymptomPhotos")
   // Visit-start code (nurse visits): generated when the nurse accepts, shown
   // only to the patient; the nurse must enter it at the door to start the
   // visit. Starting without it needs a reason (visitStartNote) and is

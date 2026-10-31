@@ -61,6 +61,8 @@
     "noPendingMatch": "आपकी खोज या फ़िल्टर से कोई बाकी अनुरोध नहीं मिला।",
     "noPending": "कोई बाकी अनुरोध नहीं है।",
     "allergies": "एलर्जी: {list}",
+    "symptomPhotos": "मरीज़ की फ़ोटो",
+    "openPhoto": "फ़ोटो {n} खोलें",
     "reject": "अस्वीकार करें",
     "accept": "स्वीकार करें",
     "upcomingAppointments": "आने वाले अपॉइंटमेंट",
@@ -193,7 +195,13 @@
     "notesPlaceholder": "कंसल्टेशन नोट्स / मेरे विचार (वैकल्पिक)…",
     "clinicalTitle": "कंसल्टेशन विवरण (सभी वैकल्पिक)",
     "optional": "वैकल्पिक",
-    "clinical": {"chiefComplaints": "मुख्य शिकायतें", "history": "इतिहास", "examination": "जाँच", "findings": "निष्कर्ष (CAPITALS)", "diagnosis": "निदान (CAPITALS)"},
+    "clinical": {
+      "chiefComplaints": "मुख्य शिकायतें",
+      "history": "इतिहास",
+      "examination": "जाँच",
+      "findings": "निष्कर्ष (CAPITALS)",
+      "diagnosis": "निदान (CAPITALS)"
+    },
     "prescription": "प्रिस्क्रिप्शन",
     "medicineName": "दवा का नाम",
     "dosage": "खुराक",

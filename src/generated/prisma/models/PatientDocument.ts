@@ -200,6 +200,7 @@ export type PatientDocumentWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"PatientDocument"> | Date | string
   patient?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   nurseBookings?: Prisma.AppointmentListRelationFilter
+  symptomAppointments?: Prisma.AppointmentListRelationFilter
 }
 
 export type PatientDocumentOrderByWithRelationInput = {
@@ -212,6 +213,7 @@ export type PatientDocumentOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   patient?: Prisma.UserOrderByWithRelationInput
   nurseBookings?: Prisma.AppointmentOrderByRelationAggregateInput
+  symptomAppointments?: Prisma.AppointmentOrderByRelationAggregateInput
 }
 
 export type PatientDocumentWhereUniqueInput = Prisma.AtLeast<{
@@ -227,6 +229,7 @@ export type PatientDocumentWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"PatientDocument"> | Date | string
   patient?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   nurseBookings?: Prisma.AppointmentListRelationFilter
+  symptomAppointments?: Prisma.AppointmentListRelationFilter
 }, "id">
 
 export type PatientDocumentOrderByWithAggregationInput = {
@@ -264,6 +267,7 @@ export type PatientDocumentCreateInput = {
   createdAt?: Date | string
   patient: Prisma.UserCreateNestedOneWithoutDocumentsInput
   nurseBookings?: Prisma.AppointmentCreateNestedManyWithoutPrescriptionDocInput
+  symptomAppointments?: Prisma.AppointmentCreateNestedManyWithoutSymptomPhotosInput
 }
 
 export type PatientDocumentUncheckedCreateInput = {
@@ -275,6 +279,7 @@ export type PatientDocumentUncheckedCreateInput = {
   fileName?: string | null
   createdAt?: Date | string
   nurseBookings?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPrescriptionDocInput
+  symptomAppointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutSymptomPhotosInput
 }
 
 export type PatientDocumentUpdateInput = {
@@ -286,6 +291,7 @@ export type PatientDocumentUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patient?: Prisma.UserUpdateOneRequiredWithoutDocumentsNestedInput
   nurseBookings?: Prisma.AppointmentUpdateManyWithoutPrescriptionDocNestedInput
+  symptomAppointments?: Prisma.AppointmentUpdateManyWithoutSymptomPhotosNestedInput
 }
 
 export type PatientDocumentUncheckedUpdateInput = {
@@ -297,6 +303,7 @@ export type PatientDocumentUncheckedUpdateInput = {
   fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   nurseBookings?: Prisma.AppointmentUncheckedUpdateManyWithoutPrescriptionDocNestedInput
+  symptomAppointments?: Prisma.AppointmentUncheckedUpdateManyWithoutSymptomPhotosNestedInput
 }
 
 export type PatientDocumentCreateManyInput = {
@@ -421,6 +428,18 @@ export type PatientDocumentCreateNestedOneWithoutNurseBookingsInput = {
   connect?: Prisma.PatientDocumentWhereUniqueInput
 }
 
+export type PatientDocumentCreateNestedManyWithoutSymptomAppointmentsInput = {
+  create?: Prisma.XOR<Prisma.PatientDocumentCreateWithoutSymptomAppointmentsInput, Prisma.PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput> | Prisma.PatientDocumentCreateWithoutSymptomAppointmentsInput[] | Prisma.PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput[]
+  connectOrCreate?: Prisma.PatientDocumentCreateOrConnectWithoutSymptomAppointmentsInput | Prisma.PatientDocumentCreateOrConnectWithoutSymptomAppointmentsInput[]
+  connect?: Prisma.PatientDocumentWhereUniqueInput | Prisma.PatientDocumentWhereUniqueInput[]
+}
+
+export type PatientDocumentUncheckedCreateNestedManyWithoutSymptomAppointmentsInput = {
+  create?: Prisma.XOR<Prisma.PatientDocumentCreateWithoutSymptomAppointmentsInput, Prisma.PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput> | Prisma.PatientDocumentCreateWithoutSymptomAppointmentsInput[] | Prisma.PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput[]
+  connectOrCreate?: Prisma.PatientDocumentCreateOrConnectWithoutSymptomAppointmentsInput | Prisma.PatientDocumentCreateOrConnectWithoutSymptomAppointmentsInput[]
+  connect?: Prisma.PatientDocumentWhereUniqueInput | Prisma.PatientDocumentWhereUniqueInput[]
+}
+
 export type PatientDocumentUpdateOneWithoutNurseBookingsNestedInput = {
   create?: Prisma.XOR<Prisma.PatientDocumentCreateWithoutNurseBookingsInput, Prisma.PatientDocumentUncheckedCreateWithoutNurseBookingsInput>
   connectOrCreate?: Prisma.PatientDocumentCreateOrConnectWithoutNurseBookingsInput
@@ -431,6 +450,32 @@ export type PatientDocumentUpdateOneWithoutNurseBookingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PatientDocumentUpdateToOneWithWhereWithoutNurseBookingsInput, Prisma.PatientDocumentUpdateWithoutNurseBookingsInput>, Prisma.PatientDocumentUncheckedUpdateWithoutNurseBookingsInput>
 }
 
+export type PatientDocumentUpdateManyWithoutSymptomAppointmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.PatientDocumentCreateWithoutSymptomAppointmentsInput, Prisma.PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput> | Prisma.PatientDocumentCreateWithoutSymptomAppointmentsInput[] | Prisma.PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput[]
+  connectOrCreate?: Prisma.PatientDocumentCreateOrConnectWithoutSymptomAppointmentsInput | Prisma.PatientDocumentCreateOrConnectWithoutSymptomAppointmentsInput[]
+  upsert?: Prisma.PatientDocumentUpsertWithWhereUniqueWithoutSymptomAppointmentsInput | Prisma.PatientDocumentUpsertWithWhereUniqueWithoutSymptomAppointmentsInput[]
+  set?: Prisma.PatientDocumentWhereUniqueInput | Prisma.PatientDocumentWhereUniqueInput[]
+  disconnect?: Prisma.PatientDocumentWhereUniqueInput | Prisma.PatientDocumentWhereUniqueInput[]
+  delete?: Prisma.PatientDocumentWhereUniqueInput | Prisma.PatientDocumentWhereUniqueInput[]
+  connect?: Prisma.PatientDocumentWhereUniqueInput | Prisma.PatientDocumentWhereUniqueInput[]
+  update?: Prisma.PatientDocumentUpdateWithWhereUniqueWithoutSymptomAppointmentsInput | Prisma.PatientDocumentUpdateWithWhereUniqueWithoutSymptomAppointmentsInput[]
+  updateMany?: Prisma.PatientDocumentUpdateManyWithWhereWithoutSymptomAppointmentsInput | Prisma.PatientDocumentUpdateManyWithWhereWithoutSymptomAppointmentsInput[]
+  deleteMany?: Prisma.PatientDocumentScalarWhereInput | Prisma.PatientDocumentScalarWhereInput[]
+}
+
+export type PatientDocumentUncheckedUpdateManyWithoutSymptomAppointmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.PatientDocumentCreateWithoutSymptomAppointmentsInput, Prisma.PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput> | Prisma.PatientDocumentCreateWithoutSymptomAppointmentsInput[] | Prisma.PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput[]
+  connectOrCreate?: Prisma.PatientDocumentCreateOrConnectWithoutSymptomAppointmentsInput | Prisma.PatientDocumentCreateOrConnectWithoutSymptomAppointmentsInput[]
+  upsert?: Prisma.PatientDocumentUpsertWithWhereUniqueWithoutSymptomAppointmentsInput | Prisma.PatientDocumentUpsertWithWhereUniqueWithoutSymptomAppointmentsInput[]
+  set?: Prisma.PatientDocumentWhereUniqueInput | Prisma.PatientDocumentWhereUniqueInput[]
+  disconnect?: Prisma.PatientDocumentWhereUniqueInput | Prisma.PatientDocumentWhereUniqueInput[]
+  delete?: Prisma.PatientDocumentWhereUniqueInput | Prisma.PatientDocumentWhereUniqueInput[]
+  connect?: Prisma.PatientDocumentWhereUniqueInput | Prisma.PatientDocumentWhereUniqueInput[]
+  update?: Prisma.PatientDocumentUpdateWithWhereUniqueWithoutSymptomAppointmentsInput | Prisma.PatientDocumentUpdateWithWhereUniqueWithoutSymptomAppointmentsInput[]
+  updateMany?: Prisma.PatientDocumentUpdateManyWithWhereWithoutSymptomAppointmentsInput | Prisma.PatientDocumentUpdateManyWithWhereWithoutSymptomAppointmentsInput[]
+  deleteMany?: Prisma.PatientDocumentScalarWhereInput | Prisma.PatientDocumentScalarWhereInput[]
+}
+
 export type PatientDocumentCreateWithoutPatientInput = {
   id?: string
   title: string
@@ -439,6 +484,7 @@ export type PatientDocumentCreateWithoutPatientInput = {
   fileName?: string | null
   createdAt?: Date | string
   nurseBookings?: Prisma.AppointmentCreateNestedManyWithoutPrescriptionDocInput
+  symptomAppointments?: Prisma.AppointmentCreateNestedManyWithoutSymptomPhotosInput
 }
 
 export type PatientDocumentUncheckedCreateWithoutPatientInput = {
@@ -449,6 +495,7 @@ export type PatientDocumentUncheckedCreateWithoutPatientInput = {
   fileName?: string | null
   createdAt?: Date | string
   nurseBookings?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPrescriptionDocInput
+  symptomAppointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutSymptomPhotosInput
 }
 
 export type PatientDocumentCreateOrConnectWithoutPatientInput = {
@@ -498,6 +545,7 @@ export type PatientDocumentCreateWithoutNurseBookingsInput = {
   fileName?: string | null
   createdAt?: Date | string
   patient: Prisma.UserCreateNestedOneWithoutDocumentsInput
+  symptomAppointments?: Prisma.AppointmentCreateNestedManyWithoutSymptomPhotosInput
 }
 
 export type PatientDocumentUncheckedCreateWithoutNurseBookingsInput = {
@@ -508,11 +556,39 @@ export type PatientDocumentUncheckedCreateWithoutNurseBookingsInput = {
   fileUrl: string
   fileName?: string | null
   createdAt?: Date | string
+  symptomAppointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutSymptomPhotosInput
 }
 
 export type PatientDocumentCreateOrConnectWithoutNurseBookingsInput = {
   where: Prisma.PatientDocumentWhereUniqueInput
   create: Prisma.XOR<Prisma.PatientDocumentCreateWithoutNurseBookingsInput, Prisma.PatientDocumentUncheckedCreateWithoutNurseBookingsInput>
+}
+
+export type PatientDocumentCreateWithoutSymptomAppointmentsInput = {
+  id?: string
+  title: string
+  category?: string
+  fileUrl: string
+  fileName?: string | null
+  createdAt?: Date | string
+  patient: Prisma.UserCreateNestedOneWithoutDocumentsInput
+  nurseBookings?: Prisma.AppointmentCreateNestedManyWithoutPrescriptionDocInput
+}
+
+export type PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput = {
+  id?: string
+  patientId: string
+  title: string
+  category?: string
+  fileUrl: string
+  fileName?: string | null
+  createdAt?: Date | string
+  nurseBookings?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPrescriptionDocInput
+}
+
+export type PatientDocumentCreateOrConnectWithoutSymptomAppointmentsInput = {
+  where: Prisma.PatientDocumentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PatientDocumentCreateWithoutSymptomAppointmentsInput, Prisma.PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput>
 }
 
 export type PatientDocumentUpsertWithoutNurseBookingsInput = {
@@ -534,6 +610,7 @@ export type PatientDocumentUpdateWithoutNurseBookingsInput = {
   fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patient?: Prisma.UserUpdateOneRequiredWithoutDocumentsNestedInput
+  symptomAppointments?: Prisma.AppointmentUpdateManyWithoutSymptomPhotosNestedInput
 }
 
 export type PatientDocumentUncheckedUpdateWithoutNurseBookingsInput = {
@@ -544,6 +621,23 @@ export type PatientDocumentUncheckedUpdateWithoutNurseBookingsInput = {
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  symptomAppointments?: Prisma.AppointmentUncheckedUpdateManyWithoutSymptomPhotosNestedInput
+}
+
+export type PatientDocumentUpsertWithWhereUniqueWithoutSymptomAppointmentsInput = {
+  where: Prisma.PatientDocumentWhereUniqueInput
+  update: Prisma.XOR<Prisma.PatientDocumentUpdateWithoutSymptomAppointmentsInput, Prisma.PatientDocumentUncheckedUpdateWithoutSymptomAppointmentsInput>
+  create: Prisma.XOR<Prisma.PatientDocumentCreateWithoutSymptomAppointmentsInput, Prisma.PatientDocumentUncheckedCreateWithoutSymptomAppointmentsInput>
+}
+
+export type PatientDocumentUpdateWithWhereUniqueWithoutSymptomAppointmentsInput = {
+  where: Prisma.PatientDocumentWhereUniqueInput
+  data: Prisma.XOR<Prisma.PatientDocumentUpdateWithoutSymptomAppointmentsInput, Prisma.PatientDocumentUncheckedUpdateWithoutSymptomAppointmentsInput>
+}
+
+export type PatientDocumentUpdateManyWithWhereWithoutSymptomAppointmentsInput = {
+  where: Prisma.PatientDocumentScalarWhereInput
+  data: Prisma.XOR<Prisma.PatientDocumentUpdateManyMutationInput, Prisma.PatientDocumentUncheckedUpdateManyWithoutSymptomAppointmentsInput>
 }
 
 export type PatientDocumentCreateManyPatientInput = {
@@ -563,6 +657,7 @@ export type PatientDocumentUpdateWithoutPatientInput = {
   fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   nurseBookings?: Prisma.AppointmentUpdateManyWithoutPrescriptionDocNestedInput
+  symptomAppointments?: Prisma.AppointmentUpdateManyWithoutSymptomPhotosNestedInput
 }
 
 export type PatientDocumentUncheckedUpdateWithoutPatientInput = {
@@ -573,10 +668,43 @@ export type PatientDocumentUncheckedUpdateWithoutPatientInput = {
   fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   nurseBookings?: Prisma.AppointmentUncheckedUpdateManyWithoutPrescriptionDocNestedInput
+  symptomAppointments?: Prisma.AppointmentUncheckedUpdateManyWithoutSymptomPhotosNestedInput
 }
 
 export type PatientDocumentUncheckedUpdateManyWithoutPatientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PatientDocumentUpdateWithoutSymptomAppointmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patient?: Prisma.UserUpdateOneRequiredWithoutDocumentsNestedInput
+  nurseBookings?: Prisma.AppointmentUpdateManyWithoutPrescriptionDocNestedInput
+}
+
+export type PatientDocumentUncheckedUpdateWithoutSymptomAppointmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  patientId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  nurseBookings?: Prisma.AppointmentUncheckedUpdateManyWithoutPrescriptionDocNestedInput
+}
+
+export type PatientDocumentUncheckedUpdateManyWithoutSymptomAppointmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  patientId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -591,10 +719,12 @@ export type PatientDocumentUncheckedUpdateManyWithoutPatientInput = {
 
 export type PatientDocumentCountOutputType = {
   nurseBookings: number
+  symptomAppointments: number
 }
 
 export type PatientDocumentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   nurseBookings?: boolean | PatientDocumentCountOutputTypeCountNurseBookingsArgs
+  symptomAppointments?: boolean | PatientDocumentCountOutputTypeCountSymptomAppointmentsArgs
 }
 
 /**
@@ -614,6 +744,13 @@ export type PatientDocumentCountOutputTypeCountNurseBookingsArgs<ExtArgs extends
   where?: Prisma.AppointmentWhereInput
 }
 
+/**
+ * PatientDocumentCountOutputType without action
+ */
+export type PatientDocumentCountOutputTypeCountSymptomAppointmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AppointmentWhereInput
+}
+
 
 export type PatientDocumentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -625,6 +762,7 @@ export type PatientDocumentSelect<ExtArgs extends runtime.Types.Extensions.Inter
   createdAt?: boolean
   patient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   nurseBookings?: boolean | Prisma.PatientDocument$nurseBookingsArgs<ExtArgs>
+  symptomAppointments?: boolean | Prisma.PatientDocument$symptomAppointmentsArgs<ExtArgs>
   _count?: boolean | Prisma.PatientDocumentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["patientDocument"]>
 
@@ -664,6 +802,7 @@ export type PatientDocumentOmit<ExtArgs extends runtime.Types.Extensions.Interna
 export type PatientDocumentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patient?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   nurseBookings?: boolean | Prisma.PatientDocument$nurseBookingsArgs<ExtArgs>
+  symptomAppointments?: boolean | Prisma.PatientDocument$symptomAppointmentsArgs<ExtArgs>
   _count?: boolean | Prisma.PatientDocumentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PatientDocumentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -678,6 +817,7 @@ export type $PatientDocumentPayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     patient: Prisma.$UserPayload<ExtArgs>
     nurseBookings: Prisma.$AppointmentPayload<ExtArgs>[]
+    symptomAppointments: Prisma.$AppointmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1083,6 +1223,7 @@ export interface Prisma__PatientDocumentClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   patient<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   nurseBookings<T extends Prisma.PatientDocument$nurseBookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PatientDocument$nurseBookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  symptomAppointments<T extends Prisma.PatientDocument$symptomAppointmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PatientDocument$symptomAppointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1523,6 +1664,30 @@ export type PatientDocumentDeleteManyArgs<ExtArgs extends runtime.Types.Extensio
  * PatientDocument.nurseBookings
  */
 export type PatientDocument$nurseBookingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Appointment
+   */
+  select?: Prisma.AppointmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Appointment
+   */
+  omit?: Prisma.AppointmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppointmentInclude<ExtArgs> | null
+  where?: Prisma.AppointmentWhereInput
+  orderBy?: Prisma.AppointmentOrderByWithRelationInput | Prisma.AppointmentOrderByWithRelationInput[]
+  cursor?: Prisma.AppointmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AppointmentScalarFieldEnum | Prisma.AppointmentScalarFieldEnum[]
+}
+
+/**
+ * PatientDocument.symptomAppointments
+ */
+export type PatientDocument$symptomAppointmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Appointment
    */

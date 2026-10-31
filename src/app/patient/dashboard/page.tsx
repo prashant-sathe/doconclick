@@ -44,6 +44,7 @@ import DependentPicker from "@/components/patient/DependentPicker";
 import TimeSlotPicker from "@/components/patient/TimeSlotPicker";
 import AddressAutocomplete from "@/components/patient/AddressAutocomplete";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import SymptomPhotoPicker, { type SymptomPhoto } from "@/components/patient/SymptomPhotoPicker";
 import { useBookingProfileGate } from "@/components/patient/CompleteProfileSheet";
 import { missingProfileFields } from "@/lib/bookingProfile";
 import { readPatientLocation, writePatientLocation } from "@/lib/patientLocation";
@@ -350,6 +351,7 @@ function PatientDashboardInner() {
   const [bookingOpen, setBookingOpen] = useState(false);
   const [consultType, setConsultType] = useState("HOME");
   const [symptoms, setSymptoms] = useState("");
+  const [symptomPhotos, setSymptomPhotos] = useState<SymptomPhoto[]>([]);
   const [allergies, setAllergies] = useState("");
   const [relation, setRelation] = useState("Self");
   const [dependentId, setDependentId] = useState<string | null>(null);
@@ -553,6 +555,7 @@ function PatientDashboardInner() {
     setBookingOpen(false);
     setConsultType(defaultConsultType(doc));
     setSymptoms("");
+    setSymptomPhotos([]);
     setRelation("Self");
     setDependentId(null);
     setConsentGiven(false);
@@ -778,6 +781,7 @@ function PatientDashboardInner() {
           setBookingOpen(false);
           setConsultType(defaultConsultType(doc));
           setSymptoms("");
+          setSymptomPhotos([]);
           setRelation("Self");
           setDependentId(null);
           setConsentGiven(false);
@@ -962,6 +966,7 @@ function PatientDashboardInner() {
       body: JSON.stringify({
         doctorId: selectedDoctor.id,
         symptoms,
+        symptomPhotoIds: symptomPhotos.map((p) => p.id),
         dependentId,
         allergies,
         consentGiven,
@@ -1593,6 +1598,8 @@ function PatientDashboardInner() {
                     value={symptoms}
                     onChange={(e) => setSymptoms(e.target.value)}
                   />
+
+                  <SymptomPhotoPicker photos={symptomPhotos} onChange={setSymptomPhotos} onError={setBookingError} className="mb-4" />
 
                   {/* Allergies */}
                   <label className="input-label"><AlertTriangle className="inline w-3.5 h-3.5 mr-1 text-amber-500" />{tf("allergies")}</label>
