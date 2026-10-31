@@ -36,3 +36,22 @@ export function speakableText(text: string): string {
     .trim()
     .slice(0, VOICE_SPEAK_MAX_CHARS);
 }
+
+/**
+ * A reply split for speaking: the first sentence on its own (so audio starts
+ * as soon as it's ready), then the rest in parts of up to ~300 characters.
+ * Splits after . ! ? । ॥ or a line break; a tiny first sentence ("ठीक आहे.")
+ * is joined to the next.
+ */
+export function speechChunks(text: string): string[] {
+  const sentences = speakableText(text).split(/(?<=[.!?।॥])\s+|\n+/).map((s) => s.trim()).filter(Boolean);
+  const out: string[] = [];
+  for (const s of sentences) {
+    const last = out.length - 1;
+    const tinyOpener = out.length === 1 && out[0].length < 25;
+    const roomInPart = out.length > 1 && out[last].length + s.length + 1 <= 300;
+    if (tinyOpener || roomInPart) out[last] += ` ${s}`;
+    else out.push(s);
+  }
+  return out.length ? out : [speakableText(text)];
+}

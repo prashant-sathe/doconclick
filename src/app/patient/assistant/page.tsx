@@ -629,19 +629,29 @@ export default function HealthAssistantPage() {
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const voiceModeRef = useRef(false);
   const voicePausedRef = useRef(false);
+  // One turn at a time: a question heard while another is still being
+  // answered is dropped, and listening only resumes once a turn is over.
+  const turnActive = useRef(false);
   const listenAgain = () => {
-    if (voiceModeRef.current && !voicePausedRef.current) void voiceRef.current?.start({ handsFree: true });
+    if (voiceModeRef.current && !voicePausedRef.current && !turnActive.current) void voiceRef.current?.start({ handsFree: true });
   };
   const pauseVoice = (paused: boolean) => { voicePausedRef.current = paused; setVoicePaused(paused); };
   const voiceTurn = async (question: string) => {
-    setVoiceError(null);
-    setVoiceTurnInfo({ question, reply: "", suggestions: false });
-    const reply = await send(question, { voiceMode: true });
-    if (!voiceModeRef.current) return;
-    if (!reply) setVoiceError(t("somethingWrong"));
-    else if (reply.text) {
-      setVoiceTurnInfo({ question, reply: reply.text, suggestions: reply.suggestions });
-      await voiceRef.current?.speak(reply.text, reply.key);
+    if (turnActive.current) return;
+    turnActive.current = true;
+    try {
+      setVoiceError(null);
+      setVoiceTurnInfo({ question, reply: "", suggestions: false });
+      const reply = await send(question, { voiceMode: true });
+      if (!voiceModeRef.current) return;
+      if (!reply) setVoiceError(t("somethingWrong"));
+      else if (reply.text) {
+        setVoiceTurnInfo({ question, reply: reply.text, suggestions: reply.suggestions });
+        // Talking over the reply (barge-in) stops it; this then resolves.
+        await voiceRef.current?.speak(reply.text, reply.key, { bargeIn: true });
+      }
+    } finally {
+      turnActive.current = false;
     }
     listenAgain();
   };
@@ -655,7 +665,8 @@ export default function HealthAssistantPage() {
       if (e === "blocked" || e === "unsupported") pauseVoice(true);
       else if (e !== "playFailed") setTimeout(listenAgain, 1200);
     },
-    onIdle: () => { if (voiceModeRef.current) pauseVoice(true); },
+    onIdle: () => { if (voiceModeRef.current) { pauseVoice(true); voiceRef.current?.closeMic(); } },
+    onBargeIn: () => voiceRef.current?.stopSpeaking(),
   });
   useEffect(() => { voiceRef.current = voice; });
   const openVoiceMode = () => {
@@ -673,6 +684,7 @@ export default function HealthAssistantPage() {
     voiceModeRef.current = false;
     voiceRef.current?.cancel();
     voiceRef.current?.stopSpeaking();
+    voiceRef.current?.closeMic();
     setVoiceMode(false);
   }, []);
   const voiceModeState: VoiceModeState = voicePaused ? "paused"
@@ -688,7 +700,7 @@ export default function HealthAssistantPage() {
   };
   const onVoiceMute = () => {
     if (voicePausedRef.current) { voice.unlockAudio(); pauseVoice(false); setVoiceError(null); void voice.start({ handsFree: true }); }
-    else { pauseVoice(true); voice.cancel(); voice.stopSpeaking(); }
+    else { pauseVoice(true); voice.cancel(); voice.stopSpeaking(); voice.closeMic(); }
   };
   const speaker: Speaker = { speak: voice.speak, stop: voice.stopSpeaking, speakingKey: voice.speakingKey, loadingKey: voice.loadingKey };
   const voiceBusy = voice.phase !== "idle";

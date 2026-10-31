@@ -12,7 +12,8 @@ import { searchNurses } from "@/lib/nurseSearch";
 import { awayAt } from "@/lib/timeOff";
 import { readJson } from "@/lib/routeGuards";
 import { parseBody, assistantRequestSchema } from "@/lib/schemas";
-import { withErrorLocale } from "@/lib/apiErrors";
+import { withErrorLocale, requestLanguage } from "@/lib/apiErrors";
+import { APP_LANGUAGE_LABELS_EN } from "@/lib/appLanguage";
 
 type InputItem = OpenAI.Responses.ResponseInputItem;
 type FunctionCall = OpenAI.Responses.ResponseFunctionToolCall;
@@ -38,6 +39,7 @@ function checkRateLimit(patientId: string): boolean {
 const SYSTEM_PROMPT = `You are the DocOnClick Health Assistant — you help patients in India figure out which type of doctor to see, then point them to real doctors on the platform. You can also point them to registered nurses who come home for nursing care. You also help with account/app issues (booking problems, payment disputes, complaints) by raising a support ticket. You are not a doctor.
 
 Rules:
+- Language: reply in the language of the patient's latest message — Marathi, Hindi, Kannada or English. Patients often mix in English words (doctor, BP, sugar, appointment); that doesn't mean they switched to English, so keep to their main language and its script. Only change language when the patient clearly does.
 - Never diagnose a condition, and never recommend medicines, dosages, or treatment. Your only job is triage: understand the symptoms well enough to recommend a medical specialty.
 - All prices are in Indian Rupees (₹). Never mention insurance or copays — those aren't part of this app.
 - Emergencies come first. If the patient describes any of these red flags, stop triage and tell them clearly to call 112 or go to the nearest hospital emergency department now (you can still offer to find a doctor for afterwards):
@@ -464,13 +466,17 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     return NextResponse.json({ error: "Health Assistant is not configured." }, { status: 503 });
   }
 
+  // The app language is a hint for the first message / unclear cases only.
+  const appLanguage = APP_LANGUAGE_LABELS_EN[await requestLanguage()];
+  const instructions = `${SYSTEM_PROMPT}\n\nThe patient's app is set to ${appLanguage}.${body.voice ? VOICE_MODE_NOTE : ""}`;
+
   const newItems: InputItem[] = [];
 
   try {
     for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
       const response = await client.responses.create({
         model: ASSISTANT_MODEL,
-        instructions: body.voice ? SYSTEM_PROMPT + VOICE_MODE_NOTE : SYSTEM_PROMPT,
+        instructions,
         input: [...priorItems, ...newItems],
         tools: TOOLS,
         reasoning: { effort: "low" },

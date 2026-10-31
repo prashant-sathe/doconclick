@@ -32,14 +32,20 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     return NextResponse.json({ error: "Health Assistant is not configured." }, { status: 503 });
   }
 
-  const language = APP_LANGUAGE_LABELS_EN[await requestLanguage()];
+  // The reply's own language (it may differ from the app's): Kannada and
+  // Latin script say which; Devanagari is Hindi or Marathi — the app
+  // language decides when it's one of those.
+  const own = await requestLanguage();
+  const language = /[\u0C80-\u0CFF]/.test(text) ? "Kannada"
+    : /[\u0900-\u097F]/.test(text) ? (own === "hi-IN" || own === "mr-IN" ? APP_LANGUAGE_LABELS_EN[own] : "Hindi or Marathi, whichever the text is written in")
+    : "Indian English";
   try {
     const speech = await client.audio.speech.create({
       model: VOICE_TTS_MODEL,
       voice: VOICE_TTS_VOICE,
       input: text,
       response_format: "mp3",
-      instructions: `You are a caring health assistant in India speaking to a patient. Speak warmly, calmly and clearly at a moderate pace, with natural ${language} pronunciation (Indian accent for any English words). Say helpline numbers such as 112 and 14416 digit by digit.`,
+      instructions: `You are a caring health assistant in India speaking to a patient. Speak warmly, calmly and clearly at a moderate pace, in ${language}, with natural pronunciation (Indian accent for any English words). Say helpline numbers such as 112 and 14416 digit by digit.`,
     });
     return new NextResponse(speech.body, {
       headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" },

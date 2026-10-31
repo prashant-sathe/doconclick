@@ -20,7 +20,7 @@ import type { ChildProcess } from "child_process";
 import { chromium } from "playwright";
 import { prisma } from "../src/lib/prisma";
 import { getOpenAIClient, VOICE_TTS_MODEL, VOICE_TTS_VOICE } from "../src/lib/openai";
-import { speakableText, VOICE_MAX_BYTES } from "../src/lib/assistantVoice";
+import { speakableText, speechChunks, VOICE_MAX_BYTES } from "../src/lib/assistantVoice";
 import { startDevServer } from "./devServer";
 
 let BASE = process.env.BASE_URL ?? "";
@@ -44,6 +44,9 @@ const speak = (cookie: string, text: unknown) =>
 
 async function main() {
   check("speakableText drops the chat markdown", speakableText("**Fever** for *2 days* — see a `GP`\n- call 112") === "Fever for 2 days — see a GP\ncall 112", JSON.stringify(speakableText("**Fever** for *2 days* — see a `GP`\n- call 112")));
+
+  const parts = speechChunks("ठीक आहे. तापासाठी जनरल फिजिशियन योग्य राहतील. मी तीन डॉक्टर शोधले आहेत, ते स्क्रीनवर आहेत. श्वास घ्यायला त्रास झाला तर 112 वर कॉल करा.");
+  check("speechChunks: a short first part (a tiny opener joined), then the rest", parts.length === 2 && parts[0].startsWith("ठीक आहे. तापासाठी") && parts[0].length < 60, JSON.stringify(parts));
 
   let child: ChildProcess | null = null;
   if (!BASE) {
@@ -92,6 +95,20 @@ async function main() {
       check(`transcribe (${lang}): the sentence comes back in its script`, r.status === 200 && script.test(text) && text.includes(word), `${r.status} "${text}" ${Date.now() - t1} ms`);
     }
 
+    // ── Language: app in English, patient speaking Marathi ──
+    {
+      const res = await fetch(`${BASE}/api/patient/assistant`, {
+        method: "POST",
+        headers: { Cookie: cookieFor(patient, "en-IN"), "Content-Type": "application/json" },
+        body: JSON.stringify({ voice: true, messages: [{ role: "user", content: "माझं BP थोडं high आहे, कोणत्या doctor ला दाखवू?" }] }),
+      });
+      const data = await res.json();
+      const reply = (data.items ?? []).filter((i: { type?: string; role?: string }) => i.type === "message" && i.role === "assistant")
+        .map((i: { content: { text?: string }[] }) => i.content.map((c) => c.text ?? "").join("")).join(" ");
+      const devanagari = (reply.match(/[ऀ-ॿ]/g) ?? []).length, latin = (reply.match(/[A-Za-z]/g) ?? []).length;
+      check("app in English + a Marathi question (mixed with English words) → the reply stays Marathi", res.status === 200 && devanagari > latin, `${devanagari} Devanagari / ${latin} Latin: ${reply.slice(0, 80)}`);
+    }
+
     // ── The page, with a fake microphone playing a spoken question ──
     const wav = path.join(tmp, "question.wav");
     const spoken = await getOpenAIClient().audio.speech.create({
@@ -135,10 +152,25 @@ async function main() {
     }
 
     // ── Hands-free voice mode: no taps between speaking and the reply ──
-    // A fresh browser, so the fake microphone plays the question once and
-    // then stays silent — the pause that ends the turn.
+    // A fresh browser; the mic stays open for the session, so the fake
+    // microphone plays this once: the question, a long quiet (the pause that
+    // ends the turn, then the reply), and a follow-up said over the reply.
+    const followUp = await getOpenAIClient().audio.speech.create({
+      model: VOICE_TTS_MODEL, voice: VOICE_TTS_VOICE, response_format: "wav",
+      input: "थांबा, मला खोकला सुद्धा आहे. खोकल्यासाठी कोणत्या डॉक्टरांना दाखवू?",
+    });
+    const pcm = (buf: Buffer) => { const i = buf.indexOf("data"); return buf.subarray(i + 8); };
+    const q = pcm(fs.readFileSync(wav)), f = pcm(Buffer.from(await followUp.arrayBuffer()));
+    const silence = Buffer.alloc(24000 * 2 * 13); // 13 s at 24 kHz, 16-bit mono
+    const body = Buffer.concat([q, silence, f, Buffer.alloc(24000 * 2 * 8)]);
+    const header = Buffer.alloc(44);
+    header.write("RIFF", 0); header.writeUInt32LE(36 + body.length, 4); header.write("WAVE", 8); header.write("fmt ", 12);
+    header.writeUInt32LE(16, 16); header.writeUInt16LE(1, 20); header.writeUInt16LE(1, 22); header.writeUInt32LE(24000, 24);
+    header.writeUInt32LE(48000, 28); header.writeUInt16LE(2, 32); header.writeUInt16LE(16, 34); header.write("data", 36); header.writeUInt32LE(body.length, 40);
+    const conversation = path.join(tmp, "conversation.wav");
+    fs.writeFileSync(conversation, Buffer.concat([header, body]));
     const handsFree = await chromium.launch({
-      args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream", `--use-file-for-fake-audio-capture=${wav}%noloop`, "--autoplay-policy=no-user-gesture-required"],
+      args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream", `--use-file-for-fake-audio-capture=${conversation}%noloop`, "--autoplay-policy=no-user-gesture-required"],
     });
     try {
       const ctx = await handsFree.newContext({ viewport: { width: 390, height: 844 } });
@@ -165,6 +197,15 @@ async function main() {
       check("the overlay shows the question and the reply, and speaks it", speech.status() === 200 && /ताप/.test(question) && /[ऀ-ॿ]/.test(reply), `"${question}" → "${reply.slice(0, 60)}"`);
       check("…a short spoken-style reply (voice mode: no list, no markdown)", reply.length < 400 && !/\*\*|^\s*-\s/m.test(reply), `${reply.length} chars`);
       await page.screenshot({ path: path.join(tmp, "voice-mode-speaking.png") });
+      // The follow-up is said while the reply is playing: it stops the reply
+      // and becomes the next question, without any tap.
+      const t0 = Date.now();
+      const second = await page.waitForResponse((res) => res.url().endsWith("/api/patient/assistant/transcribe"), { timeout: 60000 });
+      const secondText = String((await second.json()).text ?? "");
+      check("talking over the reply (barge-in) stops it and is heard as the next question", second.status() === 200 && /खोकला/.test(secondText), `${Date.now() - t0} ms later: "${secondText}"`);
+      await overlay.getByText(/बोलत आहे/).waitFor({ timeout: 90000 });
+      const reply2 = (await overlay.locator("p.line-clamp-5").textContent()) ?? "";
+      check("…and the second answer is spoken too (a two-turn conversation, no taps)", /[ऀ-ॿ]/.test(reply2), reply2.slice(0, 70));
       await overlay.getByRole("button", { name: "मध्येच थांबवा" }).click();
       await overlay.getByText(/^(ऐकत आहे…|बोला, ऐकत आहे…)$/).waitFor({ timeout: 10000 });
       check("tapping the orb interrupts the reply and it listens again", true, (await status.textContent()) ?? "");
@@ -174,7 +215,7 @@ async function main() {
       await overlay.getByRole("button", { name: "व्हॉइस मोड बंद करा" }).first().click();
       await overlay.waitFor({ state: "detached", timeout: 5000 });
       const bubbles = await page.locator(".bg-primary-500").count();
-      check("ending voice mode leaves the conversation in the chat", bubbles >= 1 && (await page.locator(".rounded-bl-md").count()) >= 1, `${bubbles} question(s)`);
+      check("ending voice mode leaves the conversation in the chat", bubbles >= 2 && (await page.locator(".rounded-bl-md").count()) >= 1, `${bubbles} question(s)`);
       console.log(`      screenshots: ${path.join(tmp, "voice-mode-speaking.png")}, voice-mode-listening.png`);
     } finally {
       await handsFree.close();
