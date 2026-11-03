@@ -115,7 +115,7 @@ interface Review {
   rating: number;
   comment: string | null;
   createdAt: string;
-  patient: { name: string };
+  reviewer: string;
 }
 
 // ── Haversine distance (km) ────────────────────────────────────────────────
@@ -1842,7 +1842,7 @@ function PatientDashboardInner() {
                               <RatingStars avgRating={r.rating} totalReviews={1} />
                             </div>
                             {r.comment && <p className="text-xs text-slate-600 mt-1">&ldquo;{r.comment}&rdquo;</p>}
-                            <p className="text-[10px] text-slate-400 mt-0.5">{r.patient.name}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">{r.reviewer}</p>
                           </div>
                         ))}
                       </div>
