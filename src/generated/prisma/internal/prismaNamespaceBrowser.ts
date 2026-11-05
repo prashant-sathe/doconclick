@@ -102,7 +102,11 @@ export const ModelName = {
   Coupon: 'Coupon',
   CouponRedemption: 'CouponRedemption',
   PaymentOrder: 'PaymentOrder',
-  PaymentOrderItem: 'PaymentOrderItem'
+  PaymentOrderItem: 'PaymentOrderItem',
+  LabTest: 'LabTest',
+  LabBooking: 'LabBooking',
+  LabBookingItem: 'LabBookingItem',
+  LabReport: 'LabReport'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -540,6 +544,8 @@ export const WalletTransactionScalarFieldEnum = {
   cashfreePaymentId: 'cashfreePaymentId',
   adminId: 'adminId',
   note: 'note',
+  labBookingId: 'labBookingId',
+  refundOfLabBookingId: 'refundOfLabBookingId',
   createdAt: 'createdAt'
 } as const
 
@@ -708,7 +714,8 @@ export const PrescriptionTestScalarFieldEnum = {
   id: 'id',
   appointmentId: 'appointmentId',
   name: 'name',
-  instructions: 'instructions'
+  instructions: 'instructions',
+  labTestId: 'labTestId'
 } as const
 
 export type PrescriptionTestScalarFieldEnum = (typeof PrescriptionTestScalarFieldEnum)[keyof typeof PrescriptionTestScalarFieldEnum]
@@ -912,6 +919,7 @@ export const PlatformSettingsScalarFieldEnum = {
   doctorRegistrationFee: 'doctorRegistrationFee',
   nurseSubscriptionFee: 'nurseSubscriptionFee',
   nurseShiftServicesSeeded: 'nurseShiftServicesSeeded',
+  labTestsSeeded: 'labTestsSeeded',
   bookingHorizonDays: 'bookingHorizonDays',
   chatFollowUpDays: 'chatFollowUpDays',
   cashDueLimit: 'cashDueLimit',
@@ -1027,6 +1035,76 @@ export const PaymentOrderItemScalarFieldEnum = {
 } as const
 
 export type PaymentOrderItemScalarFieldEnum = (typeof PaymentOrderItemScalarFieldEnum)[keyof typeof PaymentOrderItemScalarFieldEnum]
+
+
+export const LabTestScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  b2bPrice: 'b2bPrice',
+  commissionPercent: 'commissionPercent',
+  isActive: 'isActive',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LabTestScalarFieldEnum = (typeof LabTestScalarFieldEnum)[keyof typeof LabTestScalarFieldEnum]
+
+
+export const LabBookingScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  appointmentId: 'appointmentId',
+  patientName: 'patientName',
+  patientAge: 'patientAge',
+  patientGender: 'patientGender',
+  address: 'address',
+  pinCode: 'pinCode',
+  lat: 'lat',
+  lng: 'lng',
+  collectionDate: 'collectionDate',
+  collectionSlot: 'collectionSlot',
+  notes: 'notes',
+  totalAmount: 'totalAmount',
+  paymentMethod: 'paymentMethod',
+  paymentStatus: 'paymentStatus',
+  cashfreeOrderId: 'cashfreeOrderId',
+  cfPaymentId: 'cfPaymentId',
+  paidAt: 'paidAt',
+  status: 'status',
+  adminNote: 'adminNote',
+  cancelledBy: 'cancelledBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LabBookingScalarFieldEnum = (typeof LabBookingScalarFieldEnum)[keyof typeof LabBookingScalarFieldEnum]
+
+
+export const LabBookingItemScalarFieldEnum = {
+  id: 'id',
+  bookingId: 'bookingId',
+  labTestId: 'labTestId',
+  name: 'name',
+  b2bPrice: 'b2bPrice',
+  commissionPercent: 'commissionPercent',
+  price: 'price'
+} as const
+
+export type LabBookingItemScalarFieldEnum = (typeof LabBookingItemScalarFieldEnum)[keyof typeof LabBookingItemScalarFieldEnum]
+
+
+export const LabReportScalarFieldEnum = {
+  id: 'id',
+  bookingId: 'bookingId',
+  fileUrl: 'fileUrl',
+  fileName: 'fileName',
+  documentId: 'documentId',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt'
+} as const
+
+export type LabReportScalarFieldEnum = (typeof LabReportScalarFieldEnum)[keyof typeof LabReportScalarFieldEnum]
 
 
 export const SortOrder = {

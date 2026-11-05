@@ -402,5 +402,49 @@
   "feePaymentCreditedToWallet": {
     "title": "Payment credited to wallet",
     "body": "The fee changed while you were paying, so your ₹{amount} payment was credited to your wallet. Please pay the fee again."
+  },
+  "labBookingNew": {
+    "title": "New lab booking",
+    "body": "{patient} booked {count, plural, one {# lab test} other {# lab tests}} — ₹{amount}."
+  },
+  "labBookingCancelledByPatient": {
+    "title": "Lab booking cancelled",
+    "body": "{patient} cancelled their lab booking."
+  },
+  "labBookingPaidWallet": {
+    "title": "Lab tests booked",
+    "body": "₹{amount} paid from your wallet. We'll confirm the sample collection soon."
+  },
+  "labBookingConfirmed": {
+    "title": "Lab booking confirmed",
+    "body": "Your lab test booking is confirmed. Check the app for the collection details."
+  },
+  "labBookingSampleCollected": {
+    "title": "Sample collected",
+    "body": "Your sample has been collected. We'll let you know when the report is ready."
+  },
+  "labBookingCompleted": {
+    "title": "Lab tests completed",
+    "body": "Your lab tests are done. Check the app for details."
+  },
+  "labBookingCancelled": {
+    "title": "Lab booking cancelled",
+    "body": "Your lab test booking was cancelled. Check the app for details."
+  },
+  "labBookingCancelledRefunded": {
+    "title": "Lab booking cancelled",
+    "body": "Your lab test booking was cancelled. ₹{amount} was refunded to your wallet."
+  },
+  "labBookingPaidOnline": {
+    "title": "Lab tests booked",
+    "body": "₹{amount} paid online. We'll confirm the sample collection soon."
+  },
+  "labPaymentCreditedToWallet": {
+    "title": "Payment added to wallet",
+    "body": "We couldn't apply your ₹{amount} lab payment to the booking, so it was added to your wallet."
+  },
+  "labReportReady": {
+    "title": "Your lab report is ready",
+    "body": "Open the app to view or download your lab test report."
   }
 }

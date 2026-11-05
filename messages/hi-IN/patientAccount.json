@@ -42,7 +42,8 @@
     "anyDistance": "कोई भी दूरी",
     "signOut": "साइन आउट करें",
     "family": "परिवार के सदस्य",
-    "medicines": "दवा रिमाइंडर"
+    "medicines": "दवा रिमाइंडर",
+    "labTests": "लैब टेस्ट"
   },
   "personal": {
     "title": "व्यक्तिगत और मेडिकल जानकारी",
@@ -295,7 +296,9 @@
       "REASSIGNMENT_CREDIT": "अपॉइंटमेंट रद्द — पैसे वापस",
       "CANCELLATION_REFUND": "अपॉइंटमेंट रद्द — पैसे वापस",
       "PAYMENT_CREDIT": "पेमेंट वॉलेट में जमा",
-      "REFERRAL_BONUS": "रेफ़रल इनाम"
+      "REFERRAL_BONUS": "रेफ़रल इनाम",
+      "LAB_TEST_PAYMENT": "लैब टेस्ट भुगतान",
+      "LAB_TEST_REFUND": "लैब बुकिंग रद्द — वापस"
     },
     "status": {
       "PENDING": "प्रोसेस हो रहा है",

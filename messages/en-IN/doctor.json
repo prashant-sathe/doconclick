@@ -215,6 +215,8 @@
     "recommendedTests": "Recommended Tests",
     "testName": "Test name (e.g. CBC, X-Ray Chest)",
     "testInstructions": "Instructions (e.g. fasting required, optional)",
+    "labBookable": "Patient can book this in the app: {name} · ₹{price}",
+    "labNotListed": "Not in the lab test list — the patient can't book it in the app",
     "addTest": "Add test",
     "needsNurse": "Patient needs a nurse at home (optional)",
     "needsNurseHint": "The patient gets a one-tap “Book a nurse” with this prescription attached — no upload needed.",

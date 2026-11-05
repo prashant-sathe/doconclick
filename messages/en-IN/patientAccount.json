@@ -42,7 +42,8 @@
     "anyDistance": "Any distance",
     "signOut": "Sign Out",
     "family": "Family Members",
-    "medicines": "Medicine Reminders"
+    "medicines": "Medicine Reminders",
+    "labTests": "Lab Tests"
   },
   "personal": {
     "title": "Personal & Medical Info",
@@ -295,7 +296,9 @@
       "REASSIGNMENT_CREDIT": "Appointment cancelled — refunded",
       "CANCELLATION_REFUND": "Appointment cancelled — refunded",
       "PAYMENT_CREDIT": "Payment credited to wallet",
-      "REFERRAL_BONUS": "Referral reward"
+      "REFERRAL_BONUS": "Referral reward",
+      "LAB_TEST_PAYMENT": "Lab test payment",
+      "LAB_TEST_REFUND": "Lab booking cancelled — refunded"
     },
     "status": {
       "PENDING": "Processing",

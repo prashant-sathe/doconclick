@@ -9,6 +9,8 @@ interface LocationPickerMapProps {
   lng: number | null;
   onChange: (lat: number, lng: number) => void;
   height?: number;
+  // Where to open the map when there's no pin yet (no marker is placed there).
+  center?: { lat: number; lng: number } | null;
 }
 
 const DEFAULT_CENTER: [number, number] = [20.5937, 78.9629]; // India centroid
@@ -25,7 +27,7 @@ function pinSvg() {
   </svg>`;
 }
 
-export default function LocationPickerMap({ lat, lng, onChange, height = 280 }: LocationPickerMapProps) {
+export default function LocationPickerMap({ lat, lng, onChange, height = 280, center = null }: LocationPickerMapProps) {
   const t = useTranslations("shared.locationPicker");
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletRef = useRef<typeof import("leaflet") | null>(null);
@@ -51,8 +53,8 @@ export default function LocationPickerMap({ lat, lng, onChange, height = 280 }: 
       const container = mapRef.current as HTMLDivElement & { _leaflet_id?: number };
       if (container._leaflet_id != null) delete container._leaflet_id;
 
-      const start: [number, number] = lat != null && lng != null ? [lat, lng] : DEFAULT_CENTER;
-      const map = L.map(container, { zoomControl: false }).setView(start, lat != null ? 15 : 4);
+      const start: [number, number] = lat != null && lng != null ? [lat, lng] : center ? [center.lat, center.lng] : DEFAULT_CENTER;
+      const map = L.map(container, { zoomControl: false }).setView(start, lat != null ? 15 : center ? 14 : 4);
       L.control.zoom({ position: "bottomright" }).addTo(map);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap contributors",

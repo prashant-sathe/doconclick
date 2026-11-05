@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Stethoscope, Users, CalendarCheck,
   DollarSign, MessageCircle, Settings, Tag,
   LogOut, ChevronRight, FileBarChart, Wallet, Megaphone, TicketPercent,
-  Menu, X, HeartPulse, ClipboardList, Inbox,
+  Menu, X, HeartPulse, ClipboardList, Inbox, FlaskConical, TestTubes,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/AuthProvider";
@@ -25,6 +25,8 @@ const topItems: NavItem[] = [
   { href: "/admin/nurse-services", label: "Nurse Services", icon: ClipboardList },
   { href: "/admin/patients",   label: "Patients",    icon: Users },
   { href: "/admin/bookings",   label: "Bookings",    icon: CalendarCheck },
+  { href: "/admin/lab-tests",  label: "Lab Tests",   icon: FlaskConical },
+  { href: "/admin/lab-bookings", label: "Lab Bookings", icon: TestTubes },
 ];
 
 // Everything that moves or configures money, under one heading.

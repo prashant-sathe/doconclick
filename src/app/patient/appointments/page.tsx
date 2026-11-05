@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Loader2, CalendarClock, Stethoscope, Home, Building2, Video, FileText, Star, X, Wallet, CreditCard, RotateCcw, Clock, Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin, MessageCircle, Navigation, UserCheck, HeartPulse, CheckCircle2, Activity, AlertTriangle,
+  Loader2, CalendarClock, Stethoscope, Home, Building2, Video, FileText, Star, X, Wallet, CreditCard, RotateCcw, Clock, Pill, ThumbsDown, CreditCard as CardIcon, Car, MapPinCheck, MapPin, MessageCircle, Navigation, UserCheck, HeartPulse, CheckCircle2, Activity, AlertTriangle, FlaskConical,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn, formatDoctorName, formatProviderName } from "@/lib/utils";
@@ -82,6 +82,9 @@ interface Appointment {
   };
   review: { id: string; rating: number; comment: string | null } | null;
   medicines: Medicine[];
+  // Recommended tests; `bookable` = in the admin's lab catalogue.
+  tests?: { id: string; name: string; instructions: string | null; bookable: boolean }[];
+  labBooking?: { id: string; status: string } | null;
   clinic: { name: string; address: string; lat: number; lng: number } | null;
   reassignedFromId: string | null;
   reassignedTo: { id: string; doctor: { name: string } } | null;
@@ -449,6 +452,29 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {a.status === "COMPLETED" && a.providerType !== "NURSE" && (a.tests?.length ?? 0) > 0 && (
+        <div className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 mb-3">
+          <p className="text-sm font-semibold text-teal-800 flex items-center gap-1.5"><FlaskConical className="w-4 h-4" />{t("labTitle")}</p>
+          <ul className="mt-1 space-y-0.5">
+            {a.tests!.map((test) => (
+              <li key={test.id} className="text-xs text-teal-900/80">
+                • {test.name}{test.instructions ? ` — ${test.instructions}` : ""}
+                {!test.bookable && <span className="text-slate-400"> ({t("labNotBookable")})</span>}
+              </li>
+            ))}
+          </ul>
+          {a.labBooking ? (
+            <Link href="/patient/lab-tests" className="text-xs font-semibold text-emerald-700 mt-2 flex items-center gap-1 hover:underline">
+              <CheckCircle2 className="w-3.5 h-3.5" />{t("labBooked", { status: a.labBooking.status })}
+            </Link>
+          ) : a.tests!.some((test) => test.bookable) ? (
+            <Link href={`/patient/lab-tests/book?appointmentId=${a.id}`} className="tap-44-y btn-primary py-2 px-3 text-xs mt-2 inline-flex">
+              <FlaskConical className="w-3.5 h-3.5" /> {t("labBook")}
+            </Link>
+          ) : null}
         </div>
       )}
 

@@ -448,7 +448,11 @@ export const ModelName = {
   Coupon: 'Coupon',
   CouponRedemption: 'CouponRedemption',
   PaymentOrder: 'PaymentOrder',
-  PaymentOrderItem: 'PaymentOrderItem'
+  PaymentOrderItem: 'PaymentOrderItem',
+  LabTest: 'LabTest',
+  LabBooking: 'LabBooking',
+  LabBookingItem: 'LabBookingItem',
+  LabReport: 'LabReport'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -464,7 +468,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pushToken" | "notification" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "providerTimeOff" | "duesPayment" | "payoutRequest" | "settlementPayoutCorrection" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "medicineReminder" | "medicineDose" | "prescriptionTest" | "prescriptionVersion" | "doctorFavouriteMedicine" | "prescriptionTemplate" | "prescriptionAttachment" | "review" | "complaint" | "complaintMessage" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "referral" | "referralCode" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem"
+    modelProps: "user" | "pushToken" | "notification" | "savedDoctor" | "patientProfile" | "patientDependent" | "patientDocument" | "doctorProfile" | "nurseProfile" | "nurseService" | "vitalReading" | "nursePackage" | "nurseReferral" | "nurseServiceOffering" | "nursePaymentLog" | "doctorChangeRequest" | "staffProfile" | "appointment" | "wallet" | "walletTransaction" | "settlement" | "providerTimeOff" | "duesPayment" | "payoutRequest" | "settlementPayoutCorrection" | "doctorPaymentLog" | "message" | "prescriptionMedicine" | "medicineReminder" | "medicineDose" | "prescriptionTest" | "prescriptionVersion" | "doctorFavouriteMedicine" | "prescriptionTemplate" | "prescriptionAttachment" | "review" | "complaint" | "complaintMessage" | "clinic" | "clinicSlot" | "clinicLeave" | "specialty" | "announcement" | "announcementRecipient" | "impersonationLog" | "platformSettings" | "referral" | "referralCode" | "coupon" | "couponRedemption" | "paymentOrder" | "paymentOrderItem" | "labTest" | "labBooking" | "labBookingItem" | "labReport"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4316,6 +4320,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LabTest: {
+      payload: Prisma.$LabTestPayload<ExtArgs>
+      fields: Prisma.LabTestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LabTestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LabTestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload>
+        }
+        findFirst: {
+          args: Prisma.LabTestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LabTestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload>
+        }
+        findMany: {
+          args: Prisma.LabTestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload>[]
+        }
+        create: {
+          args: Prisma.LabTestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload>
+        }
+        createMany: {
+          args: Prisma.LabTestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LabTestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload>[]
+        }
+        delete: {
+          args: Prisma.LabTestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload>
+        }
+        update: {
+          args: Prisma.LabTestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload>
+        }
+        deleteMany: {
+          args: Prisma.LabTestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LabTestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LabTestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload>[]
+        }
+        upsert: {
+          args: Prisma.LabTestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabTestPayload>
+        }
+        aggregate: {
+          args: Prisma.LabTestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLabTest>
+        }
+        groupBy: {
+          args: Prisma.LabTestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LabTestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LabTestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LabTestCountAggregateOutputType> | number
+        }
+      }
+    }
+    LabBooking: {
+      payload: Prisma.$LabBookingPayload<ExtArgs>
+      fields: Prisma.LabBookingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LabBookingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LabBookingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload>
+        }
+        findFirst: {
+          args: Prisma.LabBookingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LabBookingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload>
+        }
+        findMany: {
+          args: Prisma.LabBookingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload>[]
+        }
+        create: {
+          args: Prisma.LabBookingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload>
+        }
+        createMany: {
+          args: Prisma.LabBookingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LabBookingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload>[]
+        }
+        delete: {
+          args: Prisma.LabBookingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload>
+        }
+        update: {
+          args: Prisma.LabBookingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload>
+        }
+        deleteMany: {
+          args: Prisma.LabBookingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LabBookingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LabBookingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload>[]
+        }
+        upsert: {
+          args: Prisma.LabBookingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingPayload>
+        }
+        aggregate: {
+          args: Prisma.LabBookingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLabBooking>
+        }
+        groupBy: {
+          args: Prisma.LabBookingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LabBookingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LabBookingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LabBookingCountAggregateOutputType> | number
+        }
+      }
+    }
+    LabBookingItem: {
+      payload: Prisma.$LabBookingItemPayload<ExtArgs>
+      fields: Prisma.LabBookingItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LabBookingItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LabBookingItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload>
+        }
+        findFirst: {
+          args: Prisma.LabBookingItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LabBookingItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload>
+        }
+        findMany: {
+          args: Prisma.LabBookingItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload>[]
+        }
+        create: {
+          args: Prisma.LabBookingItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload>
+        }
+        createMany: {
+          args: Prisma.LabBookingItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LabBookingItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload>[]
+        }
+        delete: {
+          args: Prisma.LabBookingItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload>
+        }
+        update: {
+          args: Prisma.LabBookingItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.LabBookingItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LabBookingItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LabBookingItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.LabBookingItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabBookingItemPayload>
+        }
+        aggregate: {
+          args: Prisma.LabBookingItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLabBookingItem>
+        }
+        groupBy: {
+          args: Prisma.LabBookingItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LabBookingItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LabBookingItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LabBookingItemCountAggregateOutputType> | number
+        }
+      }
+    }
+    LabReport: {
+      payload: Prisma.$LabReportPayload<ExtArgs>
+      fields: Prisma.LabReportFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LabReportFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LabReportFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload>
+        }
+        findFirst: {
+          args: Prisma.LabReportFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LabReportFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload>
+        }
+        findMany: {
+          args: Prisma.LabReportFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload>[]
+        }
+        create: {
+          args: Prisma.LabReportCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload>
+        }
+        createMany: {
+          args: Prisma.LabReportCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LabReportCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload>[]
+        }
+        delete: {
+          args: Prisma.LabReportDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload>
+        }
+        update: {
+          args: Prisma.LabReportUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload>
+        }
+        deleteMany: {
+          args: Prisma.LabReportDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LabReportUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LabReportUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload>[]
+        }
+        upsert: {
+          args: Prisma.LabReportUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LabReportPayload>
+        }
+        aggregate: {
+          args: Prisma.LabReportAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLabReport>
+        }
+        groupBy: {
+          args: Prisma.LabReportGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LabReportGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LabReportCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LabReportCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4774,6 +5074,8 @@ export const WalletTransactionScalarFieldEnum = {
   cashfreePaymentId: 'cashfreePaymentId',
   adminId: 'adminId',
   note: 'note',
+  labBookingId: 'labBookingId',
+  refundOfLabBookingId: 'refundOfLabBookingId',
   createdAt: 'createdAt'
 } as const
 
@@ -4942,7 +5244,8 @@ export const PrescriptionTestScalarFieldEnum = {
   id: 'id',
   appointmentId: 'appointmentId',
   name: 'name',
-  instructions: 'instructions'
+  instructions: 'instructions',
+  labTestId: 'labTestId'
 } as const
 
 export type PrescriptionTestScalarFieldEnum = (typeof PrescriptionTestScalarFieldEnum)[keyof typeof PrescriptionTestScalarFieldEnum]
@@ -5146,6 +5449,7 @@ export const PlatformSettingsScalarFieldEnum = {
   doctorRegistrationFee: 'doctorRegistrationFee',
   nurseSubscriptionFee: 'nurseSubscriptionFee',
   nurseShiftServicesSeeded: 'nurseShiftServicesSeeded',
+  labTestsSeeded: 'labTestsSeeded',
   bookingHorizonDays: 'bookingHorizonDays',
   chatFollowUpDays: 'chatFollowUpDays',
   cashDueLimit: 'cashDueLimit',
@@ -5261,6 +5565,76 @@ export const PaymentOrderItemScalarFieldEnum = {
 } as const
 
 export type PaymentOrderItemScalarFieldEnum = (typeof PaymentOrderItemScalarFieldEnum)[keyof typeof PaymentOrderItemScalarFieldEnum]
+
+
+export const LabTestScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  b2bPrice: 'b2bPrice',
+  commissionPercent: 'commissionPercent',
+  isActive: 'isActive',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LabTestScalarFieldEnum = (typeof LabTestScalarFieldEnum)[keyof typeof LabTestScalarFieldEnum]
+
+
+export const LabBookingScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  appointmentId: 'appointmentId',
+  patientName: 'patientName',
+  patientAge: 'patientAge',
+  patientGender: 'patientGender',
+  address: 'address',
+  pinCode: 'pinCode',
+  lat: 'lat',
+  lng: 'lng',
+  collectionDate: 'collectionDate',
+  collectionSlot: 'collectionSlot',
+  notes: 'notes',
+  totalAmount: 'totalAmount',
+  paymentMethod: 'paymentMethod',
+  paymentStatus: 'paymentStatus',
+  cashfreeOrderId: 'cashfreeOrderId',
+  cfPaymentId: 'cfPaymentId',
+  paidAt: 'paidAt',
+  status: 'status',
+  adminNote: 'adminNote',
+  cancelledBy: 'cancelledBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LabBookingScalarFieldEnum = (typeof LabBookingScalarFieldEnum)[keyof typeof LabBookingScalarFieldEnum]
+
+
+export const LabBookingItemScalarFieldEnum = {
+  id: 'id',
+  bookingId: 'bookingId',
+  labTestId: 'labTestId',
+  name: 'name',
+  b2bPrice: 'b2bPrice',
+  commissionPercent: 'commissionPercent',
+  price: 'price'
+} as const
+
+export type LabBookingItemScalarFieldEnum = (typeof LabBookingItemScalarFieldEnum)[keyof typeof LabBookingItemScalarFieldEnum]
+
+
+export const LabReportScalarFieldEnum = {
+  id: 'id',
+  bookingId: 'bookingId',
+  fileUrl: 'fileUrl',
+  fileName: 'fileName',
+  documentId: 'documentId',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt'
+} as const
+
+export type LabReportScalarFieldEnum = (typeof LabReportScalarFieldEnum)[keyof typeof LabReportScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -5596,6 +5970,10 @@ export type GlobalOmitConfig = {
   couponRedemption?: Prisma.CouponRedemptionOmit
   paymentOrder?: Prisma.PaymentOrderOmit
   paymentOrderItem?: Prisma.PaymentOrderItemOmit
+  labTest?: Prisma.LabTestOmit
+  labBooking?: Prisma.LabBookingOmit
+  labBookingItem?: Prisma.LabBookingItemOmit
+  labReport?: Prisma.LabReportOmit
 }
 
 /* Types for Logging */

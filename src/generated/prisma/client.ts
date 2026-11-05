@@ -301,3 +301,23 @@ export type PaymentOrder = Prisma.PaymentOrderModel
  * 
  */
 export type PaymentOrderItem = Prisma.PaymentOrderItemModel
+/**
+ * Model LabTest
+ * 
+ */
+export type LabTest = Prisma.LabTestModel
+/**
+ * Model LabBooking
+ * 
+ */
+export type LabBooking = Prisma.LabBookingModel
+/**
+ * Model LabBookingItem
+ * 
+ */
+export type LabBookingItem = Prisma.LabBookingItemModel
+/**
+ * Model LabReport
+ * 
+ */
+export type LabReport = Prisma.LabReportModel

@@ -9,6 +9,8 @@ import { settleAppointmentPayment, notifySettlement, creditFeePaymentToWallet } 
 import { NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX } from "@/lib/nurseConstants";
 import { DUES_ORDER_PREFIX, settleDuesPayment, notifyDuesSettled } from "@/lib/duesPayments";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { LAB_ORDER_PREFIX, settleLabPayment } from "@/lib/labBookings";
+import { notifyLabSettled } from "@/lib/labNotify";
 
 interface CashfreeWebhookPayload {
   type: "PAYMENT_SUCCESS_WEBHOOK" | "PAYMENT_FAILED_WEBHOOK" | string;
@@ -152,6 +154,18 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   // Two order types share this one webhook (Cashfree webhooks are registered
   // once per merchant account, not per order kind) — distinguished by the
   // order_id prefix each create-order route generates.
+  // A patient paying for lab tests booked from a prescription.
+  if (orderId.startsWith(LAB_ORDER_PREFIX)) {
+    const result = await settleLabPayment({
+      orderId,
+      amount: payload.data.order.order_amount,
+      cfPaymentId: String(payload.data.payment.cf_payment_id),
+    });
+    if (result.outcome === "unknown") console.error("Cashfree webhook: no lab booking found for order", orderId);
+    notifyLabSettled(result);
+    return NextResponse.json({ ok: true });
+  }
+
   // A doctor paying the commission they owe on cash visits.
   if (orderId.startsWith(DUES_ORDER_PREFIX)) {
     const result = await settleDuesPayment({

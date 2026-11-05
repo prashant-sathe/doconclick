@@ -11,6 +11,7 @@ import { hasCareAccess } from "@/lib/careAccess";
 import { GATEWAY_OMIT, withLiveLocationOnlyWhileLive } from "@/lib/appointmentView";
 import { parseFeedView, feedWhere, feedPaging, feedResponse, badCursor } from "@/lib/appointmentFeed";
 import { withErrorLocale } from "@/lib/apiErrors";
+import { resolveLabTest } from "@/lib/labTests";
 
 // GET: The logged-in user's own appointments (as patient or as doctor).
 // ?view=active (polling) / ?view=history (paged) — see src/lib/appointmentFeed.ts.
@@ -51,6 +52,8 @@ export const GET = withErrorLocale(async function GET(req: Request) {
         clinic: { select: { name: true, address: true, lat: true, lng: true } },
         review: true,
         medicines: true,
+        tests: { select: { id: true, name: true, instructions: true, labTestId: true }, orderBy: { id: "asc" } },
+        labBookings: { where: { status: { notIn: ["CANCELLED", "PENDING_PAYMENT"] } }, select: { id: true, status: true }, orderBy: { createdAt: "desc" }, take: 1 },
         attachments: true,
         reassignedTo: { select: { id: true, doctor: { select: { name: true } } } },
         package: { select: { visits: true, intervalDays: true } },
@@ -67,8 +70,13 @@ export const GET = withErrorLocale(async function GET(req: Request) {
         _count: { select: { messages: { where: { senderId: { not: authUser.id }, readAt: null } } } },
       },
     });
+    // Which prescribed tests the patient can book (same rule as src/lib/labBookings.ts).
+    const labCatalogue = appointments.some((a) => a.tests.length > 0)
+      ? await prisma.labTest.findMany({ where: { isActive: true }, select: { id: true, name: true } })
+      : [];
+    const labIds = new Set(labCatalogue.map((t) => t.id));
     return feedResponse(owner, view,
-      appointments.map(({ _count, doctor: { role, deletedAt, doctorProfile, ...doctor }, ...a }) => ({
+      appointments.map(({ _count, doctor: { role, deletedAt, doctorProfile, ...doctor }, tests, labBookings, ...a }) => ({
         // The provider's position only while they're on the way (not after the visit).
         ...withLiveLocationOnlyWhileLive(a),
         // The bookable-rule fields are only read here, never sent to the client.
@@ -85,6 +93,11 @@ export const GET = withErrorLocale(async function GET(req: Request) {
         platformFee: safeNum(a.platformFee),
         discountAmount: safeNum(a.discountAmount),
         unreadMessageCount: _count.messages,
+        tests: tests.map(({ labTestId, ...test }) => ({
+          ...test,
+          bookable: (!!labTestId && labIds.has(labTestId)) || !!resolveLabTest(test.name, labCatalogue),
+        })),
+        labBooking: labBookings[0] ?? null,
       }))
     );
   }

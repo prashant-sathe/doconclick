@@ -342,6 +342,7 @@ export type UserWhereInput = {
   referralCode?: Prisma.XOR<Prisma.ReferralCodeNullableScalarRelationFilter, Prisma.ReferralCodeWhereInput> | null
   referralsMade?: Prisma.ReferralListRelationFilter
   referredBy?: Prisma.XOR<Prisma.ReferralNullableScalarRelationFilter, Prisma.ReferralWhereInput> | null
+  labBookings?: Prisma.LabBookingListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -406,6 +407,7 @@ export type UserOrderByWithRelationInput = {
   referralCode?: Prisma.ReferralCodeOrderByWithRelationInput
   referralsMade?: Prisma.ReferralOrderByRelationAggregateInput
   referredBy?: Prisma.ReferralOrderByWithRelationInput
+  labBookings?: Prisma.LabBookingOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -473,6 +475,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   referralCode?: Prisma.XOR<Prisma.ReferralCodeNullableScalarRelationFilter, Prisma.ReferralCodeWhereInput> | null
   referralsMade?: Prisma.ReferralListRelationFilter
   referredBy?: Prisma.XOR<Prisma.ReferralNullableScalarRelationFilter, Prisma.ReferralWhereInput> | null
+  labBookings?: Prisma.LabBookingListRelationFilter
 }, "id" | "mobile" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -581,6 +584,7 @@ export type UserCreateInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -645,6 +649,7 @@ export type UserUncheckedCreateInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserUpdateInput = {
@@ -709,6 +714,7 @@ export type UserUpdateInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -773,6 +779,7 @@ export type UserUncheckedUpdateInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1587,6 +1594,20 @@ export type UserUpdateOneRequiredWithoutPaymentOrdersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPaymentOrdersInput, Prisma.UserUpdateWithoutPaymentOrdersInput>, Prisma.UserUncheckedUpdateWithoutPaymentOrdersInput>
 }
 
+export type UserCreateNestedOneWithoutLabBookingsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLabBookingsInput, Prisma.UserUncheckedCreateWithoutLabBookingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLabBookingsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutLabBookingsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLabBookingsInput, Prisma.UserUncheckedCreateWithoutLabBookingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLabBookingsInput
+  upsert?: Prisma.UserUpsertWithoutLabBookingsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLabBookingsInput, Prisma.UserUpdateWithoutLabBookingsInput>, Prisma.UserUncheckedUpdateWithoutLabBookingsInput>
+}
+
 export type UserCreateWithoutPushTokensInput = {
   id?: string
   name: string
@@ -1648,6 +1669,7 @@ export type UserCreateWithoutPushTokensInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutPushTokensInput = {
@@ -1711,6 +1733,7 @@ export type UserUncheckedCreateWithoutPushTokensInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutPushTokensInput = {
@@ -1790,6 +1813,7 @@ export type UserUpdateWithoutPushTokensInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPushTokensInput = {
@@ -1853,6 +1877,7 @@ export type UserUncheckedUpdateWithoutPushTokensInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -1916,6 +1941,7 @@ export type UserCreateWithoutNotificationsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -1979,6 +2005,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -2058,6 +2085,7 @@ export type UserUpdateWithoutNotificationsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -2121,6 +2149,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutSavedDoctorsInput = {
@@ -2184,6 +2213,7 @@ export type UserCreateWithoutSavedDoctorsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutSavedDoctorsInput = {
@@ -2247,6 +2277,7 @@ export type UserUncheckedCreateWithoutSavedDoctorsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutSavedDoctorsInput = {
@@ -2315,6 +2346,7 @@ export type UserCreateWithoutSavedByPatientsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutSavedByPatientsInput = {
@@ -2378,6 +2410,7 @@ export type UserUncheckedCreateWithoutSavedByPatientsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutSavedByPatientsInput = {
@@ -2457,6 +2490,7 @@ export type UserUpdateWithoutSavedDoctorsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
@@ -2520,6 +2554,7 @@ export type UserUncheckedUpdateWithoutSavedDoctorsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutSavedByPatientsInput = {
@@ -2594,6 +2629,7 @@ export type UserUpdateWithoutSavedByPatientsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
@@ -2657,6 +2693,7 @@ export type UserUncheckedUpdateWithoutSavedByPatientsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutPatientProfileInput = {
@@ -2720,6 +2757,7 @@ export type UserCreateWithoutPatientProfileInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutPatientProfileInput = {
@@ -2783,6 +2821,7 @@ export type UserUncheckedCreateWithoutPatientProfileInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutPatientProfileInput = {
@@ -2862,6 +2901,7 @@ export type UserUpdateWithoutPatientProfileInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPatientProfileInput = {
@@ -2925,6 +2965,7 @@ export type UserUncheckedUpdateWithoutPatientProfileInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutDocumentsInput = {
@@ -2988,6 +3029,7 @@ export type UserCreateWithoutDocumentsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutDocumentsInput = {
@@ -3051,6 +3093,7 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutDocumentsInput = {
@@ -3130,6 +3173,7 @@ export type UserUpdateWithoutDocumentsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDocumentsInput = {
@@ -3193,6 +3237,7 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutDoctorProfileInput = {
@@ -3256,6 +3301,7 @@ export type UserCreateWithoutDoctorProfileInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutDoctorProfileInput = {
@@ -3319,6 +3365,7 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutDoctorProfileInput = {
@@ -3398,6 +3445,7 @@ export type UserUpdateWithoutDoctorProfileInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDoctorProfileInput = {
@@ -3461,6 +3509,7 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutNurseProfileInput = {
@@ -3524,6 +3573,7 @@ export type UserCreateWithoutNurseProfileInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutNurseProfileInput = {
@@ -3587,6 +3637,7 @@ export type UserUncheckedCreateWithoutNurseProfileInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutNurseProfileInput = {
@@ -3666,6 +3717,7 @@ export type UserUpdateWithoutNurseProfileInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNurseProfileInput = {
@@ -3729,6 +3781,7 @@ export type UserUncheckedUpdateWithoutNurseProfileInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutVitalsInput = {
@@ -3792,6 +3845,7 @@ export type UserCreateWithoutVitalsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutVitalsInput = {
@@ -3855,6 +3909,7 @@ export type UserUncheckedCreateWithoutVitalsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutVitalsInput = {
@@ -3923,6 +3978,7 @@ export type UserCreateWithoutVitalsRecordedInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutVitalsRecordedInput = {
@@ -3986,6 +4042,7 @@ export type UserUncheckedCreateWithoutVitalsRecordedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutVitalsRecordedInput = {
@@ -4065,6 +4122,7 @@ export type UserUpdateWithoutVitalsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVitalsInput = {
@@ -4128,6 +4186,7 @@ export type UserUncheckedUpdateWithoutVitalsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutVitalsRecordedInput = {
@@ -4202,6 +4261,7 @@ export type UserUpdateWithoutVitalsRecordedInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
@@ -4265,6 +4325,7 @@ export type UserUncheckedUpdateWithoutVitalsRecordedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutNursePaymentLogsInput = {
@@ -4328,6 +4389,7 @@ export type UserCreateWithoutNursePaymentLogsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
@@ -4391,6 +4453,7 @@ export type UserUncheckedCreateWithoutNursePaymentLogsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutNursePaymentLogsInput = {
@@ -4470,6 +4533,7 @@ export type UserUpdateWithoutNursePaymentLogsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
@@ -4533,6 +4597,7 @@ export type UserUncheckedUpdateWithoutNursePaymentLogsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutChangeRequestsInput = {
@@ -4596,6 +4661,7 @@ export type UserCreateWithoutChangeRequestsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutChangeRequestsInput = {
@@ -4659,6 +4725,7 @@ export type UserUncheckedCreateWithoutChangeRequestsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutChangeRequestsInput = {
@@ -4727,6 +4794,7 @@ export type UserCreateWithoutChangeRequestsResolvedInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutChangeRequestsResolvedInput = {
@@ -4790,6 +4858,7 @@ export type UserUncheckedCreateWithoutChangeRequestsResolvedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutChangeRequestsResolvedInput = {
@@ -4869,6 +4938,7 @@ export type UserUpdateWithoutChangeRequestsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChangeRequestsInput = {
@@ -4932,6 +5002,7 @@ export type UserUncheckedUpdateWithoutChangeRequestsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutChangeRequestsResolvedInput = {
@@ -5006,6 +5077,7 @@ export type UserUpdateWithoutChangeRequestsResolvedInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChangeRequestsResolvedInput = {
@@ -5069,6 +5141,7 @@ export type UserUncheckedUpdateWithoutChangeRequestsResolvedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutStaffAccountInput = {
@@ -5132,6 +5205,7 @@ export type UserCreateWithoutStaffAccountInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutStaffAccountInput = {
@@ -5195,6 +5269,7 @@ export type UserUncheckedCreateWithoutStaffAccountInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutStaffAccountInput = {
@@ -5263,6 +5338,7 @@ export type UserCreateWithoutStaffMembersInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutStaffMembersInput = {
@@ -5326,6 +5402,7 @@ export type UserUncheckedCreateWithoutStaffMembersInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutStaffMembersInput = {
@@ -5405,6 +5482,7 @@ export type UserUpdateWithoutStaffAccountInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStaffAccountInput = {
@@ -5468,6 +5546,7 @@ export type UserUncheckedUpdateWithoutStaffAccountInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutStaffMembersInput = {
@@ -5542,6 +5621,7 @@ export type UserUpdateWithoutStaffMembersInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStaffMembersInput = {
@@ -5605,6 +5685,7 @@ export type UserUncheckedUpdateWithoutStaffMembersInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutAsPatientInput = {
@@ -5668,6 +5749,7 @@ export type UserCreateWithoutAsPatientInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutAsPatientInput = {
@@ -5731,6 +5813,7 @@ export type UserUncheckedCreateWithoutAsPatientInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutAsPatientInput = {
@@ -5799,6 +5882,7 @@ export type UserCreateWithoutAsDoctorInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutAsDoctorInput = {
@@ -5862,6 +5946,7 @@ export type UserUncheckedCreateWithoutAsDoctorInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutAsDoctorInput = {
@@ -5941,6 +6026,7 @@ export type UserUpdateWithoutAsPatientInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsPatientInput = {
@@ -6004,6 +6090,7 @@ export type UserUncheckedUpdateWithoutAsPatientInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutAsDoctorInput = {
@@ -6078,6 +6165,7 @@ export type UserUpdateWithoutAsDoctorInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsDoctorInput = {
@@ -6141,6 +6229,7 @@ export type UserUncheckedUpdateWithoutAsDoctorInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutWalletInput = {
@@ -6204,6 +6293,7 @@ export type UserCreateWithoutWalletInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutWalletInput = {
@@ -6267,6 +6357,7 @@ export type UserUncheckedCreateWithoutWalletInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutWalletInput = {
@@ -6346,6 +6437,7 @@ export type UserUpdateWithoutWalletInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletInput = {
@@ -6409,6 +6501,7 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutWalletTransactionsAdjustedInput = {
@@ -6472,6 +6565,7 @@ export type UserCreateWithoutWalletTransactionsAdjustedInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
@@ -6535,6 +6629,7 @@ export type UserUncheckedCreateWithoutWalletTransactionsAdjustedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutWalletTransactionsAdjustedInput = {
@@ -6614,6 +6709,7 @@ export type UserUpdateWithoutWalletTransactionsAdjustedInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
@@ -6677,6 +6773,7 @@ export type UserUncheckedUpdateWithoutWalletTransactionsAdjustedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutSettlementsInput = {
@@ -6740,6 +6837,7 @@ export type UserCreateWithoutSettlementsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsInput = {
@@ -6803,6 +6901,7 @@ export type UserUncheckedCreateWithoutSettlementsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsInput = {
@@ -6871,6 +6970,7 @@ export type UserCreateWithoutSettlementsAdminedInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
@@ -6934,6 +7034,7 @@ export type UserUncheckedCreateWithoutSettlementsAdminedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsAdminedInput = {
@@ -7002,6 +7103,7 @@ export type UserCreateWithoutSettlementsPaidInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutSettlementsPaidInput = {
@@ -7065,6 +7167,7 @@ export type UserUncheckedCreateWithoutSettlementsPaidInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutSettlementsPaidInput = {
@@ -7144,6 +7247,7 @@ export type UserUpdateWithoutSettlementsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsInput = {
@@ -7207,6 +7311,7 @@ export type UserUncheckedUpdateWithoutSettlementsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutSettlementsAdminedInput = {
@@ -7281,6 +7386,7 @@ export type UserUpdateWithoutSettlementsAdminedInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
@@ -7344,6 +7450,7 @@ export type UserUncheckedUpdateWithoutSettlementsAdminedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutSettlementsPaidInput = {
@@ -7418,6 +7525,7 @@ export type UserUpdateWithoutSettlementsPaidInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettlementsPaidInput = {
@@ -7481,6 +7589,7 @@ export type UserUncheckedUpdateWithoutSettlementsPaidInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutTimeOffInput = {
@@ -7544,6 +7653,7 @@ export type UserCreateWithoutTimeOffInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutTimeOffInput = {
@@ -7607,6 +7717,7 @@ export type UserUncheckedCreateWithoutTimeOffInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutTimeOffInput = {
@@ -7686,6 +7797,7 @@ export type UserUpdateWithoutTimeOffInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTimeOffInput = {
@@ -7749,6 +7861,7 @@ export type UserUncheckedUpdateWithoutTimeOffInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutDuesPaymentsInput = {
@@ -7812,6 +7925,7 @@ export type UserCreateWithoutDuesPaymentsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutDuesPaymentsInput = {
@@ -7875,6 +7989,7 @@ export type UserUncheckedCreateWithoutDuesPaymentsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutDuesPaymentsInput = {
@@ -7954,6 +8069,7 @@ export type UserUpdateWithoutDuesPaymentsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDuesPaymentsInput = {
@@ -8017,6 +8133,7 @@ export type UserUncheckedUpdateWithoutDuesPaymentsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutPayoutRequestsInput = {
@@ -8080,6 +8197,7 @@ export type UserCreateWithoutPayoutRequestsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutPayoutRequestsInput = {
@@ -8143,6 +8261,7 @@ export type UserUncheckedCreateWithoutPayoutRequestsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutPayoutRequestsInput = {
@@ -8222,6 +8341,7 @@ export type UserUpdateWithoutPayoutRequestsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
@@ -8285,6 +8405,7 @@ export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutPaymentLogsInput = {
@@ -8348,6 +8469,7 @@ export type UserCreateWithoutPaymentLogsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutPaymentLogsInput = {
@@ -8411,6 +8533,7 @@ export type UserUncheckedCreateWithoutPaymentLogsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutPaymentLogsInput = {
@@ -8490,6 +8613,7 @@ export type UserUpdateWithoutPaymentLogsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentLogsInput = {
@@ -8553,6 +8677,7 @@ export type UserUncheckedUpdateWithoutPaymentLogsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -8616,6 +8741,7 @@ export type UserCreateWithoutMessagesSentInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -8679,6 +8805,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -8758,6 +8885,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -8821,6 +8949,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutMedicineRemindersInput = {
@@ -8884,6 +9013,7 @@ export type UserCreateWithoutMedicineRemindersInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutMedicineRemindersInput = {
@@ -8947,6 +9077,7 @@ export type UserUncheckedCreateWithoutMedicineRemindersInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutMedicineRemindersInput = {
@@ -9026,6 +9157,7 @@ export type UserUpdateWithoutMedicineRemindersInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMedicineRemindersInput = {
@@ -9089,6 +9221,7 @@ export type UserUncheckedUpdateWithoutMedicineRemindersInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutFavouriteMedicinesInput = {
@@ -9152,6 +9285,7 @@ export type UserCreateWithoutFavouriteMedicinesInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutFavouriteMedicinesInput = {
@@ -9215,6 +9349,7 @@ export type UserUncheckedCreateWithoutFavouriteMedicinesInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutFavouriteMedicinesInput = {
@@ -9294,6 +9429,7 @@ export type UserUpdateWithoutFavouriteMedicinesInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFavouriteMedicinesInput = {
@@ -9357,6 +9493,7 @@ export type UserUncheckedUpdateWithoutFavouriteMedicinesInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutPrescriptionTemplatesInput = {
@@ -9420,6 +9557,7 @@ export type UserCreateWithoutPrescriptionTemplatesInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutPrescriptionTemplatesInput = {
@@ -9483,6 +9621,7 @@ export type UserUncheckedCreateWithoutPrescriptionTemplatesInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutPrescriptionTemplatesInput = {
@@ -9562,6 +9701,7 @@ export type UserUpdateWithoutPrescriptionTemplatesInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPrescriptionTemplatesInput = {
@@ -9625,6 +9765,7 @@ export type UserUncheckedUpdateWithoutPrescriptionTemplatesInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutReviewsGivenInput = {
@@ -9688,6 +9829,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutReviewsGivenInput = {
@@ -9751,6 +9893,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutReviewsGivenInput = {
@@ -9819,6 +9962,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutReviewsReceivedInput = {
@@ -9882,6 +10026,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutReviewsReceivedInput = {
@@ -9961,6 +10106,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsGivenInput = {
@@ -10024,6 +10170,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutReviewsReceivedInput = {
@@ -10098,6 +10245,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
@@ -10161,6 +10309,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutComplaintsInput = {
@@ -10224,6 +10373,7 @@ export type UserCreateWithoutComplaintsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsInput = {
@@ -10287,6 +10437,7 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsInput = {
@@ -10355,6 +10506,7 @@ export type UserCreateWithoutComplaintsAssignedInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsAssignedInput = {
@@ -10418,6 +10570,7 @@ export type UserUncheckedCreateWithoutComplaintsAssignedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsAssignedInput = {
@@ -10497,6 +10650,7 @@ export type UserUpdateWithoutComplaintsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsInput = {
@@ -10560,6 +10714,7 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutComplaintsAssignedInput = {
@@ -10634,6 +10789,7 @@ export type UserUpdateWithoutComplaintsAssignedInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsAssignedInput = {
@@ -10697,6 +10853,7 @@ export type UserUncheckedUpdateWithoutComplaintsAssignedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutComplaintMessagesInput = {
@@ -10760,6 +10917,7 @@ export type UserCreateWithoutComplaintMessagesInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutComplaintMessagesInput = {
@@ -10823,6 +10981,7 @@ export type UserUncheckedCreateWithoutComplaintMessagesInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutComplaintMessagesInput = {
@@ -10902,6 +11061,7 @@ export type UserUpdateWithoutComplaintMessagesInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintMessagesInput = {
@@ -10965,6 +11125,7 @@ export type UserUncheckedUpdateWithoutComplaintMessagesInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutClinicsInput = {
@@ -11028,6 +11189,7 @@ export type UserCreateWithoutClinicsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutClinicsInput = {
@@ -11091,6 +11253,7 @@ export type UserUncheckedCreateWithoutClinicsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutClinicsInput = {
@@ -11170,6 +11333,7 @@ export type UserUpdateWithoutClinicsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClinicsInput = {
@@ -11233,6 +11397,7 @@ export type UserUncheckedUpdateWithoutClinicsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutAnnouncementsCreatedInput = {
@@ -11296,6 +11461,7 @@ export type UserCreateWithoutAnnouncementsCreatedInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
@@ -11359,6 +11525,7 @@ export type UserUncheckedCreateWithoutAnnouncementsCreatedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementsCreatedInput = {
@@ -11438,6 +11605,7 @@ export type UserUpdateWithoutAnnouncementsCreatedInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
@@ -11501,6 +11669,7 @@ export type UserUncheckedUpdateWithoutAnnouncementsCreatedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutAnnouncementRecipientsInput = {
@@ -11564,6 +11733,7 @@ export type UserCreateWithoutAnnouncementRecipientsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
@@ -11627,6 +11797,7 @@ export type UserUncheckedCreateWithoutAnnouncementRecipientsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementRecipientsInput = {
@@ -11706,6 +11877,7 @@ export type UserUpdateWithoutAnnouncementRecipientsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
@@ -11769,6 +11941,7 @@ export type UserUncheckedUpdateWithoutAnnouncementRecipientsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutImpersonationsStartedInput = {
@@ -11832,6 +12005,7 @@ export type UserCreateWithoutImpersonationsStartedInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
@@ -11895,6 +12069,7 @@ export type UserUncheckedCreateWithoutImpersonationsStartedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutImpersonationsStartedInput = {
@@ -11963,6 +12138,7 @@ export type UserCreateWithoutImpersonationsReceivedInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
@@ -12026,6 +12202,7 @@ export type UserUncheckedCreateWithoutImpersonationsReceivedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutImpersonationsReceivedInput = {
@@ -12105,6 +12282,7 @@ export type UserUpdateWithoutImpersonationsStartedInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
@@ -12168,6 +12346,7 @@ export type UserUncheckedUpdateWithoutImpersonationsStartedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutImpersonationsReceivedInput = {
@@ -12242,6 +12421,7 @@ export type UserUpdateWithoutImpersonationsReceivedInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
@@ -12305,6 +12485,7 @@ export type UserUncheckedUpdateWithoutImpersonationsReceivedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutReferralsMadeInput = {
@@ -12368,6 +12549,7 @@ export type UserCreateWithoutReferralsMadeInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutReferralsMadeInput = {
@@ -12431,6 +12613,7 @@ export type UserUncheckedCreateWithoutReferralsMadeInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutReferralsMadeInput = {
@@ -12499,6 +12682,7 @@ export type UserCreateWithoutReferredByInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutReferredByInput = {
@@ -12562,6 +12746,7 @@ export type UserUncheckedCreateWithoutReferredByInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutReferredByInput = {
@@ -12641,6 +12826,7 @@ export type UserUpdateWithoutReferralsMadeInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReferralsMadeInput = {
@@ -12704,6 +12890,7 @@ export type UserUncheckedUpdateWithoutReferralsMadeInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutReferredByInput = {
@@ -12778,6 +12965,7 @@ export type UserUpdateWithoutReferredByInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReferredByInput = {
@@ -12841,6 +13029,7 @@ export type UserUncheckedUpdateWithoutReferredByInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutReferralCodeInput = {
@@ -12904,6 +13093,7 @@ export type UserCreateWithoutReferralCodeInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutReferralCodeInput = {
@@ -12967,6 +13157,7 @@ export type UserUncheckedCreateWithoutReferralCodeInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutReferralCodeInput = {
@@ -13046,6 +13237,7 @@ export type UserUpdateWithoutReferralCodeInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReferralCodeInput = {
@@ -13109,6 +13301,7 @@ export type UserUncheckedUpdateWithoutReferralCodeInput = {
   prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutCouponsCreatedInput = {
@@ -13172,6 +13365,7 @@ export type UserCreateWithoutCouponsCreatedInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutCouponsCreatedInput = {
@@ -13235,6 +13429,7 @@ export type UserUncheckedCreateWithoutCouponsCreatedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutCouponsCreatedInput = {
@@ -13314,6 +13509,7 @@ export type UserUpdateWithoutCouponsCreatedInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
@@ -13377,6 +13573,7 @@ export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutCouponRedemptionsInput = {
@@ -13440,6 +13637,7 @@ export type UserCreateWithoutCouponRedemptionsInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
@@ -13503,6 +13701,7 @@ export type UserUncheckedCreateWithoutCouponRedemptionsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutCouponRedemptionsInput = {
@@ -13582,6 +13781,7 @@ export type UserUpdateWithoutCouponRedemptionsInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
@@ -13645,6 +13845,7 @@ export type UserUncheckedUpdateWithoutCouponRedemptionsInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutPaymentOrdersInput = {
@@ -13708,6 +13909,7 @@ export type UserCreateWithoutPaymentOrdersInput = {
   referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutPaymentOrdersInput = {
@@ -13771,6 +13973,7 @@ export type UserUncheckedCreateWithoutPaymentOrdersInput = {
   referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
   referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
   referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+  labBookings?: Prisma.LabBookingUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutPaymentOrdersInput = {
@@ -13850,6 +14053,7 @@ export type UserUpdateWithoutPaymentOrdersInput = {
   referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
@@ -13913,6 +14117,279 @@ export type UserUncheckedUpdateWithoutPaymentOrdersInput = {
   referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
   referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
   referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
+  labBookings?: Prisma.LabBookingUncheckedUpdateManyWithoutPatientNestedInput
+}
+
+export type UserCreateWithoutLabBookingsInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  medicineRemindersEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralCreateNestedOneWithoutInviteeInput
+}
+
+export type UserUncheckedCreateWithoutLabBookingsInput = {
+  id?: string
+  name: string
+  mobile: string
+  email?: string | null
+  password?: string
+  role?: string
+  photoUrl?: string | null
+  termsAcceptedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  tokenVersion?: number
+  offlineUntil?: Date | string | null
+  language?: string
+  medicineRemindersEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedCreateNestedOneWithoutUserInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  nurseProfile?: Prisma.NurseProfileUncheckedCreateNestedOneWithoutUserInput
+  asPatient?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  asDoctor?: Prisma.AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssigneeInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutAuthorInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutPatientInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutDoctorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutDoctorInput
+  settlementsAdmined?: Prisma.SettlementUncheckedCreateNestedManyWithoutSettledByAdminInput
+  settlementsPaid?: Prisma.SettlementUncheckedCreateNestedManyWithoutPaidByAdminInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedCreateNestedManyWithoutDoctorInput
+  duesPayments?: Prisma.DuesPaymentUncheckedCreateNestedManyWithoutDoctorInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedCreateNestedManyWithoutProviderInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedCreateNestedManyWithoutDoctorInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutPatientInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedCreateNestedManyWithoutDoctorInput
+  clinics?: Prisma.ClinicUncheckedCreateNestedManyWithoutDoctorInput
+  pushTokens?: Prisma.PushTokenUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedCreateNestedManyWithoutUserInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutAdminInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutTargetUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedCreateNestedManyWithoutUserInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPatientInput
+  documents?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedCreateNestedManyWithoutNurseInput
+  vitals?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutPatientInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedCreateNestedManyWithoutPatientInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedCreateNestedManyWithoutRecordedByInput
+  staffAccount?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  staffMembers?: Prisma.StaffProfileUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutDoctorInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedCreateNestedManyWithoutResolvedByInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedCreateNestedManyWithoutDoctorInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedCreateNestedManyWithoutDoctorInput
+  referralCode?: Prisma.ReferralCodeUncheckedCreateNestedOneWithoutUserInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerInput
+  referredBy?: Prisma.ReferralUncheckedCreateNestedOneWithoutInviteeInput
+}
+
+export type UserCreateOrConnectWithoutLabBookingsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutLabBookingsInput, Prisma.UserUncheckedCreateWithoutLabBookingsInput>
+}
+
+export type UserUpsertWithoutLabBookingsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutLabBookingsInput, Prisma.UserUncheckedUpdateWithoutLabBookingsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutLabBookingsInput, Prisma.UserUncheckedCreateWithoutLabBookingsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutLabBookingsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutLabBookingsInput, Prisma.UserUncheckedUpdateWithoutLabBookingsInput>
+}
+
+export type UserUpdateWithoutLabBookingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUpdateOneWithoutInviteeNestedInput
+}
+
+export type UserUncheckedUpdateWithoutLabBookingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  offlineUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patientProfile?: Prisma.PatientProfileUncheckedUpdateOneWithoutUserNestedInput
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  nurseProfile?: Prisma.NurseProfileUncheckedUpdateOneWithoutUserNestedInput
+  asPatient?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  asDoctor?: Prisma.AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  complaintsAssigned?: Prisma.ComplaintUncheckedUpdateManyWithoutAssigneeNestedInput
+  complaintMessages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutPatientNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutDoctorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutDoctorNestedInput
+  settlementsAdmined?: Prisma.SettlementUncheckedUpdateManyWithoutSettledByAdminNestedInput
+  settlementsPaid?: Prisma.SettlementUncheckedUpdateManyWithoutPaidByAdminNestedInput
+  payoutRequests?: Prisma.PayoutRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  duesPayments?: Prisma.DuesPaymentUncheckedUpdateManyWithoutDoctorNestedInput
+  timeOff?: Prisma.ProviderTimeOffUncheckedUpdateManyWithoutProviderNestedInput
+  paymentLogs?: Prisma.DoctorPaymentLogUncheckedUpdateManyWithoutDoctorNestedInput
+  savedDoctors?: Prisma.SavedDoctorUncheckedUpdateManyWithoutPatientNestedInput
+  savedByPatients?: Prisma.SavedDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+  clinics?: Prisma.ClinicUncheckedUpdateManyWithoutDoctorNestedInput
+  pushTokens?: Prisma.PushTokenUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  walletTransactionsAdjusted?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminNestedInput
+  announcementsCreated?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementRecipients?: Prisma.AnnouncementRecipientUncheckedUpdateManyWithoutUserNestedInput
+  impersonationsStarted?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutAdminNestedInput
+  impersonationsReceived?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutTargetUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  couponRedemptions?: Prisma.CouponRedemptionUncheckedUpdateManyWithoutUserNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPatientNestedInput
+  documents?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  nursePaymentLogs?: Prisma.NursePaymentLogUncheckedUpdateManyWithoutNurseNestedInput
+  vitals?: Prisma.VitalReadingUncheckedUpdateManyWithoutPatientNestedInput
+  medicineReminders?: Prisma.MedicineReminderUncheckedUpdateManyWithoutPatientNestedInput
+  vitalsRecorded?: Prisma.VitalReadingUncheckedUpdateManyWithoutRecordedByNestedInput
+  staffAccount?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  staffMembers?: Prisma.StaffProfileUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequests?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutDoctorNestedInput
+  changeRequestsResolved?: Prisma.DoctorChangeRequestUncheckedUpdateManyWithoutResolvedByNestedInput
+  favouriteMedicines?: Prisma.DoctorFavouriteMedicineUncheckedUpdateManyWithoutDoctorNestedInput
+  prescriptionTemplates?: Prisma.PrescriptionTemplateUncheckedUpdateManyWithoutDoctorNestedInput
+  referralCode?: Prisma.ReferralCodeUncheckedUpdateOneWithoutUserNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerNestedInput
+  referredBy?: Prisma.ReferralUncheckedUpdateOneWithoutInviteeNestedInput
 }
 
 
@@ -13960,6 +14437,7 @@ export type UserCountOutputType = {
   favouriteMedicines: number
   prescriptionTemplates: number
   referralsMade: number
+  labBookings: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -14002,6 +14480,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   favouriteMedicines?: boolean | UserCountOutputTypeCountFavouriteMedicinesArgs
   prescriptionTemplates?: boolean | UserCountOutputTypeCountPrescriptionTemplatesArgs
   referralsMade?: boolean | UserCountOutputTypeCountReferralsMadeArgs
+  labBookings?: boolean | UserCountOutputTypeCountLabBookingsArgs
 }
 
 /**
@@ -14287,6 +14766,13 @@ export type UserCountOutputTypeCountReferralsMadeArgs<ExtArgs extends runtime.Ty
   where?: Prisma.ReferralWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountLabBookingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LabBookingWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -14350,6 +14836,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   referralCode?: boolean | Prisma.User$referralCodeArgs<ExtArgs>
   referralsMade?: boolean | Prisma.User$referralsMadeArgs<ExtArgs>
   referredBy?: boolean | Prisma.User$referredByArgs<ExtArgs>
+  labBookings?: boolean | Prisma.User$labBookingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -14455,6 +14942,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   referralCode?: boolean | Prisma.User$referralCodeArgs<ExtArgs>
   referralsMade?: boolean | Prisma.User$referralsMadeArgs<ExtArgs>
   referredBy?: boolean | Prisma.User$referredByArgs<ExtArgs>
+  labBookings?: boolean | Prisma.User$labBookingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -14509,6 +14997,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     referralCode: Prisma.$ReferralCodePayload<ExtArgs> | null
     referralsMade: Prisma.$ReferralPayload<ExtArgs>[]
     referredBy: Prisma.$ReferralPayload<ExtArgs> | null
+    labBookings: Prisma.$LabBookingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -14966,6 +15455,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   referralCode<T extends Prisma.User$referralCodeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referralCodeArgs<ExtArgs>>): Prisma.Prisma__ReferralCodeClient<runtime.Types.Result.GetResult<Prisma.$ReferralCodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   referralsMade<T extends Prisma.User$referralsMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referralsMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   referredBy<T extends Prisma.User$referredByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referredByArgs<ExtArgs>>): Prisma.Prisma__ReferralClient<runtime.Types.Result.GetResult<Prisma.$ReferralPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  labBookings<T extends Prisma.User$labBookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$labBookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LabBookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16469,6 +16959,30 @@ export type User$referredByArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.ReferralInclude<ExtArgs> | null
   where?: Prisma.ReferralWhereInput
+}
+
+/**
+ * User.labBookings
+ */
+export type User$labBookingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LabBooking
+   */
+  select?: Prisma.LabBookingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LabBooking
+   */
+  omit?: Prisma.LabBookingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LabBookingInclude<ExtArgs> | null
+  where?: Prisma.LabBookingWhereInput
+  orderBy?: Prisma.LabBookingOrderByWithRelationInput | Prisma.LabBookingOrderByWithRelationInput[]
+  cursor?: Prisma.LabBookingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LabBookingScalarFieldEnum | Prisma.LabBookingScalarFieldEnum[]
 }
 
 /**

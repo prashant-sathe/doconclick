@@ -11,78 +11,79 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  mobile    String   @unique
-  email     String?  @unique
-  password  String   @default("")
-  role      String   @default("PATIENT") // PATIENT, DOCTOR, ADMIN, STAFF
-  photoUrl  String?  // admin's own profile photo — patients/doctors use their profile-table column instead
-  termsAcceptedAt DateTime? // set when the patient/doctor accepts the Terms of Service + Privacy Policy gate
-  deletedAt DateTime?
+  id                       String    @id @default(cuid())
+  name                     String
+  mobile                   String    @unique
+  email                    String?   @unique
+  password                 String    @default("")
+  role                     String    @default("PATIENT") // PATIENT, DOCTOR, ADMIN, STAFF
+  photoUrl                 String? // admin's own profile photo — patients/doctors use their profile-table column instead
+  termsAcceptedAt          DateTime? // set when the patient/doctor accepts the Terms of Service + Privacy Policy gate
+  deletedAt                DateTime?
   // Bumped to revoke every session at once (logout-all, password change,
   // delete, suspend). Sessions carry it as the JWT `tv` claim.
-  tokenVersion Int @default(0)
+  tokenVersion             Int       @default(0)
   // A provider (doctor/nurse) who tapped "Go offline": no new bookings from
   // anyone until this instant — the end of that IST day, so they're back
   // tomorrow without remembering to switch it off (src/lib/timeOff.ts).
-  offlineUntil DateTime?
+  offlineUntil             DateTime?
   // UI and push language: "en-IN" | "hi-IN" | "mr-IN" | "kn-IN" (src/lib/appLanguage.ts).
   // The `doconclick_lang` cookie mirrors it for page rendering; pushes —
   // often sent with no request from this user — read it from here.
-  language     String  @default("en-IN")
+  language                 String    @default("en-IN")
   // Patient's master switch for medicine-dose pushes (FP1-22,
   // /patient/profile/medicines). On by default; each medicine also has its own.
-  medicineRemindersEnabled Boolean @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  medicineRemindersEnabled Boolean   @default(true)
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 
-  patientProfile PatientProfile?
-  doctorProfile  DoctorProfile?
-  nurseProfile   NurseProfile?
-  asPatient      Appointment[]   @relation("PatientAppointments")
-  asDoctor       Appointment[]   @relation("DoctorAppointments")
-  complaints     Complaint[]
-  complaintsAssigned Complaint[] @relation("ComplaintAssignee")
-  complaintMessages  ComplaintMessage[] @relation("ComplaintMessagesWritten")
-  reviewsGiven   Review[]        @relation("PatientReviews")
-  reviewsReceived Review[]       @relation("DoctorReviews")
-  messagesSent   Message[]       @relation("SentMessages")
-  settlements       Settlement[] @relation("DoctorSettlements")
-  settlementsAdmined Settlement[] @relation("AdminSettlements")
-  settlementsPaid   Settlement[] @relation("SettlementsPaidBy")
-  payoutRequests    PayoutRequest[] @relation("DoctorPayoutRequests")
-  duesPayments      DuesPayment[]   @relation("DoctorDuesPayments")
-  timeOff           ProviderTimeOff[] @relation("ProviderTimeOff")
-  paymentLogs       DoctorPaymentLog[] @relation("DoctorPaymentLogs")
-  savedDoctors      SavedDoctor[] @relation("PatientSavedDoctors")
-  savedByPatients   SavedDoctor[] @relation("DoctorSavedBy")
-  clinics           Clinic[]      @relation("DoctorClinics")
-  pushTokens        PushToken[]
-  notifications     Notification[]
-  wallet            Wallet?
-  walletTransactionsAdjusted WalletTransaction[] @relation("WalletAdjustedBy")
-  announcementsCreated   Announcement[]          @relation("AnnouncementsCreated")
-  announcementRecipients AnnouncementRecipient[] @relation("AnnouncementRecipients")
-  impersonationsStarted  ImpersonationLog[]      @relation("ImpersonationsStarted")
-  impersonationsReceived ImpersonationLog[]      @relation("ImpersonationsReceived")
-  couponsCreated         Coupon[]               @relation("CouponsCreatedByAdmin")
-  couponRedemptions      CouponRedemption[]
-  paymentOrders          PaymentOrder[]         @relation("PatientPaymentOrders")
-  documents              PatientDocument[]      @relation("PatientDocuments")
-  nursePaymentLogs       NursePaymentLog[]      @relation("NursePaymentLogs")
-  vitals                 VitalReading[]         @relation("PatientVitals")
-  medicineReminders      MedicineReminder[]     @relation("PatientMedicineReminders")
-  vitalsRecorded         VitalReading[]         @relation("VitalsRecordedBy")
-  staffAccount           StaffProfile?           @relation("StaffAccount")
-  staffMembers           StaffProfile[]          @relation("DoctorStaff")
-  changeRequests         DoctorChangeRequest[]   @relation("DoctorChangeRequests")
-  changeRequestsResolved DoctorChangeRequest[]   @relation("ChangeRequestsResolvedBy")
-  favouriteMedicines     DoctorFavouriteMedicine[] @relation("DoctorFavouriteMedicines")
-  prescriptionTemplates  PrescriptionTemplate[]    @relation("DoctorPrescriptionTemplates")
-  referralCode           ReferralCode?
-  referralsMade          Referral[]                @relation("ReferralsMade")
-  referredBy             Referral?                 @relation("ReferralInvitee")
+  patientProfile             PatientProfile?
+  doctorProfile              DoctorProfile?
+  nurseProfile               NurseProfile?
+  asPatient                  Appointment[]             @relation("PatientAppointments")
+  asDoctor                   Appointment[]             @relation("DoctorAppointments")
+  complaints                 Complaint[]
+  complaintsAssigned         Complaint[]               @relation("ComplaintAssignee")
+  complaintMessages          ComplaintMessage[]        @relation("ComplaintMessagesWritten")
+  reviewsGiven               Review[]                  @relation("PatientReviews")
+  reviewsReceived            Review[]                  @relation("DoctorReviews")
+  messagesSent               Message[]                 @relation("SentMessages")
+  settlements                Settlement[]              @relation("DoctorSettlements")
+  settlementsAdmined         Settlement[]              @relation("AdminSettlements")
+  settlementsPaid            Settlement[]              @relation("SettlementsPaidBy")
+  payoutRequests             PayoutRequest[]           @relation("DoctorPayoutRequests")
+  duesPayments               DuesPayment[]             @relation("DoctorDuesPayments")
+  timeOff                    ProviderTimeOff[]         @relation("ProviderTimeOff")
+  paymentLogs                DoctorPaymentLog[]        @relation("DoctorPaymentLogs")
+  savedDoctors               SavedDoctor[]             @relation("PatientSavedDoctors")
+  savedByPatients            SavedDoctor[]             @relation("DoctorSavedBy")
+  clinics                    Clinic[]                  @relation("DoctorClinics")
+  pushTokens                 PushToken[]
+  notifications              Notification[]
+  wallet                     Wallet?
+  walletTransactionsAdjusted WalletTransaction[]       @relation("WalletAdjustedBy")
+  announcementsCreated       Announcement[]            @relation("AnnouncementsCreated")
+  announcementRecipients     AnnouncementRecipient[]   @relation("AnnouncementRecipients")
+  impersonationsStarted      ImpersonationLog[]        @relation("ImpersonationsStarted")
+  impersonationsReceived     ImpersonationLog[]        @relation("ImpersonationsReceived")
+  couponsCreated             Coupon[]                  @relation("CouponsCreatedByAdmin")
+  couponRedemptions          CouponRedemption[]
+  paymentOrders              PaymentOrder[]            @relation("PatientPaymentOrders")
+  documents                  PatientDocument[]         @relation("PatientDocuments")
+  nursePaymentLogs           NursePaymentLog[]         @relation("NursePaymentLogs")
+  vitals                     VitalReading[]            @relation("PatientVitals")
+  medicineReminders          MedicineReminder[]        @relation("PatientMedicineReminders")
+  vitalsRecorded             VitalReading[]            @relation("VitalsRecordedBy")
+  staffAccount               StaffProfile?             @relation("StaffAccount")
+  staffMembers               StaffProfile[]            @relation("DoctorStaff")
+  changeRequests             DoctorChangeRequest[]     @relation("DoctorChangeRequests")
+  changeRequestsResolved     DoctorChangeRequest[]     @relation("ChangeRequestsResolvedBy")
+  favouriteMedicines         DoctorFavouriteMedicine[] @relation("DoctorFavouriteMedicines")
+  prescriptionTemplates      PrescriptionTemplate[]    @relation("DoctorPrescriptionTemplates")
+  referralCode               ReferralCode?
+  referralsMade              Referral[]                @relation("ReferralsMade")
+  referredBy                 Referral?                 @relation("ReferralInvitee")
+  labBookings                LabBooking[]              @relation("PatientLabBookings")
 }
 
 model PushToken {
@@ -105,7 +106,7 @@ model Notification {
   title     String
   body      String
   url       String
-  kind      String?   // messages/<locale>/push.json key; null for fixed-text pushes
+  kind      String? // messages/<locale>/push.json key; null for fixed-text pushes
   readAt    DateTime?
   createdAt DateTime  @default(now())
 
@@ -152,36 +153,36 @@ model PatientProfile {
   // distance" (no limit). Applied everywhere doctors are listed — map,
   // assistant, saved list, booking — except that doctors offering video
   // are always shown (video doesn't depend on distance).
-  searchRadiusKm        Int?
+  searchRadiusKm Int?
 
   // When to push "your appointment is coming up" before a scheduled visit:
   // CSV of minutes before it, from APPOINTMENT_REMINDER_LEADS
   // (src/lib/appointmentReminderLeads.ts). "" = no reminders.
-  reminderLeadMinutes   String  @default("60")
+  reminderLeadMinutes String @default("60")
 
   dependents PatientDependent[]
 }
 
 model PatientDependent {
-  id               String   @id @default(cuid())
-  patientProfileId String
-  patientProfile   PatientProfile @relation(fields: [patientProfileId], references: [id], onDelete: Cascade)
-  name             String
-  relation         String   // Spouse, Son, Daughter, Father, Mother, Other
-  age              Int?
-  gender           String?
-  bloodGroup       String?
-  height           Int?
-  weight           Int?
-  allergies        String?
-  chronicDiseases  String?
-  medications      String?
-  surgeries        String?
+  id                    String         @id @default(cuid())
+  patientProfileId      String
+  patientProfile        PatientProfile @relation(fields: [patientProfileId], references: [id], onDelete: Cascade)
+  name                  String
+  relation              String // Spouse, Son, Daughter, Father, Mother, Other
+  age                   Int?
+  gender                String?
+  bloodGroup            String?
+  height                Int?
+  weight                Int?
+  allergies             String?
+  chronicDiseases       String?
+  medications           String?
+  surgeries             String?
   emergencyContactName  String?
   emergencyContactPhone String?
-  createdAt        DateTime @default(now())
-  appointments     Appointment[]
-  vitals           VitalReading[]
+  createdAt             DateTime       @default(now())
+  appointments          Appointment[]
+  vitals                VitalReading[]
 }
 
 // A patient's general health-records vault — lab reports, scans, discharge
@@ -190,125 +191,127 @@ model PatientDependent {
 // files). Lives on User directly, like Appointment.patientId, rather than
 // PatientProfile, since a record shouldn't depend on that row existing.
 model PatientDocument {
-  id        String   @id @default(cuid())
-  patientId String
-  patient   User     @relation("PatientDocuments", fields: [patientId], references: [id], onDelete: Cascade)
-  title     String
-  category  String   @default("Other") // Lab Report, Prescription, Scan/X-ray, Vaccination, Discharge Summary, Other
-  fileUrl   String
-  fileName  String?
-  createdAt DateTime @default(now())
+  id                  String        @id @default(cuid())
+  patientId           String
+  patient             User          @relation("PatientDocuments", fields: [patientId], references: [id], onDelete: Cascade)
+  title               String
+  category            String        @default("Other") // Lab Report, Prescription, Scan/X-ray, Vaccination, Discharge Summary, Other
+  fileUrl             String
+  fileName            String?
+  createdAt           DateTime      @default(now())
   // Nurse bookings that attached this as the doctor's prescription.
-  nurseBookings Appointment[] @relation("NurseBookingPrescription")
+  nurseBookings       Appointment[] @relation("NurseBookingPrescription")
   // Doctor bookings that attached this as a photo under "Symptoms / Reason".
   symptomAppointments Appointment[] @relation("AppointmentSymptomPhotos")
+  // The lab booking report this is a copy of (uploaded by an admin).
+  labReports          LabReport[]
 }
 
 model DoctorProfile {
-  id            String  @id @default(cuid())
-  userId        String  @unique
-  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  photoUrl      String?
-  qualification String?
-  medRegNo      String? @unique
-  specialty     String  @default("General Physician")
-  experience    Int     @default(0)
-  consultFee    Float   @default(0)
-  videoFee      Float   @default(0)
-  homeVisitFee  Float   @default(0)
-  availability  String  @default("Mon-Fri, 9AM-5PM")
-  radius        Int     @default(10)
-  lat           Float?
-  lng           Float?
-  languages     String  @default("English, Hindi")
-  bio           String?
-  offersHomeVisit Boolean @default(true)
-  offersClinic    Boolean @default(true)
-  offersVideo     Boolean @default(false)
-  isVerified    Boolean @default(false)
-  avgRating     Float   @default(0)
-  totalReviews  Int     @default(0)
-  bankDetails   String?
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photoUrl             String?
+  qualification        String?
+  medRegNo             String?   @unique
+  specialty            String    @default("General Physician")
+  experience           Int       @default(0)
+  consultFee           Float     @default(0)
+  videoFee             Float     @default(0)
+  homeVisitFee         Float     @default(0)
+  availability         String    @default("Mon-Fri, 9AM-5PM")
+  radius               Int       @default(10)
+  lat                  Float?
+  lng                  Float?
+  languages            String    @default("English, Hindi")
+  bio                  String?
+  offersHomeVisit      Boolean   @default(true)
+  offersClinic         Boolean   @default(true)
+  offersVideo          Boolean   @default(false)
+  isVerified           Boolean   @default(false)
+  avgRating            Float     @default(0)
+  totalReviews         Int       @default(0)
+  bankDetails          String?
   // Set on every bank-details change — admins see a recent change before paying out.
   bankDetailsUpdatedAt DateTime?
-  status        String  @default("PENDING") // PENDING, APPROVED, REJECTED, SUSPENDED
+  status               String    @default("PENDING") // PENDING, APPROVED, REJECTED, SUSPENDED
 
-  registrationFeePaid   Boolean @default(false)
-  registrationFeeStatus String  @default("PENDING") // PENDING, PAID
+  registrationFeePaid     Boolean   @default(false)
+  registrationFeeStatus   String    @default("PENDING") // PENDING, PAID
   // What the registration order in cashfreeOrderId was created for (fee −
   // coupon) — the webhook checks the payment against this, so the admin
   // changing the fee mid-checkout can't reject a real payment.
   registrationOrderAmount Float?
-  medRegCertUrl         String?
-  degreeCertUrl         String?
-  kycDocUrl             String?
-  signatureUrl          String?
-  address               String?
-  clinicName            String?
-  clinicPhotoUrl        String?
-  cashfreeOrderId       String?
-  cashfreePaymentId     String?
-  trialEndsAt           DateTime?
-  subscriptionPaidUntil DateTime?
+  medRegCertUrl           String?
+  degreeCertUrl           String?
+  kycDocUrl               String?
+  signatureUrl            String?
+  address                 String?
+  clinicName              String?
+  clinicPhotoUrl          String?
+  cashfreeOrderId         String?
+  cashfreePaymentId       String?
+  trialEndsAt             DateTime?
+  subscriptionPaidUntil   DateTime?
 }
 
 // A receptionist/front-desk account created by a doctor, scoped to that one
 // doctor's appointment queue only (accept/reject/cancel/no-show) — no
 // earnings, payouts, or profile access. See src/lib/staffGuard.ts.
 model NurseProfile {
-  id               String  @id @default(cuid())
-  userId           String  @unique
-  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  photoUrl         String?
-  qualification    String? // ANM, GNM, B.Sc Nursing, M.Sc Nursing
-  councilRegNo     String? @unique // Nursing Council registration number
-  councilState     String?
-  experience       Int     @default(0)
-  gender           String? // Male, Female, Other — patients can filter for a female nurse
-  languages        String  @default("Marathi, Hindi, English")
-  bio              String?
-  radius           Int     @default(10) // km the nurse will travel for a home visit
-  lat              Float?
-  lng              Float?
-  approvedLat      Float? // base point the admin approved (re-review compares against this)
-  approvedLng      Float?
-  address          String?
-  availability     String  @default("Mon-Sat, 8AM-8PM")
-  isVerified       Boolean @default(false)
-  avgRating        Float   @default(0)
-  totalReviews     Int     @default(0)
-  bankDetails      String?
-  status           String  @default("PENDING") // PENDING, APPROVED, REJECTED, SUSPENDED
-  councilCertUrl   String?
-  degreeCertUrl    String?
-  kycDocUrl        String?
-  policeVerifUrl   String?
-  registrationFeePaid   Boolean   @default(false)
+  id                    String                 @id @default(cuid())
+  userId                String                 @unique
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photoUrl              String?
+  qualification         String? // ANM, GNM, B.Sc Nursing, M.Sc Nursing
+  councilRegNo          String?                @unique // Nursing Council registration number
+  councilState          String?
+  experience            Int                    @default(0)
+  gender                String? // Male, Female, Other — patients can filter for a female nurse
+  languages             String                 @default("Marathi, Hindi, English")
+  bio                   String?
+  radius                Int                    @default(10) // km the nurse will travel for a home visit
+  lat                   Float?
+  lng                   Float?
+  approvedLat           Float? // base point the admin approved (re-review compares against this)
+  approvedLng           Float?
+  address               String?
+  availability          String                 @default("Mon-Sat, 8AM-8PM")
+  isVerified            Boolean                @default(false)
+  avgRating             Float                  @default(0)
+  totalReviews          Int                    @default(0)
+  bankDetails           String?
+  status                String                 @default("PENDING") // PENDING, APPROVED, REJECTED, SUSPENDED
+  councilCertUrl        String?
+  degreeCertUrl         String?
+  kycDocUrl             String?
+  policeVerifUrl        String?
+  registrationFeePaid   Boolean                @default(false)
   subscriptionPaidUntil DateTime?
   cashfreeOrderId       String?
   cashfreePaymentId     String?
   // Admin can change the nurse fees at any time, so the webhook checks the
   // payment against the amount this order was actually created for.
   pendingOrderAmount    Float?
-  createdAt        DateTime @default(now())
-  services         NurseServiceOffering[]
+  createdAt             DateTime               @default(now())
+  services              NurseServiceOffering[]
 }
 
 // Admin-managed catalogue of nurse services (like Specialty for doctors).
 model NurseService {
-  id                   String   @id @default(cuid())
-  name                 String   @unique
+  id                   String                 @id @default(cuid())
+  name                 String                 @unique
   // VISIT = a procedure/visit (minutes); SHIFT = the nurse stays for
   // durationMinutes (12h / 24h attendant care). Shifts skip the nurse's
   // daily working hours but still block her calendar for their full length.
-  kind                 String   @default("VISIT") // VISIT, SHIFT
+  kind                 String                 @default("VISIT") // VISIT, SHIFT
   description          String?
-  durationMinutes      Int      @default(30)
-  suggestedPrice       Float    @default(0)
-  requiresPrescription Boolean  @default(false) // injections/IV need a doctor's prescription
-  isActive             Boolean  @default(true)
-  sortOrder            Int      @default(0)
-  createdAt            DateTime @default(now())
+  durationMinutes      Int                    @default(30)
+  suggestedPrice       Float                  @default(0)
+  requiresPrescription Boolean                @default(false) // injections/IV need a doctor's prescription
+  isActive             Boolean                @default(true)
+  sortOrder            Int                    @default(0)
+  createdAt            DateTime               @default(now())
   offerings            NurseServiceOffering[]
   appointments         Appointment[]
   referrals            NurseReferral[]
@@ -317,52 +320,52 @@ model NurseService {
 // Vitals a nurse records during a visit (BP, pulse, SpO2, temperature, sugar).
 // The subject is the account holder, or one of their family members.
 model VitalReading {
-  id            String    @id @default(cuid())
+  id            String            @id @default(cuid())
   patientId     String
-  patient       User      @relation("PatientVitals", fields: [patientId], references: [id], onDelete: Cascade)
+  patient       User              @relation("PatientVitals", fields: [patientId], references: [id], onDelete: Cascade)
   dependentId   String?
   dependent     PatientDependent? @relation(fields: [dependentId], references: [id], onDelete: Cascade)
   appointmentId String?
-  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  appointment   Appointment?      @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
   recordedById  String
-  recordedBy    User      @relation("VitalsRecordedBy", fields: [recordedById], references: [id])
-  recordedAt    DateTime  @default(now())
+  recordedBy    User              @relation("VitalsRecordedBy", fields: [recordedById], references: [id])
+  recordedAt    DateTime          @default(now())
   systolic      Int?
   diastolic     Int?
   pulse         Int?
   spo2          Int?
   temperatureC  Float?
   sugarMgDl     Int?
-  sugarType     String?   // FASTING, RANDOM, POST_MEAL
+  sugarType     String? // FASTING, RANDOM, POST_MEAL
   notes         String?
-  alertLevel    String    @default("NORMAL") // NORMAL, WARNING, CRITICAL
-  alerts        String?   // readable summary of what was out of range
+  alertLevel    String            @default("NORMAL") // NORMAL, WARNING, CRITICAL
+  alerts        String? // readable summary of what was out of range
 
   @@index([patientId, dependentId, recordedAt])
 }
 
 model NursePackage {
-  id           String   @id @default(cuid())
+  id           String        @id @default(cuid())
   patientId    String
   nurseId      String
   serviceId    String
   visits       Int
-  intervalDays Int      @default(1)
-  createdAt    DateTime @default(now())
+  intervalDays Int           @default(1)
+  createdAt    DateTime      @default(now())
   appointments Appointment[]
 }
 
 // "Nurse care needed" written by a doctor while completing a consultation.
 model NurseReferral {
-  id            String       @id @default(cuid())
-  appointmentId String       @unique
-  appointment   Appointment  @relation("ReferralSource", fields: [appointmentId], references: [id], onDelete: Cascade)
+  id            String        @id @default(cuid())
+  appointmentId String        @unique
+  appointment   Appointment   @relation("ReferralSource", fields: [appointmentId], references: [id], onDelete: Cascade)
   serviceId     String
-  service       NurseService @relation(fields: [serviceId], references: [id])
-  visits        Int          @default(1)
-  intervalDays  Int          @default(1)
+  service       NurseService  @relation(fields: [serviceId], references: [id])
+  visits        Int           @default(1)
+  intervalDays  Int           @default(1)
   instructions  String?
-  createdAt     DateTime     @default(now())
+  createdAt     DateTime      @default(now())
   bookings      Appointment[] @relation("ReferralBookings")
 }
 
@@ -382,8 +385,8 @@ model NursePaymentLog {
   id                String   @id @default(cuid())
   nurseId           String
   nurse             User     @relation("NursePaymentLogs", fields: [nurseId], references: [id])
-  type              String   // REGISTRATION, SUBSCRIPTION
-  amount            Float    // amount actually charged (after any coupon discount)
+  type              String // REGISTRATION, SUBSCRIPTION
+  amount            Float // amount actually charged (after any coupon discount)
   couponCode        String?
   discountAmount    Float    @default(0)
   cashfreePaymentId String?
@@ -421,161 +424,162 @@ model StaffProfile {
 }
 
 model Appointment {
-  id            String    @id @default(cuid())
-  patientId     String
-  patient       User      @relation("PatientAppointments", fields: [patientId], references: [id])
-  doctorId      String
-  doctor        User      @relation("DoctorAppointments", fields: [doctorId], references: [id])
-  symptoms      String
-  patientName   String?
-  relation      String    @default("Self")
-  allergies     String?
-  dependentId   String?
-  dependent     PatientDependent? @relation(fields: [dependentId], references: [id])
-  consentGiven  Boolean   @default(false)
-  consultType   String    @default("CLINIC") // CLINIC, HOME, VIDEO
+  id                      String                   @id @default(cuid())
+  patientId               String
+  patient                 User                     @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctorId                String
+  doctor                  User                     @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  symptoms                String
+  patientName             String?
+  relation                String                   @default("Self")
+  allergies               String?
+  dependentId             String?
+  dependent               PatientDependent?        @relation(fields: [dependentId], references: [id])
+  consentGiven            Boolean                  @default(false)
+  consultType             String                   @default("CLINIC") // CLINIC, HOME, VIDEO
   // Who the booking is with. Nurse bookings reuse this whole table (and the
   // payment/wallet/settlement/review machinery keyed on doctorId) — doctorId
   // then holds the nurse's user id. Nurse visits are always consultType HOME.
-  providerType  String    @default("DOCTOR") // DOCTOR, NURSE
-  nurseServiceId String?
-  nurseService   NurseService? @relation(fields: [nurseServiceId], references: [id], onDelete: SetNull)
-  serviceName    String?   // denormalised so it survives the service being renamed/removed
-  prescriptionDocId String?
-  prescriptionDoc   PatientDocument? @relation("NurseBookingPrescription", fields: [prescriptionDocId], references: [id], onDelete: SetNull)
+  providerType            String                   @default("DOCTOR") // DOCTOR, NURSE
+  nurseServiceId          String?
+  nurseService            NurseService?            @relation(fields: [nurseServiceId], references: [id], onDelete: SetNull)
+  serviceName             String? // denormalised so it survives the service being renamed/removed
+  prescriptionDocId       String?
+  prescriptionDoc         PatientDocument?         @relation("NurseBookingPrescription", fields: [prescriptionDocId], references: [id], onDelete: SetNull)
   // Photos the patient attached under "Symptoms / Reason" when booking a
   // doctor (rash, wound, old report…). They live in the patient's vault.
-  symptomPhotos     PatientDocument[] @relation("AppointmentSymptomPhotos")
+  symptomPhotos           PatientDocument[]        @relation("AppointmentSymptomPhotos")
   // Visit-start code (nurse visits): generated when the nurse accepts, shown
   // only to the patient; the nurse must enter it at the door to start the
   // visit. Starting without it needs a reason (visitStartNote) and is
   // flagged for the admin.
-  visitOtp          String?
-  visitOtpAttempts  Int       @default(0)
-  visitStartedAt    DateTime?
-  visitStartNote    String?
+  visitOtp                String?
+  visitOtpAttempts        Int                      @default(0)
+  visitStartedAt          DateTime?
+  visitStartNote          String?
   // Multi-visit nurse package: every visit is its own appointment (own
   // travel / start / completion / refund) grouped by packageId, paid once.
-  packageId         String?
-  package           NursePackage? @relation(fields: [packageId], references: [id], onDelete: SetNull)
-  packageIndex      Int?      // 1-based visit number within the package
+  packageId               String?
+  package                 NursePackage?            @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  packageIndex            Int? // 1-based visit number within the package
   // Nurse booking made from a doctor's referral — the referral's
   // prescription stands in for an uploaded one.
-  nurseReferralId   String?
-  nurseReferral     NurseReferral? @relation("ReferralBookings", fields: [nurseReferralId], references: [id], onDelete: SetNull)
+  nurseReferralId         String?
+  nurseReferral           NurseReferral?           @relation("ReferralBookings", fields: [nurseReferralId], references: [id], onDelete: SetNull)
   // On a doctor's consultation: the nurse care the doctor recommended.
-  referralGiven     NurseReferral? @relation("ReferralSource")
-  vitals            VitalReading[]
-  complaints        Complaint[]
-  status        String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED, NO_SHOW
-  acceptedAt    DateTime? // set when the doctor accepts (PENDING_APPROVAL → SCHEDULED); used for the late-cancellation warning
-  videoStartedPushAt DateTime? // set when the "video consultation started" push goes out — once per appointment
-  completedAt   DateTime? // set when marked COMPLETED; starts the prescription edit window (src/lib/prescriptionLock.ts). Null on rows completed before it existed
-  paymentMethod String    @default("CASH") // ONLINE, CASH
-  paymentStatus String    @default("PENDING") // PENDING, PAID
-  paidAt        DateTime?
-  isEmergency   Boolean   @default(false)
-  amount        Float     @default(0)
-  platformFee   Float     @default(0)
+  referralGiven           NurseReferral?           @relation("ReferralSource")
+  vitals                  VitalReading[]
+  complaints              Complaint[]
+  status                  String                   @default("PENDING_APPROVAL") // PENDING_APPROVAL, SCHEDULED, REJECTED, EXPIRED, COMPLETED, CANCELLED, NO_SHOW
+  acceptedAt              DateTime? // set when the doctor accepts (PENDING_APPROVAL → SCHEDULED); used for the late-cancellation warning
+  videoStartedPushAt      DateTime? // set when the "video consultation started" push goes out — once per appointment
+  completedAt             DateTime? // set when marked COMPLETED; starts the prescription edit window (src/lib/prescriptionLock.ts). Null on rows completed before it existed
+  paymentMethod           String                   @default("CASH") // ONLINE, CASH
+  paymentStatus           String                   @default("PENDING") // PENDING, PAID
+  paidAt                  DateTime?
+  isEmergency             Boolean                  @default(false)
+  amount                  Float                    @default(0)
+  platformFee             Float                    @default(0)
   // Coupon applied at payment checkout. The platform absorbs the discount:
   // the patient pays `amount - discountAmount`, but the doctor's payout and
   // `platformFee` are still computed off the full `amount`. `couponCode` is
   // denormalised so it survives the coupon row being deleted.
-  couponId       String?
-  coupon         Coupon?  @relation(fields: [couponId], references: [id], onDelete: SetNull)
-  couponCode     String?
-  discountAmount Float    @default(0)
-  cashfreeOrderId   String?
-  cashfreePaymentId String?
-  settlementId  String?
-  settlement    Settlement? @relation(fields: [settlementId], references: [id])
-  prescriptionUrl String? // deprecated — superseded by `attachments`; kept so existing data isn't dropped
-  doctorNotes   String?
+  couponId                String?
+  coupon                  Coupon?                  @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  couponCode              String?
+  discountAmount          Float                    @default(0)
+  cashfreeOrderId         String?
+  cashfreePaymentId       String?
+  settlementId            String?
+  settlement              Settlement?              @relation(fields: [settlementId], references: [id])
+  prescriptionUrl         String? // deprecated — superseded by `attachments`; kept so existing data isn't dropped
+  doctorNotes             String?
   // Clinical record the doctor fills when completing the visit — all optional.
   // findings + diagnosis are stored upper-case (src/lib/consultation.ts).
-  chiefComplaints String?
-  history         String?
-  examination     String?
-  findings        String?
-  diagnosis       String?
-  travelStatus  String    @default("NOT_STARTED") // NOT_STARTED, ON_THE_WAY, ARRIVED
+  chiefComplaints         String?
+  history                 String?
+  examination             String?
+  findings                String?
+  diagnosis               String?
+  travelStatus            String                   @default("NOT_STARTED") // NOT_STARTED, ON_THE_WAY, ARRIVED
   // Where a HOME visit happens, copied from the booking — so editing the
   // profile address later never sends the doctor/nurse to the wrong house.
   // Null on CLINIC/VIDEO and on rows booked before the snapshot existed
   // (readers fall back to the profile then; see src/lib/visitAddress.ts).
-  visitAddress  String?
-  visitLandmark String?
-  visitPinCode  String?
-  visitLat      Float?
-  visitLng      Float?
-  doctorLat     Float?
-  doctorLng     Float?
+  visitAddress            String?
+  visitLandmark           String?
+  visitPinCode            String?
+  visitLat                Float?
+  visitLng                Float?
+  doctorLat               Float?
+  doctorLng               Float?
   doctorLocationUpdatedAt DateTime?
-  followUpOfId  String?
-  followUpOf    Appointment? @relation("FollowUp", fields: [followUpOfId], references: [id])
-  followUps     Appointment[] @relation("FollowUp")
+  followUpOfId            String?
+  followUpOf              Appointment?             @relation("FollowUp", fields: [followUpOfId], references: [id])
+  followUps               Appointment[]            @relation("FollowUp")
   // Set on the new appointment created when a doctor cancels an accepted
   // (SCHEDULED) appointment and the system auto-books the nearest other
   // available doctor in its place. The cancelled appointment itself keeps
   // status CANCELLED — `reassignedTo` on it points at the replacement.
-  reassignedFromId String?      @unique
-  reassignedFrom   Appointment? @relation("Reassignment", fields: [reassignedFromId], references: [id], onDelete: SetNull)
-  reassignedTo     Appointment? @relation("Reassignment")
-  clinicId      String?
-  clinic        Clinic?   @relation(fields: [clinicId], references: [id], onDelete: SetNull)
-  scheduledAt   DateTime  @default(now())
+  reassignedFromId        String?                  @unique
+  reassignedFrom          Appointment?             @relation("Reassignment", fields: [reassignedFromId], references: [id], onDelete: SetNull)
+  reassignedTo            Appointment?             @relation("Reassignment")
+  clinicId                String?
+  clinic                  Clinic?                  @relation(fields: [clinicId], references: [id], onDelete: SetNull)
+  scheduledAt             DateTime                 @default(now())
   // Patient-requested new time for an accepted (SCHEDULED) appointment. The
   // booking keeps its original scheduledAt — and its payment — until the
   // provider accepts the new time (moves scheduledAt) or keeps the original
   // (clears this). Lapses on its own once either time passes.
-  requestedScheduledAt DateTime?
+  requestedScheduledAt    DateTime?
   // Set once the provider's "your appointment is coming up" push has gone
   // out (see src/lib/appointmentReminders.ts), so the periodic sweep never
   // reminds the same appointment twice.
-  reminderSentAt DateTime?
+  reminderSentAt          DateTime?
   // The patient's reminders (their PatientProfile.reminderLeadMinutes):
   // the lead times already pushed, CSV of minutes ("1440,60"), and the
   // scheduledAt they were for — a moved appointment (any reschedule path)
   // no longer matches, so its reminders start over.
-  patientRemindersSent String    @default("")
-  patientRemindersFor  DateTime?
+  patientRemindersSent    String                   @default("")
+  patientRemindersFor     DateTime?
   // Follow-up the doctor suggested when completing this consultation
   // ("review in N days") — the first instant of that IST day, plus an
   // optional short note for the patient. Only the patient and the doctor
   // see them. followUpReminderSentAt is set once the "time for your
   // follow-up" push has gone out (src/lib/appointmentReminders.ts), and
   // cleared again when the doctor changes the date.
-  followUpDate          DateTime?
-  followUpNote          String?
-  followUpReminderSentAt DateTime?
+  followUpDate            DateTime?
+  followUpNote            String?
+  followUpReminderSentAt  DateTime?
   // Set once the "your medicines are running out — see the doctor again"
   // push has gone out for this prescription (src/lib/medicineReminders.ts).
-  medicineRefillSentAt  DateTime?
+  medicineRefillSentAt    DateTime?
   // Last "please pay" push for an unpaid online visit — sent when the
   // provider tries to set off, or taps "Remind to pay" (src/lib/payReminder.ts).
   // Throttled on this, so a patient isn't pushed again within minutes.
-  payReminderSentAt DateTime?
+  payReminderSentAt       DateTime?
   // Set when the doctor or their front desk (STAFF) booked this on the
   // patient's behalf — a walk-in or phone-in (/doctor/walk-in) — to the id
   // of whoever entered it. Null for everything the patient booked.
-  bookedById    String?
+  bookedById              String?
   // Audit for an admin cancel / reassign / no-show from /admin/bookings
   // (POST /api/admin/bookings/[id]/action): which admin, the reason they
   // gave (admin-only — never shown to the patient or provider), and when.
-  adminActionBy     String?
-  adminActionReason String?
-  adminActionAt     DateTime?
-  createdAt     DateTime  @default(now())
-  review        Review?
-  medicines     PrescriptionMedicine[]
-  tests         PrescriptionTest[]
-  attachments   PrescriptionAttachment[]
-  prescriptionVersions PrescriptionVersion[]
-  messages      Message[]
-  walletTransaction WalletTransaction?
-  paymentOrderItems PaymentOrderItem[]
-  couponRedemption  CouponRedemption?
-  medicineReminders MedicineReminder[]
+  adminActionBy           String?
+  adminActionReason       String?
+  adminActionAt           DateTime?
+  createdAt               DateTime                 @default(now())
+  review                  Review?
+  medicines               PrescriptionMedicine[]
+  tests                   PrescriptionTest[]
+  attachments             PrescriptionAttachment[]
+  prescriptionVersions    PrescriptionVersion[]
+  messages                Message[]
+  walletTransaction       WalletTransaction?
+  paymentOrderItems       PaymentOrderItem[]
+  couponRedemption        CouponRedemption?
+  medicineReminders       MedicineReminder[]
+  labBookings             LabBooking[]
 
   // /api/appointments/me pages and polls by owner + visit time (src/lib/appointmentFeed.ts).
   @@index([patientId, scheduledAt])
@@ -596,65 +600,70 @@ model Wallet {
 }
 
 model WalletTransaction {
-  id                String       @id @default(cuid())
-  walletId          String
-  wallet            Wallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
-  type              String       // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT, REASSIGNMENT_CREDIT, CANCELLATION_REFUND, PAYMENT_CREDIT, REFERRAL_BONUS
-  amount            Float        // always positive; direction implied by `type`
-  balanceAfter      Float?       // wallet.balance immediately after this row settled; null until status = SUCCESS
-  status            String       @default("SUCCESS") // PENDING, SUCCESS, FAILED — only TOPUP rows are ever created PENDING
-  appointmentId     String?      @unique // set for BOOKING_PAYMENT rows
+  id                    String       @id @default(cuid())
+  walletId              String
+  wallet                Wallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  type                  String // TOPUP, BOOKING_PAYMENT, ADMIN_CREDIT, ADMIN_DEBIT, REASSIGNMENT_CREDIT, CANCELLATION_REFUND, PAYMENT_CREDIT, REFERRAL_BONUS
+  amount                Float // always positive; direction implied by `type`
+  balanceAfter          Float? // wallet.balance immediately after this row settled; null until status = SUCCESS
+  status                String       @default("SUCCESS") // PENDING, SUCCESS, FAILED — only TOPUP rows are ever created PENDING
+  appointmentId         String?      @unique // set for BOOKING_PAYMENT rows
   // Set on the CANCELLATION_REFUND / REASSIGNMENT_CREDIT row that refunds an
   // appointment — unique, so concurrent cancels can never refund it twice.
-  refundOfAppointmentId String?  @unique
+  refundOfAppointmentId String?      @unique
   // Set on the PAYMENT_CREDIT row for a gateway payment that couldn't (fully)
   // be applied — unique, so a webhook retry or a racing verify-order can
   // never credit the same payment twice.
-  creditOfPaymentId String?      @unique
+  creditOfPaymentId     String?      @unique
   // Set on the REFERRAL_BONUS row. One per referral: the reward claims the
   // Referral row (PENDING → REWARDED) in the same transaction, and
   // Referral.walletTransactionId is unique.
-  referralId        String?
-  appointment       Appointment? @relation(fields: [appointmentId], references: [id])
-  cashfreeOrderId   String?      // set for TOPUP rows
-  cashfreePaymentId String?
-  adminId           String?      // set for ADMIN_CREDIT/ADMIN_DEBIT rows
-  admin             User?        @relation("WalletAdjustedBy", fields: [adminId], references: [id])
-  note              String?      // admin adjustment reason
-  createdAt         DateTime     @default(now())
+  referralId            String?
+  appointment           Appointment? @relation(fields: [appointmentId], references: [id])
+  cashfreeOrderId       String? // set for TOPUP rows
+  cashfreePaymentId     String?
+  adminId               String? // set for ADMIN_CREDIT/ADMIN_DEBIT rows
+  admin                 User?        @relation("WalletAdjustedBy", fields: [adminId], references: [id])
+  note                  String? // admin adjustment reason
+  // Set on the LAB_TEST_PAYMENT / LAB_TEST_REFUND row of a lab booking. A
+  // second charge/refund is blocked by LabBooking.paymentStatus's guarded
+  // update in the same transaction (src/lib/labBookings.ts).
+  labBookingId          String?
+  refundOfLabBookingId  String?
+  createdAt             DateTime     @default(now())
 }
 
 model Settlement {
-  id               String   @id @default(cuid())
-  doctorId         String
-  doctor           User     @relation("DoctorSettlements", fields: [doctorId], references: [id])
-  cashCount        Int      @default(0)
-  onlineCount      Int      @default(0)
-  cashFeeOwed      Float    @default(0) // owed BY doctor TO platform
-  onlinePayoutOwed Float    @default(0) // owed TO doctor BY platform
-  netAmount        Float    // onlinePayoutOwed - cashFeeOwed
-  note             String?
+  id                String                       @id @default(cuid())
+  doctorId          String
+  doctor            User                         @relation("DoctorSettlements", fields: [doctorId], references: [id])
+  cashCount         Int                          @default(0)
+  onlineCount       Int                          @default(0)
+  cashFeeOwed       Float                        @default(0) // owed BY doctor TO platform
+  onlinePayoutOwed  Float                        @default(0) // owed TO doctor BY platform
+  netAmount         Float // onlinePayoutOwed - cashFeeOwed
+  note              String?
   // Client-generated per "Settle" click (reused on retry / the negative-net
   // acknowledgement), so a double-submit returns this settlement, not a second one.
-  idempotencyKey   String?  @unique
-  settledByAdminId String?
-  settledByAdmin   User?    @relation("AdminSettlements", fields: [settledByAdminId], references: [id])
+  idempotencyKey    String?                      @unique
+  settledByAdminId  String?
+  settledByAdmin    User?                        @relation("AdminSettlements", fields: [settledByAdminId], references: [id])
   // Payout lifecycle (F27; src/lib/settlementPayout.ts). PREPARED = the
   // platform owes this net and hasn't sent it yet; PAID = sent, with the bank
   // reference/UTR and the date it went out; NO_PAYOUT = net ≤ 0, nothing for
   // the platform to send. null = settled before F27 (treated as paid, no reference).
-  status           String?
-  payoutReference  String?   // UTR / bank reference, shown to the provider
-  paidAt           DateTime? // the day the payout was sent (admin-entered)
-  payoutNote       String?   // admin-only — never returned to the provider
-  paidByAdminId    String?
-  paidByAdmin      User?     @relation("SettlementsPaidBy", fields: [paidByAdminId], references: [id])
-  markedPaidAt     DateTime? // when the admin recorded it
-  createdAt        DateTime @default(now())
-  appointments     Appointment[]
-  payoutRequests   PayoutRequest[]
+  status            String?
+  payoutReference   String? // UTR / bank reference, shown to the provider
+  paidAt            DateTime? // the day the payout was sent (admin-entered)
+  payoutNote        String? // admin-only — never returned to the provider
+  paidByAdminId     String?
+  paidByAdmin       User?                        @relation("SettlementsPaidBy", fields: [paidByAdminId], references: [id])
+  markedPaidAt      DateTime? // when the admin recorded it
+  createdAt         DateTime                     @default(now())
+  appointments      Appointment[]
+  payoutRequests    PayoutRequest[]
   payoutCorrections SettlementPayoutCorrection[]
-  duesPayment      DuesPayment?
+  duesPayment       DuesPayment?
 }
 
 // A doctor's own request to be paid out — settlement is still an admin
@@ -671,8 +680,8 @@ model ProviderTimeOff {
   id         String   @id @default(cuid())
   providerId String
   provider   User     @relation("ProviderTimeOff", fields: [providerId], references: [id], onDelete: Cascade)
-  startDate  String   // "YYYY-MM-DD", IST
-  endDate    String   // "YYYY-MM-DD", IST, inclusive
+  startDate  String // "YYYY-MM-DD", IST
+  endDate    String // "YYYY-MM-DD", IST, inclusive
   reason     String?
   createdAt  DateTime @default(now())
 
@@ -691,7 +700,7 @@ model DuesPayment {
   doctorId       String
   doctor         User        @relation("DoctorDuesPayments", fields: [doctorId], references: [id], onDelete: Cascade)
   amount         Float
-  appointmentIds String      // JSON array of the covered Appointment ids
+  appointmentIds String // JSON array of the covered Appointment ids
   status         String      @default("CREATED") // CREATED, PAID, FAILED
   cfPaymentId    String?
   paidAt         DateTime?
@@ -703,16 +712,16 @@ model DuesPayment {
 }
 
 model PayoutRequest {
-  id           String      @id @default(cuid())
-  doctorId     String
-  doctor       User        @relation("DoctorPayoutRequests", fields: [doctorId], references: [id], onDelete: Cascade)
-  amount       Float
-  status       String      @default("PENDING") // PENDING, FULFILLED, DISMISSED
-  note         String?
-  createdAt    DateTime    @default(now())
-  resolvedAt   DateTime?
-  settlementId String?
-  settlement   Settlement? @relation(fields: [settlementId], references: [id], onDelete: SetNull)
+  id                 String      @id @default(cuid())
+  doctorId           String
+  doctor             User        @relation("DoctorPayoutRequests", fields: [doctorId], references: [id], onDelete: Cascade)
+  amount             Float
+  status             String      @default("PENDING") // PENDING, FULFILLED, DISMISSED
+  note               String?
+  createdAt          DateTime    @default(now())
+  resolvedAt         DateTime?
+  settlementId       String?
+  settlement         Settlement? @relation(fields: [settlementId], references: [id], onDelete: SetNull)
   // Set when an admin dismisses it (status DISMISSED) — the reason is shown
   // to the provider; the admin id is the audit trail.
   dismissReason      String?
@@ -745,8 +754,8 @@ model DoctorPaymentLog {
   id                String   @id @default(cuid())
   doctorId          String
   doctor            User     @relation("DoctorPaymentLogs", fields: [doctorId], references: [id])
-  type              String   // REGISTRATION, SUBSCRIPTION
-  amount            Float    // amount actually charged (after any coupon discount)
+  type              String // REGISTRATION, SUBSCRIPTION
+  amount            Float // amount actually charged (after any coupon discount)
   couponCode        String?
   discountAmount    Float    @default(0)
   cashfreePaymentId String?
@@ -759,10 +768,10 @@ model Message {
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   senderId      String
   sender        User        @relation("SentMessages", fields: [senderId], references: [id])
-  text          String      // may be "" when the message is a file attachment with no caption
+  text          String // may be "" when the message is a file attachment with no caption
   fileUrl       String?
   fileName      String?
-  fileType      String?     // MIME type, e.g. "application/pdf", "image/jpeg"
+  fileType      String? // MIME type, e.g. "application/pdf", "image/jpeg"
   readAt        DateTime?
   createdAt     DateTime    @default(now())
 }
@@ -784,26 +793,26 @@ model PrescriptionMedicine {
 // end date until the patient picks them. Belongs to the account holder, also
 // for a family member's prescription (they see those prescriptions too).
 model MedicineReminder {
-  id            String      @id @default(cuid())
+  id            String         @id @default(cuid())
   appointmentId String
-  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  appointment   Appointment    @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   patientId     String
-  patient       User        @relation("PatientMedicineReminders", fields: [patientId], references: [id], onDelete: Cascade)
+  patient       User           @relation("PatientMedicineReminders", fields: [patientId], references: [id], onDelete: Cascade)
   // Copied from PrescriptionMedicine — its rows are recreated on every save.
   name          String
-  nameKey       String      // lower-cased name, to match a medicine across saves
-  dosage        String      @default("")
-  frequency     String      @default("")
-  duration      String      @default("")
-  timesOfDay    String[]    // IST "HH:mm", sorted, all outside quiet hours; [] = not set yet
-  startDate     DateTime    // first IST day (its first instant)
-  endDate       DateTime?   // last IST day (its first instant); null = not set yet
-  enabled       Boolean     @default(true)
+  nameKey       String // lower-cased name, to match a medicine across saves
+  dosage        String         @default("")
+  frequency     String         @default("")
+  duration      String         @default("")
+  timesOfDay    String[] // IST "HH:mm", sorted, all outside quiet hours; [] = not set yet
+  startDate     DateTime // first IST day (its first instant)
+  endDate       DateTime? // last IST day (its first instant); null = not set yet
+  enabled       Boolean        @default(true)
   // The patient changed the times/days — a later re-save with the same
   // frequency and duration keeps their choice.
-  setByPatient  Boolean     @default(false)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  setByPatient  Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   doses         MedicineDose[]
 
   @@index([patientId, endDate])
@@ -817,8 +826,8 @@ model MedicineDose {
   id         String           @id @default(cuid())
   reminderId String
   reminder   MedicineReminder @relation(fields: [reminderId], references: [id], onDelete: Cascade)
-  doseDate   String           // IST YYYY-MM-DD
-  doseTime   String           // IST HH:mm
+  doseDate   String // IST YYYY-MM-DD
+  doseTime   String // IST HH:mm
   notifiedAt DateTime?
   takenAt    DateTime?
   createdAt  DateTime         @default(now())
@@ -832,6 +841,10 @@ model PrescriptionTest {
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   name          String
   instructions  String?
+  // The admin lab test this row matched by name when the doctor saved it
+  // (src/lib/labTests.ts) — only matched tests can be booked by the patient.
+  labTestId     String?
+  labTest       LabTest?    @relation(fields: [labTestId], references: [id], onDelete: SetNull)
 }
 
 // Audit trail of a prescription's medicines + tests: one row per saved change
@@ -840,10 +853,10 @@ model PrescriptionVersion {
   id            String      @id @default(cuid())
   appointmentId String
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  version       Int         // 1, 2, 3… per appointment
-  medicines     Json        // [{ name, dosage, frequency, duration, instructions }]
-  tests         Json        // [{ name, instructions }]
-  editedById    String      // the doctor's user id (no FK, so history survives account changes)
+  version       Int // 1, 2, 3… per appointment
+  medicines     Json // [{ name, dosage, frequency, duration, instructions }]
+  tests         Json // [{ name, instructions }]
+  editedById    String // the doctor's user id (no FK, so history survives account changes)
   createdAt     DateTime    @default(now())
 
   @@unique([appointmentId, version])
@@ -857,7 +870,7 @@ model DoctorFavouriteMedicine {
   doctorId     String
   doctor       User     @relation("DoctorFavouriteMedicines", fields: [doctorId], references: [id], onDelete: Cascade)
   name         String
-  nameKey      String   // lower-cased name — one favourite per medicine name
+  nameKey      String // lower-cased name — one favourite per medicine name
   dosage       String   @default("")
   frequency    String   @default("")
   duration     String   @default("")
@@ -874,9 +887,9 @@ model PrescriptionTemplate {
   doctorId  String
   doctor    User     @relation("DoctorPrescriptionTemplates", fields: [doctorId], references: [id], onDelete: Cascade)
   name      String
-  nameKey   String   // lower-cased name — template names are unique per doctor
-  medicines Json     // [{ name, dosage, frequency, duration, instructions }]
-  tests     Json     // [{ name, instructions }]
+  nameKey   String // lower-cased name — template names are unique per doctor
+  medicines Json // [{ name, dosage, frequency, duration, instructions }]
+  tests     Json // [{ name, instructions }]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -900,7 +913,7 @@ model Review {
   doctor        User        @relation("DoctorReviews", fields: [doctorId], references: [id])
   appointmentId String      @unique
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
-  rating        Int         // 1–5
+  rating        Int // 1–5
   comment       String?
   createdAt     DateTime    @default(now())
 }
@@ -910,28 +923,28 @@ model Review {
 // messages only — priority, assignee and internal notes are admin-only
 // (src/lib/complaints.ts holds the shared rules and the SLA hours).
 model Complaint {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  subject     String
-  description String
-  status      String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
-  priority    String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
-  assigneeId  String?
-  assignee    User?    @relation("ComplaintAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  id              String             @id @default(cuid())
+  userId          String
+  user            User               @relation(fields: [userId], references: [id])
+  subject         String
+  description     String
+  status          String             @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
+  priority        String             @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  assigneeId      String?
+  assignee        User?              @relation("ComplaintAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
   // The booking the ticket is about — the filer's own (checked on create),
   // or set by an admin.
-  appointmentId String?
-  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  appointmentId   String?
+  appointment     Appointment?       @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
   // A callback number other than the account mobile, if the filer gave one.
-  contactMobile String?
+  contactMobile   String?
   // SLA: first public admin reply, and when it was last marked resolved.
   firstResponseAt DateTime?
   resolvedAt      DateTime?
   // Last public message from either side — list ordering and "waiting on" status.
-  lastActivityAt  DateTime @default(now())
-  createdAt   DateTime @default(now())
-  messages    ComplaintMessage[]
+  lastActivityAt  DateTime           @default(now())
+  createdAt       DateTime           @default(now())
+  messages        ComplaintMessage[]
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
@@ -955,21 +968,21 @@ model ComplaintMessage {
 }
 
 model Clinic {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   doctorId  String
-  doctor    User     @relation("DoctorClinics", fields: [doctorId], references: [id], onDelete: Cascade)
+  doctor    User      @relation("DoctorClinics", fields: [doctorId], references: [id], onDelete: Cascade)
   name      String
   address   String
   photoUrl  String?
   lat       Float
   lng       Float
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
   // Soft delete: set together with isActive = false, so every patient-facing
   // query (they all filter isActive) hides it, while past appointments keep
   // their clinic name/address. Only the doctor's own lists filter on this.
   deletedAt DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   slots        ClinicSlot[]
   leaves       ClinicLeave[]
@@ -993,7 +1006,7 @@ model ClinicLeave {
   id        String   @id @default(cuid())
   clinicId  String
   clinic    Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
-  date      String   // "YYYY-MM-DD"
+  date      String // "YYYY-MM-DD"
   reason    String?
   createdAt DateTime @default(now())
 
@@ -1013,8 +1026,8 @@ model Announcement {
   title           String
   message         String
   bannerImageUrl  String?
-  buttons         Json?     // [{ label: string, url: string }], max 2 — enforced in API layer
-  audience        String    // DOCTOR, PATIENT, BOTH
+  buttons         Json? // [{ label: string, url: string }], max 2 — enforced in API layer
+  audience        String // DOCTOR, PATIENT, BOTH
   status          String    @default("DRAFT") // DRAFT, SENT
   createdByUserId String
   createdBy       User      @relation("AnnouncementsCreated", fields: [createdByUserId], references: [id])
@@ -1049,60 +1062,62 @@ model ImpersonationLog {
 }
 
 model PlatformSettings {
-  id                      String   @id @default(cuid())
-  clinicCommissionPercent Float    @default(10)
-  videoCommissionPercent  Float    @default(10)
-  homeCommissionPercent   Float    @default(10)
+  id                            String   @id @default(cuid())
+  clinicCommissionPercent       Float    @default(10)
+  videoCommissionPercent        Float    @default(10)
+  homeCommissionPercent         Float    @default(10)
   // Nurses — all admin-set. A fee of 0 means "free": no payment step at
   // registration / no monthly subscription gate.
-  nurseCommissionPercent  Float    @default(10)
-  nurseRegistrationFee    Float    @default(0)
+  nurseCommissionPercent        Float    @default(10)
+  nurseRegistrationFee          Float    @default(0)
   // Doctors' one-time registration fee — read by checkout, coupons and the
   // approve gate (src/lib/doctorFees.ts). Original = the "MRP" (struck
   // through when discounted); doctorRegistrationFee = the optional discounted
   // price that is charged (null / ≥ original = no discount, the original is
   // charged; an explicit ₹0 = free: activated without a payment step). The
   // monthly subscription is still a constant.
-  doctorRegistrationOriginalFee Float @default(499)
-  doctorRegistrationFee   Float?   @default(99)
-  nurseSubscriptionFee    Float    @default(0)
+  doctorRegistrationOriginalFee Float    @default(499)
+  doctorRegistrationFee         Float?   @default(99)
+  nurseSubscriptionFee          Float    @default(0)
   // One-time: the starter 12h/24h shift services were added to an existing
   // catalogue (so an admin deleting them later doesn't bring them back).
-  nurseShiftServicesSeeded Boolean @default(false)
+  nurseShiftServicesSeeded      Boolean  @default(false)
+  // The B2B lab test price list was written into LabTest (src/lib/labTests.ts) — once, so an admin deleting tests sticks.
+  labTestsSeeded                Boolean  @default(false)
   // How far ahead a patient can book or reschedule (doctor and nurse), in
   // days — see src/lib/bookingLimits.ts.
-  bookingHorizonDays      Int      @default(60)
+  bookingHorizonDays            Int      @default(60)
   // Days after a visit is completed that patient and provider can still send
   // chat messages (0 = read-only right away) — see src/lib/chatAccess.ts.
-  chatFollowUpDays        Int      @default(7)
+  chatFollowUpDays              Int      @default(7)
   // Most a doctor may owe in commission on cash visits (net of their online
   // earnings) before new cash bookings from their side are refused until
   // they pay it (src/lib/duesPayments.ts). ₹0 = no limit.
-  cashDueLimit            Float    @default(2000)
+  cashDueLimit                  Float    @default(2000)
   // Supplier block printed on patient receipts (appointment payments and
   // wallet top-ups — src/lib/receipts.ts). Unset name falls back to
   // "DocOnClick"; GSTIN / address are left off the receipt while unset.
   // receiptTaxNote overrides the default GST line on appointment receipts.
-  receiptLegalName        String?
-  receiptAddress          String?
-  receiptGstin            String?
-  receiptTaxNote          String?
+  receiptLegalName              String?
+  receiptAddress                String?
+  receiptGstin                  String?
+  receiptTaxNote                String?
   // Mobile app splash: admin uploads an image that the native shell shows over
   // the WebView while it boots (the real native splash is baked into the app
   // binary and can't change without a store update — this is the dynamic layer
   // on top). splashFit: "cover" (full-bleed) or "contain" (centred logo on
   // splashBgColor). See SplashOverlay.tsx / /api/app-config.
-  splashImageUrl          String?
-  splashFit               String   @default("cover") // "cover", "contain"
-  splashBgColor           String   @default("#F8FAFC")
+  splashImageUrl                String?
+  splashFit                     String   @default("cover") // "cover", "contain"
+  splashBgColor                 String   @default("#F8FAFC")
   // Invite & earn (FP1-23, src/lib/referrals.ts): wallet credit to the
   // referrer when a referred patient completes a first paid visit / a
   // referred doctor or nurse is approved. ₹0 = that side of the programme
   // is off. Cap = most rewards one referrer can earn per IST calendar month.
-  referralRewardPatient   Float    @default(0)
-  referralRewardProvider  Float    @default(0)
-  referralMonthlyCap      Int      @default(10)
-  updatedAt               DateTime @updatedAt
+  referralRewardPatient         Float    @default(0)
+  referralRewardProvider        Float    @default(0)
+  referralMonthlyCap            Int      @default(10)
+  updatedAt                     DateTime @updatedAt
 }
 
 // One row per referred account (FP1-23): inviteeId is unique, so an account
@@ -1110,25 +1125,25 @@ model PlatformSettings {
 // (REWARDED, with the REFERRAL_BONUS wallet row in the same transaction) or
 // refused (REJECTED + rejectReason). See src/lib/referrals.ts.
 model Referral {
-  id            String    @id @default(cuid())
-  referrerId    String
-  referrer      User      @relation("ReferralsMade", fields: [referrerId], references: [id], onDelete: Cascade)
-  inviteeId     String    @unique
-  invitee       User      @relation("ReferralInvitee", fields: [inviteeId], references: [id], onDelete: Cascade)
-  inviteeRole   String    // PATIENT, DOCTOR, NURSE — picks the reward amount
-  status        String    @default("PENDING") // PENDING, REWARDED, REJECTED
-  rejectReason  String?   // SAME_MOBILE, SAME_DEVICE, NO_DEVICE, MONTHLY_CAP, ACCOUNT_DELETED
+  id                      String    @id @default(cuid())
+  referrerId              String
+  referrer                User      @relation("ReferralsMade", fields: [referrerId], references: [id], onDelete: Cascade)
+  inviteeId               String    @unique
+  invitee                 User      @relation("ReferralInvitee", fields: [inviteeId], references: [id], onDelete: Cascade)
+  inviteeRole             String // PATIENT, DOCTOR, NURSE — picks the reward amount
+  status                  String    @default("PENDING") // PENDING, REWARDED, REJECTED
+  rejectReason            String? // SAME_MOBILE, SAME_DEVICE, NO_DEVICE, MONTHLY_CAP, ACCOUNT_DELETED
   // HMAC of the invitee's mobile (not the number itself — it outlives an
   // account deletion), so a number can only ever earn one reward.
-  mobileHash    String?
-  deviceId      String?   // the invitee's device cookie at signup
-  rewardAmount  Float?
-  rewardedAt    DateTime?
-  walletTransactionId     String? @unique // the REFERRAL_BONUS ledger row
+  mobileHash              String?
+  deviceId                String? // the invitee's device cookie at signup
+  rewardAmount            Float?
+  rewardedAt              DateTime?
+  walletTransactionId     String?   @unique // the REFERRAL_BONUS ledger row
   qualifyingAppointmentId String? // the patient's first paid + completed visit
-  lastCheckedAt DateTime? // last looked at by the reward sweep (it takes the least recent first)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  lastCheckedAt           DateTime? // last looked at by the reward sweep (it takes the least recent first)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
   @@index([referrerId, status, rewardedAt])
   @@index([status, inviteeRole, lastCheckedAt])
@@ -1153,56 +1168,56 @@ model ReferralCode {
 // Promotional discount code, created by an admin and applied by a patient at
 // payment checkout. See src/lib/coupons.ts and /api/coupons/apply.
 model Coupon {
-  id             String   @id @default(cuid())
-  code           String   @unique // stored UPPERCASE
-  description    String?
-  discountType   String   @default("PERCENT") // PERCENT, FLAT
-  discountValue  Float     // percent (0-100) or rupee amount
-  maxDiscount    Float?    // cap in rupees, only meaningful for PERCENT
-  minAmount      Float    @default(0) // minimum base amount to qualify
+  id               String    @id @default(cuid())
+  code             String    @unique // stored UPPERCASE
+  description      String?
+  discountType     String    @default("PERCENT") // PERCENT, FLAT
+  discountValue    Float // percent (0-100) or rupee amount
+  maxDiscount      Float? // cap in rupees, only meaningful for PERCENT
+  minAmount        Float     @default(0) // minimum base amount to qualify
   // What this coupon can be used for — CSV of APPOINTMENT, DOCTOR_REGISTRATION,
   // DOCTOR_SUBSCRIPTION, NURSE_REGISTRATION, NURSE_SUBSCRIPTION. Empty/null
   // is treated as APPOINTMENT only.
-  appliesTo      String   @default("APPOINTMENT")
-  consultTypes   String?  // CSV of CLINIC,VIDEO,HOME — null/empty means all (APPOINTMENT only)
-  maxRedemptions Int?     // total cap across all users — null means unlimited
-  perUserLimit   Int      @default(1)
+  appliesTo        String    @default("APPOINTMENT")
+  consultTypes     String? // CSV of CLINIC,VIDEO,HOME — null/empty means all (APPOINTMENT only)
+  maxRedemptions   Int? // total cap across all users — null means unlimited
+  perUserLimit     Int       @default(1)
   // Reserved+confirmed slot counter. Incremented atomically when a patient
   // applies the coupon, decremented if they remove it or the appointment is
   // cancelled unpaid. Guards `maxRedemptions` without a race.
-  usedCount      Int      @default(0)
-  startsAt       DateTime?
-  expiresAt      DateTime?
-  isActive       Boolean  @default(true)
+  usedCount        Int       @default(0)
+  startsAt         DateTime?
+  expiresAt        DateTime?
+  isActive         Boolean   @default(true)
   // Listed to patients on /patient/payment (tap to apply). Off by default so
   // a code handed out privately never shows up for everyone.
-  isPublic       Boolean  @default(false)
+  isPublic         Boolean   @default(false)
   createdByAdminId String?
-  createdByAdmin   User?  @relation("CouponsCreatedByAdmin", fields: [createdByAdminId], references: [id], onDelete: SetNull)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdByAdmin   User?     @relation("CouponsCreatedByAdmin", fields: [createdByAdminId], references: [id], onDelete: SetNull)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
-  redemptions    CouponRedemption[]
-  appointments   Appointment[]
+  redemptions  CouponRedemption[]
+  appointments Appointment[]
 }
 
 model CouponRedemption {
-  id            String   @id @default(cuid())
-  couponId      String
-  coupon        Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String       @id @default(cuid())
+  couponId       String
+  coupon         Coupon       @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   // Exactly one of these identifies what the coupon was used on:
   //  - appointmentId for a patient booking payment (kind APPOINTMENT)
   //  - orderId (the Cashfree order id) for a doctor/nurse registration/subscription fee
-  kind          String   @default("APPOINTMENT") // APPOINTMENT, DOCTOR_REGISTRATION, DOCTOR_SUBSCRIPTION, NURSE_REGISTRATION, NURSE_SUBSCRIPTION
-  appointmentId String?  @unique
-  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  orderId       String?  @unique
+  kind           String       @default("APPOINTMENT") // APPOINTMENT, DOCTOR_REGISTRATION, DOCTOR_SUBSCRIPTION, NURSE_REGISTRATION, NURSE_SUBSCRIPTION
+  appointmentId  String?      @unique
+  appointment    Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  orderId        String?      @unique
   discountAmount Float
-  status        String   @default("RESERVED") // RESERVED, CONFIRMED
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status         String       @default("RESERVED") // RESERVED, CONFIRMED
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
 // One Cashfree checkout for one or more appointments (a nurse package's
@@ -1211,15 +1226,15 @@ model CouponRedemption {
 // a second payment for something already paid — can still be traced and
 // credited to the patient's wallet. Settled by src/lib/paymentOrders.ts.
 model PaymentOrder {
-  id          String   @id @default(cuid())
-  orderId     String   @unique // Cashfree order_id
+  id          String             @id @default(cuid())
+  orderId     String             @unique // Cashfree order_id
   patientId   String
-  patient     User     @relation("PatientPaymentOrders", fields: [patientId], references: [id])
-  amount      Float    // order_amount sent to Cashfree
-  status      String   @default("CREATED") // CREATED, PAID, PARTIAL (some items credited), CREDITED (all to wallet)
-  cfPaymentId String?  // the payment that settled it
+  patient     User               @relation("PatientPaymentOrders", fields: [patientId], references: [id])
+  amount      Float // order_amount sent to Cashfree
+  status      String             @default("CREATED") // CREATED, PAID, PARTIAL (some items credited), CREDITED (all to wallet)
+  cfPaymentId String? // the payment that settled it
   settledAt   DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime           @default(now())
   items       PaymentOrderItem[]
 
   @@index([patientId])
@@ -1231,9 +1246,101 @@ model PaymentOrderItem {
   paymentOrder   PaymentOrder @relation(fields: [paymentOrderId], references: [id], onDelete: Cascade)
   appointmentId  String
   appointment    Appointment  @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  amount         Float        // this appointment's share when the order was created
-  outcome        String?      // APPLIED (marked PAID) or CREDITED (sent to wallet); null until settled
+  amount         Float // this appointment's share when the order was created
+  outcome        String? // APPLIED (marked PAID) or CREDITED (sent to wallet); null until settled
 
   @@unique([paymentOrderId, appointmentId])
   @@index([appointmentId])
+}
+
+// Admin-managed lab test catalogue (/admin/lab-tests), seeded from the B2B
+// price list. The patient pays b2bPrice plus commissionPercent on top,
+// rounded to the rupee — labTestPrice() in src/lib/labTests.ts.
+model LabTest {
+  id                String             @id @default(cuid())
+  name              String             @unique
+  b2bPrice          Float
+  commissionPercent Float              @default(50)
+  isActive          Boolean            @default(true)
+  sortOrder         Int                @default(0)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  prescriptionTests PrescriptionTest[]
+  bookingItems      LabBookingItem[]
+}
+
+// A patient's request to get the lab tests from a completed consultation's
+// prescription done. Admins move it along by hand (/admin/lab-bookings);
+// the patient sees the status and the admin's note.
+model LabBooking {
+  id              String           @id @default(cuid())
+  patientId       String
+  patient         User             @relation("PatientLabBookings", fields: [patientId], references: [id], onDelete: Cascade)
+  appointmentId   String?
+  appointment     Appointment?     @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  patientName     String // who the sample is from (account holder or family member), snapshot
+  patientAge      Int? // snapshot of the account holder's / family member's age at booking
+  patientGender   String?
+  address         String // where to collect the sample
+  pinCode         String? // 6-digit PIN code of the collection address
+  // Exact pin the patient dropped on the map (sample is collected at home); required for new bookings.
+  lat             Float?
+  lng             Float?
+  // Sample collection slot the patient picked when booking (admins only see it):
+  // IST day "YYYY-MM-DD" + slot key from LAB_COLLECTION_SLOTS ("07-09" = 7–9 AM).
+  collectionDate  String?
+  collectionSlot  String?
+  notes           String? // patient's note, e.g. a preferred time
+  totalAmount     Float // sum of the items' prices
+  paymentMethod   String // WALLET (debited when booked), ONLINE (Cashfree)
+  paymentStatus   String           @default("PENDING") // PENDING, PAID, REFUNDED (to the wallet)
+  // ONLINE: the latest Cashfree order (`labt<bookingId>_<ts>`) and the payment that settled it.
+  cashfreeOrderId String?
+  cfPaymentId     String?
+  paidAt          DateTime?
+  // PENDING_PAYMENT = an ONLINE booking not paid yet (admins act only once it is paid).
+  status          String           @default("REQUESTED") // PENDING_PAYMENT, REQUESTED, CONFIRMED, SAMPLE_COLLECTED, COMPLETED, CANCELLED
+  adminNote       String? // shown to the patient
+  cancelledBy     String? // PATIENT, ADMIN, SYSTEM (an unpaid booking replaced by a new one)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  items           LabBookingItem[]
+  reports         LabReport[]
+
+  @@index([patientId, createdAt])
+  @@index([status, createdAt])
+  @@index([appointmentId])
+  @@index([cashfreeOrderId])
+}
+
+// One test in a lab booking, priced when booked (later catalogue edits don't change it).
+model LabBookingItem {
+  id                String     @id @default(cuid())
+  bookingId         String
+  booking           LabBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  labTestId         String?
+  labTest           LabTest?   @relation(fields: [labTestId], references: [id], onDelete: SetNull)
+  name              String
+  b2bPrice          Float
+  commissionPercent Float
+  price             Float
+
+  @@index([bookingId])
+}
+
+// A report file an admin uploaded for a lab booking. The same file is filed
+// in the patient's records vault (PatientDocument, "Lab Report"), so it stays
+// with their health records; deleting it from the vault keeps this row.
+model LabReport {
+  id           String           @id @default(cuid())
+  bookingId    String
+  booking      LabBooking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  fileUrl      String
+  fileName     String?
+  documentId   String?
+  document     PatientDocument? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  uploadedById String // the admin's user id (no FK)
+  createdAt    DateTime         @default(now())
+
+  @@index([bookingId])
 }

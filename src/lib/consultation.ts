@@ -9,6 +9,7 @@ import { PACKAGE_INTERVAL_OPTIONS, PACKAGE_MAX_VISITS } from "@/lib/nursePackage
 import { getBookingHorizonDays } from "@/lib/bookingLimits";
 import { addDaysYmd, istDayKey, isValidYmd } from "@/lib/istDate";
 import { FOLLOW_UP_NOTE_MAX, followUpInstant } from "@/lib/followUp";
+import { matchLabTests } from "@/lib/labTests";
 
 // The pieces of closing a doctor's consultation — prescription items, files,
 // a nurse referral and the completion guards — shared by the one-shot
@@ -93,7 +94,9 @@ export async function replacePrescription(
   await tx.prescriptionMedicine.deleteMany({ where: { appointmentId } });
   await tx.prescriptionMedicine.createMany({ data: medicines.map((m) => ({ appointmentId, ...m })) });
   await tx.prescriptionTest.deleteMany({ where: { appointmentId } });
-  await tx.prescriptionTest.createMany({ data: tests.map((t) => ({ appointmentId, ...t })) });
+  // Tests matching the admin's lab catalogue are linked, so the patient can book them.
+  const linkedTests = await matchLabTests(tx, tests);
+  await tx.prescriptionTest.createMany({ data: linkedTests.map((t) => ({ appointmentId, ...t })) });
   await recordPrescriptionVersion(tx, {
     appointmentId,
     editedById,

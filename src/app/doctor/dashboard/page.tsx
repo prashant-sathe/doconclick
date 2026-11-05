@@ -29,6 +29,7 @@ import AnnouncementPopup from "@/components/AnnouncementPopup";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { playMessageChime } from "@/lib/playNotificationSound";
 import { FREQUENCY_OPTIONS, DURATION_OPTIONS, TEST_SUGGESTIONS } from "@/lib/medicalOptions";
+import { resolveLabTest } from "@/lib/labTestMatch";
 import { VIDEO_UNLOCK_DELAY_SECONDS } from "@/lib/videoCall";
 import { cn, formatDoctorName } from "@/lib/utils";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -327,6 +328,12 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   const [followUp, setFollowUp] = useState<FollowUpValue>(() => ({ ...NO_FOLLOW_UP, ...(loadDraft(appt.id).followUp ?? {}) }));
   const servicesLoad = useLoad<{ id: string; name: string; requiresPrescription: boolean }[]>("/api/nurse-services", { fallback: t("servicesLoadFailed") });
   const nurseServices = servicesLoad.data ?? [];
+  // The admin's lab catalogue: its names fill the test autocomplete, and a
+  // test that matches one can be booked by the patient after the visit.
+  const labLoad = useLoad<{ id: string; name: string; price: number }[]>("/api/lab-tests");
+  // Same rule the server links prescription tests by (src/lib/labTestMatch.ts).
+  const labMatch = (name: string) => resolveLabTest(name, labLoad.data ?? []);
+  const testSuggestions = labLoad.data && labLoad.data.length > 0 ? labLoad.data.map((lt) => lt.name) : TEST_SUGGESTIONS;
   const [referralError, setReferralError] = useState("");
   const [followUpError, setFollowUpError] = useState("");
   const [submitError, setSubmitError] = useState("");
@@ -532,7 +539,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       <div>
         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t("recommendedTests")}</p>
         <datalist id="test-suggestions">
-          {TEST_SUGGESTIONS.map((o) => <option key={o} value={o} />)}
+          {testSuggestions.map((o) => <option key={o} value={o} />)}
         </datalist>
         <div className="space-y-2">
           {tests.map((row, i) => (
@@ -552,6 +559,16 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
                   </button>
                 )}
               </div>
+              {row.name.trim() && labLoad.data && (() => {
+                const match = labMatch(row.name);
+                return match ? (
+                  <p className="sm:col-span-3 text-[11px] font-semibold text-teal-700 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> {t("labBookable", { price: match.price, name: match.name })}
+                  </p>
+                ) : (
+                  <p className="sm:col-span-3 text-[11px] text-slate-400">{t("labNotListed")}</p>
+                );
+              })()}
             </div>
           ))}
         </div>

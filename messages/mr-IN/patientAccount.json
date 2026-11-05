@@ -42,7 +42,8 @@
     "anyDistance": "कितीही अंतर",
     "signOut": "साइन आउट करा",
     "family": "कुटुंबातील सदस्य",
-    "medicines": "औषधांची आठवण"
+    "medicines": "औषधांची आठवण",
+    "labTests": "लॅब तपासण्या"
   },
   "personal": {
     "title": "वैयक्तिक व वैद्यकीय माहिती",
@@ -295,7 +296,9 @@
       "REASSIGNMENT_CREDIT": "अपॉइंटमेंट रद्द — पैसे परत",
       "CANCELLATION_REFUND": "अपॉइंटमेंट रद्द — पैसे परत",
       "PAYMENT_CREDIT": "पेमेंट वॉलेटमध्ये जमा",
-      "REFERRAL_BONUS": "रेफरल बक्षीस"
+      "REFERRAL_BONUS": "रेफरल बक्षीस",
+      "LAB_TEST_PAYMENT": "लॅब तपासणी पेमेंट",
+      "LAB_TEST_REFUND": "लॅब बुकिंग रद्द — परत"
     },
     "status": {
       "PENDING": "प्रक्रिया सुरू आहे",

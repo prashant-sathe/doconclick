@@ -265,7 +265,11 @@
       "followUpUnavailable": "Follow-up unavailable",
       "bookAgain": "Book Again",
       "bookFollowUp": "Book Follow-up",
-      "followUpSuggested": "Follow-up suggested on {date}"
+      "followUpSuggested": "Follow-up suggested on {date}",
+      "labTitle": "Lab tests recommended",
+      "labBook": "Book lab tests",
+      "labBooked": "Lab tests booked — {status, select, REQUESTED {request sent} CONFIRMED {confirmed} SAMPLE_COLLECTED {sample collected} COMPLETED {completed} other {in progress}}. View",
+      "labNotBookable": "book with any lab"
     },
     "cancelDialog": {
       "titleAppointment": "Cancel this appointment?",
@@ -355,5 +359,93 @@
       "setting": "Setting…",
       "confirm": "Set this location"
     }
+  },
+  "labTests": {
+    "title": "My lab tests",
+    "subtitle": "Tests you booked from your doctor's prescription, and where they are.",
+    "empty": "No lab tests booked yet. After a consultation, book the tests your doctor recommended from Appointments.",
+    "goToAppointments": "Go to Appointments",
+    "bookedOn": "Booked {date, date, medium}",
+    "total": "Total",
+    "status": {
+      "PENDING_PAYMENT": "Awaiting payment",
+      "REQUESTED": "Requested",
+      "CONFIRMED": "Confirmed",
+      "SAMPLE_COLLECTED": "Sample collected",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "payment": {
+      "WALLET": "Paid from wallet",
+      "ONLINE": "Paid online"
+    },
+    "paymentStatus": {
+      "PENDING": "Not paid yet",
+      "PAID": "Paid",
+      "REFUNDED": "Refunded to wallet"
+    },
+    "adminNote": "Update from DocOnClick:",
+    "cancel": "Cancel booking",
+    "cancelTitle": "Cancel this lab booking?",
+    "cancelMessage": "Your request will be withdrawn.",
+    "cancelRefundMessage": "₹{amount} will go back to your wallet.",
+    "cancelConfirm": "Cancel booking",
+    "keep": "Keep it",
+    "cancelled": "Lab booking cancelled.",
+    "cancelledRefunded": "Lab booking cancelled — ₹{amount} refunded to your wallet.",
+    "book": {
+      "title": "Book lab tests",
+      "subtitle": "Pick the tests from your prescription. Our team will call you to confirm the sample collection.",
+      "back": "Appointments",
+      "missing": "Open this page from a completed appointment.",
+      "alreadyBooked": "You've already booked lab tests for this consultation.",
+      "viewBookings": "View my lab tests",
+      "noneBookable": "None of the prescribed tests can be booked in the app yet — please get them done at a lab of your choice.",
+      "forPatient": "Tests for",
+      "testsTitle": "Prescribed tests",
+      "notBookable": "Not bookable in the app: {tests}",
+      "total": "Total",
+      "address": "Address for sample collection",
+      "addressPlaceholder": "House / flat, street, area, PIN code",
+      "notes": "Note (optional)",
+      "notesPlaceholder": "e.g. Best time: morning before 9 AM",
+      "payWith": "Pay with",
+      "method": {
+        "WALLET": "Wallet",
+        "ONLINE": "Pay online"
+      },
+      "walletBalance": "Balance ₹{amount}",
+      "walletShort": "₹{amount} short in your wallet — add money or pay online.",
+      "addMoney": "Add money",
+      "submit": "{method, select, WALLET {Pay ₹{amount} from wallet} other {Pay ₹{amount} online}}",
+      "booked": "Lab tests booked! We'll confirm shortly.",
+      "onlineHint": "UPI, card or net banking",
+      "pinCode": "PIN code",
+      "collectionDay": "Collection day",
+      "timeSlot": "Time slot",
+      "pickSlot": "Pick a slot",
+      "mapLabel": "Pin your exact location",
+      "mapHint": "The sample is collected at your home — tap the map or drag the pin to your exact door.",
+      "useMyLocation": "Use my current location",
+      "locationSet": "Location pinned ({coords})",
+      "locationMissing": "Pin your location on the map to continue.",
+      "locationFailed": "Couldn't get your location — turn on location, or tap the map instead.",
+      "locationOutside": "That location is outside India — tap the map to set it."
+    },
+    "reportReady": "Your report is ready",
+    "reportFile": "Lab report",
+    "viewReport": "View",
+    "downloadReport": "Download",
+    "reportInVault": "Also saved in Profile → Documents.",
+    "payNow": "Pay ₹{amount}",
+    "payFailed": "Couldn't open the payment page. Please try again.",
+    "downloadFailed": "Couldn't download the report. Please try again.",
+    "return": {
+      "checking": "Confirming your payment…",
+      "paid": "Payment received — your lab tests are booked. We'll confirm the sample collection soon.",
+      "credited": "We received your payment but couldn't apply it to this booking, so it was added to your wallet.",
+      "pending": "We haven't received the payment yet. If money was deducted, it'll show here in a few minutes."
+    },
+    "collectionAt": "Sample collection: {day}, {slot}"
   }
 }

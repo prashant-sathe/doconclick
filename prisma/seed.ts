@@ -1,6 +1,7 @@
 import { PrismaClient } from "../src/generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
+import { DEFAULT_LAB_TESTS } from "../src/lib/labTestPriceList";
 
 const connectionString =
   process.env.DATABASE_URL ??
@@ -237,6 +238,12 @@ async function main() {
       },
     });
   }
+
+  // Lab test catalogue (B2B price list, 50% commission). Existing rows are left as the admin set them.
+  await prisma.labTest.createMany({
+    data: DEFAULT_LAB_TESTS.map(([name, b2bPrice], i) => ({ name, b2bPrice, commissionPercent: 50, sortOrder: i })),
+    skipDuplicates: true,
+  });
 
   console.log("\n✅ Done! Seeded admin, 1 patient, and 10 approved doctors.\n");
   console.log("  ┌──────────────────────────────────────────────┐");

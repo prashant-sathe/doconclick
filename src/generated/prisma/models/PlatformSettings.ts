@@ -71,6 +71,7 @@ export type PlatformSettingsMinAggregateOutputType = {
   doctorRegistrationFee: number | null
   nurseSubscriptionFee: number | null
   nurseShiftServicesSeeded: boolean | null
+  labTestsSeeded: boolean | null
   bookingHorizonDays: number | null
   chatFollowUpDays: number | null
   cashDueLimit: number | null
@@ -98,6 +99,7 @@ export type PlatformSettingsMaxAggregateOutputType = {
   doctorRegistrationFee: number | null
   nurseSubscriptionFee: number | null
   nurseShiftServicesSeeded: boolean | null
+  labTestsSeeded: boolean | null
   bookingHorizonDays: number | null
   chatFollowUpDays: number | null
   cashDueLimit: number | null
@@ -125,6 +127,7 @@ export type PlatformSettingsCountAggregateOutputType = {
   doctorRegistrationFee: number
   nurseSubscriptionFee: number
   nurseShiftServicesSeeded: number
+  labTestsSeeded: number
   bookingHorizonDays: number
   chatFollowUpDays: number
   cashDueLimit: number
@@ -188,6 +191,7 @@ export type PlatformSettingsMinAggregateInputType = {
   doctorRegistrationFee?: true
   nurseSubscriptionFee?: true
   nurseShiftServicesSeeded?: true
+  labTestsSeeded?: true
   bookingHorizonDays?: true
   chatFollowUpDays?: true
   cashDueLimit?: true
@@ -215,6 +219,7 @@ export type PlatformSettingsMaxAggregateInputType = {
   doctorRegistrationFee?: true
   nurseSubscriptionFee?: true
   nurseShiftServicesSeeded?: true
+  labTestsSeeded?: true
   bookingHorizonDays?: true
   chatFollowUpDays?: true
   cashDueLimit?: true
@@ -242,6 +247,7 @@ export type PlatformSettingsCountAggregateInputType = {
   doctorRegistrationFee?: true
   nurseSubscriptionFee?: true
   nurseShiftServicesSeeded?: true
+  labTestsSeeded?: true
   bookingHorizonDays?: true
   chatFollowUpDays?: true
   cashDueLimit?: true
@@ -356,6 +362,7 @@ export type PlatformSettingsGroupByOutputType = {
   doctorRegistrationFee: number | null
   nurseSubscriptionFee: number
   nurseShiftServicesSeeded: boolean
+  labTestsSeeded: boolean
   bookingHorizonDays: number
   chatFollowUpDays: number
   cashDueLimit: number
@@ -406,6 +413,7 @@ export type PlatformSettingsWhereInput = {
   doctorRegistrationFee?: Prisma.FloatNullableFilter<"PlatformSettings"> | number | null
   nurseSubscriptionFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseShiftServicesSeeded?: Prisma.BoolFilter<"PlatformSettings"> | boolean
+  labTestsSeeded?: Prisma.BoolFilter<"PlatformSettings"> | boolean
   bookingHorizonDays?: Prisma.IntFilter<"PlatformSettings"> | number
   chatFollowUpDays?: Prisma.IntFilter<"PlatformSettings"> | number
   cashDueLimit?: Prisma.FloatFilter<"PlatformSettings"> | number
@@ -433,6 +441,7 @@ export type PlatformSettingsOrderByWithRelationInput = {
   doctorRegistrationFee?: Prisma.SortOrderInput | Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
+  labTestsSeeded?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
@@ -463,6 +472,7 @@ export type PlatformSettingsWhereUniqueInput = Prisma.AtLeast<{
   doctorRegistrationFee?: Prisma.FloatNullableFilter<"PlatformSettings"> | number | null
   nurseSubscriptionFee?: Prisma.FloatFilter<"PlatformSettings"> | number
   nurseShiftServicesSeeded?: Prisma.BoolFilter<"PlatformSettings"> | boolean
+  labTestsSeeded?: Prisma.BoolFilter<"PlatformSettings"> | boolean
   bookingHorizonDays?: Prisma.IntFilter<"PlatformSettings"> | number
   chatFollowUpDays?: Prisma.IntFilter<"PlatformSettings"> | number
   cashDueLimit?: Prisma.FloatFilter<"PlatformSettings"> | number
@@ -490,6 +500,7 @@ export type PlatformSettingsOrderByWithAggregationInput = {
   doctorRegistrationFee?: Prisma.SortOrderInput | Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
+  labTestsSeeded?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
@@ -525,6 +536,7 @@ export type PlatformSettingsScalarWhereWithAggregatesInput = {
   doctorRegistrationFee?: Prisma.FloatNullableWithAggregatesFilter<"PlatformSettings"> | number | null
   nurseSubscriptionFee?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
   nurseShiftServicesSeeded?: Prisma.BoolWithAggregatesFilter<"PlatformSettings"> | boolean
+  labTestsSeeded?: Prisma.BoolWithAggregatesFilter<"PlatformSettings"> | boolean
   bookingHorizonDays?: Prisma.IntWithAggregatesFilter<"PlatformSettings"> | number
   chatFollowUpDays?: Prisma.IntWithAggregatesFilter<"PlatformSettings"> | number
   cashDueLimit?: Prisma.FloatWithAggregatesFilter<"PlatformSettings"> | number
@@ -552,6 +564,7 @@ export type PlatformSettingsCreateInput = {
   doctorRegistrationFee?: number | null
   nurseSubscriptionFee?: number
   nurseShiftServicesSeeded?: boolean
+  labTestsSeeded?: boolean
   bookingHorizonDays?: number
   chatFollowUpDays?: number
   cashDueLimit?: number
@@ -579,6 +592,7 @@ export type PlatformSettingsUncheckedCreateInput = {
   doctorRegistrationFee?: number | null
   nurseSubscriptionFee?: number
   nurseShiftServicesSeeded?: boolean
+  labTestsSeeded?: boolean
   bookingHorizonDays?: number
   chatFollowUpDays?: number
   cashDueLimit?: number
@@ -606,6 +620,7 @@ export type PlatformSettingsUpdateInput = {
   doctorRegistrationFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  labTestsSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   chatFollowUpDays?: Prisma.IntFieldUpdateOperationsInput | number
   cashDueLimit?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -633,6 +648,7 @@ export type PlatformSettingsUncheckedUpdateInput = {
   doctorRegistrationFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  labTestsSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   chatFollowUpDays?: Prisma.IntFieldUpdateOperationsInput | number
   cashDueLimit?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -660,6 +676,7 @@ export type PlatformSettingsCreateManyInput = {
   doctorRegistrationFee?: number | null
   nurseSubscriptionFee?: number
   nurseShiftServicesSeeded?: boolean
+  labTestsSeeded?: boolean
   bookingHorizonDays?: number
   chatFollowUpDays?: number
   cashDueLimit?: number
@@ -687,6 +704,7 @@ export type PlatformSettingsUpdateManyMutationInput = {
   doctorRegistrationFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  labTestsSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   chatFollowUpDays?: Prisma.IntFieldUpdateOperationsInput | number
   cashDueLimit?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -714,6 +732,7 @@ export type PlatformSettingsUncheckedUpdateManyInput = {
   doctorRegistrationFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   nurseSubscriptionFee?: Prisma.FloatFieldUpdateOperationsInput | number
   nurseShiftServicesSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  labTestsSeeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingHorizonDays?: Prisma.IntFieldUpdateOperationsInput | number
   chatFollowUpDays?: Prisma.IntFieldUpdateOperationsInput | number
   cashDueLimit?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -741,6 +760,7 @@ export type PlatformSettingsCountOrderByAggregateInput = {
   doctorRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
+  labTestsSeeded?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
@@ -785,6 +805,7 @@ export type PlatformSettingsMaxOrderByAggregateInput = {
   doctorRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
+  labTestsSeeded?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
@@ -812,6 +833,7 @@ export type PlatformSettingsMinOrderByAggregateInput = {
   doctorRegistrationFee?: Prisma.SortOrder
   nurseSubscriptionFee?: Prisma.SortOrder
   nurseShiftServicesSeeded?: Prisma.SortOrder
+  labTestsSeeded?: Prisma.SortOrder
   bookingHorizonDays?: Prisma.SortOrder
   chatFollowUpDays?: Prisma.SortOrder
   cashDueLimit?: Prisma.SortOrder
@@ -858,6 +880,7 @@ export type PlatformSettingsSelect<ExtArgs extends runtime.Types.Extensions.Inte
   doctorRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
+  labTestsSeeded?: boolean
   bookingHorizonDays?: boolean
   chatFollowUpDays?: boolean
   cashDueLimit?: boolean
@@ -885,6 +908,7 @@ export type PlatformSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   doctorRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
+  labTestsSeeded?: boolean
   bookingHorizonDays?: boolean
   chatFollowUpDays?: boolean
   cashDueLimit?: boolean
@@ -912,6 +936,7 @@ export type PlatformSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   doctorRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
+  labTestsSeeded?: boolean
   bookingHorizonDays?: boolean
   chatFollowUpDays?: boolean
   cashDueLimit?: boolean
@@ -939,6 +964,7 @@ export type PlatformSettingsSelectScalar = {
   doctorRegistrationFee?: boolean
   nurseSubscriptionFee?: boolean
   nurseShiftServicesSeeded?: boolean
+  labTestsSeeded?: boolean
   bookingHorizonDays?: boolean
   chatFollowUpDays?: boolean
   cashDueLimit?: boolean
@@ -955,7 +981,7 @@ export type PlatformSettingsSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "doctorRegistrationOriginalFee" | "doctorRegistrationFee" | "nurseSubscriptionFee" | "nurseShiftServicesSeeded" | "bookingHorizonDays" | "chatFollowUpDays" | "cashDueLimit" | "receiptLegalName" | "receiptAddress" | "receiptGstin" | "receiptTaxNote" | "splashImageUrl" | "splashFit" | "splashBgColor" | "referralRewardPatient" | "referralRewardProvider" | "referralMonthlyCap" | "updatedAt", ExtArgs["result"]["platformSettings"]>
+export type PlatformSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clinicCommissionPercent" | "videoCommissionPercent" | "homeCommissionPercent" | "nurseCommissionPercent" | "nurseRegistrationFee" | "doctorRegistrationOriginalFee" | "doctorRegistrationFee" | "nurseSubscriptionFee" | "nurseShiftServicesSeeded" | "labTestsSeeded" | "bookingHorizonDays" | "chatFollowUpDays" | "cashDueLimit" | "receiptLegalName" | "receiptAddress" | "receiptGstin" | "receiptTaxNote" | "splashImageUrl" | "splashFit" | "splashBgColor" | "referralRewardPatient" | "referralRewardProvider" | "referralMonthlyCap" | "updatedAt", ExtArgs["result"]["platformSettings"]>
 
 export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlatformSettings"
@@ -971,6 +997,7 @@ export type $PlatformSettingsPayload<ExtArgs extends runtime.Types.Extensions.In
     doctorRegistrationFee: number | null
     nurseSubscriptionFee: number
     nurseShiftServicesSeeded: boolean
+    labTestsSeeded: boolean
     bookingHorizonDays: number
     chatFollowUpDays: number
     cashDueLimit: number
@@ -1418,6 +1445,7 @@ export interface PlatformSettingsFieldRefs {
   readonly doctorRegistrationFee: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly nurseSubscriptionFee: Prisma.FieldRef<"PlatformSettings", 'Float'>
   readonly nurseShiftServicesSeeded: Prisma.FieldRef<"PlatformSettings", 'Boolean'>
+  readonly labTestsSeeded: Prisma.FieldRef<"PlatformSettings", 'Boolean'>
   readonly bookingHorizonDays: Prisma.FieldRef<"PlatformSettings", 'Int'>
   readonly chatFollowUpDays: Prisma.FieldRef<"PlatformSettings", 'Int'>
   readonly cashDueLimit: Prisma.FieldRef<"PlatformSettings", 'Float'>

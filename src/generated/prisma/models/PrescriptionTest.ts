@@ -29,6 +29,7 @@ export type PrescriptionTestMinAggregateOutputType = {
   appointmentId: string | null
   name: string | null
   instructions: string | null
+  labTestId: string | null
 }
 
 export type PrescriptionTestMaxAggregateOutputType = {
@@ -36,6 +37,7 @@ export type PrescriptionTestMaxAggregateOutputType = {
   appointmentId: string | null
   name: string | null
   instructions: string | null
+  labTestId: string | null
 }
 
 export type PrescriptionTestCountAggregateOutputType = {
@@ -43,6 +45,7 @@ export type PrescriptionTestCountAggregateOutputType = {
   appointmentId: number
   name: number
   instructions: number
+  labTestId: number
   _all: number
 }
 
@@ -52,6 +55,7 @@ export type PrescriptionTestMinAggregateInputType = {
   appointmentId?: true
   name?: true
   instructions?: true
+  labTestId?: true
 }
 
 export type PrescriptionTestMaxAggregateInputType = {
@@ -59,6 +63,7 @@ export type PrescriptionTestMaxAggregateInputType = {
   appointmentId?: true
   name?: true
   instructions?: true
+  labTestId?: true
 }
 
 export type PrescriptionTestCountAggregateInputType = {
@@ -66,6 +71,7 @@ export type PrescriptionTestCountAggregateInputType = {
   appointmentId?: true
   name?: true
   instructions?: true
+  labTestId?: true
   _all?: true
 }
 
@@ -146,6 +152,7 @@ export type PrescriptionTestGroupByOutputType = {
   appointmentId: string
   name: string
   instructions: string | null
+  labTestId: string | null
   _count: PrescriptionTestCountAggregateOutputType | null
   _min: PrescriptionTestMinAggregateOutputType | null
   _max: PrescriptionTestMaxAggregateOutputType | null
@@ -174,7 +181,9 @@ export type PrescriptionTestWhereInput = {
   appointmentId?: Prisma.StringFilter<"PrescriptionTest"> | string
   name?: Prisma.StringFilter<"PrescriptionTest"> | string
   instructions?: Prisma.StringNullableFilter<"PrescriptionTest"> | string | null
+  labTestId?: Prisma.StringNullableFilter<"PrescriptionTest"> | string | null
   appointment?: Prisma.XOR<Prisma.AppointmentScalarRelationFilter, Prisma.AppointmentWhereInput>
+  labTest?: Prisma.XOR<Prisma.LabTestNullableScalarRelationFilter, Prisma.LabTestWhereInput> | null
 }
 
 export type PrescriptionTestOrderByWithRelationInput = {
@@ -182,7 +191,9 @@ export type PrescriptionTestOrderByWithRelationInput = {
   appointmentId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   instructions?: Prisma.SortOrderInput | Prisma.SortOrder
+  labTestId?: Prisma.SortOrderInput | Prisma.SortOrder
   appointment?: Prisma.AppointmentOrderByWithRelationInput
+  labTest?: Prisma.LabTestOrderByWithRelationInput
 }
 
 export type PrescriptionTestWhereUniqueInput = Prisma.AtLeast<{
@@ -193,7 +204,9 @@ export type PrescriptionTestWhereUniqueInput = Prisma.AtLeast<{
   appointmentId?: Prisma.StringFilter<"PrescriptionTest"> | string
   name?: Prisma.StringFilter<"PrescriptionTest"> | string
   instructions?: Prisma.StringNullableFilter<"PrescriptionTest"> | string | null
+  labTestId?: Prisma.StringNullableFilter<"PrescriptionTest"> | string | null
   appointment?: Prisma.XOR<Prisma.AppointmentScalarRelationFilter, Prisma.AppointmentWhereInput>
+  labTest?: Prisma.XOR<Prisma.LabTestNullableScalarRelationFilter, Prisma.LabTestWhereInput> | null
 }, "id">
 
 export type PrescriptionTestOrderByWithAggregationInput = {
@@ -201,6 +214,7 @@ export type PrescriptionTestOrderByWithAggregationInput = {
   appointmentId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   instructions?: Prisma.SortOrderInput | Prisma.SortOrder
+  labTestId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PrescriptionTestCountOrderByAggregateInput
   _max?: Prisma.PrescriptionTestMaxOrderByAggregateInput
   _min?: Prisma.PrescriptionTestMinOrderByAggregateInput
@@ -214,6 +228,7 @@ export type PrescriptionTestScalarWhereWithAggregatesInput = {
   appointmentId?: Prisma.StringWithAggregatesFilter<"PrescriptionTest"> | string
   name?: Prisma.StringWithAggregatesFilter<"PrescriptionTest"> | string
   instructions?: Prisma.StringNullableWithAggregatesFilter<"PrescriptionTest"> | string | null
+  labTestId?: Prisma.StringNullableWithAggregatesFilter<"PrescriptionTest"> | string | null
 }
 
 export type PrescriptionTestCreateInput = {
@@ -221,6 +236,7 @@ export type PrescriptionTestCreateInput = {
   name: string
   instructions?: string | null
   appointment: Prisma.AppointmentCreateNestedOneWithoutTestsInput
+  labTest?: Prisma.LabTestCreateNestedOneWithoutPrescriptionTestsInput
 }
 
 export type PrescriptionTestUncheckedCreateInput = {
@@ -228,6 +244,7 @@ export type PrescriptionTestUncheckedCreateInput = {
   appointmentId: string
   name: string
   instructions?: string | null
+  labTestId?: string | null
 }
 
 export type PrescriptionTestUpdateInput = {
@@ -235,6 +252,7 @@ export type PrescriptionTestUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   appointment?: Prisma.AppointmentUpdateOneRequiredWithoutTestsNestedInput
+  labTest?: Prisma.LabTestUpdateOneWithoutPrescriptionTestsNestedInput
 }
 
 export type PrescriptionTestUncheckedUpdateInput = {
@@ -242,6 +260,7 @@ export type PrescriptionTestUncheckedUpdateInput = {
   appointmentId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  labTestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PrescriptionTestCreateManyInput = {
@@ -249,6 +268,7 @@ export type PrescriptionTestCreateManyInput = {
   appointmentId: string
   name: string
   instructions?: string | null
+  labTestId?: string | null
 }
 
 export type PrescriptionTestUpdateManyMutationInput = {
@@ -262,6 +282,7 @@ export type PrescriptionTestUncheckedUpdateManyInput = {
   appointmentId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  labTestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PrescriptionTestListRelationFilter = {
@@ -279,6 +300,7 @@ export type PrescriptionTestCountOrderByAggregateInput = {
   appointmentId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
+  labTestId?: Prisma.SortOrder
 }
 
 export type PrescriptionTestMaxOrderByAggregateInput = {
@@ -286,6 +308,7 @@ export type PrescriptionTestMaxOrderByAggregateInput = {
   appointmentId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
+  labTestId?: Prisma.SortOrder
 }
 
 export type PrescriptionTestMinOrderByAggregateInput = {
@@ -293,6 +316,7 @@ export type PrescriptionTestMinOrderByAggregateInput = {
   appointmentId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
+  labTestId?: Prisma.SortOrder
 }
 
 export type PrescriptionTestCreateNestedManyWithoutAppointmentInput = {
@@ -337,16 +361,60 @@ export type PrescriptionTestUncheckedUpdateManyWithoutAppointmentNestedInput = {
   deleteMany?: Prisma.PrescriptionTestScalarWhereInput | Prisma.PrescriptionTestScalarWhereInput[]
 }
 
+export type PrescriptionTestCreateNestedManyWithoutLabTestInput = {
+  create?: Prisma.XOR<Prisma.PrescriptionTestCreateWithoutLabTestInput, Prisma.PrescriptionTestUncheckedCreateWithoutLabTestInput> | Prisma.PrescriptionTestCreateWithoutLabTestInput[] | Prisma.PrescriptionTestUncheckedCreateWithoutLabTestInput[]
+  connectOrCreate?: Prisma.PrescriptionTestCreateOrConnectWithoutLabTestInput | Prisma.PrescriptionTestCreateOrConnectWithoutLabTestInput[]
+  createMany?: Prisma.PrescriptionTestCreateManyLabTestInputEnvelope
+  connect?: Prisma.PrescriptionTestWhereUniqueInput | Prisma.PrescriptionTestWhereUniqueInput[]
+}
+
+export type PrescriptionTestUncheckedCreateNestedManyWithoutLabTestInput = {
+  create?: Prisma.XOR<Prisma.PrescriptionTestCreateWithoutLabTestInput, Prisma.PrescriptionTestUncheckedCreateWithoutLabTestInput> | Prisma.PrescriptionTestCreateWithoutLabTestInput[] | Prisma.PrescriptionTestUncheckedCreateWithoutLabTestInput[]
+  connectOrCreate?: Prisma.PrescriptionTestCreateOrConnectWithoutLabTestInput | Prisma.PrescriptionTestCreateOrConnectWithoutLabTestInput[]
+  createMany?: Prisma.PrescriptionTestCreateManyLabTestInputEnvelope
+  connect?: Prisma.PrescriptionTestWhereUniqueInput | Prisma.PrescriptionTestWhereUniqueInput[]
+}
+
+export type PrescriptionTestUpdateManyWithoutLabTestNestedInput = {
+  create?: Prisma.XOR<Prisma.PrescriptionTestCreateWithoutLabTestInput, Prisma.PrescriptionTestUncheckedCreateWithoutLabTestInput> | Prisma.PrescriptionTestCreateWithoutLabTestInput[] | Prisma.PrescriptionTestUncheckedCreateWithoutLabTestInput[]
+  connectOrCreate?: Prisma.PrescriptionTestCreateOrConnectWithoutLabTestInput | Prisma.PrescriptionTestCreateOrConnectWithoutLabTestInput[]
+  upsert?: Prisma.PrescriptionTestUpsertWithWhereUniqueWithoutLabTestInput | Prisma.PrescriptionTestUpsertWithWhereUniqueWithoutLabTestInput[]
+  createMany?: Prisma.PrescriptionTestCreateManyLabTestInputEnvelope
+  set?: Prisma.PrescriptionTestWhereUniqueInput | Prisma.PrescriptionTestWhereUniqueInput[]
+  disconnect?: Prisma.PrescriptionTestWhereUniqueInput | Prisma.PrescriptionTestWhereUniqueInput[]
+  delete?: Prisma.PrescriptionTestWhereUniqueInput | Prisma.PrescriptionTestWhereUniqueInput[]
+  connect?: Prisma.PrescriptionTestWhereUniqueInput | Prisma.PrescriptionTestWhereUniqueInput[]
+  update?: Prisma.PrescriptionTestUpdateWithWhereUniqueWithoutLabTestInput | Prisma.PrescriptionTestUpdateWithWhereUniqueWithoutLabTestInput[]
+  updateMany?: Prisma.PrescriptionTestUpdateManyWithWhereWithoutLabTestInput | Prisma.PrescriptionTestUpdateManyWithWhereWithoutLabTestInput[]
+  deleteMany?: Prisma.PrescriptionTestScalarWhereInput | Prisma.PrescriptionTestScalarWhereInput[]
+}
+
+export type PrescriptionTestUncheckedUpdateManyWithoutLabTestNestedInput = {
+  create?: Prisma.XOR<Prisma.PrescriptionTestCreateWithoutLabTestInput, Prisma.PrescriptionTestUncheckedCreateWithoutLabTestInput> | Prisma.PrescriptionTestCreateWithoutLabTestInput[] | Prisma.PrescriptionTestUncheckedCreateWithoutLabTestInput[]
+  connectOrCreate?: Prisma.PrescriptionTestCreateOrConnectWithoutLabTestInput | Prisma.PrescriptionTestCreateOrConnectWithoutLabTestInput[]
+  upsert?: Prisma.PrescriptionTestUpsertWithWhereUniqueWithoutLabTestInput | Prisma.PrescriptionTestUpsertWithWhereUniqueWithoutLabTestInput[]
+  createMany?: Prisma.PrescriptionTestCreateManyLabTestInputEnvelope
+  set?: Prisma.PrescriptionTestWhereUniqueInput | Prisma.PrescriptionTestWhereUniqueInput[]
+  disconnect?: Prisma.PrescriptionTestWhereUniqueInput | Prisma.PrescriptionTestWhereUniqueInput[]
+  delete?: Prisma.PrescriptionTestWhereUniqueInput | Prisma.PrescriptionTestWhereUniqueInput[]
+  connect?: Prisma.PrescriptionTestWhereUniqueInput | Prisma.PrescriptionTestWhereUniqueInput[]
+  update?: Prisma.PrescriptionTestUpdateWithWhereUniqueWithoutLabTestInput | Prisma.PrescriptionTestUpdateWithWhereUniqueWithoutLabTestInput[]
+  updateMany?: Prisma.PrescriptionTestUpdateManyWithWhereWithoutLabTestInput | Prisma.PrescriptionTestUpdateManyWithWhereWithoutLabTestInput[]
+  deleteMany?: Prisma.PrescriptionTestScalarWhereInput | Prisma.PrescriptionTestScalarWhereInput[]
+}
+
 export type PrescriptionTestCreateWithoutAppointmentInput = {
   id?: string
   name: string
   instructions?: string | null
+  labTest?: Prisma.LabTestCreateNestedOneWithoutPrescriptionTestsInput
 }
 
 export type PrescriptionTestUncheckedCreateWithoutAppointmentInput = {
   id?: string
   name: string
   instructions?: string | null
+  labTestId?: string | null
 }
 
 export type PrescriptionTestCreateOrConnectWithoutAppointmentInput = {
@@ -383,28 +451,101 @@ export type PrescriptionTestScalarWhereInput = {
   appointmentId?: Prisma.StringFilter<"PrescriptionTest"> | string
   name?: Prisma.StringFilter<"PrescriptionTest"> | string
   instructions?: Prisma.StringNullableFilter<"PrescriptionTest"> | string | null
+  labTestId?: Prisma.StringNullableFilter<"PrescriptionTest"> | string | null
+}
+
+export type PrescriptionTestCreateWithoutLabTestInput = {
+  id?: string
+  name: string
+  instructions?: string | null
+  appointment: Prisma.AppointmentCreateNestedOneWithoutTestsInput
+}
+
+export type PrescriptionTestUncheckedCreateWithoutLabTestInput = {
+  id?: string
+  appointmentId: string
+  name: string
+  instructions?: string | null
+}
+
+export type PrescriptionTestCreateOrConnectWithoutLabTestInput = {
+  where: Prisma.PrescriptionTestWhereUniqueInput
+  create: Prisma.XOR<Prisma.PrescriptionTestCreateWithoutLabTestInput, Prisma.PrescriptionTestUncheckedCreateWithoutLabTestInput>
+}
+
+export type PrescriptionTestCreateManyLabTestInputEnvelope = {
+  data: Prisma.PrescriptionTestCreateManyLabTestInput | Prisma.PrescriptionTestCreateManyLabTestInput[]
+  skipDuplicates?: boolean
+}
+
+export type PrescriptionTestUpsertWithWhereUniqueWithoutLabTestInput = {
+  where: Prisma.PrescriptionTestWhereUniqueInput
+  update: Prisma.XOR<Prisma.PrescriptionTestUpdateWithoutLabTestInput, Prisma.PrescriptionTestUncheckedUpdateWithoutLabTestInput>
+  create: Prisma.XOR<Prisma.PrescriptionTestCreateWithoutLabTestInput, Prisma.PrescriptionTestUncheckedCreateWithoutLabTestInput>
+}
+
+export type PrescriptionTestUpdateWithWhereUniqueWithoutLabTestInput = {
+  where: Prisma.PrescriptionTestWhereUniqueInput
+  data: Prisma.XOR<Prisma.PrescriptionTestUpdateWithoutLabTestInput, Prisma.PrescriptionTestUncheckedUpdateWithoutLabTestInput>
+}
+
+export type PrescriptionTestUpdateManyWithWhereWithoutLabTestInput = {
+  where: Prisma.PrescriptionTestScalarWhereInput
+  data: Prisma.XOR<Prisma.PrescriptionTestUpdateManyMutationInput, Prisma.PrescriptionTestUncheckedUpdateManyWithoutLabTestInput>
 }
 
 export type PrescriptionTestCreateManyAppointmentInput = {
   id?: string
   name: string
   instructions?: string | null
+  labTestId?: string | null
 }
 
 export type PrescriptionTestUpdateWithoutAppointmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  labTest?: Prisma.LabTestUpdateOneWithoutPrescriptionTestsNestedInput
 }
 
 export type PrescriptionTestUncheckedUpdateWithoutAppointmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  labTestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PrescriptionTestUncheckedUpdateManyWithoutAppointmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  labTestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type PrescriptionTestCreateManyLabTestInput = {
+  id?: string
+  appointmentId: string
+  name: string
+  instructions?: string | null
+}
+
+export type PrescriptionTestUpdateWithoutLabTestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appointment?: Prisma.AppointmentUpdateOneRequiredWithoutTestsNestedInput
+}
+
+export type PrescriptionTestUncheckedUpdateWithoutLabTestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  appointmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type PrescriptionTestUncheckedUpdateManyWithoutLabTestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  appointmentId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -416,7 +557,9 @@ export type PrescriptionTestSelect<ExtArgs extends runtime.Types.Extensions.Inte
   appointmentId?: boolean
   name?: boolean
   instructions?: boolean
+  labTestId?: boolean
   appointment?: boolean | Prisma.AppointmentDefaultArgs<ExtArgs>
+  labTest?: boolean | Prisma.PrescriptionTest$labTestArgs<ExtArgs>
 }, ExtArgs["result"]["prescriptionTest"]>
 
 export type PrescriptionTestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -424,7 +567,9 @@ export type PrescriptionTestSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   appointmentId?: boolean
   name?: boolean
   instructions?: boolean
+  labTestId?: boolean
   appointment?: boolean | Prisma.AppointmentDefaultArgs<ExtArgs>
+  labTest?: boolean | Prisma.PrescriptionTest$labTestArgs<ExtArgs>
 }, ExtArgs["result"]["prescriptionTest"]>
 
 export type PrescriptionTestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -432,7 +577,9 @@ export type PrescriptionTestSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   appointmentId?: boolean
   name?: boolean
   instructions?: boolean
+  labTestId?: boolean
   appointment?: boolean | Prisma.AppointmentDefaultArgs<ExtArgs>
+  labTest?: boolean | Prisma.PrescriptionTest$labTestArgs<ExtArgs>
 }, ExtArgs["result"]["prescriptionTest"]>
 
 export type PrescriptionTestSelectScalar = {
@@ -440,29 +587,35 @@ export type PrescriptionTestSelectScalar = {
   appointmentId?: boolean
   name?: boolean
   instructions?: boolean
+  labTestId?: boolean
 }
 
-export type PrescriptionTestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appointmentId" | "name" | "instructions", ExtArgs["result"]["prescriptionTest"]>
+export type PrescriptionTestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appointmentId" | "name" | "instructions" | "labTestId", ExtArgs["result"]["prescriptionTest"]>
 export type PrescriptionTestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   appointment?: boolean | Prisma.AppointmentDefaultArgs<ExtArgs>
+  labTest?: boolean | Prisma.PrescriptionTest$labTestArgs<ExtArgs>
 }
 export type PrescriptionTestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   appointment?: boolean | Prisma.AppointmentDefaultArgs<ExtArgs>
+  labTest?: boolean | Prisma.PrescriptionTest$labTestArgs<ExtArgs>
 }
 export type PrescriptionTestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   appointment?: boolean | Prisma.AppointmentDefaultArgs<ExtArgs>
+  labTest?: boolean | Prisma.PrescriptionTest$labTestArgs<ExtArgs>
 }
 
 export type $PrescriptionTestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PrescriptionTest"
   objects: {
     appointment: Prisma.$AppointmentPayload<ExtArgs>
+    labTest: Prisma.$LabTestPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     appointmentId: string
     name: string
     instructions: string | null
+    labTestId: string | null
   }, ExtArgs["result"]["prescriptionTest"]>
   composites: {}
 }
@@ -858,6 +1011,7 @@ readonly fields: PrescriptionTestFieldRefs;
 export interface Prisma__PrescriptionTestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   appointment<T extends Prisma.AppointmentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppointmentDefaultArgs<ExtArgs>>): Prisma.Prisma__AppointmentClient<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  labTest<T extends Prisma.PrescriptionTest$labTestArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PrescriptionTest$labTestArgs<ExtArgs>>): Prisma.Prisma__LabTestClient<runtime.Types.Result.GetResult<Prisma.$LabTestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -891,6 +1045,7 @@ export interface PrescriptionTestFieldRefs {
   readonly appointmentId: Prisma.FieldRef<"PrescriptionTest", 'String'>
   readonly name: Prisma.FieldRef<"PrescriptionTest", 'String'>
   readonly instructions: Prisma.FieldRef<"PrescriptionTest", 'String'>
+  readonly labTestId: Prisma.FieldRef<"PrescriptionTest", 'String'>
 }
     
 
@@ -1289,6 +1444,25 @@ export type PrescriptionTestDeleteManyArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many PrescriptionTests to delete.
    */
   limit?: number
+}
+
+/**
+ * PrescriptionTest.labTest
+ */
+export type PrescriptionTest$labTestArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LabTest
+   */
+  select?: Prisma.LabTestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LabTest
+   */
+  omit?: Prisma.LabTestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LabTestInclude<ExtArgs> | null
+  where?: Prisma.LabTestWhereInput
 }
 
 /**
