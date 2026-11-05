@@ -74,6 +74,17 @@ git checkout android/app/src/main/AndroidManifest.xml   # the tool only reformat
 The in-app splash (shown after the plain native one) is the image uploaded in
 Admin → Settings, stored outside the repo; re-upload it when the logo changes.
 
+### Festive splash (no app update needed)
+
+`png/festive/diwali-splash-2400.png` is the Diwali edition of that splash:
+the same 2400×1664 transparent stacked logo with a festive mark (glow +
+rangoli ring, a diya in the heart, a diya on each side, "शुभ दीपावली"). Upload
+it in Admin → Settings → splash with Fit **contain** and the usual background
+`#F8FAFC`; after the festival re-upload `png/logo/logo-stacked-2400.png`.
+`diwali-splash-preview.png` shows it on the background. Regenerate with
+`npx tsx assets/brand/source/diwali_splash.ts` (macOS — the Devanagari text
+uses Kohinoor Devanagari).
+
 ## Regenerating
 
 `source/build_logo.py` draws every SVG; `source/export.ts` renders the PNGs.

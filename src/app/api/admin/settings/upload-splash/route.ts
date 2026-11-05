@@ -19,7 +19,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
 
-  const form = await req.formData();
+  const form = await req.formData().catch(() => null);
+  if (!form) return NextResponse.json({ error: "Couldn't read the upload. Please pick the image again." }, { status: 400 });
   const file = form.get("file");
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -38,7 +39,13 @@ export async function POST(req: Request) {
   // The bytes decide what this is, not the client-sent MIME type (src/lib/fileSniff.ts).
   const sniffed = verifyUpload(buffer, file.type, Object.keys(ALLOWED_TYPES));
   if ("error" in sniffed) return NextResponse.json({ error: sniffed.error }, { status: 400 });
-  const url = await uploadToS3(`app-splash/${filename}`, buffer, sniffed.type);
-
-  return NextResponse.json({ url });
+  // A storage failure (missing/expired AWS credentials, bucket permissions)
+  // used to surface as a bare 500 — log the real cause and say what failed.
+  try {
+    const url = await uploadToS3(`app-splash/${filename}`, buffer, sniffed.type);
+    return NextResponse.json({ url });
+  } catch (err) {
+    console.error("Splash image upload to S3 failed:", err);
+    return NextResponse.json({ error: "Couldn't save the image to storage (S3). Check the server's AWS settings and try again." }, { status: 502 });
+  }
 }

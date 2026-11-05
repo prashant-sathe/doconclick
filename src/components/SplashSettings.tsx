@@ -121,8 +121,13 @@ export default function SplashSettings() {
                   disabled={uploading}
                   className="btn-secondary inline-flex items-center gap-2 disabled:opacity-60"
                 >
-                  {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
-                  {imageUrl ? "Replace image" : "Upload image"}
+                  {/* Icon swaps inside a fixed wrapper and the label is its own element: React
+                      never inserts next to a bare text node, which browser translation or an
+                      extension may have replaced (that crashed the page mid-upload). */}
+                  <span className="inline-flex w-4 h-4" aria-hidden>
+                    {uploading ? <Loader2 key="busy" className="w-4 h-4 animate-spin" /> : <ImagePlus key="idle" className="w-4 h-4" />}
+                  </span>
+                  <span>{imageUrl ? "Replace image" : "Upload image"}</span>
                 </button>
                 {imageUrl && (
                   <button
@@ -130,7 +135,7 @@ export default function SplashSettings() {
                     onClick={() => setImageUrl(null)}
                     className="inline-flex items-center gap-2 text-sm font-semibold px-3 py-2 rounded-lg text-rose-600 hover:bg-rose-50"
                   >
-                    <Trash2 className="w-4 h-4" /> Remove
+                    <Trash2 className="w-4 h-4" /> <span>Remove</span>
                   </button>
                 )}
               </div>
@@ -183,7 +188,7 @@ export default function SplashSettings() {
 
             {error && (
               <p className="text-xs text-rose-600 flex items-center gap-1.5">
-                <AlertCircle className="w-3.5 h-3.5" /> {error}
+                <AlertCircle className="w-3.5 h-3.5" /> <span>{error}</span>
               </p>
             )}
 
@@ -193,8 +198,12 @@ export default function SplashSettings() {
               disabled={saving || uploading}
               className="btn-primary inline-flex items-center gap-2 disabled:opacity-60"
             >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <Check className="w-4 h-4" /> : null}
-              {saved ? "Saved" : "Save splash settings"}
+              {(saving || saved) && (
+                <span className="inline-flex w-4 h-4" aria-hidden>
+                  {saving ? <Loader2 key="busy" className="w-4 h-4 animate-spin" /> : <Check key="done" className="w-4 h-4" />}
+                </span>
+              )}
+              <span>{saved ? "Saved" : "Save splash settings"}</span>
             </button>
           </div>
         </div>
