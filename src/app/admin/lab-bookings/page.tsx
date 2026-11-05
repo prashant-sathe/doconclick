@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TestTubes, Loader2, AlertCircle, Search, Phone, Wallet, CreditCard, MapPin, StickyNote, XCircle, Upload, FileText, Trash2, Share2, CalendarClock } from "lucide-react";
 import { mapsUrl, addressWithPin, collectionDayLabel, labShareText, slotLabel, whatsAppShareUrl } from "@/lib/labShare";
 import { cn } from "@/lib/utils";
@@ -279,15 +279,22 @@ export default function AdminLabBookings() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Only the latest request may fill the list — a slower older one (an earlier
+  // filter, or the reload after a status change) must not overwrite it.
+  const seq = useRef(0);
   const load = useCallback(async () => {
+    const mine = ++seq.current;
     setLoading(true);
     const params = new URLSearchParams({ status: filter });
     if (query.trim()) params.set("q", query.trim());
-    const res = await fetch(`/api/admin/lab-bookings?${params}`);
+    const res = await fetch(`/api/admin/lab-bookings?${params}`).catch(() => null);
+    if (mine !== seq.current) return;
     setLoading(false);
-    if (!res.ok) { setError((await res.json().catch(() => ({}))).error ?? "Could not load lab bookings."); return; }
+    if (!res || !res.ok) { setError((await res?.json().catch(() => ({})))?.error ?? "Could not load lab bookings."); return; }
+    const json = await res.json();
+    if (mine !== seq.current) return;
     setError("");
-    setData(await res.json());
+    setData(json);
   }, [filter, query]);
 
   useEffect(() => {
@@ -295,10 +302,16 @@ export default function AdminLabBookings() {
     return () => clearTimeout(t);
   }, [load, query]);
 
+  // A card's save can finish after the admin switched filters — always go by
+  // the filter (and loader) that are current now, not the ones it started with.
+  const latest = useRef({ filter, load });
+  useEffect(() => { latest.current = { filter, load }; }, [filter, load]);
   const replace = (b: Booking) => {
-    // Changing status moves the card out of a filtered list — reload to keep counts right.
-    if (filter !== "ALL" && b.status !== filter) { void load(); return; }
+    const { filter: now, load: reload } = latest.current;
+    // A status change moves the card out of a filtered list — reload to keep counts right.
+    if (now !== "ALL" && b.status !== now) { void reload(); return; }
     setData((d) => d && { ...d, bookings: d.bookings.map((x) => (x.id === b.id ? b : x)) });
+    void reload();
   };
 
   const total = data ? Object.values(data.counts).reduce((s, n) => s + n, 0) : 0;

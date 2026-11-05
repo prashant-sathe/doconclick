@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FlaskConical, MapPin, Wallet, CreditCard, Info, XCircle, FileText, Download, Eye, Loader2, CheckCircle2, AlertCircle, CalendarClock } from "lucide-react";
@@ -57,10 +57,14 @@ async function openCheckout(paymentSessionId: string) {
 /** Back from Cashfree: the webhook usually beats us, else verify asks the gateway. */
 function useReturnFromCheckout(onDone: () => void) {
   const params = useSearchParams();
-  const orderId = params.get("labOrder");
-  const bookingId = params.get("booking");
+  // Read once: clearing ?labOrder from the URL below changes useSearchParams,
+  // which must not cancel the confirmation that's already running.
+  const [ret] = useState(() => ({ orderId: params.get("labOrder"), bookingId: params.get("booking") }));
   const [state, setState] = useState<"checking" | "paid" | "credited" | "pending" | null>(null);
+  const onDoneRef = useRef(onDone);
+  useEffect(() => { onDoneRef.current = onDone; }, [onDone]);
   useEffect(() => {
+    const { orderId, bookingId } = ret;
     if (!orderId || !bookingId) return;
     window.history.replaceState(null, "", window.location.pathname);
     let cancelled = false;
@@ -73,17 +77,15 @@ function useReturnFromCheckout(onDone: () => void) {
         if (cancelled) return;
         if (res.ok && (res.data.status === "PAID" || res.data.status === "CREDITED")) {
           setState(res.data.status === "PAID" ? "paid" : "credited");
-          onDone();
+          onDoneRef.current();
           return;
         }
         await new Promise((r) => setTimeout(r, 3000));
       }
-      if (!cancelled) { setState("pending"); onDone(); }
+      if (!cancelled) { setState("pending"); onDoneRef.current(); }
     })();
     return () => { cancelled = true; };
-    // Once per return from checkout.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId, bookingId]);
+  }, [ret]);
   return state;
 }
 

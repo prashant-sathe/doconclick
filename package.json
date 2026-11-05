@@ -43,6 +43,7 @@
     "test:symptom-photos": "tsx tests/symptom-photos.ts",
     "test:lab-tests": "tsx tests/lab-tests.ts",
     "test:lab-payments": "tsx tests/lab-payments.ts",
+    "test:lab-e2e": "tsx tests/lab-e2e.ts",
     "test:assistant": "tsx tests/assistant-safety.ts",
     "test:care-access": "tsx tests/care-access.ts",
     "test:prescriptions": "tsx tests/prescriptions.ts",
