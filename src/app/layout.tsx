@@ -10,6 +10,8 @@ import { ToastProvider } from "@/components/Toast";
 import { NativeBootstrap } from "@/components/NativeBootstrap";
 import { SplashOverlay } from "@/components/SplashOverlay";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import FestiveDecor from "@/components/FestiveDecor";
+import { activeFestival } from "@/lib/festive";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -80,6 +82,8 @@ export default async function RootLayout({
   // every request anyway.
   const locale = await getLocale();
   const messages = await getMessages();
+  // Festive decoration window (src/lib/festive.ts) — decided here, per request.
+  const festival = activeFestival();
   return (
     // suppressHydrationWarning: the Capacitor native shell injects
     // --safe-area-inset-* as an inline style on <html> before React
@@ -101,6 +105,7 @@ export default async function RootLayout({
             <AuthProvider>
               <NativeBootstrap />
               <OfflineBanner />
+              {festival && <FestiveDecor festival={festival} />}
               {children}
             </AuthProvider>
           </ToastProvider>
