@@ -110,8 +110,8 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
                 type="button"
                 onClick={() => onSelect(d.id)}
                 className={cn(
-                  "flex-1 min-w-0 text-left px-3 py-2.5 rounded-xl border text-sm font-semibold transition-all",
-                  selectedId === d.id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
+                  "flex-1 min-w-0 text-left px-3 py-2.5 rounded-2xl border text-sm font-semibold transition-all",
+                  selectedId === d.id ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                 )}
               >
                 {d.name}
@@ -120,22 +120,22 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
               {confirmDeleteId === d.id ? (
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button type="button" onClick={() => deleteDependent(d.id)} disabled={deletingId === d.id}
-                    className="tap-44-y text-xs font-semibold text-red-600 px-2 py-2 rounded-lg hover:bg-red-50">
+                    className="tap-44-y text-xs font-semibold text-red-600 px-2 py-2 rounded-full hover:bg-red-50">
                     {deletingId === d.id ? "…" : t("delete")}
                   </button>
                   <button type="button" onClick={() => setConfirmDeleteId(null)}
-                    className="tap-44-y text-xs font-semibold text-slate-400 px-2 py-2 rounded-lg hover:bg-slate-100">
+                    className="tap-44-y text-xs font-semibold text-slate-400 px-2 py-2 rounded-full hover:bg-slate-100">
                     {tc("cancel")}
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button type="button" onClick={() => startEdit(d)} aria-label={t("editName", { name: d.name })}
-                    className="p-2.5 rounded-lg text-slate-300 hover:text-blue-500 hover:bg-blue-50 transition-colors">
+                    className="p-2.5 rounded-full text-slate-300 hover:text-blue-500 hover:bg-blue-50 transition-colors">
                     <Pencil className="w-4 h-4" />
                   </button>
                   <button type="button" onClick={() => setConfirmDeleteId(d.id)} aria-label={t("deleteName", { name: d.name })}
-                    className="p-2.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors">
+                    className="p-2.5 rounded-full text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -149,7 +149,7 @@ export default function DependentPicker({ relation, selectedId, onSelect }: {
       )}
 
       {showAddForm && (
-        <div className="border border-slate-200 rounded-xl p-4 space-y-3 bg-slate-50/50">
+        <div className="border border-slate-200 rounded-2xl p-4 space-y-3 bg-slate-50/50">
           <DependentFields form={form} onChange={setForm} namePlaceholder={t("namePlaceholder", { relation: relationLabel })} />
           {error && <p className="text-xs text-red-600">{error}</p>}
           <div className="flex gap-2">

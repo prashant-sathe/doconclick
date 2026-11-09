@@ -106,14 +106,14 @@ export default function AdminNurses() {
         <p className="text-slate-500 text-sm mt-1">Review registrations, documents and services. Only approved nurses can be booked.</p>
       </div>
       {notice && !open && (
-        <div className="mb-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">{notice}</div>
+        <div className="mb-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-2.5">{notice}</div>
       )}
 
       <div className="flex flex-wrap items-center gap-2 mb-4">
         {FILTERS.map((f) => {
           const count = f === "ALL" ? nurses?.length ?? 0 : (nurses ?? []).filter((n) => n.nurseProfile?.status === f).length;
           return (
-            <button key={f} onClick={() => setFilter(f)} className={cn("px-3 py-1.5 rounded-full text-xs font-semibold border", filter === f ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-600 border-slate-200")}>
+            <button key={f} onClick={() => setFilter(f)} className={cn("min-h-10 px-4 py-1.5 rounded-full text-xs font-semibold border", filter === f ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200")}>
               {f === "ALL" ? "All" : f.charAt(0) + f.slice(1).toLowerCase()} ({count})
             </button>
           );
@@ -129,9 +129,9 @@ export default function AdminNurses() {
       {loading ? (
         <Loader2 className="w-6 h-6 animate-spin text-slate-300" />
       ) : !nurses ? null : list.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center text-sm text-slate-400">No nurses here yet.</div>
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-10 text-center text-sm text-slate-400">No nurses here yet.</div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-50">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm divide-y divide-slate-50">
           {list.map((n) => {
             const p = n.nurseProfile;
             const check = p ? nurseChecklist({ ...p, serviceCount: p.services.length }) : null;
@@ -155,7 +155,7 @@ export default function AdminNurses() {
       {open && op && (
         <>
           <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setOpenId(null)} />
-          <div className="fixed right-0 top-0 h-full w-full max-w-xl bg-white shadow-2xl z-50 overflow-y-auto">
+          <div className="fixed right-0 top-0 h-full w-full max-w-xl bg-white sm:rounded-l-3xl shadow-2xl z-50 overflow-y-auto">
             <div className="px-6 py-5 border-b border-slate-100 flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-xl font-extrabold text-slate-900">{open.name}</h2>
@@ -165,8 +165,8 @@ export default function AdminNurses() {
             </div>
 
             <div className="p-6 space-y-6">
-              {impact.error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4 flex-shrink-0" />{impact.error}</div>}
-              {notice && <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">{notice}</div>}
+              {impact.error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4 flex-shrink-0" />{impact.error}</div>}
+              {notice && <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-2.5">{notice}</div>}
               <div className="flex flex-wrap gap-2">
                 {op.status !== "APPROVED" && (
                   <button
@@ -249,9 +249,9 @@ export default function AdminNurses() {
                   {DOCS.map((d) => {
                     const url = op[d.key] as string | null;
                     return url ? (
-                      <a key={d.key} href={url} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-100 px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 flex items-center gap-1.5"><FileText className="w-4 h-4" />{d.label}</a>
+                      <a key={d.key} href={url} target="_blank" rel="noopener noreferrer" className="rounded-2xl border border-slate-100 px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 flex items-center gap-1.5"><FileText className="w-4 h-4" />{d.label}</a>
                     ) : (
-                      <span key={d.key} className="rounded-xl border border-dashed border-slate-200 px-3 py-2 text-sm text-slate-400">{d.label} — missing</span>
+                      <span key={d.key} className="min-h-11 inline-flex items-center rounded-full border border-dashed border-slate-200 px-4 py-2 text-sm text-slate-400">{d.label} — missing</span>
                     );
                   })}
                 </div>
@@ -260,7 +260,7 @@ export default function AdminNurses() {
               <section>
                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Services</h3>
                 {op.services.length === 0 ? <p className="text-sm text-slate-400">No services selected.</p> : (
-                  <ul className="text-sm divide-y divide-slate-50 border border-slate-100 rounded-xl">
+                  <ul className="text-sm divide-y divide-slate-50 border border-slate-100 rounded-2xl">
                     {op.services.map((s) => (
                       <li key={s.service.name} className="px-3 py-2 flex justify-between"><span>{s.service.name}</span><strong>₹{s.price}</strong></li>
                     ))}

@@ -56,7 +56,7 @@ export default function PatientVitalsPage() {
           <ArrowLeft className="w-4 h-4" /> {t("back")}
         </Link>
         <div className="flex items-center gap-3 mb-4">
-          <span className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center"><Activity className="w-5 h-5" /></span>
+          <span className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center"><Activity className="w-5 h-5" /></span>
           <div>
             <h1 className="text-xl font-extrabold text-slate-900">{t("title")}</h1>
             <p className="text-sm text-slate-500">{t("subtitle")}</p>
@@ -66,7 +66,7 @@ export default function PatientVitalsPage() {
           <div className="flex flex-wrap gap-2 mb-4">
             {people.map((p) => (
               <button key={p.id ?? "me"} onClick={() => setWho(p.id)}
-                className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border", who === p.id ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200")}>
+                className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border", who === p.id ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200")}>
                 {p.id == null ? t("me") : `${p.name} (${relationLabel(p.relation ?? "")})`}
               </button>
             ))}

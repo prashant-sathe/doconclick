@@ -116,7 +116,7 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
 
   return (
     <div>
-      <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 mb-2">
+      <div className="relative w-full h-32 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 mb-2">
         {url ? (
           <Image src={url} alt={t("photoAlt")} fill sizes="100vw" className="object-cover" />
         ) : (
@@ -127,7 +127,7 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
         )}
       </div>
       <div className="flex items-center gap-3">
-        <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer flex-shrink-0">
+        <label className="btn-secondary min-h-10 px-3.5 text-xs cursor-pointer flex-shrink-0">
           {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
           {url ? t("replacePhoto") : t("uploadPhoto")}
           <input type="file" accept=".jpg,.jpeg,.png" className="hidden"
@@ -135,7 +135,7 @@ function ClinicPhotoUpload({ url, onUploaded }: { url: string | null; onUploaded
         </label>
         {url && (
           <button type="button" onClick={remove} disabled={busy}
-            className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60 flex-shrink-0" title={t("remove")}>
+            className="tap-44 p-2 rounded-full text-red-500 hover:bg-red-50 disabled:opacity-60 flex-shrink-0" title={t("remove")}>
             <Trash2 className="w-3.5 h-3.5" />
           </button>
         )}
@@ -178,7 +178,7 @@ function AffectedBookingList({ bookings, showDate = false }: { bookings: Affecte
     <>
       <ul className="mt-3 max-h-48 overflow-y-auto space-y-1.5">
         {bookings.map((b) => (
-          <li key={b.id} className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
+          <li key={b.id} className="flex items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-2 text-xs">
             <span className="font-semibold text-slate-700 truncate">{b.patientName}</span>
             <span className="text-slate-500 flex-shrink-0">
               {new Date(b.scheduledAt).toLocaleString(locale, {
@@ -292,13 +292,13 @@ function ClinicLeaveManager({ clinicId }: { clinicId: string }) {
           {leaves.length > 0 && (
             <ul className="space-y-1.5 mb-3">
               {leaves.map((l) => (
-                <li key={l.id} className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-sm">
+                <li key={l.id} className="flex items-center justify-between gap-2 rounded-2xl border border-slate-200 px-3.5 py-2 text-sm">
                   <span className="text-slate-700 font-semibold">
                     {formatLeaveDate(l.date, locale)}
                     {l.reason && <span className="text-slate-400 font-normal"> — {l.reason}</span>}
                   </span>
                   <button type="button" onClick={() => removeLeave(l.id)} disabled={removingId === l.id} aria-label={t("removeDate")}
-                    className="text-red-400 hover:text-red-600 p-1 rounded-lg hover:bg-red-50 flex-shrink-0 disabled:opacity-60">
+                    className="tap-44 text-red-400 hover:text-red-600 p-1.5 rounded-full hover:bg-red-50 flex-shrink-0 disabled:opacity-60">
                     {removingId === l.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                   </button>
                 </li>
@@ -390,7 +390,7 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
   const canSave = !missingAddress && !missingLocation && !missingSlot;
 
   return (
-    <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+    <section className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
           <span className="w-7 h-7 rounded-full bg-teal-50 text-teal-600 text-xs font-extrabold flex items-center justify-center flex-shrink-0">
@@ -403,7 +403,7 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
             <span className="badge badge-warning text-[10px] flex-shrink-0">{t("incomplete")}</span>
           )}
         </div>
-        <button type="button" onClick={onDelete} title={t("deleteClinicTitle")} className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0">
+        <button type="button" onClick={onDelete} title={t("deleteClinicTitle")} className="tap-44 w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0">
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
@@ -457,31 +457,31 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
         )}
         <div className="space-y-3 mt-2">
           {clinic.slotGroups.map((group, groupIdx) => (
-            <div key={groupIdx} className="rounded-xl border border-slate-200 p-3 space-y-2.5">
+            <div key={groupIdx} className="rounded-2xl border border-slate-200 p-3 space-y-2.5">
               <div className="flex flex-wrap gap-1.5">
                 {DAYS.map((d) => (
                   <button key={d} type="button" onClick={() => toggleDay(groupIdx, d)}
-                    className={cn("px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-all",
-                      group.days.includes(d) ? "bg-teal-600 text-white border-teal-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                    className={cn("tap-44-y min-w-11 min-h-9 px-3 py-1.5 rounded-full text-xs font-bold border transition-all",
+                      group.days.includes(d) ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                     )}>
                     {tDays(d)}
                   </button>
                 ))}
               </div>
               <div className="flex items-center gap-3">
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <label className="input-label">{t("from")}</label>
-                  <input type="time" className="input-field" value={group.fromTime}
+                  <input type="time" className="input-field min-w-0 px-3" value={group.fromTime}
                     onChange={(e) => updateGroup(groupIdx, { fromTime: e.target.value })} />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <label className="input-label">{t("to")}</label>
-                  <input type="time" className="input-field" value={group.toTime}
+                  <input type="time" className="input-field min-w-0 px-3" value={group.toTime}
                     onChange={(e) => updateGroup(groupIdx, { toTime: e.target.value })} />
                 </div>
                 {clinic.slotGroups.length > 1 && (
                   <button type="button" onClick={() => removeGroup(groupIdx)} aria-label={t("removeRange")}
-                    className="text-red-400 hover:text-red-600 p-1.5 mt-4 rounded-lg hover:bg-red-50 flex-shrink-0">
+                    className="tap-44 text-red-400 hover:text-red-600 p-1.5 mt-4 rounded-full hover:bg-red-50 flex-shrink-0">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 )}
@@ -489,7 +489,7 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
             </div>
           ))}
         </div>
-        <button type="button" onClick={addGroup} className="btn-secondary mt-2.5 py-1.5 px-3 text-xs gap-1">
+        <button type="button" onClick={addGroup} className="btn-secondary mt-2.5 min-h-10 px-3.5 text-xs gap-1">
           <Plus className="w-3.5 h-3.5" /> {t("addRange")}
         </button>
         <p className="text-[11px] text-slate-400 mt-1.5">
@@ -499,7 +499,7 @@ function ClinicCard({ clinic, index, onChange, onSave, onDelete }: {
 
       {clinic.id && <ClinicLeaveManager clinicId={clinic.id} />}
 
-      {clinic.error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">{clinic.error}</p>}
+      {clinic.error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5">{clinic.error}</p>}
 
       <button type="button" disabled={!canSave || clinic.saving} onClick={onSave}
         className="btn-primary w-full justify-center py-2.5 text-sm">
@@ -657,7 +657,7 @@ export default function DoctorClinicsPage() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
+          <div className="w-14 h-14 rounded-full bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <Building2 className="w-7 h-7 text-white" />
           </div>
           <div className="min-w-0">
@@ -669,7 +669,7 @@ export default function DoctorClinicsPage() {
         </div>
 
         {pageNotice && (
-          <p className="mb-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">{pageNotice}</p>
+          <p className="mb-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-2.5">{pageNotice}</p>
         )}
 
         <div className="space-y-6">
@@ -688,7 +688,7 @@ export default function DoctorClinicsPage() {
         <button
           type="button"
           onClick={addClinic}
-          className="w-full flex items-center justify-center gap-1.5 mt-6 py-3.5 rounded-2xl border-2 border-dashed border-slate-200 text-slate-500 text-sm font-semibold hover:border-teal-300 hover:text-teal-600 hover:bg-teal-50/50 transition-colors"
+          className="w-full flex items-center justify-center gap-1.5 mt-6 py-3.5 rounded-3xl border-2 border-dashed border-slate-200 text-slate-500 text-sm font-semibold hover:border-teal-300 hover:text-teal-600 hover:bg-teal-50/50 transition-colors"
         >
           <Plus className="w-4 h-4" /> {t("addClinic")}
         </button>

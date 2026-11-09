@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, IndianRupee, Building2, UserCircle, Sparkles, UserPlus } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { computeDoctorCompleteness } from "@/lib/doctorProfileCompleteness";
 import { useAuth } from "@/components/AuthProvider";
 import { useTranslations } from "next-intl";
+import { FloatingTabBar, tabItemClass } from "@/components/FloatingTabBar";
 
 const TABS = [
   { href: "/doctor/dashboard", label: "dashboard", icon: LayoutDashboard },
@@ -46,19 +46,15 @@ export default function DoctorMobileNav() {
   }, [user?.role]);
 
   return (
-    <nav
-      className="safe-bottom lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-xl border-t border-slate-200 flex items-stretch"
-    >
+    <FloatingTabBar>
       {tabs.map(({ href, label, icon: Icon }) => {
         const active = pathname === href;
         return (
           <Link
             key={href}
             href={href}
-            className={cn(
-              "flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 py-2.5 px-0.5 text-[11px] font-semibold whitespace-nowrap relative",
-              active ? "text-teal-600" : "text-slate-400"
-            )}
+            aria-current={active ? "page" : undefined}
+            className={tabItemClass(active)}
           >
             <span className="relative">
               {href === "/doctor/support" ? (
@@ -85,6 +81,6 @@ export default function DoctorMobileNav() {
           </Link>
         );
       })}
-    </nav>
+    </FloatingTabBar>
   );
 }

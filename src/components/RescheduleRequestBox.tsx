@@ -40,7 +40,7 @@ export default function RescheduleRequestBox({ appointmentId, requestedAt, onDon
   };
 
   return (
-    <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+    <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2.5">
       <p className="text-xs font-semibold text-amber-800 flex items-center gap-1.5">
         <CalendarClock className="w-3.5 h-3.5 flex-shrink-0" />
         {t("asked", { when: new Date(requestedAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) })}

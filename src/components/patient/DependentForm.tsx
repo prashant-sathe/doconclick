@@ -136,7 +136,7 @@ export function DependentFields({ form, onChange, namePlaceholder, showLabels = 
           {CHRONIC_OPTIONS.map((o) => (
             <button key={o} type="button" onClick={() => toggleChronic(o)} aria-pressed={form.chronicDiseases.includes(o)}
               className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
-                form.chronicDiseases.includes(o) ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                form.chronicDiseases.includes(o) ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
               )}>
               {chronicLabel(o)}
             </button>

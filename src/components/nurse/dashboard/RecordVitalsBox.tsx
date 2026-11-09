@@ -66,7 +66,7 @@ export default function RecordVitalsBox({ visit, onSaved }: { visit: Visit; onSa
   );
 
   return (
-    <div className="rounded-xl border border-slate-200 p-3 mb-2">
+    <div className="rounded-2xl border border-slate-200 p-3 mb-2">
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5"><Activity className="w-4 h-4 text-rose-500" />{t("title")}</p>
         {!open && <button type="button" onClick={() => { setOpen(true); setResult(null); }} className="text-xs font-semibold text-blue-600">{t("record")}</button>}
@@ -81,7 +81,7 @@ export default function RecordVitalsBox({ visit, onSaved }: { visit: Visit; onSa
         </p>
       ))}
       {result?.level === "CRITICAL" && (
-        <div className="mt-2 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-800">
+        <div className="mt-2 rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-800">
           <p className="font-bold flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" />{t("criticalTitle")}</p>
           {result.alerts.filter((a) => a.level === "CRITICAL").map((a, i) => <p key={i}>• {a.message}</p>)}
           <p className="mt-1">{t.rich("criticalAdvice", { b: (c) => <strong>{c}</strong> })}</p>
@@ -89,7 +89,7 @@ export default function RecordVitalsBox({ visit, onSaved }: { visit: Visit; onSa
         </div>
       )}
       {result?.level === "WARNING" && (
-        <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-900">
+        <div className="mt-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-900">
           <p className="font-semibold">{t("warningTitle")}</p>
           {result.alerts.map((a, i) => <p key={i}>• {a.message}</p>)}
           <p className="mt-0.5">{t("warningNote")}</p>
@@ -109,7 +109,7 @@ export default function RecordVitalsBox({ visit, onSaved }: { visit: Visit; onSa
             <div className="flex gap-1.5">
               {SUGAR_TYPES.map((st) => (
                 <button key={st.id} type="button" onClick={() => set("sugarType", st.id)}
-                  className={cn("flex-1 py-1.5 rounded-lg border text-[11px] font-semibold", f.sugarType === st.id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                  className={cn("flex-1 min-h-9 py-1.5 rounded-full border text-[11px] font-semibold", f.sugarType === st.id ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600")}>
                   {t(`sugarType.${st.id}`)}
                 </button>
               ))}

@@ -53,7 +53,7 @@ export default function VoiceModeOverlay({
     >
       <div className="flex items-center justify-between px-4 sm:px-7 py-3">
         <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
-          <span className="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center"><Sparkles className="w-4 h-4 text-white" /></span>
+          <span className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center"><Sparkles className="w-4 h-4 text-white" /></span>
           {t("voiceMode")}
         </div>
         <button type="button" onClick={onEnd} aria-label={t("voiceModeEnd")} className="tap-44 w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100">

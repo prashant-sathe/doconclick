@@ -169,7 +169,7 @@ function ReviewModal({ appointmentId, onClose, onSubmitted }: { appointmentId: s
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
+      <div className="bg-white rounded-3xl shadow-2xl p-6 max-w-sm w-full">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-extrabold text-slate-900">{t("title")}</h3>
           <button aria-label={t("close")} onClick={onClose} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
@@ -268,11 +268,11 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+    <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5">
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex items-start gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-            <Icon className="w-5 h-5 text-blue-600" />
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+            <Icon className="w-5 h-5 text-emerald-600" />
           </div>
           <div className="min-w-0">
             <div className="font-bold text-slate-900 flex items-center gap-2 flex-wrap">
@@ -305,7 +305,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
 
       {/* The nurse can only start the visit with this code — so it proves she's really at the door. */}
       {a.providerType === "NURSE" && a.status === "SCHEDULED" && a.visitOtp && !a.visitStartedAt && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 mb-3 flex items-center justify-between gap-3">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 mb-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-semibold text-rose-700">{t("visitCode")}</p>
             <p className="text-[11px] text-rose-700/80">{t("visitCodeHint")}</p>
@@ -315,7 +315,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       )}
       {a.providerType === "NURSE" && a.vitals && a.vitals.length > 0 && (
         <Link href="/patient/profile/vitals" className={cn(
-          "rounded-xl border px-4 py-2.5 mb-3 text-xs flex items-center justify-between gap-2",
+          "rounded-2xl border px-4 py-2.5 mb-3 text-xs flex items-center justify-between gap-2",
           a.vitals[0].alertLevel === "CRITICAL" ? "border-red-200 bg-red-50 text-red-800" : a.vitals[0].alertLevel === "WARNING" ? "border-amber-200 bg-amber-50 text-amber-900" : "border-slate-200 bg-slate-50 text-slate-700"
         )}>
           <span className="flex items-center gap-1.5 min-w-0">
@@ -326,19 +326,19 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         </Link>
       )}
       {a.providerType === "NURSE" && a.visitStartedAt && a.visitStartNote && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 mb-3 text-xs text-amber-800">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2.5 mb-3 text-xs text-amber-800">
           {t("startedWithoutCode", { note: a.visitStartNote })}
         </div>
       )}
 
       {a.status === "PENDING_APPROVAL" && a.reassignedFromId && a.reassignedFrom && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
           <UserCheck className="w-4 h-4 flex-shrink-0" />
           {t("reassignedToYou", { from: formatDoctorName(a.reassignedFrom.doctor.name), to: provider })}
         </div>
       )}
       {a.status === "PENDING_APPROVAL" && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
           <span className="flex items-center gap-2">
             <Clock className="w-4 h-4 flex-shrink-0" />
             {scheduledForLater
@@ -353,18 +353,18 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         </div>
       )}
       {a.status === "CANCELLED" && a.reassignedTo && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
           <UserCheck className="w-4 h-4 flex-shrink-0" />
           {t("reassignedAway", { from: provider, to: formatDoctorName(a.reassignedTo.doctor.name) })}
         </div>
       )}
       {a.status === "REJECTED" && (
-        <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
           <ThumbsDown className="w-4 h-4 flex-shrink-0 text-slate-400" /> {t("rejected", { provider })}
         </div>
       )}
       {a.status === "EXPIRED" && (
-        <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-600 mb-3 flex items-center gap-2">
           <Clock className="w-4 h-4 flex-shrink-0 text-slate-400" /> {t("expired", { provider })}
         </div>
       )}
@@ -375,7 +375,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
           href={(a.clinic ? clinicDirectionsUrl(a.clinic) : clinicDirectionsUrl(a.doctor.doctorProfile))!}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-teal-50 border border-teal-200 rounded-xl px-4 py-3 text-sm text-teal-800 mb-3 flex items-center justify-between gap-2 hover:bg-teal-100 transition-colors"
+          className="bg-teal-50 border border-teal-200 rounded-2xl px-4 py-3 text-sm text-teal-800 mb-3 flex items-center justify-between gap-2 hover:bg-teal-100 transition-colors"
         >
           <span className="flex items-center gap-2 min-w-0">
             <Building2 className="w-4 h-4 flex-shrink-0" />
@@ -392,7 +392,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ON_THE_WAY" && (
         <Link
           href={`/patient/track/${a.id}`}
-          className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 mb-3 flex items-center justify-between gap-2 hover:bg-emerald-100 transition-colors"
+          className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 text-sm text-emerald-800 mb-3 flex items-center justify-between gap-2 hover:bg-emerald-100 transition-colors"
         >
           <span className="flex items-center gap-2">
             <Car className="w-4 h-4 flex-shrink-0" /> {t("onTheWay", { provider })}
@@ -403,12 +403,12 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
         </Link>
       )}
       {a.status === "SCHEDULED" && a.consultType === "HOME" && a.travelStatus === "ARRIVED" && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 text-sm text-blue-800 mb-3 flex items-center gap-2">
           <MapPinCheck className="w-4 h-4 flex-shrink-0" /> {t("arrived", { provider })}
         </div>
       )}
       {needsPayment && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-sm text-amber-800 mb-3 flex items-center justify-between gap-2 flex-wrap">
           <span className="flex items-center gap-2">
             <CardIcon className="w-4 h-4 flex-shrink-0" />
             {nothingToPay
@@ -433,17 +433,17 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       </div>
 
       {a.doctorNotes && (
-        <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-600 mb-3">
+        <div className="bg-slate-50 rounded-2xl p-3 text-xs text-slate-600 mb-3">
           <span className="font-semibold text-slate-700">{t("notes", { provider: providerKind })} </span>{a.doctorNotes}
         </div>
       )}
 
       {a.status === "COMPLETED" && a.medicines.length > 0 && (
-        <div className="border border-slate-100 rounded-xl overflow-hidden mb-3">
+        <div className="border border-slate-100 rounded-2xl overflow-hidden mb-3">
           <div className="bg-slate-50 px-3 py-2 flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
             <Pill className="w-3.5 h-3.5" /> {t("prescription")}
           </div>
-          <div className="divide-y divide-slate-50">
+          <div className="divide-y divide-slate-100">
             {a.medicines.map((m) => (
               <div key={m.id} className="px-3 py-2 text-sm">
                 <span className="font-semibold text-slate-800">{m.name}</span>
@@ -456,7 +456,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       )}
 
       {a.status === "COMPLETED" && a.providerType !== "NURSE" && (a.tests?.length ?? 0) > 0 && (
-        <div className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 mb-3">
+        <div className="rounded-2xl border border-teal-200 bg-teal-50/60 px-4 py-3 mb-3">
           <p className="text-sm font-semibold text-teal-800 flex items-center gap-1.5"><FlaskConical className="w-4 h-4" />{t("labTitle")}</p>
           <ul className="mt-1 space-y-0.5">
             {a.tests!.map((test) => (
@@ -467,7 +467,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
             ))}
           </ul>
           {a.labBooking ? (
-            <Link href="/patient/lab-tests" className="text-xs font-semibold text-emerald-700 mt-2 flex items-center gap-1 hover:underline">
+            <Link href="/patient/lab-tests" className="tap-44-y text-xs font-semibold text-emerald-700 mt-2 flex items-center gap-1 hover:underline">
               <CheckCircle2 className="w-3.5 h-3.5" />{t("labBooked", { status: a.labBooking.status })}
             </Link>
           ) : a.tests!.some((test) => test.bookable) ? (
@@ -479,7 +479,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       )}
 
       {a.status === "COMPLETED" && a.referralGiven && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50/60 px-4 py-3 mb-3">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50/60 px-4 py-3 mb-3">
           <p className="text-sm font-semibold text-rose-800 flex items-center gap-1.5"><HeartPulse className="w-4 h-4" />{t("recommendsNurse", { provider })}</p>
           <p className="text-xs text-rose-900/80 mt-0.5">
             {a.referralGiven.service.name} — {t("visits", { count: a.referralGiven.visits })}{a.referralGiven.visits > 1 ? `, ${tc("everyDays", { count: a.referralGiven.intervalDays })}` : ""}
@@ -496,7 +496,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       )}
 
       {suggestedFollowUp && (
-        <div className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 mb-3">
+        <div className="rounded-2xl border border-teal-200 bg-teal-50/60 px-4 py-3 mb-3">
           <p className="text-sm font-semibold text-teal-800 flex items-center gap-1.5">
             <CalendarClock className="w-4 h-4 flex-shrink-0" />{t("followUpSuggested", { date: followUpLabel(a.followUpDate ?? "", locale) })}
           </p>
@@ -512,7 +512,7 @@ function AppointmentCard({ a, patientId, now, onCancel, onReschedule, onWithdraw
       )}
 
       {pendingNewTime && (
-        <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
+        <div className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
           <p className="font-semibold flex items-center gap-1.5">
             <CalendarClock className="w-3.5 h-3.5 flex-shrink-0" />
             {t("newTimeRequested", { time: new Date(pendingNewTime).toLocaleString(locale, DATE_TIME) })}
@@ -754,7 +754,7 @@ export default function PatientAppointments() {
 
   if (authLoading || !user || user.role !== "PATIENT") {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">
-      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
     </div>;
   }
 
@@ -777,7 +777,7 @@ export default function PatientAppointments() {
       <PatientMobileNav />
       <PullToRefresh onRefresh={load} className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-blue-500 flex items-center justify-center shadow-lg flex-shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <CalendarClock className="w-7 h-7 text-white" />
           </div>
           <div>
@@ -803,7 +803,7 @@ export default function PatientAppointments() {
                   ))}
                 </div>
                 {!pendingExpanded && pending.length > PAGE_SIZE && (
-                  <button onClick={() => setPendingExpanded(true)} className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors">
+                  <button onClick={() => setPendingExpanded(true)} className="btn-secondary w-full mt-3 min-h-11 text-xs">
                     {t("loadMore", { count: pending.length - PAGE_SIZE })}
                   </button>
                 )}
@@ -815,7 +815,7 @@ export default function PatientAppointments() {
                 <CalendarClock className="w-4 h-4" /> {t("upcomingHeading", { count: upcoming.length })}
               </h2>
               {upcoming.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-sm">
+                <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-8 text-center text-slate-400 text-sm">
                   {t("noUpcoming")} <Link href="/patient/dashboard" className="tap-44-y text-blue-600 font-semibold">{t("bookOneNow")}</Link>
                 </div>
               ) : (
@@ -826,7 +826,7 @@ export default function PatientAppointments() {
                 </div>
               )}
               {!upcomingExpanded && upcoming.length > PAGE_SIZE && (
-                <button onClick={() => setUpcomingExpanded(true)} className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors">
+                <button onClick={() => setUpcomingExpanded(true)} className="btn-secondary w-full mt-3 min-h-11 text-xs">
                   {t("loadMore", { count: upcoming.length - PAGE_SIZE })}
                 </button>
               )}
@@ -835,7 +835,7 @@ export default function PatientAppointments() {
             <section>
               <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">{t("pastHeading", { count: pastTotal })}</h2>
               {past.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-sm">
+                <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-8 text-center text-slate-400 text-sm">
                   {t("noPast")}
                 </div>
               ) : (
@@ -849,7 +849,7 @@ export default function PatientAppointments() {
                 <button
                   onClick={() => { if (!pastExpanded) setPastExpanded(true); else void history.loadMore(); }}
                   disabled={history.loadingMore}
-                  className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+                  className="btn-secondary w-full mt-3 min-h-11 text-xs"
                 >
                   {history.loadingMore ? t("loading") : t("loadMore", { count: pastTotal - pastShown })}
                 </button>
@@ -872,7 +872,7 @@ export default function PatientAppointments() {
         const refundAmount = Math.max(0, cancelTarget.amount - cancelTarget.discountAmount);
         return (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <div className="bg-white rounded-3xl p-6 max-w-sm w-full">
               <div className="flex items-center gap-2 mb-3">
                 <ThumbsDown className="w-5 h-5 text-red-600" />
                 <h3 className="font-bold text-slate-800">
@@ -887,12 +887,12 @@ export default function PatientAppointments() {
                 })}
               </p>
               {willRefund && (
-                <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-2">
+                <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-2xl px-3 py-2 mb-2">
                   {t("cancelDialog.refund", { amount: refundAmount })}
                 </p>
               )}
               {cancelError && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-2">
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-3 py-2 mb-2">
                   {cancelError}
                 </p>
               )}
@@ -900,7 +900,7 @@ export default function PatientAppointments() {
                 <button onClick={() => { setCancelTarget(null); setCancelError(""); }} className="btn-secondary flex-1">
                   {cancelTarget.status === "SCHEDULED" ? t("cancelDialog.keepAppointment") : t("cancelDialog.keepRequest")}
                 </button>
-                <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
                   {cancelling ? t("cancelDialog.cancelling") : t("cancelDialog.confirm")}
                 </button>
               </div>
@@ -911,7 +911,7 @@ export default function PatientAppointments() {
 
       {rescheduleTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <CalendarClock className="w-5 h-5 text-blue-600" />
               <h3 className="font-bold text-slate-800">{t("rescheduleDialog.title")}</h3>
@@ -923,7 +923,7 @@ export default function PatientAppointments() {
               })}
             </p>
             {rescheduleTarget.status === "SCHEDULED" && (
-              <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">
+              <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-2xl px-3 py-2 mb-3">
                 {t(rescheduleTarget.requestedScheduledAt ? "rescheduleDialog.needsConfirmReplaces" : "rescheduleDialog.needsConfirm", {
                   provider: formatProviderName(rescheduleTarget.doctor.name, rescheduleTarget.providerType),
                   time: new Date(rescheduleTarget.scheduledAt).toLocaleString(locale, DATE_TIME),
@@ -953,7 +953,7 @@ export default function PatientAppointments() {
               />
             )}
             {rescheduleError && (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-3">
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-3 py-2 mb-3">
                 {rescheduleError}
               </p>
             )}
@@ -964,7 +964,7 @@ export default function PatientAppointments() {
               <button
                 onClick={confirmReschedule}
                 disabled={rescheduling || !newScheduledAt}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="btn-primary flex-1"
               >
                 {rescheduling ? t("rescheduleDialog.saving") : t("rescheduleDialog.confirm")}
               </button>

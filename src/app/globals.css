@@ -87,6 +87,23 @@
   --color-surface-800: hsl(222, 47%, 11%);
   --color-surface-900: hsl(222, 47%, 7%);
   --color-surface-950: hsl(222, 47%, 4%);
+
+  /*
+   * Soft "floating glass" look (2026-11 redesign): rounder corners and
+   * diffuse, low-contrast shadows app-wide. Overriding the theme tokens
+   * restyles every rounded-xl / rounded-2xl / shadow-* already in the pages
+   * without touching each file.
+   */
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.375rem;
+  --radius-3xl: 1.75rem;
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.07);
+  --shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.09);
+  --shadow-xl: 0 18px 44px rgba(15, 23, 42, 0.12);
+  --shadow-2xl: 0 28px 64px rgba(15, 23, 42, 0.16);
 }
 
 @layer base {
@@ -102,7 +119,14 @@
     /* Devanagari (hi/mr) and Kannada (kn) glyphs come from --font-deva /
        --font-knda — Inter has none. */
     font-family: var(--font-sans), var(--font-deva), var(--font-knda), system-ui, sans-serif;
-    background-color: var(--color-surface-50);
+    background-color: hsl(160, 20%, 97%);
+    /* Faint mint wash at the top, fading to neutral — the soft canvas the
+       glass header / cards float over. */
+    background-image:
+      radial-gradient(120% 60% at 50% -10%, hsla(162, 60%, 88%, 0.55) 0%, transparent 60%),
+      linear-gradient(180deg, hsl(160, 22%, 97%) 0%, hsl(220, 20%, 97%) 100%);
+    background-repeat: no-repeat;
+    min-height: 100vh;
     color: hsl(222, 47%, 11%);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -133,13 +157,13 @@
 }
 
 @layer components {
-  /* Glass Card Effect */
+  /* Glass Card Effect — frosted white over the map / soft canvas */
   .glass-card {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+    background: rgba(255, 255, 255, 0.74);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
   }
 
   .glass-card-dark {
@@ -147,6 +171,26 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Floating pill chrome (header bar, bottom tab bar). A touch more opaque
+     than .glass-card so text stays readable over busy map tiles. */
+  .glass-pill {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 10px 32px rgba(15, 23, 42, 0.12), 0 1px 3px rgba(15, 23, 42, 0.06);
+  }
+
+  /* Round icon button that sits inside a glass pill (bell, search, inbox). */
+  .icon-pill {
+    @apply inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/80 text-slate-600 border border-white shadow-sm transition-colors hover:bg-white hover:text-slate-900;
+  }
+
+  /* Standard content card — white, very round, soft shadow, hairline border. */
+  .surface-card {
+    @apply rounded-3xl bg-white border border-slate-100/80 shadow-sm;
   }
 
   /* Hide scrollbar for horizontally-scrollable chip rows */
@@ -167,17 +211,23 @@
     background: linear-gradient(135deg, hsl(219, 65%, 16%) 0%, hsl(219, 74%, 28%) 50%, hsl(162, 68%, 26%) 100%);
   }
 
+  /* Page canvas: faint mint wash at the top fading to cool neutral — the
+     soft background the floating glass header / cards sit on. */
   .gradient-surface {
-    background: linear-gradient(180deg, hsl(220, 20%, 98%) 0%, hsl(219, 80%, 97%) 100%);
+    background-color: hsl(200, 20%, 97%);
+    background-image:
+      radial-gradient(120% 50% at 50% -5%, hsla(162, 60%, 86%, 0.6) 0%, transparent 60%),
+      linear-gradient(180deg, hsl(160, 25%, 97%) 0%, hsl(215, 25%, 97%) 100%);
+    background-repeat: no-repeat;
   }
 
   /* Stat cards */
   .stat-card {
-    @apply rounded-2xl p-6 transition-all duration-300;
-    background: rgba(255, 255, 255, 0.9);
+    @apply rounded-3xl p-6 transition-all duration-300;
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
   }
   .stat-card:hover {
     transform: translateY(-2px);
@@ -186,30 +236,30 @@
 
   /* Buttons */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed;
-    background: linear-gradient(135deg, hsl(162, 65%, 32%) 0%, hsl(162, 68%, 26%) 100%);
-    box-shadow: 0 4px 14px rgba(29, 135, 103, 0.35);
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed;
+    background: linear-gradient(135deg, hsl(162, 62%, 36%) 0%, hsl(162, 68%, 28%) 100%);
+    box-shadow: 0 6px 16px rgba(29, 135, 103, 0.28);
   }
   .btn-primary:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(29, 135, 103, 0.45);
+    box-shadow: 0 8px 22px rgba(29, 135, 103, 0.36);
   }
   .btn-primary:active:not(:disabled) {
     transform: translateY(0);
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 border;
-    border-color: hsl(219, 75%, 90%);
-    color: hsl(219, 70%, 30%);
-    background: hsl(219, 80%, 97%);
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200 border bg-white disabled:opacity-60 disabled:cursor-not-allowed;
+    border-color: hsl(162, 40%, 82%);
+    color: hsl(162, 68%, 24%);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   }
-  .btn-secondary:hover {
-    background: hsl(219, 75%, 93%);
+  .btn-secondary:hover:not(:disabled) {
+    background: hsl(162, 70%, 96%);
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200;
     background: linear-gradient(135deg, hsl(0, 84%, 62%) 0%, hsl(0, 84%, 52%) 100%);
     box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
   }
@@ -219,7 +269,7 @@
   }
 
   .btn-success {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200;
     background: linear-gradient(135deg, hsl(142, 71%, 50%) 0%, hsl(142, 71%, 40%) 100%);
     box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
   }
@@ -228,12 +278,12 @@
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100 hover:text-slate-900;
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100 hover:text-slate-900;
   }
 
   /* Inputs */
   .input-field {
-    @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-blue-400 focus:ring-3 focus:ring-blue-100;
+    @apply w-full rounded-2xl border border-slate-200/90 bg-white px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100;
   }
 
   .input-label {
@@ -270,11 +320,11 @@
 
   /* Sidebar item */
   .sidebar-item {
-    @apply flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-500 transition-all duration-200 hover:bg-white/60 hover:text-slate-900;
+    @apply flex items-center gap-3 rounded-full px-4 py-3 text-sm font-medium text-slate-500 transition-all duration-200 hover:bg-white/60 hover:text-slate-900;
   }
   .sidebar-item.active {
-    @apply bg-white text-primary-600 font-semibold;
-    box-shadow: 0 2px 8px rgba(26, 72, 158, 0.12);
+    @apply bg-white text-emerald-700 font-semibold;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
   }
 
   /* Skeleton loader */

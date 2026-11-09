@@ -129,7 +129,7 @@ export function RowAllergyWarning({ name, kit }: { name: string; kit: Prescripti
   const hits = useMemo(() => (kit.allergies.length ? medicineAllergyMatches(name, kit.allergies) : []), [name, kit.allergies]);
   if (!hits.length) return null;
   return (
-    <p role="alert" className="col-span-2 sm:col-span-6 flex items-start gap-1.5 rounded-md bg-red-50 border border-red-200 px-2 py-1 text-[11px] font-semibold text-red-700">
+    <p role="alert" className="col-span-2 sm:col-span-6 flex items-start gap-1.5 rounded-xl bg-red-50 border border-red-200 px-2.5 py-1 text-[11px] font-semibold text-red-700">
       <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" /> {t("rowAllergy", { list: hits.join(", ") })}
     </p>
   );
@@ -193,7 +193,7 @@ export function PrescriptionToolbar({ kit, medicines, tests, onReplace, onAddMed
   return (
     <div className="space-y-2 mb-2">
       {kit.allergies.length > 0 && (
-        <p className="flex items-start gap-1.5 rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1.5 text-xs text-amber-800">
+        <p className="flex items-start gap-1.5 rounded-2xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
           <AlertTriangle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
           <span>
             <span className="font-semibold">{t("allergiesOnRecord")}</span> {kit.allergies.join(", ")}
@@ -211,7 +211,7 @@ export function PrescriptionToolbar({ kit, medicines, tests, onReplace, onAddMed
         )}
         {kit.templates.length > 0 && (
           <select
-            className="input-field text-xs py-1.5 w-auto min-h-[44px]"
+            className="input-field text-xs py-1.5 w-auto min-h-[44px] rounded-full"
             value=""
             aria-label={t("useTemplate")}
             onChange={(e) => { const tpl = kit.templates.find((x) => x.id === e.target.value); if (tpl) offer(tpl); }}
@@ -237,7 +237,7 @@ export function PrescriptionToolbar({ kit, medicines, tests, onReplace, onAddMed
       </div>
 
       {savingOpen && hasItems && (
-        <div className="bg-white rounded-lg border border-slate-200 p-2 space-y-1">
+        <div className="bg-white rounded-2xl border border-slate-200 p-2.5 space-y-1">
           <div className="flex gap-1.5">
             <input
               className="input-field text-xs py-1.5 flex-1"
@@ -272,7 +272,7 @@ export function PrescriptionToolbar({ kit, medicines, tests, onReplace, onAddMed
       )}
 
       {manage && kit.templates.length > 0 && (
-        <ul className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
+        <ul className="bg-white rounded-2xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
           {kit.templates.map((x) => (
             <li key={x.id} className="flex items-center justify-between gap-2 px-2.5 py-1 text-xs text-slate-700">
               <span className="truncate">{x.name} <span className="text-slate-400">· {t("templateCounts", { medicines: x.medicines.length, tests: x.tests.length })}</span></span>

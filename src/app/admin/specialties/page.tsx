@@ -125,14 +125,14 @@ export default function AdminSpecialties() {
         </p>
       </div>
 
-      <form onSubmit={addSpecialty} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6 flex items-end gap-3 flex-wrap">
+      <form onSubmit={addSpecialty} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-6 flex items-end gap-3 flex-wrap">
         <div>
           <label className="input-label">Color</label>
           <input
             type="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}
-            className="w-11 h-11 rounded-lg border border-slate-200 cursor-pointer"
+            className="w-11 h-11 rounded-full border border-slate-200 cursor-pointer"
           />
         </div>
         <div className="flex-1 min-w-[200px]">
@@ -161,7 +161,7 @@ export default function AdminSpecialties() {
           placeholder="Search specialties…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="input-field pl-10"
+          className="input-field rounded-full pl-10"
         />
       </div>
 
@@ -177,7 +177,7 @@ export default function AdminSpecialties() {
       ) : (
         <div className="space-y-3">
           {filtered.map((s) => (
-            <div key={s.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+            <div key={s.id} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
@@ -218,7 +218,7 @@ export default function AdminSpecialties() {
 
       {editTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full">
             <div className="flex items-center gap-2 mb-4">
               <Pencil className="w-5 h-5 text-blue-600" />
               <h3 className="font-bold text-slate-800">Edit Specialty</h3>
@@ -231,7 +231,7 @@ export default function AdminSpecialties() {
                     type="color"
                     value={editColor}
                     onChange={(e) => setEditColor(e.target.value)}
-                    className="w-11 h-11 rounded-lg border border-slate-200 cursor-pointer"
+                    className="w-11 h-11 rounded-full border border-slate-200 cursor-pointer"
                   />
                 </div>
                 <div className="flex-1">
@@ -256,7 +256,7 @@ export default function AdminSpecialties() {
               <button
                 onClick={saveEdit}
                 disabled={saving || !editName.trim()}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="btn-primary flex-1"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                 {saving ? "Saving…" : "Save"}
@@ -285,7 +285,7 @@ export default function AdminSpecialties() {
 
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <Trash2 className="w-5 h-5 text-red-600" />
               <h3 className="font-bold text-slate-800">Delete this specialty?</h3>
@@ -303,7 +303,7 @@ export default function AdminSpecialties() {
               <button
                 onClick={confirmDelete}
                 disabled={deleting}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 min-h-11 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {deleting ? "Deleting…" : "Delete Specialty"}
               </button>

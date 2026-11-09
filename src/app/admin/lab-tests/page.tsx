@@ -103,10 +103,10 @@ export default function AdminLabTests() {
         )}
       </div>
 
-      {error && <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4" />{error}</div>}
+      {error && <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4" />{error}</div>}
 
       {adding && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-5 max-w-4xl">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-5 max-w-4xl">
           <h2 className="font-bold text-slate-800 mb-3">New lab test</h2>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
             <div className="sm:col-span-2">
@@ -134,7 +134,7 @@ export default function AdminLabTests() {
 
       <div className="relative max-w-sm mb-4">
         <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-        <input className="input-field pl-9" placeholder="Search tests" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <input className="input-field rounded-full pl-9" placeholder="Search tests" value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
 
       {loadError ? (
@@ -142,9 +142,9 @@ export default function AdminLabTests() {
       ) : rows === null ? (
         <Loader2 className="w-6 h-6 animate-spin text-slate-300" />
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-x-auto">
           <table className="w-full text-sm min-w-[720px]">
-            <thead className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+            <thead className="bg-slate-50/70 text-slate-500 text-xs uppercase tracking-wider">
               <tr>
                 <th className="text-left font-bold px-4 py-3 w-12">#</th>
                 <th className="text-left font-bold px-4 py-3">Test name</th>
@@ -168,9 +168,9 @@ export default function AdminLabTests() {
                         title="Save"
                         disabled={busyId === t.id || !editForm.name.trim() || editPreview === null}
                         onClick={async () => { if (await patch(t.id, toBody(editForm))) setEditId(null); }}
-                        className="w-9 h-9 rounded-lg flex items-center justify-center text-teal-600 hover:bg-teal-50 disabled:opacity-40"
+                        className="w-9 h-9 tap-44 rounded-full flex items-center justify-center text-teal-600 hover:bg-teal-50 disabled:opacity-40"
                       >{busyId === t.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}</button>
-                      <button title="Cancel" onClick={() => setEditId(null)} className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50"><X className="w-4 h-4" /></button>
+                      <button title="Cancel" onClick={() => setEditId(null)} className="w-9 h-9 tap-44 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-50"><X className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>
@@ -190,15 +190,15 @@ export default function AdminLabTests() {
                       <button
                         title="Edit"
                         onClick={() => { setEditId(t.id); setEditForm({ name: t.name, b2bPrice: String(t.b2bPrice), commissionPercent: String(t.commissionPercent) }); }}
-                        className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                        className="w-9 h-9 tap-44 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-50"
                       ><Pencil className="w-4 h-4" /></button>
                       <button
                         title={t.isActive ? "Hide from doctors & patients" : "Show again"}
                         disabled={busyId === t.id}
                         onClick={() => patch(t.id, { isActive: !t.isActive })}
-                        className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                        className="w-9 h-9 tap-44 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-50"
                       >{t.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
-                      <button title="Delete" onClick={() => setDeleteTarget(t)} className="w-9 h-9 rounded-lg flex items-center justify-center text-red-500 hover:bg-red-50"><Trash2 className="w-4 h-4" /></button>
+                      <button title="Delete" onClick={() => setDeleteTarget(t)} className="w-9 h-9 tap-44 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>

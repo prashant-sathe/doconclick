@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MapPin, CalendarCheck2, UserCircle, Bookmark, Sparkles, HeartPulse } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 import { useTranslations } from "next-intl";
+import { FloatingTabBar, tabItemClass } from "@/components/FloatingTabBar";
 
 const TABS = [
   { href: "/patient/dashboard", label: "tabDoctors", icon: MapPin },
@@ -31,19 +31,15 @@ export default function PatientMobileNav() {
   }, []);
 
   return (
-    <nav
-      className="safe-bottom lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-xl border-t border-slate-200 flex items-stretch"
-    >
+    <FloatingTabBar>
       {TABS.map(({ href, label, icon: Icon }) => {
         const active = pathname === href;
         return (
           <Link
             key={href}
             href={href}
-            className={cn(
-              "flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 py-2.5 px-0.5 text-[10px] font-semibold whitespace-nowrap relative",
-              active ? "text-blue-600" : "text-slate-400"
-            )}
+            aria-current={active ? "page" : undefined}
+            className={tabItemClass(active)}
           >
             <span className="relative">
               <Icon className="w-5 h-5" />
@@ -55,6 +51,6 @@ export default function PatientMobileNav() {
           </Link>
         );
       })}
-    </nav>
+    </FloatingTabBar>
   );
 }

@@ -157,12 +157,12 @@ function DoctorPatientHistoryInner() {
         </Link>
 
         {error ? (
-          <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center text-slate-400">{error}</div>
+          <div className="bg-white rounded-3xl border border-slate-100/80 p-10 text-center text-slate-400">{error}</div>
         ) : data ? (
           <>
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
+            <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 mb-6">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center text-white text-xl font-extrabold">
+                <div className="w-14 h-14 rounded-full bg-teal-500 flex items-center justify-center text-white text-xl font-extrabold">
                   {displayName.charAt(0)}
                 </div>
                 <div>
@@ -182,28 +182,28 @@ function DoctorPatientHistoryInner() {
 
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t("snapshot")}</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-red-50 rounded-xl p-3">
+                <div className="bg-red-50 rounded-2xl p-3">
                   <Droplets className="w-3.5 h-3.5 text-red-500 mb-1" />
                   <p className="text-[10px] font-semibold text-slate-500 uppercase">{t("bloodGroup")}</p>
                   <p className="text-sm font-bold text-slate-800">{subject?.bloodGroup ?? "—"}</p>
                 </div>
-                <div className="bg-amber-50 rounded-xl p-3">
+                <div className="bg-amber-50 rounded-2xl p-3">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-500 mb-1" />
                   <p className="text-[10px] font-semibold text-slate-500 uppercase">{t("allergies")}</p>
                   <p className="text-sm font-bold text-slate-800 truncate">{subject?.allergies ?? "—"}</p>
                 </div>
-                <div className="bg-purple-50 rounded-xl p-3">
+                <div className="bg-purple-50 rounded-2xl p-3">
                   <Pill className="w-3.5 h-3.5 text-purple-500 mb-1" />
                   <p className="text-[10px] font-semibold text-slate-500 uppercase">{t("chronic")}</p>
                   <p className="text-sm font-bold text-slate-800 truncate">{subject?.chronicDiseases ?? "—"}</p>
                 </div>
-                <div className="bg-blue-50 rounded-xl p-3">
+                <div className="bg-blue-50 rounded-2xl p-3">
                   <Scissors className="w-3.5 h-3.5 text-blue-500 mb-1" />
                   <p className="text-[10px] font-semibold text-slate-500 uppercase">{t("surgeries")}</p>
                   <p className="text-sm font-bold text-slate-800 truncate">{subject?.surgeries ?? "—"}</p>
                 </div>
                 {bmi && (
-                  <div className={`rounded-xl p-3 ${bmiCategoryClasses(bmi.category)}`}>
+                  <div className={`rounded-2xl p-3 ${bmiCategoryClasses(bmi.category)}`}>
                     <p className="text-[10px] font-semibold uppercase opacity-70">BMI</p>
                     <p className="text-sm font-bold">{bmi.value}</p>
                     <p className="text-[10px] font-semibold">{t(`bmi.${bmi.category}`)}</p>
@@ -234,7 +234,7 @@ function DoctorPatientHistoryInner() {
               {data.appointments.map((a) => {
                 const Icon = TYPE_ICON[a.consultType] ?? Stethoscope;
                 return (
-                <div key={a.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <div key={a.id} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Icon className="w-4 h-4 text-teal-500" />
@@ -261,7 +261,7 @@ function DoctorPatientHistoryInner() {
                           href={att.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-teal-600 bg-teal-50 border border-teal-100 rounded-lg px-2 py-1 hover:bg-teal-100"
+                          className="inline-flex items-center gap-1 text-xs text-teal-600 bg-teal-50 border border-teal-100 rounded-full px-3 py-1.5 min-h-9 hover:bg-teal-100"
                         >
                           <Paperclip className="w-3 h-3" /> {att.fileName ?? t("attachment", { n: i + 1 })}
                         </a>

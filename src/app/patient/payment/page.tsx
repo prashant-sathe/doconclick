@@ -172,12 +172,12 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
   };
 
   if (loading) {
-    return <div className="bg-white rounded-2xl p-8 text-center text-slate-400">{tc("loading")}</div>;
+    return <div className="bg-white rounded-3xl p-8 text-center text-slate-400">{tc("loading")}</div>;
   }
 
   if (!apptId || !appt) {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-md w-full text-center">
+      <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 max-w-md w-full text-center">
         <p className="text-slate-500">{error || t("notFound")}</p>
         <Link href="/patient/appointments" className="btn-secondary w-full justify-center mt-5">{tc("myAppointments")}</Link>
       </div>
@@ -186,7 +186,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
 
   if (appt.paymentStatus === "PAID") {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+      <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
         <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-emerald-500" />
         </div>
@@ -213,7 +213,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
   if (appt.status !== "SCHEDULED") {
     const pendingApproval = appt.status === "PENDING_APPROVAL";
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-md w-full text-center">
+      <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 max-w-md w-full text-center">
         <p className="text-slate-500">
           {pendingApproval
             ? t("pendingApproval", { who: appt.providerType === "NURSE" ? "nurse" : "doctor" })
@@ -225,8 +225,8 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-md w-full">
-      <div className="bg-slate-50 rounded-xl p-4 mb-4">
+    <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 max-w-md w-full">
+      <div className="bg-slate-50 rounded-2xl p-4 mb-4">
         <div className="flex justify-between text-sm">
           <span className="text-slate-500">{t(appt.providerType === "NURSE" ? "nurseVisitWith" : "consultationWith", { name: formatProviderName(appt.doctor.name, appt.providerType) })}</span>
           <span className="text-slate-700">{isPackage ? t("perVisit", { amount: appt.amount }) : `₹${appt.amount}`}</span>
@@ -253,7 +253,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
           wrong on a package bill), and not on a free booking with nothing to discount. */}
       <div className={isPackage || (free && !appt.couponCode) ? "hidden" : "mb-4"}>
         {appt.couponCode ? (
-          <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 text-sm">
+          <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-2xl px-3 py-2.5 text-sm">
             <span className="flex items-center gap-2 font-semibold text-emerald-700">
               <TicketPercent className="w-4 h-4" /> {t("couponApplied", { code: appt.couponCode })}
             </span>
@@ -269,7 +269,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
         ) : (
           <div className="flex gap-2">
             <input
-              className="input-field flex-1 uppercase"
+              className="input-field rounded-full flex-1 uppercase"
               placeholder={t("couponPlaceholder")}
               value={couponInput}
               onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
@@ -295,7 +295,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
                     type="button"
                     onClick={() => applyCoupon(o.code)}
                     disabled={applyingCoupon}
-                    className="w-full flex items-center justify-between gap-3 text-left border border-dashed border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50 rounded-xl px-3 py-2.5 disabled:opacity-60"
+                    className="w-full flex items-center justify-between gap-3 text-left border border-dashed border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50 rounded-2xl px-3 py-2.5 disabled:opacity-60"
                     aria-label={t("applyOffer", { code: o.code })}
                   >
                     <span className="min-w-0">
@@ -317,7 +317,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+        <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 mb-4">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
           {error}
         </div>
@@ -404,7 +404,7 @@ export default function PatientPayment() {
             </p>
           )}
         </div>
-        <Suspense fallback={<div className="bg-white rounded-2xl p-8 text-center text-slate-400">{tc("loading")}</div>}>
+        <Suspense fallback={<div className="bg-white rounded-3xl p-8 text-center text-slate-400">{tc("loading")}</div>}>
           <PaymentContent onFreeChange={setFree} />
         </Suspense>
       </div>

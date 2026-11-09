@@ -11,7 +11,7 @@ export default function CompleteVisitDialog({ target, notes, onNotes, busy, onBa
   const tc = useTranslations("nurse.common");
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+      <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full">
         <h3 className="font-bold text-slate-800 mb-1">{t("completeDialog.title")}</h3>
         <p className="text-sm text-slate-500 mb-3">{t("completeDialog.serviceFor", { service: target.serviceName ?? "", name: patientLabel(target) })}</p>
         <label className="input-label">{t("completeDialog.notes")}</label>

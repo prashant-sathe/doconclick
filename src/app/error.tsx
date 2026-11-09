@@ -21,7 +21,7 @@ export default function Error({
 
   return (
     <div className="min-h-screen gradient-surface flex flex-col items-center justify-center text-center px-6 py-16">
-      <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center mb-5">
+      <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mb-5">
         <AlertTriangle className="w-8 h-8 text-amber-500" />
       </div>
       <h1 className="text-xl font-bold text-slate-900">Something went wrong</h1>

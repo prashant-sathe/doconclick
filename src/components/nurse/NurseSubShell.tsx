@@ -33,7 +33,7 @@ export default function NurseSubShell({ title, description, icon, children }: {
           <ArrowLeft className="w-4 h-4" /> {t("backToProfile")}
         </Link>
         <div className="flex items-center gap-3 mb-5">
-          <span className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center flex-shrink-0">{icon}</span>
+          <span className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center flex-shrink-0">{icon}</span>
           <div>
             <h1 className="text-xl font-extrabold text-slate-900">{title}</h1>
             {description && <p className="text-sm text-slate-500">{description}</p>}

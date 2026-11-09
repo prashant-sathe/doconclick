@@ -97,7 +97,7 @@ export default function NotificationInbox({ accent = "blue" }: { accent?: keyof 
           <button
             type="button"
             onClick={() => markRead()}
-            className={cn("tap-44-y inline-flex items-center gap-1.5 text-xs font-semibold rounded-lg px-3 py-1.5 hover:opacity-80", c.text, c.bg)}
+            className={cn("tap-44-y inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-1.5 hover:opacity-80", c.text, c.bg)}
           >
             <CheckCheck className="w-3.5 h-3.5" /> {t("markAllRead")}
           </button>
@@ -115,7 +115,7 @@ export default function NotificationInbox({ accent = "blue" }: { accent?: keyof 
           <p className="text-xs mt-1">{t("emptyHint")}</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-50 overflow-hidden">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm divide-y divide-slate-50 overflow-hidden">
           {items.map((n) => (
             <button
               key={n.id}
@@ -123,7 +123,7 @@ export default function NotificationInbox({ accent = "blue" }: { accent?: keyof 
               onClick={() => open(n)}
               className={cn("w-full text-left px-4 py-3.5 flex items-start gap-3 hover:bg-slate-50 transition-colors", !n.readAt && "bg-slate-50/60")}
             >
-              <span className={cn("w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0", n.readAt ? "bg-slate-100 text-slate-400" : cn(c.icon, "text-white"))}>
+              <span className={cn("w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0", n.readAt ? "bg-slate-100 text-slate-400" : cn(c.icon, "text-white"))}>
                 <Bell className="w-4 h-4" />
               </span>
               <span className="min-w-0 flex-1">

@@ -79,8 +79,8 @@ function Header() {
   const { id } = useParams<{ id: string }>();
   const t = useTranslations("patient.doctorProfile");
   return (
-    <header className="safe-top sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <header className="safe-top sticky top-0 z-30 px-3 pt-3">
+      <div className="glass-pill rounded-full max-w-2xl mx-auto pl-3 pr-1.5 py-1.5 flex items-center justify-between gap-3">
         <Link href="/" className="tap-44-y flex items-center gap-2">
           <Image src="/logo-icon.png" alt="DocOnClick" width={512} height={512} className="w-8 h-8 object-contain" />
           <span className="font-extrabold text-slate-900">DocOnClick</span>
@@ -176,7 +176,7 @@ export default function DoctorProfilePage() {
   if (doctor === undefined) {
     return (
       <div className="min-h-screen gradient-surface flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
       </div>
     );
   }
@@ -237,9 +237,9 @@ export default function DoctorProfilePage() {
             </button>
           </div>
         )}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden">
           {(doctor.clinics.length > 0 ? doctor.clinics[0].photoUrl : profile.clinicPhotoUrl) && (
-            <div className="relative w-full h-40 sm:h-48 bg-slate-100">
+            <div className="relative m-2 mb-0 h-40 sm:h-48 bg-slate-100 rounded-[1.1rem] overflow-hidden">
               <Image
                 src={(doctor.clinics.length > 0 ? doctor.clinics[0].photoUrl : profile.clinicPhotoUrl)!}
                 alt={(doctor.clinics[0]?.name ?? profile.clinicName) ? t("clinicPhotoOf", { name: doctor.clinics[0]?.name ?? profile.clinicName ?? "" }) : t("clinicPhoto")}
@@ -261,8 +261,8 @@ export default function DoctorProfilePage() {
                 className={cn(
                   "tap-44 absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors",
                   saved
-                    ? "bg-blue-50 border-blue-200 text-blue-600"
-                    : "bg-white border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-200"
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-600"
+                    : "bg-white border-slate-200 text-slate-400 hover:text-emerald-600 hover:border-emerald-200"
                 )}
               >
                 {saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
@@ -274,11 +274,11 @@ export default function DoctorProfilePage() {
                 alt={doctor.name}
                 width={64}
                 height={64}
-                className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 shadow"
+                className="w-16 h-16 rounded-full object-cover flex-shrink-0 shadow"
               />
             ) : (
               <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-xl font-extrabold shadow"
+                className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xl font-extrabold shadow"
                 style={{ background: `linear-gradient(135deg, ${colorFor(profile.specialty)}, ${colorFor(profile.specialty)}99)` }}
               >
                 {doctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
@@ -314,7 +314,7 @@ export default function DoctorProfilePage() {
           </div>
 
           {profile.bio && (
-            <p className="text-sm text-slate-600 bg-slate-50 rounded-xl p-3.5 mb-5 leading-relaxed">
+            <p className="text-sm text-slate-600 bg-slate-50 rounded-2xl p-3.5 mb-5 leading-relaxed">
               {profile.bio}
             </p>
           )}
@@ -328,7 +328,7 @@ export default function DoctorProfilePage() {
                   const open = isClinicOpenNow(clinic.slots);
                   const next = open ? null : findNextOpening([clinic], new Date());
                   return (
-                    <div key={clinic.id} className="bg-slate-50 rounded-xl px-3.5 py-2.5 flex items-start justify-between gap-3">
+                    <div key={clinic.id} className="bg-slate-50 rounded-2xl px-3.5 py-2.5 flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                           <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" /> {clinic.name}
@@ -402,7 +402,7 @@ export default function DoctorProfilePage() {
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t("recentReviews")}</p>
               <div className="space-y-2">
                 {reviews.slice(0, 4).map((r) => (
-                  <div key={r.id} className="bg-slate-50 rounded-xl px-3 py-2">
+                  <div key={r.id} className="bg-slate-50 rounded-2xl px-3 py-2">
                     <RatingStars avgRating={r.rating} totalReviews={1} />
                     {r.comment && <p className="text-xs text-slate-600 mt-1">&ldquo;{r.comment}&rdquo;</p>}
                     <p className="text-[10px] text-slate-400 mt-0.5">{r.reviewer}</p>

@@ -139,7 +139,7 @@ export default function LocationPickerMap({ lat, lng, onChange, height = 280, ce
 
   return (
     <div>
-      <div ref={mapRef} style={{ height }} className="w-full rounded-xl overflow-hidden border border-slate-200" />
+      <div ref={mapRef} style={{ height }} className="w-full rounded-2xl overflow-hidden border border-slate-200" />
       <p className="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1.5">
         <MapPin className="w-3 h-3 flex-shrink-0" /> {t("hint")}
       </p>

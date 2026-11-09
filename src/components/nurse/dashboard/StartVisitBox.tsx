@@ -45,14 +45,14 @@ export default function StartVisitBox({ visitId, scheduledAt, onStarted }: { vis
   const outsideWindow = startWindowProblem(new Date(scheduledAt), td, locale);
   if (outsideWindow) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
         <p className="text-xs text-slate-600 flex items-center gap-1.5"><Clock className="w-4 h-4 text-slate-400 shrink-0" />{outsideWindow}</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-3">
+    <div className="rounded-2xl border border-rose-200 bg-rose-50/50 p-3">
       {!skipping ? (
         <>
           <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5"><KeyRound className="w-4 h-4 text-rose-500" />{t("askCode")}</p>

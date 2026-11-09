@@ -75,7 +75,7 @@ const isGenderKey = (g: string): g is (typeof GENDER_KEYS)[number] => (GENDER_KE
 
 function Section({ title, icon: Icon, id, children }: { title: string; icon: React.ElementType; id?: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-4 scroll-mt-20">
+    <section id={id} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-4 scroll-mt-20">
       <h2 className="font-bold text-slate-900 flex items-center gap-2 mb-4"><Icon className="w-4 h-4 text-rose-500" />{title}</h2>
       {children}
     </section>
@@ -397,7 +397,7 @@ function NurseProfileContent() {
             {couponKind && (
               <div className="mt-4 pt-4 border-t border-slate-100">
                 {activeCoupon ? (
-                  <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+                  <div className="flex items-center justify-between gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
                     <span className="flex items-center gap-1.5 font-semibold">
                       <TicketPercent className="w-4 h-4" /> {t("fees.couponOff", { code: activeCoupon.code, amount: activeCoupon.discountAmount })}
                     </span>
@@ -465,7 +465,7 @@ function NurseProfileContent() {
                 {WEEK.map((d) => (
                   <button key={d} type="button"
                     onClick={() => setHours((h) => ({ ...h, days: h.days.includes(d) ? h.days.filter((x) => x !== d) : WEEK.filter((w) => w === d || h.days.includes(w)) }))}
-                    className={cn("px-3 py-2 rounded-xl text-xs font-bold border", hours.days.includes(d) ? "bg-rose-600 text-white border-rose-600" : "bg-white text-slate-600 border-slate-200")}>
+                    className={cn("min-h-11 min-w-11 px-3 py-2 rounded-full text-xs font-bold border", hours.days.includes(d) ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200")}>
                     {tc(`days.${d}`)}
                   </button>
                 ))}
@@ -496,7 +496,7 @@ function NurseProfileContent() {
               const url = p[d.field] as string | null;
               const docLocked = locked && d.type !== "photo";
               return (
-                <div key={d.type} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 px-3 py-2.5">
+                <div key={d.type} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 px-3 py-2.5">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                       {url ? <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" /> : <Circle className="w-4 h-4 text-slate-300 flex-shrink-0" />}
@@ -532,7 +532,7 @@ function NurseProfileContent() {
             {catalogue.map((s) => {
               const on = s.id in picked;
               return (
-                <div key={s.id} className={cn("rounded-xl border px-3 py-2.5 flex items-center gap-3", on ? "border-rose-200 bg-rose-50/40" : "border-slate-100")}>
+                <div key={s.id} className={cn("rounded-2xl border px-3 py-2.5 flex items-center gap-3", on ? "border-emerald-200 bg-emerald-50/50" : "border-slate-100")}>
                   <input type="checkbox" checked={on} onChange={() => togglePick(s)} className="w-4 h-4 accent-rose-500 flex-shrink-0" aria-label={s.name} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-800">{s.name}</p>
@@ -575,7 +575,7 @@ function NurseProfileContent() {
           )}
           <div className="mt-4">
             <label className="input-label">{t.rich("area.travelUpTo", { km: loc.radius, b: (c) => <strong>{c}</strong> })}</label>
-            <input type="range" min={1} max={30} value={loc.radius} onChange={(e) => setLoc((l) => ({ ...l, radius: Number(e.target.value) }))} className="w-full accent-rose-500" />
+            <input type="range" min={1} max={30} value={loc.radius} onChange={(e) => setLoc((l) => ({ ...l, radius: Number(e.target.value) }))} className="w-full accent-emerald-600" />
           </div>
           <SaveRow {...locSaver} onSave={saveLocation} />
         </Section>
@@ -610,7 +610,7 @@ function NurseProfileContent() {
         </Section>
 
         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-1.5">{t("account.heading")}</p>
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-50 mb-4">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden divide-y divide-slate-50 mb-4">
           {[
             { href: "/nurse/security", label: t("account.security"), icon: Lock },
             { href: "/nurse/notifications", label: t("account.notifications"), icon: Bell },
@@ -618,14 +618,14 @@ function NurseProfileContent() {
             { href: "/nurse/terms", label: t("account.terms"), icon: FileCheck },
           ].map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} className="flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 transition-colors">
-              <span className="w-9 h-9 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center flex-shrink-0"><Icon className="w-4 h-4" /></span>
+              <span className="w-9 h-9 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center flex-shrink-0"><Icon className="w-4 h-4" /></span>
               <span className="text-sm font-semibold text-slate-800 flex-1">{label}</span>
               <ChevronRight className="w-4 h-4 text-slate-300" />
             </Link>
           ))}
         </div>
 
-        <button onClick={logout} className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">
+        <button onClick={logout} className="w-full flex items-center justify-center gap-2 py-3 rounded-full min-h-11 bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">
           <LogOut className="w-4 h-4" /> {t("signOut")}
         </button>
       </div>

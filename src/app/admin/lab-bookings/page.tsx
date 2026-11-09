@@ -107,7 +107,7 @@ function BookingCard({ b, onChanged }: { b: Booking; onChanged: (b: Booking) => 
   const noteChanged = (note.trim() || null) !== (b.adminNote ?? null);
 
   return (
-    <div className={cn("bg-white rounded-2xl border shadow-sm p-5", closed ? "border-slate-200 opacity-75" : "border-slate-100")}>
+    <div className={cn("bg-white rounded-3xl border shadow-sm p-5", closed ? "border-slate-200 opacity-75" : "border-slate-100")}>
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0">
           <p className="font-bold text-slate-900 flex items-center gap-2 flex-wrap">
@@ -137,7 +137,7 @@ function BookingCard({ b, onChanged }: { b: Booking; onChanged: (b: Booking) => 
         </div>
       </div>
 
-      <div className="mt-3 border border-slate-100 rounded-xl divide-y divide-slate-50">
+      <div className="mt-3 border border-slate-100 rounded-2xl divide-y divide-slate-50">
         {b.items.map((i) => (
           <div key={i.id} className="px-3 py-2 text-sm flex justify-between gap-3">
             <span className="text-slate-800">{i.name}</span>
@@ -185,7 +185,7 @@ function BookingCard({ b, onChanged }: { b: Booking; onChanged: (b: Booking) => 
       )}
 
       {!closed && b.status !== "PENDING_PAYMENT" && (
-        <div className="mt-4 rounded-xl border border-teal-100 bg-teal-50/40 p-3">
+        <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50/40 p-3">
           <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Report</p>
           {b.reports.length > 0 && (
             <ul className="space-y-1.5 mb-2">
@@ -194,7 +194,7 @@ function BookingCard({ b, onChanged }: { b: Booking; onChanged: (b: Booking) => 
                   <FileText className="w-4 h-4 text-teal-600 flex-shrink-0" />
                   <a href={downloadHref(r.fileUrl, r.fileName, true)} target="_blank" rel="noreferrer" className="text-teal-700 font-semibold hover:underline truncate">{r.fileName || "Lab report"}</a>
                   <span className="text-xs text-slate-400 flex-shrink-0">{when(r.createdAt)}</span>
-                  <button title="Delete report" disabled={busy} onClick={() => setDeleteReport(r.id)} className="ml-auto w-8 h-8 rounded-lg flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
+                  <button title="Delete report" disabled={busy} onClick={() => setDeleteReport(r.id)} className="ml-auto w-9 h-9 tap-44 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
                 </li>
               ))}
             </ul>
@@ -328,7 +328,7 @@ export default function AdminLabBookings() {
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={cn("px-3 py-1.5 rounded-full text-xs font-semibold border", filter === s ? "bg-teal-600 text-white border-teal-600" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300")}
+            className={cn("min-h-10 px-4 py-1.5 rounded-full text-xs font-semibold border", filter === s ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300")}
           >
             {s === "ALL" ? "All" : STATUS_LABEL[s]} {data && <span className="opacity-75">({s === "ALL" ? total : data.counts[s] ?? 0})</span>}
           </button>
@@ -337,10 +337,10 @@ export default function AdminLabBookings() {
 
       <div className="relative max-w-sm mb-5">
         <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-        <input className="input-field pl-9" placeholder="Search patient name or mobile" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <input className="input-field rounded-full pl-9" placeholder="Search patient name or mobile" value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
 
-      {error && <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4" />{error} <button onClick={load} className="underline font-semibold">Retry</button></div>}
+      {error && <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4" />{error} <button onClick={load} className="underline font-semibold">Retry</button></div>}
 
       {data === null ? (
         <Loader2 className="w-6 h-6 animate-spin text-slate-300" />

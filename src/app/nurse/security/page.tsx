@@ -46,7 +46,7 @@ export default function NurseSecurityPage() {
       {user?.hasPassword === false ? (
         <SetPasswordViaGoogle />
       ) : (
-      <form onSubmit={save} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
+      <form onSubmit={save} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 space-y-4">
         <div>
           <label className="input-label">{t("current")}</label>
           <input type={show ? "text" : "password"} autoComplete="current-password" className="input-field" placeholder={t("currentPlaceholder")}
@@ -67,17 +67,17 @@ export default function NurseSecurityPage() {
           <input type={show ? "text" : "password"} autoComplete="new-password" className="input-field" placeholder={t("repeat")}
             value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); setError(""); setSaved(false); }} />
         </div>
-        {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">{error}</div>}
+        {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5">{error}</div>}
         {saved && <p className="text-sm text-emerald-600 font-semibold flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> {t("updated")}</p>}
         <button type="submit" disabled={saving} className="btn-primary w-full justify-center py-3">
           {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("saving")}</> : t("update")}
         </button>
       </form>
       )}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mt-4">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mt-4">
         <LogoutAllDevices />
       </div>
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mt-4">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mt-4">
         <DeleteAccount />
       </div>
     </NurseSubShell>

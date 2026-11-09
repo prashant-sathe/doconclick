@@ -39,10 +39,10 @@ export default function Footer() {
             <p className="text-blue-100 mt-1 text-sm">{t("ctaSub")}</p>
           </div>
           <div className="flex gap-3">
-            <Link href="/patient/register" className="inline-flex items-center gap-2 bg-white text-blue-600 font-bold rounded-xl px-6 py-3 text-sm hover:bg-blue-50 transition-all shadow-lg">
+            <Link href="/patient/register" className="inline-flex items-center gap-2 bg-white text-blue-600 font-bold rounded-full px-6 py-3 min-h-11 text-sm hover:bg-blue-50 transition-all shadow-lg">
               {t("registerPatient")} <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/doctor/register" className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/30 text-white font-semibold rounded-xl px-6 py-3 text-sm hover:bg-white/20 transition-all">
+            <Link href="/doctor/register" className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/30 text-white font-semibold rounded-full px-6 py-3 min-h-11 text-sm hover:bg-white/20 transition-all">
               {t("joinDoctor")}
             </Link>
           </div>
@@ -73,7 +73,7 @@ export default function Footer() {
                 { label: "in", href: "#", title: "Instagram" },
                 { label: "li", href: "#", title: "LinkedIn" },
               ].map(({ label, href, title }) => (
-                <a key={title} href={href} title={title} className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-600 transition-all duration-200 text-xs font-bold">
+                <a key={title} href={href} title={title} className="w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-emerald-600 transition-all duration-200 text-xs font-bold">
                   {label}
                 </a>
               ))}

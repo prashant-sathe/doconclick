@@ -124,7 +124,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
   return (
     <>
       <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl z-50 flex flex-col animate-slide-in overflow-hidden">
+      <div className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white sm:rounded-l-3xl shadow-2xl z-50 flex flex-col animate-slide-in overflow-hidden">
 
         <div className="px-6 py-6 flex items-start justify-between flex-shrink-0"
           style={{ background: "linear-gradient(135deg, hsl(160,84%,32%) 0%, hsl(172,76%,40%) 100%)" }}>
@@ -142,7 +142,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
             </div>
           </div>
           <button onClick={onClose}
-            className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+            className="w-9 h-9 tap-44 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -150,7 +150,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="p-6 space-y-4">
-              {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-10 rounded-xl" />)}
+              {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-10 rounded-2xl" />)}
             </div>
           ) : (
             <div className="p-6 space-y-6">
@@ -159,7 +159,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
                 <h3 className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
                   <Phone className="w-3.5 h-3.5" /> Contact
                 </h3>
-                <div className="bg-slate-50 rounded-xl divide-y divide-slate-100 overflow-hidden">
+                <div className="bg-slate-50 rounded-2xl divide-y divide-slate-100 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 gap-4">
                     <div className="flex items-center gap-2 text-slate-500 text-sm"><Phone className="w-3.5 h-3.5" /> Mobile</div>
                     <span className="text-sm text-slate-800">{data?.user?.mobile ?? "—"}</span>
@@ -176,11 +176,11 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
                 <h3 className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
                   <ShieldCheck className="w-3.5 h-3.5" /> Adjust Balance
                 </h3>
-                <div className="bg-slate-50 rounded-xl p-4 space-y-3">
+                <div className="bg-slate-50 rounded-2xl p-4 space-y-3">
                   <div className="flex gap-2">
                     <button
                       onClick={() => setDirection("CREDIT")}
-                      className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-semibold border transition-colors ${
+                      className={`flex-1 flex items-center justify-center gap-1.5 min-h-11 py-2 rounded-full text-sm font-semibold border transition-colors ${
                         direction === "CREDIT" ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200"
                       }`}
                     >
@@ -188,7 +188,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
                     </button>
                     <button
                       onClick={() => setDirection("DEBIT")}
-                      className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-semibold border transition-colors ${
+                      className={`flex-1 flex items-center justify-center gap-1.5 min-h-11 py-2 rounded-full text-sm font-semibold border transition-colors ${
                         direction === "DEBIT" ? "bg-red-600 text-white border-red-600" : "bg-white text-slate-600 border-slate-200"
                       }`}
                     >
@@ -235,9 +235,9 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
                   <WalletIcon className="w-3.5 h-3.5" /> Transaction History
                 </h3>
                 {(data?.transactions.length ?? 0) === 0 ? (
-                  <div className="px-4 py-6 text-sm text-slate-400 text-center bg-slate-50 rounded-xl">No transactions yet</div>
+                  <div className="px-4 py-6 text-sm text-slate-400 text-center bg-slate-50 rounded-2xl">No transactions yet</div>
                 ) : (
-                  <div className="bg-slate-50 rounded-xl divide-y divide-slate-100 overflow-hidden">
+                  <div className="bg-slate-50 rounded-2xl divide-y divide-slate-100 overflow-hidden">
                     {data?.transactions.map((t) => {
                       const isCredit = CREDIT_TYPES.has(t.type);
                       const Icon = isCredit ? ArrowDownCircle : ArrowUpCircle;
@@ -302,7 +302,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
       {/* Negative-balance acknowledgement */}
       {confirmNegative && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <AlertTriangle className="w-5 h-5 text-amber-600" />
               <h3 className="font-bold text-slate-800">This will take the wallet negative</h3>
@@ -315,7 +315,7 @@ function WalletDrawer({ userId, onClose, onAdjusted }: { userId: string; onClose
               <button
                 onClick={() => submit(true)}
                 disabled={submitting}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 min-h-11 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60"
               >
                 {submitting ? "Applying…" : "Confirm Debit"}
               </button>
@@ -389,7 +389,7 @@ export default function AdminWallets() {
         <button
           onClick={() => p.data && setViewId(p.data.userId)}
           title="View & Adjust Wallet"
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
+          className="w-9 h-9 tap-44 flex items-center justify-center rounded-full text-blue-500 hover:bg-blue-50 transition-colors"
         >
           <Eye className="w-4 h-4" />
         </button>
@@ -424,20 +424,20 @@ export default function AdminWallets() {
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-6">
         <div className="relative max-w-sm">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input type="text" placeholder="Search by name or mobile…"
             value={search} onChange={(e) => setSearch(e.target.value)}
-            className="input-field pl-10" />
+            className="input-field rounded-full pl-10" />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-4 sm:p-6 lg:p-8 space-y-3">
-            {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
+            {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-2xl" />)}
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-12 text-slate-400">

@@ -144,7 +144,7 @@ function LabTestsList() {
       {data === null ? (
         !error && <div className="space-y-3">{[1, 2].map((i) => <div key={i} className="skeleton h-32 rounded-2xl" />)}</div>
       ) : data.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-8 text-center">
           <FlaskConical className="w-10 h-10 text-slate-200 mx-auto mb-3" />
           <p className="text-sm text-slate-500">{t("empty")}</p>
           <Link href="/patient/appointments" className="tap-44-y btn-primary py-2 px-4 text-sm mt-4 inline-flex">{t("goToAppointments")}</Link>
@@ -154,7 +154,7 @@ function LabTestsList() {
           {data.map((b) => {
             const step = STEPS.indexOf(b.status as (typeof STEPS)[number]);
             return (
-              <div key={b.id} className={cn("bg-white rounded-2xl border shadow-sm p-5", b.status === "CANCELLED" ? "border-slate-200 opacity-80" : "border-slate-100")}>
+              <div key={b.id} className={cn("bg-white rounded-3xl border shadow-sm p-5", b.status === "CANCELLED" ? "border-slate-200 opacity-80" : "border-slate-100")}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-bold text-slate-900">{b.patientName}</p>
@@ -170,7 +170,7 @@ function LabTestsList() {
                 )}
 
                 {b.reports.length > 0 && (
-                  <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50/60 p-3">
+                  <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-3">
                     <p className="text-sm font-semibold text-emerald-800 flex items-center gap-1.5 mb-2"><FileText className="w-4 h-4" />{t("reportReady")}</p>
                     <div className="space-y-2">
                       {b.reports.map((r) => (
@@ -185,7 +185,7 @@ function LabTestsList() {
                   </div>
                 )}
 
-                <div className="mt-3 border border-slate-100 rounded-xl divide-y divide-slate-50">
+                <div className="mt-3 border border-slate-100 rounded-2xl divide-y divide-slate-100">
                   {b.items.map((i) => (
                     <div key={i.id} className="px-3 py-2 text-sm flex justify-between gap-3">
                       <span className="text-slate-800">{i.name}</span>
@@ -211,7 +211,7 @@ function LabTestsList() {
                 )}
 
                 {b.adminNote && (
-                  <div className="mt-3 rounded-xl bg-teal-50 border border-teal-100 px-3 py-2 text-sm text-teal-900 flex items-start gap-2">
+                  <div className="mt-3 rounded-2xl bg-teal-50 border border-teal-100 px-3 py-2 text-sm text-teal-900 flex items-start gap-2">
                     <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
                     <span><span className="font-semibold">{t("adminNote")} </span>{b.adminNote}</span>
                   </div>

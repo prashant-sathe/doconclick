@@ -116,10 +116,10 @@ export default function AdminNurseServices() {
         )}
       </div>
 
-      {error && <div className="max-w-3xl mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4" />{error}</div>}
+      {error && <div className="max-w-3xl mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5 flex items-center gap-2"><AlertCircle className="w-4 h-4" />{error}</div>}
 
       {adding && (
-        <div className="max-w-3xl bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-5">
+        <div className="max-w-3xl bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-5">
           <h2 className="font-bold text-slate-800 mb-3">New service</h2>
           <ServiceForm value={form} onChange={setForm} />
           <div className="flex gap-2 mt-4">
@@ -136,7 +136,7 @@ export default function AdminNurseServices() {
       ) : (
         <div className="max-w-3xl space-y-3">
           {rows.map((s) => (
-            <div key={s.id} className={cn("bg-white rounded-2xl border shadow-sm p-5", s.isActive ? "border-slate-100" : "border-slate-200 opacity-70")}>
+            <div key={s.id} className={cn("bg-white rounded-3xl border shadow-sm p-5", s.isActive ? "border-slate-100" : "border-slate-200 opacity-70")}>
               {editId === s.id ? (
                 <>
                   <ServiceForm value={editForm} onChange={setEditForm} />
@@ -172,19 +172,19 @@ export default function AdminNurseServices() {
                         setEditId(s.id);
                         setEditForm({ name: s.name, description: s.description ?? "", durationMinutes: String(s.durationMinutes), suggestedPrice: String(s.suggestedPrice), requiresPrescription: s.requiresPrescription, shift: s.kind === "SHIFT" });
                       }}
-                      className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                      className="w-9 h-9 tap-44 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-50"
                     ><Pencil className="w-4 h-4" /></button>
                     <button
                       title={s.isActive ? "Hide from patients & nurses" : "Show again"}
                       disabled={busyId === s.id}
                       onClick={() => patch(s.id, { isActive: !s.isActive })}
-                      className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                      className="w-9 h-9 tap-44 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-50"
                     >{s.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
                     <button
                       title="Delete"
                       disabled={s._count.appointments > 0}
                       onClick={() => setDeleteTarget(s)}
-                      className="w-9 h-9 rounded-lg flex items-center justify-center text-red-500 hover:bg-red-50 disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="w-9 h-9 tap-44 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 disabled:opacity-30 disabled:hover:bg-transparent"
                     ><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </div>

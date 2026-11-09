@@ -98,10 +98,10 @@ export default function DoctorSupportTicketsPage() {
             {tickets.map((ticket) => {
               const Icon = STATUS_ICON[ticket.status] ?? AlertCircle;
               return (
-                <Link key={ticket.id} href={`/doctor/support/tickets/${ticket.id}`} className="block bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-md transition-shadow">
+                <Link key={ticket.id} href={`/doctor/support/tickets/${ticket.id}`} className="block bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4 hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-3">
                     <div className={
-                      "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 " +
+                      "w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 " +
                       (ticket.status === "RESOLVED" ? "bg-emerald-50 text-emerald-500" : ticket.status === "IN_PROGRESS" ? "bg-amber-50 text-amber-500" : "bg-red-50 text-red-500")
                     }>
                       <Icon className="w-4 h-4" />

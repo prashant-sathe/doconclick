@@ -44,11 +44,11 @@ export default function VerificationDocumentsPage() {
       loading={loading}
     >
       {isVerified ? (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 flex items-center gap-2">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 text-sm text-emerald-800 flex items-center gap-2">
           <BadgeCheck className="w-4 h-4 flex-shrink-0" /> {t("verified")}
         </div>
       ) : (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-sm text-amber-800">
           {t.rich("mandatory", { star: () => <span className="text-red-500 font-bold">*</span> })}
         </div>
       )}

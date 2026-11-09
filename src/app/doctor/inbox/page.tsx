@@ -27,7 +27,7 @@ export default function DoctorInboxPage() {
       <DoctorMobileNav />
       <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
+          <div className="w-14 h-14 rounded-full bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <Inbox className="w-7 h-7 text-white" />
           </div>
           <div>

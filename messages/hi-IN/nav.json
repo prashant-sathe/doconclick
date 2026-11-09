@@ -47,7 +47,10 @@
     "noPendingRequests": "कोई लंबित अनुरोध नहीं।",
     "viewAllInDashboard": "डैशबोर्ड में सब देखें",
     "inbox": "इनबॉक्स",
-    "inboxUnread": "इनबॉक्स, {count} अपठित"
+    "inboxUnread": "इनबॉक्स, {count} अपठित",
+    "goodMorning": "सुप्रभात",
+    "goodAfternoon": "शुभ दोपहर",
+    "goodEvening": "शुभ संध्या"
   },
   "walletEvent": {
     "TOPUP": "वॉलेट में पैसे जोड़े गए",

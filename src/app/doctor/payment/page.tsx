@@ -103,7 +103,7 @@ export default function DoctorPayment() {
     <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <div className="w-14 h-14 rounded-full gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
             <CreditCard className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900">{t("registrationFee")}</h1>
@@ -118,7 +118,7 @@ export default function DoctorPayment() {
         </div>
 
         {alreadyPaid ? (
-          <div className="bg-white rounded-2xl shadow-xl p-10 text-center">
+          <div className="bg-white rounded-3xl shadow-xl p-10 text-center">
             <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
               <CheckCircle className="w-9 h-9 text-emerald-500" />
             </div>
@@ -129,8 +129,8 @@ export default function DoctorPayment() {
             </button>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
-            <div className="bg-slate-50 rounded-xl p-4 mb-3">
+          <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+            <div className="bg-slate-50 rounded-2xl p-4 mb-3">
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 text-sm">{t("registrationFee")}</span>
                 <span className="flex items-baseline gap-2">
@@ -148,11 +148,11 @@ export default function DoctorPayment() {
 
             <div className={free ? "hidden" : "mb-3"}>
               {coupon ? (
-                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 text-sm">
+                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-2xl px-3 py-2.5 text-sm">
                   <span className="flex items-center gap-2 font-semibold text-emerald-700">
                     <TicketPercent className="w-4 h-4" /> {t("couponOff", { code: coupon.code, amount: coupon.discountAmount })}
                   </span>
-                  <button onClick={() => setCoupon(null)} className="text-emerald-700 hover:text-emerald-900" aria-label={t("removeCoupon")}>
+                  <button onClick={() => setCoupon(null)} className="tap-44 text-emerald-700 hover:text-emerald-900" aria-label={t("removeCoupon")}>
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -173,7 +173,7 @@ export default function DoctorPayment() {
               {couponError && <p className="text-xs text-red-500 mt-1.5">{couponError}</p>}
             </div>
 
-            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 mb-6 flex items-start gap-3">
               <Gift className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
               <div className="min-w-0">
                 <p className="text-sm font-bold text-emerald-700">
@@ -186,7 +186,7 @@ export default function DoctorPayment() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+              <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 mb-4">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
                 {error}
               </div>

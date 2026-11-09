@@ -49,9 +49,9 @@ export default function LanguageSwitch({ compact = false }: { compact?: boolean 
           lang={lang}
           onClick={() => choose(lang)}
           className={cn(
-            "rounded-xl border font-semibold transition-colors inline-flex items-center justify-center gap-1 tap-44-y",
+            "rounded-full border font-semibold transition-colors inline-flex items-center justify-center gap-1 tap-44-y",
             compact ? "px-2.5 py-1.5 text-xs" : "py-2.5 text-sm",
-            lang === current ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+            lang === current ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
           )}
         >
           {busy === lang && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
@@ -63,8 +63,8 @@ export default function LanguageSwitch({ compact = false }: { compact?: boolean 
 
   if (compact) return pills;
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-5">
-      <p className="text-sm font-bold text-slate-800 flex items-center gap-1.5 mb-1"><Languages className="w-4 h-4 text-blue-500" /> {t("title")}</p>
+    <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4 mb-5">
+      <p className="text-sm font-bold text-slate-800 flex items-center gap-1.5 mb-1"><Languages className="w-4 h-4 text-emerald-600" /> {t("title")}</p>
       <p className="text-xs text-slate-500 mb-3">{t("hint")}</p>
       {pills}
     </div>

@@ -381,7 +381,7 @@ function PatientNurseContent() {
   };
 
   if (authLoading || !user) {
-    return <div className="min-h-screen gradient-surface flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>;
+    return <div className="min-h-screen gradient-surface flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>;
   }
 
   const back = () => { setError(""); setNotice(""); if (nurse) setNurse(null); else { setService(null); setNurses(null); } };
@@ -393,7 +393,7 @@ function PatientNurseContent() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
         {booked && nurse && service ? (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 text-center">
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-8 text-center">
             <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-4">
               <CalendarCheck2 className="w-8 h-8 text-emerald-500" />
             </div>
@@ -412,7 +412,7 @@ function PatientNurseContent() {
             )}
 
             {notice && (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800 mb-4">{notice}</div>
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800 mb-4">{notice}</div>
             )}
             {!service && (
               <>
@@ -432,7 +432,7 @@ function PatientNurseContent() {
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{g.title}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {g.items.map((s) => (
-                      <button key={s.id} onClick={() => pickService(s)} className="text-left bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:border-rose-300 hover:shadow transition-all">
+                      <button key={s.id} onClick={() => pickService(s)} className="text-left bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4 hover:border-rose-300 hover:shadow transition-all">
                         <p className="font-bold text-slate-900">{s.name}</p>
                         {s.description && <p className="text-xs text-slate-500 mt-1">{s.description}</p>}
                         <p className="text-xs text-slate-400 mt-2 flex items-center gap-2">
@@ -458,10 +458,10 @@ function PatientNurseContent() {
                 <p className="text-sm text-slate-500 mb-4">{t("nearYou")}</p>
                 <div className="flex flex-wrap items-center gap-2 mb-4">
                   {SORTS.map((s) => (
-                    <button key={s.id} onClick={() => setSort(s.id)} className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border", sort === s.id ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200")}>{t(`sort.${s.id}`)}</button>
+                    <button key={s.id} onClick={() => setSort(s.id)} className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border", sort === s.id ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200")}>{t(`sort.${s.id}`)}</button>
                   ))}
-                  <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 ml-auto">
-                    <input type="checkbox" checked={femaleOnly} onChange={(e) => setFemaleOnly(e.target.checked)} className="accent-rose-500" />
+                  <label className="min-h-11 flex items-center gap-2 px-3 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 ml-auto cursor-pointer">
+                    <input type="checkbox" checked={femaleOnly} onChange={(e) => setFemaleOnly(e.target.checked)} className="w-4 h-4 accent-rose-500" />
                     {t("femaleOnly")}
                   </label>
                 </div>
@@ -471,7 +471,7 @@ function PatientNurseContent() {
                 {nurses === null ? (
                   <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-slate-300" /></div>
                 ) : needsLocation ? (
-                  <div className="bg-white rounded-2xl border border-amber-200 p-6 text-center">
+                  <div className="bg-white rounded-3xl border border-amber-200 p-6 text-center">
                     <p className="text-sm font-semibold text-slate-800">{t("whereTitle")}</p>
                     <p className="text-xs text-slate-500 mt-1 mb-4">{t("whereBody")}</p>
                     <button onClick={() => locateWithGps()} disabled={locating} className="btn-primary py-2.5 px-4 text-sm mx-auto">
@@ -480,15 +480,15 @@ function PatientNurseContent() {
                     <Link href="/patient/profile/address" className="block text-xs font-semibold text-blue-600 mt-3">{t("addHome")}</Link>
                   </div>
                 ) : shown.length === 0 ? (
-                  <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center">
+                  <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-8 text-center">
                     <p className="text-sm text-slate-500">{t("noneTitle")}</p>
                     <p className="text-xs text-slate-400 mt-1">{t("noneBody")}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {shown.map((n) => (
-                      <button key={n.id} onClick={() => pickNurse(n)} className="w-full text-left bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:border-rose-300 transition-all flex gap-3">
-                        <div className="w-14 h-14 rounded-xl bg-rose-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <button key={n.id} onClick={() => pickNurse(n)} className="w-full text-left bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4 hover:border-rose-300 transition-all flex gap-3">
+                        <div className="w-14 h-14 rounded-full bg-rose-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                           {n.photoUrl ? <Image src={n.photoUrl} alt={n.name} width={56} height={56} className="w-full h-full object-cover" /> : <HeartPulse className="w-6 h-6 text-rose-400" />}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -524,8 +524,8 @@ function PatientNurseContent() {
 
             {service && nurse && (
               <form onSubmit={submit} className="space-y-4">
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex gap-3">
-                  <div className="w-14 h-14 rounded-xl bg-rose-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4 flex gap-3">
+                  <div className="w-14 h-14 rounded-full bg-rose-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {nurse.photoUrl ? <Image src={nurse.photoUrl} alt={nurse.name} width={56} height={56} className="w-full h-full object-cover" /> : <HeartPulse className="w-6 h-6 text-rose-400" />}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -536,8 +536,8 @@ function PatientNurseContent() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
-                  <div className="flex items-center justify-between rounded-xl bg-rose-50 px-3 py-2.5">
+                <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 space-y-4">
+                  <div className="flex items-center justify-between rounded-2xl bg-rose-50 px-3 py-2.5">
                     <p className="text-sm font-semibold text-rose-700">{service.name}</p>
                     <p className="text-sm font-extrabold text-rose-700">₹{nurse.price}</p>
                   </div>
@@ -547,7 +547,7 @@ function PatientNurseContent() {
                     <div className="grid grid-cols-4 gap-2">
                       {RELATIONS.map((r) => (
                         <button key={r} type="button" onClick={() => { setRelation(r); setDependentId(null); }}
-                          className={cn("min-h-11 py-2 rounded-xl border text-xs font-semibold", relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                          className={cn("min-h-11 py-2 rounded-full border text-xs font-semibold", relation === r ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600")}>
                           {tc(`relation.${r}`)}
                         </button>
                       ))}
@@ -564,7 +564,7 @@ function PatientNurseContent() {
                         const off = w === "NOW" && !canComeNow(nurse);
                         return (
                           <button key={w} type="button" disabled={off} onClick={() => { setWhen(w); setError(""); }}
-                            className={cn("py-2.5 rounded-xl border text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed", when === w ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                            className={cn("min-h-11 py-2.5 rounded-full border text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed", when === w ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600")}>
                             {w === "NOW" ? t("asap") : shiftMode ? t("shiftStartsAt") : t("pickTime")}
                           </button>
                         );
@@ -595,7 +595,7 @@ function PatientNurseContent() {
                     <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
                       {PACKAGE_VISIT_OPTIONS.map((n) => (
                         <button key={n} type="button" onClick={() => { setVisits(n); setError(""); }}
-                          className={cn("min-h-11 py-2 rounded-xl border text-sm font-semibold", visits === n ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                          className={cn("min-h-11 py-2 rounded-full border text-sm font-semibold", visits === n ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600")}>
                           {n}
                         </button>
                       ))}
@@ -605,12 +605,12 @@ function PatientNurseContent() {
                         <div className={cn("grid grid-cols-3 gap-2 mt-2", shiftMode && "hidden")}>
                           {PACKAGE_INTERVAL_OPTIONS.map((n) => (
                             <button key={n} type="button" onClick={() => { setIntervalDays(n); setError(""); }}
-                              className={cn("min-h-11 py-2 rounded-xl border text-xs font-semibold", intervalDays === n ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                              className={cn("min-h-11 py-2 rounded-full border text-xs font-semibold", intervalDays === n ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600")}>
                               {intervalLabel(n)}
                             </button>
                           ))}
                         </div>
-                        <div className="mt-2 rounded-xl bg-slate-50 border border-slate-100 p-3">
+                        <div className="mt-2 rounded-2xl bg-slate-50 border border-slate-100 p-3">
                           <p className="text-xs font-semibold text-slate-700 mb-1.5">
                             {shiftMode ? t("yourShifts", { count: visits }) : when === "NOW" ? t("yourVisitsNow", { count: visits }) : t("yourVisits", { count: visits })}
                           </p>
@@ -659,14 +659,14 @@ function PatientNurseContent() {
                   </div>
 
                   {referral && referral.service.id === service.id && (
-                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
                       <p className="text-sm font-semibold text-emerald-800 flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" />{t("referralAttached", { doctor: formatProviderName(referral.doctorName, "DOCTOR") })}</p>
                       <p className="text-xs text-emerald-700 mt-0.5">{t("referralBody")}</p>
                     </div>
                   )}
 
                   {service.requiresPrescription && !(referral && referral.service.id === service.id) && (
-                    <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3">
+                    <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-3">
                       <p className="text-sm font-semibold text-amber-800 flex items-center gap-1.5"><FileText className="w-4 h-4" />{t("rxRequired")}</p>
                       <p className="text-xs text-amber-700 mt-0.5 mb-2">{t("rxOnlyPrescribed", { service: service.name.toLowerCase() })}</p>
                       {docs.length > 0 && (
@@ -689,12 +689,12 @@ function PatientNurseContent() {
                     <textarea rows={2} className="input-field" placeholder={t("notesPlaceholder")} value={notes} onChange={(e) => setNotes(e.target.value)} />
                   </div>
 
-                  <label className="flex items-start gap-2.5 text-xs text-slate-600">
-                    <input type="checkbox" checked={consent} onChange={(e) => { setConsent(e.target.checked); setError(""); }} className="w-4 h-4 mt-0.5 accent-blue-500 flex-shrink-0" />
+                  <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 min-h-11 cursor-pointer hover:border-emerald-300 transition-colors text-xs text-slate-600">
+                    <input type="checkbox" checked={consent} onChange={(e) => { setConsent(e.target.checked); setError(""); }} className="w-5 h-5 accent-emerald-600 flex-shrink-0" />
                     {t("consent")}
                   </label>
 
-                  {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-start gap-2"><AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />{error}</div>}
+                  {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5 flex items-start gap-2"><AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />{error}</div>}
 
                   <button type="submit" disabled={booking} className="btn-primary w-full justify-center py-3.5 text-base">
                     {shiftMode ? t("requestShifts", { count: visits, total }) : visits > 1 ? t("requestVisits", { count: visits, total }) : t("requestVisit", { price: nurse.price })}

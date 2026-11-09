@@ -69,7 +69,7 @@ export default function SplashSettings() {
   };
 
   return (
-    <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+    <section className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6">
       <h2 className="font-bold text-slate-800 mb-1 flex items-center gap-2">
         <Smartphone className="w-4 h-4 text-blue-500" /> Mobile App Splash Screen
       </h2>
@@ -133,7 +133,7 @@ export default function SplashSettings() {
                   <button
                     type="button"
                     onClick={() => setImageUrl(null)}
-                    className="inline-flex items-center gap-2 text-sm font-semibold px-3 py-2 rounded-lg text-rose-600 hover:bg-rose-50"
+                    className="inline-flex items-center gap-2 text-sm font-semibold px-3 py-2 rounded-full text-rose-600 hover:bg-rose-50"
                   >
                     <Trash2 className="w-4 h-4" /> <span>Remove</span>
                   </button>
@@ -154,8 +154,8 @@ export default function SplashSettings() {
                     type="button"
                     onClick={() => setFit(opt.value)}
                     className={cn(
-                      "text-left rounded-xl border p-3 transition",
-                      fit === opt.value ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-slate-300",
+                      "text-left rounded-2xl border p-3 transition",
+                      fit === opt.value ? "border-emerald-500 bg-emerald-50" : "border-slate-200 hover:border-slate-300",
                     )}
                   >
                     <span className="block text-sm font-semibold text-slate-800">{opt.label}</span>

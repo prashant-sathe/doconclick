@@ -59,14 +59,14 @@ export default function AdminComplaints() {
         <p className="text-slate-500 text-sm mt-1">Tickets from patients, nurses and doctors — reply, assign, prioritise and track response times.</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-5 flex flex-wrap items-center gap-2">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4 mb-5 flex flex-wrap items-center gap-2">
         <form
           onSubmit={(e) => { e.preventDefault(); setSearch(q.trim()); }}
           className="relative flex-1 min-w-[200px]"
         >
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
-            className="input-field pl-10 py-2 text-sm"
+            className="input-field rounded-full pl-10 py-2 text-sm"
             placeholder="Search subject, name, mobile or ticket id"
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -121,9 +121,9 @@ export default function AdminComplaints() {
           {complaints.map((c) => {
             const Icon = STATUS_ICON[c.status] ?? AlertCircle;
             return (
-              <Link key={c.id} href={`/admin/complaints/${c.id}`} className="block bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+              <Link key={c.id} href={`/admin/complaints/${c.id}`} className="block bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-start gap-4">
-                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5",
+                  <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 mt-0.5",
                     c.status === "RESOLVED" ? "bg-emerald-50 text-emerald-500" : c.status === "IN_PROGRESS" ? "bg-amber-50 text-amber-500" : "bg-red-50 text-red-500"
                   )}>
                     <Icon className="w-5 h-5" />

@@ -65,14 +65,14 @@ export default function TimeSlotPicker({
       {date && (
         loading ? (
           <div className="flex justify-center py-4">
-            <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
+            <Loader2 className="w-5 h-5 animate-spin text-emerald-500" />
           </div>
         ) : error ? (
           <p className="text-xs text-red-500 text-center py-3">{t("loadError")}</p>
         ) : slots.length === 0 ? (
           <p className="text-xs text-slate-400 text-center py-3">{t("noSlots")}</p>
         ) : (
-          <div className="border border-slate-100 rounded-xl p-2">
+          <div className="border border-slate-100 rounded-2xl p-2">
             <div className="grid grid-cols-3 gap-2 max-h-52 overflow-y-auto pr-0.5">
               {slots.map((s) => (
                 <button
@@ -80,9 +80,9 @@ export default function TimeSlotPicker({
                   type="button"
                   onClick={() => onChange(`${date}T${s.time}`)}
                   className={cn(
-                    "min-h-11 py-2 rounded-xl border text-xs font-semibold transition-all flex-shrink-0",
+                    "min-h-11 py-2 rounded-full border text-xs font-semibold transition-all flex-shrink-0",
                     selectedTime === s.time
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      ? "border-emerald-500 bg-emerald-50 text-emerald-700"
                       : "border-slate-200 text-slate-500 hover:border-slate-300"
                   )}
                 >

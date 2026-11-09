@@ -10,6 +10,7 @@ import { useDoctorNotifications } from "@/hooks/useDoctorNotifications";
 import { useAnnouncementNotifications } from "@/hooks/useAnnouncementNotifications";
 import NotificationToast from "@/components/doctor/NotificationToast";
 import InboxButton from "@/components/InboxButton";
+import HeaderGreeting from "@/components/HeaderGreeting";
 import { useTranslations } from "next-intl";
 
 const NAV = [
@@ -53,11 +54,12 @@ export default function DoctorHeader() {
 
   return (
     <header
-      className="safe-top sticky z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100"
+      className="safe-top sticky z-30 px-3 sm:px-4 pt-2 pb-1"
       style={{ top: "var(--imp-banner-h, 0px)" }}
     >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-        <Link href="/doctor/dashboard" className="flex items-center flex-shrink-0">
+      <div className="max-w-5xl mx-auto glass-pill rounded-full pl-1.5 pr-1.5 lg:pl-5 py-1.5 flex items-center justify-between gap-3">
+        <HeaderGreeting name={user ? (isStaff ? user.name : formatDoctorName(user.name)) : null} href="/doctor/dashboard" className="lg:hidden" />
+        <Link href="/doctor/dashboard" className="hidden lg:flex items-center flex-shrink-0">
           <Image src="/logo.png" alt="DocOnClick" width={1200} height={242} className="h-7 sm:h-8 w-auto object-contain" />
         </Link>
 
@@ -70,8 +72,8 @@ export default function DoctorHeader() {
               key={href}
               href={href}
               className={cn(
-                "px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors",
-                pathname === href ? "text-teal-600 bg-teal-50" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                "px-3 py-2 rounded-full text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors",
+                pathname === href ? "text-emerald-700 bg-white shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
               )}
             >
               {href === "/doctor/support" ? (
@@ -91,16 +93,13 @@ export default function DoctorHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <span className="text-sm text-slate-500 hidden xl:inline">
-            {user && t.rich("header.hi", { name: isStaff ? user.name : formatDoctorName(user.name), strong: (c) => <strong className="text-slate-800">{c}</strong> })}
-          </span>
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
 
           {isStaff && (
             <button
               onClick={logout}
               title={t("header.signOut")}
-              className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/80 border border-white shadow-sm text-slate-600 hover:bg-white hover:text-slate-900 transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -112,7 +111,7 @@ export default function DoctorHeader() {
             <button
               onClick={toggleBell}
               title={t("header.notifications")}
-              className="relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
+              className="relative w-10 h-10 flex items-center justify-center rounded-full bg-white/80 border border-white shadow-sm text-slate-600 hover:bg-white hover:text-slate-900 transition-colors"
             >
               <Bell className={cn("w-4 h-4", hasUnseen && "animate-bell-ring")} />
               {hasUnseen && (

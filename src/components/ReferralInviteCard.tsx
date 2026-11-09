@@ -67,9 +67,9 @@ export default function ReferralInviteCard() {
   );
 
   return (
-    <section aria-labelledby="referral-card-title" className="mb-5 bg-white rounded-2xl border border-emerald-100 shadow-sm p-5">
+    <section aria-labelledby="referral-card-title" className="mb-5 bg-white rounded-3xl border border-emerald-100 shadow-sm p-5">
       <div className="flex items-start gap-3">
-        <span className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+        <span className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
           <Gift className="w-5 h-5" />
         </span>
         <div className="min-w-0 flex-1">
@@ -78,7 +78,7 @@ export default function ReferralInviteCard() {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-slate-50 border border-dashed border-slate-200 px-4 py-2.5">
+      <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-slate-50 border border-dashed border-slate-200 px-4 py-2.5">
         <span className="text-xs font-semibold text-slate-500">{t("yourCode")}</span>
         <span className="font-mono font-bold tracking-widest text-slate-900 select-all">{card.code}</span>
       </div>

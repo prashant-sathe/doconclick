@@ -142,7 +142,7 @@ export default function PaymentQrPanel({
           {linkError ? (
             <div className="px-4 text-center">
               <p className="text-sm text-red-600 mb-3">{linkError}</p>
-              <button type="button" onClick={fetchLink} className="btn-secondary py-2 px-3 text-xs"><RefreshCw className="w-3.5 h-3.5" /> {tc("retry")}</button>
+              <button type="button" onClick={fetchLink} className="btn-secondary min-h-10 py-2 px-3.5 text-xs"><RefreshCw className="w-3.5 h-3.5" /> {tc("retry")}</button>
             </div>
           ) : qr ? (
             // eslint-disable-next-line @next/next/no-img-element

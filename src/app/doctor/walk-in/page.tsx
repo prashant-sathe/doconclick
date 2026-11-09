@@ -288,7 +288,7 @@ export default function WalkInBookingPage() {
       <div ref={topRef} className="max-w-2xl mx-auto px-4 sm:px-6 py-8 scroll-mt-20">
         <Link href="/doctor/dashboard" className="btn-ghost gap-1.5 text-sm mb-3 -ml-2"><ArrowLeft className="w-4 h-4" /> {t("dashboard")}</Link>
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
+          <div className="w-12 h-12 rounded-full bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <UserPlus className="w-6 h-6 text-white" />
           </div>
           <div className="min-w-0">
@@ -317,7 +317,7 @@ export default function WalkInBookingPage() {
         )}
 
         {ctx && booked && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 sm:p-6">
             <div className="flex items-start gap-3 mb-4">
               <div className="w-11 h-11 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
                 <CheckCircle2 className="w-6 h-6 text-emerald-500" />
@@ -333,9 +333,9 @@ export default function WalkInBookingPage() {
             </div>
 
             {booked.free ? (
-              <p className="text-sm bg-emerald-50 text-emerald-700 rounded-xl px-4 py-3 font-semibold">{t("noFee")}</p>
+              <p className="text-sm bg-emerald-50 text-emerald-700 rounded-2xl px-4 py-3 font-semibold">{t("noFee")}</p>
             ) : booked.appointment.paymentMethod === "CASH" ? (
-              <p className="text-sm bg-slate-50 text-slate-700 rounded-xl px-4 py-3 flex items-center gap-2">
+              <p className="text-sm bg-slate-50 text-slate-700 rounded-2xl px-4 py-3 flex items-center gap-2">
                 <Banknote className="w-4 h-4 text-slate-500" /> <span>{t.rich("collectCash", { amount: booked.appointment.amount, b: (c) => <strong>{c}</strong> })}</span>
               </p>
             ) : (
@@ -367,7 +367,7 @@ export default function WalkInBookingPage() {
         {ctx && !booked && !ctx.blocked && ctx.types.length > 0 && (
           <div className="space-y-4">
             {/* 1 — Patient */}
-            <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+            <section className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5">
               <h2 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5"><Phone className="w-4 h-4 text-slate-400" /> {t("patientMobile")}</h2>
               <div className="relative">
                 <input
@@ -385,7 +385,7 @@ export default function WalkInBookingPage() {
               {lookup.state === "error" && <p className="text-sm text-red-600 mt-2">{lookup.error}</p>}
 
               {found && (
-                <div className="mt-3 bg-teal-50 border border-teal-100 rounded-xl px-4 py-3 flex items-start gap-2.5">
+                <div className="mt-3 bg-emerald-50 border border-emerald-100 rounded-2xl px-4 py-3 flex items-start gap-2.5">
                   <UserCheck className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
                   <div className="min-w-0 text-sm">
                     <p className="font-bold text-slate-900">{found.name.trim() || t("nameNotSet")}</p>
@@ -402,7 +402,7 @@ export default function WalkInBookingPage() {
                 </div>
               )}
               {isNew && (
-                <p className="mt-3 text-xs text-slate-500 bg-slate-50 rounded-xl px-3 py-2">{t("newPatient")}</p>
+                <p className="mt-3 text-xs text-slate-500 bg-slate-50 rounded-2xl px-3.5 py-2.5">{t("newPatient")}</p>
               )}
 
               {(holderNeedsName || holderNeedsAgeGender) && (
@@ -457,7 +457,7 @@ export default function WalkInBookingPage() {
             {patientReady && (
               <>
                 {/* 2 — Visit */}
-                <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <section className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5">
                   <h2 className="text-sm font-bold text-slate-800 mb-3">{t("visit")}</h2>
                   <div className={cn("grid gap-2", ctx.types.length === 3 ? "grid-cols-3" : ctx.types.length === 2 ? "grid-cols-2" : "grid-cols-1")}>
                     {ctx.types.map(({ type, fee }) => {
@@ -469,8 +469,8 @@ export default function WalkInBookingPage() {
                           type="button"
                           onClick={() => { setConsultType(type); setSlotTime(null); }}
                           className={cn(
-                            "rounded-xl border px-2 py-3 text-center transition-colors",
-                            consultType === type ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                            "rounded-2xl border px-2 py-3 text-center transition-colors",
+                            consultType === type ? "border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                           )}
                         >
                           <Icon className="w-5 h-5 mx-auto mb-1" />
@@ -513,8 +513,8 @@ export default function WalkInBookingPage() {
                                 type="button"
                                 onClick={() => setSlotTime(s.time)}
                                 className={cn(
-                                  "rounded-lg border py-2 text-xs font-semibold",
-                                  slotTime === s.time ? "border-teal-500 bg-teal-500 text-white" : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                                  "rounded-full border min-h-10 py-2 text-xs font-semibold",
+                                  slotTime === s.time ? "border-emerald-600 bg-emerald-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                                 )}
                               >
                                 {s.label}
@@ -544,21 +544,21 @@ export default function WalkInBookingPage() {
                 </section>
 
                 {/* 3 — Details */}
-                <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-2.5">
+                <section className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 space-y-2.5">
                   <h2 className="text-sm font-bold text-slate-800">{t("reason")}</h2>
                   <textarea value={symptoms} onChange={(e) => setSymptoms(e.target.value)} rows={2} maxLength={1000} placeholder={t("reasonPlaceholder")} className="input-field w-full" />
                   <input value={allergies} onChange={(e) => setAllergies(e.target.value)} maxLength={500} placeholder={t("allergiesPlaceholder")} className="input-field w-full" />
                 </section>
 
                 {/* 4 — Payment */}
-                <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <section className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5">
                   <h2 className="text-sm font-bold text-slate-800 mb-3">{t("payment", { fee })}</h2>
                   <div className="grid grid-cols-2 gap-2">
                     <PayOption active={paymentMethod === "CASH"} onClick={() => setPaymentMethod("CASH")} icon={Banknote} title={t("cash")} note={ctx.cashBlocked ? t("paused") : t("collectAtVisit")} disabled={!!ctx.cashBlocked} />
                     <PayOption active={paymentMethod === "ONLINE"} onClick={() => setPaymentMethod("ONLINE")} icon={QrCode} title={t("online")} note={t("onlineNote")} />
                   </div>
                   {ctx.cashBlocked && (
-                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-3">
+                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-2xl px-3.5 py-2.5 mt-3">
                       {ctx.cashBlocked}{!isStaff && <> <Link href="/doctor/earnings" className="font-semibold underline">{t("payNow")}</Link></>}
                     </p>
                   )}
@@ -570,7 +570,7 @@ export default function WalkInBookingPage() {
                 </label>
 
                 {formError && (
-                  <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
                     <AlertTriangle className="w-4 h-4 flex-shrink-0" /> {formError}
                   </div>
                 )}
@@ -613,9 +613,9 @@ function Chip({ active, onClick, children, block }: { active: boolean; onClick: 
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-full border px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1 transition-colors",
-        block && "justify-center py-2.5 rounded-xl",
-        active ? "border-teal-500 bg-teal-50 text-teal-700" : "border-slate-200 text-slate-600 hover:bg-slate-50"
+        "rounded-full border min-h-10 px-3.5 py-2 text-xs font-semibold inline-flex items-center gap-1 transition-colors",
+        block && "justify-center min-h-11 py-2.5",
+        active ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
       )}
     >
       {children}
@@ -630,11 +630,11 @@ function PayOption({ active, onClick, icon: Icon, title, note, disabled }: { act
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "rounded-xl border px-3 py-3 text-left transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
-        active ? "border-teal-500 bg-teal-50" : "border-slate-200 hover:bg-slate-50"
+        "rounded-2xl border px-3.5 py-3 text-left transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+        active ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500" : "border-slate-200 bg-white hover:bg-slate-50"
       )}
     >
-      <span className={cn("flex items-center gap-1.5 text-sm font-bold", active ? "text-teal-700" : "text-slate-700")}><Icon className="w-4 h-4" /> {title}</span>
+      <span className={cn("flex items-center gap-1.5 text-sm font-bold", active ? "text-emerald-700" : "text-slate-700")}><Icon className="w-4 h-4" /> {title}</span>
       <span className="block text-xs text-slate-500 mt-0.5">{note}</span>
     </button>
   );

@@ -34,7 +34,7 @@ export const COMPLAINT_STATUS_BADGE: Record<string, string> = {
 };
 
 const ACCENT = {
-  blue: { bubble: "bg-blue-600 text-white", button: "btn-primary" },
+  blue: { bubble: "bg-emerald-600 text-white", button: "btn-primary" },
   rose: { bubble: "bg-rose-500 text-white", button: "btn-primary" },
   teal: { bubble: "bg-teal-600 text-white", button: "btn-primary" },
 };
@@ -86,7 +86,7 @@ export default function ComplaintThread({ id, backHref, accent = "blue" }: { id:
       {back}
       {error && <LoadError error={error} onRetry={reload} retrying={reloading} hasData />}
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-4">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-4">
         <div className="flex items-start justify-between gap-3 mb-2">
           <h2 className="font-bold text-slate-900 break-words min-w-0">{data.subject}</h2>
           <span className={cn(COMPLAINT_STATUS_BADGE[data.status] ?? "badge badge-gray", "flex-shrink-0")}>
@@ -133,9 +133,9 @@ export default function ComplaintThread({ id, backHref, accent = "blue" }: { id:
         </div>
       )}
 
-      <form onSubmit={send} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+      <form onSubmit={send} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4">
         {data.status === "RESOLVED" && (
-          <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2 mb-3">{t("resolvedNote")}</p>
+          <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-2xl px-3 py-2 mb-3">{t("resolvedNote")}</p>
         )}
         <label className="input-label" htmlFor="complaint-reply">{t("replyLabel")}</label>
         <textarea
@@ -148,7 +148,7 @@ export default function ComplaintThread({ id, backHref, accent = "blue" }: { id:
           maxLength={COMPLAINT_MESSAGE_MAX}
         />
         {sendError && (
-          <div role="alert" className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mb-3">{sendError}</div>
+          <div role="alert" className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5 mb-3">{sendError}</div>
         )}
         <button type="submit" disabled={sending || !reply.trim()} className={cn(styles.button, "w-full justify-center py-3")}>
           {sending ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("sending")}</> : <><Send className="w-4 h-4" /> {t("send")}</>}

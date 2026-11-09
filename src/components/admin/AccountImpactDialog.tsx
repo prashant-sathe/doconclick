@@ -154,7 +154,7 @@ export default function AccountImpactDialog({
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[70] p-4">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center gap-2 mb-3">
           <AlertTriangle className="w-5 h-5 text-amber-500" />
           <h3 className="font-bold text-slate-800">{title}</h3>
@@ -171,7 +171,7 @@ export default function AccountImpactDialog({
               </p>
               <ul className="max-h-48 overflow-y-auto space-y-1.5">
                 {impact.bookings.map((b) => (
-                  <li key={b.id} className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
+                  <li key={b.id} className="flex items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-1.5 text-xs">
                     <span className="font-semibold text-slate-700 truncate">{isPatient ? b.providerName : b.patientName}</span>
                     <span className="text-slate-500 flex-shrink-0">
                       {fmtWhen(b.scheduledAt)} · {b.consultType.toLowerCase()}
@@ -193,8 +193,8 @@ export default function AccountImpactDialog({
                 ["CANCEL", Undo2, "Cancel and refund all", "Cancel every booking and refund what was paid to the patients' wallets."],
               ] as const).map(([value, Icon, label, hint]) => (
                 <label key={value} className={cn(
-                  "flex items-start gap-2.5 rounded-xl border px-3 py-2.5 cursor-pointer",
-                  action === value ? "border-blue-300 bg-blue-50" : "border-slate-200"
+                  "flex items-start gap-2.5 rounded-2xl border px-3 py-2.5 cursor-pointer",
+                  action === value ? "border-emerald-400 bg-emerald-50" : "border-slate-200"
                 )}>
                   <input type="radio" name="bookingAction" className="mt-1" checked={action === value} onChange={() => setAction(value)} />
                   <span>
@@ -214,7 +214,7 @@ export default function AccountImpactDialog({
           )}
 
           {isPatient && walletAfter > 0 && (
-            <p className="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+            <p className="flex items-start gap-2 rounded-2xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
               <Wallet className="w-4 h-4 flex-shrink-0" />
               <span>
                 Their wallet will hold ₹{walletAfter}
@@ -232,7 +232,7 @@ export default function AccountImpactDialog({
           <button
             onClick={() => onConfirm(action)}
             disabled={busy}
-            className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-60"
+            className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 min-h-11 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-60"
           >
             {busy && <Loader2 className="w-4 h-4 animate-spin" />}
             {actionLabel}

@@ -29,7 +29,7 @@ export default function ReportsHub() {
                 <Link
                   key={r.slug}
                   href={`/admin/reports/${r.slug}`}
-                  className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:border-blue-200 hover:shadow-md transition-all group"
+                  className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 hover:border-blue-200 hover:shadow-md transition-all group"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-bold text-slate-800 text-sm leading-snug">{r.title}</h3>

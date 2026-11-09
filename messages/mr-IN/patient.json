@@ -358,7 +358,10 @@
       "cancel": "रद्द करा",
       "setting": "सेट करत आहोत…",
       "confirm": "हे लोकेशन सेट करा"
-    }
+    },
+    "cardBook": "बुक करा",
+    "cardRoute": "रस्ता",
+    "nearbyHeading": "जवळपास"
   },
   "labTests": {
     "title": "माझ्या लॅब तपासण्या",

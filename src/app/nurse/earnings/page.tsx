@@ -105,7 +105,7 @@ export default function NurseEarningsPage() {
         <h1 className="text-2xl font-extrabold text-slate-900 mb-4">{t("title")}</h1>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4">
             <p className="text-xs font-semibold text-slate-500 flex items-center gap-1"><Wallet className="w-3.5 h-3.5" />{pendingPayout < 0 ? t("youOwe") : t("netPayout")}</p>
             <p className="text-2xl font-extrabold text-slate-900 mt-1">{inr(Math.abs(pendingPayout))}</p>
             <p className="text-[11px] text-slate-400">
@@ -113,14 +113,14 @@ export default function NurseEarningsPage() {
               {dues && dues.cashFeeOwed > 0 && ` · ${t("cashBreakdown", { online: inr(dues.onlinePayoutOwed), fee: inr(dues.cashFeeOwed) })}`}
             </p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4">
             <p className="text-xs font-semibold text-slate-500 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />{t("lifetime")}</p>
             <p className="text-2xl font-extrabold text-slate-900 mt-1">{inr(lifetime)}</p>
             <p className="text-[11px] text-slate-400">{t("completedCount", { count: completed.length })}</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-4">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4 mb-4">
           {openRequest ? (
             <p className="text-sm text-amber-700 flex items-center gap-1.5"><Clock className="w-4 h-4" />
               {/* Settled at what's owed then, not the figure at request time. */}
@@ -141,7 +141,7 @@ export default function NurseEarningsPage() {
             </button>
           )}
           {dismissedRequest && (
-            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 mt-3 break-words">
+            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded-2xl px-3 py-2 mt-3 break-words">
               {t.rich("requestDismissed", {
                 date: fmtDate(dismissedRequest.createdAt),
                 reason: dismissedRequest.dismissReason ?? "—",
@@ -153,7 +153,7 @@ export default function NurseEarningsPage() {
         </div>
 
         <h2 className="font-bold text-slate-800 mb-2">{t("completedVisits")}</h2>
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-50 mb-6">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm divide-y divide-slate-50 mb-6">
           {completed.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-8">{t("noCompleted")}</p>
           ) : completed.map((v) => (
@@ -173,7 +173,7 @@ export default function NurseEarningsPage() {
         </div>
 
         <h2 className="font-bold text-slate-800 mb-2 flex items-center gap-1.5"><History className="w-4 h-4" />{t("history")}</h2>
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-50">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm divide-y divide-slate-50">
           {settlements.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-8">{t("noSettlements")}</p>
           ) : settlements.map((s) => (

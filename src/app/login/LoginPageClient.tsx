@@ -77,7 +77,7 @@ function LoginForm() {
       </div>
 
       {/* Login Card */}
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
+      <div className="glass-card rounded-3xl p-6 sm:p-8">
         <form onSubmit={submit} className="space-y-5">
           {/* Mobile */}
           <div>
@@ -132,7 +132,7 @@ function LoginForm() {
 
           {/* Error */}
           {error && (
-            <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
               {error}
             </div>
@@ -209,9 +209,9 @@ export default function LoginPageClient() {
       style={{ paddingTop: "calc(4.5rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
     >
       {!native && (
-        <div className="fixed top-5 left-6">
+        <div className="fixed left-4 z-10" style={{ top: "calc(1rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}>
           {/* Arrow only on phones — the language pills need the row (4 languages). */}
-          <Link href="/" aria-label={tc("home")} className="btn-ghost gap-1.5 text-sm tap-44-y">← <span className="hidden sm:inline">{tc("home")}</span></Link>
+          <Link href="/" aria-label={tc("home")} className="btn-ghost glass-pill gap-1.5 text-sm min-h-11 tap-44-y">← <span className="hidden sm:inline">{tc("home")}</span></Link>
         </div>
       )}
       {/* Before signing in: the choice is kept and adopted by the account. */}

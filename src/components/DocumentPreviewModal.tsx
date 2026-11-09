@@ -45,14 +45,14 @@ export default function DocumentPreviewModal({
   return (
     <div className="fixed inset-0 z-[100] bg-slate-900/60 flex items-end sm:items-center justify-center sm:p-4" onClick={onClose}>
       <div
-        className="bg-white w-full sm:max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col max-h-[92vh]"
+        className="bg-white w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-xl flex flex-col max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-label={title}
       >
         <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-slate-100">
           <h2 className="font-bold text-slate-900">{title}</h2>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-700" aria-label={closeLabel}><X className="w-5 h-5" /></button>
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-700 tap-44" aria-label={closeLabel}><X className="w-5 h-5" /></button>
         </div>
         <div className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-100 p-3 sm:p-4">
           <div ref={frameRef} className="w-full">

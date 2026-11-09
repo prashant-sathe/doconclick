@@ -13,14 +13,14 @@ export default function AdminSettings() {
         <p className="text-slate-500 text-sm mt-1">General configuration for DocOnClick.</p>
       </div>
       <div className="max-w-2xl space-y-6">
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
               <Settings className="w-5 h-5" />
             </div>
             <h2 className="font-bold text-slate-800">General Info</h2>
           </div>
-          <div className="flex items-start gap-3 text-sm text-slate-600 bg-blue-50 border border-blue-100 rounded-xl p-4">
+          <div className="flex items-start gap-3 text-sm text-slate-600 bg-blue-50 border border-blue-100 rounded-2xl p-4">
             <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
             <div>
               <p>Fees, commission, cash dues and receipt details are managed in the <Link href="/admin/finance" className="text-blue-600 font-semibold underline">Finance section</Link>.</p>
@@ -31,9 +31,9 @@ export default function AdminSettings() {
 
         <Link
           href="/admin/settings/admins"
-          className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex items-center gap-4 hover:border-slate-200 transition-colors"
+          className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 flex items-center gap-4 hover:border-slate-200 transition-colors"
         >
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div className="flex-1 min-w-0">

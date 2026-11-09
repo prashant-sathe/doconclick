@@ -48,7 +48,7 @@ export default function FamilyMembersPage() {
       ) : (
         <div className="-my-2 divide-y divide-slate-100">
           {members.map((d) => (
-            <Link key={d.id} href={`/patient/profile/family/${d.id}`} className="flex items-center gap-3 py-3 -mx-2 px-2 rounded-xl hover:bg-slate-50 transition-colors">
+            <Link key={d.id} href={`/patient/profile/family/${d.id}`} className="flex items-center gap-3 py-3 -mx-2 px-2 rounded-2xl hover:bg-slate-50 transition-colors">
               <span className="w-10 h-10 rounded-full bg-violet-50 text-violet-600 font-bold flex items-center justify-center flex-shrink-0">
                 {d.name.trim().charAt(0).toUpperCase()}
               </span>

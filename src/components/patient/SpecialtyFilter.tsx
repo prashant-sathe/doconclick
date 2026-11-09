@@ -23,7 +23,7 @@ export default function SpecialtyFilter({
           className={cn(
             "min-h-11 flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors",
             value === ""
-              ? "bg-blue-600 border-blue-600 text-white"
+              ? "bg-emerald-600 border-emerald-600 text-white"
               : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
           )}
         >
@@ -48,7 +48,7 @@ export default function SpecialtyFilter({
         ))}
       </div>
       {/* Edge fades hint that the chip row scrolls horizontally */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-white to-transparent opacity-80" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-gradient-to-r from-white to-transparent opacity-80" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-white to-transparent" />
     </div>
   );

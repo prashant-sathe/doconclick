@@ -98,18 +98,18 @@ export default function ProfessionalDetailsPage() {
       onSave={save}
     >
       {changeRequest?.status === "PENDING" && (
-        <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+        <div className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
           <Clock className="w-4 h-4 flex-shrink-0" />
           <span><span className="font-semibold">{t("waitingReview")}</span> {describeChanges(changeRequest, fieldLabel)}</span>
         </div>
       )}
       {changeRequest?.status === "REJECTED" && (
-        <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+        <div className="flex items-start gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
           <XCircle className="w-4 h-4 flex-shrink-0" />
           <span><span className="font-semibold">{t("notApproved")}</span> ({describeChanges(changeRequest, fieldLabel)}){changeRequest.reviewNote ? `: ${changeRequest.reviewNote}` : "."}</span>
         </div>
       )}
-      {notice && <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">{notice}</p>}
+      {notice && <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3">{notice}</p>}
       {locked && (
         <p className="flex items-start gap-1.5 text-xs text-slate-500">
           <Lock className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />

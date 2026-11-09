@@ -75,7 +75,7 @@ export default function ReportDetailPage() {
       </div>
 
       {(config.dateFilter || config.statusFilter) && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6 flex flex-wrap items-end gap-4">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-6 flex flex-wrap items-end gap-4">
           {config.dateFilter && (
             <>
               <div className="form-group">

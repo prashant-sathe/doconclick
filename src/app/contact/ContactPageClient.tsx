@@ -55,7 +55,7 @@ export default function ContactPageClient() {
                 { icon: Clock,   title: t("hoursTitle"), info: t("hoursInfo"),          sub: t("hoursSub"),    color: "text-amber-500", bg: "bg-amber-50" },
               ].map(({ icon: Icon, title, info, sub, color, bg }) => (
                 <div key={title} className="stat-card flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>
+                  <div className={`w-12 h-12 rounded-full ${bg} flex items-center justify-center flex-shrink-0`}>
                     <Icon className={`w-5 h-5 ${color}`} />
                   </div>
                   <div>
@@ -92,7 +92,7 @@ export default function ContactPageClient() {
 
             {/* Contact form */}
             <div className="lg:col-span-3">
-              <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
+              <div className="surface-card shadow-lg p-6 sm:p-8">
                 {sent ? (
                   <div className="text-center py-12">
                     <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
@@ -119,7 +119,7 @@ export default function ContactPageClient() {
                           ].map(({ id, label }) => (
                             <button
                               key={id} type="button" onClick={() => set("type", id)}
-                              className={`py-2.5 px-3 rounded-xl border text-xs font-semibold transition-all ${form.type === id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"}`}
+                              className={`py-2.5 px-3 min-h-11 rounded-full border text-xs font-semibold transition-all ${form.type === id ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
                             >
                               {label}
                             </button>

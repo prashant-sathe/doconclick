@@ -80,7 +80,7 @@ export default function SavedDoctorsPage() {
   if (authLoading || !user || user.role !== "PATIENT") {
     return (
       <div className="min-h-screen gradient-surface flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
       </div>
     );
   }
@@ -91,7 +91,7 @@ export default function SavedDoctorsPage() {
       <PatientMobileNav />
       <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-blue-500 flex items-center justify-center shadow-lg flex-shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <Bookmark className="w-7 h-7 text-white" />
           </div>
           <div>
@@ -101,7 +101,7 @@ export default function SavedDoctorsPage() {
         </div>
 
         {pinnedLabel && (
-          <div className="mb-6 flex items-center gap-2 text-xs bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-4 py-2.5">
+          <div className="mb-6 flex items-center gap-2 text-xs bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl px-4 py-2.5">
             <Compass className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="flex-1 min-w-0">{t.rich("distancesFrom", { place: pinnedLabel, b: (c) => <span className="font-semibold">{c}</span> })}</span>
             <Link href="/patient/dashboard" className="font-semibold flex-shrink-0 underline">{t("change")}</Link>
@@ -127,12 +127,12 @@ export default function SavedDoctorsPage() {
             const { id, doctor, distanceKm } = entry;
             const profile = doctor.doctorProfile;
             return (
-              <div key={id} className={cn("bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4", dimmed && "opacity-60")}>
+              <div key={id} className={cn("bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4 flex items-center gap-4", dimmed && "opacity-60")}>
                 {profile?.photoUrl ? (
-                  <Image src={profile.photoUrl} alt={doctor.name} width={56} height={56} className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 shadow" />
+                  <Image src={profile.photoUrl} alt={doctor.name} width={56} height={56} className="w-14 h-14 rounded-full object-cover flex-shrink-0 shadow" />
                 ) : (
                   <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-lg font-extrabold shadow"
+                    className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 text-white text-lg font-extrabold shadow"
                     style={{ background: `linear-gradient(135deg, ${colorFor(profile?.specialty ?? "")}, ${colorFor(profile?.specialty ?? "")}99)` }}
                   >
                     {doctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}

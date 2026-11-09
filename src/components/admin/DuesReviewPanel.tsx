@@ -38,7 +38,7 @@ export default function DuesReviewPanel({ onResolved }: { onResolved?: () => voi
       </p>
       <div className="space-y-2">
         {data.map((r) => (
-          <div key={r.id} className="bg-white rounded-xl border border-amber-100 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div key={r.id} className="bg-white rounded-2xl border border-amber-100 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0 text-sm">
               <p className="font-semibold text-slate-800">{formatProviderName(r.doctorName, r.providerRole)} · {r.doctorMobile}</p>
               <p className="text-xs text-slate-500">

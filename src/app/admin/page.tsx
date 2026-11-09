@@ -128,7 +128,7 @@ export default function AdminOverview() {
           <h1 className="text-2xl font-extrabold text-slate-900">Dashboard Overview</h1>
           <p className="text-slate-500 text-sm mt-1">Welcome back, Admin. Here&apos;s what&apos;s happening today.</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-slate-500 bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm">
+        <div className="flex items-center gap-2 text-sm text-slate-500 bg-white/80 border border-white rounded-full px-4 py-2.5 shadow-sm">
           <Clock className="w-4 h-4" />
           {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
         </div>
@@ -156,21 +156,21 @@ export default function AdminOverview() {
       {(data.pendingDoctors > 0 || data.pendingNurses > 0 || data.openComplaints > 0) && (
         <div className="flex flex-wrap gap-4 mb-8">
           {data.pendingDoctors > 0 && (
-            <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 text-sm text-amber-700 font-medium">
+            <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3 text-sm text-amber-700 font-medium">
               <AlertCircle className="w-4 h-4" />
               {data.pendingDoctors} doctor{data.pendingDoctors > 1 ? "s" : ""} pending verification
               <a href="/admin/doctors" className="underline ml-1 hover:text-amber-800">Review →</a>
             </div>
           )}
           {data.pendingNurses > 0 && (
-            <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 text-sm text-amber-700 font-medium">
+            <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3 text-sm text-amber-700 font-medium">
               <AlertCircle className="w-4 h-4" />
               {data.pendingNurses} nurse{data.pendingNurses > 1 ? "s" : ""} pending verification
               <a href="/admin/nurses" className="underline ml-1 hover:text-amber-800">Review →</a>
             </div>
           )}
           {data.openComplaints > 0 && (
-            <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-xl px-5 py-3 text-sm text-red-700 font-medium">
+            <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-2xl px-5 py-3 text-sm text-red-700 font-medium">
               <AlertCircle className="w-4 h-4" />
               {data.openComplaints} open complaint{data.openComplaints > 1 ? "s" : ""}
               <Link href="/admin/complaints" className="underline ml-1 hover:text-red-800">View →</Link>
@@ -180,7 +180,7 @@ export default function AdminOverview() {
       )}
 
       {/* Recent Appointments */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden animate-fade-in-up" style={{ animationDelay: "0.25s", opacity: 0 }}>
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden animate-fade-in-up" style={{ animationDelay: "0.25s", opacity: 0 }}>
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-blue-500" />

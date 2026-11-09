@@ -100,7 +100,7 @@ export default function Home() {
       <Navbar />
 
       {/* ── HERO ───────────────────────────────────────────────── */}
-      <section className="pt-24 pb-0 gradient-hero overflow-hidden relative">
+      <section className="pt-28 pb-0 gradient-hero overflow-hidden relative">
         {/* Grid overlay */}
         <div className="absolute inset-0 opacity-[0.07]"
           style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
@@ -126,10 +126,10 @@ export default function Home() {
                 {t("hero.sub")}
               </p>
               <div className="flex flex-wrap gap-4 mb-10">
-                <Link href="/patient/register" className="inline-flex items-center gap-2.5 bg-white text-blue-600 font-bold rounded-xl px-8 py-4 text-base hover:bg-blue-50 transition-all shadow-2xl hover:-translate-y-0.5">
+                <Link href="/patient/register" className="inline-flex items-center gap-2.5 bg-white text-blue-600 font-bold rounded-full px-8 py-4 min-h-11 text-base hover:bg-blue-50 transition-all shadow-2xl hover:-translate-y-0.5">
                   {t("hero.bookDoctor")} <ArrowRight className="w-5 h-5" />
                 </Link>
-                <Link href="/doctor/register" className="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur border border-white/30 text-white font-semibold rounded-xl px-8 py-4 text-base hover:bg-white/20 transition-all">
+                <Link href="/doctor/register" className="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur border border-white/30 text-white font-semibold rounded-full px-8 py-4 min-h-11 text-base hover:bg-white/20 transition-all">
                   <Stethoscope className="w-5 h-5" /> {t("hero.joinDoctor")}
                 </Link>
               </div>
@@ -144,15 +144,15 @@ export default function Home() {
             {/* Right — floating card stack */}
             <div className="flex flex-col gap-4 items-center lg:items-end pb-8">
               {/* Consultation modes */}
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 w-full max-w-xs sm:max-w-sm lg:w-80 animate-float" style={{ animationDelay: "0s" }}>
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-6 w-full max-w-xs sm:max-w-sm lg:w-80 animate-float" style={{ animationDelay: "0s" }}>
                 <p className="text-white font-bold mb-4 text-sm uppercase tracking-wider">{t("hero.chooseTitle")}</p>
                 {[
                   { icon: HomeIcon,  k: "home",   color: "bg-emerald-400" },
                   { icon: Video,     k: "video",  color: "bg-blue-400" },
                   { icon: Building2, k: "clinic", color: "bg-purple-400" },
                 ].map(({ icon: Icon, k, color }) => (
-                  <div key={k} className="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 cursor-pointer transition-all mb-2 last:mb-0">
-                    <div className={`w-9 h-9 rounded-lg ${color} flex items-center justify-center flex-shrink-0`}>
+                  <div key={k} className="flex items-center gap-3 p-3 rounded-2xl bg-white/10 hover:bg-white/20 cursor-pointer transition-all mb-2 last:mb-0">
+                    <div className={`w-9 h-9 rounded-full ${color} flex items-center justify-center flex-shrink-0`}>
                       <Icon className="w-4.5 h-4.5 text-white" />
                     </div>
                     <div>
@@ -181,7 +181,7 @@ export default function Home() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {STATS.map(({ key, icon: Icon }, i) => (
               <div key={key} className="stat-card text-center animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s`, opacity: 0 }}>
-                <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center mx-auto mb-3">
                   <Icon className="w-6 h-6 text-white" />
                 </div>
                 <div className="text-xl sm:text-3xl font-extrabold text-slate-900 mb-1">{td(`stats.${key}Value`)}</div>
@@ -235,7 +235,7 @@ export default function Home() {
             {HOW_STEPS.map(({ n, key }, i) => (
               <div key={n} className="relative animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s`, opacity: 0 }}>
                 {i < HOW_STEPS.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-[calc(100%-16px)] w-8 h-0.5 bg-blue-100 z-10" />
+                  <div className="hidden lg:block absolute top-8 left-[calc(100%-16px)] w-8 h-0.5 bg-emerald-100 z-10" />
                 )}
                 <div className="text-5xl font-extrabold gradient-text mb-4 leading-none">{n}</div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{td(`how.${key}Title`)}</h3>
@@ -300,8 +300,8 @@ export default function Home() {
                   { icon: TrendingUp, k: "f4" },
                 ].map(({ icon: Icon, k }) => (
                   <div key={k} className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Icon className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Icon className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
                       <div className="font-bold text-slate-900 text-sm">{td(`trust.${k}Title`)}</div>
@@ -318,7 +318,7 @@ export default function Home() {
                 { k: "boxVideo", color: "bg-amber-500" },
                 { k: "boxLang", color: "bg-purple-600" },
               ].map(({ k, color }) => (
-                <div key={k} className={`${color} rounded-2xl p-8 text-white text-center card-hover`}>
+                <div key={k} className={`${color} rounded-3xl p-8 text-white shadow-lg text-center card-hover`}>
                   <div className="text-4xl font-extrabold mb-2">{td(`trust.${k}Value`)}</div>
                   <div className="text-sm font-medium opacity-80">{td(`trust.${k}Label`)}</div>
                 </div>

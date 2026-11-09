@@ -45,9 +45,9 @@ export default function PatientNotificationToast({ event, onDismiss }: {
     <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 w-[calc(100%-2rem)] max-w-sm animate-fade-in-up">
       <button
         onClick={() => { router.push("/patient/appointments"); onDismiss(); }}
-        className="w-full text-left bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 flex items-start gap-3 hover:border-blue-200 transition-colors"
+        className="w-full text-left bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 flex items-start gap-3 hover:border-blue-200 transition-colors"
       >
-        <div className={`w-9 h-9 rounded-xl ${copy.bg} flex items-center justify-center flex-shrink-0`}>
+        <div className={`w-9 h-9 rounded-2xl ${copy.bg} flex items-center justify-center flex-shrink-0`}>
           <Icon className={`w-4 h-4 ${copy.color}`} />
         </div>
         <div className="min-w-0 flex-1">

@@ -36,12 +36,12 @@ export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm"
+        className="bg-white rounded-3xl shadow-xl p-6 w-full max-w-sm"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-extrabold text-slate-900">{t("title")}</h2>
-          <button aria-label={t("close")} onClick={onClose} className="tap-44 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600">
+          <button aria-label={t("close")} onClick={onClose} className="tap-44 w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-slate-600">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -51,8 +51,8 @@ export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
             <button
               key={v}
               onClick={() => setAmount(v)}
-              className={`px-3.5 py-2 rounded-lg text-sm font-semibold border transition-colors ${
-                amount === v ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"
+              className={`min-h-11 px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
+                amount === v ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200 hover:border-emerald-300"
               }`}
             >
               ₹{v}
@@ -72,7 +72,7 @@ export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
         />
 
         {error && (
-          <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+          <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
             {error}
           </div>

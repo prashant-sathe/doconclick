@@ -56,7 +56,7 @@ export function ImpersonationBanner({
         type="button"
         onClick={handleExit}
         disabled={exiting}
-        className="flex items-center gap-1.5 bg-amber-950/10 hover:bg-amber-950/20 rounded-lg px-3 py-1 transition-colors disabled:opacity-60"
+        className="flex items-center gap-1.5 bg-amber-950/10 hover:bg-amber-950/20 rounded-full px-3 py-1 transition-colors disabled:opacity-60"
       >
         {exiting ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
         Exit impersonation

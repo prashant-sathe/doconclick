@@ -61,7 +61,7 @@ function SidebarContents({ pathname, user, logout, onNavigate, inboxUnread }: {
           key={href}
           href={href}
           onClick={onNavigate}
-          className={cn("sidebar-item", isActive && "active")}
+          className={cn("sidebar-item min-h-11", isActive && "active")}
         >
           <Icon className="w-4 h-4 flex-shrink-0" />
           <span className="flex-1">{label}</span>
@@ -76,7 +76,7 @@ function SidebarContents({ pathname, user, logout, onNavigate, inboxUnread }: {
   };
   return (
     <>
-      <div className="px-6 py-5 border-b border-slate-200/70">
+      <div className="px-5 py-5 border-b border-slate-200/50">
         <div className="flex items-center gap-2.5">
           <Image src="/logo-icon.png" alt="DocOnClick" width={512} height={512} className="w-9 h-9 object-contain" />
           <div>
@@ -86,18 +86,18 @@ function SidebarContents({ pathname, user, logout, onNavigate, inboxUnread }: {
         </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto no-scrollbar px-3 py-4 space-y-1">
         {topItems.map(renderItem)}
         <div className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Money</div>
         {moneyItems.map(renderItem)}
         <div className="pt-2 space-y-1">{bottomItems.map(renderItem)}</div>
       </nav>
 
-      <div className="px-3 py-4 border-t border-slate-200/70 space-y-2">
+      <div className="px-3 py-4 border-t border-slate-200/50 space-y-2">
         <Link
           href="/admin/profile"
           onClick={onNavigate}
-          className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/60 border border-slate-200/60 hover:bg-white transition-colors", pathname === "/admin/profile" && "ring-1 ring-blue-200")}
+          className={cn("flex items-center gap-3 px-3 py-2.5 rounded-full bg-white/70 border border-white shadow-sm hover:bg-white transition-colors", pathname === "/admin/profile" && "ring-2 ring-emerald-200")}
         >
           <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center flex-shrink-0">
             <span className="text-white text-xs font-bold">
@@ -113,7 +113,7 @@ function SidebarContents({ pathname, user, logout, onNavigate, inboxUnread }: {
         </Link>
         <button
           onClick={logout}
-          className="sidebar-item w-full text-red-500 hover:bg-red-50 hover:text-red-600"
+          className="sidebar-item min-h-11 w-full text-red-500 hover:bg-red-50 hover:text-red-600"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign Out</span>
@@ -135,12 +135,12 @@ export default function AdminSidebar() {
     <>
       {/* ── Mobile/tablet top bar — the sidebar's only surface below lg ── */}
       <header
-        className="lg:hidden fixed top-0 inset-x-0 z-30 h-14 flex items-center gap-3 px-4 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl"
-        style={{ top: "var(--imp-banner-h, 0px)" }}
+        className="lg:hidden fixed inset-x-2 z-30 h-14 flex items-center gap-3 pl-2 pr-2 rounded-full glass-pill"
+        style={{ top: "calc(var(--imp-banner-h, 0px) + 0.5rem)" }}
       >
         <button
           onClick={() => setMobileOpen(true)}
-          className="w-9 h-9 -ml-1.5 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors flex-shrink-0"
+          className="icon-pill flex-shrink-0"
           title="Open menu"
         >
           <Menu className="w-5 h-5" />
@@ -150,10 +150,10 @@ export default function AdminSidebar() {
         <InboxButton />
       </header>
 
-      {/* ── Desktop rail — unchanged, just gated behind lg: ─────────────── */}
+      {/* ── Desktop rail — floating glass panel, gated behind lg: ───────── */}
       <aside
-        className="hidden lg:flex w-64 fixed left-0 flex-col border-r border-slate-200/70 bg-slate-50/80 backdrop-blur-xl z-40"
-        style={{ top: "var(--imp-banner-h, 0px)", height: "calc(100vh - var(--imp-banner-h, 0px))" }}
+        className="hidden lg:flex w-64 fixed left-3 flex-col rounded-3xl glass-card overflow-hidden z-40"
+        style={{ top: "calc(var(--imp-banner-h, 0px) + 0.75rem)", height: "calc(100vh - var(--imp-banner-h, 0px) - 1.5rem)" }}
       >
         <SidebarContents pathname={pathname} user={user} logout={logout} inboxUnread={inboxUnread} />
       </aside>
@@ -161,11 +161,11 @@ export default function AdminSidebar() {
       {/* ── Mobile/tablet drawer ─────────────────────────────────────── */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div className="fixed inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
-          <aside className="relative w-72 max-w-[85vw] flex flex-col bg-slate-50 shadow-2xl">
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <aside className="relative w-72 max-w-[85vw] m-2 flex flex-col rounded-3xl gradient-surface border border-white shadow-2xl overflow-hidden">
             <button
               onClick={() => setMobileOpen(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-400 hover:bg-slate-100 shadow-sm z-10"
+              className="absolute top-4 right-3 icon-pill z-10"
               title="Close menu"
             >
               <X className="w-4 h-4" />

@@ -31,5 +31,5 @@ export function PayShell({ children }: { children: React.ReactNode }) {
 }
 
 export function Card({ children }: { children: React.ReactNode }) {
-  return <div className="bg-white rounded-2xl shadow-xl p-7 border border-slate-100 text-center">{children}</div>;
+  return <div className="glass-card rounded-3xl p-7 text-center">{children}</div>;
 }

@@ -626,14 +626,14 @@ function FinanceContent() {
       )}
 
       {/* Tabs — money configuration lives here; Settings keeps the non-financial bits. */}
-      <div role="tablist" className="flex gap-1 max-w-full min-w-0 overflow-x-auto border-b border-slate-200 mb-6">
+      <div role="tablist" className="flex gap-2 max-w-full min-w-0 overflow-x-auto no-scrollbar pb-1 mb-6">
         {TABS.map((t) => (
           <button
             key={t.id}
             role="tab"
             aria-selected={tab === t.id}
             onClick={() => selectTab(t.id)}
-            className={`px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 -mb-px transition-colors ${tab === t.id ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}
+            className={`min-h-11 px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap border transition-colors ${tab === t.id ? "bg-emerald-600 text-white border-emerald-600 shadow-sm" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"}`}
           >
             {t.label}
           </button>
@@ -643,9 +643,9 @@ function FinanceContent() {
       {tab === "payouts" && (
         <>
       {/* Pending Settlements */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-8">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 mt-8">
         <h2 className="font-bold text-slate-800 mb-1 text-lg">Pending Settlements</h2>
-        {settleError && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 my-3">{settleError}</p>}
+        {settleError && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-3 py-2 my-3">{settleError}</p>}
         <p className="text-xs text-slate-400 mb-5">
           Cash fee owed = commission the doctor collected in cash and owes the platform. Online payout owed = money the platform holds and owes the doctor.
         </p>
@@ -653,7 +653,7 @@ function FinanceContent() {
           <LoadError error={pendingLoad.error} onRetry={pendingLoad.reload} retrying={pendingLoad.reloading} hasData={!!pendingLoad.data} />
         )}
         {pendingLoad.loading ? (
-          <div className="skeleton h-24 rounded-xl" />
+          <div className="skeleton h-24 rounded-2xl" />
         ) : !pendingLoad.data ? null : pending.length === 0 ? (
           <p className="text-sm text-slate-400 text-center py-8">Nothing to settle right now.</p>
         ) : (
@@ -669,13 +669,13 @@ function FinanceContent() {
       </div>
 
       {/* Settlement History */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-6">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 mt-6">
         <h2 className="font-bold text-slate-800 mb-5 text-lg">Settlement History</h2>
         {historyLoad.error && (
           <LoadError error={historyLoad.error} onRetry={historyLoad.reload} retrying={historyLoad.reloading} hasData={!!historyLoad.data} />
         )}
         {historyLoad.loading ? (
-          <div className="skeleton h-24 rounded-xl" />
+          <div className="skeleton h-24 rounded-2xl" />
         ) : !historyLoad.data ? null : history.length === 0 ? (
           <p className="text-sm text-slate-400 text-center py-8">No settlements recorded yet.</p>
         ) : (
@@ -706,7 +706,7 @@ function FinanceContent() {
       {tab === "fees" && (
         <div className="space-y-6">
       {/* Commission Settings */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 max-w-lg">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 max-w-lg">
         <h2 className="font-bold text-slate-800 mb-1 text-lg">Commission Settings</h2>
         <p className="text-xs text-slate-400 mb-5">
           Set a different platform commission per visit type. Applies to future appointments only — already-booked appointments keep the rate they were charged at.
@@ -786,7 +786,7 @@ function FinanceContent() {
       {/* Negative-net confirmation */}
       {confirmNegative && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <Wallet className="w-5 h-5 text-red-600" />
               <h3 className="font-bold text-slate-800">Doctor owes the platform</h3>
@@ -867,7 +867,7 @@ function FinanceContent() {
                 <label className="input-label">Note (admin only — not shown to the provider)</label>
                 <textarea value={payNote} onChange={(e) => setPayNote(e.target.value)} maxLength={500} rows={2} className="input-field" />
               </div>
-              {payError && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-2 py-1.5">{payError}</p>}
+              {payError && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-2.5 py-1.5">{payError}</p>}
             </div>
           }
           confirmLabel={payDuplicate ? "Record anyway" : "Mark paid"}
@@ -923,7 +923,7 @@ function FinanceContent() {
                   ))}
                 </div>
               )}
-              {fixError && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-2 py-1.5">{fixError}</p>}
+              {fixError && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-2.5 py-1.5">{fixError}</p>}
             </div>
           }
           confirmLabel={fixDuplicate ? tFix("saveAnyway") : tFix("save")}
@@ -948,7 +948,7 @@ function FinanceContent() {
                 <label className="input-label">Reason (shown to the provider)</label>
                 <textarea value={dismissReason} onChange={(e) => setDismissReason(e.target.value)} maxLength={300} rows={3} className="input-field" autoFocus />
               </div>
-              {dismissError && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-2 py-1.5">{dismissError}</p>}
+              {dismissError && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-2.5 py-1.5">{dismissError}</p>}
             </div>
           }
           confirmLabel="Dismiss request"

@@ -18,7 +18,7 @@ export default function PatientInboxPage() {
   }, [loading, user, router]);
 
   if (loading || !user || user.role !== "PATIENT") {
-    return <div className="min-h-screen gradient-surface flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>;
+    return <div className="min-h-screen gradient-surface flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>;
   }
 
   return (
@@ -27,7 +27,7 @@ export default function PatientInboxPage() {
       <PatientMobileNav />
       <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-blue-500 flex items-center justify-center shadow-lg flex-shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <Inbox className="w-7 h-7 text-white" />
           </div>
           <div>

@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 export function SetPasswordViaGoogle() {
   const t = useTranslations("shared.security");
   return (
-    <div className="flex items-start gap-2.5 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600">
+    <div className="flex items-start gap-2.5 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-600">
       <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5 text-slate-400" />
       <p>
         {t("googleNoPassword")}{" "}
@@ -147,7 +147,7 @@ export function DeleteAccount() {
           {t("deleteTitle")}
         </button>
       ) : (
-        <div className="mt-3 rounded-xl border border-red-200 bg-red-50/60 p-4 space-y-3">
+        <div className="mt-3 rounded-2xl border border-red-200 bg-red-50/60 p-4 space-y-3">
           <div className="flex items-start gap-2 text-xs text-slate-700">
             <AlertTriangle className="w-4 h-4 flex-shrink-0 text-red-500" />
             <ul className="space-y-1.5">

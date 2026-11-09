@@ -41,7 +41,7 @@ function ReturnContent() {
 
   if (status === "checking") {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+      <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
         <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto mb-5" />
         <h2 className="text-xl font-extrabold text-slate-900 mb-2">{t("checkingTitle")}</h2>
         <p className="text-slate-500">{t("checkingBody")}</p>
@@ -51,7 +51,7 @@ function ReturnContent() {
 
   if (status === "success") {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+      <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
         <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-emerald-500" />
         </div>
@@ -64,7 +64,7 @@ function ReturnContent() {
 
   if (status === "failed") {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+      <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
         <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-5">
           <XCircle className="w-9 h-9 text-red-500" />
         </div>
@@ -77,7 +77,7 @@ function ReturnContent() {
 
   if (status === "pending") {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+      <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
         <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-5">
           <Clock className="w-9 h-9 text-amber-500" />
         </div>
@@ -91,7 +91,7 @@ function ReturnContent() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+    <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
       <p className="text-slate-500 mb-8">{t("error")}</p>
       <Link href="/patient/wallet" className="btn-primary w-full justify-center py-3.5">{t("goToWallet")}</Link>
     </div>
@@ -100,7 +100,7 @@ function ReturnContent() {
 
 function LoadingFallback() {
   const t = useTranslations("patientAccount.topUpReturn");
-  return <div className="bg-white rounded-2xl p-8 text-center text-slate-400">{t("loading")}</div>;
+  return <div className="bg-white rounded-3xl p-8 text-center text-slate-400">{t("loading")}</div>;
 }
 
 export default function WalletTopUpReturn() {

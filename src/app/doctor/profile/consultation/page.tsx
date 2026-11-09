@@ -66,7 +66,7 @@ export default function ConsultationSettingsPage() {
     // <button>, so the whole row stays tappable via the label's native
     // click-forwards-to-input behavior — a <button> with its own onClick
     // only responds inside its own small hit box, not the row around it.
-    <label className="flex items-center justify-between p-4 rounded-xl border border-slate-200 cursor-pointer">
+    <label className="flex items-center justify-between p-4 rounded-2xl border border-slate-200 cursor-pointer">
       <span className="flex items-center gap-2 text-sm font-semibold text-slate-800"><Icon className="w-4 h-4 text-slate-400" /> {label}</span>
       <input
         type="checkbox"

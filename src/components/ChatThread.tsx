@@ -236,9 +236,9 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       .finally(() => setDownloadingId(null));
   };
 
-  const accentBubble = accent === "teal" ? "bg-teal-600" : "bg-blue-600";
-  const accentBtn = accent === "teal" ? "bg-teal-600 hover:bg-teal-700" : "bg-blue-600 hover:bg-blue-700";
-  const accentRing = accent === "teal" ? "focus:ring-teal-200" : "focus:ring-blue-200";
+  const accentBubble = accent === "teal" ? "bg-teal-600" : "bg-emerald-600";
+  const accentBtn = accent === "teal" ? "bg-teal-600 hover:bg-teal-700" : "bg-emerald-600 hover:bg-emerald-700";
+  const accentRing = accent === "teal" ? "focus:ring-teal-200" : "focus:ring-emerald-100";
 
   return (
     <div className="flex flex-col h-full">
@@ -262,7 +262,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
             return (
               <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
                 <div className={cn(
-                  "max-w-[75%] rounded-2xl px-4 py-2.5 text-sm shadow-sm",
+                  "max-w-[75%] rounded-3xl px-4 py-2.5 text-sm shadow-sm",
                   mine ? `${accentBubble} text-white rounded-br-sm` : "bg-white text-slate-700 border border-slate-100 rounded-bl-sm"
                 )}>
                   {m.fileUrl && (
@@ -276,7 +276,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                         <img
                           src={downloadUrl(m.fileUrl, m.fileName, "inline")}
                           alt={m.fileName ?? t("attachment")}
-                          className="max-w-full rounded-lg max-h-64 object-cover"
+                          className="max-w-full rounded-2xl max-h-64 object-cover"
                           loading="lazy"
                           decoding="async"
                         />
@@ -286,7 +286,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
                         href={downloadUrl(m.fileUrl, m.fileName, "attachment")}
                         onClick={(e) => onAttachmentClick(e, m)}
                         className={cn(
-                          "min-h-11 flex items-center gap-2 rounded-lg px-2.5 py-2 mb-1.5 text-xs font-medium",
+                          "min-h-11 flex items-center gap-2 rounded-2xl px-2.5 py-2 mb-1.5 text-xs font-medium",
                           mine ? "bg-white/15 hover:bg-white/25" : "bg-slate-50 hover:bg-slate-100"
                         )}
                       >
@@ -313,7 +313,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
       {notice && (
         <div role="alert" className="px-3 py-2 text-xs text-red-600 bg-red-50 border-t border-red-100 flex items-center justify-between gap-2">
           <span>{notice}</span>
-          <button onClick={() => setNotice("")} aria-label={t("dismiss")} className="text-red-400 hover:text-red-600 flex-shrink-0">
+          <button onClick={() => setNotice("")} aria-label={t("dismiss")} className="text-red-400 hover:text-red-600 flex-shrink-0 tap-44">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -351,13 +351,13 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
           title={t("attachHint")}
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading || sending}
-          className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-11 h-11 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Paperclip className="w-4 h-4" />}
         </button>
         <textarea
           rows={1}
-          className={cn("input-field resize-none flex-1 py-2.5", accentRing)}
+          className={cn("input-field resize-none flex-1 py-2.5 rounded-3xl", accentRing)}
           placeholder={t("placeholder")}
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -368,7 +368,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
         <button aria-label={t("send")}
           onClick={send}
           disabled={!text.trim() || sending}
-          className={cn("w-11 h-11 rounded-xl flex items-center justify-center text-white flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed", accentBtn)}
+          className={cn("w-11 h-11 rounded-full flex items-center justify-center text-white shadow-sm flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed", accentBtn)}
         >
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
         </button>
@@ -384,7 +384,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
             pendingPreviewUrl ? (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={pendingPreviewUrl} alt={pendingFile.name} className="w-full max-h-48 object-contain rounded-lg mb-2 bg-slate-50" />
+                <img src={pendingPreviewUrl} alt={pendingFile.name} className="w-full max-h-48 object-contain rounded-2xl mb-2 bg-slate-50" />
                 {t("sendFileImageBody")}
               </>
             ) : (
@@ -424,7 +424,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
           <button
             type="button"
             onClick={() => setLightboxUrl(null)}
-            className="absolute top-4 right-4 text-white/80 hover:text-white"
+            className="absolute top-4 right-4 text-white/80 hover:text-white tap-44"
             aria-label={t("close")}
           >
             <X className="w-7 h-7" />
@@ -434,7 +434,7 @@ export default function ChatThread({ appointmentId, meId, accent = "blue" }: Cha
             src={lightboxUrl}
             alt={t("attachment")}
             onClick={(e) => e.stopPropagation()}
-            className="max-h-full max-w-full object-contain rounded-lg"
+            className="max-h-full max-w-full object-contain rounded-2xl"
           />
         </div>
       )}

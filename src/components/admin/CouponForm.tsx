@@ -137,7 +137,7 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
         {isEdit ? `Edit ${coupon.code}` : "New Coupon"}
       </h1>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 space-y-4">
         <div>
           <label className="input-label">Code</label>
           <input
@@ -168,9 +168,9 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
                   key={t}
                   type="button"
                   onClick={() => setDiscountType(t)}
-                  className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${
+                  className={`flex-1 min-h-11 py-2 rounded-full text-sm font-semibold border transition-colors ${
                     discountType === t
-                      ? "bg-blue-600 text-white border-blue-600"
+                      ? "bg-emerald-600 text-white border-emerald-600"
                       : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                   }`}
                 >
@@ -224,9 +224,9 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
                 key={o.value}
                 type="button"
                 onClick={() => toggleApplies(o.value)}
-                className={`py-2 px-2 rounded-xl text-xs font-semibold leading-tight border transition-colors ${
+                className={`min-h-11 py-2 px-2 rounded-full text-xs font-semibold leading-tight border transition-colors ${
                   appliesTo.includes(o.value)
-                    ? "bg-blue-600 text-white border-blue-600"
+                    ? "bg-emerald-600 text-white border-emerald-600"
                     : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                 }`}
               >
@@ -246,9 +246,9 @@ export default function CouponForm({ coupon }: { coupon?: CouponData }) {
                   key={t}
                   type="button"
                   onClick={() => toggleType(t)}
-                  className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${
+                  className={`flex-1 min-h-11 py-2 rounded-full text-sm font-semibold border transition-colors ${
                     consultTypes.includes(t)
-                      ? "bg-blue-600 text-white border-blue-600"
+                      ? "bg-emerald-600 text-white border-emerald-600"
                       : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                   }`}
                 >

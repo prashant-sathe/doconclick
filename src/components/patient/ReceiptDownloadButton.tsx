@@ -51,7 +51,7 @@ export default function ReceiptDownloadButton({ kind, id, compact = false }: { k
       <button
         onClick={() => setOpen(true)}
         className={compact
-          ? "inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 py-1"
+          ? "tap-44-y mt-1 inline-flex items-center gap-1 min-h-9 px-3 rounded-full bg-emerald-50 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
           : "tap-44-y btn-secondary py-2 px-3 text-xs"}
       >
         <Receipt className="w-3.5 h-3.5" />

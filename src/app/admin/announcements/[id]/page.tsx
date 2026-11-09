@@ -149,7 +149,7 @@ export default function AnnouncementDetailPage() {
   if (loading || !announcement) {
     return (
       <div className="p-4 sm:p-6 lg:p-8 max-w-3xl">
-        <div className="skeleton h-8 w-64 rounded-lg mb-6" />
+        <div className="skeleton h-8 w-64 rounded-full mb-6" />
         <div className="skeleton h-96 rounded-2xl" />
       </div>
     );
@@ -170,7 +170,7 @@ export default function AnnouncementDetailPage() {
       </div>
 
       {!isDraft && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6 flex items-center gap-6">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-6 flex items-center gap-6">
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Sent</p>
             <p className="text-sm font-semibold text-slate-800 mt-0.5">
@@ -195,7 +195,7 @@ export default function AnnouncementDetailPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 space-y-4">
         <div>
           <label className="input-label">Title</label>
           {isDraft ? (
@@ -218,7 +218,7 @@ export default function AnnouncementDetailPage() {
           <div>
             <label className="input-label">Banner Image</label>
             {bannerImageUrl ? (
-              <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200">
+              <div className="relative w-full h-32 rounded-2xl overflow-hidden border border-slate-200">
                 <Image src={bannerImageUrl} alt="Banner" fill sizes="100vw" className="object-cover" />
                 {isDraft && (
                   <button
@@ -234,7 +234,7 @@ export default function AnnouncementDetailPage() {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="w-full h-24 rounded-xl border-2 border-dashed border-slate-200 flex items-center justify-center gap-2 text-slate-400 hover:border-slate-300 hover:text-slate-500 transition-colors"
+                  className="w-full h-24 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center gap-2 text-slate-400 hover:border-slate-300 hover:text-slate-500 transition-colors"
                 >
                   {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImagePlus className="w-5 h-5" />}
                   <span className="text-sm font-medium">{uploading ? "Uploading…" : "Upload banner (JPG/PNG, max 5MB)"}</span>
@@ -255,9 +255,9 @@ export default function AnnouncementDetailPage() {
                 <button
                   key={opt.value}
                   onClick={() => setAudience(opt.value)}
-                  className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${
+                  className={`flex-1 min-h-11 py-2 rounded-full text-sm font-semibold border transition-colors ${
                     audience === opt.value
-                      ? "bg-blue-600 text-white border-blue-600"
+                      ? "bg-emerald-600 text-white border-emerald-600"
                       : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                   }`}
                 >
@@ -335,7 +335,7 @@ export default function AnnouncementDetailPage() {
 
       {deleteOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <Trash2 className="w-5 h-5 text-red-600" />
               <h3 className="font-bold text-slate-800">Delete this draft?</h3>
@@ -346,7 +346,7 @@ export default function AnnouncementDetailPage() {
               <button
                 onClick={confirmDelete}
                 disabled={deleting}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 min-h-11 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {deleting ? "Deleting…" : "Delete Draft"}
               </button>
@@ -357,7 +357,7 @@ export default function AnnouncementDetailPage() {
 
       {sendOpen && announcement && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full">
             <div className="flex items-center gap-2 mb-3">
               <Send className="w-5 h-5 text-blue-600" />
               <h3 className="font-bold text-slate-800">Send this announcement?</h3>

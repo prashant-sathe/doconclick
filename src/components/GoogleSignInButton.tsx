@@ -58,7 +58,7 @@ export default function GoogleSignInButton({ role = "PATIENT", next, intent, lab
       href={webStartUrl}
       onClick={handleClick}
       aria-disabled={busy}
-      className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-colors aria-disabled:opacity-60 aria-disabled:pointer-events-none"
+      className="flex items-center justify-center gap-2.5 w-full min-h-11 py-3.5 rounded-full border border-slate-200 text-sm font-semibold text-slate-700 bg-white shadow-sm hover:bg-slate-50 transition-colors aria-disabled:opacity-60 aria-disabled:pointer-events-none"
     >
       {busy ? (
         <Loader2 className="w-[18px] h-[18px] animate-spin" />

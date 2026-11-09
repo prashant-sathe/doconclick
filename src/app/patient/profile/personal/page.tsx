@@ -148,7 +148,7 @@ export default function PersonalSettingsPage() {
       </div>
 
       {bmi && (
-        <div className={cn("rounded-xl px-4 py-2.5 text-sm font-semibold flex items-center justify-between", bmiCategoryClasses(bmi.category))}>
+        <div className={cn("rounded-2xl px-4 py-2.5 text-sm font-semibold flex items-center justify-between", bmiCategoryClasses(bmi.category))}>
           <span>BMI: {bmi.value}</span>
           <span>{t(`bmiCategory.${bmi.category}`)}</span>
         </div>
@@ -160,7 +160,7 @@ export default function PersonalSettingsPage() {
           {CHRONIC_OPTIONS.map((o) => (
             <button key={o} type="button" onClick={() => toggleChronic(o)}
               className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
-                form.chronicDiseases.includes(o) ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                form.chronicDiseases.includes(o) ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
               )}>
               {chronicLabel(o)}
             </button>

@@ -110,8 +110,8 @@ export default function HealthDocumentsPage() {
           {documents.map((doc) => {
             const Icon = CATEGORY_ICON[doc.category] ?? FileText;
             return (
-              <div key={doc.id} className="flex items-center gap-3 rounded-xl border border-slate-100 p-3">
-                <span className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+              <div key={doc.id} className="flex items-center gap-3 rounded-2xl border border-slate-100 p-3">
+                <span className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
                   <Icon className="w-4.5 h-4.5" />
                 </span>
                 <div className="min-w-0 flex-1">
@@ -124,7 +124,7 @@ export default function HealthDocumentsPage() {
                   type="button"
                   onClick={() => onOpen(doc)}
                   disabled={downloadingId === doc.id}
-                  className="tap-44 w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-slate-100 flex-shrink-0"
+                  className="tap-44 w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-slate-100 flex-shrink-0"
                   title={t("viewTitle")}
                 >
                   {downloadingId === doc.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
@@ -132,7 +132,7 @@ export default function HealthDocumentsPage() {
                 <button aria-label={t("removeAria", { title: doc.title })}
                   type="button"
                   onClick={() => setDeleteTarget(doc)}
-                  className="tap-44 w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0"
+                  className="tap-44 w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0"
                   title={t("remove")}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -200,7 +200,7 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+      <div className="bg-white rounded-3xl p-6 max-w-sm w-full">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-bold text-slate-800">{t("dialogTitle")}</h3>
           <button aria-label={t("close")} onClick={onClose} className="tap-44 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200">
@@ -230,7 +230,7 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
         />
 
         {error && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-3">{error}</p>
+          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-3 py-2 mb-3">{error}</p>
         )}
 
         <div className="flex gap-3">
@@ -238,7 +238,7 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
           <button
             onClick={submit}
             disabled={busy}
-            className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-60"
+            className="btn-primary flex-1"
           >
             {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("uploading")}</> : t("upload")}
           </button>

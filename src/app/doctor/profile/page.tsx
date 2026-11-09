@@ -78,7 +78,7 @@ function Group({ label, children }: { label: string; children: React.ReactNode }
   return (
     <div className="mb-5">
       <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-1.5">{label}</p>
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-50">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden divide-y divide-slate-100">
         {children}
       </div>
     </div>
@@ -89,8 +89,8 @@ function Row({ href, icon, tint, title, trailing }: {
   href: string; icon: React.ReactNode; tint: string; title: string; trailing?: React.ReactNode;
 }) {
   return (
-    <Link href={href} className="flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 transition-colors">
-      <span className={cn("w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0", tint)}>{icon}</span>
+    <Link href={href} className="flex items-center gap-3 px-4 py-3.5 min-h-14 hover:bg-slate-50 transition-colors">
+      <span className={cn("w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0", tint)}>{icon}</span>
       <span className="text-sm font-semibold text-slate-800 flex-1 min-w-0 truncate">{title}</span>
       {trailing}
       <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
@@ -158,14 +158,14 @@ export default function DoctorProfilePage() {
 
       <div className="max-w-xl mx-auto py-6 px-4 sm:px-6">
         {/* Header */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-4 flex items-center gap-4">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-4 flex items-center gap-4">
           <AvatarEditor url={photoUrl} onChange={(u) => setPhotoUrl(u || null)} />
           <div className="min-w-0 flex-1">
             <EditableName name={user.name} displayName={formatDoctorName(user.name)} onSaved={refresh} />
             <p className="text-sm text-slate-500 truncate">{p.specialty ?? t("specialtyNotSet")}</p>
             <div className="mt-2 flex items-center gap-2">
               <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
-                <div className={cn("h-full rounded-full transition-all", completeness.percent === 100 ? "bg-emerald-500" : "bg-teal-500")}
+                <div className={cn("h-full rounded-full transition-all", completeness.percent === 100 ? "bg-emerald-500" : "bg-emerald-400")}
                   style={{ width: `${completeness.percent}%` }} />
               </div>
               <span className="text-xs font-semibold text-slate-500 flex-shrink-0">
@@ -177,7 +177,7 @@ export default function DoctorProfilePage() {
 
         {/* Account status */}
         {!registrationFeePaid && (
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-5 flex items-center justify-between gap-3 flex-wrap">
+          <div className="bg-blue-50 border border-blue-200 rounded-3xl p-4 mb-5 flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-start gap-2.5 min-w-0">
               <ShieldCheck className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-slate-700 min-w-0">
@@ -196,7 +196,7 @@ export default function DoctorProfilePage() {
           </div>
         )}
         {registrationFeePaid && !subActive && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-5 flex items-center justify-between gap-3 flex-wrap">
+          <div className="bg-red-50 border border-red-200 rounded-3xl p-4 mb-5 flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-start gap-2.5 min-w-0">
               <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-slate-700"><span className="font-bold text-slate-900">{t("planExpired")}</span> {t("renewToKeep")}</p>
@@ -210,12 +210,12 @@ export default function DoctorProfilePage() {
           const left = daysUntil(target);
           const tone = left <= 2 ? "text-red-600" : left <= 7 ? "text-amber-600" : "text-emerald-600";
           return (
-            <div className="bg-white border border-slate-100 shadow-sm rounded-2xl p-4 mb-5 flex items-center gap-2.5 text-sm">
+            <div className="bg-white border border-slate-100/80 shadow-sm rounded-3xl p-4 mb-5 flex items-center gap-2.5 text-sm">
               <CheckCircle2 className={cn("w-5 h-5 flex-shrink-0", tone)} />
               <span className="text-slate-700 flex-1">
                 <span className="font-bold text-slate-900">{isTrial ? t("trialActive") : t("planActive")}</span> · {left === 0 ? t("expiresToday") : t("daysLeft", { count: left })}
               </span>
-              <Link href="/doctor/subscribe" className="text-teal-600 font-semibold flex-shrink-0">{t("manage")}</Link>
+              <Link href="/doctor/subscribe" className="inline-flex items-center min-h-10 px-3.5 -my-1.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold flex-shrink-0 hover:bg-emerald-100">{t("manage")}</Link>
             </div>
           );
         })()}
@@ -266,7 +266,7 @@ export default function DoctorProfilePage() {
 
         <button
           onClick={logout}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 min-h-12 rounded-full bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
         >
           <LogOut className="w-4 h-4" /> {t("signOut")}
         </button>

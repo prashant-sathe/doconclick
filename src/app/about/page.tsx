@@ -72,7 +72,7 @@ export default async function AboutPage() {
                 { icon: Globe,       k: "boxVideo",  bg: "bg-purple-600" },
                 { icon: Award,       k: "boxLang",   bg: "bg-amber-500" },
               ].map(({ icon: Icon, k, bg }) => (
-                <div key={k} className={`${bg} rounded-2xl p-8 text-white card-hover`}>
+                <div key={k} className={`${bg} rounded-3xl p-8 text-white shadow-lg card-hover`}>
                   <Icon className="w-8 h-8 mb-3 opacity-80" />
                   <div className="text-3xl font-extrabold mb-1">{td(`${k}Value`)}</div>
                   <div className="text-sm opacity-80">{td(`${k}Label`)}</div>
@@ -96,7 +96,7 @@ export default async function AboutPage() {
               alt={t("founderPhotoAlt")}
               width={510}
               height={510}
-              className="w-32 h-32 rounded-2xl object-cover mx-auto mb-5 shadow"
+              className="w-32 h-32 rounded-full object-cover mx-auto mb-5 shadow"
             />
             <h3 className="text-lg font-bold text-slate-900">{t("founderName")}</h3>
             <p className="text-sm font-semibold text-blue-600 mt-1">{t("founderRole")}</p>
@@ -114,7 +114,7 @@ export default async function AboutPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {VALUES.map(({ icon: Icon, key }) => (
               <div key={key} className="stat-card card-hover text-center">
-                <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-5">
+                <div className="w-14 h-14 rounded-full gradient-primary flex items-center justify-center mx-auto mb-5">
                   <Icon className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-3">{td(`${key}Title`)}</h3>

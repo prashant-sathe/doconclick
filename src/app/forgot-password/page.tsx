@@ -24,7 +24,7 @@ function ForgotPasswordContent() {
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-xl">
+        <div className="w-16 h-16 rounded-full gradient-primary flex items-center justify-center mx-auto mb-4 shadow-xl">
           <KeyRound className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t("title")}</h1>
@@ -33,9 +33,9 @@ function ForgotPasswordContent() {
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
+      <div className="glass-card rounded-3xl p-6 sm:p-8">
         {error && (
-          <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-5">
+          <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
             {isKnownError(error) ? tg(ERRORS[error]) : tg("generic")}
           </div>
@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       <div className="fixed top-[calc(1.25rem_+_var(--safe-area-inset-top,env(safe-area-inset-top)))] left-6 z-10">
-        <Link href={native ? "/login" : "/"} className="btn-ghost gap-1.5 text-sm tap-44-y">
+        <Link href={native ? "/login" : "/"} className="btn-ghost glass-pill gap-1.5 text-sm min-h-11 tap-44-y">
           ← {native ? tc("back") : tc("home")}
         </Link>
       </div>

@@ -86,9 +86,9 @@ function PayContent() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-7 border border-slate-100">
+    <div className="glass-card rounded-3xl p-6 sm:p-7">
       <div className="text-center mb-5">
-        <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-3 shadow-lg">
+        <div className="w-14 h-14 rounded-full gradient-primary flex items-center justify-center mx-auto mb-3 shadow-lg">
           <CreditCard className="w-7 h-7 text-white" />
         </div>
         <h1 className="text-2xl font-extrabold text-slate-900">{t("title")}</h1>
@@ -97,7 +97,7 @@ function PayContent() {
         </p>
       </div>
 
-      <div className="bg-slate-50 rounded-xl p-4 mb-5 text-sm space-y-1.5">
+      <div className="bg-white/80 border border-slate-100 rounded-2xl p-4 mb-5 text-sm space-y-1.5">
         <div className="flex justify-between gap-3"><span className="text-slate-500">{t("patient")}</span><span className="text-slate-800 font-semibold text-right">{bill.patientName}</span></div>
         <div className="flex justify-between gap-3"><span className="text-slate-500">{tc("doctor")}</span><span className="text-slate-800 font-semibold text-right">{doctor}{bill.specialty ? ` · ${bill.specialty}` : ""}</span></div>
         <div className="flex justify-between gap-3"><span className="text-slate-500 flex items-center gap-1"><Icon className="w-3.5 h-3.5" /> {label}</span><span className="text-slate-800 text-right">{bill.clinic?.name ?? ""}</span></div>
@@ -112,7 +112,7 @@ function PayContent() {
       </div>
 
       {error && (
-        <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">{error}</div>
+        <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 mb-4">{error}</div>
       )}
 
       <button onClick={pay} disabled={paying} className="btn-primary w-full justify-center py-3.5 text-base">

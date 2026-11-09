@@ -125,14 +125,14 @@ export default function AddressAutocomplete({
         <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400 absolute right-3 top-3.5" />
       )}
       {open && suggestions.length > 0 && value.trim().length >= 3 && (
-        <div className="absolute z-50 mt-1 w-full bg-white rounded-xl border border-slate-200 shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full bg-white rounded-2xl border border-slate-200 shadow-lg max-h-60 overflow-y-auto">
           {suggestions.map((s, i) => (
             <button
               key={s.id}
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => select(s)}
-              className={`w-full text-left px-3.5 py-2.5 text-sm flex items-start gap-2 hover:bg-slate-50 transition-colors ${i === activeIndex ? "bg-blue-50" : ""}`}
+              className={`w-full text-left px-3.5 py-2.5 text-sm flex items-start gap-2 hover:bg-slate-50 transition-colors ${i === activeIndex ? "bg-emerald-50" : ""}`}
             >
               <MapPin className="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" />
               <span className="text-slate-700 leading-snug">{s.label}</span>

@@ -86,7 +86,7 @@ export default function NewAnnouncement() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Form */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 space-y-4">
           <div>
             <label className="input-label">Title</label>
             <input className="input-field" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Diwali offer — 20% off consultations" />
@@ -106,7 +106,7 @@ export default function NewAnnouncement() {
           <div>
             <label className="input-label">Banner Image (optional)</label>
             {bannerImageUrl ? (
-              <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200">
+              <div className="relative w-full h-32 rounded-2xl overflow-hidden border border-slate-200">
                 <Image src={bannerImageUrl} alt="Banner" fill sizes="100vw" className="object-cover" />
                 <button
                   onClick={() => setBannerImageUrl(null)}
@@ -119,7 +119,7 @@ export default function NewAnnouncement() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="w-full h-24 rounded-xl border-2 border-dashed border-slate-200 flex items-center justify-center gap-2 text-slate-400 hover:border-slate-300 hover:text-slate-500 transition-colors"
+                className="w-full h-24 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center gap-2 text-slate-400 hover:border-slate-300 hover:text-slate-500 transition-colors"
               >
                 {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImagePlus className="w-5 h-5" />}
                 <span className="text-sm font-medium">{uploading ? "Uploading…" : "Upload banner (JPG/PNG, max 5MB)"}</span>
@@ -135,9 +135,9 @@ export default function NewAnnouncement() {
                 <button
                   key={opt.value}
                   onClick={() => setAudience(opt.value)}
-                  className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${
+                  className={`flex-1 min-h-11 py-2 rounded-full text-sm font-semibold border transition-colors ${
                     audience === opt.value
-                      ? "bg-blue-600 text-white border-blue-600"
+                      ? "bg-emerald-600 text-white border-emerald-600"
                       : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                   }`}
                 >

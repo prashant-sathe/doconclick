@@ -69,14 +69,14 @@ export default function PatientRegisterClient({ next: rawNext }: { next?: string
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <div className="w-14 h-14 rounded-full gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Heart className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900">{t("title")}</h1>
           <p className="text-slate-500 mt-2">{t("subtitle")}</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
+        <div className="glass-card rounded-3xl p-6 sm:p-8">
           <form onSubmit={submit} className="space-y-5">
             <div>
               <label className="input-label"><Phone className="inline w-3.5 h-3.5 mr-1" />{tc("mobileNumber")}</label>
@@ -101,7 +101,7 @@ export default function PatientRegisterClient({ next: rawNext }: { next?: string
 
             <ReferralCodeField referral={referral} />
 
-            {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">{error}</div>}
+            {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5">{error}</div>}
 
             <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3.5 text-base">
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> {tr("creatingAccount")}</> : <>{tr("createAccount")} <ArrowRight className="w-4 h-4" /></>}

@@ -80,7 +80,7 @@ export default function ReportTable<T extends Record<string, unknown>>({
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
           <p className="text-xs text-slate-400">{loading ? "Loading…" : `${rows.length} row${rows.length === 1 ? "" : "s"}`}</p>
           <button onClick={handleExport} disabled={loading || rows.length === 0} className="btn-ghost gap-2 text-xs disabled:opacity-40">
@@ -90,7 +90,7 @@ export default function ReportTable<T extends Record<string, unknown>>({
 
         {loading ? (
           <div className="p-8 space-y-3">
-            {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
+            {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-2xl" />)}
           </div>
         ) : rows.length === 0 ? (
           <div className="text-center py-12 text-slate-400">

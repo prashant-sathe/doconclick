@@ -56,9 +56,9 @@ export default function NotificationSettings() {
 
   if (!supported) {
     return (
-      <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+      <section className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6">
         <h2 className="font-bold text-slate-800 mb-1 flex items-center gap-2">
-          <Bell className="w-4 h-4 text-blue-500" /> {t("settingsTitle")}
+          <Bell className="w-4 h-4 text-emerald-600" /> {t("settingsTitle")}
         </h2>
         <p className="text-sm text-slate-500">{t("notSupported")}</p>
       </section>
@@ -66,14 +66,14 @@ export default function NotificationSettings() {
   }
 
   return (
-    <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+    <section className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6">
       <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-        <Bell className="w-4 h-4 text-blue-500" /> {t("settingsTitle")}
+        <Bell className="w-4 h-4 text-emerald-600" /> {t("settingsTitle")}
       </h2>
 
       {permission === "denied" ? (
-        <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4">
-          <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+        <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-2xl p-4">
+          <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
             <BellOff className="w-4 h-4 text-amber-600" />
           </div>
           <div className="min-w-0 flex-1">
@@ -89,7 +89,7 @@ export default function NotificationSettings() {
               <button
                 type="button"
                 onClick={openSystemNotificationSettings}
-                className="text-xs font-semibold px-3 py-1.5 rounded-lg text-amber-700 hover:bg-amber-100 mt-2 inline-flex items-center gap-1"
+                className="text-xs font-semibold px-3 py-1.5 rounded-full text-amber-700 hover:bg-amber-100 mt-2 inline-flex items-center gap-1"
               >
                 {t("openMacSettings")} <ExternalLink className="w-3 h-3" />
               </button>
@@ -100,7 +100,7 @@ export default function NotificationSettings() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className={cn(
-              "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0",
+              "w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0",
               subscribed ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400"
             )}>
               {subscribed ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}

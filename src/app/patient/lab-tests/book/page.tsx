@@ -19,7 +19,7 @@ import { getCurrentPositionCompat } from "@/lib/platform";
 // Leaflet touches window — load the map on the client only.
 const LocationPickerMap = dynamic(() => import("@/components/LocationPickerMap"), {
   ssr: false,
-  loading: () => <div className="skeleton h-[260px] rounded-xl" />,
+  loading: () => <div className="skeleton h-[260px] rounded-2xl" />,
 });
 
 interface Quote {
@@ -131,7 +131,7 @@ function BookLabTests() {
 
   if (data.openBooking) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 text-center">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 text-center">
         <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-3" />
         <p className="text-sm text-slate-700">{t("alreadyBooked")}</p>
         <Link href="/patient/lab-tests" className="tap-44-y btn-primary py-2 px-4 text-sm mt-4 inline-flex">{t("viewBookings")}</Link>
@@ -139,22 +139,22 @@ function BookLabTests() {
     );
   }
   if (bookable.length === 0) {
-    return <div className="bg-white rounded-2xl border border-slate-100 p-6 text-sm text-slate-500 text-center">{t("noneBookable")}</div>;
+    return <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 text-sm text-slate-500 text-center">{t("noneBookable")}</div>;
   }
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5">
         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t("forPatient")}</p>
         <p className="font-semibold text-slate-900">{data.patientName}</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5">
         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">{t("testsTitle")}</p>
-        <div className="divide-y divide-slate-50">
+        <div className="divide-y divide-slate-100">
           {bookable.map((b) => (
-            <label key={b.id} className="flex items-start gap-3 py-2.5 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 mt-0.5 accent-teal-600" checked={selectedIds.has(b.id)} onChange={() => toggle(b.id)} />
+            <label key={b.id} className="flex items-start gap-3 py-3 px-2 -mx-2 min-h-11 rounded-2xl hover:bg-slate-50 cursor-pointer">
+              <input type="checkbox" className="w-5 h-5 mt-0.5 accent-teal-600" checked={selectedIds.has(b.id)} onChange={() => toggle(b.id)} />
               <span className="flex-1 min-w-0">
                 <span className="text-sm font-semibold text-slate-800 block">{b.name}</span>
                 {b.instructions && <span className="text-xs text-slate-500 block">{b.instructions}</span>}
@@ -172,7 +172,7 @@ function BookLabTests() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-3">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 space-y-3">
         <div>
           <label className="input-label">{t("address")}</label>
           <textarea rows={2} className="input-field resize-none" maxLength={500} value={addressValue} onChange={(e) => setAddress(e.target.value)} placeholder={t("addressPlaceholder")} />
@@ -218,7 +218,7 @@ function BookLabTests() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5">
         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">{t("payWith")}</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {(["WALLET", "ONLINE"] as const).map((m) => (
@@ -226,7 +226,7 @@ function BookLabTests() {
               key={m}
               type="button"
               onClick={() => setMethod(m)}
-              className={cn("tap-44-y text-left rounded-xl border px-4 py-3 flex items-start gap-3", method === m ? "border-teal-500 bg-teal-50" : "border-slate-200 hover:border-teal-300")}
+              className={cn("tap-44-y text-left rounded-2xl border px-4 py-3 flex items-start gap-3", method === m ? "border-teal-500 bg-teal-50" : "border-slate-200 hover:border-teal-300")}
             >
               {m === "WALLET" ? <Wallet className="w-5 h-5 text-teal-600 flex-shrink-0" /> : <CreditCard className="w-5 h-5 text-teal-600 flex-shrink-0" />}
               <span>

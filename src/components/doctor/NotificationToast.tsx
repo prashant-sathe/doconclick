@@ -34,7 +34,7 @@ export default function NotificationToast({ request, onDismiss, href = "/doctor/
         onClick={() => { router.push(href); onDismiss(); }}
         className="w-full text-left bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 flex items-start gap-3 hover:border-teal-200 transition-colors"
       >
-        <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center flex-shrink-0">
+        <div className="w-9 h-9 rounded-full bg-teal-50 flex items-center justify-center flex-shrink-0">
           <Bell className="w-4 h-4 text-teal-600" />
         </div>
         <div className="min-w-0 flex-1">

@@ -68,7 +68,7 @@ export default function EditableName({
             type="button"
             onClick={save}
             disabled={saving}
-            className="tap-44-y w-11 h-7 rounded-lg flex items-center justify-center text-emerald-600 hover:bg-emerald-50 flex-shrink-0"
+            className="tap-44-y w-11 h-7 rounded-full flex items-center justify-center text-emerald-600 hover:bg-emerald-50 flex-shrink-0"
             title={t("save")}
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
@@ -77,7 +77,7 @@ export default function EditableName({
             type="button"
             onClick={() => setEditing(false)}
             disabled={saving}
-            className="tap-44-y w-11 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 flex-shrink-0"
+            className="tap-44-y w-11 h-7 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 flex-shrink-0"
             title={t("cancel")}
           >
             <X className="w-4 h-4" />

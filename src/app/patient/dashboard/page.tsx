@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
   MapPin, Home, Building2, Video, Stethoscope, Clock,
-  ChevronDown, X, Loader2, UserCircle, Languages,
+  X, Loader2, UserCircle, Languages,
   Navigation, AlertCircle, IndianRupee, CalendarClock,
   CalendarCheck2, AlertTriangle, ShieldCheck, Users, Search,
   Bookmark, BookmarkCheck, Sparkles, Compass, RefreshCw, Crosshair,
@@ -38,6 +38,7 @@ import {
   writeStoredDoctorFilters,
 } from "@/lib/doctorFilters";
 import PatientMobileNav from "@/components/patient/PatientMobileNav";
+import InboxButton from "@/components/InboxButton";
 import EnableNotificationsPrompt from "@/components/EnableNotificationsPrompt";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import DependentPicker from "@/components/patient/DependentPicker";
@@ -299,6 +300,94 @@ function DoctorListCard({
   );
 }
 
+// Horizontal "nearby" card over the bottom of the map — photo on top with a
+// rating chip, name + distance, address, Book / Route actions.
+function NearbyClinicCard({
+  doctor,
+  clinic,
+  distanceKm,
+  color,
+  isOpen,
+  onBook,
+}: {
+  doctor: Doctor;
+  clinic: Clinic;
+  distanceKm: number | null;
+  color: string;
+  isOpen: boolean;
+  onBook: () => void;
+}) {
+  const td = useTranslations("patient.dashboard");
+  // A photo that fails to load (or isn't an image at all) falls back to the
+  // coloured initial tile instead of a broken-image box.
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const profile = doctor.doctorProfile;
+  if (!profile) return null;
+  const photo = photoFailed ? null : clinic.photoUrl ?? profile.clinicPhotoUrl ?? profile.photoUrl;
+  const bareName = doctor.name.replace(/^dr\.?\s*/i, "").trim();
+  const initial = (bareName[0] ?? doctor.name.trim()[0] ?? "?").toUpperCase();
+
+  return (
+    <div className="snap-center flex-shrink-0 w-[78vw] max-w-[300px] glass-card rounded-3xl p-2 pointer-events-auto">
+      <button type="button" onClick={onBook} className="block w-full text-left">
+        <div className="relative h-28 rounded-[1.1rem] overflow-hidden bg-slate-100">
+          {photo ? (
+            <Image src={photo} alt={clinic.name} fill sizes="300px" className="object-cover" onError={() => setPhotoFailed(true)} />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center text-white font-extrabold text-3xl"
+              style={{ background: `linear-gradient(135deg, ${color}, ${color}99)` }}
+            >
+              {initial}
+            </div>
+          )}
+          <span
+            className={cn(
+              "absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur",
+              isOpen ? "bg-emerald-600/90 text-white" : "bg-white/90 text-slate-500"
+            )}
+          >
+            {isOpen ? td("listOpen") : td("listClosed")}
+          </span>
+          {profile.totalReviews > 0 && (
+            <span className="absolute top-2 right-2 text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/95 text-slate-800 shadow-sm">
+              <span className="text-amber-500">★</span> {profile.avgRating.toFixed(1)}
+            </span>
+          )}
+        </div>
+        <div className="px-1.5 pt-2">
+          <div className="flex items-center gap-1.5">
+            <p className="font-bold text-slate-900 text-sm truncate flex-1 min-w-0">
+              {formatDoctorName(doctor.name)}
+            </p>
+            {profile.isVerified && <VerifiedBadge />}
+            {distanceKm != null && (
+              <span className="text-[11px] text-slate-500 flex-shrink-0">{distanceKm.toFixed(1)} km</span>
+            )}
+          </div>
+          <p className="text-[11px] text-slate-500 truncate">
+            {profile.specialty} · {clinic.name}
+          </p>
+          <p className="text-[11px] text-slate-400 truncate">{clinic.address}</p>
+        </div>
+      </button>
+      <div className="flex items-center gap-1.5 px-1 pt-2 pb-0.5">
+        <button type="button" onClick={onBook} className="btn-primary !px-5 !py-0 h-9 text-xs">
+          {td("cardBook")}
+        </button>
+        <a
+          href={`https://www.google.com/maps/dir/?api=1&destination=${clinic.lat},${clinic.lng}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white/90 px-3.5 h-9 text-xs font-semibold text-slate-600 hover:text-slate-900"
+        >
+          <Navigation className="w-3 h-3" /> {td("cardRoute")}
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 // PAGE COMPONENT
 // ══════════════════════════════════════════════════════════════════════════
@@ -310,6 +399,7 @@ function PatientDashboardInner() {
   // Booking sheet strings come from the "booking" namespace; the map, list
   // and doctor card from "patient".
   const td = useTranslations("patient.dashboard");
+  const tn = useTranslations("nav.header");
   const tp = useTranslations("patient.common");
   const tb = useTranslations("booking.dashboardSheet");
   const tf = useTranslations("booking.form");
@@ -678,6 +768,13 @@ function PatientDashboardInner() {
     return list;
   }, [mapDoctors, clinicDistance, effectiveRadiusKm]);
 
+  // Closest clinics first for the bottom card carousel (capped — it's a
+  // quick pick, the list view has everything).
+  const nearbyCards = useMemo(
+    () => [...clinicMarkers].sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)).slice(0, 12),
+    [clinicMarkers]
+  );
+
   // ── Initialise Leaflet once map div is available ───────────────────────
   const initMap = useCallback(
     async (center: [number, number]) => {
@@ -699,7 +796,11 @@ function PatientDashboardInner() {
         zoomControl: false,
       });
 
-      L.control.zoom({ position: "bottomright" }).addTo(map);
+      // Phones pinch-zoom, and the +/- buttons would sit under the nearby
+      // cards carousel — only desktop gets them.
+      if (window.matchMedia("(min-width: 1024px)").matches) {
+        L.control.zoom({ position: "bottomright" }).addTo(map);
+      }
 
       L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -1043,61 +1144,72 @@ function PatientDashboardInner() {
   // so the two stay visually in sync instead of drifting apart.
   const headerRow = (
     <div
-      className="flex items-start justify-between p-3 sm:p-4 gap-2 sm:gap-3"
-      style={{ paddingTop: "calc(0.75rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
+      className="px-3 sm:px-4 pt-2 pb-2"
+      style={{ paddingTop: "calc(0.5rem + var(--safe-area-inset-top, env(safe-area-inset-top)))" }}
     >
-      {/* Logo / title — tap the location line to change it */}
-      <button
-        onClick={() => setLocationPickerOpen(true)}
-        className="glass-card rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 pointer-events-auto shadow-lg min-w-0 text-left"
-      >
-        <div className="min-w-0">
-          <Image src="/logo.png" alt="DocOnClick" width={1200} height={242} className="h-6 sm:h-7 w-auto object-contain" />
-          <p className={cn("text-xs mt-0.5 truncate", customLabel ? "text-blue-600 font-semibold" : "text-slate-500")}>
-            {customLabel ? `📍 ${customLabel}` : posError ? `📍 ${td("setYourLocation")}` : `📍 ${td("yourLocationChange")}`}
-          </p>
-        </div>
-      </button>
-
-      {/* Right: quick actions + profile */}
-      <div className="glass-card rounded-2xl px-2.5 sm:px-4 py-2.5 sm:py-3 flex items-center gap-1.5 sm:gap-3 pointer-events-auto shadow-lg flex-shrink-0">
-        {profilePercent != null && profilePercent < 100 && (
-          <button
-            onClick={() => router.push("/patient/profile")}
-            className="tap-44 hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors"
-            title={td("completeProfile")}
-          >
-            {td("profilePercent", { percent: profilePercent })}
-          </button>
-        )}
+      <div className="glass-pill rounded-full pl-1.5 pr-1.5 py-1.5 flex items-center justify-between gap-2 pointer-events-auto">
+        {/* Avatar + greeting; the second line is the search location — tap to change it */}
         <button
-          onClick={() => router.push("/patient/assistant")}
-          className="tap-44 hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl gradient-primary text-white text-xs font-semibold hover:opacity-90 transition-opacity"
-          title={td("healthAssistant")}
+          onClick={() => setLocationPickerOpen(true)}
+          className="flex items-center gap-2.5 min-w-0 text-left"
         >
-          <Sparkles className="w-4 h-4" /> {td("askAi")}
+          <span className="w-10 h-10 rounded-full gradient-primary text-white text-sm font-bold flex items-center justify-center flex-shrink-0 ring-2 ring-white shadow-sm">
+            {((user?.name ?? "").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("") || "?").toUpperCase()}
+          </span>
+          <span className="min-w-0 leading-tight">
+            <span className="block text-sm text-slate-900 truncate">
+              {tn.rich("hi", { name: user?.name?.trim() || tn("there"), strong: (c) => <strong className="font-bold">{c}</strong> })}
+            </span>
+            <span className={cn("block text-xs truncate", customLabel ? "text-blue-600 font-semibold" : posError ? "text-amber-600" : "text-emerald-700/80")}>
+              {customLabel ? `📍 ${customLabel}` : posError ? `📍 ${td("setYourLocation")}` : `📍 ${td("yourLocationChange")}`}
+            </span>
+          </span>
         </button>
-        <button aria-label={td("myAppointments")}
-          onClick={() => router.push("/patient/appointments")}
-          className="tap-44 hidden lg:flex w-8 h-8 rounded-xl bg-blue-50 items-center justify-center text-blue-500 hover:bg-blue-100 transition-colors"
-          title={td("myAppointments")}
-        >
-          <CalendarCheck2 className="w-4 h-4" />
-        </button>
-        <button aria-label={td("profile")}
-          onClick={() => router.push("/patient/profile")}
-          className="tap-44 w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors flex-shrink-0"
-          title={td("profile")}
-        >
-          <UserCircle className="w-4 h-4" />
-        </button>
+
+        {/* Right: quick actions + profile */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {profilePercent != null && profilePercent < 100 && (
+            <button
+              onClick={() => router.push("/patient/profile")}
+              className="tap-44 hidden lg:flex items-center gap-1.5 px-3 h-10 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors"
+              title={td("completeProfile")}
+            >
+              {td("profilePercent", { percent: profilePercent })}
+            </button>
+          )}
+          <button
+            onClick={() => router.push("/patient/assistant")}
+            className="tap-44 hidden lg:flex items-center gap-1.5 px-3.5 h-10 rounded-full gradient-primary text-white text-xs font-semibold hover:opacity-90 transition-opacity"
+            title={td("healthAssistant")}
+          >
+            <Sparkles className="w-4 h-4" /> {td("askAi")}
+          </button>
+          <button aria-label={td("myAppointments")}
+            onClick={() => router.push("/patient/appointments")}
+            className="tap-44 hidden lg:flex icon-pill"
+            title={td("myAppointments")}
+          >
+            <CalendarCheck2 className="w-4 h-4" />
+          </button>
+          <InboxButton />
+          <button aria-label={td("profile")}
+            onClick={() => router.push("/patient/profile")}
+            className="tap-44 icon-pill relative flex-shrink-0"
+            title={td("profile")}
+          >
+            <UserCircle className="w-4 h-4" />
+            {profilePercent != null && profilePercent < 100 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 border border-white lg:hidden" />
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
 
   const searchRow = (
     <div className="px-3 sm:px-4 pb-3 sm:pb-4 pointer-events-auto">
-      <div className="glass-card rounded-2xl p-2.5 max-w-full">
+      <div className="glass-card rounded-3xl p-2.5 max-w-full">
         <div className="flex items-center gap-2 mb-2">
           <div className="relative flex-1 min-w-0">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1106,7 +1218,7 @@ function PatientDashboardInner() {
               placeholder={td("searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-8 pr-8 py-2 rounded-xl border border-slate-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full pl-8 pr-8 py-2.5 rounded-full border border-slate-200/80 bg-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />
             {search && (
               <button aria-label={td("clearSearch")}
@@ -1118,13 +1230,13 @@ function PatientDashboardInner() {
               </button>
             )}
           </div>
-          <div className="flex items-center gap-0.5 bg-white/80 border border-slate-200 rounded-xl p-1 flex-shrink-0">
+          <div className="flex items-center gap-0.5 bg-white/90 border border-slate-200/80 rounded-full p-1 flex-shrink-0">
             <button aria-label={td("mapView")}
               onClick={() => setViewMode("map")}
               title={td("mapView")}
               className={cn(
-                "tap-44-y w-11 h-7 rounded-lg flex items-center justify-center transition-colors",
-                viewMode === "map" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-slate-600"
+                "tap-44-y w-11 h-7 rounded-full flex items-center justify-center transition-colors",
+                viewMode === "map" ? "bg-emerald-600 text-white" : "text-slate-400 hover:text-slate-600"
               )}
             >
               <MapPin className="w-4 h-4" />
@@ -1133,8 +1245,8 @@ function PatientDashboardInner() {
               onClick={() => setViewMode("list")}
               title={td("listView")}
               className={cn(
-                "tap-44-y w-11 h-7 rounded-lg flex items-center justify-center transition-colors",
-                viewMode === "list" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-slate-600"
+                "tap-44-y w-11 h-7 rounded-full flex items-center justify-center transition-colors",
+                viewMode === "list" ? "bg-emerald-600 text-white" : "text-slate-400 hover:text-slate-600"
               )}
             >
               <List className="w-4 h-4" />
@@ -1143,7 +1255,7 @@ function PatientDashboardInner() {
           <button aria-label={td("refreshAria")}
             onClick={refreshMap}
             disabled={refreshing}
-            className="tap-44 w-9 h-9 rounded-xl bg-white/80 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 transition-colors disabled:opacity-60 flex-shrink-0"
+            className="tap-44 w-9 h-9 rounded-full bg-white/90 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-emerald-600 transition-colors disabled:opacity-60 flex-shrink-0"
             title={td("refreshTitle")}
           >
             <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
@@ -1296,15 +1408,30 @@ function PatientDashboardInner() {
         </div>
       </div>
 
-      {/* ── Doctor count badge ──────────────────────────────────────── */}
-      <div className={cn("absolute bottom-[calc(5rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-6 right-4 z-20 pointer-events-none", (pickingOnMap || viewMode === "list") && "hidden")}>
-        <div className="glass-card rounded-2xl px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 pointer-events-auto">
-          <Stethoscope className="w-4 h-4 text-blue-500" />
-          <span className="text-xs sm:text-sm font-semibold text-slate-700">
-            {td("clinicsNearby", { count: clinicMarkers.length })}
-          </span>
+      {/* ── Nearby clinic cards (swipe) + count ──────────────────────── */}
+      {viewMode === "map" && !panelOpen && !pickingOnMap && nearbyCards.length > 0 && (
+        <div className="absolute inset-x-0 lg:left-[200px] lg:right-16 bottom-[calc(5.25rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-5 z-20 pointer-events-none">
+          <div className="px-4 pb-2 flex">
+            <span className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1.5 text-xs font-semibold text-slate-700">
+              <Stethoscope className="w-3.5 h-3.5 text-emerald-600" />
+              {td("clinicsNearby", { count: clinicMarkers.length })}
+            </span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto no-scrollbar snap-x snap-mandatory px-4 pb-1 pointer-events-auto">
+            {nearbyCards.map(({ doctor: doc, clinic, distance }) => (
+              <NearbyClinicCard
+                key={`${doc.id}-${clinic.id}`}
+                doctor={doc}
+                clinic={clinic}
+                distanceKm={distance ?? null}
+                color={colorFor(doc.doctorProfile?.specialty ?? "")}
+                isOpen={isClinicOpenNow(clinic.slots, new Date(now))}
+                onBook={() => openDoctorPanel(doc, clinic.id)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <PatientMobileNav />
 
@@ -1977,18 +2104,6 @@ function PatientDashboardInner() {
             <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
             <span className="text-slate-600 truncate">{customLabel ? td("noClinicsWithinOf", { km: searchRadiusKm, place: customLabel }) : td("noClinicsWithinHere", { km: searchRadiusKm })}</span>
             <button onClick={() => setIgnoreRadius(true)} className="font-semibold text-blue-600 flex-shrink-0">{td("showAll")}</button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Tap hint (shown when no panel is open) ──────────────────── */}
-      {/* Sits clear above the "clinics nearby" badge — on phones the two
-          floating chips used to collide at the bottom edge. */}
-      {viewMode === "map" && !panelOpen && !pickingOnMap && clinicMarkers.length > 0 && (
-        <div className="absolute bottom-[calc(9rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-24 inset-x-0 z-20 flex justify-center pointer-events-none">
-          <div className="glass-card rounded-full px-4 py-2 flex items-center gap-2 text-xs text-slate-500 shadow">
-            <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
-            {td("tapPinHint")}
           </div>
         </div>
       )}

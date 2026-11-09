@@ -26,8 +26,8 @@ export default function Navbar() {
   const displayName = user ? (user.role === "DOCTOR" ? formatDoctorName(user.name) : user.name || user.mobile) : "";
 
   return (
-    <nav className="safe-top fixed top-0 inset-x-0 z-50 border-b border-white/20 bg-white/90 backdrop-blur-xl">
-      <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between gap-3 xl:gap-6">
+    <nav className="safe-top fixed top-0 inset-x-0 z-50 px-3 sm:px-4 pt-3">
+      <div className="glass-pill rounded-full mx-auto max-w-7xl pl-5 pr-2.5 sm:pr-3 py-2 flex items-center justify-between gap-3 xl:gap-6">
         {/* Logo */}
         <Link href="/" className="flex items-center flex-shrink-0">
           <Image src="/logo.png" alt="DocOnClick" width={1200} height={242} className="h-9 w-auto" />
@@ -40,9 +40,9 @@ export default function Navbar() {
               key={href}
               href={href}
               className={cn(
-                "px-2.5 xl:px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200",
+                "px-2.5 xl:px-4 py-2 min-h-10 inline-flex items-center rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200",
                 pathname === href
-                  ? "text-blue-600 bg-blue-50 font-semibold"
+                  ? "text-emerald-700 bg-emerald-50 font-semibold"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               )}
             >
@@ -76,18 +76,18 @@ export default function Navbar() {
         </div>
 
         {/* Mobile hamburger */}
-        <button aria-label={open ? t("closeMenu") : t("openMenu")} aria-expanded={open} onClick={() => setOpen(v => !v)} className="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
+        <button aria-label={open ? t("closeMenu") : t("openMenu")} aria-expanded={open} onClick={() => setOpen(v => !v)} className="lg:hidden icon-pill w-11 h-11">
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {/* Mobile menu */}
       {open && (
-        <div className="lg:hidden border-t border-slate-100 bg-white px-6 py-4 space-y-1">
+        <div className="lg:hidden glass-card rounded-3xl mx-auto max-w-7xl mt-2 px-4 py-4 space-y-1">
           {navLinks.map(({ href, label }) => (
             <Link key={href} href={href} onClick={() => setOpen(false)}
-              className={cn("block px-4 py-3 rounded-xl text-sm font-medium transition-colors",
-                pathname === href ? "text-blue-600 bg-blue-50" : "text-slate-700 hover:bg-slate-50"
+              className={cn("block px-4 py-3 rounded-full text-sm font-medium transition-colors",
+                pathname === href ? "text-emerald-700 bg-emerald-50 font-semibold" : "text-slate-700 hover:bg-white/70"
               )}>
               {label}
             </Link>

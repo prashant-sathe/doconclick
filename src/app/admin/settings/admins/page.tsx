@@ -77,7 +77,7 @@ export default function AdminAdmins() {
         <p className="text-slate-500 text-sm mt-1">Create and manage accounts with full access to this admin panel.</p>
       </div>
 
-      <form onSubmit={addAdmin} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6">
+      <form onSubmit={addAdmin} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-6">
         <div className="grid sm:grid-cols-2 gap-3 mb-3">
           <div>
             <label className="input-label">Full Name</label>
@@ -118,7 +118,7 @@ export default function AdminAdmins() {
       ) : (
         <div className="space-y-3">
           {admins.map((a) => (
-            <div key={a.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+            <div key={a.id} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-9 h-9 rounded-full gradient-primary flex items-center justify-center flex-shrink-0">

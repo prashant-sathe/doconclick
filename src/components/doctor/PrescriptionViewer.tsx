@@ -130,7 +130,7 @@ export default function PrescriptionViewer({ appointmentId, patientId, onClose, 
   return (
     <div className="fixed inset-0 z-[100] bg-slate-900/60 flex items-end sm:items-center justify-center sm:p-4" onClick={onClose}>
       <div
-        className="bg-white w-full sm:max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col max-h-[92vh]"
+        className="bg-white w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-xl flex flex-col max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-label={t("dialogLabel")}

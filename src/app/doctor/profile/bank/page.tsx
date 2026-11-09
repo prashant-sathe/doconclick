@@ -89,7 +89,7 @@ export default function BankDetailsPage() {
       onSave={noPassword ? undefined : save}
     >
       {current && (
-        <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm">
+        <div className="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{t("current")}</p>
           <p className="font-semibold text-slate-800">
             {current.bankName} · XXXX{current.account.slice(-4)} · {current.ifsc}

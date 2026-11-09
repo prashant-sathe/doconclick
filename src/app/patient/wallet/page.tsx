@@ -28,9 +28,9 @@ export default function WalletPage() {
       <PatientHeader />
       <PatientMobileNav />
       <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 mb-6">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100/80 p-6 mb-6">
           <div className="flex items-center gap-3 mb-1">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-emerald-600" />
             </div>
             <span className="text-sm font-semibold text-slate-500">{t("balance")}</span>
@@ -43,23 +43,23 @@ export default function WalletPage() {
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-6">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100/80 p-6">
           <h2 className="text-sm font-bold text-slate-800 mb-4">{t("history")}</h2>
 
           {loading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => <div key={i} className="skeleton h-14 rounded-xl" />)}
+              {[1, 2, 3].map((i) => <div key={i} className="skeleton h-14 rounded-2xl" />)}
             </div>
           ) : transactions.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-10">{t("none")}</p>
           ) : (
-            <div className="divide-y divide-slate-50">
+            <div className="divide-y divide-slate-100">
               {transactions.map((txn) => {
                 const isCredit = CREDIT_TYPES.has(txn.type);
                 const Icon = txn.type === "ADMIN_CREDIT" || txn.type === "ADMIN_DEBIT" ? ShieldCheck : (isCredit ? ArrowDownCircle : ArrowUpCircle);
                 return (
                   <div key={txn.id} className="py-3.5 flex items-center gap-3">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${isCredit ? "bg-emerald-50" : "bg-blue-50"}`}>
+                    <div className={`w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 ${isCredit ? "bg-emerald-50" : "bg-blue-50"}`}>
                       <Icon className={`w-4 h-4 ${isCredit ? "text-emerald-600" : "text-blue-600"}`} />
                     </div>
                     <div className="min-w-0 flex-1">

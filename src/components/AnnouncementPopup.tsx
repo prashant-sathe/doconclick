@@ -90,8 +90,8 @@ export default function AnnouncementPopup({ onAllSeen }: { onAllSeen?: () => voi
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full relative overflow-hidden">
-        <button aria-label={t("close")} onClick={dismiss} className="absolute top-5 right-5 text-white/80 hover:text-white z-10 bg-black/20 rounded-full p-1.5">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full relative overflow-hidden">
+        <button aria-label={t("close")} onClick={dismiss} className="absolute top-5 right-5 text-white/80 hover:text-white z-10 bg-black/20 rounded-full p-1.5 tap-44">
           <X className="w-5 h-5" />
         </button>
         {current.bannerImageUrl && (

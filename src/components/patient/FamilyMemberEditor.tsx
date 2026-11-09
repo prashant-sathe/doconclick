@@ -104,7 +104,7 @@ export default function FamilyMemberEditor({ id }: { id?: string }) {
         <button
           type="button"
           onClick={() => setConfirmDelete(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 mt-3 rounded-2xl bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 mt-3 rounded-full bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
         >
           <Trash2 className="w-4 h-4" /> {t("delete")}
         </button>

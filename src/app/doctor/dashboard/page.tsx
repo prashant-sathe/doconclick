@@ -181,7 +181,7 @@ function VitalsChip({ a }: { a: Appointment }) {
     <Link
       href={historyHref(a)}
       className={cn(
-        "mt-1.5 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-semibold border",
+        "mt-1.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border",
         critical ? "bg-red-50 border-red-200 text-red-700" : warn ? "bg-amber-50 border-amber-200 text-amber-800" : "bg-slate-50 border-slate-200 text-slate-600"
       )}
     >
@@ -458,7 +458,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
   };
 
   return (
-    <div className="mt-3 bg-teal-50 border border-teal-100 rounded-xl p-4 space-y-3">
+    <div className="mt-3 bg-teal-50 border border-teal-100 rounded-3xl p-4 space-y-3">
       <div className="space-y-2">
         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t("clinicalTitle")}</p>
         {CLINICAL_KEYS.map((key) => (
@@ -495,7 +495,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         <MedicineDatalist id={`medicine-suggestions-${appt.id}`} kit={kit} />
         <div className="space-y-2">
           {medicines.map((m, i) => (
-            <div key={i} className="bg-white rounded-lg border border-slate-200 p-2.5 grid grid-cols-2 sm:grid-cols-6 gap-1.5 items-center">
+            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-2.5 grid grid-cols-2 sm:grid-cols-6 gap-1.5 items-center">
               <div className="col-span-2 flex items-center gap-1">
                 <input className="input-field text-xs py-1.5 flex-1 min-w-0" placeholder={t("medicineName")} list={`medicine-suggestions-${appt.id}`} value={m.name} onChange={(e) => setMed(i, "name", e.target.value)} />
                 <FavouriteStar row={m} kit={kit} />
@@ -543,7 +543,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         </datalist>
         <div className="space-y-2">
           {tests.map((row, i) => (
-            <div key={i} className="bg-white rounded-lg border border-slate-200 p-2.5 grid grid-cols-1 sm:grid-cols-3 gap-1.5 items-center">
+            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-2.5 grid grid-cols-1 sm:grid-cols-3 gap-1.5 items-center">
               <input
                 className="input-field text-xs py-1.5 sm:col-span-1"
                 placeholder={t("testName")}
@@ -577,7 +577,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         </button>
       </div>
 
-      <div className="rounded-xl border border-rose-100 bg-white p-3">
+      <div className="rounded-2xl border border-rose-100 bg-white p-3">
         <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer">
           <input type="checkbox" className="w-4 h-4 accent-rose-500" checked={nurseCare.on} onChange={(e) => { setNurseCare((c) => ({ ...c, on: e.target.checked })); setReferralError(""); }} />
           <HeartPulse className="w-4 h-4 text-rose-500" /> {t("needsNurse")}
@@ -607,7 +607,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         {referralError && <p className="text-xs text-red-500 mt-2">{referralError}</p>}
       </div>
 
-      <div className="rounded-xl border border-teal-100 bg-white p-3">
+      <div className="rounded-2xl border border-teal-100 bg-white p-3">
         <p className="text-sm font-semibold text-slate-800 flex items-center gap-2 mb-2">
           <CalendarClock className="w-4 h-4 text-teal-600" /> {tf("title")}
         </p>
@@ -616,7 +616,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       </div>
 
       {hasPrescriptionItems && (
-        <label className="flex items-start gap-2.5 rounded-xl border border-teal-200 bg-white px-3 py-2.5 cursor-pointer">
+        <label className="flex items-start gap-2.5 rounded-2xl border border-teal-200 bg-white px-3 py-2.5 cursor-pointer">
           <input
             type="checkbox"
             checked={confirmed}
@@ -639,7 +639,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
         {files.length > 0 && (
           <ul className="mt-2 space-y-1">
             {files.map((f, i) => (
-              <li key={i} className="flex items-center justify-between gap-2 bg-white rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs text-slate-600">
+              <li key={i} className="flex items-center justify-between gap-2 bg-white rounded-xl border border-slate-200 px-3 py-1.5 text-xs text-slate-600">
                 <span className="truncate">{f.name}</span>
                 <button type="button" onClick={() => removeFile(i)} className="text-slate-400 hover:text-red-500 flex-shrink-0" aria-label={t("removeFile")}>
                   <X className="w-3.5 h-3.5" />
@@ -652,12 +652,12 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
       </div>
       {submitError && <p className="text-xs text-red-500">{submitError}</p>}
       <div className="flex gap-2">
-        <button onClick={() => setConfirmingCancel(true)} className="btn-secondary py-1.5 px-3 text-xs flex-1 justify-center">{t("cancel")}</button>
+        <button onClick={() => setConfirmingCancel(true)} className="btn-secondary min-h-11 px-3 text-xs flex-1 justify-center">{t("cancel")}</button>
         <button
           onClick={() => setConfirmingComplete(true)}
           disabled={busy || !hasPrescriptionItems || !confirmed}
           title={!hasPrescriptionItems ? t("needItems") : !confirmed ? t("needConfirm") : undefined}
-          className="btn-primary py-1.5 px-3 text-xs flex-1 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-primary min-h-11 px-3 text-xs flex-1 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : t("markComplete")}
         </button>
@@ -665,7 +665,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
       {confirmingCancel && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-xl">
             <div className="flex items-center gap-2 mb-3">
               <XCircle className="w-5 h-5 text-red-600" />
               <h3 className="font-bold text-slate-800">{t("discardTitle")}</h3>
@@ -679,7 +679,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
               </button>
               <button
                 onClick={() => { clearDraft(); onCancel(); }}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
               >
                 {t("discard")}
               </button>
@@ -690,7 +690,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
 
       {confirmingComplete && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-xl">
             <div className="flex items-center gap-2 mb-3">
               <CheckCircle2 className="w-5 h-5 text-teal-600" />
               <h3 className="font-bold text-slate-800">{t("completeTitle")}</h3>
@@ -705,7 +705,7 @@ function CompleteVisitForm({ appt, onDone, onCancel }: {
               <button
                 onClick={submit}
                 disabled={busy}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : t("markComplete")}
               </button>
@@ -739,7 +739,7 @@ function ContactLinks({ mobile }: { mobile: string }) {
   const t = useTranslations("doctor.dashboard");
   const links = contactLinks(mobile);
   if (!links) return null;
-  const pill = "inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] font-bold transition-colors";
+  const pill = "tap-44-y inline-flex items-center gap-1 min-h-9 rounded-full border bg-white px-3 py-1 text-[11px] font-bold transition-colors";
   return (
     <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
       <span className="text-xs text-slate-400 tabular-nums">{mobile}</span>
@@ -764,7 +764,7 @@ function SymptomPhotos({ photos }: { photos?: { id: string; fileUrl: string }[] 
       <div className="flex gap-1.5 flex-wrap">
         {photos.map((p, i) => (
           <a key={p.id} href={p.fileUrl} target="_blank" rel="noopener noreferrer" title={t("openPhoto", { n: i + 1 })}
-            className="block w-14 h-14 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 hover:ring-2 hover:ring-teal-300">
+            className="block w-14 h-14 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 hover:ring-2 hover:ring-teal-300">
             {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary aspect ratio per upload, next/image needs a fixed intrinsic size */}
             <img src={p.fileUrl} alt={t("openPhoto", { n: i + 1 })} className="w-full h-full object-cover" />
           </a>
@@ -1231,7 +1231,7 @@ export default function DoctorDashboard() {
       <PullToRefresh onRefresh={loadAppointments} className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-5">
-          <div className="w-14 h-14 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
+          <div className="w-14 h-14 rounded-full bg-teal-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <Stethoscope className="w-7 h-7 text-white" />
           </div>
           <div className="min-w-0">
@@ -1262,7 +1262,7 @@ export default function DoctorDashboard() {
         {announcementsDone && <EnableNotificationsPrompt />}
 
         {/* Today at a glance — the day's shape in one card instead of a flat stat grid */}
-        <div className="gradient-hero rounded-2xl p-5 mb-6 text-white shadow-lg">
+        <div className="gradient-hero rounded-3xl p-5 mb-6 text-white shadow-lg">
           <div className="flex items-center justify-between mb-2.5">
             <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">
               {t("today", { date: new Date().toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Kolkata" }) })}
@@ -1314,7 +1314,7 @@ export default function DoctorDashboard() {
             earnings honest. Complete opens the visit's prescription form in
             Upcoming; no-show confirms first. */}
         {overdue.length > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6">
+          <div className="bg-amber-50 border border-amber-200 rounded-3xl p-4 mb-6">
             <div className="flex items-start gap-2 mb-3">
               <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
               <div>
@@ -1331,7 +1331,7 @@ export default function DoctorDashboard() {
                 const homeNotArrived = a.consultType === "HOME" && a.travelStatus !== "ARRIVED";
                 const unpaidOnline = a.paymentMethod === "ONLINE" && a.paymentStatus !== "PAID";
                 return (
-                  <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 bg-white rounded-xl border border-amber-100 px-3 py-2">
+                  <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 bg-white rounded-2xl border border-amber-100 px-3.5 py-2.5">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-800 truncate">{patientLabel(a)}</p>
                       <p className="text-xs text-slate-500">
@@ -1342,22 +1342,22 @@ export default function DoctorDashboard() {
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
                       {homeNotArrived ? (
-                        <button onClick={() => jumpToCard(a.id)} className="btn-secondary py-1.5 px-3 text-xs">
+                        <button onClick={() => jumpToCard(a.id)} className="btn-secondary min-h-11 px-3.5 text-xs">
                           {t("openVisit")}
                         </button>
                       ) : (
                         <>
                           {!isStaff && !unpaidOnline && (
-                            <button onClick={() => { setCompletingId(a.id); jumpToCard(a.id); }} className="btn-primary py-1.5 px-3 text-xs">
+                            <button onClick={() => { setCompletingId(a.id); jumpToCard(a.id); }} className="btn-primary min-h-11 px-3.5 text-xs">
                               <CheckCircle2 className="w-3.5 h-3.5" /> {t("complete")}
                             </button>
                           )}
                           {unpaidOnline && (
-                            <button onClick={() => setPayQrFor(a)} className="btn-secondary py-1.5 px-3 text-xs text-amber-700 border-amber-200">
+                            <button onClick={() => setPayQrFor(a)} className="btn-secondary min-h-11 px-3.5 text-xs text-amber-700 border-amber-200">
                               <QrCode className="w-3.5 h-3.5" /> {t("payQr")}
                             </button>
                           )}
-                          <button onClick={() => setNoShowTarget(a)} className="btn-secondary py-1.5 px-3 text-xs text-amber-700 border-amber-200">
+                          <button onClick={() => setNoShowTarget(a)} className="btn-secondary min-h-11 px-3.5 text-xs text-amber-700 border-amber-200">
                             <UserX className="w-3.5 h-3.5" /> {t("noShow")}
                           </button>
                         </>
@@ -1378,7 +1378,7 @@ export default function DoctorDashboard() {
             shape, complementing the flat sorted lists below rather than
             replacing them: tapping a block jumps to the same appointment's
             full card further down, where the real actions live. */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden mb-6">
           <button
             type="button"
             onClick={() => setTimelineOpen((o) => !o)}
@@ -1420,7 +1420,7 @@ export default function DoctorDashboard() {
                           type="button"
                           onClick={() => jumpToCard(a.id)}
                           className={cn(
-                            "absolute rounded-lg px-2 py-1 text-left overflow-hidden border transition-colors",
+                            "absolute rounded-xl px-2 py-1 text-left overflow-hidden border transition-colors",
                             isPending
                               ? "bg-amber-50 border-amber-200 border-dashed hover:bg-amber-100"
                               : "bg-teal-50 border-teal-200 hover:bg-teal-100"
@@ -1455,7 +1455,7 @@ export default function DoctorDashboard() {
           <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            className="input-field pl-10 pr-10"
+            className="input-field rounded-full pl-10 pr-10"
             placeholder={t("searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -1464,7 +1464,7 @@ export default function DoctorDashboard() {
             <button
               type="button"
               onClick={() => setSearch("")}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="tap-44 absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
               aria-label={t("clearSearch")}
             >
               <X className="w-4 h-4" />
@@ -1482,8 +1482,8 @@ export default function DoctorDashboard() {
                 onClick={() => setFilters((f) => ({ ...f, range: r }))}
                 aria-pressed={filters.range === r}
                 className={cn(
-                  "tap-44-y flex-shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors",
-                  filters.range === r ? "bg-teal-600 border-teal-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                  "flex-shrink-0 min-h-10 rounded-full border px-4 py-2 text-xs font-bold transition-colors",
+                  filters.range === r ? "bg-emerald-600 border-emerald-600 text-white shadow-sm" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                 )}
               >
                 {t(`filters.range.${r}`)}
@@ -1493,7 +1493,7 @@ export default function DoctorDashboard() {
           <div className="flex gap-2 mt-2 flex-wrap items-center">
             <select
               aria-label={t("filters.type")}
-              className="input-field w-auto py-1.5 pl-3 pr-8 text-xs"
+              className="input-field w-auto min-h-11 rounded-full py-2 pl-4 pr-8 text-xs"
               value={filters.type}
               onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value as QueueFilters["type"] }))}
             >
@@ -1504,7 +1504,7 @@ export default function DoctorDashboard() {
             {clinicOptions.length > 1 && (
               <select
                 aria-label={t("filters.clinic")}
-                className="input-field w-auto max-w-[12rem] py-1.5 pl-3 pr-8 text-xs"
+                className="input-field w-auto max-w-[12rem] min-h-11 rounded-full py-2 pl-4 pr-8 text-xs"
                 value={filters.clinicId}
                 onChange={(e) => setFilters((f) => ({ ...f, clinicId: e.target.value }))}
               >
@@ -1514,14 +1514,14 @@ export default function DoctorDashboard() {
             )}
             <select
               aria-label={t("filters.status")}
-              className="input-field w-auto py-1.5 pl-3 pr-8 text-xs"
+              className="input-field w-auto min-h-11 rounded-full py-2 pl-4 pr-8 text-xs"
               value={filters.status}
               onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value as QueueFilters["status"] }))}
             >
               {QUEUE_STATUSES.map((st) => <option key={st} value={st}>{t(`filters.statusOption.${st}`)}</option>)}
             </select>
             {filtersOn && (
-              <button type="button" onClick={() => setFilters(DEFAULT_QUEUE_FILTERS)} className="text-xs font-semibold text-teal-600 hover:underline px-1">
+              <button type="button" onClick={() => setFilters(DEFAULT_QUEUE_FILTERS)} className="tap-44-y text-xs font-semibold text-teal-600 hover:underline px-2">
                 {t("filters.clear")}
               </button>
             )}
@@ -1539,7 +1539,7 @@ export default function DoctorDashboard() {
 
         {/* Pending Requests */}
         {showSection("PENDING_APPROVAL") && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden mb-6">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center gap-2">
               <Inbox className="w-5 h-5 text-amber-500" />
@@ -1547,17 +1547,17 @@ export default function DoctorDashboard() {
               {pending.length > 0 && <span className="badge badge-warning">{t("newCount", { count: pending.length })}</span>}
             </div>
             {pending.length > 1 && (
-              <button onClick={() => setConfirmingBulkAccept(true)} className="btn-secondary py-1.5 px-3 text-xs gap-1">
+              <button onClick={() => setConfirmingBulkAccept(true)} className="btn-secondary min-h-10 px-3.5 text-xs gap-1">
                 <ThumbsUp className="w-3.5 h-3.5" /> {t("acceptAllCount", { count: pending.length })}
               </button>
             )}
           </div>
           {bulkNotice && <p className="px-6 py-2 text-xs font-semibold text-amber-700 bg-amber-50 border-b border-amber-100">{bulkNotice}</p>}
-          <div className="divide-y divide-slate-50">
+          <div className="divide-y divide-slate-100">
             {loadingAppts && apptsError ? (
               <div className="p-4"><LoadError error={apptsError} onRetry={retryAppointments} retrying={apptsRetrying} /></div>
             ) : loadingAppts ? (
-              <div className="p-6 space-y-3">{[...Array(2)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
+              <div className="p-6 space-y-3">{[...Array(2)].map((_, i) => <div key={i} className="skeleton h-14 rounded-2xl" />)}</div>
             ) : pending.length === 0 ? (
               <p className="text-sm text-slate-400 text-center py-10">{search || filtersOn ? t("noPendingMatch") : t("noPending")}</p>
             ) : (
@@ -1570,7 +1570,7 @@ export default function DoctorDashboard() {
                     className={cn("px-4 sm:px-6 py-4 transition-colors duration-700", highlightId === a.id && "bg-teal-50")}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-50">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-amber-50">
                         <Icon className="w-5 h-5 text-amber-600" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -1588,7 +1588,7 @@ export default function DoctorDashboard() {
                         <SymptomPhotos photos={a.symptomPhotos} />
                         <VitalsChip a={a} />
                         {a.allergies && (
-                          <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
+                          <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-2.5 py-1 mt-1 inline-flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3 flex-shrink-0" /> {t("allergies", { list: a.allergies })}
                           </div>
                         )}
@@ -1618,18 +1618,18 @@ export default function DoctorDashboard() {
 
         {/* Upcoming Appointments */}
         {showSection("SCHEDULED") && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden mb-6">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
             <CalendarCheck className="w-5 h-5 text-teal-500" />
             <h2 className="font-bold text-slate-800">{t("upcomingAppointments")}</h2>
           </div>
-          <div className="divide-y divide-slate-50">
+          <div className="divide-y divide-slate-100">
             {loadingAppts && apptsError ? (
               // The Retry card is in Pending Requests above.
               <p className="text-sm text-slate-400 text-center py-10">{t("couldntLoad")}</p>
             ) : loadingAppts ? (
               <div className="p-6 space-y-3">
-                {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}
+                {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-14 rounded-2xl" />)}
               </div>
             ) : upcoming.length === 0 ? (
               <p className="text-sm text-slate-400 text-center py-10">{search || filtersOn ? t("noUpcomingMatch") : t("noUpcoming")}</p>
@@ -1666,7 +1666,7 @@ export default function DoctorDashboard() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start gap-2.5">
-                          <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-teal-50">
+                          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 bg-teal-50">
                             <Icon className="w-4.5 h-4.5 text-teal-600" />
                           </div>
                           <div className="min-w-0 flex-1">
@@ -1681,7 +1681,7 @@ export default function DoctorDashboard() {
                             <SymptomPhotos photos={a.symptomPhotos} />
                             <VitalsChip a={a} />
                             {a.allergies && (
-                              <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-1 inline-flex items-center gap-1">
+                              <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-2.5 py-1 mt-1 inline-flex items-center gap-1">
                                 <AlertTriangle className="w-3 h-3 flex-shrink-0" /> {t("allergies", { list: a.allergies })}
                               </div>
                             )}
@@ -1698,7 +1698,7 @@ export default function DoctorDashboard() {
                                 <button
                                   type="button"
                                   onClick={() => setPayQrFor(a)}
-                                  className="ml-1 inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-bold text-amber-700 hover:bg-amber-100"
+                                  className="tap-44-y ml-1 inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 hover:bg-amber-100"
                                 >
                                   <QrCode className="w-3 h-3" /> {t("payQr")}
                                 </button>
@@ -1715,7 +1715,7 @@ export default function DoctorDashboard() {
                               </div>
                             )}
                             {isOverdue(a, now) && (
-                              <div className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-0.5 font-semibold mt-1 ml-1">
+                              <div className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-0.5 font-semibold mt-1 ml-1">
                                 <AlertTriangle className="w-3 h-3" /> {t("pastOverdue")}
                               </div>
                             )}
@@ -1732,7 +1732,7 @@ export default function DoctorDashboard() {
                           {/* Travelling and the video call are the doctor's own (the travel
                               API and /doctor/video refuse STAFF) — a receptionist only sees status. */}
                           {isStaff && a.consultType === "HOME" && (
-                            <span className="flex-1 h-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm font-semibold flex items-center justify-center gap-1.5">
+                            <span className="flex-1 h-11 rounded-full bg-slate-50 border border-slate-200 text-slate-500 text-sm font-semibold flex items-center justify-center gap-1.5">
                               <Car className="w-4 h-4" />
                               {a.travelStatus === "ARRIVED" ? t("doctorArrived") : a.travelStatus === "ON_THE_WAY" ? t("doctorOnWay") : t("doctorNotLeft")}
                             </span>
@@ -1760,7 +1760,7 @@ export default function DoctorDashboard() {
                           )}
                           {!isStaff && a.consultType === "VIDEO" && a.paymentStatus === "PAID" && (
                             unlockSec > 0 ? (
-                              <span className="flex-1 h-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm font-semibold flex items-center justify-center gap-1.5 opacity-70">
+                              <span className="flex-1 h-11 rounded-full bg-slate-50 border border-slate-200 text-slate-500 text-sm font-semibold flex items-center justify-center gap-1.5 opacity-70">
                                 <Loader2 className="w-4 h-4 animate-spin" /> {t("unlockingIn", { seconds: unlockSec })}
                               </span>
                             ) : (
@@ -1771,7 +1771,7 @@ export default function DoctorDashboard() {
                           )}
                           {readyToComplete && !isStaff && (
                             paymentBlocked ? (
-                              <span className="flex-1 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm font-semibold flex items-center justify-center gap-1.5" title={t("awaitingPaymentTitle")}>
+                              <span className="flex-1 h-11 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-sm font-semibold flex items-center justify-center gap-1.5" title={t("awaitingPaymentTitle")}>
                                 <Clock className="w-4 h-4" /> {t("awaitingPayment")}
                               </span>
                             ) : (
@@ -1781,7 +1781,7 @@ export default function DoctorDashboard() {
                             )
                           )}
 
-                          <Link href={`/doctor/chat/${a.id}`} className="relative w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center flex-shrink-0 hover:bg-slate-50 transition-colors" title={t("chatWithPatient")}>
+                          <Link href={`/doctor/chat/${a.id}`} className="relative w-11 h-11 rounded-full border border-slate-200/80 bg-white shadow-sm flex items-center justify-center flex-shrink-0 hover:bg-slate-50 transition-colors" title={t("chatWithPatient")}>
                             <MessageCircle className="w-4 h-4 text-slate-500" />
                             {a.unreadMessageCount > 0 && (
                               <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
@@ -1797,7 +1797,7 @@ export default function DoctorDashboard() {
                                 const rect = e.currentTarget.getBoundingClientRect();
                                 setOpenMenu({ id: a.id, top: rect.bottom + 8, right: window.innerWidth - rect.right });
                               }}
-                              className="w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors"
+                              className="w-11 h-11 rounded-full border border-slate-200/80 bg-white shadow-sm flex items-center justify-center hover:bg-slate-50 transition-colors"
                               title={t("moreActions")}
                             >
                               <MoreHorizontal className="w-4 h-4 text-slate-500" />
@@ -1806,7 +1806,7 @@ export default function DoctorDashboard() {
                               <>
                                 <div className="fixed inset-0 z-30" onClick={() => setOpenMenu(null)} />
                                 <div
-                                  className="fixed w-52 bg-white rounded-xl border border-slate-100 shadow-lg z-40 overflow-hidden py-1"
+                                  className="fixed w-52 bg-white rounded-2xl border border-slate-100 shadow-lg z-40 overflow-hidden py-1.5"
                                   style={{ top: openMenu.top, right: openMenu.right }}
                                 >
                                   {!isStaff && (
@@ -1871,27 +1871,30 @@ export default function DoctorDashboard() {
 
         {/* Recent Completed */}
         {completed.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden mb-6">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-500" />
               <h2 className="font-bold text-slate-800">{t("recentCompleted")}</h2>
             </div>
-            <div className="divide-y divide-slate-50">
+            <div className="divide-y divide-slate-100">
               {(completedExpanded ? completed : completed.slice(0, PAGE_SIZE)).map((a) => (
-                <div key={a.id} className="px-6 py-3.5 flex items-center justify-between">
-                  <div>
-                    {isStaff ? (
-                      <span className="font-semibold text-slate-800 text-sm">{patientLabel(a)}</span>
-                    ) : (
-                      <Link href={historyHref(a)} className="tap-44-y font-semibold text-slate-800 text-sm hover:underline hover:text-teal-600">
-                        {patientLabel(a)}
-                      </Link>
-                    )}
-                    {a.relation !== "Self" && (
-                      <span className="badge badge-gray text-[10px] ml-1.5">{tc("relationOf", { relation: a.relation, name: a.patient.name })}</span>
-                    )}
-                    <div className="text-xs text-slate-400">
+                <div key={a.id} className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {isStaff ? (
+                        <span className="font-semibold text-slate-800 text-sm truncate">{patientLabel(a)}</span>
+                      ) : (
+                        <Link href={historyHref(a)} className="tap-44-y font-semibold text-slate-800 text-sm truncate hover:underline hover:text-teal-600">
+                          {patientLabel(a)}
+                        </Link>
+                      )}
+                      {a.relation !== "Self" && (
+                        <span className="badge badge-gray text-[10px] flex-shrink-0 max-w-[45%] truncate">{tc("relationOf", { relation: a.relation, name: a.patient.name })}</span>
+                      )}
+                    </div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">
                       {new Date(a.scheduledAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {tc("typeShort", { type: a.consultType })}
+                      {!isStaff && <span className="sm:hidden font-bold text-slate-700 whitespace-nowrap"> · ₹{a.amount - a.platformFee}</span>}
                     </div>
                     {a.followUpDate && (
                       <div className="text-xs text-teal-700 font-semibold flex items-center gap-1 mt-0.5">
@@ -1899,20 +1902,20 @@ export default function DoctorDashboard() {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-3">
-                    {!isStaff && <div className="text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>}
+                  <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                    {!isStaff && <div className="hidden sm:block text-sm font-bold text-slate-700">₹{a.amount - a.platformFee}</div>}
                     {!isStaff && (
-                      <button type="button" onClick={() => setFollowUpFor(a)} className="w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={tfu("title")} aria-label={tfu("title")}>
+                      <button type="button" onClick={() => setFollowUpFor(a)} className="w-11 h-11 rounded-full border border-slate-200/80 bg-white shadow-sm flex items-center justify-center hover:bg-slate-50 transition-colors" title={tfu("title")} aria-label={tfu("title")}>
                         <CalendarClock className="w-4 h-4 text-teal-600" />
                       </button>
                     )}
                     {!isStaff && (
-                      <button type="button" onClick={() => setRxFor({ id: a.id, patientId: a.patientId })} className="w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("prescriptionTitle")} aria-label={t("prescription")}>
+                      <button type="button" onClick={() => setRxFor({ id: a.id, patientId: a.patientId })} className="w-11 h-11 rounded-full border border-slate-200/80 bg-white shadow-sm flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("prescriptionTitle")} aria-label={t("prescription")}>
                         <FileText className="w-4 h-4 text-teal-600" />
                       </button>
                     )}
                     {/* Readable after completion; open for follow-up questions for a few days. */}
-                    <Link href={`/doctor/chat/${a.id}`} className="relative w-11 h-11 rounded-xl border border-slate-100 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("chatWithPatient")}>
+                    <Link href={`/doctor/chat/${a.id}`} className="relative w-11 h-11 rounded-full border border-slate-200/80 bg-white shadow-sm flex items-center justify-center hover:bg-slate-50 transition-colors" title={t("chatWithPatient")}>
                       <MessageCircle className="w-4 h-4 text-slate-500" />
                       {a.unreadMessageCount > 0 && (
                         <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 border border-white text-white text-[10px] font-bold flex items-center justify-center">
@@ -1934,15 +1937,15 @@ export default function DoctorDashboard() {
 
         {/* Cancelled */}
         {cancelled.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden mb-6">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
               <XCircle className="w-5 h-5 text-red-400" />
               <h2 className="font-bold text-slate-800">{t("cancelledAppointments")}</h2>
             </div>
-            <div className="divide-y divide-slate-50">
+            <div className="divide-y divide-slate-100">
               {(cancelledExpanded ? cancelled : cancelled.slice(0, PAGE_SIZE)).map((a) => (
-                <div key={a.id} className="px-6 py-3.5 flex items-center justify-between">
-                  <div>
+                <div key={a.id} className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
                     <span className="font-semibold text-slate-500 text-sm">{patientLabel(a)}</span>
                     {a.relation !== "Self" && (
                       <span className="badge badge-gray text-[10px] ml-1.5">{tc("relationOf", { relation: a.relation, name: a.patient.name })}</span>
@@ -1951,7 +1954,7 @@ export default function DoctorDashboard() {
                       {new Date(a.scheduledAt).toLocaleDateString(locale, { dateStyle: "medium", timeZone: "Asia/Kolkata" })} · {tc("typeShort", { type: a.consultType })}
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1.5">
+                  <div className="flex flex-col items-end gap-1.5 flex-shrink-0 max-w-[50%] text-right">
                     <span className="badge badge-danger">{t("cancelledBadge")}</span>
                     {/* A referral on a cancelled consultation is void (src/lib/nurseReferral.ts) — let the doctor clear it. */}
                     {a.referralGiven && !isStaff && (
@@ -1979,15 +1982,15 @@ export default function DoctorDashboard() {
 
         {/* No-Show — kept separate from Cancelled since this wasn't the doctor's doing */}
         {noShow.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden mb-6">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
               <UserX className="w-5 h-5 text-amber-500" />
               <h2 className="font-bold text-slate-800">{t("patientNoShows")}</h2>
             </div>
-            <div className="divide-y divide-slate-50">
+            <div className="divide-y divide-slate-100">
               {(noShowExpanded ? noShow : noShow.slice(0, PAGE_SIZE)).map((a) => (
-                <div key={a.id} className="px-6 py-3.5 flex items-center justify-between">
-                  <div>
+                <div key={a.id} className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
                     <span className="font-semibold text-slate-500 text-sm">{patientLabel(a)}</span>
                     {a.relation !== "Self" && (
                       <span className="badge badge-gray text-[10px] ml-1.5">{tc("relationOf", { relation: a.relation, name: a.patient.name })}</span>
@@ -1998,7 +2001,7 @@ export default function DoctorDashboard() {
                     {/* A no-show is worth a call to rebook. */}
                     <ContactLinks mobile={a.patient.mobile} />
                   </div>
-                  <span className="badge badge-warning">{t("noShowBadge")}</span>
+                  <span className="badge badge-warning flex-shrink-0">{t("noShowBadge")}</span>
                 </div>
               ))}
             </div>
@@ -2018,7 +2021,7 @@ export default function DoctorDashboard() {
               void past.loadMore();
             }}
             disabled={past.loadingMore}
-            className="btn-secondary w-full py-2.5 text-sm mb-6"
+            className="btn-secondary w-full min-h-11 py-2.5 text-sm mb-6"
           >
             {past.loadingMore ? <Loader2 className="w-4 h-4 animate-spin" /> : t("loadOlder")}
           </button>
@@ -2028,7 +2031,7 @@ export default function DoctorDashboard() {
       {/* Cancel confirmation */}
       {cancelTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-xl">
             <div className="flex items-center gap-2 mb-3">
               <XCircle className="w-5 h-5 text-red-600" />
               <h3 className="font-bold text-slate-800">{t(cancelTarget.bookedById ? "cancelDialog.walkInTitle" : "cancelDialog.title")}</h3>
@@ -2037,7 +2040,7 @@ export default function DoctorDashboard() {
               {t(cancelTarget.bookedById ? "cancelDialog.walkInBody" : "cancelDialog.body", { name: patientLabel(cancelTarget), when: new Date(cancelTarget.scheduledAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) })}
             </p>
             {isLateCancellation(cancelTarget) && (
-              <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-5 flex items-start gap-1.5">
+              <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-2xl px-3.5 py-2.5 mb-5 flex items-start gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
                 <span>{t("cancelDialog.late")}</span>
               </div>
@@ -2046,7 +2049,7 @@ export default function DoctorDashboard() {
               <button onClick={() => setCancelTarget(null)} className="btn-secondary flex-1">
                 {t("cancelDialog.keep")}
               </button>
-              <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+              <button onClick={confirmCancel} disabled={cancelling} className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
                 {cancelling ? t("cancelDialog.busy") : t(cancelTarget.bookedById ? "cancelDialog.walkInConfirm" : "cancelDialog.confirm")}
               </button>
             </div>
@@ -2070,7 +2073,7 @@ export default function DoctorDashboard() {
       {/* Pay-by-phone QR for an unpaid online visit */}
       {payQrFor && (
         <div className="fixed inset-0 z-[100] bg-slate-900/50 flex items-end sm:items-center justify-center p-4" onClick={() => setPayQrFor(null)}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-3xl shadow-xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-3 mb-4">
               <div className="min-w-0">
                 <p className="font-bold text-slate-900 truncate">{patientLabel(payQrFor)}</p>
@@ -2093,7 +2096,7 @@ export default function DoctorDashboard() {
       {/* No-show confirmation */}
       {noShowTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-xl">
             <div className="flex items-center gap-2 mb-3">
               <UserX className="w-5 h-5 text-amber-600" />
               <h3 className="font-bold text-slate-800">{t("noShowDialog.title")}</h3>
@@ -2105,7 +2108,7 @@ export default function DoctorDashboard() {
               <button onClick={() => setNoShowTarget(null)} className="btn-secondary flex-1">
                 {t("goBack")}
               </button>
-              <button onClick={confirmNoShow} disabled={markingNoShow} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+              <button onClick={confirmNoShow} disabled={markingNoShow} className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
                 {markingNoShow ? t("noShowDialog.busy") : t("noShowDialog.confirm")}
               </button>
             </div>
@@ -2179,7 +2182,7 @@ export default function DoctorDashboard() {
       {/* Reject confirmation */}
       {rejectTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-xl">
             <div className="flex items-center gap-2 mb-3">
               <ThumbsDown className="w-5 h-5 text-red-600" />
               <h3 className="font-bold text-slate-800">{t("rejectDialog.title")}</h3>
@@ -2191,7 +2194,7 @@ export default function DoctorDashboard() {
               <button onClick={() => setRejectTarget(null)} className="btn-secondary flex-1">
                 {t("rejectDialog.keep")}
               </button>
-              <button onClick={confirmReject} disabled={rejecting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+              <button onClick={confirmReject} disabled={rejecting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
                 {rejecting ? t("rejectDialog.busy") : t("rejectDialog.confirm")}
               </button>
             </div>

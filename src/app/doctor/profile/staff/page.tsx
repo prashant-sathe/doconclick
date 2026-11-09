@@ -158,7 +158,7 @@ export default function DoctorStaffPage() {
                     onClick={() => openPanel(s, "rename")}
                     title={t("rename")}
                     aria-label={t("renameAria", { name: s.name })}
-                    className="w-9 h-9 rounded-lg border border-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                    className="w-10 h-10 rounded-full border border-slate-200/80 bg-white shadow-sm flex items-center justify-center text-slate-500 hover:bg-slate-50"
                   >
                     <Pencil className="w-4 h-4" />
                   </button>
@@ -166,7 +166,7 @@ export default function DoctorStaffPage() {
                     onClick={() => openPanel(s, "reset")}
                     title={t("resetPassword")}
                     aria-label={t("resetAria", { name: s.name })}
-                    className="w-9 h-9 rounded-lg border border-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                    className="w-10 h-10 rounded-full border border-slate-200/80 bg-white shadow-sm flex items-center justify-center text-slate-500 hover:bg-slate-50"
                   >
                     <KeyRound className="w-4 h-4" />
                   </button>
@@ -174,7 +174,7 @@ export default function DoctorStaffPage() {
                     onClick={() => toggleActive(s)}
                     disabled={busyId === s.userId}
                     title={s.active ? t("revoke") : t("reactivate")}
-                    className="w-9 h-9 rounded-lg border border-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-50"
+                    className="w-10 h-10 rounded-full border border-slate-200/80 bg-white shadow-sm flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-50"
                   >
                     {busyId === s.userId ? <Loader2 className="w-4 h-4 animate-spin" /> : s.active ? <Ban className="w-4 h-4 text-red-500" /> : <RotateCcw className="w-4 h-4 text-emerald-500" />}
                   </button>
@@ -182,7 +182,7 @@ export default function DoctorStaffPage() {
                     onClick={() => setDeleteTarget(s)}
                     title={t("delete")}
                     aria-label={t("deleteAria", { name: s.name })}
-                    className="w-9 h-9 rounded-lg border border-slate-100 flex items-center justify-center text-red-500 hover:bg-red-50"
+                    className="w-10 h-10 rounded-full border border-slate-200/80 bg-white shadow-sm flex items-center justify-center text-red-500 hover:bg-red-50"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -198,7 +198,7 @@ export default function DoctorStaffPage() {
                     className="input-field flex-1 text-sm"
                     autoFocus
                   />
-                  <button onClick={() => submitRename(s.userId)} disabled={busyId === s.userId || !newName.trim() || newName.trim() === s.name} className="btn-primary py-2 px-3 text-xs disabled:opacity-60">
+                  <button onClick={() => submitRename(s.userId)} disabled={busyId === s.userId || !newName.trim() || newName.trim() === s.name} className="btn-primary min-h-10 py-2 px-3.5 text-xs disabled:opacity-60">
                     {t("save")}
                   </button>
                 </div>
@@ -212,7 +212,7 @@ export default function DoctorStaffPage() {
                     placeholder={t("newPassword")}
                     className="input-field flex-1 text-sm"
                   />
-                  <button onClick={() => submitReset(s.userId)} disabled={busyId === s.userId} className="btn-primary py-2 px-3 text-xs">
+                  <button onClick={() => submitReset(s.userId)} disabled={busyId === s.userId} className="btn-primary min-h-10 py-2 px-3.5 text-xs">
                     {t("set")}
                   </button>
                 </div>

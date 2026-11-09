@@ -24,12 +24,12 @@ export default async function DataDeletionPage({
   const retainedItems = [t("retained1"), t("retained2"), t("retained3")];
 
   return (
-    <div className="min-h-screen bg-slate-50 safe-screen">
+    <div className="min-h-screen gradient-surface safe-screen">
       <div className="mx-auto max-w-3xl px-6 py-12">
-        <Link href="/" className="text-sm font-semibold text-blue-600 hover:underline tap-44-y">{t("back")}</Link>
+        <Link href="/" className="glass-pill inline-flex items-center rounded-full px-4 min-h-11 text-sm font-semibold text-blue-600 hover:underline">{t("back")}</Link>
 
         <div className="mt-6 mb-8 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0">
             <Trash2 className="w-5 h-5" />
           </div>
           <div>
@@ -45,7 +45,7 @@ export default async function DataDeletionPage({
           </div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 space-y-10">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100/80 p-5 sm:p-8 space-y-10">
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Smartphone className="w-4.5 h-4.5 text-slate-400" />
@@ -64,7 +64,7 @@ export default async function DataDeletionPage({
             </ol>
             <Link
               href="/account/delete"
-              className="inline-flex items-center gap-2 rounded-xl bg-red-600 text-white text-sm font-semibold px-5 py-3 hover:bg-red-700 transition-colors"
+              className="inline-flex items-center gap-2 rounded-full min-h-11 bg-red-600 text-white text-sm font-semibold px-5 py-3 hover:bg-red-700 transition-colors"
             >
               <Trash2 className="w-4 h-4" /> {t("deleteBtn")}
             </Link>
@@ -85,7 +85,7 @@ export default async function DataDeletionPage({
             </ol>
             <a
               href="mailto:doconclick.co@gmail.com?subject=Data%20Deletion%20Request"
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 text-white text-sm font-semibold px-5 py-3 hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 rounded-full min-h-11 bg-emerald-600 text-white text-sm font-semibold px-5 py-3 hover:bg-emerald-700 transition-colors"
             >
               <Mail className="w-4 h-4" /> {t("emailBtn")}
             </a>

@@ -224,8 +224,8 @@ export default function NurseDashboardPage() {
               key={id}
               onClick={() => setTab(id)}
               className={cn(
-                "flex-1 px-2 py-2 rounded-full text-sm font-semibold border whitespace-nowrap transition-colors",
-                tab === id ? "bg-rose-600 text-white border-rose-600" : "bg-white text-slate-600 border-slate-200"
+                "flex-1 min-h-11 px-2 py-2 rounded-full text-sm font-semibold border whitespace-nowrap transition-colors",
+                tab === id ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200"
               )}
             >
               {t(`tabs.${id}`)}{counts[id] > 0 && ` (${counts[id]})`}
@@ -233,10 +233,10 @@ export default function NurseDashboardPage() {
           ))}
         </div>
 
-        {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mb-4">{error}</div>}
+        {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5 mb-4">{error}</div>}
 
         {list.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center text-sm text-slate-400">
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-10 text-center text-sm text-slate-400">
             {t(`empty.${tab}`)}
           </div>
         ) : (
@@ -248,7 +248,7 @@ export default function NurseDashboardPage() {
               const paid = v.paymentStatus === "PAID";
               const shiftWait = v.nurseService?.kind === "SHIFT" && v.visitStartedAt ? shiftWaitProblem(new Date(v.visitStartedAt), v.nurseService.durationMinutes, t, locale) : null;
               return (
-                <div key={v.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <div key={v.id} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-bold text-slate-900 flex items-center gap-1.5"><UserIcon className="w-4 h-4 text-slate-400" />{patientLabel(v)}</p>
@@ -261,7 +261,7 @@ export default function NurseDashboardPage() {
                     </div>
                   </div>
 
-                  <div className="mt-3 rounded-xl bg-rose-50 px-3 py-2">
+                  <div className="mt-3 rounded-2xl bg-rose-50 px-3 py-2">
                     <p className="text-sm font-semibold text-rose-700 flex items-center justify-between gap-2">
                       <span>{v.serviceName ?? tc("nursingVisit")}</span>
                       {v.package && v.packageIndex && v.status !== "PENDING_APPROVAL" && (
@@ -297,7 +297,7 @@ export default function NurseDashboardPage() {
                   {v.status === "PENDING_APPROVAL" && v.packageId && v.package && (() => {
                     const sessions = packageSessions(v.packageId);
                     return (
-                      <div className="mt-3 rounded-xl border border-rose-200 px-3 py-2.5">
+                      <div className="mt-3 rounded-2xl border border-rose-200 px-3 py-2.5">
                         <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5"><Layers className="w-4 h-4 text-rose-500" />{t("package", { count: sessions.length, interval: t("interval", { days: v.package.intervalDays }) })}</p>
                         <ol className="text-xs text-slate-600 mt-1 space-y-0.5 list-decimal list-inside">
                           {sessions.map((x) => <li key={x.id}>{new Date(x.scheduledAt).toLocaleString(locale, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}</li>)}
@@ -309,7 +309,7 @@ export default function NurseDashboardPage() {
                   })()}
 
                   {v.nurseReferral && (
-                    <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-2.5 text-xs text-slate-700">
+                    <div className="mt-3 rounded-2xl border border-blue-100 bg-blue-50/50 px-3 py-2.5 text-xs text-slate-700">
                       <p className="font-semibold text-blue-800 flex items-center gap-1.5"><Stethoscope className="w-3.5 h-3.5" />{t("referredBy", { name: v.nurseReferral.appointment.doctor.name.replace(/^dr\.?\s*/i, ""), date: new Date(v.nurseReferral.appointment.scheduledAt).toLocaleDateString(locale, { timeZone: "Asia/Kolkata" }) })}</p>
                       {v.nurseReferral.instructions && <p className="mt-1">{t("instructions", { text: v.nurseReferral.instructions })}</p>}
                       {v.nurseReferral.appointment.medicines.length > 0 && (
@@ -338,7 +338,7 @@ export default function NurseDashboardPage() {
                       {v.requestedScheduledAt && (
                         <RescheduleRequestBox appointmentId={v.id} requestedAt={v.requestedScheduledAt} onDone={load} />
                       )}
-                      <div className={cn("mt-4 rounded-xl px-3 py-2 text-xs font-semibold flex items-center gap-1.5", paid ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")}>
+                      <div className={cn("mt-4 rounded-2xl px-3 py-2 text-xs font-semibold flex items-center gap-1.5", paid ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")}>
                         <IndianRupee className="w-3.5 h-3.5" />
                         <span className="flex-1">{paid ? t("paid") : t("awaitingPayment")}</span>
                         {!paid && (
@@ -348,13 +348,13 @@ export default function NurseDashboardPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-3 gap-2 mt-3">
-                        <a href={`tel:${v.patient.mobile}`} className="btn-secondary justify-center py-2 text-xs"><Phone className="w-4 h-4" /> {t("call")}</a>
-                        <Link href={`/nurse/chat/${v.id}`} className="btn-secondary justify-center py-2 text-xs relative">
+                        <a href={`tel:${v.patient.mobile}`} className="btn-secondary justify-center min-h-11 py-2 text-xs"><Phone className="w-4 h-4" /> {t("call")}</a>
+                        <Link href={`/nurse/chat/${v.id}`} className="btn-secondary justify-center min-h-11 py-2 text-xs relative">
                           <MessageCircle className="w-4 h-4" /> {t("chat")}
                           {v.unreadMessageCount > 0 && <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">{v.unreadMessageCount}</span>}
                         </Link>
                         {dir ? (
-                          <a href={dir} target="_blank" rel="noopener noreferrer" className="btn-secondary justify-center py-2 text-xs"><Navigation className="w-4 h-4" /> {t("map")}</a>
+                          <a href={dir} target="_blank" rel="noopener noreferrer" className="btn-secondary justify-center min-h-11 py-2 text-xs"><Navigation className="w-4 h-4" /> {t("map")}</a>
                         ) : <span />}
                       </div>
                       <div className="mt-3">
@@ -375,7 +375,7 @@ export default function NurseDashboardPage() {
                           </button>
                         )}
                         {v.travelStatus === "ON_THE_WAY" && (
-                          <button disabled={busy} onClick={() => setJourneyConfirm({ visit: v, action: "stop" })} className="w-full text-xs font-semibold text-slate-500 mt-2 py-1 hover:text-slate-700">
+                          <button disabled={busy} onClick={() => setJourneyConfirm({ visit: v, action: "stop" })} className="w-full min-h-10 text-xs font-semibold text-slate-500 mt-1 py-2 hover:text-slate-700">
                             {t("stopJourney")}
                           </button>
                         )}
@@ -397,7 +397,7 @@ export default function NurseDashboardPage() {
                             <CheckCircle2 className="w-4 h-4" /> {t("completeVisit")}
                           </button>
                         )}
-                        <button onClick={() => setCancelTarget(v)} className="w-full text-xs font-semibold text-red-500 mt-2 py-1">
+                        <button onClick={() => setCancelTarget(v)} className="w-full min-h-10 text-xs font-semibold text-red-500 mt-1 py-2">
                           {t("cancelVisitLink")}
                         </button>
                       </div>

@@ -68,9 +68,9 @@ export default function DoctorFeeSettings() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+    <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
           <Stethoscope className="w-5 h-5" />
         </div>
         <div>
@@ -92,7 +92,7 @@ export default function DoctorFeeSettings() {
               <input id="doctor-reg-fee" type="number" min={0} className="input-field" placeholder="No discount" value={discounted} onChange={(e) => setDiscounted(e.target.value)} />
             </div>
           </div>
-          <div className="mt-3 rounded-xl bg-slate-50 border border-slate-100 px-4 py-3 max-w-lg">
+          <div className="mt-3 rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3 max-w-lg">
             <p className="text-xs text-slate-500 mb-1">Doctors will see</p>
             {preview ? (
               <p className="flex items-baseline gap-2">

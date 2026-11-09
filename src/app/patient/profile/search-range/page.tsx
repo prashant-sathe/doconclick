@@ -64,16 +64,16 @@ export default function SearchRangeSettingsPage() {
         <button
           type="button"
           onClick={() => change(null)}
-          className={cn("min-h-11 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
-            radius == null ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300")}
+          className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+            radius == null ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300")}
         >
           {t("any")}
         </button>
         <button
           type="button"
           onClick={() => change(radius ?? DEFAULT_RADIUS_KM)}
-          className={cn("min-h-11 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
-            radius != null ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300")}
+          className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+            radius != null ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300")}
         >
           {t("within")}
         </button>
@@ -92,7 +92,7 @@ export default function SearchRangeSettingsPage() {
             step={1}
             value={radius}
             onChange={(e) => change(Number(e.target.value))}
-            className="w-full accent-blue-600"
+            className="w-full accent-emerald-600"
           />
           <div className="flex justify-between text-[11px] text-slate-400 mt-1">
             <span>{t("km", { km: SEARCH_RADIUS_MIN_KM })}</span>

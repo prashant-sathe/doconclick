@@ -44,9 +44,9 @@ export default function ReceiptSettings() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+    <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
           <Receipt className="w-5 h-5" />
         </div>
         <div>

@@ -74,10 +74,10 @@ export default function ImageCropModal({ file, aspect, round, onCancel, onConfir
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <h3 className="font-bold text-slate-900">{t("title")}</h3>
-          <button aria-label={t("close")} type="button" onClick={cancel} className="text-slate-300 hover:text-slate-500">
+          <button aria-label={t("close")} type="button" onClick={cancel} className="text-slate-300 hover:text-slate-500 tap-44">
             <X className="w-5 h-5" />
           </button>
         </div>

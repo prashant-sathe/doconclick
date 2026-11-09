@@ -92,13 +92,13 @@ export default function BookingQRPage() {
       loading={loading}
     >
       {!isVerified ? (
-        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600">
+        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-600">
           <Lock className="w-4 h-4 flex-shrink-0" /> {t("locked")}
         </div>
       ) : (
         <>
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
-            <div className="w-[132px] h-[132px] rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center flex-shrink-0">
+            <div className="w-[132px] h-[132px] rounded-2xl border border-slate-100 bg-slate-50 flex items-center justify-center flex-shrink-0">
               {qrDataUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={qrDataUrl} alt={t("qrAlt")} width={120} height={120} />
@@ -108,7 +108,7 @@ export default function BookingQRPage() {
             </div>
             <div className="min-w-0 flex-1 w-full">
               <p className="text-xs font-semibold text-slate-500 mb-1">{t("publicLink")}</p>
-              <p className="text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2 break-all mb-3">{profileUrl}</p>
+              <p className="text-xs text-slate-600 bg-slate-50 rounded-2xl px-3.5 py-2.5 break-all mb-3">{profileUrl}</p>
               <div className="flex flex-wrap gap-2">
                 <button type="button" onClick={copyLink} className="btn-secondary py-2 px-3 text-xs">
                   {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}

@@ -16,20 +16,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (loading || !user || user.role !== "ADMIN") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center gradient-surface">
         <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen gradient-surface">
       <AdminSidebar />
-      {/* Inline `style` can't be responsive, so the mobile top-bar's 3.5rem
-          offset (absent on lg: and up, where the sidebar itself starts below
-          the banner) has to be expressed as an arbitrary-value class instead
-          — same --imp-banner-h var, just gated per breakpoint. */}
-      <main className="flex-1 min-w-0 max-w-full lg:ml-64 min-h-screen pt-[calc(3.5rem+var(--imp-banner-h,0px))] lg:pt-[var(--imp-banner-h,0px)]">
+      {/* Inline `style` can't be responsive, so the mobile top-bar's 4.5rem
+          offset (0.5rem gap + 3.5rem floating pill + 0.5rem gap; absent on lg:
+          and up, where the floating sidebar itself starts below the banner)
+          has to be expressed as an arbitrary-value class instead — same
+          --imp-banner-h var, just gated per breakpoint. */}
+      <main className="flex-1 min-w-0 max-w-full lg:ml-[17.5rem] min-h-screen pt-[calc(4.5rem+var(--imp-banner-h,0px))] lg:pt-[var(--imp-banner-h,0px)]">
         {children}
       </main>
     </div>

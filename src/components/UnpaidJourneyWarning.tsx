@@ -44,7 +44,7 @@ export default function UnpaidJourneyWarning({ info, busy, onGoAnyway, onClose }
         </div>
         <div className="text-sm text-slate-600 space-y-2 mb-4">
           <p>{t.rich("body", { name: info.patientName, b: (c) => <strong>{c}</strong> })}</p>
-          <p className="text-xs bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-3 py-2 flex items-start gap-1.5">
+          <p className="text-xs bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl px-3 py-2 flex items-start gap-1.5">
             <BellRing className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
             {info.reminderSent
               ? t("justSent")
@@ -58,7 +58,7 @@ export default function UnpaidJourneyWarning({ info, busy, onGoAnyway, onClose }
             <button onClick={remind} disabled={reminding || busy} className="btn-secondary justify-center py-2 text-xs">
               {reminding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <BellRing className="w-3.5 h-3.5" />} {t("remindAgain")}
             </button>
-            <button onClick={onGoAnyway} disabled={busy} className="justify-center py-2 text-xs rounded-xl border border-red-200 text-red-700 font-semibold inline-flex items-center gap-1.5 hover:bg-red-50 disabled:opacity-60">
+            <button onClick={onGoAnyway} disabled={busy} className="justify-center py-2 min-h-11 text-xs rounded-full border border-red-200 text-red-700 font-semibold inline-flex items-center gap-1.5 hover:bg-red-50 disabled:opacity-60">
               {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Car className="w-3.5 h-3.5" />} {t("goAnyway")}
             </button>
           </div>

@@ -87,7 +87,7 @@ function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) 
         onChange={(e) => { const f = e.target.files?.[0]; if (f) setPendingFile(f); e.target.value = ""; }}
       />
       {menuOpen && (
-        <div className="absolute left-0 top-full mt-2 z-20 w-44 rounded-xl bg-white border border-slate-100 shadow-lg py-1 overflow-hidden">
+        <div className="absolute left-0 top-full mt-2 z-20 w-44 rounded-2xl bg-white border border-slate-100 shadow-lg py-1 overflow-hidden">
           <button
             type="button"
             onClick={() => { setMenuOpen(false); inputRef.current?.click(); }}
@@ -134,7 +134,7 @@ function Group({ label, children }: { label: string; children: React.ReactNode }
   return (
     <div className="mb-5">
       <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-1.5">{label}</p>
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-50">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden divide-y divide-slate-100">
         {children}
       </div>
     </div>
@@ -146,7 +146,7 @@ function Row({ href, icon, tint, title, trailing }: {
 }) {
   return (
     <Link href={href} className="flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 transition-colors">
-      <span className={cn("w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0", tint)}>{icon}</span>
+      <span className={cn("w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0", tint)}>{icon}</span>
       <span className="text-sm font-semibold text-slate-800 flex-1 min-w-0 truncate">{title}</span>
       {trailing}
       <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
@@ -182,7 +182,7 @@ export default function PatientProfilePage() {
 
   if (authLoading || loading || !user) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">
-      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
     </div>;
   }
 
@@ -216,7 +216,7 @@ export default function PatientProfilePage() {
 
       <div className="max-w-xl mx-auto py-6 px-4 sm:px-6">
         {/* Profile header */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6 flex items-center gap-4">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-6 flex items-center gap-4">
           <AvatarEditor url={p.photoUrl ?? ""} onChange={(url) => setProfile((prev) => ({ ...(prev ?? {}), photoUrl: url }))} />
           <div className="min-w-0 flex-1">
             <EditableName name={user.name} displayName={user.name || t("addName")} onSaved={refresh} />
@@ -224,7 +224,7 @@ export default function PatientProfilePage() {
             <div className="mt-2 flex items-center gap-2">
               <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
                 <div
-                  className={cn("h-full rounded-full transition-all", completeness.percent === 100 ? "bg-emerald-500" : "bg-blue-500")}
+                  className={cn("h-full rounded-full transition-all", completeness.percent === 100 ? "bg-emerald-500" : "bg-emerald-400")}
                   style={{ width: `${completeness.percent}%` }}
                 />
               </div>
@@ -237,7 +237,7 @@ export default function PatientProfilePage() {
 
         {bookingMissing.length > 0 && (
           <Link href="/patient/profile/personal" className="mb-5 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3.5">
-            <span className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-100 text-amber-600"><User className="w-4 h-4" /></span>
+            <span className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 bg-amber-100 text-amber-600"><User className="w-4 h-4" /></span>
             <span className="flex-1 min-w-0">
               <span className="block text-sm font-semibold text-amber-900">{t("completeTitle")}</span>
               <span className="block text-xs text-amber-700">
@@ -293,7 +293,7 @@ export default function PatientProfilePage() {
 
         <button
           onClick={logout}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-full bg-white border border-slate-100 shadow-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
         >
           <LogOut className="w-4 h-4" /> {t("signOut")}
         </button>

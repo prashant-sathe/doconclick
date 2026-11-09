@@ -73,7 +73,7 @@ function AvatarEditor({ url, onChange }: { url: string; onChange: (url: string) 
         onChange={(e) => { const f = e.target.files?.[0]; if (f) setPendingFile(f); e.target.value = ""; }}
       />
       {menuOpen && (
-        <div className="absolute left-0 top-full mt-2 z-20 w-44 rounded-xl bg-white border border-slate-100 shadow-lg py-1 overflow-hidden">
+        <div className="absolute left-0 top-full mt-2 z-20 w-44 rounded-2xl bg-white border border-slate-100 shadow-lg py-1 overflow-hidden">
           <button
             type="button"
             onClick={() => { setMenuOpen(false); inputRef.current?.click(); }}
@@ -162,9 +162,9 @@ function ChangePassword() {
   };
 
   return (
-    <form onSubmit={submit} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+    <form onSubmit={submit} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
           <Lock className="w-5 h-5" />
         </div>
         <h2 className="font-bold text-slate-800">Change Password</h2>
@@ -256,7 +256,7 @@ export default function AdminProfile() {
       </div>
 
       <div className="max-w-2xl space-y-6">
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex items-center gap-4">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 flex items-center gap-4">
           {loading ? (
             <div className="skeleton w-16 h-16 rounded-full flex-shrink-0" />
           ) : (
@@ -270,7 +270,7 @@ export default function AdminProfile() {
 
         <ChangePassword />
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6">
           <LogoutAllDevices />
         </div>
 

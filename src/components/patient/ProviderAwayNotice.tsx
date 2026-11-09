@@ -23,7 +23,7 @@ export default function ProviderAwayNotice({ provider, who = "doctor" }: { provi
   const upcoming = (provider.timeOff ?? []).slice(0, 3);
   if (!provider.awayNow && upcoming.length === 0) return null;
   return (
-    <div className="flex items-start gap-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 mb-3">
+    <div className="flex items-start gap-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-2xl px-3 py-2.5 mb-3">
       <CalendarOff className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-500" />
       <div>
         {provider.awayNow && (

@@ -44,7 +44,7 @@ export default function SymptomPhotoPicker({ photos, onChange, onError, classNam
       <p className="text-xs text-slate-500 -mt-0.5 mb-2">{tf("symptomPhotosHint")}</p>
       <div className="flex flex-wrap gap-2">
         {photos.map((p) => (
-          <div key={p.id} className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+          <div key={p.id} className="relative w-20 h-20 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50">
             {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary aspect ratio per upload, next/image needs a fixed intrinsic size */}
             <img src={p.fileUrl} alt={tf("photoTitle")} className="w-full h-full object-cover" />
             <button type="button" aria-label={tf("removePhoto")}
@@ -55,7 +55,7 @@ export default function SymptomPhotoPicker({ photos, onChange, onError, classNam
           </div>
         ))}
         {photos.length < MAX_SYMPTOM_PHOTOS && (
-          <label className={cn("w-20 h-20 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold cursor-pointer hover:border-blue-400 hover:text-blue-600", uploading && "opacity-60 pointer-events-none")}>
+          <label className={cn("w-20 h-20 rounded-2xl border-2 border-dashed border-slate-300 text-slate-500 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold cursor-pointer hover:border-emerald-400 hover:text-emerald-600", uploading && "opacity-60 pointer-events-none")}>
             {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
             {tf("addPhoto")}
             <input type="file" className="hidden" accept="image/jpeg,image/png"

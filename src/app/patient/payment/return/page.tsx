@@ -71,7 +71,7 @@ function ReturnContent() {
 
   if (status === "checking") {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+      <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
         <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto mb-5" />
         <h2 className="text-xl font-extrabold text-slate-900 mb-2">{t("confirming")}</h2>
         <p className="text-slate-500">{t("fewSeconds")}</p>
@@ -81,7 +81,7 @@ function ReturnContent() {
 
   if (status === "paid") {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+      <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
         <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
           <CheckCircle className="w-9 h-9 text-emerald-500" />
         </div>
@@ -94,7 +94,7 @@ function ReturnContent() {
 
   if (status === "credited") {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+      <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
         <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-5">
           <Wallet className="w-9 h-9 text-blue-500" />
         </div>
@@ -112,7 +112,7 @@ function ReturnContent() {
 
   if (status === "pending") {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+      <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
         <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-5">
           <Clock className="w-9 h-9 text-amber-500" />
         </div>
@@ -133,7 +133,7 @@ function ReturnContent() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+    <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
       <p className="text-slate-500 mb-8">{t("error")}</p>
       <Link href="/patient/appointments" className="btn-primary w-full justify-center py-3.5">{tc("myAppointments")}</Link>
     </div>
@@ -144,7 +144,7 @@ export default function PaymentReturn() {
   const tc = useTranslations("booking.common");
   return (
     <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
-      <Suspense fallback={<div className="bg-white rounded-2xl p-8 text-center text-slate-400">{tc("loading")}</div>}>
+      <Suspense fallback={<div className="bg-white rounded-3xl p-8 text-center text-slate-400">{tc("loading")}</div>}>
         <ReturnContent />
       </Suspense>
     </div>

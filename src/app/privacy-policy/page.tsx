@@ -21,12 +21,12 @@ export default async function PrivacyPolicyPage() {
   const l = await getTranslations("legal");
 
   return (
-    <div className="min-h-screen bg-slate-50 safe-screen">
+    <div className="min-h-screen gradient-surface safe-screen">
       <div className="mx-auto max-w-3xl px-6 py-12">
-        <Link href="/" className="text-sm font-semibold text-blue-600 hover:underline tap-44-y">{t("back")}</Link>
+        <Link href="/" className="glass-pill inline-flex items-center rounded-full px-4 min-h-11 text-sm font-semibold text-blue-600 hover:underline">{t("back")}</Link>
 
         <div className="mt-6 mb-8 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
             <FileCheck className="w-5 h-5" />
           </div>
           <div>
@@ -35,7 +35,7 @@ export default async function PrivacyPolicyPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 space-y-10">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100/80 p-5 sm:p-8 space-y-10">
           <div id="privacy-policy">
             <LegalContent title={t("privacyTitle")} sections={localizeLegal("privacy", PRIVACY_POLICY, l)} />
           </div>

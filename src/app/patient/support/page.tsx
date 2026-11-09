@@ -95,7 +95,7 @@ export default function PatientSupportPage() {
   if (authLoading || !user || user.role !== "PATIENT") {
     return (
       <div className="min-h-screen gradient-surface flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
       </div>
     );
   }
@@ -110,9 +110,9 @@ export default function PatientSupportPage() {
           <p className="text-slate-500 text-sm">{t("subtitle")}</p>
         </div>
 
-        <form onSubmit={submit} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-8">
+        <form onSubmit={submit} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0">
               <LifeBuoy className="w-4 h-4 text-blue-600" />
             </div>
             <h2 className="font-bold text-slate-800">{t("raiseTitle")}</h2>
@@ -144,7 +144,7 @@ export default function PatientSupportPage() {
             onContactMobile={setContactMobile}
           />
           {error && (
-            <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mb-3">{error}</div>
+            <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5 mb-3">{error}</div>
           )}
           <button
             type="submit"
@@ -170,10 +170,10 @@ export default function PatientSupportPage() {
             {tickets.map((ticket) => {
               const Icon = STATUS_ICON[ticket.status] ?? AlertCircle;
               return (
-                <Link key={ticket.id} href={`/patient/support/${ticket.id}`} className="block bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-md transition-shadow">
+                <Link key={ticket.id} href={`/patient/support/${ticket.id}`} className="block bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4 hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-3">
                     <div className={
-                      "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 " +
+                      "w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 " +
                       (ticket.status === "RESOLVED" ? "bg-emerald-50 text-emerald-500" : ticket.status === "IN_PROGRESS" ? "bg-amber-50 text-amber-500" : "bg-red-50 text-red-500")
                     }>
                       <Icon className="w-4 h-4" />

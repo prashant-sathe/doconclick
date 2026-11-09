@@ -13,6 +13,7 @@ import { useTranslations } from "next-intl";
 import PatientNotificationToast from "@/components/patient/PatientNotificationToast";
 import WalletNotificationToast from "@/components/patient/WalletNotificationToast";
 import InboxButton from "@/components/InboxButton";
+import HeaderGreeting from "@/components/HeaderGreeting";
 
 // Labels are message keys (messages/<locale>/nav.json).
 const WALLET_EVENTS = ["TOPUP", "BOOKING_PAYMENT", "ADMIN_CREDIT", "ADMIN_DEBIT", "REASSIGNMENT_CREDIT"] as const;
@@ -65,11 +66,12 @@ export default function PatientHeader() {
 
   return (
     <header
-      className="safe-top sticky z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100"
+      className="safe-top sticky z-30 px-3 sm:px-4 pt-2 pb-1"
       style={{ top: "var(--imp-banner-h, 0px)" }}
     >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-        <Link href="/patient/dashboard" aria-label={t("header.home")} className="tap-44-y flex items-center flex-shrink-0">
+      <div className="max-w-5xl mx-auto glass-pill rounded-full pl-1.5 pr-1.5 lg:pl-5 py-1.5 flex items-center justify-between gap-3">
+        <HeaderGreeting name={user?.name} href="/patient/profile" className="lg:hidden" />
+        <Link href="/patient/dashboard" aria-label={t("header.home")} className="hidden lg:flex tap-44-y items-center flex-shrink-0">
           <Image src="/logo.png" alt="DocOnClick" width={1200} height={242} className="h-7 sm:h-8 w-auto object-contain" />
         </Link>
 
@@ -82,8 +84,8 @@ export default function PatientHeader() {
               key={href}
               href={href}
               className={cn(
-                "px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors",
-                pathname === href ? "text-blue-600 bg-blue-50" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                "px-3 py-2 rounded-full text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors",
+                pathname === href ? "text-emerald-700 bg-white shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
               )}
             >
               {Icon && <Icon className="w-4 h-4" />}
@@ -92,15 +94,12 @@ export default function PatientHeader() {
           ); })}
         </nav>
 
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <span className="text-sm text-slate-500 hidden xl:inline">
-            {t.rich("header.hi", { name: user?.name || t("header.there"), strong: (c) => <strong className="text-slate-800">{c}</strong> })}
-          </span>
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
 
           <Link
             href="/patient/wallet"
             aria-label={balance != null ? t("header.walletBalance", { balance: balance.toLocaleString("en-IN") }) : t("header.wallet")}
-            className="tap-44-y flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition-colors"
+            className="tap-44-y flex items-center gap-1.5 px-3 h-10 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition-colors"
           >
             <WalletIcon className="w-3.5 h-3.5" />
             <span>{balance != null ? `₹${balance.toLocaleString("en-IN")}` : "—"}</span>
@@ -113,7 +112,7 @@ export default function PatientHeader() {
               onClick={toggleBell}
               title={t("header.notifications")}
               aria-label={hasUnseen ? t("header.notificationsNew") : t("header.notifications")}
-              className="tap-44 relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
+              className="tap-44 relative w-10 h-10 flex items-center justify-center rounded-full bg-white/80 border border-white shadow-sm text-slate-600 hover:bg-white hover:text-slate-900 transition-colors"
             >
               <Bell className={cn("w-4 h-4", hasUnseen && "animate-bell-ring")} />
               {hasUnseen && (

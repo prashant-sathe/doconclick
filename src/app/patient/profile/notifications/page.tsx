@@ -73,8 +73,8 @@ export default function NotificationSettingsPage() {
               type="button"
               aria-pressed={leads.includes(lead)}
               onClick={() => toggle(lead)}
-              className={cn("min-h-11 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
-                leads.includes(lead) ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300")}
+              className={cn("min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+                leads.includes(lead) ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300")}
             >
               {t(`lead.${lead}`)}
             </button>

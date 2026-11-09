@@ -38,7 +38,7 @@ export default function DoctorPaymentReturn() {
   return (
     <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       {status === "checking" && (
-        <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+        <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
           <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto mb-5" />
           <h2 className="text-xl font-extrabold text-slate-900 mb-2">{t("confirming")}</h2>
           <p className="text-slate-500">{t("fewSeconds")}</p>
@@ -46,7 +46,7 @@ export default function DoctorPaymentReturn() {
       )}
 
       {status === "paid" && (
-        <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+        <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
           <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
             <CheckCircle className="w-9 h-9 text-emerald-500" />
           </div>
@@ -59,7 +59,7 @@ export default function DoctorPaymentReturn() {
       )}
 
       {status === "pending" && (
-        <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+        <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
           <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-5">
             <Clock className="w-9 h-9 text-amber-500" />
           </div>
@@ -76,7 +76,7 @@ export default function DoctorPaymentReturn() {
       )}
 
       {status === "error" && (
-        <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+        <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md w-full">
           <p className="text-slate-500 mb-8">{t("checkFailed")}</p>
           <button onClick={() => router.push("/doctor/payment")} className="btn-primary w-full justify-center py-3.5">
             {t("backToPayment")}

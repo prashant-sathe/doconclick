@@ -89,7 +89,7 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
       <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl z-50 flex flex-col animate-slide-in overflow-hidden">
+      <div className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white sm:rounded-l-3xl shadow-2xl z-50 flex flex-col animate-slide-in overflow-hidden">
 
         {/* Header */}
         <div className="px-6 py-6 flex items-start justify-between flex-shrink-0"
@@ -115,7 +115,7 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
             </div>
           </div>
           <button onClick={onClose}
-            className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+            className="w-9 h-9 tap-44 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -124,7 +124,7 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="p-6 space-y-4">
-              {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-10 rounded-xl" />)}
+              {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-10 rounded-2xl" />)}
             </div>
           ) : !data ? (
             <div className="p-6">
@@ -143,7 +143,7 @@ function PatientDrawer({ patientId, onClose }: { patientId: string; onClose: () 
                   { label: "No-Show",    value: s?.noShowCount ?? 0,     icon: UserX,         color: "text-amber-600",  bg: "bg-amber-50" },
                   { label: "Total Spent", value: `₹${(s?.totalSpent ?? 0).toLocaleString("en-IN")}`, icon: DollarSign, color: "text-purple-600", bg: "bg-purple-50" },
                 ].map(({ label, value, icon: Icon, color, bg }) => (
-                  <div key={label} className={`${bg} rounded-xl p-3 text-center`}>
+                  <div key={label} className={`${bg} rounded-2xl p-3 text-center`}>
                     <Icon className={`w-5 h-5 ${color} mx-auto mb-1`} />
                     <div className={`text-lg font-extrabold ${color}`}>{value}</div>
                     <div className="text-xs text-slate-500">{label}</div>
@@ -245,7 +245,7 @@ function Section({ title, icon: Icon, children }: { title: string; icon: React.E
       <h3 className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
         <Icon className="w-3.5 h-3.5" /> {title}
       </h3>
-      <div className="bg-slate-50 rounded-xl divide-y divide-slate-100 overflow-hidden">
+      <div className="bg-slate-50 rounded-2xl divide-y divide-slate-100 overflow-hidden">
         {children}
       </div>
     </div>
@@ -382,7 +382,7 @@ export default function AdminPatients() {
             <button
               onClick={() => setViewId(patient.id)}
               title="View Full Profile"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
+              className="w-9 h-9 tap-44 flex items-center justify-center rounded-full text-blue-500 hover:bg-blue-50 transition-colors"
             >
               <Eye className="w-4 h-4" />
             </button>
@@ -390,14 +390,14 @@ export default function AdminPatients() {
               onClick={() => setImpersonateTarget(patient)}
               disabled={impersonatingId === patient.id}
               title="Log in as this patient"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-indigo-500 hover:bg-indigo-50 transition-colors disabled:opacity-40"
+              className="w-9 h-9 tap-44 flex items-center justify-center rounded-full text-indigo-500 hover:bg-indigo-50 transition-colors disabled:opacity-40"
             >
               <LogIn className="w-4 h-4" />
             </button>
             <button
               onClick={() => setDeleteTarget(patient)}
               title="Delete Account"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+              className="w-9 h-9 tap-44 flex items-center justify-center rounded-full text-red-600 hover:bg-red-50 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -425,31 +425,31 @@ export default function AdminPatients() {
 
       {loadError && data && <LoadError error={loadError} onRetry={reload} retrying={reloading} hasData />}
       {impact.error && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm rounded-2xl px-4 py-3">
           {impact.error}
         </div>
       )}
       {deleteNotice && (
-        <div className="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-xl px-4 py-3">
+        <div className="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-2xl px-4 py-3">
           {deleteNotice}
         </div>
       )}
 
       {/* Search */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 mb-6">
         <div className="relative max-w-sm">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input type="text" placeholder="Search by name or mobile…"
             value={search} onChange={(e) => setSearch(e.target.value)}
-            className="input-field pl-10" />
+            className="input-field rounded-full pl-10" />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-4 sm:p-6 lg:p-8 space-y-3">
-            {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
+            {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-2xl" />)}
           </div>
         ) : !data ? (
           loadError && <LoadError error={loadError} onRetry={reload} retrying={reloading} />

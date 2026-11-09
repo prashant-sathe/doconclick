@@ -390,7 +390,7 @@ function PatientBookInner() {
 
   if (authLoading) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">
-      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
     </div>;
   }
 
@@ -400,7 +400,7 @@ function PatientBookInner() {
         <PatientHeader />
         <PatientMobileNav />
         <div className="flex items-center justify-center p-6">
-          <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full overflow-hidden lg:grid lg:grid-cols-2">
+          <div className="bg-white rounded-3xl shadow-xl max-w-2xl w-full overflow-hidden lg:grid lg:grid-cols-2">
             {/* Success message */}
             <div className="p-10 text-center lg:text-left flex flex-col lg:justify-center">
               <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto lg:mx-0 mb-5">
@@ -408,7 +408,7 @@ function PatientBookInner() {
               </div>
               <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{tf("requestSent")}</h2>
               <p className="text-slate-500 mb-6">{t("waitingDoctor")}</p>
-              <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 mb-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 text-sm text-blue-800 mb-3">
                 {fee === 0 ? tf("freeNotice") : tf("payLaterNotice")}
               </div>
               <Link href="/patient/appointments" className="btn-secondary w-full justify-center py-3 mt-3">{tc("viewMyAppointments")}</Link>
@@ -465,7 +465,7 @@ function PatientBookInner() {
         </div>
 
         {pinnedLocationLabel && (
-          <div className="max-w-lg mx-auto lg:max-w-none mb-4 flex items-center gap-2 text-xs bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-4 py-2.5">
+          <div className="max-w-lg mx-auto lg:max-w-none mb-4 flex items-center gap-2 text-xs bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl px-4 py-2.5">
             <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="flex-1 min-w-0">{t.rich("showingNear", { label: pinnedLocationLabel, b: (chunks) => <span className="font-semibold">{chunks}</span> })}</span>
             <Link href="/patient/dashboard" className="font-semibold flex-shrink-0 underline">{t("change")}</Link>
@@ -473,7 +473,7 @@ function PatientBookInner() {
         )}
 
         {selectedOutOfRange && selectedDoctor && (
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-lg mx-auto text-center">
+          <div className="bg-white rounded-3xl shadow-sm p-6 sm:p-8 border border-slate-100/80 max-w-lg mx-auto text-center">
             <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
               <Compass className="w-7 h-7 text-amber-500" />
             </div>
@@ -503,7 +503,7 @@ function PatientBookInner() {
 
         {!selectedOutOfRange && (
         <form onSubmit={submit} className="lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 lg:items-start lg:min-w-0">
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-lg mx-auto lg:max-w-none lg:mx-0 lg:min-w-0">
+        <div className="bg-white rounded-3xl shadow-sm p-6 sm:p-8 border border-slate-100/80 max-w-lg mx-auto lg:max-w-none lg:mx-0 lg:min-w-0">
           <div className="space-y-5">
             {/* Search + specialty filter */}
             <div>
@@ -515,13 +515,13 @@ function PatientBookInner() {
                   placeholder={t("searchPlaceholder")}
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); set("doctorId", ""); }}
-                  className="input-field pl-10 pr-10"
+                  className="input-field rounded-full pl-10 pr-10"
                 />
                 {search && (
                   <button aria-label={t("clearSearch")}
                     type="button"
                     onClick={() => setSearch("")}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="tap-44 absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -545,8 +545,8 @@ function PatientBookInner() {
                     if ((id === "CLINIC") !== (form.consultType === "CLINIC")) setScheduledAt("");
                     set("consultType", id);
                   }}
-                    className={cn("relative flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border text-xs font-semibold transition-all",
-                      form.consultType === id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
+                    className={cn("relative flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl border text-xs font-semibold transition-all",
+                      form.consultType === id ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                     )}>
                     <Icon className="w-5 h-5" /> {typeName(id)}
                   </button>
@@ -570,7 +570,7 @@ function PatientBookInner() {
             </div>
 
             {selectedDoctor?.doctorProfile && (
-              <div className="bg-blue-50 rounded-xl p-4 text-sm text-blue-800">
+              <div className="bg-blue-50 rounded-2xl p-4 text-sm text-blue-800">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-semibold">{formatDoctorName(selectedDoctor.name)}</span>
                   {selectedDoctor.doctorProfile.isVerified && <VerifiedBadge />}
@@ -594,7 +594,7 @@ function PatientBookInner() {
 
             {/* Home Visit distance gate */}
             {homeVisitBlocked && (
-              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 flex items-start gap-2.5">
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 flex items-start gap-2.5">
                 <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1 text-xs text-red-800">
                   <p className="font-semibold">
@@ -632,7 +632,7 @@ function PatientBookInner() {
                   const hours = formatClinicHours(selectedClinic.slots);
                   if (hours.length === 0) return null;
                   return (
-                    <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <div className="mt-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                       <p className="text-xs font-semibold text-slate-600 flex items-center gap-1.5 mb-1.5">
                         <Clock className="w-3.5 h-3.5 text-slate-400" /> {tf("clinicHours")}
                       </p>
@@ -652,7 +652,7 @@ function PatientBookInner() {
                   const openClinic = findOpenClinic(selectedDoctor.clinics.filter((c) => c.id !== selectedClinic.id), effectiveBookingTime);
                   const nextHere = findNextOpening([selectedClinic], new Date());
                   return (
-                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 mt-2 flex items-start gap-2.5">
+                    <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2.5 mt-2 flex items-start gap-2.5">
                       <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1 text-xs text-red-800">
                         <p className="font-semibold">
@@ -698,13 +698,13 @@ function PatientBookInner() {
               <ProviderAwayNotice provider={selectedDoctor} />
               <div className="grid grid-cols-2 gap-3">
                 <button type="button" onClick={() => setScheduleMode("NOW")} disabled={!!selectedDoctor?.awayNow}
-                  className={cn("min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed",
-                    scheduleMode === "NOW" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                  className={cn("min-h-11 py-2.5 rounded-full border text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed",
+                    scheduleMode === "NOW" ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600")}>
                   {tf("bookNow")}
                 </button>
                 <button type="button" onClick={() => setScheduleMode("LATER")}
-                  className={cn("min-h-11 py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-1.5",
-                    scheduleMode === "LATER" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600")}>
+                  className={cn("min-h-11 py-2.5 rounded-full border text-xs font-semibold transition-all flex items-center justify-center gap-1.5",
+                    scheduleMode === "LATER" ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600")}>
                   <CalendarClock className="w-3.5 h-3.5" /> {tf("scheduleLater")}
                 </button>
               </div>
@@ -733,8 +733,8 @@ function PatientBookInner() {
               <div className="grid grid-cols-4 gap-2">
                 {RELATIONS.map((r) => (
                   <button key={r} type="button" onClick={() => { set("relation", r); setDependentId(null); }}
-                    className={cn("min-h-11 py-2 rounded-xl border text-xs font-semibold transition-all",
-                      form.relation === r ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
+                    className={cn("min-h-11 py-2 rounded-full border text-xs font-semibold transition-all",
+                      form.relation === r ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                     )}>
                     {tc(`relation.${r}`)}
                   </button>
@@ -764,9 +764,9 @@ function PatientBookInner() {
             </div>
 
             {/* Consent */}
-            <label className="flex items-start gap-2.5 rounded-xl border border-slate-200 px-4 py-3 cursor-pointer">
+            <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 min-h-11 cursor-pointer hover:border-emerald-300 transition-colors">
               <input type="checkbox" checked={consentGiven} onChange={(e) => setConsentGiven(e.target.checked)}
-                className="w-4 h-4 mt-0.5 accent-blue-500 flex-shrink-0" />
+                className="w-5 h-5 mt-0 accent-emerald-600 flex-shrink-0" />
               <span className="text-xs text-slate-600 flex items-start gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
                 {tf("consent")}
@@ -774,7 +774,7 @@ function PatientBookInner() {
             </label>
 
             {error && (
-              <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
                 {error}
               </div>
@@ -789,7 +789,7 @@ function PatientBookInner() {
 
         {/* Sticky booking summary (desktop only) */}
         <div className="hidden lg:block lg:sticky lg:top-24 mt-6 lg:mt-0">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-6">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-100/80 p-6">
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">{t("summaryTitle")}</h3>
 
             {selectedDoctor?.doctorProfile ? (
@@ -800,11 +800,11 @@ function PatientBookInner() {
                     alt={selectedDoctor.name}
                     width={44}
                     height={44}
-                    className="w-11 h-11 rounded-xl object-cover flex-shrink-0"
+                    className="w-11 h-11 rounded-full object-cover flex-shrink-0"
                   />
                 ) : (
                   <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-sm font-extrabold"
+                    className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 text-white text-sm font-extrabold"
                     style={{ background: `linear-gradient(135deg, ${colorFor(selectedDoctor.doctorProfile.specialty)}, ${colorFor(selectedDoctor.doctorProfile.specialty)}99)` }}
                   >
                     {selectedDoctor.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
@@ -908,7 +908,7 @@ export default function PatientBook() {
   return (
     <Suspense fallback={
       <div className="min-h-screen gradient-surface flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
       </div>
     }>
       <PatientBookInner />

@@ -19,7 +19,7 @@ export default function InboxButton() {
       href={href}
       title={t("inbox")}
       aria-label={count > 0 ? t("inboxUnread", { count }) : t("inbox")}
-      className="tap-44 relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors"
+      className="tap-44 relative w-10 h-10 flex items-center justify-center rounded-full bg-white/80 border border-white shadow-sm text-slate-600 hover:bg-white hover:text-slate-900 transition-colors"
     >
       <Inbox className="w-4 h-4" />
       {count > 0 && (

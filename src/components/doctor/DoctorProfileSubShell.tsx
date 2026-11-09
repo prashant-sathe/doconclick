@@ -44,7 +44,7 @@ export default function DoctorProfileSubShell({
         </Link>
         <div className="flex items-center gap-3">
           {icon && (
-            <span className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", tint)}>
+            <span className={cn("w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0", tint)}>
               {icon}
             </span>
           )}
@@ -57,13 +57,13 @@ export default function DoctorProfileSubShell({
             <Loader2 className="w-7 h-7 animate-spin text-teal-400" />
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6 mt-5 space-y-4">
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 sm:p-6 mt-5 space-y-4">
             {children}
           </div>
         )}
 
         {error && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mt-4">{error}</p>
+          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5 mt-4">{error}</p>
         )}
 
         {!loading && onSave && (

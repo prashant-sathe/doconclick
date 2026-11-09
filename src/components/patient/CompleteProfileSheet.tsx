@@ -128,7 +128,7 @@ function CompleteProfileSheet({
     <div className="fixed inset-0 bg-black/40 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={saving ? undefined : onCancel}>
       <form
         onSubmit={save}
-        className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm max-h-[85dvh] overflow-y-auto p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+        className="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-sm max-h-[85dvh] overflow-y-auto p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3 mb-1">
@@ -165,7 +165,7 @@ function CompleteProfileSheet({
                     key={g}
                     type="button"
                     onClick={() => { setGender(g); setError(""); }}
-                    className={`min-h-11 py-2.5 rounded-xl border text-sm font-semibold transition-all ${gender === g ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-slate-300"}`}
+                    className={`min-h-11 py-2.5 rounded-full border text-sm font-semibold transition-all ${gender === g ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600 hover:border-slate-300"}`}
                   >
                     {tc(`gender.${g}`)}
                   </button>
@@ -175,7 +175,7 @@ function CompleteProfileSheet({
           )}
         </div>
 
-        {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mt-4">{error}</div>}
+        {error && <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5 mt-4">{error}</div>}
 
         <button type="submit" disabled={saving} className="btn-primary w-full justify-center py-3 mt-5">
           {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("saving")}</> : t("saveContinue")}

@@ -77,14 +77,14 @@ export default function DocSlot({
   };
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-4">
+    <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 p-4">
       <div className="flex items-center gap-3 min-w-0">
         {(type === "photo" || type === "signature") && url ? (
           <Image src={url} alt={type === "photo" ? t("profilePhoto") : t("signature")}
             width={type === "photo" ? 36 : 56} height={36}
-            className={cn("flex-shrink-0 border border-slate-200 object-contain bg-white", type === "photo" ? "w-9 h-9 rounded-full object-cover" : "w-14 h-9 rounded-lg p-1")} />
+            className={cn("flex-shrink-0 border border-slate-200 object-contain bg-white", type === "photo" ? "w-9 h-9 rounded-full object-cover" : "w-14 h-9 rounded-xl p-1")} />
         ) : (
-          <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0", url ? "bg-emerald-50" : "bg-slate-100")}>
+          <div className={cn("w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0", url ? "bg-emerald-50" : "bg-slate-100")}>
             <Icon className={cn("w-4 h-4", url ? "text-emerald-600" : "text-slate-400")} />
           </div>
         )}
@@ -108,7 +108,7 @@ export default function DocSlot({
         </span>
       ) : (
         <div className="flex items-center gap-2 flex-shrink-0">
-          <label className="btn-secondary py-1.5 px-3 text-xs cursor-pointer">
+          <label className="btn-secondary min-h-10 px-3.5 text-xs cursor-pointer">
             {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
             {url ? t("replace") : t("upload")}
             <input type="file" accept={accept ?? ".pdf,.jpg,.jpeg,.png"} className="hidden"
@@ -116,7 +116,7 @@ export default function DocSlot({
           </label>
           {removable && url && (
             <button type="button" onClick={() => setConfirmRemove(true)} disabled={busy}
-              className="p-2 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-60" title={t("remove")}>
+              className="tap-44 p-2 rounded-full text-red-500 hover:bg-red-50 disabled:opacity-60" title={t("remove")}>
               <Trash2 className="w-3.5 h-3.5" />
             </button>
           )}

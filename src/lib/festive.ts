@@ -6,8 +6,7 @@ import { istDayKey } from "@/lib/istDate";
 export type Festival = "diwali";
 
 const WINDOWS: { festival: Festival; from: string; to: string }[] = [
-  // Dhanteras 6 Nov → Lakshmi Pujan 8 Nov → Bhau-beej 11 Nov 2026.
-  { festival: "diwali", from: "2026-11-04", to: "2026-11-12" },
+  // Diwali 2026 (4–12 Nov) switched off early on request (2026-11-09).
 ];
 
 /** The festival whose window today (IST) falls in, or null. */

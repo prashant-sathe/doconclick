@@ -47,7 +47,10 @@
     "noPendingRequests": "ಯಾವುದೇ ಬಾಕಿ ವಿನಂತಿಗಳಿಲ್ಲ.",
     "viewAllInDashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ನಲ್ಲಿ ಎಲ್ಲವನ್ನೂ ನೋಡಿ",
     "inbox": "ಇನ್‌ಬಾಕ್ಸ್",
-    "inboxUnread": "ಇನ್‌ಬಾಕ್ಸ್, {count} ಓದದವು"
+    "inboxUnread": "ಇನ್‌ಬಾಕ್ಸ್, {count} ಓದದವು",
+    "goodMorning": "ಶುಭೋದಯ",
+    "goodAfternoon": "ಶುಭ ಮಧ್ಯಾಹ್ನ",
+    "goodEvening": "ಶುಭ ಸಂಜೆ"
   },
   "walletEvent": {
     "TOPUP": "ವಾಲೆಟ್ ಟಾಪ್-ಅಪ್ ಆಗಿದೆ",

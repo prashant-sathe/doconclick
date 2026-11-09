@@ -124,7 +124,7 @@ export default function PatientTrackDoctor() {
 
   if (authLoading || !user) {
     return <div className="min-h-screen gradient-surface flex items-center justify-center">
-      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
     </div>;
   }
 
@@ -138,7 +138,7 @@ export default function PatientTrackDoctor() {
       <div ref={mapRef} className="absolute inset-0 z-0" />
 
       <div className="absolute top-[calc(1rem_+_var(--safe-area-inset-top,env(safe-area-inset-top)))] left-4 z-20">
-        <Link href="/patient/appointments" className="glass-card rounded-xl px-3 py-2 flex items-center gap-1.5 text-sm font-semibold text-slate-700 shadow-lg">
+        <Link href="/patient/appointments" className="glass-card rounded-full px-3.5 min-h-11 flex items-center gap-1.5 text-sm font-semibold text-slate-700 shadow-lg">
           <ArrowLeft className="w-4 h-4" /> {t("back")}
         </Link>
       </div>
@@ -159,9 +159,9 @@ export default function PatientTrackDoctor() {
         </div>
       ) : (
         <div className="absolute bottom-[calc(1.5rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] inset-x-0 z-20 flex justify-center px-4">
-          <div className="glass-card rounded-2xl p-5 w-full max-w-sm shadow-xl">
+          <div className="glass-card rounded-3xl p-5 w-full max-w-sm shadow-xl">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-11 h-11 rounded-xl bg-teal-500 flex items-center justify-center flex-shrink-0">
+              <div className="w-11 h-11 rounded-2xl bg-teal-500 flex items-center justify-center flex-shrink-0">
                 {appt.travelStatus === "ARRIVED" ? <MapPinCheck className="w-5 h-5 text-white" /> : <Car className="w-5 h-5 text-white" />}
               </div>
               <div className="min-w-0">
@@ -182,7 +182,7 @@ export default function PatientTrackDoctor() {
               </div>
             )}
             {appt.providerType === "NURSE" && appt.visitOtp && !appt.visitStartedAt && (
-              <div className="mt-3 rounded-xl bg-rose-50 border border-rose-200 px-3 py-2 flex items-center justify-between gap-3">
+              <div className="mt-3 rounded-2xl bg-rose-50 border border-rose-200 px-3 py-2 flex items-center justify-between gap-3">
                 <span className="text-xs text-rose-700">{t("otp")}</span>
                 <span className="text-xl font-extrabold tracking-[0.3em] text-rose-700">{appt.visitOtp}</span>
               </div>

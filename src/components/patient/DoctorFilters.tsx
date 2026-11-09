@@ -53,7 +53,7 @@ export default function DoctorFilters({
         className={cn(
           "min-h-11 relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors flex-shrink-0",
           count > 0
-            ? "bg-blue-600 border-blue-600 text-white"
+            ? "bg-emerald-600 border-emerald-600 text-white"
             : "bg-white border-slate-200 text-slate-600 hover:border-slate-300",
           className
         )}
@@ -61,7 +61,7 @@ export default function DoctorFilters({
         <SlidersHorizontal className="w-3.5 h-3.5" />
         {t("trigger")}
         {count > 0 && (
-          <span className="w-4 h-4 rounded-full bg-white text-blue-600 text-[10px] font-bold flex items-center justify-center">
+          <span className="w-4 h-4 rounded-full bg-white text-emerald-700 text-[10px] font-bold flex items-center justify-center">
             {count}
           </span>
         )}
@@ -70,7 +70,7 @@ export default function DoctorFilters({
       {open && createPortal(
         <div className="fixed inset-0 bg-black/40 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setOpen(false)}>
           <div
-            className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm max-h-[85dvh] overflow-y-auto p-5"
+            className="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-sm max-h-[85dvh] overflow-y-auto p-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -91,7 +91,7 @@ export default function DoctorFilters({
                     onClick={() => onChange({ ...value, language: "" })}
                     className={cn(
                       "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
-                      value.language === "" ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                      value.language === "" ? "bg-emerald-600 border-emerald-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
                     {t("any")}
@@ -103,7 +103,7 @@ export default function DoctorFilters({
                       onClick={() => onChange({ ...value, language: lang })}
                       className={cn(
                         "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
-                        value.language === lang ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                        value.language === lang ? "bg-emerald-600 border-emerald-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                       )}
                     >
                       {lang}
@@ -125,7 +125,7 @@ export default function DoctorFilters({
                     onClick={() => onChange({ ...value, minExperience: yrs })}
                     className={cn(
                       "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
-                      value.minExperience === yrs ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                      value.minExperience === yrs ? "bg-emerald-600 border-emerald-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
                     {yrs === 0 ? t("any") : t("yearsPlus", { years: yrs })}
@@ -146,7 +146,7 @@ export default function DoctorFilters({
                     onClick={() => onChange({ ...value, maxFee: fee })}
                     className={cn(
                       "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
-                      value.maxFee === fee ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                      value.maxFee === fee ? "bg-emerald-600 border-emerald-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
                     {fee == null ? t("any") : `≤ ₹${fee}`}
@@ -167,7 +167,7 @@ export default function DoctorFilters({
                     onClick={() => onChange({ ...value, sortBy: id })}
                     className={cn(
                       "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
-                      value.sortBy === id ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                      value.sortBy === id ? "bg-emerald-600 border-emerald-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >
                     {t(`sort.${id}`)}

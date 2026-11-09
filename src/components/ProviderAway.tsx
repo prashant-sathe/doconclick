@@ -69,7 +69,7 @@ function useAwayRequest() {
       message={
         <div>
           <p className="mb-2">{t("listIntro")}</p>
-          <ul className="max-h-56 overflow-y-auto divide-y divide-slate-100 border border-slate-100 rounded-xl">
+          <ul className="max-h-56 overflow-y-auto divide-y divide-slate-100 border border-slate-100 rounded-2xl">
             {pending.bookings.map((b) => (
               <li key={b.id} className="px-3 py-2">
                 <p className="font-semibold text-slate-800">{b.patientName}</p>
@@ -195,12 +195,12 @@ export function TimeOffManager() {
       {state && state.timeOff.length > 0 && (
         <ul className="space-y-2 mb-5">
           {state.timeOff.map((o) => (
-            <li key={o.id} className="flex items-center justify-between gap-3 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5">
+            <li key={o.id} className="flex items-center justify-between gap-3 bg-amber-50 border border-amber-100 rounded-2xl px-3 py-2.5">
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-800">{o.startDate === o.endDate ? day(o.startDate, locale) : `${day(o.startDate, locale)} – ${day(o.endDate, locale)}`}</p>
                 {o.reason && <p className="text-xs text-slate-500 truncate">{o.reason}</p>}
               </div>
-              <button onClick={() => remove(o.id)} disabled={removing === o.id} className="w-9 h-9 rounded-lg border border-slate-100 bg-white flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0" aria-label={t("removeTimeOff")}>
+              <button onClick={() => remove(o.id)} disabled={removing === o.id} className="w-9 h-9 rounded-full border border-slate-100 bg-white flex items-center justify-center text-red-500 hover:bg-red-50 flex-shrink-0 tap-44" aria-label={t("removeTimeOff")}>
                 {removing === o.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
               </button>
             </li>

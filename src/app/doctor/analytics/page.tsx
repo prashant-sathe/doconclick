@@ -94,17 +94,17 @@ export default function DoctorAnalytics() {
         </div>
 
         {/* Tab switcher — Earnings has the ledger/payout detail, this page has the trends. */}
-        <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 mb-6 w-fit">
-          <Link href="/doctor/earnings" className="px-4 py-1.5 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">
+        <div className="flex items-center gap-1 bg-white border border-slate-200/80 shadow-sm rounded-full p-1 mb-6 w-fit">
+          <Link href="/doctor/earnings" className="inline-flex items-center min-h-10 px-4 py-2 rounded-full text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors">
             {tTabs("earnings")}
           </Link>
-          <span className="px-4 py-1.5 rounded-lg text-sm font-semibold bg-white text-teal-600 shadow-sm">
+          <span className="inline-flex items-center min-h-10 px-4 py-2 rounded-full text-sm font-semibold bg-emerald-600 text-white shadow-sm">
             {tTabs("analytics")}
           </span>
         </div>
 
         {/* Monthly earnings trend */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 mb-6">
           <h2 className="font-bold text-slate-800 mb-1 flex items-center gap-1.5">
             <TrendingUp className="w-4 h-4 text-teal-500" /> {t("earningsTrend")}
           </h2>
@@ -114,7 +114,7 @@ export default function DoctorAnalytics() {
               <div key={m.label} className="flex-1 flex flex-col items-center gap-1.5">
                 <div className="w-full flex items-end justify-center h-28">
                   <div
-                    className="w-full max-w-10 bg-teal-500 rounded-t-md transition-all"
+                    className="w-full max-w-10 bg-teal-500 rounded-t-lg transition-all"
                     style={{ height: `${Math.max(4, (m.net / maxNet) * 100)}%` }}
                     title={t("barTitle", { amount: m.net.toLocaleString("en-IN"), count: m.bookings })}
                   />
@@ -127,7 +127,7 @@ export default function DoctorAnalytics() {
         </div>
 
         {/* Consult-type split */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6 mb-6">
           <h2 className="font-bold text-slate-800 mb-1 flex items-center gap-1.5">
             <PieChart className="w-4 h-4 text-teal-500" /> {t("split")}
           </h2>
@@ -157,7 +157,7 @@ export default function DoctorAnalytics() {
         </div>
 
         {/* Rating trend */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-6">
           <h2 className="font-bold text-slate-800 mb-1 flex items-center gap-1.5">
             <Star className="w-4 h-4 text-amber-400" /> {t("ratingTrend")}
           </h2>
@@ -174,12 +174,12 @@ export default function DoctorAnalytics() {
                   <div className="w-full flex items-end justify-center h-20">
                     {m.avgRating !== null ? (
                       <div
-                        className="w-full max-w-10 bg-amber-400 rounded-t-md transition-all"
+                        className="w-full max-w-10 bg-amber-400 rounded-t-lg transition-all"
                         style={{ height: `${Math.max(6, (m.avgRating / 5) * 100)}%` }}
                         title={t("ratingBarTitle", { rating: m.avgRating.toFixed(1), count: m.count })}
                       />
                     ) : (
-                      <div className="w-full max-w-10 h-1 bg-slate-100 rounded-t-md" />
+                      <div className="w-full max-w-10 h-1 bg-slate-100 rounded-t-lg" />
                     )}
                   </div>
                   <span className="text-[10px] text-slate-400 font-semibold">{m.label}</span>

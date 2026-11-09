@@ -102,7 +102,7 @@ export default function AvailabilitySettingsPage() {
       onSave={save}
     >
       {unreadable && (
-        <p className="flex items-start gap-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
+        <p className="flex items-start gap-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-2xl px-3 py-2.5">
           <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>{t("unreadable", { value: unreadable })}</span>
         </p>
@@ -124,8 +124,8 @@ export default function AvailabilitySettingsPage() {
           <div className="flex flex-wrap gap-2">
             {DAYS.map((d) => (
               <button key={d} type="button" onClick={() => toggleDay(i, d)} aria-pressed={b.days.includes(d)}
-                className={cn("px-3 py-2 rounded-xl text-xs font-bold border transition-all",
-                  b.days.includes(d) ? "bg-teal-600 text-white border-teal-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300")}>
+                className={cn("min-h-10 min-w-11 px-3.5 py-2 rounded-full text-xs font-bold border transition-all",
+                  b.days.includes(d) ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300")}>
                 {tDays(d)}
               </button>
             ))}

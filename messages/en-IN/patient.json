@@ -358,7 +358,10 @@
       "cancel": "Cancel",
       "setting": "Setting…",
       "confirm": "Set this location"
-    }
+    },
+    "cardBook": "Book",
+    "cardRoute": "Route",
+    "nearbyHeading": "Nearby"
   },
   "labTests": {
     "title": "My lab tests",

@@ -64,7 +64,7 @@ export default function ResetPassword() {
     <div className="min-h-screen gradient-surface flex items-center justify-center safe-screen">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 shadow-xl">
+          <div className="w-16 h-16 rounded-full gradient-primary flex items-center justify-center mx-auto mb-4 shadow-xl">
             <Lock className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t("title")}</h1>
@@ -73,7 +73,7 @@ export default function ResetPassword() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
+        <div className="glass-card rounded-3xl p-6 sm:p-8">
           <form onSubmit={submit} className="space-y-5">
             <div>
               <label className="input-label">
@@ -115,7 +115,7 @@ export default function ResetPassword() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
                 {error}
               </div>

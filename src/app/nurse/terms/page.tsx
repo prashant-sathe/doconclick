@@ -11,7 +11,7 @@ export default function NurseTermsPage() {
   const l = useTranslations("legal");
   return (
     <NurseSubShell title={t("title")} description={t("lastUpdated", { date: l("lastUpdatedDate") })} icon={<FileCheck className="w-5 h-5" />}>
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-8">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-5 space-y-8">
         <LegalContent title={t("termsOfService")} sections={localizeLegal("tos", TERMS_OF_SERVICE, l)} />
         <LegalContent title={t("privacyPolicy")} sections={localizeLegal("privacy", PRIVACY_POLICY, l)} />
       </div>

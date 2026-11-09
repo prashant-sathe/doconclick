@@ -132,7 +132,7 @@ function MetricChart({ metric, readings }: { metric: Metric; readings: VitalRead
   };
 
   return (
-    <figure className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+    <figure className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4">
       <figcaption className="flex items-baseline justify-between gap-2 mb-1">
         <span className="text-sm font-semibold" style={{ color: C.ink }}>{title}</span>
         <span className="text-[11px]" style={{ color: C.muted }}>{metric.unit} · {t("readings", { count: rows.length })}</span>
@@ -250,7 +250,7 @@ export default function VitalsCharts({ readings, emptyText }: { readings: VitalR
 
   return (
     <div className="space-y-4">
-      <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+      <section className="bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4">
         <div className="flex items-center justify-between gap-2 mb-3">
           <p className="text-sm font-semibold text-slate-800">{t("latest", { when: fmtDateTime(latest.recordedAt) })}</p>
           {latestLevel === "NORMAL" ? (
@@ -277,7 +277,7 @@ export default function VitalsCharts({ readings, emptyText }: { readings: VitalR
         {METRICS.map((m) => <MetricChart key={m.id} metric={m} readings={chrono} />)}
       </div>
 
-      <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <section className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden">
         <p className="px-4 pt-3 pb-2 text-sm font-semibold text-slate-800">{t("allReadings")}</p>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">

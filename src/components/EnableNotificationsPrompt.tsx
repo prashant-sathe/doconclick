@@ -54,7 +54,7 @@ export default function EnableNotificationsPrompt() {
   if (permission === "denied") {
     return (
       <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-4">
-        <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+        <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
           <BellOff className="w-4 h-4 text-amber-600" />
         </div>
         <div className="min-w-0 flex-1">
@@ -69,7 +69,7 @@ export default function EnableNotificationsPrompt() {
           {!isNative() && isMac() && (
             <button
               onClick={openSystemNotificationSettings}
-              className="tap-44 text-xs font-semibold px-3 py-1.5 rounded-lg text-amber-700 hover:bg-amber-100 mt-2 inline-flex items-center gap-1"
+              className="tap-44 text-xs font-semibold px-3 py-1.5 rounded-full text-amber-700 hover:bg-amber-100 mt-2 inline-flex items-center gap-1"
             >
               {t("openMacSettings")} <ExternalLink className="w-3 h-3" />
             </button>
@@ -82,11 +82,11 @@ export default function EnableNotificationsPrompt() {
   if (visible) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
-        <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full relative">
+        <div className="bg-white rounded-3xl shadow-2xl p-6 max-w-sm w-full relative">
           <button aria-label={t("dismiss")} onClick={dismiss} className="tap-44 absolute top-4 right-4 text-slate-300 hover:text-slate-500">
             <X className="w-4 h-4" />
           </button>
-          <div className="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center mb-4">
+          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
             <Bell className="w-6 h-6 text-blue-600" />
           </div>
           <h3 className="text-lg font-extrabold text-slate-900">{t("promptTitle")}</h3>
@@ -116,7 +116,7 @@ export default function EnableNotificationsPrompt() {
             {t("notReceiving")}
           </button>
         )}
-        <button aria-label={t("dismiss")} onClick={dismissHint} className="ml-auto text-slate-300 hover:text-slate-500">
+        <button aria-label={t("dismiss")} onClick={dismissHint} className="ml-auto text-slate-300 hover:text-slate-500 tap-44">
           <X className="w-3 h-3" />
         </button>
       </div>

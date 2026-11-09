@@ -47,7 +47,10 @@
     "noPendingRequests": "No pending requests.",
     "viewAllInDashboard": "View all in Dashboard",
     "inbox": "Inbox",
-    "inboxUnread": "Inbox, {count} unread"
+    "inboxUnread": "Inbox, {count} unread",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening"
   },
   "walletEvent": {
     "TOPUP": "Wallet topped up",

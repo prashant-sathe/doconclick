@@ -60,7 +60,7 @@ export default function AdminAnnouncements() {
               <Link
                 key={a.id}
                 href={`/admin/announcements/${a.id}`}
-                className="block bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:border-slate-200 transition-colors"
+                className="block bg-white rounded-3xl border border-slate-100/80 shadow-sm p-4 hover:border-slate-200 transition-colors"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
