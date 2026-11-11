@@ -7,7 +7,7 @@ import Image from "next/image";
 import {
   Loader2, MapPin, HeartPulse, PhoneCall, Compass, Bell, Wallet as WalletIcon,
   LifeBuoy, ChevronRight, Check, Camera, LogOut, User, Trash2, Lock, FileCheck, FolderHeart, Activity, Users, Pill,
-  FlaskConical,
+  FlaskConical, Bookmark,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -269,6 +269,8 @@ export default function PatientProfilePage() {
         </Group>
 
         <Group label={t("groupPreferences")}>
+          <Row href="/patient/saved" tint="bg-emerald-50 text-emerald-600" icon={<Bookmark className="w-4 h-4" />}
+            title={t("savedDoctors")} />
           <Row href="/patient/profile/search-range" tint="bg-blue-50 text-blue-500" icon={<Compass className="w-4 h-4" />}
             title={t("searchRange")}
             trailing={<span className="text-xs font-semibold text-slate-400 flex-shrink-0">{p.searchRadiusKm != null ? t("km", { km: p.searchRadiusKm }) : t("anyDistance")}</span>} />

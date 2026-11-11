@@ -43,7 +43,8 @@
     "signOut": "Sign Out",
     "family": "Family Members",
     "medicines": "Medicine Reminders",
-    "labTests": "Lab Tests"
+    "labTests": "Lab Tests",
+    "savedDoctors": "Saved doctors"
   },
   "personal": {
     "title": "Personal & Medical Info",

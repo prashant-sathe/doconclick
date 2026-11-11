@@ -1,8 +1,9 @@
 "use client";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { SlidersHorizontal, X, Languages, GraduationCap, IndianRupee, ArrowUpDown } from "lucide-react";
+import { SlidersHorizontal, X, Languages, GraduationCap, IndianRupee, ArrowUpDown, Stethoscope } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSpecialties } from "@/lib/useSpecialties";
 import { useTranslations } from "next-intl";
 import {
   type DoctorFilterState,
@@ -28,44 +29,80 @@ function activeFilterCount(f: DoctorFilterState): number {
 
 // Trigger button + a small sheet for language / experience / fee / sort —
 // shared by the map dashboard and the plain book page so filtering a doctor
-// list behaves identically on both.
+// list behaves identically on both. Pass specialty + onSpecialtyChange to
+// also pick the specialist inside the sheet (the map dashboard does, so it
+// needs no separate specialty chip row).
 export default function DoctorFilters({
   value,
   onChange,
   doctors,
   className,
+  iconOnly = false,
+  specialty,
+  onSpecialtyChange,
 }: {
   value: DoctorFilterState;
   onChange: (next: DoctorFilterState) => void;
   doctors: { doctorProfile: { languages: string } | null }[];
   className?: string;
+  /** Round 36px icon button (count as a badge) for the map search row. */
+  iconOnly?: boolean;
+  specialty?: string;
+  onSpecialtyChange?: (specialty: string) => void;
 }) {
   const t = useTranslations("patient.doctorFilters");
+  const tSpec = useTranslations("patient.specialtyFilter");
+  const { specialties } = useSpecialties();
   const [open, setOpen] = useState(false);
-  const count = activeFilterCount(value);
+  const withSpecialty = onSpecialtyChange != null;
+  const count = activeFilterCount(value) + (withSpecialty && specialty ? 1 : 0);
   const languages = collectAvailableLanguages(doctors);
+  const isDefault = isDefaultDoctorFilters(value) && !(withSpecialty && specialty);
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className={cn(
-          "min-h-11 relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors flex-shrink-0",
-          count > 0
-            ? "bg-emerald-600 border-emerald-600 text-white"
-            : "bg-white border-slate-200 text-slate-600 hover:border-slate-300",
-          className
-        )}
-      >
-        <SlidersHorizontal className="w-3.5 h-3.5" />
-        {t("trigger")}
-        {count > 0 && (
-          <span className="w-4 h-4 rounded-full bg-white text-emerald-700 text-[10px] font-bold flex items-center justify-center">
-            {count}
-          </span>
-        )}
-      </button>
+      {iconOnly ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label={t("trigger")}
+          title={t("trigger")}
+          className={cn(
+            "tap-44 relative w-9 h-9 rounded-full border flex items-center justify-center transition-colors flex-shrink-0",
+            count > 0
+              ? "bg-emerald-600 border-emerald-600 text-white"
+              : "bg-white/90 border-slate-200/80 text-slate-600 hover:text-emerald-600",
+            className
+          )}
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+          {count > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-white text-emerald-700 border border-emerald-600 text-[10px] font-bold flex items-center justify-center">
+              {count}
+            </span>
+          )}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className={cn(
+            "min-h-11 relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors flex-shrink-0",
+            count > 0
+              ? "bg-emerald-600 border-emerald-600 text-white"
+              : "bg-white border-slate-200 text-slate-600 hover:border-slate-300",
+            className
+          )}
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5" />
+          {t("trigger")}
+          {count > 0 && (
+            <span className="w-4 h-4 rounded-full bg-white text-emerald-700 text-[10px] font-bold flex items-center justify-center">
+              {count}
+            </span>
+          )}
+        </button>
+      )}
 
       {open && createPortal(
         <div className="fixed inset-0 bg-black/40 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setOpen(false)}>
@@ -79,6 +116,41 @@ export default function DoctorFilters({
                 <X className="w-4 h-4" />
               </button>
             </div>
+
+            {withSpecialty && (
+              <div className="mb-5">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <Stethoscope className="w-3.5 h-3.5" /> {t("specialist")}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onSpecialtyChange("")}
+                    className={cn(
+                      "min-h-11 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+                      !specialty ? "bg-emerald-600 border-emerald-600 text-white" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                    )}
+                  >
+                    {tSpec("all")}
+                  </button>
+                  {specialties.map(({ name, color }) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => onSpecialtyChange(name)}
+                      className={cn(
+                        "min-h-11 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+                        specialty === name ? "text-white border-transparent" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                      )}
+                      style={specialty === name ? { backgroundColor: color } : undefined}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: specialty === name ? "white" : color }} />
+                      {name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {languages.length > 0 && (
               <div className="mb-5">
@@ -177,8 +249,14 @@ export default function DoctorFilters({
             </div>
 
             <div className="flex gap-3">
-              {!isDefaultDoctorFilters(value) && (
-                <button onClick={() => onChange(DEFAULT_DOCTOR_FILTERS)} className="btn-secondary flex-1">
+              {!isDefault && (
+                <button
+                  onClick={() => {
+                    onChange(DEFAULT_DOCTOR_FILTERS);
+                    onSpecialtyChange?.("");
+                  }}
+                  className="btn-secondary flex-1"
+                >
                   {t("reset")}
                 </button>
               )}

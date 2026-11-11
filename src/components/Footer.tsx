@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Mail, ArrowRight } from "lucide-react";
+import AppStoreBadges from "@/components/AppStoreBadges";
 
 const FOOTER_LINKS = [
   { title: "groupPlatform", links: [
@@ -65,6 +66,7 @@ export default function Footer() {
                 <Mail className="w-4 h-4 text-blue-400" /> doconclick.co@gmail.com
               </a>
             </div>
+            <AppStoreBadges className="mt-6" />
             {/* Social */}
             <div className="flex gap-2 mt-6">
               {[

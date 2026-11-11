@@ -2,17 +2,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MapPin, CalendarCheck2, UserCircle, Bookmark, Sparkles, HeartPulse } from "lucide-react";
+import { MapPin, CalendarCheck2, UserCircle, Sparkles, HeartPulse } from "lucide-react";
 import { computeCompleteness } from "@/lib/profileCompleteness";
 import { useTranslations } from "next-intl";
 import { FloatingTabBar, tabItemClass } from "@/components/FloatingTabBar";
 
+// Saved doctors moved off the bar into the Profile hub (5 tabs read better
+// on small phones); /patient/saved keeps the Profile tab highlighted.
 const TABS = [
   { href: "/patient/dashboard", label: "tabDoctors", icon: MapPin },
   { href: "/patient/nurse", label: "tabNurse", icon: HeartPulse },
   { href: "/patient/assistant", label: "tabAssistant", icon: Sparkles },
   { href: "/patient/appointments", label: "appointments", icon: CalendarCheck2 },
-  { href: "/patient/saved", label: "saved", icon: Bookmark },
   { href: "/patient/profile", label: "profile", icon: UserCircle },
 ] as const;
 
@@ -33,7 +34,8 @@ export default function PatientMobileNav() {
   return (
     <FloatingTabBar>
       {TABS.map(({ href, label, icon: Icon }) => {
-        const active = pathname === href;
+        const active =
+          pathname === href || (href === "/patient/profile" && pathname === "/patient/saved");
         return (
           <Link
             key={href}

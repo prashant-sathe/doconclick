@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Loader2, Bookmark, BookmarkX, Building2, Compass, ChevronDown } from "lucide-react";
+import { Loader2, Bookmark, BookmarkX, Building2, Compass, ChevronDown, ChevronLeft } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useSpecialties } from "@/lib/useSpecialties";
 import { cn, formatDoctorName } from "@/lib/utils";
@@ -41,6 +41,7 @@ export default function SavedDoctorsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const t = useTranslations("patient.saved");
+  const tShell = useTranslations("patientAccount.shell");
   const { colorFor } = useSpecialties();
   const [saved, setSaved] = useState<SavedDoctorEntry[]>([]);
   const [searchRadiusKm, setSearchRadiusKm] = useState<number | null>(null);
@@ -90,6 +91,11 @@ export default function SavedDoctorsPage() {
       <PatientHeader />
       <PatientMobileNav />
       <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
+        {/* Saved is reached from the Profile hub on phones — give it the
+            same "‹ Profile" way back as the other profile screens. */}
+        <Link href="/patient/profile" className="lg:hidden tap-44-y btn-ghost gap-1 text-sm -ml-2 mb-3">
+          <ChevronLeft className="w-4 h-4" /> {tShell("backToProfile")}
+        </Link>
         <div className="flex items-center gap-4 mb-6">
           <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg flex-shrink-0">
             <Bookmark className="w-7 h-7 text-white" />

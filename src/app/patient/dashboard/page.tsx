@@ -12,7 +12,7 @@ import {
   Navigation, AlertCircle, IndianRupee, CalendarClock,
   CalendarCheck2, AlertTriangle, ShieldCheck, Users, Search,
   Bookmark, BookmarkCheck, Sparkles, Compass, RefreshCw, Crosshair,
-  List,
+  List, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { formatAvailability } from "@/lib/availability";
 import { useAuth } from "@/components/AuthProvider";
@@ -27,7 +27,6 @@ import { isNative, getCurrentPositionCompat } from "@/lib/platform";
 import RatingStars from "@/components/patient/RatingStars";
 import VerifiedBadge from "@/components/patient/VerifiedBadge";
 import ServiceFees from "@/components/patient/ServiceFees";
-import SpecialtyFilter from "@/components/patient/SpecialtyFilter";
 import DoctorFilters from "@/components/patient/DoctorFilters";
 import {
   type DoctorFilterState,
@@ -323,19 +322,30 @@ function NearbyClinicCard({
   const [photoFailed, setPhotoFailed] = useState(false);
   const profile = doctor.doctorProfile;
   if (!profile) return null;
-  const photo = photoFailed ? null : clinic.photoUrl ?? profile.clinicPhotoUrl ?? profile.photoUrl;
+  const clinicPhoto = clinic.photoUrl ?? profile.clinicPhotoUrl;
+  const photo = photoFailed ? null : clinicPhoto ?? profile.photoUrl;
+  // A doctor's own (portrait) photo would lose the face to object-cover in
+  // this wide strip — show it whole over a blurred copy of itself instead.
+  const isPortrait = !clinicPhoto && photo != null;
   const bareName = doctor.name.replace(/^dr\.?\s*/i, "").trim();
   const initial = (bareName[0] ?? doctor.name.trim()[0] ?? "?").toUpperCase();
 
   return (
     <div className="snap-center flex-shrink-0 w-[78vw] max-w-[300px] glass-card rounded-3xl p-2 pointer-events-auto">
       <button type="button" onClick={onBook} className="block w-full text-left">
-        <div className="relative h-28 rounded-[1.1rem] overflow-hidden bg-slate-100">
+        <div className="relative h-20 rounded-[1.1rem] overflow-hidden bg-slate-100">
           {photo ? (
-            <Image src={photo} alt={clinic.name} fill sizes="300px" className="object-cover" onError={() => setPhotoFailed(true)} />
+            isPortrait ? (
+              <>
+                <Image src={photo} alt="" aria-hidden fill sizes="300px" className="object-cover scale-110 blur-xl opacity-70" />
+                <Image src={photo} alt={formatDoctorName(doctor.name)} fill sizes="300px" className="object-contain" onError={() => setPhotoFailed(true)} />
+              </>
+            ) : (
+              <Image src={photo} alt={clinic.name} fill sizes="300px" className="object-cover" onError={() => setPhotoFailed(true)} />
+            )
           ) : (
             <div
-              className="w-full h-full flex items-center justify-center text-white font-extrabold text-3xl"
+              className="w-full h-full flex items-center justify-center text-white font-extrabold text-2xl"
               style={{ background: `linear-gradient(135deg, ${color}, ${color}99)` }}
             >
               {initial}
@@ -355,7 +365,7 @@ function NearbyClinicCard({
             </span>
           )}
         </div>
-        <div className="px-1.5 pt-2">
+        <div className="px-1.5 pt-1.5">
           <div className="flex items-center gap-1.5">
             <p className="font-bold text-slate-900 text-sm truncate flex-1 min-w-0">
               {formatDoctorName(doctor.name)}
@@ -371,18 +381,119 @@ function NearbyClinicCard({
           <p className="text-[11px] text-slate-400 truncate">{clinic.address}</p>
         </div>
       </button>
-      <div className="flex items-center gap-1.5 px-1 pt-2 pb-0.5">
-        <button type="button" onClick={onBook} className="btn-primary !px-5 !py-0 h-9 text-xs">
+      <div className="flex items-center gap-1.5 px-1 pt-1.5">
+        <button type="button" onClick={onBook} className="tap-44-y btn-primary !px-5 !py-0 h-8 text-xs">
           {td("cardBook")}
         </button>
         <a
           href={`https://www.google.com/maps/dir/?api=1&destination=${clinic.lat},${clinic.lng}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white/90 px-3.5 h-9 text-xs font-semibold text-slate-600 hover:text-slate-900"
+          className="tap-44-y inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white/90 px-3.5 h-8 text-xs font-semibold text-slate-600 hover:text-slate-900"
         >
           <Navigation className="w-3 h-3" /> {td("cardRoute")}
         </a>
+      </div>
+    </div>
+  );
+}
+
+// Google-Maps-style peek sheet for the nearby cards: drag (or tap) the
+// handle down to tuck the cards away and see the map, drag/tap up to bring
+// them back. Vertical swipes on the cards themselves work too — the card
+// row only claims horizontal panning (touch-pan-x).
+function NearbySheet({
+  collapsed,
+  onCollapsedChange,
+  label,
+  children,
+}: {
+  collapsed: boolean;
+  onCollapsedChange: (collapsed: boolean) => void;
+  label: string;
+  children: React.ReactNode;
+}) {
+  const td = useTranslations("patient.dashboard");
+  const startY = useRef<number | null>(null);
+  const dragged = useRef(false);
+  const [dy, setDy] = useState(0);
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    startY.current = e.clientY;
+    dragged.current = false;
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (startY.current == null) return;
+    const d = e.clientY - startY.current;
+    if (Math.abs(d) > 6) dragged.current = true;
+    // Follow the finger downward while open; upward while collapsed just
+    // nudges the handle a little.
+    setDy(collapsed ? Math.max(-24, Math.min(0, d)) : Math.max(0, d));
+  };
+  const end = (e: React.PointerEvent) => {
+    if (startY.current == null) return;
+    const d = e.clientY - startY.current;
+    startY.current = null;
+    setDy(0);
+    if (d > 40 && !collapsed) onCollapsedChange(true);
+    else if (d < -30 && collapsed) onCollapsedChange(false);
+  };
+  const cancel = () => {
+    startY.current = null;
+    setDy(0);
+  };
+
+  return (
+    <div
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={end}
+      onPointerCancel={cancel}
+      // A drag shouldn't also count as tapping the card under the finger.
+      onClickCapture={(e) => {
+        if (dragged.current) {
+          e.stopPropagation();
+          e.preventDefault();
+          dragged.current = false;
+        }
+      }}
+      style={{ transform: dy ? `translateY(${dy}px)` : undefined }}
+      className={cn(!dy && "transition-transform duration-200")}
+    >
+      <div className="px-4 pb-2 flex flex-col items-start touch-none">
+        <button
+          type="button"
+          onClick={() => onCollapsedChange(!collapsed)}
+          aria-expanded={!collapsed}
+          aria-label={collapsed ? td("nearbyShow") : td("nearbyHide")}
+          className="glass-card rounded-full pl-3 pr-2 py-1.5 flex items-center gap-1.5 text-xs font-semibold text-slate-700 pointer-events-auto"
+        >
+          <Stethoscope className="w-3.5 h-3.5 text-emerald-600" />
+          {label}
+          {collapsed ? (
+            <ChevronUp className="w-4 h-4 text-slate-500" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-slate-500" />
+          )}
+        </button>
+      </div>
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows,opacity] duration-300 ease-out",
+          collapsed ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"
+        )}
+      >
+        <div className="overflow-hidden min-h-0">
+          <div
+            className={cn(
+              "flex gap-3 overflow-x-auto no-scrollbar snap-x snap-mandatory px-4 pb-1 touch-pan-x",
+              collapsed ? "pointer-events-none" : "pointer-events-auto"
+            )}
+          >
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -770,6 +881,9 @@ function PatientDashboardInner() {
 
   // Closest clinics first for the bottom card carousel (capped — it's a
   // quick pick, the list view has everything).
+  // Nearby cards sheet tucked down (Google-Maps style) — panning the map
+  // tucks it automatically so the map is visible.
+  const [nearbyCollapsed, setNearbyCollapsed] = useState(false);
   const nearbyCards = useMemo(
     () => [...clinicMarkers].sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)).slice(0, 12),
     [clinicMarkers]
@@ -806,6 +920,9 @@ function PatientDashboardInner() {
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         { attribution: "© OpenStreetMap contributors", maxZoom: 19 }
       ).addTo(map);
+
+      // Exploring the map tucks the nearby cards away, like Google Maps.
+      map.on("dragstart", () => setNearbyCollapsed(true));
 
       leafletMapRef.current = map;
     },
@@ -1209,66 +1326,65 @@ function PatientDashboardInner() {
 
   const searchRow = (
     <div className="px-3 sm:px-4 pb-3 sm:pb-4 pointer-events-auto">
-      <div className="glass-card rounded-3xl p-2.5 max-w-full">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="glass-card rounded-3xl p-2 max-w-full">
+        <div className="flex items-center gap-2">
+          {/* Search gets the row; Filters sits inside it (Google-Maps
+              style) and map/list is one toggle, so the box stays wide. */}
           <div className="relative flex-1 min-w-0">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
-              type="text"
+              type="search"
+              enterKeyHint="search"
               placeholder={td("searchPlaceholder")}
+              aria-label={td("searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-8 pr-8 py-2.5 rounded-full border border-slate-200/80 bg-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              className={cn(
+                "w-full pl-9 h-10 rounded-full border border-slate-200/80 bg-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 [&::-webkit-search-cancel-button]:hidden",
+                search ? "pr-[4.75rem]" : "pr-11"
+              )}
             />
             {search && (
               <button aria-label={td("clearSearch")}
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="tap-44-y absolute right-10 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             )}
+            <div className="absolute right-1 top-1/2 -translate-y-1/2">
+              <DoctorFilters
+                iconOnly
+                className="!w-8 !h-8"
+                value={doctorFilterState}
+                onChange={applyDoctorFilters}
+                doctors={doctors}
+                specialty={specialtyFilter}
+                onSpecialtyChange={setSpecialtyFilter}
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-0.5 bg-white/90 border border-slate-200/80 rounded-full p-1 flex-shrink-0">
-            <button aria-label={td("mapView")}
-              onClick={() => setViewMode("map")}
-              title={td("mapView")}
-              className={cn(
-                "tap-44-y w-11 h-7 rounded-full flex items-center justify-center transition-colors",
-                viewMode === "map" ? "bg-emerald-600 text-white" : "text-slate-400 hover:text-slate-600"
-              )}
-            >
-              <MapPin className="w-4 h-4" />
-            </button>
-            <button aria-label={td("listView")}
-              onClick={() => setViewMode("list")}
-              title={td("listView")}
-              className={cn(
-                "tap-44-y w-11 h-7 rounded-full flex items-center justify-center transition-colors",
-                viewMode === "list" ? "bg-emerald-600 text-white" : "text-slate-400 hover:text-slate-600"
-              )}
-            >
-              <List className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            type="button"
+            aria-label={viewMode === "map" ? td("listView") : td("mapView")}
+            title={viewMode === "map" ? td("listView") : td("mapView")}
+            onClick={() => setViewMode(viewMode === "map" ? "list" : "map")}
+            className="tap-44 w-10 h-10 rounded-full bg-white/90 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-emerald-600 transition-colors flex-shrink-0"
+          >
+            {viewMode === "map" ? <List className="w-[18px] h-[18px]" /> : <MapPin className="w-[18px] h-[18px]" />}
+          </button>
           <button aria-label={td("refreshAria")}
             onClick={refreshMap}
             disabled={refreshing}
-            className="tap-44 w-9 h-9 rounded-full bg-white/90 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-emerald-600 transition-colors disabled:opacity-60 flex-shrink-0"
+            className="tap-44 w-10 h-10 rounded-full bg-white/90 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-emerald-600 transition-colors disabled:opacity-60 flex-shrink-0"
             title={td("refreshTitle")}
           >
             <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
           </button>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex-1 min-w-0">
-            <SpecialtyFilter value={specialtyFilter} onChange={setSpecialtyFilter} />
-          </div>
-          <DoctorFilters value={doctorFilterState} onChange={applyDoctorFilters} doctors={doctors} />
-        </div>
         {searchRadiusKm != null && (
-          <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
+          <p className="text-[11px] text-slate-500 mt-1.5 px-1 flex items-center gap-1">
             <Compass className="w-3 h-3 flex-shrink-0" />
             {ignoreRadius ? (
               <>{td("showingAllClinics")}{" "}
@@ -1287,7 +1403,7 @@ function PatientDashboardInner() {
         {customLabel ? (
           <button
             onClick={switchToMyLocation}
-            className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
+            className="flex items-center gap-2 w-full text-left mt-1.5 pt-1.5 px-1 border-t border-slate-100"
           >
             <MapPin className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
             <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
@@ -1297,7 +1413,7 @@ function PatientDashboardInner() {
         ) : posError ? (
           <button
             onClick={() => setLocationPickerOpen(true)}
-            className="min-h-11 flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
+            className="min-h-11 flex items-center gap-2 w-full text-left mt-1.5 pt-1.5 px-1 border-t border-slate-100"
           >
             <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
             <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
@@ -1313,7 +1429,7 @@ function PatientDashboardInner() {
               setBookingOpen(false);
               setConsultType(defaultConsultType(nearest));
             }}
-            className="flex items-center gap-2 w-full text-left mt-2 pt-2 border-t border-slate-100"
+            className="flex items-center gap-2 w-full text-left mt-1.5 pt-1.5 px-1 border-t border-slate-100"
           >
             <div
               className="w-2 h-2 rounded-full animate-pulse flex-shrink-0"
@@ -1411,13 +1527,11 @@ function PatientDashboardInner() {
       {/* ── Nearby clinic cards (swipe) + count ──────────────────────── */}
       {viewMode === "map" && !panelOpen && !pickingOnMap && nearbyCards.length > 0 && (
         <div className="absolute inset-x-0 lg:left-[200px] lg:right-16 bottom-[calc(5.25rem_+_var(--safe-area-inset-bottom,env(safe-area-inset-bottom)))] lg:bottom-5 z-20 pointer-events-none">
-          <div className="px-4 pb-2 flex">
-            <span className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1.5 text-xs font-semibold text-slate-700">
-              <Stethoscope className="w-3.5 h-3.5 text-emerald-600" />
-              {td("clinicsNearby", { count: clinicMarkers.length })}
-            </span>
-          </div>
-          <div className="flex gap-3 overflow-x-auto no-scrollbar snap-x snap-mandatory px-4 pb-1 pointer-events-auto">
+          <NearbySheet
+            collapsed={nearbyCollapsed}
+            onCollapsedChange={setNearbyCollapsed}
+            label={td("clinicsNearby", { count: clinicMarkers.length })}
+          >
             {nearbyCards.map(({ doctor: doc, clinic, distance }) => (
               <NearbyClinicCard
                 key={`${doc.id}-${clinic.id}`}
@@ -1429,7 +1543,7 @@ function PatientDashboardInner() {
                 onBook={() => openDoctorPanel(doc, clinic.id)}
               />
             ))}
-          </div>
+          </NearbySheet>
         </div>
       )}
 

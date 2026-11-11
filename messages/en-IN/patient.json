@@ -81,6 +81,7 @@
     }
   },
   "doctorFilters": {
+    "specialist": "Specialist",
     "trigger": "Filters",
     "title": "Filter & Sort",
     "close": "Close filters",
@@ -308,7 +309,7 @@
     "askAi": "Ask AI",
     "myAppointments": "My Appointments",
     "profile": "Profile",
-    "searchPlaceholder": "Search doctor or specialty…",
+    "searchPlaceholder": "Search doctors…",
     "clearSearch": "Clear search",
     "mapView": "Map view",
     "listView": "List view",
@@ -327,6 +328,8 @@
     "specialties": "Specialties",
     "tapPinToBook": "Tap a pin to book",
     "clinicsNearby": "{count, plural, one {# clinic nearby} other {# clinics nearby}}",
+    "nearbyShow": "Show nearby clinics",
+    "nearbyHide": "Hide nearby clinics",
     "clinicPhotoOf": "{name} — clinic photo",
     "clinicPhoto": "Clinic photo",
     "unsave": "Remove from saved doctors",

@@ -289,5 +289,12 @@
     "retained1": "For doctors and nurses: your name, qualification, registration number, and signature, because they appear on prescriptions and visit records your patients still rely on. Bank details are kept until any unsettled earnings are paid out.",
     "retained2": "Completed appointment history, chat messages exchanged during a consultation, and payment/settlement records — kept because they're also part of the treating doctor's medical record and our payout audit trail, and because Indian accounting law requires financial records to be retained for several years (typically up to 8 years under the Companies Act, 2013).",
     "retained3": "Any data we're legally required to keep for an ongoing dispute, complaint investigation, or regulatory request."
+  },
+  "appDownload": {
+    "playPre": "Get it on",
+    "playAria": "Download DocOnClick on Google Play",
+    "applePre": "Download on the",
+    "appleAria": "DocOnClick on the App Store — coming soon",
+    "comingSoon": "Coming soon"
   }
 }

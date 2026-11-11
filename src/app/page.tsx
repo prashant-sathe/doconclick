@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AppStoreBadges from "@/components/AppStoreBadges";
 
 // ── Rotating taglines ──────────────────────────────────────────
 const TAGLINES = ["t1", "t2", "t3", "t4"] as const;
@@ -133,6 +134,7 @@ export default function Home() {
                   <Stethoscope className="w-5 h-5" /> {t("hero.joinDoctor")}
                 </Link>
               </div>
+              <AppStoreBadges className="mb-8" />
               {/* Trust pills */}
               <div className="flex flex-wrap gap-3">
                 {(["pillVerified", "pillInstant", "pillSecure"] as const).map(k => (

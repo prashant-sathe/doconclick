@@ -81,6 +81,7 @@
     }
   },
   "doctorFilters": {
+    "specialist": "ತಜ್ಞರು",
     "trigger": "ಫಿಲ್ಟರ್‌ಗಳು",
     "title": "ಫಿಲ್ಟರ್ ಮತ್ತು ವಿಂಗಡಣೆ",
     "close": "ಫಿಲ್ಟರ್‌ಗಳನ್ನು ಮುಚ್ಚಿ",
@@ -308,7 +309,7 @@
     "askAi": "AI ಅನ್ನು ಕೇಳಿ",
     "myAppointments": "ನನ್ನ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗಳು",
     "profile": "ಪ್ರೊಫೈಲ್",
-    "searchPlaceholder": "ವೈದ್ಯರು ಅಥವಾ ವಿಶೇಷತೆ ಹುಡುಕಿ…",
+    "searchPlaceholder": "ವೈದ್ಯರನ್ನು ಹುಡುಕಿ…",
     "clearSearch": "ಹುಡುಕಾಟ ತೆರವುಗೊಳಿಸಿ",
     "mapView": "ನಕ್ಷೆ ವೀಕ್ಷಣೆ",
     "listView": "ಪಟ್ಟಿ ವೀಕ್ಷಣೆ",
@@ -327,6 +328,8 @@
     "specialties": "ವಿಶೇಷತೆಗಳು",
     "tapPinToBook": "ಬುಕ್ ಮಾಡಲು ಪಿನ್ ಟ್ಯಾಪ್ ಮಾಡಿ",
     "clinicsNearby": "{count, plural, one {ಹತ್ತಿರದಲ್ಲಿ # ಕ್ಲಿನಿಕ್} other {ಹತ್ತಿರದಲ್ಲಿ # ಕ್ಲಿನಿಕ್‌ಗಳು}}",
+    "nearbyShow": "ಹತ್ತಿರದ ಕ್ಲಿನಿಕ್‌ಗಳನ್ನು ತೋರಿಸಿ",
+    "nearbyHide": "ಹತ್ತಿರದ ಕ್ಲಿನಿಕ್‌ಗಳನ್ನು ಮರೆಮಾಡಿ",
     "clinicPhotoOf": "{name} — ಕ್ಲಿನಿಕ್ ಫೋಟೋ",
     "clinicPhoto": "ಕ್ಲಿನಿಕ್ ಫೋಟೋ",
     "unsave": "ಉಳಿಸಿದ ವೈದ್ಯರಿಂದ ತೆಗೆದುಹಾಕಿ",

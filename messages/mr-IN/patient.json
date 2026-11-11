@@ -81,6 +81,7 @@
     }
   },
   "doctorFilters": {
+    "specialist": "तज्ज्ञ",
     "trigger": "फिल्टर",
     "title": "फिल्टर आणि क्रम",
     "close": "फिल्टर बंद करा",
@@ -308,7 +309,7 @@
     "askAi": "AI ला विचारा",
     "myAppointments": "माझ्या अपॉइंटमेंट्स",
     "profile": "प्रोफाइल",
-    "searchPlaceholder": "डॉक्टर किंवा स्पेशालिटी शोधा…",
+    "searchPlaceholder": "डॉक्टर शोधा…",
     "clearSearch": "शोध साफ करा",
     "mapView": "नकाशा",
     "listView": "यादी",
@@ -327,6 +328,8 @@
     "specialties": "स्पेशालिटी",
     "tapPinToBook": "बुक करण्यासाठी पिनवर टॅप करा",
     "clinicsNearby": "जवळपास {count} क्लिनिक्स",
+    "nearbyShow": "जवळपासची क्लिनिक्स दाखवा",
+    "nearbyHide": "जवळपासची क्लिनिक्स लपवा",
     "clinicPhotoOf": "{name} — क्लिनिकचा फोटो",
     "clinicPhoto": "क्लिनिकचा फोटो",
     "unsave": "सेव्ह केलेल्या डॉक्टरांमधून काढा",
