@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
-import { createCashfreeOrder } from "@/lib/cashfree";
+import { createPayuOrder } from "@/lib/payu";
 import { UNSETTLED_WHERE, duesFor } from "@/lib/payouts";
 import { DUES_ORDER_PREFIX, owedByDoctor } from "@/lib/duesPayments";
 import { createRateLimiter } from "@/lib/rateLimit";
@@ -10,7 +10,7 @@ import { withErrorLocale } from "@/lib/apiErrors";
 
 const checkLimit = createRateLimiter(10, 10 * 60_000);
 
-// POST { returnTo? }: a Cashfree order for everything the doctor owes right
+// POST { returnTo? }: a PayU order for everything the doctor owes right
 // now. Open to a doctor whose plan has lapsed — paying dues needs no plan. The visits
 // it covers are snapshotted, so the payment settles exactly those
 // (src/lib/duesPayments.ts) even if more are completed before it lands.
@@ -21,7 +21,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     return NextResponse.json({ error: "Too many attempts. Please wait a few minutes and try again." }, { status: 429 });
   }
 
-  // Where Cashfree sends them back: Earnings, or Subscribe for a doctor whose
+  // Where PayU sends them back: Earnings, or Subscribe for a doctor whose
   // plan has lapsed (Earnings redirects them away).
   const { returnTo } = await req.json().catch(() => ({}));
   const returnPath = returnTo === "subscribe" ? "/doctor/subscribe" : "/doctor/earnings";
@@ -32,7 +32,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   if (owed <= 0) {
     return NextResponse.json({ error: "You don't owe anything right now." }, { status: 400 });
   }
-  // Cashfree's smallest order.
+  // PayU's smallest order.
   if (owed < 1) {
     return NextResponse.json({ error: `₹${owed} is below the minimum online payment — it'll be settled with your next payout.` }, { status: 400 });
   }
@@ -44,7 +44,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   });
 
   try {
-    const { paymentSessionId } = await createCashfreeOrder({
+    const { checkout } = createPayuOrder({
       orderId,
       amount: owed,
       customerId: authUser.id,
@@ -53,10 +53,10 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       returnUrl: `${origin}${returnPath}?duesOrder=${encodeURIComponent(orderId)}`,
       notifyUrl: `${origin}/api/payments/webhook`,
     });
-    return NextResponse.json({ paymentSessionId, amount: owed });
+    return NextResponse.json({ checkout, amount: owed });
   } catch (err) {
     await prisma.duesPayment.delete({ where: { id: record.id } }).catch(() => {});
-    console.error("Failed to create Cashfree order for doctor dues", authUser.id, err);
+    console.error("Failed to create PayU order for doctor dues", authUser.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
 });

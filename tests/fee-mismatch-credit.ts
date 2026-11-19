@@ -1,7 +1,7 @@
 // P0-15 — a doctor/nurse fee payment (doctor registration, doctor plan, nurse
 // registration) whose charged amount doesn't match its order is never lost:
 // nothing is activated, the full amount is credited to the payer's wallet as
-// one PAYMENT_CREDIT row (a Cashfree retry of the same payment never credits
+// one PAYMENT_CREDIT row (a PayU retry of the same payment never credits
 // twice), the reserved coupon slot is freed, and they can simply pay again —
 // a matching payment then activates as before. A retry of an already-applied
 // doctor plan payment (with or without a coupon) is a no-op: no wallet credit,
@@ -15,22 +15,19 @@
 // of a payment that was already applied credits nothing.
 //
 // Like test:nurse-fee-coupons, this starts its OWN dev server (tests/devServer.ts)
-// with Cashfree pointed at an in-process mock and a test-only secret, so no real
+// with PayU pointed at an in-process mock and a test-only secret, so no real
 // gateway order is ever created. Uses the DB in .env, throwaway users/coupons
 // only; fee settings are put back afterwards.
 //
 //   npm run test:fee-mismatch
 import "dotenv/config";
-import crypto from "crypto";
-import http from "http";
 import type { ChildProcess } from "child_process";
-import type { AddressInfo } from "net";
 import { startDevServer } from "./devServer";
+import { createPayuMock, sendPayuEvent } from "./payuMock";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
 
 let BASE = "";
-const TEST_SECRET = "test-only-cashfree-secret";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
 
 let failures = 0;
@@ -39,41 +36,15 @@ function check(label: string, ok: boolean, detail: string) {
   if (!ok) failures++;
 }
 
-const created: { order_id: string; order_amount: number; customer_details?: { customer_id?: string } }[] = [];
-const mockServer = http.createServer((req, res) => {
-  let body = "";
-  req.on("data", (c) => (body += c));
-  req.on("end", () => {
-    res.setHeader("Content-Type", "application/json");
-    if (req.method === "POST" && req.url === "/orders") {
-      const o = JSON.parse(body);
-      created.push(o);
-      res.end(JSON.stringify({ payment_session_id: `sess_${o.order_id}`, cf_order_id: `cf_${o.order_id}` }));
-      return;
-    }
-    res.statusCode = 404;
-    res.end("{}");
-  });
-});
+const pm = createPayuMock();
+const created = pm.orders;
 const lastOrder = () => created[created.length - 1];
 
-// Like real Cashfree, the webhook echoes the customer_id the order was created
-// with (looked up from the mock's record) unless one is given explicitly.
+// Like real PayU, the callback echoes the customer id the order was created
+// with (udf1, looked up from the sniffed checkout) unless one is given explicitly.
 async function success(orderId: string, amount: number, paymentId: string, customerId?: string | null) {
   const cid = customerId !== undefined ? customerId : created.find((o) => o.order_id === orderId)?.customer_details?.customer_id;
-  const body = JSON.stringify({
-    type: "PAYMENT_SUCCESS_WEBHOOK",
-    event_time: new Date().toISOString(),
-    data: {
-      order: { order_id: orderId, order_amount: amount },
-      payment: { cf_payment_id: paymentId, payment_status: "SUCCESS" },
-      ...(cid ? { customer_details: { customer_id: cid } } : {}),
-    },
-  });
-  const ts = String(Math.floor(Date.now() / 1000));
-  const sig = crypto.createHmac("sha256", TEST_SECRET).update(ts + body).digest("base64");
-  const r = await fetch(`${BASE}/api/payments/webhook`, { method: "POST", headers: { "Content-Type": "application/json", "x-webhook-signature": sig, "x-webhook-timestamp": ts }, body });
-  return r.status;
+  return (await sendPayuEvent(BASE, orderId, amount, { paymentId, customerId: cid })).status;
 }
 
 type U = { id: string; name: string; role: string; mobile: string };
@@ -155,8 +126,8 @@ async function superseded(
 }
 
 async function main() {
-  await new Promise<void>((r) => mockServer.listen(0, "127.0.0.1", r));
-  const mockPort = (mockServer.address() as AddressInfo).port;
+  await pm.start();
+  pm.installOrderSniffer();
   const stamp = String(Date.now()).slice(-7);
   const ids: string[] = [];
   const codes: string[] = [];
@@ -194,7 +165,7 @@ async function main() {
   try {
     const started = await startDevServer({
       label: "fee-mismatch",
-      env: { CASHFREE_API_BASE: `http://127.0.0.1:${mockPort}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET },
+      env: pm.env(),
     });
     server = started.child;
     BASE = started.base;
@@ -234,7 +205,7 @@ async function main() {
     check("doctor plan: paying again at the right amount extends the plan, wallet untouched",
       r.status === 200 && !!dp.subscriptionPaidUntil && dp.subscriptionPaidUntil.getTime() > Date.now() && (await walletOf(docSub.id)).balance === subCredit,
       `${dp.subscriptionPaidUntil?.toISOString()} balance ${(await walletOf(docSub.id)).balance}`);
-    // Same success webhook again (Cashfree retry) — must not extend the plan twice.
+    // Same success webhook again (PayU retry) — must not extend the plan twice.
     const subPaidUntil = dp.subscriptionPaidUntil?.getTime();
     let s = await success(order.order_id, order.order_amount, subOkPayment);
     dp = await prisma.doctorProfile.findUniqueOrThrow({ where: { userId: docSub.id } });
@@ -350,7 +321,7 @@ async function main() {
     check("invalid payers: patient/deleted-doctor wallets untouched", others.every((b) => b === 0), others.join(","));
   } finally {
     server?.kill("SIGTERM");
-    mockServer.close();
+    pm.close();
     await prisma.platformSettings.update({ where: { id: settings.id }, data: before });
     await prisma.couponRedemption.deleteMany({ where: { userId: { in: ids } } });
     await prisma.coupon.deleteMany({ where: { code: { in: codes } } });

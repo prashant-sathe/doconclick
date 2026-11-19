@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-// Shared by the pay-link page and its Cashfree return page: standalone, no
+// Shared by the pay-link page and its PayU return page: standalone, no
 // app header or nav — the person paying may never have opened the app.
 
 export interface GuestBill {

@@ -275,7 +275,7 @@ async function main() {
     const after = reportUrl ? await fetch(reportUrl) : null;
     check("…and from S3", !!after && after.status !== 200, String(after?.status));
 
-    // Online: unpaid until Cashfree confirms (settled here directly — the
+    // Online: unpaid until PayU confirms (settled here directly — the
     // webhook/verify paths run against a mock gateway in test:lab-payments).
     const c = await appt("COMPLETED", { completedAt: new Date() });
     await prisma.prescriptionTest.create({ data: { appointmentId: c.id, name: "CBC" } });

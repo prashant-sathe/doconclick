@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
-import { createCashfreeOrder } from "@/lib/cashfree";
+import { createPayuOrder } from "@/lib/payu";
 import { getOrCreateWallet, WALLET_TOPUP_ORDER_PREFIX, MIN_TOPUP_AMOUNT, MAX_TOPUP_AMOUNT } from "@/lib/wallet";
 import { withErrorLocale } from "@/lib/apiErrors";
 
-// POST: Creates a real Cashfree order for a wallet top-up and returns a
+// POST: Creates a real PayU order for a wallet top-up and returns a
 // payment_session_id for the client to redirect into checkout. Mirrors
 // /api/payments/create-order for appointments.
 export const POST = withErrorLocale(async function POST(req: Request) {
@@ -23,7 +23,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   const wallet = await getOrCreateWallet(prisma, authUser.id);
 
   // Create the ledger row first (PENDING) so the webhook has something to
-  // find by orderId once Cashfree calls back.
+  // find by orderId once PayU calls back.
   const txn = await prisma.walletTransaction.create({
     data: { walletId: wallet.id, type: "TOPUP", amount, status: "PENDING" },
   });
@@ -32,7 +32,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   const origin = externalOrigin(req, new URL(req.url));
 
   try {
-    const { paymentSessionId } = await createCashfreeOrder({
+    const { checkout } = createPayuOrder({
       orderId,
       amount,
       customerId: authUser.id,
@@ -47,9 +47,9 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       data: { cashfreeOrderId: orderId },
     });
 
-    return NextResponse.json({ paymentSessionId, txnId: txn.id });
+    return NextResponse.json({ checkout, txnId: txn.id });
   } catch (err) {
-    console.error("Failed to create Cashfree order for wallet top-up", txn.id, err);
+    console.error("Failed to create PayU order for wallet top-up", txn.id, err);
     await prisma.walletTransaction.update({ where: { id: txn.id }, data: { status: "FAILED" } });
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }

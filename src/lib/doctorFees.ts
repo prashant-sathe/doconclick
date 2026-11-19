@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { sendPushToUser } from "@/lib/firebaseAdmin";
-import { DEFAULT_DOCTOR_REGISTRATION_FEE } from "@/lib/cashfree";
+import { DEFAULT_DOCTOR_REGISTRATION_FEE } from "@/lib/payu";
 import {
   resolveDoctorRegistrationPricing,
   DEFAULT_DOCTOR_REGISTRATION_ORIGINAL_FEE,

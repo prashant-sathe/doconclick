@@ -1,4 +1,5 @@
 "use client";
+import type { PayuCheckout } from "@/lib/payu";
 import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -47,14 +48,12 @@ const STEPS = ["REQUESTED", "CONFIRMED", "SAMPLE_COLLECTED", "COMPLETED"] as con
 const fileHref = (url: string, name: string | null, inline: boolean) =>
   `/api/files/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name || "lab-report")}${inline ? "&disposition=inline" : ""}`;
 
-async function openCheckout(paymentSessionId: string) {
-  const { load: loadCashfree } = await import("@cashfreepayments/cashfree-js");
-  // Same hardcoded mode as the other checkouts (NEXT_PUBLIC_ vars are baked in at build time).
-  const cashfree = await loadCashfree({ mode: "production" });
-  cashfree.checkout({ paymentSessionId, redirectTarget: "_self" });
+async function openCheckout(checkout: PayuCheckout) {
+  const { startPayuCheckout } = await import("@/lib/payuCheckout");
+  startPayuCheckout(checkout);
 }
 
-/** Back from Cashfree: the webhook usually beats us, else verify asks the gateway. */
+/** Back from PayU: the webhook usually beats us, else verify asks the gateway. */
 function useReturnFromCheckout(onDone: () => void) {
   const params = useSearchParams();
   // Read once: clearing ?labOrder from the URL below changes useSearchParams,
@@ -111,10 +110,10 @@ function LabTestsList() {
 
   const payNow = async (b: LabBooking) => {
     setBusy(b.id);
-    const res = await mutate<{ paymentSessionId: string }>(`/api/lab-bookings/${b.id}/pay`);
+    const res = await mutate<{ checkout: PayuCheckout }>(`/api/lab-bookings/${b.id}/pay`);
     if (!res.ok) { setBusy(null); toast.error(res.error); reload(); return; }
     try {
-      await openCheckout(res.data.paymentSessionId);
+      await openCheckout(res.data.checkout);
     } catch {
       setBusy(null);
       toast.error(t("payFailed"));

@@ -2,21 +2,19 @@
 // (STAFF) looks a patient up by mobile and books them straight into the queue
 // — SCHEDULED, priced from the doctor's own fee, paid in cash at the visit or
 // online through a sign-in-free pay link (src/lib/guestPaymentToken.ts) whose
-// Cashfree order the existing webhook settles. A new number gets a
+// PayU order the existing webhook settles. A new number gets a
 // passwordless account the patient later claims by registering.
 //
 // Like test:payments, this starts its OWN dev server (MOCK_PORT env, default 3100, else a free port; tests/devServer.ts) with
-// Cashfree pointed at an in-process mock and a test-only secret, so no real
+// PayU pointed at an in-process mock and a test-only secret, so no real
 // gateway order is ever created. Stop any running `next dev` first. Uses the
 // DB in .env, throwaway users only.
 //
 //   npm run test:walk-in
 import "dotenv/config";
-import crypto from "crypto";
-import http from "http";
 import type { ChildProcess } from "child_process";
-import type { AddressInfo } from "net";
 import { startDevServer } from "./devServer";
+import { createPayuMock, sendPayuEvent } from "./payuMock";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
 import { addDaysYmd } from "../src/lib/istDate";
@@ -24,9 +22,7 @@ import { todayIsoDateIst } from "../src/lib/clinicAvailability";
 
 // Raised from the real 30/10 min because this suite books many visits for one doctor.
 const BOOKING_LIMIT = 150;
-let MOCK_PORT = 0; // mock Cashfree: free port picked in main()
 let BASE = ""; // set by startServer (MOCK_PORT env, default 3100, else a free port)
-const TEST_SECRET = "test-only-cashfree-secret";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
 const DAY = 864e5;
 
@@ -36,49 +32,21 @@ function check(label: string, ok: boolean, detail: string) {
   if (!ok) failures++;
 }
 
-// ── Mock Cashfree ──
-const mock = { createdOrders: [] as { order_id: string; order_amount: number; customer_details: { customer_id: string; customer_phone: string }; order_meta: { return_url: string } }[], payments: new Map<string, unknown[]>() };
-const mockServer = http.createServer((req, res) => {
-  let body = "";
-  req.on("data", (c) => (body += c));
-  req.on("end", () => {
-    res.setHeader("Content-Type", "application/json");
-    if (req.method === "POST" && req.url === "/orders") {
-      const o = JSON.parse(body);
-      mock.createdOrders.push(o);
-      res.end(JSON.stringify({ payment_session_id: `sess_${o.order_id}`, cf_order_id: `cf_${o.order_id}` }));
-      return;
-    }
-    const m = /^\/orders\/([^/]+)\/payments$/.exec(req.url ?? "");
-    if (req.method === "GET" && m) {
-      res.end(JSON.stringify(mock.payments.get(decodeURIComponent(m[1])) ?? []));
-      return;
-    }
-    res.statusCode = 404;
-    res.end("{}");
-  });
-});
+// ── Mock PayU ──
+const pm = createPayuMock();
+const mock = { createdOrders: pm.orders, payments: pm.payments, get hits() { return pm.state.hits; } };
 
 async function startServer(): Promise<ChildProcess> {
   const { child, base } = await startDevServer({
     label: "walk-in",
-    env: { WALKIN_BOOKING_LIMIT: String(BOOKING_LIMIT), CASHFREE_API_BASE: `http://127.0.0.1:${MOCK_PORT}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET },
+    env: pm.env({ WALKIN_BOOKING_LIMIT: String(BOOKING_LIMIT) }),
   });
   BASE = base;
   return child;
 }
 
-async function webhook(orderId: string, amount: number) {
-  const paymentId = `pay_walkin_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-  const body = JSON.stringify({
-    type: "PAYMENT_SUCCESS_WEBHOOK",
-    event_time: new Date().toISOString(),
-    data: { order: { order_id: orderId, order_amount: amount }, payment: { cf_payment_id: paymentId, payment_status: "SUCCESS" } },
-  });
-  const ts = String(Math.floor(Date.now() / 1000));
-  const sig = crypto.createHmac("sha256", TEST_SECRET).update(ts + body).digest("base64");
-  const r = await fetch(`${BASE}/api/payments/webhook`, { method: "POST", headers: { "Content-Type": "application/json", "x-webhook-signature": sig, "x-webhook-timestamp": ts }, body });
-  return { status: r.status, paymentId };
+async function webhook(orderId: string, amount: number, opts: { paymentId?: string } = {}) {
+  return sendPayuEvent(BASE, orderId, amount, { paymentId: opts.paymentId ?? `pay_wi_${Date.now()}_${Math.random().toString(36).slice(2, 7)}` });
 }
 
 type U = { id: string; name: string; role: string; mobile: string };
@@ -95,8 +63,8 @@ async function call(as: U | null, method: string, path: string, body?: unknown) 
 const tokenOf = (url: unknown) => new URL(String(url)).searchParams.get("t") ?? "";
 
 async function main() {
-  await new Promise<void>((r) => mockServer.listen(0, "127.0.0.1", r));
-  MOCK_PORT = (mockServer.address() as AddressInfo).port;
+  await pm.start();
+  pm.installOrderSniffer();
   const stamp = String(Date.now()).slice(-7);
   const ids: string[] = [];
   let n = 0;
@@ -330,7 +298,7 @@ async function main() {
     const before = mock.createdOrders.length;
     r = await call(null, "POST", "/api/payments/guest-create-order", { token });
     const order = mock.createdOrders[before];
-    check("guest-create-order → a ₹500 gateway order for the patient", r.status === 200 && r.json.paymentSessionId === `sess_${order?.order_id}` && order.order_amount === 500 && order.customer_details.customer_phone === newMobile2, `${r.status} ${r.json.error ?? ""}`);
+    check("guest-create-order → a ₹500 gateway order for the patient", r.status === 200 && (r.json.checkout as { fields?: { txnid?: string } } | undefined)?.fields?.txnid === order?.order_id && order.order_amount === 500 && order.customer_details.customer_phone === newMobile2, `${r.status} ${r.json.error ?? ""}`);
     check("…returns to /pay/<id>/return with the token", !!order && order.order_meta.return_url.includes(`/pay/${onlineId}/return?t=`), order?.order_meta.return_url ?? "");
     const rec = await prisma.paymentOrder.findUnique({ where: { orderId: order.order_id }, include: { items: true } });
     check("…recorded as a PaymentOrder for this appointment", rec?.patientId === (await appt(onlineId)).patientId && rec.items[0]?.appointmentId === onlineId, `${rec?.amount}`);
@@ -488,7 +456,7 @@ async function main() {
     check("/pay/[id] opens signed out", payPage.status === 200, `${payPage.status}`);
   } finally {
     server?.kill("SIGTERM");
-    mockServer.close();
+    pm.close();
     const all = [...ids, ...(await createdIds())];
     await prisma.paymentOrder.deleteMany({ where: { patientId: { in: all } } });
     await prisma.walletTransaction.deleteMany({ where: { wallet: { userId: { in: all } } } });

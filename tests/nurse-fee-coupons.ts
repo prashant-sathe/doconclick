@@ -1,31 +1,27 @@
 // Nurse fee coupons — same as doctors: a coupon whose appliesTo includes
 // NURSE_REGISTRATION / NURSE_SUBSCRIPTION can be previewed (/api/coupons/validate)
 // and applied at the nurse fee checkout (/api/nurses/fee-order { code }); the
-// Cashfree order is created for the discounted amount, the slot is reserved,
+// PayU order is created for the discounted amount, the slot is reserved,
 // the webhook confirms it and logs the coupon on the NursePaymentLog, and a
 // failed payment frees the slot. Doctor-only / booking-only coupons are
 // refused for nurses and vice versa.
 //
 // Like test:walk-in, this starts its OWN dev server (MOCK_PORT env, default 3100, else a free port; tests/devServer.ts) with
-// Cashfree pointed at an in-process mock and a test-only secret, so no real
+// PayU pointed at an in-process mock and a test-only secret, so no real
 // gateway order is ever created. Stop any running `next dev` first. Uses the
 // DB in .env, throwaway users/coupons only; the nurse fee settings are put
 // back afterwards.
 //
 //   npm run test:nurse-fee-coupons
 import "dotenv/config";
-import crypto from "crypto";
-import http from "http";
 import type { ChildProcess } from "child_process";
-import type { AddressInfo } from "net";
 import { startDevServer } from "./devServer";
+import { createPayuMock, sendPayuEvent } from "./payuMock";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
 import { validateCoupon } from "../src/lib/coupons";
 
-let MOCK_PORT = 0; // mock Cashfree: free port picked in main()
 let BASE = ""; // set by startServer (MOCK_PORT env, default 3100, else a free port)
-const TEST_SECRET = "test-only-cashfree-secret";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
 
 let failures = 0;
@@ -34,28 +30,14 @@ function check(label: string, ok: boolean, detail: string) {
   if (!ok) failures++;
 }
 
-// ── Mock Cashfree ──
-const mock = { createdOrders: [] as { order_id: string; order_amount: number }[] };
-const mockServer = http.createServer((req, res) => {
-  let body = "";
-  req.on("data", (c) => (body += c));
-  req.on("end", () => {
-    res.setHeader("Content-Type", "application/json");
-    if (req.method === "POST" && req.url === "/orders") {
-      const o = JSON.parse(body);
-      mock.createdOrders.push(o);
-      res.end(JSON.stringify({ payment_session_id: `sess_${o.order_id}`, cf_order_id: `cf_${o.order_id}` }));
-      return;
-    }
-    res.statusCode = 404;
-    res.end("{}");
-  });
-});
+// ── Mock PayU ──
+const pm = createPayuMock();
+const mock = { createdOrders: pm.orders, payments: pm.payments, get hits() { return pm.state.hits; } };
 
 async function startServer(): Promise<ChildProcess> {
   const { child, base } = await startDevServer({
     label: "nurse-fee-coupons",
-    env: { CASHFREE_API_BASE: `http://127.0.0.1:${MOCK_PORT}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET },
+    env: pm.env(),
   });
   BASE = base;
   return child;
@@ -63,15 +45,7 @@ async function startServer(): Promise<ChildProcess> {
 
 async function webhook(type: "PAYMENT_SUCCESS_WEBHOOK" | "PAYMENT_FAILED_WEBHOOK", orderId: string, amount: number) {
   const paymentId = `pay_nfc_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-  const body = JSON.stringify({
-    type,
-    event_time: new Date().toISOString(),
-    data: { order: { order_id: orderId, order_amount: amount }, payment: { cf_payment_id: paymentId, payment_status: type === "PAYMENT_SUCCESS_WEBHOOK" ? "SUCCESS" : "FAILED" } },
-  });
-  const ts = String(Math.floor(Date.now() / 1000));
-  const sig = crypto.createHmac("sha256", TEST_SECRET).update(ts + body).digest("base64");
-  const r = await fetch(`${BASE}/api/payments/webhook`, { method: "POST", headers: { "Content-Type": "application/json", "x-webhook-signature": sig, "x-webhook-timestamp": ts }, body });
-  return { status: r.status, paymentId };
+  return sendPayuEvent(BASE, orderId, amount, { paymentId, status: type === "PAYMENT_SUCCESS_WEBHOOK" ? "success" : "failure" });
 }
 
 type U = { id: string; name: string; role: string; mobile: string };
@@ -99,8 +73,8 @@ function pure() {
 
 async function main() {
   pure();
-  await new Promise<void>((r) => mockServer.listen(0, "127.0.0.1", r));
-  MOCK_PORT = (mockServer.address() as AddressInfo).port;
+  await pm.start();
+  pm.installOrderSniffer();
   const stamp = String(Date.now()).slice(-7);
   const ids: string[] = [];
   const codes: string[] = [];
@@ -157,8 +131,8 @@ async function main() {
     check("checkout with a doctor-only coupon → 400, no order", r.status === 400 && mock.createdOrders.length === 0, `${r.status} ${r.json.error}`);
     r = await call(nurse, "POST", "/api/nurses/fee-order", { kind: "REGISTRATION", code: reg.code });
     const regOrder = lastOrder();
-    check("checkout with the coupon → Cashfree order for ₹400, slot reserved",
-      r.status === 200 && !!r.json.paymentSessionId && regOrder?.order_amount === 400 && (await used(reg.id)) === 1,
+    check("checkout with the coupon → PayU order for ₹400, slot reserved",
+      r.status === 200 && !!r.json.checkout && regOrder?.order_amount === 400 && (await used(reg.id)) === 1,
       `${r.status} ₹${regOrder?.order_amount} used ${await used(reg.id)}`);
     const pending = await prisma.nurseProfile.findUniqueOrThrow({ where: { userId: nurse.id } });
     check("…profile holds the order and its discounted amount", pending.cashfreeOrderId === regOrder.order_id && pending.pendingOrderAmount === 400, `${pending.pendingOrderAmount}`);
@@ -204,7 +178,7 @@ async function main() {
     check("another nurse once the total cap (1) is used → 400", r.status === 400 && /usage limit/.test(String(r.json.error)), `${r.status} ${r.json.error}`);
   } finally {
     server?.kill("SIGTERM");
-    mockServer.close();
+    pm.close();
     await prisma.platformSettings.update({ where: { id: settings.id }, data: before });
     await prisma.couponRedemption.deleteMany({ where: { userId: { in: ids } } });
     await prisma.coupon.deleteMany({ where: { code: { in: codes } } });

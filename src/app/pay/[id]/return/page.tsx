@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
 const POLL_INTERVAL_MS = 2000;
 const POLL_TIMEOUT_MS = 20000;
 // Same cadence as /patient/payment/return: if the webhook hasn't landed,
-// ask the server to check with Cashfree directly — once early, once at the end.
+// ask the server to check with PayU directly — once early, once at the end.
 const VERIFY_AFTER_MS = 6000;
 
 function ReturnContent() {

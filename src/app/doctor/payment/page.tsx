@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { CreditCard, CheckCircle, Loader2, ShieldCheck, Gift, TicketPercent, X } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useTranslations } from "next-intl";
-import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
+import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/payu";
 
 // The fee and its original ("was") price are admin-set (Settings) and come
 // from /api/doctors/me; the original is struck through only when discounted.
@@ -86,11 +86,8 @@ export default function DoctorPayment() {
       setAlreadyPaid(true);
       return;
     }
-    const { load } = await import("@cashfreepayments/cashfree-js");
-    // See src/app/patient/payment/page.tsx for why this is hardcoded rather
-    // than env-driven (NEXT_PUBLIC_ vars are inlined at Docker build time).
-    const cashfree = await load({ mode: "production" });
-    cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
+    const { startPayuCheckout } = await import("@/lib/payuCheckout");
+    startPayuCheckout(data.checkout);
   };
 
   if (authLoading || !user || checking || (fee === null && !alreadyPaid)) {
@@ -112,7 +109,7 @@ export default function DoctorPayment() {
           </p>
           {!free && (
             <p className="text-slate-500 mt-2 flex items-center justify-center gap-1.5 text-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" /> {t("securedByCashfree")}
+              <ShieldCheck className="w-4 h-4 text-emerald-500" /> {t("securedByPayu")}
             </p>
           )}
         </div>

@@ -7,7 +7,7 @@ import { netPayable, confirmCouponRedemption } from "@/lib/coupons";
 import { withErrorLocale } from "@/lib/apiErrors";
 
 // POST: pays an already-SCHEDULED appointment out of the patient's wallet
-// balance. Unlike Cashfree, this is a direct authenticated server call with
+// balance. Unlike PayU, this is a direct authenticated server call with
 // an immediate result — no external redirect, no webhook, no return page.
 export const POST = withErrorLocale(async function POST(req: Request) {
   const { authUser, denied } = await requireRole("PATIENT");

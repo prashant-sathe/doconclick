@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 
 const POLL_INTERVAL_MS = 2000;
 const POLL_TIMEOUT_MS = 20000;
-// If the webhook hasn't landed by then, ask the server to check with Cashfree
+// If the webhook hasn't landed by then, ask the server to check with PayU
 // directly — once early, and once more before giving up.
 const VERIFY_AFTER_MS = 6000;
 

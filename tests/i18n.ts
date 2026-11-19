@@ -69,7 +69,7 @@ async function main() {
           .replace(/\{\s*\w+\s*\}/g, " ")
           .replace(/[{}]/g, " ")
           .replace(/<\/?\w+>/g, "")
-          .replace(/DocOnClick|Cashfree|UPI|WhatsApp|AI|OTP|PDF|JPG|PNG|SpO2|BP|CBC|COPD|ID|Dr\.|Nurse|km|pm|am|PM|AM|₹|#|[\d\s.,:;!?()/\-–—·'"%+*@&…→]/g, "");
+          .replace(/DocOnClick|Cashfree|PayU|UPI|WhatsApp|AI|OTP|PDF|JPG|PNG|SpO2|BP|CBC|COPD|ID|Dr\.|Nurse|km|pm|am|PM|AM|₹|#|[\d\s.,:;!?()/\-–—·'"%+*@&…→]/g, "");
         return text.length > 0 && !SCRIPTS[locale].re.test(text);
       });
       check(`${ns}: ${locale} text is in ${SCRIPTS[locale].name}`, latinOnly.length === 0, latinOnly.slice(0, 4).map(([k, v]) => `${k}="${v}"`).join(" | ") || "ok");

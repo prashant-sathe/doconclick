@@ -1,4 +1,5 @@
 "use client";
+import type { PayuCheckout } from "@/lib/payu";
 import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -101,17 +102,15 @@ function BookLabTests() {
   const submit = async () => {
     if (!appointmentId || chosen.length === 0) return;
     setBusy(true); setSubmitError("");
-    const res = await mutate<{ paymentSessionId?: string }>("/api/lab-bookings", {
+    const res = await mutate<{ checkout?: PayuCheckout }>("/api/lab-bookings", {
       body: { appointmentId, labTestIds: chosen.map((c) => c.id), address: addressValue, pinCode: pinValue, lat: pin?.lat, lng: pin?.lng, collectionDate: dayValue, collectionSlot: slotValue, notes, paymentMethod: method },
     });
     if (!res.ok) { setBusy(false); setSubmitError(res.error); if (res.status === 409) reload(); return; }
-    if (res.data.paymentSessionId) {
-      // Cashfree sends them back to /patient/lab-tests, which confirms the payment.
+    if (res.data.checkout) {
+      // PayU sends them back to /patient/lab-tests, which confirms the payment.
       try {
-        const { load: loadCashfree } = await import("@cashfreepayments/cashfree-js");
-        // Same hardcoded mode as the other checkouts (NEXT_PUBLIC_ vars are baked in at build time).
-        const cashfree = await loadCashfree({ mode: "production" });
-        cashfree.checkout({ paymentSessionId: res.data.paymentSessionId, redirectTarget: "_self" });
+        const { startPayuCheckout } = await import("@/lib/payuCheckout");
+        startPayuCheckout(res.data.checkout);
       } catch {
         setBusy(false);
         router.push("/patient/lab-tests");

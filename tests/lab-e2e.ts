@@ -3,28 +3,27 @@
 //   doctor  — completes a visit from the dashboard, prescribing "CBC" + the new test
 //             (the editor shows they're bookable, with the patient price);
 //   patient — opens Appointments, taps "Book lab tests", pins the home on the map
-//             with GPS, picks PIN / day / slot, pays online (Cashfree checkout
-//             stubbed in the browser + mock gateway) and lands back on My lab tests;
+//             with GPS, picks PIN / day / slot, pays online (PayU checkout form
+//             intercepted in the browser + mock gateway) and lands back on My lab tests;
 //   admin   — sees the paid request, checks the WhatsApp hand-off text (name, age,
 //             gender, phone, tests, address + PIN, coordinates, slot), confirms it
 //             with a note, uploads the report PDF (real S3);
 //   patient — sees Completed + the note + the report, downloads it, finds it in the
 //             records vault and the inbox.
 // Starts its OWN dev server (own distDir/port; the owner's `next dev` is left
-// alone) with a mock Cashfree and Firebase switched off. Throwaway users; the
+// alone) with a mock PayU and Firebase switched off. Throwaway users; the
 // added catalogue test and the uploaded report are deleted afterwards.
 // Screenshots: /tmp/lab-e2e/*.png
 //
 //   npm run test:lab-e2e
 import "dotenv/config";
 import fs from "fs";
-import http from "http";
-import type { AddressInfo } from "net";
 import type { ChildProcess } from "child_process";
 import jwt from "jsonwebtoken";
 import { chromium, type BrowserContext, type Page } from "playwright";
 import { prisma } from "../src/lib/prisma";
 import { startDevServer } from "./devServer";
+import { createPayuMock, signedEventBody } from "./payuMock";
 import { deleteFromS3 } from "../src/lib/s3";
 
 let BASE = "";
@@ -39,45 +38,26 @@ function check(label: string, ok: boolean, detail: string) {
   if (!ok) failures++;
 }
 
-// ── Mock Cashfree (server side) ──
-const mock = {
-  orders: new Map<string, { amount: number; returnUrl: string }>(),
-  payments: new Map<string, { cf_payment_id: string; payment_status: string; payment_amount: number }[]>(),
-};
-const mockServer = http.createServer((req, res) => {
-  let body = "";
-  req.on("data", (c) => (body += c));
-  req.on("end", () => {
-    res.setHeader("Content-Type", "application/json");
-    if (req.method === "POST" && req.url === "/orders") {
-      const o = JSON.parse(body);
-      mock.orders.set(o.order_id, { amount: o.order_amount, returnUrl: o.order_meta?.return_url });
-      res.end(JSON.stringify({ payment_session_id: `sess_${o.order_id}`, cf_order_id: `cf_${o.order_id}` }));
-      return;
-    }
-    const m = /^\/orders\/([^/]+)\/payments$/.exec(req.url ?? "");
-    if (req.method === "GET" && m) {
-      res.end(JSON.stringify(mock.payments.get(decodeURIComponent(m[1])) ?? []));
-      return;
-    }
-    res.statusCode = 404;
-    res.end("{}");
-  });
-});
+// ── Mock PayU (server side: verify_payment API; create-order responses are sniffed) ──
+const pm = createPayuMock();
 
-// The browser half: Cashfree.js replaced by a stub whose checkout() goes to a
-// fake gateway page; that "pays" (the mock gateway now reports a SUCCESS
-// payment) and sends the patient to the order's return URL, as Cashfree would.
-const FAKE_SDK = `window.Cashfree = function () { return { checkout: function (o) { location.href = "/__fake_gateway?s=" + encodeURIComponent(o.paymentSessionId); } }; };`;
+// The browser half: PayU's hosted page replaced by a route that receives the
+// checkout form POST, "pays" (the mock verify API now reports a success) and
+// answers with a page that auto-submits the hash-signed result to the order's
+// surl, exactly as PayU's redirect does — so /api/payments/payu-return, the
+// 303 to My lab tests and the app's own confirmation all run for real.
 async function stubGateway(ctx: BrowserContext) {
-  await ctx.route("https://sdk.cashfree.com/**", (route) => route.fulfill({ contentType: "application/javascript", body: FAKE_SDK }));
-  await ctx.route("**/__fake_gateway**", (route) => {
-    const session = new URL(route.request().url()).searchParams.get("s") ?? "";
-    const orderId = session.replace(/^sess_/, "");
-    const order = mock.orders.get(orderId);
-    if (!order) return route.fulfill({ status: 404, body: "unknown session" });
-    mock.payments.set(orderId, [{ cf_payment_id: `e2e_${orderId}`, payment_status: "SUCCESS", payment_amount: order.amount }]);
-    return route.fulfill({ status: 302, headers: { location: order.returnUrl } });
+  await ctx.route("https://test.payu.in/**", (route) => {
+    const posted = new URLSearchParams(route.request().postData() ?? "");
+    const orderId = posted.get("txnid") ?? "";
+    const amount = Number(posted.get("amount"));
+    const surl = posted.get("surl") ?? "";
+    if (!orderId || !surl) return route.fulfill({ status: 400, body: "bad checkout form" });
+    const paymentId = `e2e_${orderId}`;
+    pm.payments.set(orderId, [{ cf_payment_id: paymentId, payment_status: "SUCCESS", payment_amount: amount }]);
+    const { body } = signedEventBody(orderId, amount, { paymentId, customerId: posted.get("udf1") });
+    const inputs = [...new URLSearchParams(body)].map(([k, v]) => `<input type="hidden" name="${k}" value="${v}">`).join("");
+    return route.fulfill({ contentType: "text/html", body: `<form id="f" method="POST" action="${surl}">${inputs}</form><script>document.getElementById("f").submit()</script>` });
   });
 }
 
@@ -116,8 +96,8 @@ async function step<T>(label: string, p: Page, fn: () => Promise<T>): Promise<T 
 async function main() {
   fs.mkdirSync(SHOTS, { recursive: true });
   for (const f of fs.readdirSync(SHOTS)) fs.unlinkSync(`${SHOTS}/${f}`);
-  await new Promise<void>((r) => mockServer.listen(0, "127.0.0.1", r));
-  const mockPort = (mockServer.address() as AddressInfo).port;
+  await pm.start();
+  pm.installOrderSniffer();
 
   const stamp = String(Date.now()).slice(-8);
   const ids: string[] = [];
@@ -147,10 +127,7 @@ async function main() {
   try {
     const started = await startDevServer({
       label: "lab-e2e",
-      env: {
-        CASHFREE_API_BASE: `http://127.0.0.1:${mockPort}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: "test-only",
-        FIREBASE_PROJECT_ID: "", FIREBASE_CLIENT_EMAIL: "", FIREBASE_PRIVATE_KEY: "",
-      },
+      env: pm.env({ FIREBASE_PROJECT_ID: "", FIREBASE_CLIENT_EMAIL: "", FIREBASE_PRIVATE_KEY: "" }),
     });
     server = started.child;
     BASE = started.base;
@@ -275,7 +252,7 @@ async function main() {
     // ── 4. Admin: request → WhatsApp hand-off → confirm → report ──
     await step("admin handles the request", ap, async () => {
       await ap.goto(`${BASE}/admin/lab-bookings`);
-      const card = ap.locator("div.rounded-2xl", { hasText: "Sunita Joshi" }).first();
+      const card = ap.locator("div.rounded-3xl", { hasText: "Sunita Joshi" }).first();
       await card.waitFor({ timeout: 60_000 });
       const cardText = await card.innerText();
       check("admin sees the paid request with age/gender, slot and map link", /45 y, Female/.test(cardText) && cardText.includes("7 AM – 9 AM") && cardText.includes("Open pin in Google Maps"), cardText.replace(/\s+/g, " ").slice(0, 200));
@@ -295,8 +272,8 @@ async function main() {
       await card.locator("select").selectOption("CONFIRMED");
       check("status change saved", (await patched).ok(), "PATCH ok");
       await ap.getByRole("button", { name: /^Confirmed/ }).click();
-      await ap.locator("div.rounded-2xl", { hasText: "Sunita Joshi" }).filter({ hasText: "Confirmed" }).first().waitFor();
-      const confirmed = ap.locator("div.rounded-2xl", { hasText: "Sunita Joshi" }).first();
+      await ap.locator("div.rounded-3xl", { hasText: "Sunita Joshi" }).filter({ hasText: "Confirmed" }).first().waitFor();
+      const confirmed = ap.locator("div.rounded-3xl", { hasText: "Sunita Joshi" }).first();
       await confirmed.getByPlaceholder("e.g. Sample collection tomorrow 8–9 AM").fill("Our technician Ramesh will come at 7:30 AM. Please stay fasting.");
       const noted = ap.waitForResponse((r) => r.url().includes(`/api/admin/lab-bookings/${booking!.id}`) && r.request().method() === "PATCH");
       await confirmed.getByRole("button", { name: "Save", exact: true }).click();
@@ -307,7 +284,7 @@ async function main() {
       check("report upload accepted", (await uploaded).ok(), "POST ok");
       // Uploading completes the booking, so it moves to the Completed list.
       await ap.getByRole("button", { name: /^Completed/ }).click();
-      await ap.locator("div.rounded-2xl", { hasText: "Sunita Joshi" }).filter({ hasText: "Sunita-Joshi-CBC-report.pdf" }).first().waitFor();
+      await ap.locator("div.rounded-3xl", { hasText: "Sunita Joshi" }).filter({ hasText: "Sunita-Joshi-CBC-report.pdf" }).first().waitFor();
       await shot(ap, "08-admin-report-uploaded");
       const after = await prisma.labBooking.findUniqueOrThrow({ where: { id: booking!.id }, include: { reports: true } });
       check("report uploaded → booking COMPLETED, note saved", after.status === "COMPLETED" && after.reports.length === 1 && after.adminNote?.includes("Ramesh") === true, `${after.status} reports=${after.reports.length}`);
@@ -334,7 +311,7 @@ async function main() {
   } finally {
     await browser.close();
     server?.kill("SIGTERM");
-    mockServer.close();
+    pm.close();
     const reports = await prisma.labReport.findMany({ where: { booking: { patientId: { in: ids } } } });
     await Promise.all(reports.map((r) => deleteFromS3(r.fileUrl, "lab-reports")));
     await prisma.labBooking.deleteMany({ where: { patientId: { in: ids } } });

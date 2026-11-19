@@ -44,7 +44,7 @@ export default function DuesReviewPanel({ onResolved }: { onResolved?: () => voi
               <p className="text-xs text-slate-500">
                 ₹{r.amount.toLocaleString("en-IN")} for {r.visits} visit{r.visits === 1 ? "" : "s"}
                 {r.paidAt ? ` · paid ${new Date(r.paidAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" })}` : ""}
-                {r.cfPaymentId ? ` · Cashfree ${r.cfPaymentId}` : ""}
+                {r.cfPaymentId ? ` · PayU ${r.cfPaymentId}` : ""}
               </p>
             </div>
             <button onClick={() => resolve(r.id)} disabled={busy === r.id} className="btn-secondary py-2 px-3 text-xs">

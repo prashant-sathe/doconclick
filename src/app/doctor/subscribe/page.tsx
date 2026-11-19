@@ -84,9 +84,8 @@ export default function DoctorSubscribe() {
       setError(data.error ?? t("startFailed"));
       return;
     }
-    const { load } = await import("@cashfreepayments/cashfree-js");
-    const cashfree = await load({ mode: "production" });
-    cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
+    const { startPayuCheckout } = await import("@/lib/payuCheckout");
+    startPayuCheckout(data.checkout);
   };
 
   if (authLoading || !user || checking || !profile) {
@@ -110,7 +109,7 @@ export default function DoctorSubscribe() {
           <h1 className="text-3xl font-extrabold text-slate-900">{active ? t("yourPlan") : t("renewPlan")}</h1>
           <p className="text-slate-500 mt-2">{t("perMonth", { amount: SUBSCRIPTION_FEE })}</p>
           <p className="text-slate-500 mt-2 flex items-center justify-center gap-1.5 text-sm">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" /> {t("securedByCashfree")}
+            <ShieldCheck className="w-4 h-4 text-emerald-500" /> {t("securedByPayu")}
           </p>
         </div>
 

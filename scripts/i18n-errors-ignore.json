@@ -11,7 +11,7 @@
   "google_no_account",
   "JWT_SECRET is not set",
   "Agora is not configured (AGORA_APP_ID / AGORA_APP_CERTIFICATE missing)",
-  "Cashfree is not configured (CASHFREE_APP_ID / CASHFREE_SECRET_KEY missing)",
+  "PayU is not configured (PAYU_KEY / PAYU_SALT missing)",
   "Firebase is not configured (FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY missing)",
   "OpenAI is not configured (OPENAI_API_KEY missing)",
   "AWS S3 is not configured (AWS_REGION / AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY missing)",

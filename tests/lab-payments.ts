@@ -1,26 +1,23 @@
-// Online (Cashfree) payment for lab bookings: create → checkout, webhook
+// Online (PayU) payment for lab bookings: create → checkout, webhook
 // settle, verify fallback, pay-again, replaced/cancelled/mismatched payments
 // credited to the wallet, cash refused.
 //
-// Never touches the real Cashfree: starts its OWN dev server (tests/devServer.ts,
+// Never touches the real PayU: starts its OWN dev server (tests/devServer.ts,
 // own distDir and port — the owner's `next dev` is left alone) with
-// CASHFREE_API_BASE pointed at an in-process mock and a test-only secret that
+// PAYU_API_BASE pointed at an in-process mock and a test-only secret that
 // signs the webhook bodies. Throwaway users, deleted afterwards.
 //
 //   npm run test:lab-payments
 import "dotenv/config";
-import crypto from "crypto";
-import http from "http";
 import type { ChildProcess } from "child_process";
-import type { AddressInfo } from "net";
 import jwt from "jsonwebtoken";
 import { startDevServer } from "./devServer";
+import { createPayuMock, sendPayuEvent } from "./payuMock";
 import { prisma } from "../src/lib/prisma";
 import { labTestPrice } from "../src/lib/labTests";
 import { collectionDays } from "../src/lib/labShare";
 
 let BASE = "";
-const TEST_SECRET = "test-only-cashfree-secret";
 const JWT_SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
 const HOUR = 60 * 60_000;
 
@@ -30,52 +27,18 @@ function check(label: string, ok: boolean, detail: string) {
   if (!ok) failures++;
 }
 
-// ── Mock Cashfree ──
-const mock = {
-  orders: [] as { order_id: string; order_amount: number; return_url: string }[],
-  payments: new Map<string, { cf_payment_id: string; payment_status: string; payment_amount: number }[]>(),
-};
-const mockServer = http.createServer((req, res) => {
-  let body = "";
-  req.on("data", (c) => (body += c));
-  req.on("end", () => {
-    res.setHeader("Content-Type", "application/json");
-    if (req.method === "POST" && req.url === "/orders") {
-      const o = JSON.parse(body);
-      mock.orders.push({ order_id: o.order_id, order_amount: o.order_amount, return_url: o.order_meta?.return_url });
-      res.end(JSON.stringify({ payment_session_id: `sess_${o.order_id}`, cf_order_id: `cf_${o.order_id}` }));
-      return;
-    }
-    const m = /^\/orders\/([^/]+)\/payments$/.exec(req.url ?? "");
-    if (req.method === "GET" && m) {
-      res.end(JSON.stringify(mock.payments.get(decodeURIComponent(m[1])) ?? []));
-      return;
-    }
-    res.statusCode = 404;
-    res.end("{}");
-  });
-});
+// ── Mock PayU ──
+const pm = createPayuMock();
+const mock = { orders: pm.orders, payments: pm.payments };
 
 let seq = 0;
 async function webhook(orderId: string, amount: number, paymentId = `pay_${Date.now()}_${++seq}`) {
-  const body = JSON.stringify({
-    type: "PAYMENT_SUCCESS_WEBHOOK",
-    event_time: new Date().toISOString(),
-    data: { order: { order_id: orderId, order_amount: amount }, payment: { cf_payment_id: paymentId, payment_status: "SUCCESS" } },
-  });
-  const ts = String(Math.floor(Date.now() / 1000));
-  const sig = crypto.createHmac("sha256", TEST_SECRET).update(ts + body).digest("base64");
-  const r = await fetch(`${BASE}/api/payments/webhook`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-webhook-signature": sig, "x-webhook-timestamp": ts },
-    body,
-  });
-  return { status: r.status, paymentId };
+  return sendPayuEvent(BASE, orderId, amount, { paymentId });
 }
 
 async function main() {
-  await new Promise<void>((r) => mockServer.listen(0, "127.0.0.1", r));
-  const mockPort = (mockServer.address() as AddressInfo).port;
+  await pm.start();
+  pm.installOrderSniffer();
   const stamp = String(Date.now()).slice(-8);
   const ids: string[] = [];
   let n = 0;
@@ -120,7 +83,7 @@ async function main() {
   try {
     const started = await startDevServer({
       label: "lab-payments",
-      env: { CASHFREE_API_BASE: `http://127.0.0.1:${mockPort}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET },
+      env: pm.env(),
     });
     server = started.child;
     BASE = started.base;
@@ -130,9 +93,9 @@ async function main() {
     const a = await visit();
     check("cash is refused", (await book(a.id, "CASH")).status === 400, "400");
     let r = await book(a.id);
-    const b1 = r.json as { id: string; status: string; paymentSessionId: string; orderId: string };
-    check("ONLINE → checkout session, booking awaiting payment", r.status === 200 && !!b1.paymentSessionId && b1.status === "PENDING_PAYMENT", `${r.status} ${r.json.error ?? b1.status}`);
-    check("order id fits Cashfree's 45-character limit", b1.orderId.length <= 45, `${b1.orderId.length} chars`);
+    const b1 = r.json as { id: string; status: string; checkout: { action: string }; orderId: string };
+    check("ONLINE → checkout session, booking awaiting payment", r.status === 200 && !!b1.checkout?.action && b1.status === "PENDING_PAYMENT", `${r.status} ${r.json.error ?? b1.status}`);
+    check("order id fits PayU's 50-character txnid limit", b1.orderId.length <= 50, `${b1.orderId.length} chars`);
     check("order sent to the gateway for the booking total", lastOrder()?.order_id === b1.orderId && lastOrder()?.order_amount === price, JSON.stringify(lastOrder()));
     check("return URL brings them back to My lab tests", !!lastOrder()?.return_url.includes(`/patient/lab-tests?labOrder=${encodeURIComponent(b1.orderId)}&booking=${b1.id}`), lastOrder()?.return_url ?? "");
     r = await call(admin, "GET", "/api/admin/lab-bookings?status=ALL");
@@ -173,8 +136,8 @@ async function main() {
     r = await book(p.id);
     const b3 = r.json as { id: string; orderId: string };
     r = await call(patient, "POST", `/api/lab-bookings/${b3.id}/pay`);
-    const retry = r.json as { orderId: string; paymentSessionId: string };
-    check("Pay now → a fresh order", r.status === 200 && retry.orderId !== b3.orderId && !!retry.paymentSessionId, `${r.status} ${retry.orderId}`);
+    const retry = r.json as { orderId: string; checkout: { action: string } };
+    check("Pay now → a fresh order", r.status === 200 && retry.orderId !== b3.orderId && !!retry.checkout?.action, `${r.status} ${retry.orderId}`);
     await webhook(b3.orderId, price); // the first (older) order still pays
     b = await row(b3.id);
     check("payment on the older order still settles the booking", b.status === "REQUESTED" && b.paymentStatus === "PAID", b.status);
@@ -215,7 +178,7 @@ async function main() {
     check("each unapplied payment credited exactly once", credits === 4, String(credits));
   } finally {
     server?.kill("SIGTERM");
-    mockServer.close();
+    pm.close();
     await prisma.labBooking.deleteMany({ where: { patientId: { in: ids } } });
     await prisma.appointment.deleteMany({ where: { OR: [{ patientId: { in: ids } }, { doctorId: { in: ids } }] } });
     await prisma.notification.deleteMany({ where: { userId: { in: ids } } });

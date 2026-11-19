@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { fetchSuccessfulPayment } from "@/lib/cashfree";
+import { fetchSuccessfulPayment } from "@/lib/payu";
 import { settleAppointmentPayment, notifySettlement } from "@/lib/paymentOrders";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { withErrorLocale } from "@/lib/apiErrors";
 
-// Each call can hit the Cashfree API once per open order.
+// Each call can hit the PayU API once per open order.
 const checkLimit = createRateLimiter(10, 60 * 1000);
 // Older unsettled orders were abandoned checkouts; don't keep polling them.
 const LOOKBACK_MS = 24 * 60 * 60 * 1000;
 
 // POST { apptId }: the payment return page's fallback when the webhook is
-// late or lost. Asks Cashfree directly whether any of this appointment's open
+// late or lost. Asks PayU directly whether any of this appointment's open
 // orders was paid and, if so, settles it exactly as the webhook would.
 // Responds with where the appointment's payment ended up.
 export const POST = withErrorLocale(async function POST(req: Request) {

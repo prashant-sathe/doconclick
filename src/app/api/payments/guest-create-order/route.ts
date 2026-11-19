@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { externalOrigin } from "@/lib/googleOAuth";
-import { createCashfreeOrder } from "@/lib/cashfree";
+import { createPayuOrder } from "@/lib/payu";
 import { verifyGuestPaymentToken, guestPaymentPath } from "@/lib/guestPaymentToken";
 import { APPOINTMENT_ORDER_PREFIX, recordPaymentOrder, totalPayable, settleFreeAppointments, notifySettlement } from "@/lib/paymentOrders";
 import { createRateLimiter } from "@/lib/rateLimit";
@@ -11,7 +11,7 @@ import { withErrorLocale } from "@/lib/apiErrors";
 const checkLimit = createRateLimiter(10, 10 * 60_000);
 
 // POST { token }: create-order for the pay link (/pay/[id]) — the same
-// Cashfree order, recorded the same way, so the existing webhook settles it
+// PayU order, recorded the same way, so the existing webhook settles it
 // with no idea who opened it. The token stands in for the patient's session
 // and only ever covers its own appointment.
 export const POST = withErrorLocale(async function POST(req: Request) {
@@ -54,7 +54,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   const record = await recordPaymentOrder({ orderId, patientId, appointments: [appointment] });
 
   try {
-    const { paymentSessionId } = await createCashfreeOrder({
+    const { checkout } = createPayuOrder({
       orderId,
       amount: record.amount,
       customerId: patientId,
@@ -64,10 +64,10 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       returnUrl: `${origin}${guestPaymentPath(appointment.id, token, "return")}`,
       notifyUrl: `${origin}/api/payments/webhook`,
     });
-    return NextResponse.json({ paymentSessionId });
+    return NextResponse.json({ checkout });
   } catch (err) {
     await prisma.paymentOrder.delete({ where: { id: record.id } }).catch(() => {});
-    console.error("Failed to create Cashfree order for guest payment", appointment.id, err);
+    console.error("Failed to create PayU order for guest payment", appointment.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
 });

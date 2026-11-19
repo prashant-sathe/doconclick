@@ -2,14 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
-import { createCashfreeOrder } from "@/lib/cashfree";
+import { createPayuOrder } from "@/lib/payu";
 import { requireActiveNurse } from "@/lib/providerGuard";
 import { NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX } from "@/lib/nurseConstants";
 import { getNurseFees } from "@/lib/nurseFees";
 import { reserveFeeCoupon, releaseCouponRedemption } from "@/lib/coupons";
 import { withErrorLocale } from "@/lib/apiErrors";
 
-// POST { kind: "REGISTRATION" | "SUBSCRIPTION", code? } — creates a Cashfree
+// POST { kind: "REGISTRATION" | "SUBSCRIPTION", code? } — creates a PayU
 // order for the admin-set nurse fee. A fee of ₹0 means that step doesn't
 // exist, so there's nothing to pay for. `code` applies a coupon (appliesTo
 // must include NURSE_REGISTRATION / NURSE_SUBSCRIPTION), same as doctors.
@@ -71,7 +71,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   const amount = coupon ? coupon.netAmount : fee;
 
   try {
-    const { paymentSessionId } = await createCashfreeOrder({
+    const { checkout } = createPayuOrder({
       orderId,
       amount,
       customerId: authUser.id,
@@ -84,12 +84,12 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       where: { userId: authUser.id },
       data: { cashfreeOrderId: orderId, pendingOrderAmount: amount },
     });
-    return NextResponse.json({ paymentSessionId });
+    return NextResponse.json({ checkout });
   } catch (err) {
     if (coupon) {
       await prisma.$transaction((tx) => releaseCouponRedemption(tx, { orderId })).catch(() => {});
     }
-    console.error("Failed to create Cashfree order for nurse fee", authUser.id, err);
+    console.error("Failed to create PayU order for nurse fee", authUser.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
 });

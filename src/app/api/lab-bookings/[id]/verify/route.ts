@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, readJson } from "@/lib/routeGuards";
-import { fetchSuccessfulPayment } from "@/lib/cashfree";
+import { fetchSuccessfulPayment } from "@/lib/payu";
 import { bookingIdFromOrder, settleLabPayment } from "@/lib/labBookings";
 import { notifyLabSettled } from "@/lib/labNotify";
 import { createRateLimiter } from "@/lib/rateLimit";
@@ -10,7 +10,7 @@ import { withErrorLocale } from "@/lib/apiErrors";
 const checkLimit = createRateLimiter(20, 60_000);
 
 // POST { orderId }: the lab tests page's fallback when it comes back from
-// Cashfree before the webhook — asks the gateway and settles exactly as the
+// PayU before the webhook — asks the gateway and settles exactly as the
 // webhook would. Answers PAID, CREDITED (went to the wallet) or PENDING.
 export const POST = withErrorLocale(async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { authUser, denied } = await requireRole("PATIENT");

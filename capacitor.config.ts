@@ -22,17 +22,17 @@ const config: CapacitorConfig = {
     // this is correct for both logged-in and logged-out entry.
     url: `${ORIGIN}/login`,
     cleartext: !!DEV_ORIGIN,
-    // Cashfree hosted checkout (`cashfree.checkout({ redirectTarget: "_self" })`)
-    // navigates the WebView to *.cashfree.com and then back to our return_url
-    // (which is on ORIGIN, already allowed). Without this the WebView would
+    // PayU hosted checkout (a signed form POST, src/lib/payuCheckout.ts)
+    // navigates the WebView to *.payu.in and then back to our /api/payments/
+    // payu-return (on ORIGIN, already allowed). Without this the WebView would
     // punt that navigation to the system browser and strand the user there.
     // NOTE: full-page 3-D-Secure bank redirects land on arbitrary bank
-    // domains — those still need Cashfree's native SDK; card/UPI-collect and
-    // Cashfree-hosted UPI work with this.
-    // `*.cashfree.com`: keep hosted checkout in the WebView (see above).
+    // domains — those still need PayU's native SDK; card/UPI-collect and
+    // PayU-hosted UPI work with this.
+    // `*.payu.in`: keep hosted checkout in the WebView (see above).
     // `doconclick.co.in`: our own origin — lets the error.html "Try again"
     // button reload the app in-place instead of bouncing to the browser.
-    allowNavigation: ["*.cashfree.com", "doconclick.co.in"],
+    allowNavigation: ["*.payu.in", "doconclick.co.in"],
     // If the WebView can't load the server at all (site down, DNS/connectivity
     // failure), show this bundled page instead of the raw browser error.
     errorPath: "error.html",

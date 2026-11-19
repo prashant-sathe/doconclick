@@ -26,11 +26,8 @@ export default function WalletTopUpModal({ onClose }: { onClose: () => void }) {
       setError(data.error ?? t("couldNotStart"));
       return;
     }
-    const { load } = await import("@cashfreepayments/cashfree-js");
-    // Same NEXT_PUBLIC_*-baked-at-Docker-build-time constraint as
-    // /patient/payment — sandbox mode isn't wired up yet.
-    const cashfree = await load({ mode: "production" });
-    cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
+    const { startPayuCheckout } = await import("@/lib/payuCheckout");
+    startPayuCheckout(data.checkout);
   };
 
   return (

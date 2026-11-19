@@ -9,17 +9,19 @@
 //
 //   npm run test:admin-polish
 import "dotenv/config";
-import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import fs from "fs";
 import { parse as parseEnv } from "dotenv";
 import { prisma } from "../src/lib/prisma";
+import { sendPayuEvent } from "./payuMock";
 import { nameOrMobile } from "../src/lib/utils";
 import { isSafeAnnouncementUrl, isInternalPath, validateButtons } from "../src/lib/announcements";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
-const CF_SECRET = process.env.CASHFREE_SECRET_KEY ?? "";
+// The running server's PayU credentials (.env) — the webhook is hash-signed with the salt.
+const PAYU_KEY = process.env.PAYU_KEY ?? "";
+const PAYU_SALT = process.env.PAYU_SALT ?? "";
 const DAY = 864e5;
 
 let failures = 0;
@@ -37,15 +39,9 @@ async function call(cookie: string, method: string, path: string, body?: unknown
 }
 const as = (u: U) => `doconclick_token=${tokenFor(u)}`;
 
-/** A Cashfree PAYMENT_SUCCESS webhook for a registration order, signed like Cashfree does. */
+/** A PayU success webhook for a registration order, hash-signed like PayU does. */
 async function webhook(orderId: string, amount: number) {
-  const body = JSON.stringify({
-    type: "PAYMENT_SUCCESS_WEBHOOK",
-    data: { order: { order_id: orderId, order_amount: amount }, payment: { cf_payment_id: `pay_${orderId}`, payment_status: "SUCCESS" } },
-  });
-  const ts = String(Math.floor(Date.now() / 1000));
-  const sig = crypto.createHmac("sha256", CF_SECRET).update(ts + body).digest("base64");
-  return fetch(`${BASE}/api/payments/webhook`, { method: "POST", headers: { "Content-Type": "application/json", "x-webhook-signature": sig, "x-webhook-timestamp": ts }, body });
+  return sendPayuEvent(BASE, orderId, amount, { paymentId: `pay_${orderId}`, key: PAYU_KEY, salt: PAYU_SALT });
 }
 
 async function main() {
@@ -122,13 +118,13 @@ async function main() {
     r = await call(as(admin), "PATCH", `/api/admin/doctors/${unpaid.id}`, { status: "APPROVED" });
     check("approve gate: 'hasn't paid the ₹250 registration fee'", r.status === 400 && (r.json.error ?? "").includes("₹250"), `${r.status} ${r.json.error}`);
 
-    // ₹0 = free: activated without Cashfree.
+    // ₹0 = free: activated without PayU.
     r = await setFee(0);
     check("settings: fee ₹0 → saved", r.status === 200 && r.json.doctorRegistrationFee === 0, `${r.status}`);
     r = await call(as(freeDoc), "POST", "/api/doctors/registration-fee/create-order", {});
     p = await prisma.doctorProfile.findUniqueOrThrow({ where: { userId: freeDoc.id } });
     const freeLog = await prisma.doctorPaymentLog.findFirst({ where: { doctorId: freeDoc.id } });
-    check("fee ₹0: checkout activates directly (paid, trial started, ₹0 logged, no Cashfree order)", r.status === 200 && r.json.paid === true && p.registrationFeePaid && !!p.trialEndsAt && freeLog?.amount === 0 && !p.cashfreeOrderId, `${r.status} ${JSON.stringify(r.json)}`);
+    check("fee ₹0: checkout activates directly (paid, trial started, ₹0 logged, no PayU order)", r.status === 200 && r.json.paid === true && p.registrationFeePaid && !!p.trialEndsAt && freeLog?.amount === 0 && !p.cashfreeOrderId, `${r.status} ${JSON.stringify(r.json)}`);
     r = await call(as(admin), "PATCH", `/api/admin/doctors/${unpaid.id}`, { status: "APPROVED" });
     check("fee ₹0: the approve gate no longer waits for a payment", r.status === 200, `${r.status} ${r.json.error ?? ""}`);
     const reg = await call(as(admin), "GET", "/api/admin/reports/doctor-registrations");

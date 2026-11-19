@@ -1,18 +1,18 @@
 import { prisma } from "@/lib/prisma";
-import { createCashfreeOrder } from "@/lib/cashfree";
+import { createPayuOrder } from "@/lib/payu";
 import { externalOrigin } from "@/lib/googleOAuth";
 import { labOrderId } from "@/lib/labBookings";
 import type { JWTPayload } from "@/lib/auth";
 
 /**
- * Opens a Cashfree order for an unpaid ONLINE lab booking and remembers it on
- * the booking. Every retry gets a new order id (Cashfree ids are single-use);
+ * Builds a PayU checkout for an unpaid ONLINE lab booking and remembers it on
+ * the booking. Every retry gets a new order id (PayU txnids are single-use);
  * a payment that still lands on an older one is settled by its booking id.
  */
 export async function startLabCheckout(req: Request, user: JWTPayload, booking: { id: string; totalAmount: number }) {
   const orderId = labOrderId(booking.id);
   const origin = externalOrigin(req, new URL(req.url));
-  const { paymentSessionId } = await createCashfreeOrder({
+  const { checkout } = createPayuOrder({
     orderId,
     amount: booking.totalAmount,
     customerId: user.id,
@@ -22,5 +22,5 @@ export async function startLabCheckout(req: Request, user: JWTPayload, booking: 
     notifyUrl: `${origin}/api/payments/webhook`,
   });
   await prisma.labBooking.updateMany({ where: { id: booking.id, status: "PENDING_PAYMENT" }, data: { cashfreeOrderId: orderId } });
-  return { paymentSessionId, orderId };
+  return { checkout, orderId };
 }

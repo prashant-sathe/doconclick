@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
+import { DOCTOR_SUBSCRIPTION_FEE } from "@/lib/payu";
 import { getDoctorRegistrationFee } from "@/lib/doctorFees";
 import { getNurseFees } from "@/lib/nurseFees";
 import { normalizeCode, validateCoupon, type FeeCouponContext } from "@/lib/coupons";

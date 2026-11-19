@@ -2,26 +2,22 @@
 // wallet credits for orphaned / mismatched / duplicate / non-SCHEDULED
 // payments, and the verify-order fallback.
 //
-// Never touches the real Cashfree: this script starts its OWN dev server on
-// a free port (MOCK_PORT env, default 3100; tests/devServer.ts) with CASHFREE_API_BASE pointed at an in-process mock and a
-// test-only CASHFREE_SECRET_KEY (Next doesn't let .env override variables
-// that are already set), and signs webhook bodies locally with that key.
+// Never touches the real PayU: this script starts its OWN dev server on
+// a free port (MOCK_PORT env, default 3100; tests/devServer.ts) with PAYU_API_BASE pointed at an in-process mock and a
+// test-only PAYU_KEY/PAYU_SALT (Next doesn't let .env override variables
+// that are already set), and signs webhook forms locally with that salt.
 // Uses throwaway users deleted afterwards. Stop any running `next dev` first
 // — Next allows one dev server per project directory.
 //
 //   npm run test:payments
 import "dotenv/config";
-import crypto from "crypto";
-import http from "http";
 import type { ChildProcess } from "child_process";
-import type { AddressInfo } from "net";
 import { startDevServer } from "./devServer";
+import { createPayuMock, sendPayuEvent, forwardHash, signedEventBody } from "./payuMock";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
 
-let MOCK_PORT = 0; // mock Cashfree: free port picked in main()
 let BASE = ""; // set by startServer (MOCK_PORT env, default 3100, else a free port)
-const TEST_SECRET = "test-only-cashfree-secret";
 const JWT_SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
 
 let failures = 0;
@@ -30,68 +26,23 @@ function check(label: string, ok: boolean, detail: string) {
   if (!ok) failures++;
 }
 
-// ── Mock Cashfree ──
-const mock = {
-  createdOrders: [] as { order_id: string; order_amount: number }[],
-  payments: new Map<string, { cf_payment_id: string; payment_status: string; payment_amount: number }[]>(),
-  hits: 0,
-};
-const mockServer = http.createServer((req, res) => {
-  mock.hits++;
-  let body = "";
-  req.on("data", (c) => (body += c));
-  req.on("end", () => {
-    res.setHeader("Content-Type", "application/json");
-    if (req.method === "POST" && req.url === "/orders") {
-      const o = JSON.parse(body);
-      mock.createdOrders.push({ order_id: o.order_id, order_amount: o.order_amount });
-      res.end(JSON.stringify({ payment_session_id: `sess_${o.order_id}`, cf_order_id: `cf_${o.order_id}` }));
-      return;
-    }
-    const m = /^\/orders\/([^/]+)\/payments$/.exec(req.url ?? "");
-    if (req.method === "GET" && m) {
-      res.end(JSON.stringify(mock.payments.get(decodeURIComponent(m[1])) ?? []));
-      return;
-    }
-    res.statusCode = 404;
-    res.end("{}");
-  });
-});
+// ── Mock PayU ──
+const pm = createPayuMock();
+const mock = { createdOrders: pm.orders, payments: pm.payments, get hits() { return pm.state.hits; } };
 
 async function startServer(): Promise<ChildProcess> {
-  const { child, base } = await startDevServer({
-    label: "payment-orders",
-    env: { CASHFREE_API_BASE: `http://127.0.0.1:${MOCK_PORT}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET },
-  });
+  const { child, base } = await startDevServer({ label: "payment-orders", env: pm.env() });
   BASE = base;
   return child;
 }
 
-let paymentSeq = 0;
-async function webhook(orderId: string, amount: number, opts: { paymentId?: string; customerId?: string; badSignature?: boolean } = {}) {
-  const paymentId = opts.paymentId ?? `pay_${Date.now()}_${++paymentSeq}`;
-  const body = JSON.stringify({
-    type: "PAYMENT_SUCCESS_WEBHOOK",
-    event_time: new Date().toISOString(),
-    data: {
-      order: { order_id: orderId, order_amount: amount },
-      payment: { cf_payment_id: paymentId, payment_status: "SUCCESS" },
-      ...(opts.customerId ? { customer_details: { customer_id: opts.customerId } } : {}),
-    },
-  });
-  const ts = String(Math.floor(Date.now() / 1000));
-  const sig = crypto.createHmac("sha256", opts.badSignature ? "wrong-key" : TEST_SECRET).update(ts + body).digest("base64");
-  const r = await fetch(`${BASE}/api/payments/webhook`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-webhook-signature": sig, "x-webhook-timestamp": ts },
-    body,
-  });
-  return { status: r.status, paymentId };
+async function webhook(orderId: string, amount: number, opts: { paymentId?: string; customerId?: string; badSignature?: boolean; status?: string } = {}) {
+  return sendPayuEvent(BASE, orderId, amount, opts);
 }
 
 async function main() {
-  await new Promise<void>((r) => mockServer.listen(0, "127.0.0.1", r));
-  MOCK_PORT = (mockServer.address() as AddressInfo).port;
+  await pm.start();
+  pm.installOrderSniffer();
   const stamp = String(Date.now()).slice(-9);
   const patient = await prisma.user.create({ data: { name: "Pay Test Patient", mobile: "6" + stamp, role: "PATIENT", patientProfile: { create: { age: 30, gender: "Male" } } } });
   const doctor = await prisma.user.create({ data: { name: "Pay Test Doctor", mobile: "7" + stamp, role: "DOCTOR" } });
@@ -108,7 +59,8 @@ async function main() {
       headers: { "Content-Type": "application/json", Cookie: cookie },
       body: JSON.stringify({ appointmentId }),
     });
-    return { status: r.status, orderId: mock.createdOrders[before]?.order_id ?? "" };
+    const json = (await r.json().catch(() => ({}))) as { checkout?: { action: string; fields: Record<string, string> } };
+    return { status: r.status, orderId: mock.createdOrders[before]?.order_id ?? "", checkout: json.checkout };
   };
   const verify = async (apptId: string) => {
     const r = await fetch(`${BASE}/api/payments/verify-order`, {
@@ -125,7 +77,8 @@ async function main() {
   let server: ChildProcess | null = null;
   try {
     server = await startServer();
-    await fetch(`${BASE}/api/payments/webhook`); // compile the route before timing-sensitive checks
+    await fetch(`${BASE}/api/payments/webhook`); // compile the routes before timing-sensitive checks
+    await fetch(`${BASE}/api/payments/payu-return`, { redirect: "manual" });
 
     // ── create-order records a PaymentOrder and leaves cashfreeOrderId alone ──
     const a = await appt();
@@ -135,6 +88,9 @@ async function main() {
     check("create-order records the order", o1.status === 200 && rec?.amount === 500 && rec.items.length === 1 && rec.items[0].amount === 500, `${o1.status}, amount ${rec?.amount}`);
     check("…and doesn't overwrite cashfreeOrderId", (await prisma.appointment.findUniqueOrThrow({ where: { id: a.id } })).cashfreeOrderId === null, "still null");
     check("…amount sent to the (mock) gateway", mock.createdOrders.at(-1)?.order_amount === 500, `₹${mock.createdOrders.at(-1)?.order_amount}`);
+    const fields = mock.createdOrders.at(-1)?.fields ?? {};
+    check("checkout is a PayU form POST with the customer's details", !!o1.checkout?.action?.includes("payu.in") && fields.udf1 === patient.id && fields.phone === patient.mobile.slice(-10) && fields.amount === "500.00" && fields.surl === fields.furl && fields.surl.includes("/api/payments/payu-return?next="), JSON.stringify({ action: o1.checkout?.action, phone: fields.phone, udf1: fields.udf1 }));
+    check("…and its request hash matches key|txnid|amount|…|salt (SHA-512)", fields.hash === forwardHash(fields), `${fields.hash?.slice(0, 12)}…`);
 
     // ── Retry scenario: the OLDER order gets paid → still applied ──
     const w1 = await webhook(o1.orderId, 500);
@@ -214,7 +170,30 @@ async function main() {
 
     // ── Signature ──
     const bad = await webhook(`appt${h.id}_222`, 500, { badSignature: true });
-    check("bad signature rejected", bad.status === 401, `${bad.status}`);
+    check("bad hash rejected", bad.status === 401, `${bad.status}`);
+    const wrongKey = await fetch(`${BASE}/api/payments/webhook`, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: signedEventBody(`appt${h.id}_223`, 500).body.replace("key=test-payu-key", "key=other") });
+    check("webhook for a different merchant key rejected", wrongKey.status === 401, `${wrongKey.status}`);
+    check("unsigned (no hash) webhook rejected", (await fetch(`${BASE}/api/payments/webhook`, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "txnid=x&status=success&amount=1.00" })).status === 401, "401");
+
+    // ── Browser return (surl/furl): settles, then 303s to the app's own page ──
+    const k = await appt();
+    const ok = await createOrder(k.id);
+    const next = `/patient/payment/return?apptId=${k.id}`;
+    const ret = await sendPayuEvent(BASE, ok.orderId, 500, { customerId: patient.id, path: `/api/payments/payu-return?next=${encodeURIComponent(next)}`, redirect: "manual" });
+    const loc = ret.location ? new URL(ret.location, BASE) : null;
+    check("payu-return POST settles the appointment and 303s back", ret.status === 303 && (await paid(k.id)) && loc?.origin === new URL(BASE).origin && loc.pathname + loc.search === next, `${ret.status} ${ret.location}`);
+    const evil = await sendPayuEvent(BASE, `appt${k.id}_333`, 500, { path: "/api/payments/payu-return?next=%2F%2Fevil.com%2Fx", redirect: "manual" });
+    check("payu-return ?next=//evil.com → redirected to /, never off-site", evil.status === 303 && new URL(evil.location ?? "", BASE).origin === new URL(BASE).origin && new URL(evil.location ?? "", BASE).pathname === "/", `${evil.status} ${evil.location}`);
+    const forged = await sendPayuEvent(BASE, ok.orderId, 500, { badSignature: true, path: `/api/payments/payu-return?next=${encodeURIComponent(next)}`, redirect: "manual" });
+    check("payu-return with a bad hash still redirects but settles nothing", forged.status === 303 && (await credits(forged.paymentId)) === 0, `${forged.status}`);
+
+    // ── Failure callback for a wallet top-up marks it FAILED ──
+    const wallet = await prisma.wallet.upsert({ where: { userId: patient.id }, update: {}, create: { userId: patient.id, balance: 0 } });
+    const topupOrder = `wallettopup${patient.id}_${Date.now()}`;
+    const txn = await prisma.walletTransaction.create({ data: { walletId: wallet.id, type: "TOPUP", amount: 300, balanceAfter: wallet.balance, status: "PENDING", cashfreeOrderId: topupOrder } });
+    const failed = await webhook(topupOrder, 300, { status: "failure", paymentId: `pay_fail_${stamp}` });
+    check("failure-status webhook marks the PENDING top-up FAILED", failed.status === 200 && (await prisma.walletTransaction.findUniqueOrThrow({ where: { id: txn.id } })).status === "FAILED", `${failed.status}`);
+    await prisma.walletTransaction.deleteMany({ where: { id: txn.id } });
 
     // ── verify-order fallback ──
     const i = await appt();
@@ -237,7 +216,7 @@ async function main() {
     check("verify-order on a cancelled visit → CREDITED", vj.paymentStatus === "CREDITED" && vj.creditedAmount === 500, `${vj.paymentStatus} ₹${vj.creditedAmount}`);
   } finally {
     server?.kill("SIGTERM");
-    mockServer.close();
+    pm.close();
     await prisma.paymentOrder.deleteMany({ where: { patientId: patient.id } });
     await prisma.wallet.deleteMany({ where: { userId: patient.id } });
     await prisma.appointment.deleteMany({ where: { patientId: patient.id } });

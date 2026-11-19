@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
-import { createCashfreeOrder, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/cashfree";
+import { createPayuOrder, DOCTOR_SUBSCRIPTION_FEE } from "@/lib/payu";
 import { hasActiveDoctorSubscription } from "@/lib/subscription";
 import { reserveFeeCoupon, releaseCouponRedemption } from "@/lib/coupons";
 import { withErrorLocale } from "@/lib/apiErrors";
 
-// POST: Creates a real Cashfree order to renew a doctor's monthly
+// POST: Creates a real PayU order to renew a doctor's monthly
 // patient-access subscription. Optional body `{ code }` applies a coupon
 // (appliesTo must include DOCTOR_SUBSCRIPTION).
 export const POST = withErrorLocale(async function POST(req: Request) {
@@ -52,7 +52,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   const amount = coupon ? coupon.netAmount : DOCTOR_SUBSCRIPTION_FEE;
 
   try {
-    const { paymentSessionId } = await createCashfreeOrder({
+    const { checkout } = createPayuOrder({
       orderId,
       amount,
       customerId: authUser.id,
@@ -67,12 +67,12 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       data: { cashfreeOrderId: orderId },
     });
 
-    return NextResponse.json({ paymentSessionId });
+    return NextResponse.json({ checkout });
   } catch (err) {
     if (coupon) {
       await prisma.$transaction((tx) => releaseCouponRedemption(tx, { orderId })).catch(() => {});
     }
-    console.error("Failed to create Cashfree order for doctor subscription renewal", authUser.id, err);
+    console.error("Failed to create PayU order for doctor subscription renewal", authUser.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
 });

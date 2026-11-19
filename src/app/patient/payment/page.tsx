@@ -29,7 +29,7 @@ interface OfferedCoupon {
 }
 
 // `onFreeChange`: whether there's nothing to pay, so the page header can drop
-// the "Complete Payment / Secured by Cashfree" framing for a ₹0 booking.
+// the "Complete Payment / Secured by PayU" framing for a ₹0 booking.
 function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => void }) {
   const searchParams = useSearchParams();
   const apptId = searchParams.get("apptId");
@@ -86,14 +86,9 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
       setAppt((a) => (a ? { ...a, paymentStatus: "PAID" } : a));
       return;
     }
-    const { load } = await import("@cashfreepayments/cashfree-js");
-    // NEXT_PUBLIC_ env vars are inlined at Docker *build* time, not container
-    // runtime, so env_file: .env.production can't toggle this — hardcoded to
-    // match the current production-only setup (see CASHFREE_ENV comment in
-    // .env.production.example for how to add sandbox support later).
-    const cashfree = await load({ mode: "production" });
-    cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
-    // Browser navigates away to Cashfree's hosted checkout from here.
+    const { startPayuCheckout } = await import("@/lib/payuCheckout");
+    startPayuCheckout(data.checkout);
+    // Browser navigates away to PayU's hosted checkout from here.
   };
 
   const isPackage = !!appt?.package && appt.package.unpaidCount > 1;
@@ -359,7 +354,7 @@ function PaymentContent({ onFreeChange }: { onFreeChange: (free: boolean) => voi
           ? (paying ? <><Loader2 className="w-4 h-4 animate-spin" /> {tc("confirming")}</> : t("confirmNothing"))
           : paying
             ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("redirecting")}</>
-            : t("payViaCashfree", { amount: netPayable })}
+            : t("payViaPayu", { amount: netPayable })}
       </button>
 
       {confirmWalletPay && (
@@ -400,7 +395,7 @@ export default function PatientPayment() {
           {/* No gateway for ₹0 — don't mention one. */}
           {!free && (
             <p className="text-slate-500 mt-2 flex items-center justify-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" /> {tc("securedByCashfree")}
+              <ShieldCheck className="w-4 h-4 text-emerald-500" /> {tc("securedByPayu")}
             </p>
           )}
         </div>

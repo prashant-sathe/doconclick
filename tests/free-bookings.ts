@@ -109,7 +109,7 @@ async function main() {
       amount: 0, platformFee: 0, scheduledAt: when(), acceptedAt: new Date(),
     } as never });
     r = await call(patient, "POST", "/api/payments/create-order", { appointmentId: legacy.id });
-    check("create-order on a waiting ₹0 booking → { paid, free }, no Cashfree session", r.status === 200 && r.json.paid === true && r.json.free === true && !("paymentSessionId" in r.json), JSON.stringify(r.json));
+    check("create-order on a waiting ₹0 booking → { paid, free }, no PayU checkout", r.status === 200 && r.json.paid === true && r.json.free === true && !("checkout" in r.json), JSON.stringify(r.json));
     check("…and it's PAID", (await row(legacy.id)).paymentStatus === "PAID", "ok");
     check("…with no payment order recorded", (await prisma.paymentOrder.count({ where: { patientId: patient.id } })) === 0, "ok");
 

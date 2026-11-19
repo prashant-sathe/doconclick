@@ -309,10 +309,8 @@ function NurseProfileContent() {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) { setPaying(null); setPayError(data.error ?? t("fees.startFailed")); return; }
-    const { load: loadCashfree } = await import("@cashfreepayments/cashfree-js");
-    // Hardcoded like the doctor/patient checkout (NEXT_PUBLIC_ vars are baked in at build time).
-    const cashfree = await loadCashfree({ mode: "production" });
-    cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
+    const { startPayuCheckout } = await import("@/lib/payuCheckout");
+    startPayuCheckout(data.checkout);
   };
 
   const togglePick = (s: Service) => {

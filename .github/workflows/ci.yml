@@ -31,7 +31,7 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # No DATABASE_URL/Firebase/Cashfree secrets needed here — nothing in
+      # No DATABASE_URL/Firebase/PayU secrets needed here — nothing in
       # this app touches those at build time (sitemap.ts, the one route that
       # queries the DB, is `export const dynamic = "force-dynamic"`, i.e.
       # rendered per-request, not at build).

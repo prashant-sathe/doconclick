@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { fetchSuccessfulPayment } from "@/lib/cashfree";
+import { fetchSuccessfulPayment } from "@/lib/payu";
 import { settleDuesPayment, notifyDuesSettled } from "@/lib/duesPayments";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { withErrorLocale } from "@/lib/apiErrors";
@@ -9,7 +9,7 @@ import { withErrorLocale } from "@/lib/apiErrors";
 const checkLimit = createRateLimiter(10, 60_000);
 
 // POST { orderId }: the earnings page's fallback when it comes back from
-// Cashfree before the webhook — asks the gateway and settles exactly as the
+// PayU before the webhook — asks the gateway and settles exactly as the
 // webhook would. Answers SETTLED, REVIEW (paid, waiting on the admin) or
 // PENDING (nothing received yet).
 export const POST = withErrorLocale(async function POST(req: Request) {

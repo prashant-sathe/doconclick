@@ -1,0 +1,381 @@
+import { prisma } from "@/lib/prisma";
+import { DOCTOR_SUBSCRIPTION_FEE, type PayuEvent } from "@/lib/payu";
+import { getDoctorRegistrationFee, activateRegistration } from "@/lib/doctorFees";
+import { sendPushToUser } from "@/lib/firebaseAdmin";
+import { WALLET_TOPUP_ORDER_PREFIX } from "@/lib/wallet";
+import { releaseCouponRedemption } from "@/lib/coupons";
+import { settleAppointmentPayment, notifySettlement, creditFeePaymentToWallet } from "@/lib/paymentOrders";
+import { NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX } from "@/lib/nurseConstants";
+import { DUES_ORDER_PREFIX, settleDuesPayment, notifyDuesSettled } from "@/lib/duesPayments";
+import { LAB_ORDER_PREFIX, settleLabPayment } from "@/lib/labBookings";
+import { notifyLabSettled } from "@/lib/labNotify";
+
+// A verified PayU callback/webhook, in the shape the handlers below read.
+// (Field names are the historical ones from the PayU integration.)
+interface PaymentEventPayload {
+  type: "PAYMENT_SUCCESS_WEBHOOK" | "PAYMENT_FAILED_WEBHOOK";
+  data: {
+    order: { order_id: string; order_amount: number };
+    payment: { cf_payment_id: string; payment_status: string };
+    customer_details?: { customer_id?: string };
+  };
+}
+
+export function toPaymentEventPayload(e: PayuEvent): PaymentEventPayload | null {
+  if (e.status === "other") return null; // pending etc. — nothing to settle yet
+  return {
+    type: e.status === "success" ? "PAYMENT_SUCCESS_WEBHOOK" : "PAYMENT_FAILED_WEBHOOK",
+    data: {
+      order: { order_id: e.orderId, order_amount: e.amount },
+      payment: { cf_payment_id: e.paymentId, payment_status: e.status.toUpperCase() },
+      ...(e.customerId ? { customer_details: { customer_id: e.customerId } } : {}),
+    },
+  };
+}
+
+// A fee payment charged at a different amount than its order (e.g. the admin
+// changed the fee mid-checkout): log it, activate nothing, and credit every
+// rupee to the payer's wallet — once per payment — so it's never lost.
+async function creditMismatchedFee(
+  payload: PaymentEventPayload,
+  userId: string,
+  label: string,
+  expected: number | null,
+  url: string,
+) {
+  const { order_id: orderId, order_amount: amount } = payload.data.order;
+  console.error("PayU webhook amount mismatch for", label, userId, "expected", expected, "got", amount);
+  const credited = await creditFeePaymentToWallet({
+    userId,
+    orderId,
+    amount,
+    cfPaymentId: String(payload.data.payment.cf_payment_id),
+    note: `Charged ₹${amount} for ${label} order ${orderId} created for ₹${expected ?? "unknown"}`,
+  });
+  if (credited) {
+    void sendPushToUser(userId, { key: "feePaymentCreditedToWallet", values: { amount: credited.amount }, url });
+  }
+}
+
+// A fee payment for an order that is no longer the profile's current one
+// (they opened order A, then B, then paid A): nothing on the profile points
+// at it, so the payer comes from the signature-verified customer_id we sent
+// at create-order time. Only a live user of the right role whose id is also
+// the one embedded in the order id gets the full amount in their wallet —
+// once per payment; nothing is activated. Anything else stays a log line.
+async function creditOrphanFee(
+  payload: PaymentEventPayload,
+  prefix: string,
+  role: "DOCTOR" | "NURSE",
+  label: string,
+  url: string,
+) {
+  const orderId = payload.data.order.order_id;
+  const cfPaymentId = String(payload.data.payment.cf_payment_id);
+  const customerId = payload.data.customer_details?.customer_id;
+  const user = customerId && orderId.startsWith(`${prefix}${customerId}_`)
+    ? await prisma.user.findFirst({ where: { id: customerId, role, deletedAt: null }, select: { id: true } })
+    : null;
+  if (!user) {
+    console.error("PayU webhook: no", label, "profile found for order", orderId, "and no valid payer", customerId);
+    return;
+  }
+  // A retry of a payment that was applied while this was still the current
+  // order (the profile has since moved on to a newer one) — already used.
+  const applied = role === "DOCTOR"
+    ? await prisma.doctorPaymentLog.findFirst({ where: { cashfreePaymentId: cfPaymentId }, select: { id: true } })
+    : await prisma.nursePaymentLog.findFirst({ where: { cashfreePaymentId: cfPaymentId }, select: { id: true } });
+  if (applied) return;
+  console.error("PayU webhook: payment for superseded", label, "order", orderId, "— crediting wallet of", user.id);
+  const credited = await creditFeePaymentToWallet({
+    userId: user.id,
+    orderId,
+    amount: payload.data.order.order_amount,
+    cfPaymentId,
+    note: `Paid ₹${payload.data.order.order_amount} for superseded ${label} order ${orderId}`,
+  });
+  if (credited) {
+    void sendPushToUser(user.id, { key: "feePaymentCreditedToWallet", values: { amount: credited.amount }, url });
+  }
+}
+
+// Applies one signature-verified payment event. Idempotent: PayU may deliver
+// the same result via the browser callback, the webhook and retries, so every
+// branch below tolerates repeats. The caller must have verified the hash.
+export async function processPaymentEvent(payload: PaymentEventPayload): Promise<void> {
+  if (payload.type === "PAYMENT_FAILED_WEBHOOK") {
+    const failedOrderId = payload.data?.order?.order_id;
+    console.log("PayU payment failed for order", failedOrderId);
+    // Only wallet top-ups need explicit failure handling here — a failed
+    // appointment/doctor-fee payment just leaves paymentStatus at PENDING,
+    // indistinguishable from "not yet paid" (the patient can just retry).
+    // A wallet TOPUP row, though, is created PENDING up front and must be
+    // settled to a terminal state or the top-up return page polls to a
+    // timeout instead of showing a clean failure.
+    if (failedOrderId?.startsWith(WALLET_TOPUP_ORDER_PREFIX)) {
+      const txn = await prisma.walletTransaction.findFirst({
+        where: { cashfreeOrderId: failedOrderId, status: "PENDING" },
+        include: { wallet: true },
+      });
+      if (txn) {
+        await prisma.walletTransaction.update({ where: { id: txn.id }, data: { status: "FAILED" } });
+        void sendPushToUser(txn.wallet.userId, {
+          key: "walletTopupFailed",
+          values: { amount: txn.amount },
+          url: "/patient/wallet",
+        });
+      }
+    }
+    if (failedOrderId?.startsWith(DUES_ORDER_PREFIX)) {
+      await prisma.duesPayment.updateMany({ where: { orderId: failedOrderId, status: "CREATED" }, data: { status: "FAILED" } });
+    }
+    // Free any coupon slot a doctor or nurse reserved for this failed fee payment.
+    if (failedOrderId && ["docreg", "docsub", NURSE_REGISTRATION_ORDER_PREFIX, NURSE_SUBSCRIPTION_ORDER_PREFIX].some((p) => failedOrderId.startsWith(p))) {
+      await prisma.$transaction((tx) => releaseCouponRedemption(tx, { orderId: failedOrderId })).catch(() => {});
+    }
+    return;
+  }
+
+  if (payload.type !== "PAYMENT_SUCCESS_WEBHOOK") {
+    return;
+  }
+
+  const orderId = payload.data.order.order_id;
+
+  // Two order types share this one webhook (PayU webhooks are registered
+  // once per merchant account, not per order kind) — distinguished by the
+  // order_id prefix each create-order route generates.
+  // A patient paying for lab tests booked from a prescription.
+  if (orderId.startsWith(LAB_ORDER_PREFIX)) {
+    const result = await settleLabPayment({
+      orderId,
+      amount: payload.data.order.order_amount,
+      cfPaymentId: String(payload.data.payment.cf_payment_id),
+    });
+    if (result.outcome === "unknown") console.error("PayU webhook: no lab booking found for order", orderId);
+    notifyLabSettled(result);
+    return;
+  }
+
+  // A doctor paying the commission they owe on cash visits.
+  if (orderId.startsWith(DUES_ORDER_PREFIX)) {
+    const result = await settleDuesPayment({
+      orderId,
+      amount: payload.data.order.order_amount,
+      cfPaymentId: payload.data.payment.cf_payment_id,
+    });
+    if (result.outcome === "unknown") console.error("PayU webhook: no dues payment found for order", orderId);
+    notifyDuesSettled(result);
+    return;
+  }
+
+  if (orderId.startsWith("docreg")) {
+    const profile = await prisma.doctorProfile.findFirst({ where: { cashfreeOrderId: orderId } });
+    if (!profile) {
+      await creditOrphanFee(payload, "docreg", "DOCTOR", "doctor registration", "/doctor/payment");
+      return;
+    }
+    // PayU retries webhooks — a second delivery must not log the
+    // payment (or restart the trial) twice.
+    if (profile.registrationFeePaid) return;
+    const redemption = await prisma.couponRedemption.findUnique({
+      where: { orderId },
+      include: { coupon: { select: { code: true } } },
+    });
+    const discount = redemption?.status === "RESERVED" ? redemption.discountAmount : 0;
+    // The amount this order was created for (the fee is admin-editable, so
+    // never "today's fee"); orders from before that was recorded fall back to
+    // the current fee.
+    const expected = profile.registrationOrderAmount ?? Math.round(((await getDoctorRegistrationFee()) - discount) * 100) / 100;
+    if (payload.data.order.order_amount !== expected) {
+      await creditMismatchedFee(payload, profile.userId, "doctor registration", expected, "/doctor/payment");
+      return;
+    }
+    await activateRegistration(profile, {
+      amount: payload.data.order.order_amount,
+      discount,
+      couponCode: redemption?.coupon.code ?? null,
+      cashfreePaymentId: payload.data.payment.cf_payment_id,
+      orderId,
+    });
+    return;
+  }
+
+  if (orderId.startsWith("docsub")) {
+    const profile = await prisma.doctorProfile.findFirst({ where: { cashfreeOrderId: orderId } });
+    if (!profile) {
+      await creditOrphanFee(payload, "docsub", "DOCTOR", "doctor subscription", "/doctor/subscribe");
+      return;
+    }
+    // Already applied (PayU retries) — checked before the amount, or a
+    // retry of a coupon order would look like a mismatch and be credited to
+    // the wallet on top of the extended plan (and a plain retry would extend
+    // the plan twice).
+    const cfPaymentId = payload.data.payment.cf_payment_id;
+    if (
+      profile.cashfreePaymentId === cfPaymentId ||
+      (await prisma.doctorPaymentLog.findFirst({ where: { cashfreePaymentId: cfPaymentId }, select: { id: true } }))
+    ) {
+      return;
+    }
+    const redemption = await prisma.couponRedemption.findUnique({
+      where: { orderId },
+      include: { coupon: { select: { code: true } } },
+    });
+    // The redemption is keyed by this order id, so a CONFIRMED one is this
+    // order's own coupon — still part of what the order was created for.
+    const discount = redemption && (redemption.status === "RESERVED" || redemption.status === "CONFIRMED") ? redemption.discountAmount : 0;
+    const expected = Math.round((DOCTOR_SUBSCRIPTION_FEE - discount) * 100) / 100;
+    if (payload.data.order.order_amount !== expected) {
+      await creditMismatchedFee(payload, profile.userId, "doctor subscription", expected, "/doctor/subscribe");
+      return;
+    }
+    // Extend from whichever is later — "now" for a lapsed renewal, or the
+    // current paid-until date for someone renewing early — so early renewal
+    // never loses time they already paid for.
+    const now = Date.now();
+    const currentPaidUntil = profile.subscriptionPaidUntil ? new Date(profile.subscriptionPaidUntil).getTime() : 0;
+    const base = new Date(Math.max(now, currentPaidUntil));
+    base.setMonth(base.getMonth() + 1);
+    await prisma.$transaction([
+      prisma.doctorProfile.update({
+        where: { id: profile.id },
+        data: {
+          subscriptionPaidUntil: base,
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+        },
+      }),
+      prisma.doctorPaymentLog.create({
+        data: {
+          doctorId: profile.userId,
+          type: "SUBSCRIPTION",
+          amount: payload.data.order.order_amount,
+          couponCode: discount > 0 ? redemption?.coupon.code ?? null : null,
+          discountAmount: discount,
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+        },
+      }),
+      prisma.couponRedemption.updateMany({
+        where: { orderId, status: "RESERVED" },
+        data: { status: "CONFIRMED" },
+      }),
+    ]);
+    void sendPushToUser(profile.userId, { key: "subscriptionRenewed", url: "/doctor/dashboard" });
+    return;
+  }
+
+  if (orderId.startsWith(NURSE_REGISTRATION_ORDER_PREFIX) || orderId.startsWith(NURSE_SUBSCRIPTION_ORDER_PREFIX)) {
+    const isRegistration = orderId.startsWith(NURSE_REGISTRATION_ORDER_PREFIX);
+    const profile = await prisma.nurseProfile.findFirst({ where: { cashfreeOrderId: orderId } });
+    if (!profile) {
+      await creditOrphanFee(
+        payload,
+        isRegistration ? NURSE_REGISTRATION_ORDER_PREFIX : NURSE_SUBSCRIPTION_ORDER_PREFIX,
+        "NURSE",
+        isRegistration ? "nurse registration" : "nurse subscription",
+        "/nurse/profile",
+      );
+      return;
+    }
+    // Already applied (PayU retries) — the payment id is set on success.
+    if (profile.cashfreePaymentId === payload.data.payment.cf_payment_id) {
+      return;
+    }
+    if (profile.pendingOrderAmount == null || payload.data.order.order_amount !== profile.pendingOrderAmount) {
+      await creditMismatchedFee(payload, profile.userId, isRegistration ? "nurse registration" : "nurse subscription", profile.pendingOrderAmount, "/nurse/profile");
+      return;
+    }
+    // The order was created for the coupon-discounted amount (checked above);
+    // this only records which coupon, and confirms its slot.
+    const redemption = await prisma.couponRedemption.findUnique({
+      where: { orderId },
+      include: { coupon: { select: { code: true } } },
+    });
+    const discount = redemption?.status === "RESERVED" ? redemption.discountAmount : 0;
+    const now = Date.now();
+    const currentPaidUntil = profile.subscriptionPaidUntil ? new Date(profile.subscriptionPaidUntil).getTime() : 0;
+    const paidUntil = new Date(Math.max(now, currentPaidUntil));
+    paidUntil.setMonth(paidUntil.getMonth() + 1);
+    await prisma.$transaction([
+      prisma.nurseProfile.update({
+        where: { id: profile.id },
+        data: {
+          ...(isRegistration ? { registrationFeePaid: true } : { subscriptionPaidUntil: paidUntil }),
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+          pendingOrderAmount: null,
+        },
+      }),
+      prisma.nursePaymentLog.create({
+        data: {
+          nurseId: profile.userId,
+          type: isRegistration ? "REGISTRATION" : "SUBSCRIPTION",
+          amount: payload.data.order.order_amount,
+          couponCode: discount > 0 ? redemption?.coupon.code ?? null : null,
+          discountAmount: discount,
+          cashfreePaymentId: payload.data.payment.cf_payment_id,
+        },
+      }),
+      prisma.couponRedemption.updateMany({
+        where: { orderId, status: "RESERVED" },
+        data: { status: "CONFIRMED" },
+      }),
+    ]);
+    void sendPushToUser(profile.userId, isRegistration
+      ? { key: "registrationFeeReceived", url: "/nurse/profile" }
+      : { key: "subscriptionRenewed", url: "/nurse/dashboard" });
+    return;
+  }
+
+  if (orderId.startsWith(WALLET_TOPUP_ORDER_PREFIX)) {
+    const txn = await prisma.walletTransaction.findFirst({
+      where: { cashfreeOrderId: orderId },
+      include: { wallet: true },
+    });
+    if (!txn) {
+      console.error("PayU webhook: no wallet transaction found for order", orderId);
+      return;
+    }
+    if (txn.status !== "PENDING") {
+      // Already settled — PayU retries webhooks, this must be idempotent.
+      return;
+    }
+    if (payload.data.order.order_amount !== txn.amount) {
+      console.error(
+        "PayU webhook amount mismatch for wallet top-up", txn.id,
+        "expected", txn.amount, "got", payload.data.order.order_amount
+      );
+      return; // don't credit; flagged for manual review
+    }
+
+    const wallet = await prisma.$transaction(async (tx) => {
+      const updated = await tx.wallet.update({
+        where: { id: txn.walletId },
+        data: { balance: { increment: txn.amount } },
+      });
+      await tx.walletTransaction.update({
+        where: { id: txn.id },
+        data: { status: "SUCCESS", balanceAfter: updated.balance, cashfreePaymentId: payload.data.payment.cf_payment_id },
+      });
+      return updated;
+    });
+
+    void sendPushToUser(txn.wallet.userId, {
+      key: "walletTopupSuccess",
+      values: { amount: txn.amount, balance: wallet.balance },
+      url: "/patient/wallet",
+    });
+    return;
+  }
+
+  // Everything else is an appointment order. Settlement applies what it can
+  // and credits the rest — orphaned, mismatched, duplicate or no-longer-
+  // SCHEDULED payments — to the patient's wallet, idempotently per payment.
+  const result = await settleAppointmentPayment({
+    orderId,
+    amount: payload.data.order.order_amount,
+    cfPaymentId: String(payload.data.payment.cf_payment_id),
+    customerId: payload.data.customer_details?.customer_id,
+  });
+  notifySettlement(result);
+
+}

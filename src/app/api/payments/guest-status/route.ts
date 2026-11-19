@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { fetchSuccessfulPayment } from "@/lib/cashfree";
+import { fetchSuccessfulPayment } from "@/lib/payu";
 import { verifyGuestPaymentToken } from "@/lib/guestPaymentToken";
 import { settleAppointmentPayment, notifySettlement } from "@/lib/paymentOrders";
 import { netPayable } from "@/lib/coupons";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { withErrorLocale } from "@/lib/apiErrors";
 
-// `verify` asks Cashfree directly, once per open order — keep it rare.
+// `verify` asks PayU directly, once per open order — keep it rare.
 const checkVerifyLimit = createRateLimiter(10, 60 * 1000);
 const LOOKBACK_MS = 24 * 60 * 60 * 1000;
 
 // GET ?t=<token>[&verify=1]: what the pay link (/pay/[id]) shows — the bill
 // and whether it's paid — for a caller with no session. `verify=1` is the
 // return page's fallback when the webhook is late: settle any of this
-// appointment's open orders Cashfree says were paid, exactly as
+// appointment's open orders PayU says were paid, exactly as
 // /api/payments/verify-order does for a signed-in patient.
 export const GET = withErrorLocale(async function GET(req: Request) {
   const params = new URL(req.url).searchParams;

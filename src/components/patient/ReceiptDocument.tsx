@@ -15,7 +15,7 @@ const NAVY = "#1a489e";
 const SURFACE = "#f8fafc";
 
 const MODE_LABEL: Record<ReceiptPaymentMode, string> = {
-  ONLINE: "Online (Cashfree)",
+  ONLINE: "Online (PayU)",
   WALLET: "DocOnClick wallet",
   CASH: "Cash at the visit",
   FREE: "No payment due (fully discounted)",

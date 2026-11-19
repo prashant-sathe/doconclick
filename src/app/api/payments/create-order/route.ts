@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { externalOrigin } from "@/lib/googleOAuth";
-import { createCashfreeOrder } from "@/lib/cashfree";
+import { createPayuOrder } from "@/lib/payu";
 import { APPOINTMENT_ORDER_PREFIX, recordPaymentOrder, totalPayable, settleFreeAppointments, notifySettlement } from "@/lib/paymentOrders";
 import { withErrorLocale } from "@/lib/apiErrors";
 
-// POST: Creates a real Cashfree order for an appointment's online payment
+// POST: Creates a real PayU order for an appointment's online payment
 // and returns a payment_session_id for the client to redirect into checkout.
 export const POST = withErrorLocale(async function POST(req: Request) {
   const authUser = await getAuthUser();
@@ -46,7 +46,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
     return NextResponse.json({ error: "Wait for the nurse to accept your visits before paying." }, { status: 400 });
   }
 
-  // Nothing left to pay (a 100% coupon, or a ₹0 fee): Cashfree can't create a
+  // Nothing left to pay (a 100% coupon, or a ₹0 fee): PayU can't create a
   // ₹0 order, so settle without it — mark the visits PAID and tell the provider.
   if (totalPayable(covered) === 0) {
     const settled = await settleFreeAppointments(covered.map((a) => a.id), authUser.id);
@@ -67,7 +67,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
   const record = await recordPaymentOrder({ orderId, patientId: authUser.id, appointments: covered });
 
   try {
-    const { paymentSessionId } = await createCashfreeOrder({
+    const { checkout } = createPayuOrder({
       orderId,
       amount: record.amount,
       customerId: authUser.id,
@@ -77,11 +77,11 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       notifyUrl: `${origin}/api/payments/webhook`,
     });
 
-    return NextResponse.json({ paymentSessionId });
+    return NextResponse.json({ checkout });
   } catch (err) {
     // No gateway order exists, so nothing can ever be paid against this one.
     await prisma.paymentOrder.delete({ where: { id: record.id } }).catch(() => {});
-    console.error("Failed to create Cashfree order for appointment", appointment.id, err);
+    console.error("Failed to create PayU order for appointment", appointment.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
 });

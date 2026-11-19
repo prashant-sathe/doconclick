@@ -1,9 +1,9 @@
 // Coupons (BUG-TRACKER #45): the coupon is validated as stored (existing +
 // patch) on PATCH, past expiry and absurd flat values are refused, a 100%
 // coupon is accepted with a warning, and a booking left with nothing to pay
-// is confirmed without calling Cashfree. Pure checks, then API checks against
+// is confirmed without calling PayU. Pure checks, then API checks against
 // a live dev server and the DB in .env, throwaway users/coupons only. The
-// paid (Cashfree) path is deliberately not exercised — it would hit the
+// paid (PayU) path is deliberately not exercised — it would hit the
 // production gateway.
 //
 //   npm run test:coupons
@@ -126,7 +126,7 @@ async function main() {
     r = await call(patient, "POST", "/api/payments/create-order", { appointmentId: a1.id });
     check("create-order on a free booking → paid, no gateway", r.status === 200 && r.json.paid === true, `${r.status} ${JSON.stringify(r.json)}`);
     const done = await prisma.appointment.findUniqueOrThrow({ where: { id: a1.id } });
-    check("appointment is PAID with paidAt, no Cashfree ids", done.paymentStatus === "PAID" && !!done.paidAt && done.cashfreeOrderId === null && done.cashfreePaymentId === null, `${done.paymentStatus} ${done.paidAt?.toISOString()}`);
+    check("appointment is PAID with paidAt, no PayU ids", done.paymentStatus === "PAID" && !!done.paidAt && done.cashfreeOrderId === null && done.cashfreePaymentId === null, `${done.paymentStatus} ${done.paidAt?.toISOString()}`);
     const red = await prisma.couponRedemption.findFirst({ where: { appointmentId: a1.id } });
     check("coupon redemption CONFIRMED", red?.status === "CONFIRMED", `${red?.status}`);
     check("no PaymentOrder created", (await prisma.paymentOrder.count({ where: { patientId: patient.id } })) === ordersBefore, "ok");

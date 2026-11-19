@@ -7,7 +7,7 @@ import { withErrorLocale } from "@/lib/apiErrors";
 
 const checkLimit = createRateLimiter(10, 10 * 60_000);
 
-// POST: a fresh Cashfree checkout for the patient's own unpaid online lab booking.
+// POST: a fresh PayU checkout for the patient's own unpaid online lab booking.
 export const POST = withErrorLocale(async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { authUser, denied } = await requireRole("PATIENT");
   if (denied) return denied;
@@ -19,7 +19,7 @@ export const POST = withErrorLocale(async function POST(req: Request, { params }
   try {
     return NextResponse.json(await startLabCheckout(req, authUser, booking));
   } catch (err) {
-    console.error("Failed to create Cashfree order for lab booking", booking.id, err);
+    console.error("Failed to create PayU order for lab booking", booking.id, err);
     return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
   }
 });

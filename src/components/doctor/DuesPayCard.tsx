@@ -12,7 +12,7 @@ type DuesInfo = {
 };
 
 // "You owe ₹X platform fee → Pay now" (src/lib/duesPayments.ts), plus the
-// confirmation after coming back from Cashfree (?duesOrder=). Shown on
+// confirmation after coming back from PayU (?duesOrder=). Shown on
 // Earnings and on Subscribe — a doctor whose plan has lapsed lands on the
 // latter and can still pay what they owe. Renders nothing when nothing's owed.
 export default function DuesPayCard({ returnTo, onSettled, className = "mb-6" }: { returnTo: "earnings" | "subscribe"; onSettled?: () => void; className?: string }) {
@@ -37,7 +37,7 @@ export default function DuesPayCard({ returnTo, onSettled, className = "mb-6" }:
     void load();
   }, [load]);
 
-  // Back from Cashfree: the webhook usually beats us, else verify asks the gateway.
+  // Back from PayU: the webhook usually beats us, else verify asks the gateway.
   useEffect(() => {
     const orderId = returnOrderId;
     if (!orderId) return;
@@ -81,10 +81,8 @@ export default function DuesPayCard({ returnTo, onSettled, className = "mb-6" }:
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) { setPaying(false); setError(data.error ?? t("startFailed")); void load(); return; }
-      const { load: loadCashfree } = await import("@cashfreepayments/cashfree-js");
-      // Same hardcoded mode as the other checkouts (NEXT_PUBLIC_ vars are baked in at build time).
-      const cashfree = await loadCashfree({ mode: "production" });
-      cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
+      const { startPayuCheckout } = await import("@/lib/payuCheckout");
+      startPayuCheckout(data.checkout);
     } catch {
       setPaying(false);
       setError(tc("networkError"));

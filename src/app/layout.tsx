@@ -69,7 +69,7 @@ const ORGANIZATION_JSON_LD = {
 // GA4 measurement ID. Not a secret, so it's hardcoded here rather than a
 // NEXT_PUBLIC_ env var — those get baked in at Docker *build* time, not
 // container runtime, so env_file: .env.production can't change it anyway
-// (see CASHFREE_ENV note in .env.production.example).
+// (see Docker build-arg note in .env.production.example).
 const GA_MEASUREMENT_ID = "G-2PCQ0FEJ62";
 
 export default async function RootLayout({

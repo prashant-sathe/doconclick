@@ -6,25 +6,21 @@
 // doctors who already paid are unaffected by a price change.
 //
 // Like test:nurse-fee-coupons, this starts its OWN dev server (MOCK_PORT env,
-// default 3100, else a free port; tests/devServer.ts) with Cashfree pointed at
+// default 3100, else a free port; tests/devServer.ts) with PayU pointed at
 // an in-process mock and a test-only secret, so no real gateway order is ever
 // created. Uses the DB in .env, throwaway users/coupons only; the doctor fee
 // settings are put back afterwards.
 //
 //   npm run test:doctor-fees
 import "dotenv/config";
-import crypto from "crypto";
-import http from "http";
 import type { ChildProcess } from "child_process";
-import type { AddressInfo } from "net";
 import { startDevServer } from "./devServer";
+import { createPayuMock, sendPayuEvent } from "./payuMock";
 import jwt from "jsonwebtoken";
 import { prisma } from "../src/lib/prisma";
 import { resolveDoctorRegistrationPricing } from "../src/lib/doctorFeePricing";
 
-let MOCK_PORT = 0;
 let BASE = "";
-const TEST_SECRET = "test-only-cashfree-secret";
 const SECRET: string = process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET is not set (expected in .env)"); })();
 
 let failures = 0;
@@ -33,33 +29,12 @@ function check(label: string, ok: boolean, detail: string) {
   if (!ok) failures++;
 }
 
-// ── Mock Cashfree ──
-const mock = { createdOrders: [] as { order_id: string; order_amount: number }[] };
-const mockServer = http.createServer((req, res) => {
-  let body = "";
-  req.on("data", (c) => (body += c));
-  req.on("end", () => {
-    res.setHeader("Content-Type", "application/json");
-    if (req.method === "POST" && req.url === "/orders") {
-      const o = JSON.parse(body);
-      mock.createdOrders.push(o);
-      res.end(JSON.stringify({ payment_session_id: `sess_${o.order_id}`, cf_order_id: `cf_${o.order_id}` }));
-      return;
-    }
-    res.statusCode = 404;
-    res.end("{}");
-  });
-});
+// ── Mock PayU ──
+const pm = createPayuMock();
+const mock = { createdOrders: pm.orders, payments: pm.payments, get hits() { return pm.state.hits; } };
 
 async function webhook(orderId: string, amount: number) {
-  const body = JSON.stringify({
-    type: "PAYMENT_SUCCESS_WEBHOOK",
-    event_time: new Date().toISOString(),
-    data: { order: { order_id: orderId, order_amount: amount }, payment: { cf_payment_id: `pay_df_${Date.now()}`, payment_status: "SUCCESS" } },
-  });
-  const ts = String(Math.floor(Date.now() / 1000));
-  const sig = crypto.createHmac("sha256", TEST_SECRET).update(ts + body).digest("base64");
-  return fetch(`${BASE}/api/payments/webhook`, { method: "POST", headers: { "Content-Type": "application/json", "x-webhook-signature": sig, "x-webhook-timestamp": ts }, body });
+  return sendPayuEvent(BASE, orderId, amount, { paymentId: `pay_df_${Date.now()}` });
 }
 
 type U = { id: string; name: string; role: string; mobile: string };
@@ -89,8 +64,8 @@ function pure() {
 
 async function main() {
   pure();
-  await new Promise<void>((res) => mockServer.listen(0, "127.0.0.1", res));
-  MOCK_PORT = (mockServer.address() as AddressInfo).port;
+  await pm.start();
+  pm.installOrderSniffer();
   const stamp = String(Date.now()).slice(-7);
   const ids: string[] = [];
   const codes: string[] = [];
@@ -121,7 +96,7 @@ async function main() {
   try {
     ({ child: server, base: BASE } = await startDevServer({
       label: "doctor-fees",
-      env: { CASHFREE_API_BASE: `http://127.0.0.1:${MOCK_PORT}`, CASHFREE_APP_ID: "test-app", CASHFREE_SECRET_KEY: TEST_SECRET },
+      env: pm.env(),
     }));
     await call(admin, "GET", "/api/admin/settings"); // compile
 
@@ -147,7 +122,7 @@ async function main() {
     check("doctor sees ~~₹499~~ ₹99", r.json.registrationFee === 99 && r.json.registrationFeeOriginal === 499 && r.json.registrationFeeHasDiscount === true, JSON.stringify({ f: r.json.registrationFee, o: r.json.registrationFeeOriginal, d: r.json.registrationFeeHasDiscount }));
     r = await call(docA, "POST", "/api/doctors/registration-fee/create-order", {});
     const orderA = lastOrder();
-    check("checkout → Cashfree order for ₹99", r.status === 200 && orderA?.order_amount === 99, `${r.status} ₹${orderA?.order_amount}`);
+    check("checkout → PayU order for ₹99", r.status === 200 && orderA?.order_amount === 99, `${r.status} ₹${orderA?.order_amount}`);
     r = await call(docB, "POST", "/api/coupons/validate", { code: flat, context: "DOCTOR_REGISTRATION" });
     check("coupon preview: ₹50 off the charged ₹99 → ₹49", r.status === 200 && r.json.netAmount === 49, `${r.status} ${JSON.stringify(r.json)}`);
     r = await call(docB, "POST", "/api/doctors/registration-fee/create-order", { code: flat });
@@ -162,7 +137,7 @@ async function main() {
     r = await call(docC, "GET", "/api/doctors/me");
     check("doctor sees ₹499, no strike-through", r.json.registrationFee === 499 && r.json.registrationFeeHasDiscount === false, JSON.stringify({ f: r.json.registrationFee, d: r.json.registrationFeeHasDiscount }));
     r = await call(docC, "POST", "/api/doctors/registration-fee/create-order", {});
-    check("checkout → Cashfree order for ₹499", r.status === 200 && lastOrder()?.order_amount === 499, `${r.status} ₹${lastOrder()?.order_amount}`);
+    check("checkout → PayU order for ₹499", r.status === 200 && lastOrder()?.order_amount === 499, `${r.status} ₹${lastOrder()?.order_amount}`);
     r = await call(admin, "PATCH", `/api/admin/doctors/${docC.id}`, { status: "APPROVED" });
     check("approve gate quotes ₹499", r.status === 400 && String(r.json.error).includes("₹499"), `${r.status} ${r.json.error}`);
 
@@ -182,10 +157,10 @@ async function main() {
     check("settings: discounted ₹0 (entered) → saved", r.status === 200 && r.json.doctorRegistrationFee === 0, `${r.status}`);
     r = await call(docD, "POST", "/api/doctors/registration-fee/create-order", {});
     const pD = await prisma.doctorProfile.findUniqueOrThrow({ where: { userId: docD.id } });
-    check("free: activated without a Cashfree order", r.status === 200 && r.json.paid === true && pD.registrationFeePaid && mock.createdOrders.length === ordersBefore, `${r.status} ${JSON.stringify(r.json)}`);
+    check("free: activated without a PayU order", r.status === 200 && r.json.paid === true && pD.registrationFeePaid && mock.createdOrders.length === ordersBefore, `${r.status} ${JSON.stringify(r.json)}`);
   } finally {
     server?.kill("SIGTERM");
-    mockServer.close();
+    pm.close();
     await prisma.platformSettings.update({ where: { id: settings.id }, data: before });
     await prisma.couponRedemption.deleteMany({ where: { userId: { in: ids } } });
     await prisma.coupon.deleteMany({ where: { code: { in: codes } } });

@@ -334,7 +334,7 @@
     "placeholder": "Enter amount",
     "invalid": "Enter a valid amount.",
     "couldNotStart": "Could not start top-up. Please try again.",
-    "redirecting": "Redirecting to Cashfree…",
+    "redirecting": "Redirecting to PayU…",
     "proceed": "Proceed to Pay"
   },
   "ticketStatus": {

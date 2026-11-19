@@ -24,7 +24,7 @@ export const GET = withErrorLocale(async function GET() {
 });
 
 // POST: book prescription tests — { appointmentId, labTestIds, address, notes?, paymentMethod: WALLET | ONLINE }.
-// ONLINE answers with a Cashfree paymentSessionId to open the checkout with.
+// ONLINE answers with a PayU `checkout` form (src/lib/payu.ts) to open the checkout with.
 export const POST = withErrorLocale(async function POST(req: Request) {
   const { authUser, denied } = await requireRole("PATIENT");
   if (denied) return denied;
@@ -47,7 +47,7 @@ export const POST = withErrorLocale(async function POST(req: Request) {
       const checkout = await startLabCheckout(req, authUser, booking);
       return NextResponse.json({ ...patientLabBookingView(booking), ...checkout });
     } catch (err) {
-      console.error("Failed to create Cashfree order for lab booking", booking.id, err);
+      console.error("Failed to create PayU order for lab booking", booking.id, err);
       await prisma.labBooking.updateMany({ where: { id: booking.id, status: "PENDING_PAYMENT" }, data: { status: "CANCELLED", cancelledBy: "SYSTEM" } });
       return NextResponse.json({ error: "Could not start payment. Please try again." }, { status: 502 });
     }

@@ -47,10 +47,8 @@ function PayContent() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) { setPaying(false); setError(data.error ?? tc("startPaymentFailed")); return; }
       if (data.paid) { setPaying(false); setBill((b) => (b ? { ...b, paymentStatus: "PAID" } : b)); return; }
-      const { load } = await import("@cashfreepayments/cashfree-js");
-      // Same hardcoded mode as /patient/payment (NEXT_PUBLIC_ vars are baked in at build time).
-      const cashfree = await load({ mode: "production" });
-      cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: "_self" });
+      const { startPayuCheckout } = await import("@/lib/payuCheckout");
+      startPayuCheckout(data.checkout);
     } catch {
       setPaying(false);
       setError(tc("networkError"));
@@ -93,7 +91,7 @@ function PayContent() {
         </div>
         <h1 className="text-2xl font-extrabold text-slate-900">{t("title")}</h1>
         <p className="text-slate-500 text-sm mt-1 flex items-center justify-center gap-1.5">
-          <ShieldCheck className="w-4 h-4 text-emerald-500" /> {tc("securedByCashfree")}
+          <ShieldCheck className="w-4 h-4 text-emerald-500" /> {tc("securedByPayu")}
         </p>
       </div>
 

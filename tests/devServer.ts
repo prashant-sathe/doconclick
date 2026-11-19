@@ -1,5 +1,5 @@
-// Shared by the suites that start their OWN dev server with a mock Cashfree
-// (test:walk-in, test:dues, test:payments, test:nurse-fee-coupons).
+// Shared by the suites that start their OWN dev server with a mock PayU (tests/payuMock.ts)
+// (test:walk-in, test:dues, test:payments, test:nurse-fee-coupons, ...).
 //
 //  - MOCK_PORT env (default 3100) is the preferred dev-server port; if it is
 //    busy (e.g. the owner's `next dev -p 3100`) a free port is used instead.
@@ -10,7 +10,7 @@
 //    never touched.
 //  - Next rewrites tsconfig.json "include" for a custom distDir; the original
 //    text is restored when the test process exits.
-//  - The mock-Cashfree port is also picked free (fixed 4010-4012 clashed when
+//  - The mock-PayU port is also picked free (fixed 4010-4012 clashed when
 //    suites ran in parallel).
 import fs from "fs";
 import path from "path";

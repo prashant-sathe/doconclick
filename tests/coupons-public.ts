@@ -5,7 +5,7 @@
 // past the patient's per-user limit — and never usage counts or admin
 // fields. A listed code applies through the normal apply route. Runs against
 // a live dev server and the DB in .env, throwaway users/coupons only; no
-// gateway is called (nothing here creates a Cashfree order).
+// gateway is called (nothing here creates a PayU order).
 //
 //   BASE_URL=http://localhost:3122 npm run test:coupons-public
 import "dotenv/config";
